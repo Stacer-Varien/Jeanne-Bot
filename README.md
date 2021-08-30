@@ -1,4 +1,4 @@
-NERO is a multipurpose bot with miscellaneous, moderation, management and some fun commands. Later, he will have new commands implemented in the nearby future
+Nero is a multipurpose bot with miscellaneous, moderation, management and some fun commands. Later, he will have new commands implemented in the nearby future
 
 FEATURES
 
@@ -43,3 +43,5 @@ KNOWN BUGS AND FAULTS
 • For some reason, ID unbanning a user does not work but will work if the user name and tag has been used (for example, re!unban ZaneRE#1111)
 
 NOTE: THIS IS FOR EDUCATIONAL PURPORSES. ALSO I WOULD NOT RECOMMENDEND SELFHOSTING THE BOT AS THEY CAN BE CHANGES TO IT SUCH AS ADDING APIS THAT WILL MAKE YOU RUN ALMOST ALL FEAUTURES OF THE BOT
+
+Invite link to add the bot: https://discord.com/oauth2/authorize?client_id=831993597166747679&scope=bot&permissions=469888182
