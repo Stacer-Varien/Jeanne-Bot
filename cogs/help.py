@@ -8,7 +8,7 @@ class help(commands.Cog):
 
     @commands.group()
     async def help(self, ctx):
-        if ctx.invoked_subcommand != None:
+        if ctx.invoked_subcommand is not None:
             return
         embed = discord.Embed(title="Help Commands",
                               description="Here are some commands to help you.",
@@ -22,15 +22,15 @@ class help(commands.Cog):
             inline=True)
         embed.add_field(
             name="Creator Only",
-            value="Find Server (fserver)\nFind User (fuser)\nMutuals\nReward",
+            value="Find Server (fserver)\nFind User (fuser)\nMutuals\nBot Mutuals (bm)",
             inline=True)
         embed.add_field(
-            name="Misc", value="Ping\nHelp\nInvite\nSay", inline=True)
+            name="Misc", value="Ping\nHelp\nInvite\nSay\nSayembed (saye)", inline=True)
         embed.add_field(name="Moderation",
                         value="Warn (w)\nKick (k)\nBan (b)\nUnban (unb)\nPurge\nMute\nUnmute",
                         inline=True)
         embed.add_field(name="Management",
-                        value="Text Channel (tc)\nVoice Channel (vc)\nRole (r)",
+                        value="Text Channel (tc)\nVoice Channel (vc)\nRole (r)\nCategory (cat)",
                         inline=True)
         await ctx.send(embed=embed)
 
@@ -77,7 +77,9 @@ class help(commands.Cog):
     @help.command(aliases=['fuser'])
     async def finduser(self, ctx, *arg):
         embed = discord.Embed(
-            title="Finduser help", description="Finds a user in Discord\nAliases: finduser, fuser\n\n**NOTE**: This is an ***OWNER ONLY*** command which means only my creator can use it", color=0x093cb3)
+            title="Finduser help",
+            description="Finds a user in Discord\nAliases: finduser, fuser\n\n**NOTE**: This is an ***OWNER ONLY*** command which means only my creator can use it",
+            color=0x093cb3)
         embed.add_field(name="Example:", value="re!fuser USER", inline=False)
         await ctx.send(embed=embed)
 
@@ -107,9 +109,18 @@ class help(commands.Cog):
     async def say(self, ctx, *arg):
         embed = discord.Embed(
             title="Say help",
-            description="Type a message and I will say it.\n\n**Required Permission:** Administrator\n\n**NOTE:** After typing the message, your message will be deleted but said by me.",
+            description="Type a message and I will say it but it will be in plain text.\n\n**Required Permission:** Administrator\n\n**NOTE:** After typing the message, your message will be deleted but said by me. The message will be plain text.",
             color=0x093cb3)
         embed.add_field(name="Example:", value="re!say MESSAGE", inline=False)
+        await ctx.send(embed=embed)
+
+    @help.command(alises=['saye'])
+    async def sayembed(self, ctx, *arg):
+        embed = discord.Embed(
+            title="Sayembed help",
+            description="Type a message and I will say it but it will be in embed.\n\n**Required Permission:** Administrator\n\n**NOTE:** After typing the message, your message will be deleted but said by me",
+            color=0x093cb3)
+        embed.add_field(name="Example:", value="re!saye MESSAGE", inline=False)
         await ctx.send(embed=embed)
 
     @help.command()
@@ -118,7 +129,8 @@ class help(commands.Cog):
             title="Mute help",
             description="Mute someone and they will not talk.\n\n**Required Permission:** Kick Members\n\n**NOTE:** If a mute role doesn't exist, a new one will made. The member who gets muted will not see the channels except where the mute command happened. If there is no time, it will be infinite",
             color=0x093cb3)
-        embed.add_field(name="Example:", value="re!mute MEMBER 10m Stop spamming ", inline=False)
+        embed.add_field(
+            name="Example:", value="re!mute MEMBER 10m Stop spamming ", inline=False)
         await ctx.send(embed=embed)
 
     @help.command()
@@ -145,11 +157,11 @@ class help(commands.Cog):
     async def hentai(self, ctx):
         embed = discord.Embed(
             title="Hentai help",
-            description="Get a random hentai image. You can add a character or anime as a tag if you want a specific kind of hentai.\nAliase: h\n\n**Required permissions:** Channel must be NSFW\n\n**NOTE:** If looking for a specific kind of hentai, it must be in one word.",
+            description="Get a random hentai image\nAliase: h\n\n**Required permissions:** Channel must be NSFW",
             color=0x002aff)
         embed.add_field(
             name="Example",
-            value="re!h (for a random hentai picture)\nre!h MikuNakano (if looking for a hentai picture of a character)\nre!h fate (if looking for a hentai picture of an anime)",
+            value="re!h",
             inline=False)
         await ctx.send(embed=embed)
 
@@ -197,11 +209,14 @@ class help(commands.Cog):
         embed = discord.Embed(title="Text Channel help",
                               description="**Permission required:** Manage Channels", color=0x002aff)
         embed.add_field(name="Create Text Channel",
-                        value="Creates a new text channel\n**Aliases:** createtextchannel, ctc\n\nExample:\nre!ctc CHANNEL NAME", inline=True)
+                        value="Creates a new text channel\n**Aliases:** createtextchannel, ctc\n\nExample:\nre!ctc CHANNEL NAME",
+                        inline=True)
         embed.add_field(name="Delete Text Channel",
-                        value="Deletes the text channel\n**Aliases:** deletetextchannel, dtc\n\n**NOTE:** This command requires a mentioned channel or a channel ID in order to delete it.\n\nExample:\nre!dtc CHANNEL_NAME (with channel mentioned)\nre!dtc CHANNEL_ID (with channel ID)", inline=True)
+                        value="Deletes the text channel\n**Aliases:** deletetextchannel, dtc\n\n**NOTE:** This command requires a mentioned channel or a channel ID in order to delete it.\n\nExample:\nre!dtc CHANNEL_NAME (with channel mentioned)\nre!dtc CHANNEL_ID (with channel ID)",
+                        inline=True)
         embed.add_field(name="Rename Text Channel",
-                        value="Renames the text channel\n**Aliases:** renametextchannel, rntc\n\n**NOTE:** This command requires a mentioned channel or a channel ID in order to rename it.\n\nExample:\nre!rtc CHANNEL_NAME NEW_NAME(with channel mentioned)\nre!rntc CHANNEL_ID NEW_NAME (with channel ID)", inline=True)
+                        value="Renames the text channel\n**Aliases:** renametextchannel, rntc\n\n**NOTE:** This command requires a mentioned channel or a channel ID in order to rename it.\n\nExample:\nre!rtc CHANNEL_NAME NEW_NAME(with channel mentioned)\nre!rntc CHANNEL_ID NEW_NAME (with channel ID)",
+                        inline=True)
         await ctx.send(embed=embed)
 
     @help.command(aliases=['vc', 'voicechannel'])
@@ -209,11 +224,14 @@ class help(commands.Cog):
         embed = discord.Embed(title="Voice Channel help",
                               description="**Permission required:** Manage Channels", color=0x002aff)
         embed.add_field(name="Create Voice Channel",
-                        value="Creates a new voice channel\n**Aliases:** createvoicechannel, cvc\n\nExample:\nre!ctc CHANNEL_NAME", inline=True)
+                        value="Creates a new voice channel\n**Aliases:** createvoicechannel, cvc\n\nExample:\nre!ctc CHANNEL_NAME",
+                        inline=True)
         embed.add_field(name="Delete Voice Channel",
-                        value="Deletes the voice channel\n**Aliases:** deletevoicechannel, dvc\n\n**NOTE:** A channel ID can be used to acurately delete the channel since it can't be mentioned.\n\nExample:\nre!dvc CHANNEL NAME\nre!dvc CHANNEL_ID (with channel ID)", inline=True)
+                        value="Deletes the voice channel\n**Aliases:** deletevoicechannel, dvc\n\n**NOTE:** A channel ID can be used to acurately delete the channel since it can't be mentioned.\n\nExample:\nre!dvc CHANNEL NAME\nre!dvc CHANNEL_ID (with channel ID)",
+                        inline=True)
         embed.add_field(name="Rename Voice Channel",
-                        value="Renames the voice channel\n**Aliases:** renametextchannel, rtc\n\n**NOTE:** A channel ID can be used to acurately delete the channel since it can't be mentioned.\n\nExample:\nre!rnvc CHANNEL_NAME NEW_NAME\nre!rvc CHANNEL_ID NEW_NAME (with channel ID)", inline=True)
+                        value="Renames the voice channel\n**Aliases:** renametextchannel, rtc\n\n**NOTE:** A channel ID can be used to acurately delete the channel since it can't be mentioned.\n\nExample:\nre!rnvc CHANNEL_NAME NEW_NAME\nre!rvc CHANNEL_ID NEW_NAME (with channel ID)",
+                        inline=True)
         await ctx.send(embed=embed)
 
     @help.command(aliases=['r'])
@@ -221,11 +239,14 @@ class help(commands.Cog):
         embed = discord.Embed(title="Role help",
                               description="**Permission required:** Manage Roles", color=0x002aff)
         embed.add_field(name="Create Role",
-                        value="Creates a new role\n**Aliases:** createrole, cr\n\nExample:\nre!cr ROLE_NAME", inline=True)
+                        value="Creates a new role\n**Aliases:** createrole, cr\n\nExample:\nre!cr ROLE_NAME",
+                        inline=True)
         embed.add_field(name="Delete Role",
-                        value="Deletes a role\n**Aliases:** deleterole, dr\n\nExample:\nre!dr ROLE_NAME\nre!dvc ROLE_ID (with role ID)", inline=True)
+                        value="Deletes a role\n**Aliases:** deleterole, dr\n\nExample:\nre!dr ROLE_NAME\nre!dvc ROLE_ID (with role ID)",
+                        inline=True)
         embed.add_field(name="Rename Role",
-                        value="Renames the role\n**Aliases:** renamerole, rnr\n\n**NOTE:** A role ID or role mentioned can be used to acurately delete the channel.\n\nExample:\nre!rnr OLD_NAME NEW_NAME (with role mentioned)\nre!rnr ROLE_ID NEW_NAME (with role ID)", inline=True)
+                        value="Renames the role\n**Aliases:** renamerole, rnr\n\n**NOTE:** A role ID or role mentioned can be used to acurately delete the channel.\n\nExample:\nre!rnr OLD_NAME NEW_NAME (with role mentioned)\nre!rnr ROLE_ID NEW_NAME (with role ID)",
+                        inline=True)
         await ctx.send(embed=embed)
 
     @help.command()
@@ -234,10 +255,11 @@ class help(commands.Cog):
             title="Combine help",
             description="Type two words to get one combined word",
             color=0x002aff)
-        embed.add_field(name="Example", value="re!combine WORD_1 WORD_2", inline=False)
+        embed.add_field(
+            name="Example", value="re!combine WORD_1 WORD_2", inline=False)
         await ctx.send(embed=embed)
 
-    @help.command()
+    @help.command(aliases=['meme'])
     async def animeme(self, ctx, *arg):
         embed = discord.Embed(
             title="Animeme help",
@@ -246,6 +268,32 @@ class help(commands.Cog):
         embed.add_field(
             name="Example", value="re!animeme", inline=False)
         await ctx.send(embed=embed)
+
+    @help.command(aliases=['cat'])
+    async def category(self, ctx, *arg):
+        embed = discord.Embed(title="Category help",
+                              description="**Permission required:** Manage Channels", color=0x002aff)
+        embed.add_field(name="Create Category",
+                        value="Creates a new category\n**Aliases:** ccat, createcatagory, createcat, ccategory\n\nExample:\nre!ccat CATEGORY NAME",
+                        inline=True)
+        embed.add_field(name="Delete Category",
+                        value="Deletes the category\n**Aliases:** dcat, deletecat, delcat, deletecategory, dcategory\n\n**NOTE:** This command requires a category ID to accurately delete it in case it cannot be found.\n\nExample:\nre!dcat CATEGORY NAME (with category name)\nre!dcat CATEGORY ID (with category ID)",
+                        inline=True)
+        embed.add_field(name="Rename Category",
+                        value="Renames the category\n**Aliases:** rncat, renamecat, rncategory, renamecategory\n\n**NOTE:** This command requires a category ID to accurately rename it in case it cannot be found.\n\nExample:\nre!rncat CATEGORY NAME NEW_NAME(with category name)\nre!rncat CATEGORY ID NEW_NAME (with category ID)",
+                        inline=True)
+        await ctx.send(embed=embed)
+
+    @help.command(name='bot mutuals', aliases=['bm'])
+    async def botmutuals(self, ctx, *arg):
+        embed = discord.Embed(
+            title="Bot Mutuals help",
+            description="See where which servers Nero is in\n\n**NOTE:** This is an ***OWNER ONLY*** command which means only my creator can use it\nAliases: bm",
+            color=0x002aff)
+        embed.add_field(
+            name="Example", value="re!bm", inline=False)
+        await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(help(bot))

@@ -1,5 +1,5 @@
 import discord
-from discord import Member, Role
+from discord import Member, Role, CategoryChannel
 from discord.ext import commands
 
 
@@ -31,7 +31,7 @@ class manage(commands.Cog):
         await channel.edit(name=new_name)
         embed = discord.Embed(color=0x00FF68)
         embed.add_field(name="Text channel renamed",
-                        value=f"{channel} is now `{new_name}`", inline=False)
+                        value=f"Channel is now `{new_name}`", inline=False)
         await ctx.send(embed=embed)
 
     @commands.command(pass_context=True, aliases=['cvc', 'createvoicechannel'])
@@ -58,7 +58,7 @@ class manage(commands.Cog):
         await channel.edit(name=new_name)
         embed = discord.Embed(color=0x00FF68)
         embed.add_field(name="Voice channel renamed",
-                        value=f"{channel} has been renamed to `{new_name}`", inline=False)
+                        value=f"Channel has been renamed to `{new_name}`", inline=False)
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['cr', 'createrole'])
@@ -77,7 +77,7 @@ class manage(commands.Cog):
         await role.edit(name=new_name)
         embed = discord.Embed(color=0x00FF68)
         embed.add_field(name="Role renamed",
-                        value=f"`{role}` has been renamed to `{new_name}`", inline=False)
+                        value=f"Role has been renamed to `{new_name}`", inline=False)
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['dr'])
@@ -107,6 +107,35 @@ class manage(commands.Cog):
                         value=f"`{role}` was removed from `{member}`", inline=False)
         await ctx.send(embed=embed)
 
+    @commands.command(pass_context=True, aliases=['ccat', 'createcatagory', 'createcat', 'ccategory'])
+    @commands.has_permissions(manage_channels=True)
+    async def create_category(self, ctx, channel_name):
+        await ctx.guild.create_category_channel(channel_name)
+        embed = discord.Embed(color=0x00FF68)
+        embed.add_field(name="Category created",
+                        value=f"A new category called **{channel_name}** was created", inline=False)
+        await ctx.send(embed=embed)
+        print(f"{channel_name} was create in {ctx.guild} `({ctx.guild.id})` by {ctx.author} ({ctx.author.id})")
+
+    @commands.command(pass_context=True, aliases=['dcat', 'deletecat', 'delcat', 'deletecategory', 'dcategory'])
+    @commands.has_permissions(manage_channels=True)
+    async def delete_category(self, ctx, category: CategoryChannel):
+        await category.delete()
+        embed = discord.Embed(color=0x00FF68)
+        embed.add_field(name="Category deleted",
+                        value=f"`{category}` has been deleted", inline=False)
+        await ctx.send(embed=embed)
+        print(f"{category} was deleted in {ctx.guild} `({ctx.guild.id})` by {ctx.author} ({ctx.author.id})")
+
+    @commands.command(pass_context=True, aliases=['rncat', 'renamecat', 'rncategory', 'renamecategory'])
+    @commands.has_permissions(manage_channels=True)
+    async def rename_category(self, ctx, category: CategoryChannel, *, new_name):
+        await category.edit(name=new_name)
+        embed = discord.Embed(color=0x00FF68)
+        embed.add_field(name="Category renamed",
+                        value=f"Category is now `{new_name}`", inline=False)
+        await ctx.send(embed=embed)
+        print(f"{category} was renamed in {ctx.guild} `({ctx.guild.id})` by {ctx.author} ({ctx.author.id}) for once")
 
 def setup(bot):
     bot.add_cog(manage(bot))

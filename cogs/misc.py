@@ -11,7 +11,6 @@ class misc(commands.Cog):
         embed = discord.Embed(
             title="Invite me!",
             url="https://discord.com/oauth2/authorize?client_id=831993597166747679&scope=bot&permissions=469888182",
-            description="Invite me to your server! Doing that will make me and my creator happy",
             color=0x00bfff)
         embed.add_field(name="Or if you want to join the support server:",
                         value="https://discord.gg/Xn3EvGcMrF",
@@ -25,7 +24,7 @@ class misc(commands.Cog):
         await message.delete()
         await ctx.send(text)
 
-    @commands.group(name='saye')
+    @commands.group(aliases=['saye'])
     @commands.has_permissions(administrator=True)
     async def sayembed(self, ctx, *, text):
         message = ctx.message
