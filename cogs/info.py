@@ -20,7 +20,7 @@ class info(commands.Cog):
         if member is None:
             member = ctx.author
         hasroles = [
-            role.mention for role in member.roles if not role.name == "@everyone"]
+            role.mention for role in member.roles if not role.name == "@everyone"][1:][: : -1]
         embed = discord.Embed(title="{}'s Info".format(member.name),
                               color=0xccff33)
         embed.add_field(name="Name",
@@ -33,7 +33,7 @@ class info(commands.Cog):
                         value=len(member.roles), inline=False)
         if len(hasroles) > 20:
             hasroles = hasroles[:20]
-        embed.add_field(name="Roles",
+        embed.add_field(name="Roles (Top 20)",
                         value=" ".join(hasroles), inline=False)
         embed.add_field(name="Highest Role",
                         value=member.top_role.mention, inline=False)
@@ -51,7 +51,6 @@ class info(commands.Cog):
     @commands.guild_only()
     async def serverinfo(self, ctx):
         emojis = [str(x) for x in ctx.guild.emojis]
-        features = [str(x) for x in ctx.guild.features]
         embed = discord.Embed(color=0x00B0ff)
         embed.set_author(name="Server Info")
         embed.add_field(name="Server Name", value=ctx.guild.name, inline=True)
@@ -69,9 +68,7 @@ class info(commands.Cog):
                         inline=True)
         embed.add_field(name="Roles", value=len(ctx.guild.roles), inline=True)
         embed.add_field(name="Emojis", value=len(emojis), inline=True)
-        embed.add_field(name="Server Features",
-                        value=" \n".join(features),
-                        inline=False)
+
 
         if len(emojis) > 10:
             emojis = emojis[:10]
