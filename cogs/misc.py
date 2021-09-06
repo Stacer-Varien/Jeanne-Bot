@@ -18,9 +18,6 @@ class misc(commands.Cog):
         embed.add_field(name="Top.gg",
                         value="[Click here](https://top.gg/bot/831993597166747679)",
                         inline=True)
-        embed.add_field(name="Top.gg",
-                        value="[Click here](https://top.gg/bot/831993597166747679)",
-                        inline=True)
         embed.add_field(name="DiscordBotList",
                         value="[Click here](https://discordbotlist.com/bots/nero-3694)", inline=True)
         embed.add_field(name="HAZE server",
