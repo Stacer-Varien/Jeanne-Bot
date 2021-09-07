@@ -4,8 +4,8 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 intents = discord.Intents().all()
-aliases = ['re!', 'Re!', '<@!745658688416776336> ']
-bot = commands.Bot(command_prefix=aliases, case_sensative=False, intents=intents)
+aliases = ['re!', 'Re!', 'nero ', 'Nero ', '<@!831993597166747679> ']
+bot = commands.Bot(command_prefix=aliases, intents=intents)
 
 bot.remove_command('help')
 
