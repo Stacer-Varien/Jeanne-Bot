@@ -151,7 +151,7 @@ class moderation(commands.Cog):
  
     @commands.command()
     @commands.has_permissions(manage_messages=True)
-    async def purge(self, ctx, limit=50, member: discord.Member = None):
+    async def purge(self, ctx, limit=100, member: discord.Member = None):
         await ctx.message.delete()
         msg = []
         try:
@@ -173,7 +173,7 @@ class moderation(commands.Cog):
     @purge.error
     async def purge_error(self, ctx, error):
              if isinstance(error, MissingPermissions):
-                embed=discord.Embed(title="purge failed", description="Sorry but you cannot purge any messages", color=0xff0000)
+                embed=discord.Embed(title="Purge failed", description="Sorry but you cannot purge any messages", color=0xff0000)
                 embed.add_field(name="Reason", value="Missing permissions: Manage Messages", inline=False)
                 await ctx.send(embed=embed) 
 

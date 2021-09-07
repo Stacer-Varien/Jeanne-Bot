@@ -115,7 +115,6 @@ class manage(commands.Cog):
         embed.add_field(name="Category created",
                         value=f"A new category called **{channel_name}** was created", inline=False)
         await ctx.send(embed=embed)
-        print(f"{channel_name} was create in {ctx.guild} `({ctx.guild.id})` by {ctx.author} ({ctx.author.id})")
 
     @commands.command(pass_context=True, aliases=['dcat', 'deletecat', 'delcat', 'deletecategory', 'dcategory'])
     @commands.has_permissions(manage_channels=True)
@@ -125,7 +124,6 @@ class manage(commands.Cog):
         embed.add_field(name="Category deleted",
                         value=f"`{category}` has been deleted", inline=False)
         await ctx.send(embed=embed)
-        print(f"{category} was deleted in {ctx.guild} `({ctx.guild.id})` by {ctx.author} ({ctx.author.id})")
 
     @commands.command(pass_context=True, aliases=['rncat', 'renamecat', 'rncategory', 'renamecategory'])
     @commands.has_permissions(manage_channels=True)
@@ -135,7 +133,8 @@ class manage(commands.Cog):
         embed.add_field(name="Category renamed",
                         value=f"Category is now `{new_name}`", inline=False)
         await ctx.send(embed=embed)
-        print(f"{category} was renamed in {ctx.guild} `({ctx.guild.id})` by {ctx.author} ({ctx.author.id}) for once")
+
+
 
 def setup(bot):
     bot.add_cog(manage(bot))
