@@ -3,8 +3,7 @@ import sys
 import time
 import datetime
 from discord.ext import commands
-from discord import Member
-from discord.ext.commands.errors import MemberNotFound
+from discord import Member, User, Guild, Role
 
 format = "%a, %d %b %Y | %H:%M:%S %ZGMT"
 start_time = time.time()
@@ -21,7 +20,7 @@ class info(commands.Cog):
         if member is None:
             member = ctx.author
         hasroles = [
-            role.mention for role in member.roles if not role.name == "@everyone"][1:][: : -1]
+            role.mention for role in member.roles][1:][: : -1]
         embed = discord.Embed(title="{}'s Info".format(member.name),
                               color=0xccff33)
         embed.add_field(name="Name",
@@ -35,30 +34,24 @@ class info(commands.Cog):
         if len(hasroles) > 20:
             hasroles = hasroles[:20]
         embed.add_field(name="Roles",
-                        value=" ".join(hasroles), inline=False)
+                        value="None" if len(hasroles) ==0 else " ".join(hasroles), inline=False)
+        embed.add_field(name="Highest Role",
+                        value=member.top_role.mention, inline=False)
         embed.add_field(name="ID", value=member.id, inline=False)
         embed.add_field(name="Creation Date",
                         value=member.created_at.strftime(format),
                         inline=False)
         embed.add_field(
             name="Joined", value=member.joined_at.strftime(format), inline=False)
-        embed.set_image(url=member.avatar_url)
+        embed.set_image(url=member.avatar.url)
         await ctx.send(embed=embed)
-
-    @userinfo.error
-    async def userinfo_error(self, ctx, error):
-        if isinstance(error, MemberNotFound):
-            embed = discord.Embed(
-                title="Command failed", description="This person is not in this server", color=0xff0000)
-            await ctx.send(embed=embed)
-
 
     @commands.command(aliases=['sinfo', 'guild', 'ginfo'], pass_context=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.guild_only()
     async def serverinfo(self, ctx):
         emojis = [str(x) for x in ctx.guild.emojis]
-        features = [str(x) for x in ctx.guild.features]
+        features =[str(x) for x in ctx.guild.features]
         embed = discord.Embed(color=0x00B0ff)
         embed.set_author(name="Server Info")
         embed.add_field(name="Server Name", value=ctx.guild.name, inline=True)
@@ -76,6 +69,10 @@ class info(commands.Cog):
                         inline=True)
         embed.add_field(name="Roles", value=len(ctx.guild.roles), inline=True)
         embed.add_field(name="Emojis", value=len(emojis), inline=True)
+        embed.add_field(name="Server Features",
+                        value=" \n".join(features) if len(features) > 0 else "None",
+                        inline=False)
+
         if len(emojis) > 10:
             emojis = emojis[:10]
         embed.add_field(name='Emojis (first 10)',
@@ -100,9 +97,9 @@ class info(commands.Cog):
         embed.add_field(name="Bot Owner",
                         value="<@!597829930964877369>", inline=True)
         embed.add_field(name="Python Version",
-                        value=f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}", inline=True)
+                        value=f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}", inline=False)
         embed.add_field(name="Discord.py Version",
-                        value=f"{discord.__version__} (Pycord)", inline=True)
+                        value=f"{discord.__version__}", inline=True)
         embed.add_field(name="Server Count",
                         value=f"{len(ctx.bot.guilds)} servers", inline=True)
         embed.add_field(name="User Count",
@@ -110,7 +107,7 @@ class info(commands.Cog):
         embed.add_field(name="Ping Latency",
                         value=f'{round(ctx.bot.latency * 1000)}ms', inline=True)
         embed.add_field(name="License",
-                        value='[MIT License](https://github.com/ZaneRE544/NeroBot/blob/main/LICENSE)', inline=True)
+                        value='[MIT License](https://opensource.org/licenses/MIT)', inline=True)
         current_time = time.time()
         difference = int(round(current_time - start_time))
         uptime = str(datetime.timedelta(seconds=difference))
