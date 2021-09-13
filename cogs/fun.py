@@ -75,5 +75,16 @@ class fun(commands.Cog):
                 await ctx.send(embed=embed)
 
 
+    @commands.command(aliases=["pick"])
+    async def choose(self, ctx, *choices: str):
+        if len(choices)>1:
+            choose = discord.Embed(description=f"I chose **{random.choice(choices)}**")
+            await ctx.send(embed=choose)
+
+        elif len(choices)==1:
+            nochoices = discord.Embed(
+                description="Please add more than 1 choices")
+        await ctx.send(embed=nochoices)
+
 def setup(bot):
     bot.add_cog(fun(bot))
