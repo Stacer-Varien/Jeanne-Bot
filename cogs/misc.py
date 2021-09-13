@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-from discord.ext.commands.errors import MissingPermissions
 
 
 class misc(commands.Cog):
@@ -19,6 +18,8 @@ class misc(commands.Cog):
         embed.add_field(name="Top.gg",
                         value="[Click here](https://top.gg/bot/831993597166747679)",
                         inline=True)
+        embed.add_field(name="DiscordBots",
+                    value="[Click here](https://discord.bots.gg/bots/831993597166747679)", inline=True)
         embed.add_field(name="DiscordBotList",
                         value="[Click here](https://discordbotlist.com/bots/nero-3694)", inline=True)
         embed.add_field(name="HAZE server",
@@ -33,19 +34,6 @@ class misc(commands.Cog):
         message = ctx.message
         await message.delete()
         await ctx.send(text)
-    
-    @say.error
-    async def say_error(self, ctx, error):
-        if isinstance(error, MissingPermissions):
-            embed = discord.Embed(
-                title="Command failed", description="It looks like I cannot say your message message", color=0xff0000)
-            embed.add_field(name="Reason", value="Missing permissions: Administrator", inline=False)
-            await ctx.send(embed=embed)
-
-        elif ctx.author==ctx.owner:
-            embed = discord.Embed(
-                description="I don't care if you created me. You will not use this command", color=0xff0000)
-            await ctx.send(embed=embed)
 
     @commands.group(name='saye')
     @commands.has_permissions(administrator=True)
@@ -55,18 +43,6 @@ class misc(commands.Cog):
         await message.delete()
         await ctx.send(embed=say)
 
-    @sayembed.error
-    async def sayembed_error(self, ctx, error):
-        if isinstance(error, MissingPermissions):
-            embed = discord.Embed(
-                title="Command failed", description="It looks like I cannot say your message message", color=0xff0000)
-            embed.add_field(name="Reason", value="Missing permissions: Administrator", inline=False)
-            await ctx.send(embed=embed)
-
-        elif ctx.author==ctx.owner:
-            embed = discord.Embed(
-                description="I don't care if you created me. You will not use this command", color=0xff0000)
-            await ctx.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(misc(bot))
