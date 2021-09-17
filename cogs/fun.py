@@ -63,16 +63,11 @@ class fun(commands.Cog):
     @commands.is_nsfw()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def hentai(self, ctx):
-        if ctx.invoked_subcommand != None:
-            return
-        embed = discord.Embed(colour=0xB900FF)
-        async with aiohttp.ClientSession() as cs:
-            async with cs.get(
-                    'https://www.reddit.com/r/hentai/new.json?sort=hot') as r:
-                res = await r.json()
-                embed.set_image(url=res['data']['children'][random.randint(0, 25)]
-                                ['data']['url'])
-                await ctx.send(embed=embed)
+        ret = random.choice(requests.get("Rule34 API").json())
+        embed = discord.Embed(color=0xFFC0CB)
+        embed.set_image(url=ret["file_url"])
+        embed.set_image("Fetched from rule34.xxx")
+        await ctx.send(embed=embed)
 
 
     @commands.command(aliases=["pick"])
