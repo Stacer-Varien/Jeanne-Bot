@@ -3,6 +3,7 @@ import discord
 import random
 from discord.ext import commands
 from discord.ext.commands.converter import clean_content
+import requests
 
 
 class fun(commands.Cog):
