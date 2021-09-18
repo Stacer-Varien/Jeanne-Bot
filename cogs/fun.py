@@ -82,5 +82,9 @@ class fun(commands.Cog):
                 description="Please add more than 1 choices")
         await ctx.send(embed=nochoices)
 
+    @commands.command()
+    async def reverse(ctx, text):
+        await ctx.send(text[::-1])
+
 def setup(bot):
     bot.add_cog(fun(bot))
