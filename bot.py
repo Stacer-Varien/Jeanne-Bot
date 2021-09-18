@@ -2,9 +2,6 @@ import os
 import discord
 from discord import Member
 from discord.ext import commands
-from discord.ext.commands.converter import clean_content
-from discord.ext.commands.errors import CommandInvokeError, MissingPermissions
-from discord_slash import SlashCommand, SlashContext
 import random
 import time
 import datetime
@@ -209,6 +206,13 @@ async def help(ctx):
                     value="Text Channel (tc)\nVoice Channel (vc)\nRole (r)\nCategory (cat)",
                     inline=True)
     await ctx.send(embed=embed)
+
+@bot.slash_command(description="Roll a dice")
+async def dice(ctx):
+        embed = discord.Embed(color=0x0000FF)
+        embed.add_field(name="Dice Rolled", value="You rolled a {}!".format(
+            random.randint(1, 6)), inline=False)
+        await ctx.send(embed=embed)    
 
 load_dotenv()
 TOKEN = os.getenv("token")
