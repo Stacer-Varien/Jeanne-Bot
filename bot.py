@@ -187,7 +187,7 @@ async def help(ctx):
                           description="Here are some commands to help you.",
                           color=0x236ce1)
     embed.add_field(name="Fun",
-                    value="8 Ball (8b, 8ball)\nHentai (h) **NSFW**\nRoll Dice (rd, dice)\nCombine\nAnimeme (meme, animememe)\nFlip (coinflip, headsortails, piece)",
+                    value="8 Ball (8b, 8ball)\nHentai (h) **NSFW**\nRoll Dice (rd, dice)\nCombine\nAnimeme (meme, animememe)\nFlip (coinflip, headsortails, piece)\nReverse",
                     inline=True)
     embed.add_field(
         name="Info",
@@ -227,6 +227,31 @@ async def hentai(ctx):
                 error.add_field(name="Reason", value="Channel is not NSFW enabled")
                 await ctx.send(embed=error)        
 
+@bot.slash_command(description="Type a message and I will say it but it will be in plain text")
+async def say(ctx, text):
+        if ctx.author.guild_permissions.administrator:
+                await ctx.send(text)                
+        
+        else:
+                error=discord.Embed(title='Say Failed', description="I couldn't say this message", color=0xff0000)
+                error.add_field(name="Reason", value="Missing Permission: Administrator")
+                await ctx.send(embed=error)
+
+@bot.slash_command(description="Type a message and I will say it but it will be in embed")
+async def sayembed(ctx, text):
+        if ctx.author.guild_permissions.administrator:
+                say = discord.Embed(description=f"{text}", color=0xADD8E6)
+                await ctx.send(embed=say)                
+        
+        else:
+                error=discord.Embed(title='Say Failed', description="I couldn't say this message", color=0xff0000)
+                error.add_field(name="Reason", value="Missing Permission: Administrator")
+                await ctx.send(embed=error)
+
+@bot.slash_command(description="Type something and I will reverse the text")
+async def reverse(ctx, text):
+    await ctx.send(text[::-1])                
+                
 load_dotenv()
 TOKEN = os.getenv("token")
 bot.run(TOKEN)
