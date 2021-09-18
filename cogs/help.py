@@ -14,7 +14,7 @@ class help(commands.Cog):
                               description="Here are some commands to help you.",
                               color=0x236ce1)
         embed.add_field(name="Fun",
-                        value="8 Ball (8b, 8ball)\nHentai (h) **NSFW**\nRoll Dice (rd, dice)\nCombine\nAnimeme (meme, animememe)\nFlip (coinflip, headsortails, piece)\nChoose (pick)",
+                        value="8 Ball (8b, 8ball)\nHentai (h) **NSFW**\nRoll Dice (rd, dice)\nCombine\nAnimeme (meme, animememe)\nFlip (coinflip, headsortails, piece)\nChoose (pick)\nReverse",
                         inline=True)
         embed.add_field(
             name="Info",
@@ -314,5 +314,15 @@ class help(commands.Cog):
                         value="re!pick CHOICE_1 CHOICE_2", inline=False)
         await ctx.send(embed=embed)
 
+    @help.command()
+    async def reverse(self, ctx, *arg):
+        embed = discord.Embed(
+            title="Reverse help",
+            description="Type something and the text will be reversed",
+            color=0x0000FF)
+        embed.add_field(name="Example:",
+                        value="re!reverse TEXT", inline=False)
+        await ctx.send(embed=embed)          
+        
 def setup(bot):
     bot.add_cog(help(bot))
