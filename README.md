@@ -24,13 +24,10 @@ PLANNED FEATURES
 
 • Editing channel topics
 
-• Adding bot stats
-
 • Adding a softban command that will have the user to be banned for a specific amount of time
 
-• Allowing server owners and admins to change the prefix for their server
-
 • Adding more error messages in case of missing permissions, if a command has been committed poorly and Discord hierarchy rules
+
 
 KNOWN BUGS AND FAULTS
 
