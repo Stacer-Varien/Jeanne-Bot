@@ -83,7 +83,8 @@ class fun(commands.Cog):
         await ctx.send(embed=nochoices)
 
     @commands.command()
-    async def reverse(ctx, text):
+    async def reverse(ctx, *, text):
+        await message.delete()
         await ctx.send(text[::-1])
 
 def setup(bot):
