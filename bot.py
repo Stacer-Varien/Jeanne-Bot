@@ -217,10 +217,10 @@ async def dice(ctx):
 @bot.slash_command(description="Get some hentai from rule34")
 async def hentai(ctx):
         if ctx.channel.is_nsfw():
-                ret = random.choice(requests.get("https://rule34.xxx//index.php?page=dapi&s=post&q=index&json=1").json()) #This is not the full API for the command.
+                ret = random.choice(requests.get("https://yande.re/post.json?tags=").json()) #This is not the full API for the command.
                 embed = discord.Embed(color=0xFFC0CB)
                 embed.set_image(url=ret["file_url"])
-                embed.set_footer(text="Fetched from rule34.xxx")
+                embed.set_footer(text="Fetched from Yande.re")
                 await ctx.send(embed=embed)
         else: #error raised on SFW channels
                 error=discord.Embed(title='Hentai Failed', description="Hentai couldn't be sent in this channel", color=0xff0000)
