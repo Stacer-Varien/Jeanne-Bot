@@ -1,4 +1,3 @@
-from bot import dice
 import aiohttp
 import discord
 import random
@@ -100,7 +99,7 @@ class fun(commands.Cog):
                 description="Please add more than 1 choices")
         await ctx.send(embed=nochoices)
 
-    @hentai.error()
+    @hentai.error
     async def hentai_error(self, ctx, error):
         if isinstance(error, NSFWChannelRequired):
             error = discord.Embed(
@@ -113,21 +112,21 @@ class fun(commands.Cog):
                 title="Hentai On Cooldown", description=f"This command is on cooldown. Please wait at least {error.retry_after: .2f} seconds to use it again.", color=0xff0000)
             await ctx.send(embed=cooldown)
     
-    @_8ball.error()
+    @_8ball.error
     async def _8ball_error(self, ctx, error):
         if isinstance(error, CommandOnCooldown):
             cooldown = discord.Embed(
                 title="8 Ball On Cooldown", description=f"This command is on cooldown. Please wait at least {error.retry_after: .2f} seconds to use it again.", color=0xff0000)
             await ctx.send(embed=cooldown)
 
-    @rolldice.error()
+    @rolldice.error
     async def rolldice_error(self, ctx, error):
         if isinstance(error, CommandOnCooldown):
             cooldown = discord.Embed(
                 title="Roll Dice On Cooldown", description=f"This command is on cooldown. Please wait at least {error.retry_after: .2f} seconds to use it again.", color=0xff0000)
             await ctx.send(embed=cooldown)
 
-    @choose.error()
+    @choose.error
     async def choose_error(self, ctx, error):
         if isinstance(error, CommandOnCooldown):
             cooldown = discord.Embed(
