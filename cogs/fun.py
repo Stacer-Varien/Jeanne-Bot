@@ -1,4 +1,3 @@
-import aiohttp
 import discord
 import random
 from discord.ext import commands
@@ -56,16 +55,6 @@ class fun(commands.Cog):
     async def flip(self, ctx):
         await ctx.send(embed=discord.Embed(color=0x0000FF,
                                            description=f"`{random.choice(['Heads', 'Tails'])}`"))
-
-    @commands.command(aliases=['meme', 'animememe'])
-    async def animeme(self, ctx):
-        embed = discord.Embed(colour=0x0000FF)
-        async with aiohttp.ClientSession() as cs:
-            async with cs.get('https://www.reddit.com/r/Animemes/new.json?sort=hot') as r:
-                res = await r.json()
-                embed.set_image(url=res['data']['children']
-                                [random.randint(0, 25)]['data']['url'])
-                await ctx.send(embed=embed)
 
     @commands.command(aliases=['h'])
     @commands.is_nsfw()
