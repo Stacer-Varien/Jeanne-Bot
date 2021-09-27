@@ -14,7 +14,7 @@ class help(commands.Cog):
                               description="Here are some commands to help you.",
                               color=0x236ce1)
         embed.add_field(name="Fun",
-                        value="8 Ball (8b, 8ball)\nHentai (h) **NSFW**\nRoll Dice (rd, dice)\nCombine\nAnimeme (meme, animememe)\nFlip (coinflip, headsortails, piece)\nChoose (pick)\nReverse",
+                        value="8 Ball (8b, 8ball)\nHentai (h) **NSFW**\nRoll Dice (rd, dice)\nCombine\nFlip (coinflip, headsortails, piece)\nChoose (pick)\nReverse",
                         inline=True)
         embed.add_field(
             name="Info",
@@ -257,16 +257,6 @@ class help(commands.Cog):
             color=0x002aff)
         embed.add_field(
             name="Example", value="re!combine WORD_1 WORD_2", inline=False)
-        await ctx.send(embed=embed)
-
-    @help.command(aliases=['meme'])
-    async def animeme(self, ctx, *arg):
-        embed = discord.Embed(
-            title="Animeme help",
-            description="Get some animemes\nAliases: meme, animememe",
-            color=0x002aff)
-        embed.add_field(
-            name="Example", value="re!animeme", inline=False)
         await ctx.send(embed=embed)
 
     @help.command(aliases=['cat'])
