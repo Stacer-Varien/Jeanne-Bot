@@ -8,7 +8,6 @@ import datetime
 import sys
 import requests
 from discord.app import Option
-import aiohttp
 
 intents = discord.Intents().all()
 aliases = ['re!', 'Re!', 'nero ', 'Nero ']
@@ -100,18 +99,6 @@ async def userinfo(ctx, member: Member):
             name="Joined", value=member.joined_at.strftime(format), inline=False)
         embed.set_image(url=member.avatar.url)
         await ctx.send(embed=embed)
-
-@bot.slash_command(description="Get some animemes")
-async def animeme(ctx):
-    animeme_subreddits = [
-        'https://www.reddit.com/r/Animemes/new.json?sort=hot', 'https://www.reddit.com/r/animememes/new.json?sort=hot', 'https://www.reddit.com/r/goodanimemes/new.json?sort=hot']
-    embed = discord.Embed(colour=0x0000FF)
-    async with aiohttp.ClientSession() as cs:
-        async with cs.get(f'{random.choice(animeme_subreddits)}') as r:
-            res = await r.json()
-            embed.set_image(url=res['data']['children']
-                            [random.randint(0, 25)]['data']['url'])
-            await ctx.send(embed=embed)
 
 @bot.slash_command(description="Type two words to get one combined word")
 async def combine(ctx, name1: Option(str, "Enter 1st word"), name2: Option(str, "Enter 2nd word"),):
