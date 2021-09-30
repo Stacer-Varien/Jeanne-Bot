@@ -33,6 +33,24 @@ class help(commands.Cog):
                         value="Text Channel (tc)\nVoice Channel (vc)\nRole (r)\nCategory (cat)",
                         inline=True)
         await ctx.send(embed=embed)
+        embed.add_field(name="Reactions",
+                        value="Hug\nSlap\nSmug\nTickle\nPoke\nPat\nKiss",
+                        inline=True)
+        await ctx.send(embed=embed)
+
+    @help.command()
+    async def reactions(self, ctx, *arg):
+        embed = discord.Embed(title="Reaction Help",
+                              description="Here is the full reaction help menu",
+                              color=0x236ce1)
+        embed.add_field(name="Hug", value="Hug someone or yourself\n**Note:** You cannot hug multiple people at once or role(s). You should also hug someone in this server\n\nExample: re!hug (if yourself)\nre!hug MEMBER (if member mentioned)", inline=True)
+        embed.add_field(name="Slap", value="Slap someone or yourself\n**Note:** You cannot slap multiple people at once or role(s). You should also slap someone in this server\n\nExample: re!slap (if yourself)\nre!slap MEMBER (if member mentioned)", inline=True)
+        embed.add_field(name="Smug", value="Show a smuggy look\n**Note:** You cannot smug a member as you are the only one who can smug. if you do mentioned someone, Nero will ignore the mentioned member and still say you are smugging\n\nExample: re!smug", inline=True)
+        embed.add_field(name="Tickle", value="Tickle someone or yourself\n**Note:** You cannot tickle multiple people at once or role(s). You should also tickle someone in this server\n\nExample: re!tickle (if yourself)\nre!tickle MEMBER (if member mentioned)", inline=True)
+        embed.add_field(name="Poke", value="Poke someone or yourself\n**Note:** You cannot poke multiple people at once or role(s). You should also poke someone in this server\n\nExample: re!poke (if yourself)\nre!poke MEMBER (if member mentioned)", inline=True)
+        embed.add_field(name="Pat", value="Pat someone or yourself\n**Note:** You cannot pat multiple people at once or role(s). You should also pat someone in this server\n\nExample: re!pat (if yourself)\nre!pat MEMBER (if member mentioned)", inline=True)
+        embed.add_field(name="Kiss", value="Kiss someone or yourself\n**Note:** You cannot kiss multiple people at once or role(s). You should also kiss someone in this server\n\nExample: re!kiss (if yourself)\nre!kiss MEMBER (if member mentioned)", inline=True)
+        await ctx.send(embed=embed)
 
     @help.command()
     async def ping(self, ctx, *arg):
@@ -153,18 +171,6 @@ class help(commands.Cog):
             name="Example:", value="re!unmute MEMBER ", inline=False)
         await ctx.send(embed=embed)
 
-    @help.command(aliases=['h'])
-    async def hentai(self, ctx):
-        embed = discord.Embed(
-            title="Hentai help",
-            description="Get a random hentai image\nAliase: h\n\n**Required permissions:** Channel must be NSFW",
-            color=0x002aff)
-        embed.add_field(
-            name="Example",
-            value="re!h",
-            inline=False)
-        await ctx.send(embed=embed)
-
     @help.command()
     async def warn(self, ctx, *arg):
         embed = discord.Embed(
@@ -259,6 +265,16 @@ class help(commands.Cog):
             name="Example", value="re!combine WORD_1 WORD_2", inline=False)
         await ctx.send(embed=embed)
 
+    @help.command(aliases=['meme'])
+    async def animeme(self, ctx, *arg):
+        embed = discord.Embed(
+            title="Animeme help",
+            description="Get some animemes\nAliases: meme, animememe",
+            color=0x002aff)
+        embed.add_field(
+            name="Example", value="re!animeme", inline=False)
+        await ctx.send(embed=embed)
+
     @help.command(aliases=['cat'])
     async def category(self, ctx, *arg):
         embed = discord.Embed(title="Category help",
@@ -291,7 +307,7 @@ class help(commands.Cog):
             description="Flip a coin and get your result\n\nAliases: coinflip, headsortails, piece",
             color=0x002aff)
         embed.add_field(
-            name="Example", value="re!flip heads/tails", inline=False)
+            name="Example", value="re!flip", inline=False)
         await ctx.send(embed=embed)
 
     @help.command(aliases=['pick'])
@@ -308,11 +324,12 @@ class help(commands.Cog):
     async def reverse(self, ctx, *arg):
         embed = discord.Embed(
             title="Reverse help",
-            description="Type something and the text will be reversed",
+            description="Type something and the text will be reversed\n\n**NOTE:** This only works on a slash command. The prefixed command is still faulty",
             color=0x0000FF)
         embed.add_field(name="Example:",
-                        value="re!reverse TEXT", inline=False)
-        await ctx.send(embed=embed)          
-        
+                        value="/reverse TEXT (Make sure its Nero doing the command)", inline=False)
+        await ctx.send(embed=embed)
+
+
 def setup(bot):
     bot.add_cog(help(bot))
