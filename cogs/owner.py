@@ -1,11 +1,8 @@
 import discord
 from discord.ext import commands
 from discord import Member, User, Guild, Role
-from discord.ext.commands.errors import GuildNotFound, NotOwner, UserNotFound
 
 format = "%a, %d %b %Y | %H:%M:%S %ZGMT"
-
-
 class owner(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -25,16 +22,6 @@ class owner(commands.Cog):
             user.mutual_guilds), inline=True)
         embed.set_image(url=user.avatar_url)
         await ctx.send(embed=embed)
-
-    @finduser.error
-    async def finduser_error(self, ctx, error):
-        if isinstance(error, NotOwner):
-            embed = discord.Embed(
-                title="Owner only command", description="This command failed to commit because you are not the bot owner", color=0xff0000)
-        elif isinstance(error, UserNotFound):
-            embed = discord.Embed(
-                title="User does not exist", description="Please make sure the USER_ID is correct or maybe they have deleted their account.", color=0xff0000)
-            await ctx.send(embed=embed)
 
     @commands.command(aliases=['fserver'], pass_context=True)
     @commands.is_owner()
@@ -58,16 +45,6 @@ class owner(commands.Cog):
         embed.set_thumbnail(url=guild.icon_url)
         await ctx.send(embed=embed)
 
-    @findserver.error
-    async def findserver_error(self, ctx, error):
-        if isinstance(error, NotOwner):
-            embed = discord.Embed(
-                title="Owner only command", description="This command failed to commit because you are not the bot owner", color=0xff0000)
-        elif isinstance(error, GuildNotFound):
-            embed = discord.Embed(
-                description="Bot is not in this server", color=0xff0000)
-            await ctx.send(embed=embed)
-
     @commands.command(pass_context=True)
     @commands.is_owner()
     async def mutuals(self, ctx, user: User):
@@ -78,13 +55,6 @@ class owner(commands.Cog):
             user.mutual_guilds), inline=True)
         embed.add_field(name="Servers", value=user.mutual_guilds, inline=False)
         await ctx.send(embed=embed)
-
-    @mutuals.error
-    async def mutuals_error(self, ctx, error):
-        if isinstance(error, NotOwner):
-            embed = discord.Embed(
-                title="Owner only command", description="This command failed to commit because you are not the bot owner", color=0xff0000)
-            await ctx.send(embed=embed)
 
     @commands.command(aliases=['bm'])
     @commands.is_owner()
@@ -97,14 +67,6 @@ class owner(commands.Cog):
         embed.add_field(name="Servers", value=" \n".join(
             mutuals), inline=False)
         await ctx.send(embed=embed)
-
-    @botmutuals.error
-    async def botmutuals_error(self, ctx, error):
-        if isinstance(error, NotOwner):
-            embed = discord.Embed(
-                title="Owner only command", description="This command failed to commit because you are not the bot owner", color=0xff0000)
-            await ctx.send(embed=embed)
-
 
 def setup(bot):
     bot.add_cog(owner(bot))
