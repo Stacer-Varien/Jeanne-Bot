@@ -32,7 +32,6 @@ class help(commands.Cog):
         embed.add_field(name="Management",
                         value="Text Channel (tc)\nVoice Channel (vc)\nRole (r)\nCategory (cat)",
                         inline=True)
-        await ctx.send(embed=embed)
         embed.add_field(name="Reactions",
                         value="Hug\nSlap\nSmug\nTickle\nPoke\nPat\nKiss",
                         inline=True)
