@@ -21,10 +21,10 @@ class misc(commands.Cog):
         embed.add_field(name="DiscordBots",
                     value="[Click here](https://discord.bots.gg/bots/831993597166747679)", inline=True)
         embed.add_field(name="DiscordBotList",
-                        value="[Click here](https://discordbotlist.com/bots/nero-3694)", inline=True)
+                        value="[Click here](https://discordbotlist.com/bots/Jeanne-3694)", inline=True)
         embed.add_field(name="HAZE server",
                         value="[Click here](https://discord.gg/VVxGUmqQhF)", inline=True)
-        embed.add_field(name="NERO Support Server",
+        embed.add_field(name="Jeanne Support Server",
                         value="[Click here](https://discord.gg/Xn3EvGcMrF)", inline=True)
         await ctx.send(embed=embed)
 

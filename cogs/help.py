@@ -42,13 +42,13 @@ class help(commands.Cog):
         embed = discord.Embed(title="Reaction Help",
                               description="Here is the full reaction help menu",
                               color=0x236ce1)
-        embed.add_field(name="Hug", value="Hug someone or yourself\n**Note:** You cannot hug multiple people at once or role(s). You should also hug someone in this server\n\nExample: re!hug (if yourself)\nre!hug MEMBER (if member mentioned)", inline=True)
-        embed.add_field(name="Slap", value="Slap someone or yourself\n**Note:** You cannot slap multiple people at once or role(s). You should also slap someone in this server\n\nExample: re!slap (if yourself)\nre!slap MEMBER (if member mentioned)", inline=True)
-        embed.add_field(name="Smug", value="Show a smuggy look\n**Note:** You cannot smug a member as you are the only one who can smug. if you do mentioned someone, Nero will ignore the mentioned member and still say you are smugging\n\nExample: re!smug", inline=True)
-        embed.add_field(name="Tickle", value="Tickle someone or yourself\n**Note:** You cannot tickle multiple people at once or role(s). You should also tickle someone in this server\n\nExample: re!tickle (if yourself)\nre!tickle MEMBER (if member mentioned)", inline=True)
-        embed.add_field(name="Poke", value="Poke someone or yourself\n**Note:** You cannot poke multiple people at once or role(s). You should also poke someone in this server\n\nExample: re!poke (if yourself)\nre!poke MEMBER (if member mentioned)", inline=True)
-        embed.add_field(name="Pat", value="Pat someone or yourself\n**Note:** You cannot pat multiple people at once or role(s). You should also pat someone in this server\n\nExample: re!pat (if yourself)\nre!pat MEMBER (if member mentioned)", inline=True)
-        embed.add_field(name="Kiss", value="Kiss someone or yourself\n**Note:** You cannot kiss multiple people at once or role(s). You should also kiss someone in this server\n\nExample: re!kiss (if yourself)\nre!kiss MEMBER (if member mentioned)", inline=True)
+        embed.add_field(name="Hug", value="Hug someone or yourself\n**Note:** You cannot hug multiple people at once or role(s). You should also hug someone in this server\n\nExample: j!hug (if yourself)\nre!hug MEMBER (if member mentioned)", inline=True)
+        embed.add_field(name="Slap", value="Slap someone or yourself\n**Note:** You cannot slap multiple people at once or role(s). You should also slap someone in this server\n\nExample: j!slap (if yourself)\nre!slap MEMBER (if member mentioned)", inline=True)
+        embed.add_field(name="Smug", value="Show a smuggy look\n**Note:** You cannot smug a member as you are the only one who can smug. if you do mentioned someone, Jeanne will ignore the mentioned member and still say you are smugging\n\nExample: j!smug", inline=True)
+        embed.add_field(name="Tickle", value="Tickle someone or yourself\n**Note:** You cannot tickle multiple people at once or role(s). You should also tickle someone in this server\n\nExample: j!tickle (if yourself)\nre!tickle MEMBER (if member mentioned)", inline=True)
+        embed.add_field(name="Poke", value="Poke someone or yourself\n**Note:** You cannot poke multiple people at once or role(s). You should also poke someone in this server\n\nExample: j!poke (if yourself)\nre!poke MEMBER (if member mentioned)", inline=True)
+        embed.add_field(name="Pat", value="Pat someone or yourself\n**Note:** You cannot pat multiple people at once or role(s). You should also pat someone in this server\n\nExample: j!pat (if yourself)\nre!pat MEMBER (if member mentioned)", inline=True)
+        embed.add_field(name="Kiss", value="Kiss someone or yourself\n**Note:** You cannot kiss multiple people at once or role(s). You should also kiss someone in this server\n\nExample: j!kiss (if yourself)\nre!kiss MEMBER (if member mentioned)", inline=True)
         await ctx.send(embed=embed)
 
     @help.command()
@@ -57,7 +57,7 @@ class help(commands.Cog):
                               description="Check how fast I respond to a command",
                               color=0x236ce1)
         embed.add_field(name="Example",
-                        value="re!ping",
+                        value="j!ping",
                         inline=True)
 
     @help.command(aliases=['8b', '8ball'])
@@ -67,7 +67,7 @@ class help(commands.Cog):
             description="Ask 8 ball anything and you will get your awnser\nAliases: 8b, 8ball",
             color=0x0000FF)
         embed.add_field(name="Example:",
-                        value="re!8ball QUESTION", inline=False)
+                        value="j!8ball QUESTION", inline=False)
         await ctx.send(embed=embed)
 
     @help.command(aliases=['uinfo', 'minfo'])
@@ -78,7 +78,7 @@ class help(commands.Cog):
             color=0x093cb3)
         embed.add_field(
             name="Example:",
-            value="re!uinfo (if for yourself)\nre!uinfo MEMBER (if for a member)",
+            value="j!uinfo (if for yourself)\nre!uinfo MEMBER (if for a member)",
             inline=False)
         await ctx.send(embed=embed)
 
@@ -88,7 +88,7 @@ class help(commands.Cog):
             title="Serverinfo help",
             description="Get information about this server\nAliases: serverinfo, sinfo, guild, guildinfo, ginfo",
             color=0x093cb3)
-        embed.add_field(name="Example:", value="re!serverinfo", inline=False)
+        embed.add_field(name="Example:", value="j!serverinfo", inline=False)
         await ctx.send(embed=embed)
 
     @help.command(aliases=['fuser'])
@@ -97,7 +97,7 @@ class help(commands.Cog):
             title="Finduser help",
             description="Finds a user in Discord\nAliases: finduser, fuser\n\n**NOTE**: This is an ***OWNER ONLY*** command which means only my creator can use it",
             color=0x093cb3)
-        embed.add_field(name="Example:", value="re!fuser USER", inline=False)
+        embed.add_field(name="Example:", value="j!fuser USER", inline=False)
         await ctx.send(embed=embed)
 
     @help.command(aliases=['fserver'])
@@ -107,7 +107,7 @@ class help(commands.Cog):
             description="Finds a server I'm mutual with\nAliases: findserver, fserver\n\n**NOTE**: This is an ***OWNER ONLY*** command which means only my creator can use it",
             color=0x093cb3)
         embed.add_field(name="Example:",
-                        value="re!fserver SERVER", inline=False)
+                        value="j!fserver SERVER", inline=False)
         await ctx.send(embed=embed)
 
     @help.command(aliases=['av'])
@@ -118,7 +118,7 @@ class help(commands.Cog):
             color=0x093cb3)
         embed.add_field(
             name="Example:",
-            value="re!av (if yourself)\nre!av MEMBER (if for a member)",
+            value="j!av (if yourself)\nre!av MEMBER (if for a member)",
             inline=False)
         await ctx.send(embed=embed)
 
@@ -128,7 +128,7 @@ class help(commands.Cog):
             title="Say help",
             description="Type a message and I will say it but it will be in plain text.\n\n**Required Permission:** Administrator\n\n**NOTE:** After typing the message, your message will be deleted but said by me. The message will be plain text.",
             color=0x093cb3)
-        embed.add_field(name="Example:", value="re!say MESSAGE", inline=False)
+        embed.add_field(name="Example:", value="j!say MESSAGE", inline=False)
         await ctx.send(embed=embed)
 
     @help.command(alises=['saye'])
@@ -137,7 +137,7 @@ class help(commands.Cog):
             title="Sayembed help",
             description="Type a message and I will say it but it will be in embed.\n\n**Required Permission:** Administrator\n\n**NOTE:** After typing the message, your message will be deleted but said by me",
             color=0x093cb3)
-        embed.add_field(name="Example:", value="re!saye MESSAGE", inline=False)
+        embed.add_field(name="Example:", value="j!saye MESSAGE", inline=False)
         await ctx.send(embed=embed)
 
     @help.command()
@@ -147,7 +147,7 @@ class help(commands.Cog):
             description="Mute someone and they will not talk.\n\n**Required Permission:** Kick Members\n\n**NOTE:** If a mute role doesn't exist, a new one will made. The member who gets muted will not see the channels except where the mute command happened. If there is no time, it will be infinite",
             color=0x093cb3)
         embed.add_field(
-            name="Example:", value="re!mute MEMBER 10m Stop spamming ", inline=False)
+            name="Example:", value="j!mute MEMBER 10m Stop spamming ", inline=False)
         await ctx.send(embed=embed)
 
     @help.command()
@@ -157,7 +157,7 @@ class help(commands.Cog):
             description="Bulk delete messages.\n\n**Required Permission:** Manage Messages\n\n**NOTE:** Will delete up to 50 messages. You can also mention a member or add a number less than 50 to delete the messages",
             color=0x093cb3)
         embed.add_field(
-            name="Example:", value="re!purge 20", inline=False)
+            name="Example:", value="j!purge 20", inline=False)
         await ctx.send(embed=embed)
 
     @help.command()
@@ -167,7 +167,7 @@ class help(commands.Cog):
             description="Unmute a muted member so they can talk.\n\n**Required Permission:** Kick Members",
             color=0x093cb3)
         embed.add_field(
-            name="Example:", value="re!unmute MEMBER ", inline=False)
+            name="Example:", value="j!unmute MEMBER ", inline=False)
         await ctx.send(embed=embed)
 
     @help.command()
@@ -177,7 +177,7 @@ class help(commands.Cog):
             description="Warn a user for doing someting bad\nAliases: w\n\n**Required permissions:** Kick Members\n\n**NOTE:** A reason must be provided or the command won't work",
             color=0x002aff)
         embed.add_field(
-            name="Example", value="re!warn USER REASON", inline=False)
+            name="Example", value="j!warn USER REASON", inline=False)
         await ctx.send(embed=embed)
 
     @help.command()
@@ -187,7 +187,7 @@ class help(commands.Cog):
             description="Bans a user permanently\nAliases: b\n\n**Required permissions:** Ban Members\n\n**NOTE:** A reason must be provided or the command won't work",
             color=0x002aff)
         embed.add_field(
-            name="Example", value="re!ban USER REASON", inline=False)
+            name="Example", value="j!ban USER REASON", inline=False)
         await ctx.send(embed=embed)
 
     @help.command()
@@ -197,7 +197,7 @@ class help(commands.Cog):
             description="Kicks a user out of the server. They are able to come back to the server\nAliases: k\n\n**Required permissions:** Kick Members\n\n**NOTE:** A reason must be provided or the command won't work",
             color=0x002aff)
         embed.add_field(
-            name="Example", value="re!kick USER REASON", inline=False)
+            name="Example", value="j!kick USER REASON", inline=False)
         await ctx.send(embed=embed)
 
     @help.command()
@@ -206,7 +206,7 @@ class help(commands.Cog):
             title="Unban help",
             description="Unbans a user so they can be able to come back to the server\nAliases: unb\n\n**Required permissions:** Ban Members\n\n**NOTE:**The user's name and tag must be used to unban them or the command won't work",
             color=0x002aff)
-        embed.add_field(name="Example", value="re!unban USER", inline=False)
+        embed.add_field(name="Example", value="j!unban USER", inline=False)
         await ctx.send(embed=embed)
 
     @help.command(aliases=['tc', 'textchannel'])
@@ -261,7 +261,7 @@ class help(commands.Cog):
             description="Type two words to get one combined word",
             color=0x002aff)
         embed.add_field(
-            name="Example", value="re!combine WORD_1 WORD_2", inline=False)
+            name="Example", value="j!combine WORD_1 WORD_2", inline=False)
         await ctx.send(embed=embed)
 
     @help.command(aliases=['meme'])
@@ -271,7 +271,7 @@ class help(commands.Cog):
             description="Get some animemes\nAliases: meme, animememe",
             color=0x002aff)
         embed.add_field(
-            name="Example", value="re!animeme", inline=False)
+            name="Example", value="j!animeme", inline=False)
         await ctx.send(embed=embed)
 
     @help.command(aliases=['cat'])
@@ -293,10 +293,10 @@ class help(commands.Cog):
     async def botmutuals(self, ctx, *arg):
         embed = discord.Embed(
             title="Bot Mutuals help",
-            description="See where which servers Nero is in\n\n**NOTE:** This is an ***OWNER ONLY*** command which means only my creator can use it\nAliases: bm",
+            description="See where which servers Jeanne is in\n\n**NOTE:** This is an ***OWNER ONLY*** command which means only my creator can use it\nAliases: bm",
             color=0x002aff)
         embed.add_field(
-            name="Example", value="re!bm", inline=False)
+            name="Example", value="j!bm", inline=False)
         await ctx.send(embed=embed)
 
     @help.command(aliases=['coinflip, headsortails, piece'])
@@ -306,7 +306,7 @@ class help(commands.Cog):
             description="Flip a coin and get your result\n\nAliases: coinflip, headsortails, piece",
             color=0x002aff)
         embed.add_field(
-            name="Example", value="re!flip", inline=False)
+            name="Example", value="j!flip", inline=False)
         await ctx.send(embed=embed)
 
     @help.command(aliases=['pick'])
@@ -316,7 +316,7 @@ class help(commands.Cog):
             description="Add some choices and I will choose for you\n\n**NOTE:** You need to put more than 1 choices\nAliases: pick",
             color=0x0000FF)
         embed.add_field(name="Example:",
-                        value="re!pick CHOICE_1 CHOICE_2", inline=False)
+                        value="j!pick CHOICE_1 CHOICE_2", inline=False)
         await ctx.send(embed=embed)
 
     @help.command()
@@ -326,7 +326,7 @@ class help(commands.Cog):
             description="Type something and the text will be reversed\n\n**NOTE:** This only works on a slash command. The prefixed command is still faulty",
             color=0x0000FF)
         embed.add_field(name="Example:",
-                        value="/reverse TEXT (Make sure its Nero doing the command)", inline=False)
+                        value="/reverse TEXT (Make sure its Jeanne doing the command)", inline=False)
         await ctx.send(embed=embed)
 
 
