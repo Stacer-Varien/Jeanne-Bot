@@ -1,6 +1,7 @@
 import discord
 import asyncio
 import re
+from discord import User
 from discord.ext import commands
 from discord.ext.commands import MissingPermissions
 
@@ -30,17 +31,19 @@ class moderation(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(ban_members=True)
-    async def unban(self, ctx, *, member):
-        banned_users = await ctx.guild.bans()
-
-        member_name, member_discriminator = member.split('#')
-        for ban_entry in banned_users:
-            user = ban_entry.user
-
-            if (user.name, user.discriminator) == (member_name,
-                                                   member_discriminator):
+    async def unban(self, ctx, user : User, *, reason=None):
                 await ctx.guild.unban(user)
-                await ctx.channel.send(f"Unbanned: {user.mention}")
+                embed = discord.Embed(title="User Unbanned", color=0xFF0000)
+                embed.add_field(name="Name",
+                                value=user,
+                                inline=False)
+                embed.add_field(name="ID", value=user.id, inline=False)
+                embed.add_field(name="Reason", value=reason, inline=False)
+                embed.set_author(name=ctx.message.author,
+                                icon_url=ctx.message.author.avatar_url)
+                embed.set_thumbnail(url=user.avatar_url)
+                await ctx.send(embed=embed)
+
 
     @commands.command(description="Unmutes a specified user.")
     @commands.has_permissions(kick_members=True)
@@ -152,7 +155,6 @@ class moderation(commands.Cog):
     @commands.command()
     @commands.has_permissions(manage_messages=True)
     async def purge(self, ctx, limit=100, member: discord.Member = None):
-        await ctx.message.delete()
         msg = []
         try:
             limit = int(limit)
@@ -160,14 +162,14 @@ class moderation(commands.Cog):
             return await ctx.send("Please pass in an integer as limit")
         if not member:
             await ctx.channel.purge(limit=limit)
-            return await ctx.send(f"Purged {limit} messages", delete_after=3)
+            return await ctx.send(f"Purged {limit} messages")
         async for m in ctx.channel.history():
             if len(msg) == limit:
                 break
             if m.author == member:
                 msg.append(m)
         await ctx.channel.delete_messages(msg)
-        await ctx.send(f"Purged {limit} messages of {member.mention}", delete_after=3)
+        await ctx.send(f"Purged {limit} messages of {member.mention}")
         await self.bot.process_commands(m)
 
     @purge.error
