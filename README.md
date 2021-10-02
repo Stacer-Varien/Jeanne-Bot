@@ -1,4 +1,4 @@
-Nero is a multipurpose bot with miscellaneous, moderation, management and some fun commands. Later, he will have new commands implemented in the nearby future
+Jeanne is a multipurpose bot with miscellaneous, moderation, management and some fun commands. Later, she will have new commands implemented in the nearby future
 
 FEATURES
 
@@ -10,7 +10,7 @@ FEATURES
 
 • Getting information of a user and server
 
-• A say command that will make Nero say the message the user wants
+• A say command that will make Jeanne say the message the user wants
 
 PLANNED FEATURES
 
@@ -24,25 +24,28 @@ PLANNED FEATURES
 
 • Editing channel topics
 
+• Adding bot stats
+
 • Adding a softban command that will have the user to be banned for a specific amount of time
 
-• Adding more error messages in case of missing permissions, if a command has been committed poorly and Discord hierarchy rules
+• Allowing server owners and admins to change the prefix for their server
 
+• Adding more error messages in case of missing permissions, if a command has been committed poorly and Discord hierarchy rules
 
 KNOWN BUGS AND FAULTS
 
 • Purge for some reason won’t bulk delete messages if a user is mentioned
 
-• Nero will ‘ban’ the user even though they have been banned already instead of raising an error message
+• Jeanne will ‘ban’ the user even though they have been banned already instead of raising an error message
 
 • For some commands if poorly executed with a sub-command, it will respond with the main command instead of an error message
 
-• For some reason, ID unbanning a user does not work but will work if the user name and tag has been used (for example, re!unban ZaneRE#1111)
+• For some reason, ID unbanning a user does not work but will work if the user name and tag has been used (for example, j!unban ZaneRE#1111)
 
 NOTE: THIS IS FOR EDUCATIONAL PURPORSES. ALSO I WOULD NOT RECOMMENDEND SELFHOSTING THE BOT AS THERE CAN BE CHANGES TO IT SUCH AS ADDING APIS THAT WILL MAKE YOU RUN ALMOST ALL FEAUTURES OF THE BOT
 
 Invite link to add the bot: https://discord.com/oauth2/authorize?client_id=831993597166747679&scope=bot&permissions=469888182
 
 <a href="https://top.gg/bot/831993597166747679">
-  <img src="https://top.gg/api/widget/831993597166747679.svg" alt="NERO" />
+  <img src="https://top.gg/api/widget/831993597166747679.svg" alt="Jeanne" />
   </a>
