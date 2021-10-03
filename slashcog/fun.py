@@ -9,7 +9,7 @@ class fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @cog_ext.cog_slash(description="Ask 8 ball anything and you will get your awnser")
+    @cog_ext.cog_slash(name="8ball", description="Ask 8 ball anything and you will get your awnser")
     async def _8ball(self, ctx: SlashContext, question):
         responses = [
             'It is certain.', 'It is decidedly so.', 'Without a doubt.',
