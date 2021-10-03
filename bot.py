@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 intents = discord.Intents().all()
 aliases = ['j!', 'J!', 'jeanne ', 'Jeanne ']
 bot = commands.Bot(command_prefix=aliases, intents=intents)
-slash = SlashCommand(bot)
+slash = SlashCommand(bot, sync_commands=True, sync_on_cog_reload=True)
 
 
 bot.remove_command('help')
@@ -28,7 +28,6 @@ bot.load_extension("slashcog.help")
 bot.load_extension("slashcog.fun")
 bot.load_extension("slashcog.manage")
 bot.load_extension("slashcog.misc")
-bot.load_extension("slashcog.moderation")
 bot.load_extension("slashcog.owner")
 
 
