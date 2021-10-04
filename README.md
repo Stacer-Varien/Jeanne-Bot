@@ -44,7 +44,7 @@ KNOWN BUGS AND FAULTS
 
 NOTE: THIS IS FOR EDUCATIONAL PURPORSES. ALSO I WOULD NOT RECOMMENDEND SELFHOSTING THE BOT AS THERE CAN BE CHANGES TO IT SUCH AS ADDING APIS THAT WILL MAKE YOU RUN ALMOST ALL FEAUTURES OF THE BOT
 
-Invite link to add the bot: https://discord.com/oauth2/authorize?client_id=831993597166747679&scope=bot&permissions=469888182
+[Invite Jeanne](https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=2550197270&redirect_uri=https%3A%2F%2Fdiscord.com%2Foauth2%2Fauthorize%3Fclient_id%3D831993597166747679%26scope%3Dbot&scope=bot%20applications.commands)
 
 <a href="https://top.gg/bot/831993597166747679">
   <img src="https://top.gg/api/widget/831993597166747679.svg" alt="Jeanne" />

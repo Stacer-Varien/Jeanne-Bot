@@ -61,7 +61,7 @@ class fun(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def hentai(self, ctx):
         yandere_api = random.choice(requests.get(
-            "https://yande.re/post.json?tags=rating:explicit-loli-ntr-vore-poop-pooping-scat-scat_eating-scat_on_penis-bestiality-shota-blood-rape-bee-animal-hyper-guro").json())
+            "https://yande.re/post.json?tags=").json()) #not full API
         yandere = discord.Embed(color=0xFFC0CB)
         yandere.set_image(url=yandere_api["file_url"])
         yandere.set_footer(text="Fetched from Yande.re")
