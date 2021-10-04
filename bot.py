@@ -9,10 +9,9 @@ from dotenv import load_dotenv
 intents = discord.Intents().all()
 aliases = ['j!', 'J!', 'jeanne ', 'Jeanne ']
 bot = commands.Bot(command_prefix=aliases, intents=intents)
+bot.remove_command('help')
 slash = SlashCommand(bot, sync_commands=True, sync_on_cog_reload=True)
 
-
-bot.remove_command('help')
 
 bot.load_extension("cogs.moderation")
 bot.load_extension("cogs.help")
@@ -29,6 +28,7 @@ bot.load_extension("slashcog.fun")
 bot.load_extension("slashcog.manage")
 bot.load_extension("slashcog.misc")
 bot.load_extension("slashcog.owner")
+bot.load_extension("slashcog.reactions")
 
 
 @bot.event
@@ -36,6 +36,7 @@ async def on_ready():
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="j!help or /help"))
     print('Connected to bot: {}'.format(bot.user.name))
     print('Bot ID: {}'.format(bot.user.id))
+
 
 @bot.event
 async def on_command_error(ctx, error):
