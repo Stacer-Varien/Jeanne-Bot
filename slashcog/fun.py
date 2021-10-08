@@ -3,13 +3,12 @@ import random
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 import requests
-from discord.ext.commands.errors import NSFWChannelRequired
 
 class fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @cog_ext.cog_slash(name="8ball", description="Ask 8 ball anything and you will get your awnser")
+    @cog_ext.cog_slash(name='8ball', description="Ask 8 ball anything and you will get your awnser")
     async def _8ball(self, ctx: SlashContext, question):
         responses = [
             'It is certain.', 'It is decidedly so.', 'Without a doubt.',
@@ -49,22 +48,19 @@ class fun(commands.Cog):
 
     @cog_ext.cog_slash(description="Get some hentai from Yande.re")
     @commands.is_nsfw()
-    async def hentai(self, ctx: SlashContext):
-                yandere_api = random.choice(requests.get("https://yande.re/post.json?tags=rating:explicit-yiff-loli-ntr-vore-poop-pooping-scat-scat_eating-scat_on_penis-bestiality-furry-shota-blood-rape-bee-animal-hyper-guro-child-cub").json())
+    async def hentai(self, ctx: SlashContext, tag=None):
+                if tag == None:
+                    tag=""
+                yandere_api = random.choice(requests.get(f"https://yande.re/post.json?tags=rating:explicit-loli-shota-cub-scat-vore-guro-child{tag}").json())
                 yandere = discord.Embed(color=0xFFC0CB)
                 yandere.set_image(url=yandere_api["file_url"])
                 yandere.set_footer(text="Fetched from Yande.re")
 
                 await ctx.send(embed=yandere)
 
-    @hentai.error
-    async def hentai_error(self, ctx, error):
-        if isinstance(error, NSFWChannelRequired):
-            error = discord.Embed(
-                        title='Hentai Failed', description="Hentai couldn't be sent in this channel", color=0xff0000)
-            error.add_field(
-                        name="Reason", value="Channel is not NSFW enabled")
-            await ctx.send(embed=error)
+                if IndexError:
+                    print(f"{tag} is not found in Yande.re API") #this prevents the bot to fall apart whenever a tag is not found for some reason
+
  
 def setup(bot):
     bot.add_cog(fun(bot))
