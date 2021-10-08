@@ -68,5 +68,19 @@ class owner(commands.Cog):
             mutuals), inline=False)
         await ctx.send(embed=embed)
 
+
+    @commands.command()
+    @commands.is_owner()
+    async def play(self, ctx, *, activity):
+        await ctx.bot.change_presence(activity=discord.Game(name=activity))
+        await ctx.send(f"Bot's activity changed to {activity}")
+
+
+    @commands.command()
+    @commands.is_owner()
+    async def listen(self, ctx, *, activity):
+        await ctx.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=activity))
+        await ctx.send(f"Bot's activity changed to {activity}")
+
 def setup(bot):
     bot.add_cog(owner(bot))
