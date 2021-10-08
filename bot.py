@@ -27,6 +27,7 @@ bot.load_extension("slashcog.help")
 bot.load_extension("slashcog.fun")
 bot.load_extension("slashcog.manage")
 bot.load_extension("slashcog.misc")
+bot.load_extension("slashcog.moderation")
 bot.load_extension("slashcog.owner")
 bot.load_extension("slashcog.reactions")
 
@@ -36,7 +37,6 @@ async def on_ready():
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="j!help or /help"))
     print('Connected to bot: {}'.format(bot.user.name))
     print('Bot ID: {}'.format(bot.user.id))
-
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -52,6 +52,32 @@ async def on_command_error(ctx, error):
             no_user = discord.Embed(
                 title="User does not exist", description="Please make sure the USER_ID is valid or maybe they have deleted their account.", color=0xff0000)
             await ctx.send(embed=no_user)
+    elif isinstance(error, CommandOnCooldown):
+        embed = discord.Embed(
+            title="Command On Cooldown", description=f"This command is on cooldown. Please wait at least {error.retry_after: .2f} seconds to use it again.", color=0xff0000)
+        await ctx.send(embed=embed)
+    elif isinstance(error, NSFWChannelRequired):
+        error = discord.Embed(
+            title='Hentai Failed', description="Hentai couldn't be sent in this channel", color=0xff0000)
+        error.add_field(
+            name="Reason", value="Channel is not NSFW enabled")
+        await ctx.send(embed=error)
+
+
+@bot.event
+async def on_slash_command_error(ctx, error):
+    if isinstance(error, NotOwner):
+       embed = discord.Embed(
+           title="Owner only command", description="This command failed to commit because you are not the bot owner", color=0xff0000)
+       await ctx.send(embed=embed)
+    elif isinstance(error, GuildNotFound):
+        embed = discord.Embed(
+            description="Bot is not in this server", color=0xff0000)
+        await ctx.send(embed=embed)
+    elif isinstance(error, UserNotFound):
+        no_user = discord.Embed(
+            title="User does not exist", description="Please make sure the USER_ID is valid or maybe they have deleted their account.", color=0xff0000)
+        await ctx.send(embed=no_user)
     elif isinstance(error, CommandOnCooldown):
         embed = discord.Embed(
             title="Command On Cooldown", description=f"This command is on cooldown. Please wait at least {error.retry_after: .2f} seconds to use it again.", color=0xff0000)
