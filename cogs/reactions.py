@@ -149,5 +149,28 @@ class reactions(commands.Cog):
                 title="Tickle failed", description="Please tickle someone who is in the server\nIf you were trying to mention a role or used `@everyone` or `@here`, then good luck mention spamming", color=0xff0000)
             await ctx.send(embed=embed)
 
+    @commands.command()
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def baka(self, ctx, *, member: Member = None):
+        baka_api = requests.get(
+            "https://nekos.life/api/v2/img/baka").json()
+
+        if member == None:
+            baka = discord.Embed(color=0xFFC0CB)
+            baka.set_image(url=baka_api["url"])
+            await ctx.send(f"*{ctx.author.mention}, you are a baka!*", embed=baka)
+
+        else:
+            baka = discord.Embed(color=0xFFC0CB)
+            baka.set_image(url=baka_api["url"])
+            await ctx.send(f"*{member.name}, {ctx.author.mention} called you a baka!*", embed=baka)
+
+    @baka.error
+    async def baka_error(self, ctx, error):
+        if isinstance(error, MemberNotFound):
+            embed = discord.Embed(
+                title="Baka failed", description="Please call someone who is in the server a baka\nIf you were trying to mention a role or used `@everyone` or `@here`, then good luck mention spamming", color=0xff0000)
+            await ctx.send(embed=embed)
+
 def setup(bot):
     bot.add_cog(reactions(bot))

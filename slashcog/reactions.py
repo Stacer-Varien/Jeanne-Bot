@@ -112,5 +112,21 @@ class reactions(commands.Cog):
             tickle.set_image(url=tickle_api["url"])
             await ctx.send(f"*{ctx.author.mention} tickled {member.name}*", embed=tickle)
 
+    @cog_ext.cog_slash(description="Call someone or yourself a baka!")
+    async def baka(self, ctx:SlashContext, member: Member = None):
+        tickle_api = requests.get("https://nekos.life/api/v2/img/baka").json()
+
+        if member == None:
+            baka = discord.Embed(color=0xFFC0CB)
+            baka.set_footer(text="Fetched from nekos.life")
+            baka.set_image(url=tickle_api["url"])
+            await ctx.send(f"*{ctx.author.mention}*, you are a baka!", embed=baka)
+
+        else:
+            baka = discord.Embed(color=0xFFC0CB)
+            baka.set_footer(text="Fetched from nekos.life")
+            baka.set_image(url=tickle_api["url"])
+            await ctx.send(f"*{member.mention}, {ctx.author.mention} called you a baka!*", embed=baka)
+
 def setup(bot):
     bot.add_cog(reactions(bot))
