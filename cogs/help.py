@@ -319,15 +319,16 @@ class help(commands.Cog):
                         value="j!pick CHOICE_1 CHOICE_2", inline=False)
         await ctx.send(embed=embed)
 
-    @help.command()
-    async def reverse(self, ctx, *arg):
+    @help.command(aliases=['h'])
+    async def hentai(self, ctx, *arg):
         embed = discord.Embed(
-            title="Reverse help",
-            description="Type something and the text will be reversed\n\n**NOTE:** This only works on a slash command. The prefixed command is still faulty",
+            title="Hentai help",
+            description="Get hentai from Yande.re. You can include a tag if you want a specific hentai\n\n**NOTE:** For including a tag, put it as Yande.re intended it to be. If the tag doesn't exist, I will ignore the command or give a random hentai\nAliases: h",
             color=0x0000FF)
         embed.add_field(name="Example:",
-                        value="/reverse TEXT (Make sure its Jeanne doing the command)", inline=False)
+                        value="j!h (for a random hentai pic)\nj!h +yuri (for a specific tag)", inline=False)
         await ctx.send(embed=embed)
+
 
 
 def setup(bot):
