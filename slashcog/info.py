@@ -15,9 +15,10 @@ class info(commands.Cog):
         self.bot = bot
 
     @cog_ext.cog_slash(description="See the bot's status from development to now")
-    async def stats(self, ctx: SlashContext):
+    async def stats(self, ctx:SlashContext):
         embed = discord.Embed(title="Bot stats", color=0x236ce1)
-        embed.add_field(name="Name", value="<@!831993597166747679>", inline=True)
+        embed.add_field(
+            name="Name", value="<@!831993597166747679>", inline=True)
         embed.add_field(name="Bot ID", value="831993597166747679", inline=True)
         embed.add_field(name="Bot Owner",
                         value="<@!597829930964877369>", inline=True)
@@ -32,11 +33,9 @@ class info(commands.Cog):
         embed.add_field(name="Ping Latency",
                         value=f'{round(ctx.bot.latency * 1000)}ms', inline=True)
         embed.add_field(name="License",
-                        value='[MIT License](https://github.com/ZaneRE544/Jeanne-Bot/blob/main/LICENSE)', inline=True)
-        current_time = time.time()
-        difference = int(round(current_time - start_time))
-        uptime = str(datetime.timedelta(seconds=difference))
-        embed.add_field(name="Uptime", value=f"{uptime} hours", inline=True)
+                        value='[MIT License](https://github.com/ZaneRE544/NeroBot/blob/main/LICENSE)', inline=True)
+        embed.set_image(
+            url="https://cdn.discordapp.com/avatars/831993597166747679/763c0da36ae6dec08433a01c58cf7e60.webp?size=1024")
         await ctx.send(embed=embed)
 
     @cog_ext.cog_slash(description="See the information of a member or yourself")
