@@ -59,13 +59,19 @@ class fun(commands.Cog):
     @commands.command(aliases=['h'])
     @commands.is_nsfw()
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def hentai(self, ctx):
+    async def hentai(self, ctx, *, tag=None):
+        if tag == None:
+            tag = ""
         yandere_api = random.choice(requests.get(
-            "https://yande.re/post.json?tags=").json()) #not full API
+                    f"https://yande.re/post.json?tags=rating:explicit-loli-shota-cub-scat-vore-guro-child{tag}").json())
         yandere = discord.Embed(color=0xFFC0CB)
         yandere.set_image(url=yandere_api["file_url"])
         yandere.set_footer(text="Fetched from Yande.re")
+
         await ctx.send(embed=yandere)
+
+        if IndexError:
+            print(f"{tag} is not found in Yande.re API")  # this prevents the bot to fall apart whenever a tag is not found for some reason
 
     @commands.command(aliases=["pick"])
     @commands.cooldown(1, 5, commands.BucketType.user)
