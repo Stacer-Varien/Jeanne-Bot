@@ -12,17 +12,15 @@ class reactions(commands.Cog):
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def hug(self, ctx, *, member: Member = None):
-        hug_api = requests.get("https://nekos.life/api/v2/img/hug").json()
-
-        if member == None:
-            hugs = discord.Embed(color=0xFFC0CB)
-            hugs.set_image(url=hug_api["url"])
-            await ctx.send(f"*Hugging {ctx.author.mention}* :people_hugging:", embed=hugs)
-
-        else:
-            hugs = discord.Embed(color=0xFFC0CB)
-            hugs.set_image(url=hug_api["url"])
-            await ctx.send(f"*{ctx.author.mention} hugged {member.name}* :people_hugging:", embed=hugs)
+            hug_api = requests.get("https://nekos.life/api/v2/img/hug").json()
+            if member == None:
+                msg=f"Hugging {ctx.author.mention}"
+            else:
+                msg=f"*{ctx.author.mention} kissed {member.mention}*"
+            hug = discord.Embed(color=0xFFC0CB)
+            hug.set_footer(text="Fetched from nekos.life")
+            hug.set_image(url=hug_api["url"])
+            await ctx.send(msg, embed=hug)
 
     @hug.error
     async def hug_error(self, ctx, error):
@@ -36,15 +34,14 @@ class reactions(commands.Cog):
     async def slap(self, ctx, *, member: Member = None):
         slap_api = requests.get("https://nekos.life/api/v2/img/slap").json()
 
+        slap = discord.Embed(color=0xFFC0CB)
+        slap.set_footer(text="Fetched from nekos.life")
+        slap.set_image(url=slap_api["url"])
         if member == None:
-            slap = discord.Embed(color=0xFFC0CB)
-            slap.set_image(url=slap_api["url"])
-            await ctx.send(f"*Slapping {ctx.author.mention}*", embed=slap)
-
+                msg=f"Slapping {ctx.author.mention}"
         else:
-            slap = discord.Embed(color=0xFFC0CB)
-            slap.set_image(url=slap_api["url"])
-            await ctx.send(f"*{ctx.author.mention} slapped {member.name}*", embed=slap)
+                msg=f"*{ctx.author.mention} slapped {member.mention}*"
+        await ctx.send(msg, embed=slap)
 
     @slap.error
     async def slap_error(self, ctx, error):
@@ -58,6 +55,7 @@ class reactions(commands.Cog):
     async def smug(self, ctx):
         smug_api = requests.get("https://nekos.life/api/v2/img/smug").json()
         smug = discord.Embed(color=0xFFC0CB)
+        smug.set_footer(text="Fetched from nekos.life")
         smug.set_image(url=smug_api["url"])
         await ctx.send(f"*{ctx.author.mention} is smugging*", embed=smug)
 
@@ -65,16 +63,14 @@ class reactions(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def poke(self, ctx, *, member: Member = None):
         poke_api = requests.get("https://nekos.life/api/v2/img/poke").json()
-
+        poke = discord.Embed(color=0xFFC0CB)
+        poke.set_footer(text="Fetched from nekos.life")
+        poke.set_image(url=poke_api["url"])
         if member == None:
-            poke = discord.Embed(color=0xFFC0CB)
-            poke.set_image(url=poke_api["url"])
-            await ctx.send(f"*Poking {ctx.author.mention}*", embed=poke)
-
+                msg=f"Poking {ctx.author.mention}"
         else:
-            poke = discord.Embed(color=0xFFC0CB)
-            poke.set_image(url=poke_api["url"])
-            await ctx.send(f"*{ctx.author.mention} poked {member.name}*", embed=poke)
+                msg=f"*{ctx.author.mention} poked {member.mention}*"
+        await ctx.send(msg, embed=poke)
 
     @poke.error
     async def poke_error(self, ctx, error):
@@ -87,16 +83,14 @@ class reactions(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def pat(self, ctx, *, member: Member = None):
         pat_api = requests.get("https://nekos.life/api/v2/img/pat").json()
-
+        pat = discord.Embed(color=0xFFC0CB)
+        pat.set_footer(text="Fetched from nekos.life")
+        pat.set_image(url=pat_api["url"])
         if member == None:
-            poke = discord.Embed(color=0xFFC0CB)
-            poke.set_image(url=pat_api["url"])
-            await ctx.send(f"*Patting {ctx.author.mention}*", embed=poke)
-
+                msg=f"Patting {ctx.author.mention}"
         else:
-            poke = discord.Embed(color=0xFFC0CB)
-            poke.set_image(url=pat_api["url"])
-            await ctx.send(f"*{ctx.author.mention} patted {member.name}*", embed=poke)
+                msg=f"*{ctx.author.mention} patted {member.mention}*"
+        await ctx.send(msg, embed=pat)
 
     @pat.error
     async def pat_error(self, ctx, error):
@@ -108,17 +102,15 @@ class reactions(commands.Cog):
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def kiss(self, ctx, *, member: Member = None):
-        kiss_api = requests.get("https://nekos.life/api/v2/img/kiss").json()
-
-        if member == None:
-            poke = discord.Embed(color=0xFFC0CB)
-            poke.set_image(url=kiss_api["url"])
-            await ctx.send(f"*Kissing {ctx.author.mention}*", embed=poke)
-
-        else:
-            poke = discord.Embed(color=0xFFC0CB)
-            poke.set_image(url=kiss_api["url"])
-            await ctx.send(f"*{ctx.author.mention} kissed {member.name}*", embed=poke)
+            kiss_api = requests.get("https://nekos.life/api/v2/img/kiss").json()
+            if member == None:
+                msg=f"Kissing {ctx.author.mention}"
+            else:
+                msg=f"*{ctx.author.mention} kissed {member.mention}*"
+            kiss = discord.Embed(color=0xFFC0CB)
+            kiss.set_footer(text="Fetched from nekos.life")
+            kiss.set_image(url=kiss_api["url"])
+            await ctx.send(msg, embed=kiss)
 
     @kiss.error
     async def kiss_error(self, ctx, error):
@@ -130,17 +122,15 @@ class reactions(commands.Cog):
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def tickle(self, ctx, *, member: Member = None):
-        tickle_api = requests.get("https://nekos.life/api/v2/img/tickle").json()
-
-        if member == None:
+            tickle_api = requests.get("https://nekos.life/api/v2/img/tickle").json()
+            if member == None:
+                msg=f"Kissing {ctx.author.mention}"
+            else:
+                msg=f"*{ctx.author.mention} kissed {member.mention}*"
             tickle = discord.Embed(color=0xFFC0CB)
+            tickle.set_footer(text="Fetched from nekos.life")
             tickle.set_image(url=tickle_api["url"])
-            await ctx.send(f"*Tickling {ctx.author.mention}*", embed=tickle)
-
-        else:
-            tickle = discord.Embed(color=0xFFC0CB)
-            tickle.set_image(url=tickle_api["url"])
-            await ctx.send(f"*{ctx.author.mention} tickled {member.name}*", embed=tickle)
+            await ctx.send(msg, embed=tickle)
 
     @tickle.error
     async def tickle_error(self, ctx, error):
@@ -152,18 +142,15 @@ class reactions(commands.Cog):
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def baka(self, ctx, *, member: Member = None):
-        baka_api = requests.get(
-            "https://nekos.life/api/v2/img/baka").json()
-
-        if member == None:
+            baka_api = requests.get("https://nekos.life/api/v2/img/baka").json()
+            if member == None:
+                msg=f"*{ctx.author.mention}, you are a baka!*"
+            else:
+                msg=f"*{member.mention}, {ctx.author.mention} called you a baka!*"
             baka = discord.Embed(color=0xFFC0CB)
+            baka.set_footer(text="Fetched from nekos.life")
             baka.set_image(url=baka_api["url"])
-            await ctx.send(f"*{ctx.author.mention}, you are a baka!*", embed=baka)
-
-        else:
-            baka = discord.Embed(color=0xFFC0CB)
-            baka.set_image(url=baka_api["url"])
-            await ctx.send(f"*{member.name}, {ctx.author.mention} called you a baka!*", embed=baka)
+            await ctx.send(msg, embed=baka)
 
     @baka.error
     async def baka_error(self, ctx, error):
