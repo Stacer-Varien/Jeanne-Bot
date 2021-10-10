@@ -30,21 +30,6 @@ class moderation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @cog_ext.cog_slash(description="Unban a user")
-    @commands.has_permissions(ban_members=True)
-    async def unban(self, ctx:SlashContext, user : User, reason=None):
-                await ctx.guild.unban(user)
-                embed = discord.Embed(title="User Unbanned", color=0xFF0000)
-                embed.add_field(name="Name",
-                                value=user,
-                                inline=False)
-                embed.add_field(name="ID", value=user.id, inline=False)
-                embed.add_field(name="Reason", value=reason, inline=False)
-                embed.set_author(name=ctx.message.author,
-                                icon_url=ctx.message.author.avatar_url)
-                embed.set_thumbnail(url=user.avatar_url)
-                await ctx.send(embed=embed)
-
 
     @cog_ext.cog_slash(description="Unmute a member")
     @commands.has_permissions(kick_members=True)
@@ -156,7 +141,6 @@ class moderation(commands.Cog):
     @cog_ext.cog_slash(description="Bulk delete messages")
     @commands.has_permissions(manage_messages=True)
     async def purge(self, ctx, limit=100, member: discord.Member = None):
-        await ctx.message.delete()
         msg = []
         try:
             limit = int(limit)
@@ -177,7 +161,7 @@ class moderation(commands.Cog):
     @purge.error
     async def purge_error(self, ctx, error):
              if isinstance(error, MissingPermissions):
-                embed=discord.Embed(title="Purge failed", description="Sorry but you cannot purge any messages", color=0xff0000)
+                embed=discord.Embed(title="Purge failed", description="Sorry but you cannot purge messages", color=0xff0000)
                 embed.add_field(name="Reason", value="Missing permissions: Manage Messages", inline=False)
                 await ctx.send(embed=embed) 
 
