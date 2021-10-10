@@ -175,7 +175,7 @@ class moderation(commands.Cog):
     @purge.error
     async def purge_error(self, ctx, error):
              if isinstance(error, MissingPermissions):
-                embed=discord.Embed(title="Purge failed", description="Sorry but you cannot purge any messages", color=0xff0000)
+                embed=discord.Embed(title="Purge failed", description="Sorry but you cannot purge messages", color=0xff0000)
                 embed.add_field(name="Reason", value="Missing permissions: Manage Messages", inline=False)
                 await ctx.send(embed=embed) 
 

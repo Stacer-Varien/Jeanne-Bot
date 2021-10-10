@@ -5,13 +5,11 @@ from discord.ext.commands.errors import NotOwner, UserNotFound, GuildNotFound, N
 from discord_slash import SlashCommand
 from dotenv import load_dotenv
 
-
 intents = discord.Intents().all()
 aliases = ['j!', 'J!', 'jeanne ', 'Jeanne ']
 bot = commands.Bot(command_prefix=aliases, intents=intents)
 bot.remove_command('help')
 slash = SlashCommand(bot, sync_commands=True, sync_on_cog_reload=True)
-
 
 bot.load_extension("cogs.moderation")
 bot.load_extension("cogs.help")
@@ -70,14 +68,6 @@ async def on_slash_command_error(ctx, error):
        embed = discord.Embed(
            title="Owner only command", description="This command failed to commit because you are not the bot owner", color=0xff0000)
        await ctx.send(embed=embed)
-    elif isinstance(error, GuildNotFound):
-        embed = discord.Embed(
-            description="Bot is not in this server", color=0xff0000)
-        await ctx.send(embed=embed)
-    elif isinstance(error, UserNotFound):
-        no_user = discord.Embed(
-            title="User does not exist", description="Please make sure the USER_ID is valid or maybe they have deleted their account.", color=0xff0000)
-        await ctx.send(embed=no_user)
     elif isinstance(error, CommandOnCooldown):
         embed = discord.Embed(
             title="Command On Cooldown", description=f"This command is on cooldown. Please wait at least {error.retry_after: .2f} seconds to use it again.", color=0xff0000)
