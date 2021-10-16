@@ -49,9 +49,16 @@ class fun(commands.Cog):
     @cog_ext.cog_slash(description="Get some hentai from Yande.re")
     @commands.is_nsfw()
     async def hentai(self, ctx: SlashContext, tag=None):
-        badtags=["loli", "shota", "cub", "scat", "shit", "vore", "ugly_bastard", "gore", "guro"]
+        badtags=["+loli", "+shota", "+cub", "+scat", "+shit", "+vore", "+ugly_bastard", "+gore", "+guro"]
+        
         if tag == None:
-            tag = ""
+            yandere_api = random.choice(requests.get(
+                        f"https://yande.re/post.json?tags=rating:explicit-loli-shota-cub-scat-ugly_bastard-vore-guro-child-urine").json())
+            yandere = discord.Embed(color=0xFFC0CB)
+            yandere.set_image(url=yandere_api["file_url"])
+            yandere.set_footer(text="Fetched from Yande.re")
+
+            await ctx.send(embed=yandere)
         elif any(word in tag.lower() for word in badtags):
             blacklisted_tags = discord.Embed(description="This tag is currently blacklisted")
             await ctx.send(embed=blacklisted_tags)
