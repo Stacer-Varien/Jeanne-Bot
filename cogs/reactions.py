@@ -14,9 +14,9 @@ class reactions(commands.Cog):
     async def hug(self, ctx, *, member: Member = None):
             hug_api = requests.get("https://nekos.life/api/v2/img/hug").json()
             if member == None:
-                msg=f"Hugging {ctx.author.mention}"
+                msg=f"*Hugging {ctx.author.mention}*"
             else:
-                msg=f"*{ctx.author.mention} kissed {member.mention}*"
+                msg=f"*{ctx.author.mention} hugged {member.mention}*"
             hug = discord.Embed(color=0xFFC0CB)
             hug.set_footer(text="Fetched from nekos.life")
             hug.set_image(url=hug_api["url"])
@@ -67,7 +67,7 @@ class reactions(commands.Cog):
         poke.set_footer(text="Fetched from nekos.life")
         poke.set_image(url=poke_api["url"])
         if member == None:
-                msg=f"Poking {ctx.author.mention}"
+                msg=f"*Poking {ctx.author.mention}*"
         else:
                 msg=f"*{ctx.author.mention} poked {member.mention}*"
         await ctx.send(msg, embed=poke)
@@ -87,7 +87,7 @@ class reactions(commands.Cog):
         pat.set_footer(text="Fetched from nekos.life")
         pat.set_image(url=pat_api["url"])
         if member == None:
-                msg=f"Patting {ctx.author.mention}"
+                msg=f"*Patting {ctx.author.mention}*"
         else:
                 msg=f"*{ctx.author.mention} patted {member.mention}*"
         await ctx.send(msg, embed=pat)
@@ -124,7 +124,7 @@ class reactions(commands.Cog):
     async def tickle(self, ctx, *, member: Member = None):
             tickle_api = requests.get("https://nekos.life/api/v2/img/tickle").json()
             if member == None:
-                msg=f"Kissing {ctx.author.mention}"
+                msg=f"*Kissing {ctx.author.mention}*"
             else:
                 msg=f"*{ctx.author.mention} kissed {member.mention}*"
             tickle = discord.Embed(color=0xFFC0CB)
