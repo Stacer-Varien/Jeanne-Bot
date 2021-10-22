@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from discord import Member, User, Guild, Role
+from discord import User, Guild
 
 format = "%a, %d %b %Y | %H:%M:%S %ZGMT"
 class owner(commands.Cog):
