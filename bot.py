@@ -11,6 +11,7 @@ bot = commands.Bot(command_prefix=aliases, intents=intents)
 bot.remove_command('help')
 slash = SlashCommand(bot, sync_commands=True, sync_on_cog_reload=True)
 
+#prefixed cog commands
 bot.load_extension("cogs.moderation")
 bot.load_extension("cogs.help")
 bot.load_extension("cogs.misc")
@@ -19,7 +20,10 @@ bot.load_extension("cogs.manage")
 bot.load_extension("cogs.info")
 bot.load_extension("cogs.owner")
 bot.load_extension("cogs.reactions")
+bot.load_extension("cogs.nsfw")
+bot.load_extension("cogs.images")
 
+#slash cog commands
 bot.load_extension("slashcog.info")
 bot.load_extension("slashcog.help")
 bot.load_extension("slashcog.fun")
@@ -28,6 +32,8 @@ bot.load_extension("slashcog.misc")
 bot.load_extension("slashcog.moderation")
 bot.load_extension("slashcog.owner")
 bot.load_extension("slashcog.reactions")
+bot.load_extension("slashcog.nsfw")
+bot.load_extension("slashcog.images")
 
 
 @bot.event
