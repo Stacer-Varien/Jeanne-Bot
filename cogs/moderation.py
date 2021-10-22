@@ -1,9 +1,10 @@
-import discord
-import asyncio
-import re
-from discord import User
+import discord, asyncio, re
+from discord import User, Member, Embed
+from discord.errors import Forbidden
 from discord.ext import commands
 from discord.ext.commands import MissingPermissions
+from discord.ext.commands.errors import MemberNotFound
+from discord.utils import get
 
 
 time_regex = re.compile("(?:(\d{1,5})(h|s|m|d))+?")
@@ -33,103 +34,128 @@ class moderation(commands.Cog):
     @commands.has_permissions(ban_members=True)
     async def unban(self, ctx, user : User, *, reason=None):
                 await ctx.guild.unban(user)
-                embed = discord.Embed(title="User Unbanned", color=0xFF0000)
+                embed = Embed(title="User Unbanned", color=0xFF0000)
                 embed.add_field(name="Name",
                                 value=user,
-                                inline=False)
-                embed.add_field(name="ID", value=user.id, inline=False)
-                embed.add_field(name="Reason", value=reason, inline=False)
-                embed.set_author(name=ctx.message.author,
-                                icon_url=ctx.message.author.avatar_url)
+                                inline=True)
+                embed.add_field(name="ID", value=user.id, inline=True)
+                embed.add_field(name="Reason", value=reason, inline=True)
+                embed.add_field(name="Responsible Moderator",
+                                value=ctx.author, inline=True)
                 embed.set_thumbnail(url=user.avatar_url)
                 await ctx.send(embed=embed)
 
 
-    @commands.command(description="Unmutes a specified user.")
+    @commands.command()
     @commands.has_permissions(kick_members=True)
-    async def unmute(self, ctx, member: discord.Member):
-        mutedRole = discord.utils.get(ctx.guild.roles, name="Muted")
+    async def unmute(self, ctx, member: Member):
+        mutedRole = get(ctx.guild.roles, name="Muted")
 
         await member.remove_roles(mutedRole)
-        await member.send(f"You have unmuted from: - {ctx.guild.name}")
-        embed = discord.Embed(
-            title="unmute", description=f" unmuted-{member.mention}", colour=discord.Colour.light_gray())
+        embed = Embed(
+            title="Member Unmute", color=0xFF0000)
+        embed.add_field(name="Name",
+                        value=member,
+                        inline=True)
+        embed.add_field(name="ID", value=member.id, inline=True)
+        embed.add_field(name="Responsible Moderator",
+                        value=ctx.author, inline=True)
+        embed.set_image(url=member.avatar_url)
         await ctx.send(embed=embed)
 
     @commands.command(pass_context=True, aliases=['w'])
     @commands.has_permissions(kick_members=True)
-    async def warn(self, ctx, member: discord.Member, reason=None):
-                embed = discord.Embed(title="User was warned", color=0xFF0000)
-                embed.add_field(name="Name",
-                                value=member,
-                                inline=False)
-                embed.add_field(name="ID", value=member.id, inline=False)
-                embed.add_field(name="Reason", value=reason, inline=False)
-                embed.set_author(name=ctx.message.author,
-                                icon_url=ctx.message.author.avatar_url)
-                embed.set_thumbnail(url=member.avatar_url)
-
-                await ctx.send(embed=embed)
+    async def warn(self, ctx, member: Member, reason=None):
+        warn = Embed(title="Member Warned", color=0xFF0000)
+        warn.add_field(name="Name", value=member, inline=True)
+        warn.add_field(name="ID", value=member.id, inline=True)
+        warn.add_field(name="Reason", value=reason, inline=True)
+        warn.add_field(name="Responsible Moderator",
+                      value=ctx.author, inline=True)
+        warn.set_image(url=member.avatar_url)
+        await ctx.send(embed=warn)
 
     @warn.error
     async def warn_error(self, ctx, error):
              if isinstance(error, MissingPermissions):
-                embed=discord.Embed(title="Warn failed", description="Sorry but you cannot warn this user", color=0xff0000)
+                embed=Embed(title="Warn failed", description="Sorry but you cannot warn this user", color=0xff0000)
                 embed.add_field(name="Reason", value="Missing permissions: Kick Members", inline=False)
-                await ctx.send(embed=embed) 
+                await ctx.send(embed=embed)
+             elif isinstance(error, MemberNotFound):
+                embed = discord.Embed(
+                    Title="Warn failed", color=0xff0000)
+                embed.add_field(
+                    name="Reason", value="Member is not in this server or invalid user ID has been given", inline=False)
+                await ctx.send(embed=embed)
 
 
     @commands.command(pass_context=True, aliases=['b'])
     @commands.has_permissions(ban_members=True)
-    async def ban(self, ctx, member: discord.User, *, reason=None):
-                embed = discord.Embed(title="User Banned", color=0xFF0000)
-                embed.add_field(name="Name",
-                                value=member,
-                                inline=False)
-                embed.add_field(name="ID", value=member.id, inline=False)
-                embed.add_field(name="Reason", value=reason, inline=False)
-                embed.set_author(name=ctx.message.author,
-                                icon_url=ctx.message.author.avatar_url)
-                embed.set_thumbnail(url=member.avatar_url)
-                await ctx.send(embed=embed)
-                await ctx.guild.ban(member, reason=reason)
+    async def ban(self, ctx, user: User, *, reason=None):
+        banmsg = Embed(description=f"You are banned from **{ctx.guild.name}** for **{reason}**")
+        try:
+            await user.send(embed=banmsg) #if the member's DMs is opened before banning
+        except Forbidden: #if member's DMs are closed
+            pass    #will now ban the member
+        ban = discord.Embed(title="User Banned", color=0xFF0000)
+        ban.add_field(name="Name", value=user, inline=True)
+        ban.add_field(name="ID", value=user.id, inline=True)
+        ban.add_field(name="Reason", value=reason, inline=True)
+        ban.add_field(name="Responsible Moderator", value=ctx.author, inline=True)
+        ban.set_image(url=user.avatar_url)
+        await ctx.send(embed=ban)
+        await ctx.guild.ban(user, reason=reason)
+
 
     @ban.error
     async def ban_error(self, ctx, error):
-             if isinstance(error, MissingPermissions):
-                embed=discord.Embed(title="Ban failed", description="Sorry but you cannot ban this user", color=0xff0000)
-                embed.add_field(name="Reason", value="Missing permissions: Ban Members", inline=False)
-                await ctx.send(embed=embed) 
+        if isinstance(error, MissingPermissions):
+            embed=Embed(title="Ban failed", description="Sorry but you cannot ban this user", color=0xff0000)
+            embed.add_field(name="Reason", value="Missing permissions: Ban Members", inline=False)
+            await ctx.send(embed=embed)
+        elif isinstance(error, MemberNotFound):
+            embed = Embed(
+                title="Ban failed", description="Invalid user ID given.", color=0xff0000)
+            await ctx.send(embed=embed)
+            
    
 
     @commands.command(pass_context=True, aliases=['k'])
     @commands.has_permissions(kick_members=True)
-    async def kick(self, ctx, member: discord.Member, *, reason=None):
-            embed = discord.Embed(title="User Kicked", color=0xFF0000)
-            embed.add_field(name="Name",
-                            value=member,
-                            inline=False)
-            embed.add_field(name="ID", value=member.id, inline=False)
-            embed.add_field(name="Reason", value=reason, inline=False)
-            embed.set_author(name=ctx.message.author,
-                             icon_url=ctx.message.author.avatar_url)
-            embed.set_thumbnail(url=member.avatar_url)
-
-            await ctx.send(embed=embed)
-            await ctx.guild.kick(member, reason=reason)
+    async def kick(self, ctx, member: Member, *, reason=None):
+        kickmsg = Embed(
+            description=f"You are kicked from **{ctx.guild.name}** for **{reason}**")
+        try:
+            # if the member's DMs is opened
+            await member.send(embed=kickmsg)
+        except Forbidden:  # if member's DMs are closed
+            pass  # will now kick the member
+        kick = Embed(title="Member Kicked", color=0xFF0000)
+        kick.add_field(name="Name", value=member, inline=True)
+        kick.add_field(name="ID", value=member.id, inline=True)
+        kick.add_field(name="Reason", value=reason, inline=True)
+        kick.add_field(name="Responsible Moderator",
+                      value=ctx.author, inline=True)
+        kick.set_image(url=member.avatar_url)
+        await ctx.send(embed=kick)
+        await ctx.guild.kick(member, reason=reason)
 
     @kick.error
     async def kick_error(self, ctx, error):
-             if isinstance(error, MissingPermissions):
-                embed=discord.Embed(title="Kick failed", description="Sorry but you cannot kick this user", color=0xff0000)
-                embed.add_field(name="Reason", value="Missing permissions: Kick Members", inline=False)
-                await ctx.send(embed=embed) 
+        if isinstance(error, MissingPermissions):
+            embed=Embed(title="Kick failed", description="Sorry but you cannot kick this user", color=0xff0000)
+            embed.add_field(name="Reason", value="Missing permissions: Kick Members", inline=False)
+            await ctx.send(embed=embed)
+        elif isinstance(error, MemberNotFound):             
+            embed = Embed(
+                title="Kick failed", description="Member is not in this server", color=0xff0000)
+            await ctx.send(embed=embed)    
         
 
 
     @commands.command()
     @commands.has_permissions(kick_members=True)
-    async def mute(self, ctx, member: discord.Member, time: TimeConverter = None, *, reason=None):
+    async def mute(self, ctx, member: Member, time: TimeConverter = None, *, reason=None):
         guild = ctx.guild
         mutedRole = discord.utils.get(guild.roles, name="Muted")
 
@@ -140,21 +166,33 @@ class moderation(commands.Cog):
                 await channel.set_permissions(mutedRole, speak=False, send_messages=False, read_message_history=True, read_messages=False)
         role = discord.utils.get(ctx.guild.roles, name="Muted")
         await member.add_roles(role)
-        await ctx.send(("Muted {} for {} for {}s" if time else "Muted {} for {}").format(member, reason, time))
+        mute = Embed(title="Member Muted", color=0xff0000)
+        mute.add_field(name="Name", value=member, inline=True)
+        mute.add_field(name="ID", value=member.id, inline=True)
+        mute.add_field(name="Reason", value=reason, inline=True)
+        mute.add_field(name="Duration", value=time, inline=True)
+        mute.add_field(name="Responsible Moderator",
+                       value=ctx.author, inline=True)
+        mute.set_image(url=member.avatar_url)
+        await ctx.send(embed=mute)
         if time:
             await asyncio.sleep(time)
             await member.remove_roles(role)
         
     @mute.error
     async def mute_error(self, ctx, error):
-             if isinstance(error, MissingPermissions):
-                embed=discord.Embed(title="Mute failed", description="Sorry but you cannot mute this user", color=0xff0000)
-                embed.add_field(name="Reason", value="Missing permissions: Kick Members", inline=False)
-                await ctx.send(embed=embed)     
+        if isinstance(error, MissingPermissions):
+            embed=discord.Embed(title="Mute failed", description="Sorry but you cannot mute this user", color=0xff0000)
+            embed.add_field(name="Reason", value="Missing permissions: Kick Members", inline=False)
+            await ctx.send(embed=embed)     
+        elif isinstance(error, MissingPermissions):
+            embed = discord.Embed(
+                title="Mute failed", description="Member is not in this server", color=0xff0000)
+            await ctx.send(embed=embed)
  
     @commands.command()
     @commands.has_permissions(manage_messages=True)
-    async def purge(self, ctx, limit=100, member: discord.Member = None):
+    async def purge(self, ctx, member: Member = None, *, limit=100):
         msg = []
         try:
             limit = int(limit)
@@ -162,14 +200,14 @@ class moderation(commands.Cog):
             return await ctx.send("Please pass in an integer as limit")
         if not member:
             await ctx.channel.purge(limit=limit)
-            return await ctx.send(f"Purged {limit} messages")
+            return await ctx.send(f"Purged {limit} messages", delete_after=3)
         async for m in ctx.channel.history():
             if len(msg) == limit:
                 break
             if m.author == member:
                 msg.append(m)
         await ctx.channel.delete_messages(msg)
-        await ctx.send(f"Purged {limit} messages of {member.mention}")
+        await ctx.send(f"Purged {limit} messages of {member.mention}", delete_after=3)
         await self.bot.process_commands(m)
 
     @purge.error
