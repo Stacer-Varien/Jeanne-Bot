@@ -56,28 +56,6 @@ class fun(commands.Cog):
         await ctx.send(embed=discord.Embed(color=0x0000FF,
                                            description=f"`{random.choice(['Heads', 'Tails'])}`"))
 
-    @commands.command(aliases=['h'])
-    @commands.is_nsfw()
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    async def hentai(self, ctx, *, tag=None):
-        badtags=["loli", "shota", "cub", "scat", "shit", "vore", "ugly_bastard", "gore", "guro"]
-        if tag == None:
-            tag = ""
-        elif any(word in tag.lower() for word in badtags):
-            blacklisted_tags = discord.Embed(description="This tag is currently blacklisted")
-            await ctx.send(embed=blacklisted_tags)
-        else:
-            yandere_api = random.choice(requests.get(
-                        f"https://yande.re/post.json?tags=rating:explicit-loli-shota-cub-scat-ugly_bastard-vore-guro-child-urine{tag}").json())
-            yandere = discord.Embed(color=0xFFC0CB)
-            yandere.set_image(url=yandere_api["file_url"])
-            yandere.set_footer(text="Fetched from Yande.re")
-
-            await ctx.send(embed=yandere)
-
-        if IndexError:
-            print(f"{tag} is not found in Yande.re API")  # this prevents the bot to fall apart whenever a tag is not found for some reason
-
     @commands.command(aliases=["pick"])
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def choose(self, ctx, *choices: str):
@@ -90,6 +68,11 @@ class fun(commands.Cog):
             nochoices = discord.Embed(
                 description="Please add more than 1 choices")
         await ctx.send(embed=nochoices)
+
+    @commands.command()
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def reverse(self, ctx, *, text):
+        await ctx.send(text[::-1])    
 
 
 

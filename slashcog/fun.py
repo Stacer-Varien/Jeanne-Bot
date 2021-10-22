@@ -2,7 +2,6 @@ import discord
 import random
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
-import requests
 
 class fun(commands.Cog):
     def __init__(self, bot):
@@ -46,27 +45,10 @@ class fun(commands.Cog):
         await ctx.send(embed=discord.Embed(color=0x0000FF,
                                            description=f"`{random.choice(['Heads', 'Tails'])}`"))
 
-    @cog_ext.cog_slash(description="Get some hentai from Yande.re")
-    @commands.is_nsfw()
-    async def hentai(self, ctx: SlashContext, tag=None):
-        badtags=["loli", "shota", "cub", "scat", "shit", "vore", "ugly_bastard", "gore", "guro"]
-        if tag == None:
-            tag = ""
-        elif any(word in tag.lower() for word in badtags):
-            blacklisted_tags = discord.Embed(description="This tag is currently blacklisted")
-            await ctx.send(embed=blacklisted_tags)
-        else:
-            yandere_api = random.choice(requests.get(
-                        f"https://yande.re/post.json?tags=rating:explicit-loli-shota-cub-scat-ugly_bastard-vore-guro-child-urine{tag}").json())
-            yandere = discord.Embed(color=0xFFC0CB)
-            yandere.set_image(url=yandere_api["file_url"])
-            yandere.set_footer(text="Fetched from Yande.re")
+    @cog_ext.cog_slash(description="Say something and I will say it in reversed text")
+    async def reverse(self, ctx, text):
+        await ctx.send(text[::-1])
 
-            await ctx.send(embed=yandere)
 
-        if IndexError:
-            print(f"{tag} is not found in Yande.re API")  # this prevents the bot to fall apart whenever a tag is not found for some reason
-
- 
 def setup(bot):
     bot.add_cog(fun(bot))
