@@ -108,8 +108,10 @@ class info(commands.Cog):
                         value=f"{len(set(ctx.bot.get_all_members()))}", inline=True)
         embed.add_field(name="Ping Latency",
                         value=f'{round(ctx.bot.latency * 1000)}ms', inline=True)
+        embed.add_field(
+            name="Uptime", value="[Click Here](https://status.watchbot.app/bot/831993597166747679)\nPowered by [WatchBot](https://watchbot.app/)")
         embed.add_field(name="License",
-                        value='[MIT License](https://github.com/ZaneRE544/NeroBot/blob/main/LICENSE)', inline=True)
+                        value='[MIT License](https://github.com/ZaneRE544/JeanneBot/blob/main/LICENSE)', inline=True)
         embed.set_image(
             url="https://cdn.discordapp.com/avatars/831993597166747679/763c0da36ae6dec08433a01c58cf7e60.webp?size=1024")
         await ctx.send(embed=embed)
