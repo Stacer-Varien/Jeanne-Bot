@@ -1,5 +1,3 @@
-import discord
-from discord import Embed
 from discord.ext import commands
 from discord_slash.context import SlashContext
 from discord_slash.utils.manage_components import create_button, create_actionrow
@@ -61,13 +59,17 @@ class help(commands.Cog):
                 label="Hentai (NSFW CHANNEL REQUIRED)",
                 custom_id="nsfw"
             ),
+            create_button(
+                style=ButtonStyle.blue,
+                label="Utilities",
+                custom_id="utilities"
+            ),
         ]
         
         action_row = create_actionrow(*buttons1)
         action_row2 = create_actionrow(*buttons2)
 
-        await ctx.send("Click on one of the buttons to get help on a command module\nYou will see the full commands and use of them", components=[action_row])
-        await ctx.send("_ _", components=[action_row2])
+        await ctx.send("Click on one of the buttons to get help on a command module\nYou will see the full commands and use of them", components=[action_row, action_row2], delete_after=60)
 
 def setup(bot):
     bot.add_cog(help(bot))
