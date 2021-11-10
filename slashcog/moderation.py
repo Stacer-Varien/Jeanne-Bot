@@ -1,12 +1,9 @@
-import discord
-import asyncio
-import re
+import discord, asyncio, re
 from discord import Member, Embed
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 from discord.ext.commands import MissingPermissions
 from discord.utils import get
-from discord.errors import Forbidden
 
 
 time_regex = re.compile("(?:(\d{1,5})(h|s|m|d))+?")
@@ -35,7 +32,7 @@ class moderation(commands.Cog):
 
     @cog_ext.cog_slash(description="Unmute a member")
     @commands.has_permissions(kick_members=True)
-    async def unmute(self, ctx:SlashContext, member: Member):
+    async def unmute(self, ctx, member: Member):
         mutedRole = get(ctx.guild.roles, name="Muted")
 
         await member.remove_roles(mutedRole)
@@ -47,7 +44,7 @@ class moderation(commands.Cog):
         embed.add_field(name="ID", value=member.id, inline=True)
         embed.add_field(name="Responsible Moderator",
                         value=ctx.author, inline=True)
-        embed.set_image(url=member.avatar_url)
+        embed.set_thumbnail(url=member.avatar_url)
         await ctx.send(embed=embed)
 
     @cog_ext.cog_slash(description="Warn a member")
@@ -76,19 +73,21 @@ class moderation(commands.Cog):
     @cog_ext.cog_slash(description="Ban a user")
     @commands.has_permissions(ban_members=True)
     async def ban(self, ctx:SlashContext, user: Member, reason=None):
-        banmsg = Embed(description=f"You are banned from **{ctx.guild.name}** for **{reason}**")
         try:
-            await user.send(embed=banmsg) #if the member's DMs is opened before banning
-        except Forbidden: #if member's DMs are closed
-            pass    #will now ban the member
+            banmsg = Embed(
+                description=f"You are banned from **{ctx.guild.name}** for **{reason}**")
+            await user.send(embed=banmsg)
+        except:
+            pass
         ban = discord.Embed(title="User Banned", color=0xFF0000)
         ban.add_field(name="Name", value=user, inline=True)
         ban.add_field(name="ID", value=user.id, inline=True)
+        ban.add_field(name="Responsible Moderator",
+                      value=ctx.author, inline=True)
         ban.add_field(name="Reason", value=reason, inline=True)
-        ban.add_field(name="Responsible Moderator", value=ctx.author, inline=True)
-        ban.set_image(url=user.avatar_url)
+        ban.set_thumbnail(url=user.avatar_url)
         await ctx.send(embed=ban)
-        await ctx.guild.ban(user, reason=reason)
+        await user.ban(reason=reason)
 
     @ban.error
     async def ban_error(self, ctx, error):
@@ -100,23 +99,22 @@ class moderation(commands.Cog):
 
     @cog_ext.cog_slash(description="Kick a member out of the server")
     @commands.has_permissions(kick_members=True)
-    async def kick(self, ctx:SlashContext, member: discord.Member, reason=None):
-        kickmsg = Embed(
-            description=f"You are kicked from **{ctx.guild.name}** for **{reason}**")
+    async def kick(self, ctx, member: discord.Member, reason=None):
         try:
-            # if the member's DMs is opened
+            kickmsg = Embed(
+                description=f"You are kicked from **{ctx.guild.name}** for **{reason}**")
             await member.send(embed=kickmsg)
-        except Forbidden:  # if member's DMs are closed
-            pass  # will now kick the member
+        except:
+            pass
         kick = Embed(title="Member Kicked", color=0xFF0000)
         kick.add_field(name="Name", value=member, inline=True)
         kick.add_field(name="ID", value=member.id, inline=True)
-        kick.add_field(name="Reason", value=reason, inline=True)
         kick.add_field(name="Responsible Moderator",
-                      value=ctx.author, inline=True)
-        kick.set_image(url=member.avatar_url)
+                       value=ctx.author, inline=True)
+        kick.add_field(name="Reason", value=reason, inline=False)
+        kick.set_thumbnail(url=member.avatar_url)
         await ctx.send(embed=kick)
-        await ctx.guild.kick(member, reason=reason)
+        await member.kick(reason=reason)
 
     @kick.error
     async def kick_error(self, ctx, error):
@@ -124,7 +122,17 @@ class moderation(commands.Cog):
                 embed=discord.Embed(title="Kick failed", description="Sorry but you cannot kick this user", color=0xff0000)
                 embed.add_field(name="Reason", value="Missing permissions: Kick Members", inline=False)
                 await ctx.send(embed=embed) 
-        
+
+    @cog_ext.cog_slash(description="Creates a mute role")
+    @commands.bot_has_permissions(manage_roles=True)
+    async def muterole(self, ctx):
+        guild = ctx.guild
+        await guild.create_role(name="Muted")
+        await ctx.send("Mute role created")
+
+        for channel in guild.channels:
+            mute_role = get(guild.roles, name="Muted")
+            await channel.set_permissions(mute_role, speak=False, send_messages=False, read_message_history=True, read_messages=False)
 
 
     @cog_ext.cog_slash(description="Mute a member")
