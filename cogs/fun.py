@@ -2,9 +2,6 @@ import discord
 import random
 from discord.ext import commands
 from discord.ext.commands.converter import clean_content
-from discord.ext.commands.errors import CommandOnCooldown, NSFWChannelRequired
-import requests
-
 
 class fun(commands.Cog):
     def __init__(self, bot):
