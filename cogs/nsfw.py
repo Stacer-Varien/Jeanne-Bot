@@ -2,7 +2,8 @@ import discord, random, requests
 from discord import Embed
 from discord.ext import commands
 
-badtags = ["+loli", "+shota", "+cub"]
+badtags = ["loli", "shota", "cub", "scat",
+           "shit", "vore", "gore", "guro"]
 
 class nsfw(commands.Cog):
     def __init__(self, bot):
@@ -34,7 +35,9 @@ class nsfw(commands.Cog):
             yandere.set_footer(text="Fetched from Yande.re")
             await ctx.send(embed=yandere)
         except IndexError:
-            await ctx.send(f"{tag} doesn't exist. Please make sure the tag format is the same as the Yande.re tag format or if the tag exists")
+            notag = Embed(
+                description=f"{tag} doesn't exist. Please make sure the tag format is the same as the Yande.re tag format or if the tag exists")
+            await ctx.send(embed=notag)
 
     @commands.command()
     @commands.is_nsfw()
@@ -58,7 +61,9 @@ class nsfw(commands.Cog):
             gelbooru.set_footer(text="Fetched from Gelbooru")
             await ctx.send(embed=gelbooru)
         except IndexError:
-            await ctx.send(f"{tag} doesn't exist. Please make sure the tag format is the same as the Gelbooru tag format or if the tag exists")
+            notag = Embed(
+                description=f"{tag} doesn't exist. Please make sure the tag format is the same as the Gelbooru tag format or if the tag exists")
+            await ctx.send(embed=notag)
 
     @commands.command()
     @commands.is_nsfw()
@@ -82,7 +87,9 @@ class nsfw(commands.Cog):
             danbooru.set_footer(text="Fetched from Danbooru")
             await ctx.send(embed=danbooru)
         except IndexError:
-            await ctx.send(f"{tag} doesn't exist. Please make sure the tag format is the same as the Danbooru tag format or if the tag exists")
+            notag = Embed(
+                description=f"{tag} doesn't exist. Please make sure the tag format is the same as the Danbooru tag format or if the tag exists")
+            await ctx.send(embed=notag)
     
 
 

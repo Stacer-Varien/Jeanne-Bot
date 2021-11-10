@@ -11,7 +11,7 @@ class nsfw(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @cog_ext.cog_slash("Get a random hentai from Yande.re")
+    @cog_ext.cog_slash(description="Get a random hentai from Yande.re")
     @commands.is_nsfw()
     async def yandere(self, ctx:SlashContext, tag=None):
         try:
@@ -36,7 +36,9 @@ class nsfw(commands.Cog):
             yandere.set_footer(text="Fetched from Yande.re")
             await ctx.send(embed=yandere)
         except IndexError:
-            await ctx.send(f"{tag} doesn't exist. Please make sure the tag format is the same as the Yande.re tag format or if the tag exists")
+            notag = Embed(
+                description=f"{tag} doesn't exist. Please make sure the tag format is the same as the Danbooru tag format or if the tag exists")
+            await ctx.send(embed=notag)
 
     @cog_ext.cog_slash(description="Get a random hentai from Gelbooru")
     @commands.is_nsfw()
@@ -59,7 +61,9 @@ class nsfw(commands.Cog):
             gelbooru.set_footer(text="Fetched from Gelbooru")
             await ctx.send(embed=gelbooru)
         except IndexError:
-            await ctx.send(f"{tag} doesn't exist. Please make sure the tag format is the same as the Gelbooru tag format or if the tag exists")
+            notag = Embed(
+                description=f"{tag} doesn't exist. Please make sure the tag format is the same as the Danbooru tag format or if the tag exists")
+            await ctx.send(embed=notag)
 
     @cog_ext.cog_slash(description="Get a random hentai from Danbooru")
     @commands.is_nsfw()
@@ -82,7 +86,9 @@ class nsfw(commands.Cog):
             danbooru.set_footer(text="Fetched from Danbooru")
             await ctx.send(embed=danbooru)
         except IndexError:
-            await ctx.send(f"{tag} doesn't exist. Please make sure the tag format is the same as the Danbooru tag format or if the tag exists")
+            notag = Embed(
+                description=f"{tag} doesn't exist. Please make sure the tag format is the same as the Danbooru tag format or if the tag exists")
+            await ctx.send(embed=notag)
 
     
 
