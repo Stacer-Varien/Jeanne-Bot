@@ -11,7 +11,7 @@ class utilities(commands.Cog):
     @cog_ext.cog_slash(description="Get weather information on a city")
     async def weather(self, ctx:SlashContext, city):
         city = city
-        urlil = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid=f8e10f057f4c41611cc2075f28cd3f2d&units=metric'
+        urlil = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid=' #Certain APIs are private
         async with aiohttp.ClientSession() as session:
             async with session.get(urlil) as r:
                 if r.status == 200:
