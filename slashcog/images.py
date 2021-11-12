@@ -20,6 +20,7 @@ class images(commands.Cog):
         await ctx.send(embed=kitsune)
 
     @cog_ext.cog_slash(description="Need a wallpaper for your PC?")
+    @commands.is_nsfw()
     async def wallpaper(self, ctx: SlashContext):
         wallpaper_api = requests.get(
             "https://nekos.life/api/v2/img/wallpaper").json()

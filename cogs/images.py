@@ -4,10 +4,6 @@ import requests
 from discord import Embed
 from discord.ext import commands
 
-badtags = ["+loli", "+shota", "+cub", "+scat",
-           "+shit", "+vore", "+gore", "+guro"]
-
-
 class images(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -22,6 +18,7 @@ class images(commands.Cog):
         await ctx.send(embed=kitsune)
 
     @commands.command()
+    @commands.is_nsfw()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def wallpaper(self, ctx):
         wallpaper_api = requests.get(
