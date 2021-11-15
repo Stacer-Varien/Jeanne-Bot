@@ -32,18 +32,13 @@ class misc(commands.Cog):
                 style=ButtonStyle.URL,
                 label="HAZE Server",
                 url="https://discord.gg/VVxGUmqQhF"
-            ),
-            create_button(
-                style=ButtonStyle.URL,
-                label="Jeanne Support Server",
-                url="https://discord.gg/Xn3EvGcMrF"
             ),]
 
         action_row=create_actionrow(*buttons)
 
         embed = Embed(
             title="Invite me!",
-            description="Click on one of these buttons to invite me to you server or join my creator's servers",
+            description="Click on one of these buttons to invite me to you server or join my creator's server",
             color=0x00bfff)
 
         await ctx.send(embed=embed, components=[action_row])
