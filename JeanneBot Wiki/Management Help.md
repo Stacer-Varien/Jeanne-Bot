@@ -1,6 +1,6 @@
 # Management Commands
 
-*Text Channel, Voice Channel, Category commands require the `manage channels` permisson and Role commands require the `manage roles` permisson*
+*Text Channel commands, Voice Channel commands and Category commands require the `manage channels` permisson and Role commands require the `manage roles` permisson*
 
 >**Create Text Channel**
 * Creates a new text channel
