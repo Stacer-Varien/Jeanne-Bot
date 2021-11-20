@@ -1,3 +1,4 @@
+from discord import Embed
 from discord.ext import commands
 from discord_slash.context import SlashContext
 from discord_slash.utils.manage_components import create_button, create_actionrow
@@ -10,66 +11,26 @@ class help(commands.Cog):
         self.bot = bot
 
     @cog_ext.cog_slash(description="See how you can use the bot's command")
-    async def help(self, ctx: SlashContext):
-        buttons1 = [
+    async def help(self, ctx):
+        buttons = [
             create_button(
-                style=ButtonStyle.blue,
-                label="Fun",
-                custom_id="Fun"
+                style=ButtonStyle.URL,
+                label="Jeanne Wiki",
+                url="https://github.com/ZaneRE544/Jeanne-Bot/wiki/JeanneBot-Wiki#welcome-to-the-jeanne-bot-wiki"
             ),
             create_button(
-                style=ButtonStyle.blue,
-                label="Info",
-                custom_id="Info"
-            ),
-            create_button(
-                style=ButtonStyle.green,
-                label="Creater Only (OWNER ONLY)",
-                custom_id="owner"
-            ),
-            create_button(
-                style=ButtonStyle.blue,
-                label="Misc",
-                custom_id="misc"
-            ),
-            create_button(
-                style=ButtonStyle.blue,
-                label="Moderation",
-                custom_id="mod"
-            ),]
-    
-        buttons2=[    
-            create_button(
-                style=ButtonStyle.blue,
-                label="Management",
-                custom_id="manage"
-            ),
-            create_button(
-                style=ButtonStyle.blue,
-                label="Reactions",
-                custom_id="reactions"
-            ),
-            create_button(
-                style=ButtonStyle.blue,
-                label="Images",
-                custom_id="image"
-            ),
-            create_button(
-                style=ButtonStyle.red,
-                label="Hentai (NSFW CHANNEL REQUIRED)",
-                custom_id="nsfw"
-            ),
-            create_button(
-                style=ButtonStyle.blue,
-                label="Utilities",
-                custom_id="utilities"
+                style=ButtonStyle.URL,
+                label="Support Server",
+                url="https://discord.gg/VVxGUmqQhF"
             ),
         ]
-        
-        action_row = create_actionrow(*buttons1)
-        action_row2 = create_actionrow(*buttons2)
 
-        await ctx.send("Click on one of the buttons to get help on a command module\nYou will see the full commands and use of them", components=[action_row, action_row2], delete_after=60)
+        action_row = create_actionrow(*buttons)
+
+        help = Embed(
+            description="Click on one of the buttons to open the documentation or get help on the support server")
+
+        await ctx.send(embed=help, components=[action_row])
 
 def setup(bot):
     bot.add_cog(help(bot))
