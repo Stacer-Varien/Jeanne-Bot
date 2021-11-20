@@ -3,7 +3,7 @@
 >**Findserver**
 * Finds a server I'm mutual with
 * **NOTE**: This is an ***OWNER ONLY*** command which means only my creator can use it and can only work on a prefixed command
-Aliases: findserver, fserver
+* Aliases: findserver, fserver
 
     Example: `j!fserver SERVER`
 
