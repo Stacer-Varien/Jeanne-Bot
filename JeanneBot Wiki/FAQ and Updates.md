@@ -9,4 +9,4 @@
 >[**Wallpaper command now NSFW enabled**](https://github.com/ZaneRE544/ZaneRE544/blob/main/Why%20the%20wallpaper%20command%20is%20now%20NSFW%20enabled.txt)
 
 
->[**FAQ (backlogs, new commands and will be asked multiple times](https://github.com/ZaneRE544/ZaneRE544/blob/main/FAQ.txt)
+>[**FAQ (backlogs, new commands and will be asked multiple times)**](https://github.com/ZaneRE544/ZaneRE544/blob/main/FAQ.txt)
