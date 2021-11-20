@@ -155,7 +155,7 @@ class moderation(commands.Cog):
         mute.add_field(name="Duration", value=time, inline=True)
         mute.add_field(name="Responsible Moderator",
                        value=ctx.author, inline=True)
-        mute.set_image(url=member.avatar_url)
+        mute.set_thumbnail(url=member.avatar_url)
         await ctx.send(embed=mute)
         if time:
             await asyncio.sleep(time)
