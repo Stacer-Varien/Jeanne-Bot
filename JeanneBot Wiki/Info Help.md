@@ -25,7 +25,7 @@
 
 >**Guild Banner**
 * See the server's banner.
-* **NOTE:** If the server doesn't have a banner, it will return with a footer text only. If the server is not boosted to level 2, it will return with an error.
+* **NOTE:** If the server doesn't have a banner, it will return with a footer text only.
 * Aliases: guildbanner, serverbanner, gbanner, sbanner
 
     Example: `j!gbanner`
