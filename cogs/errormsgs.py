@@ -27,11 +27,7 @@ class errors(commands.Cog):
             await ctx.send(embed=embed)
         elif isinstance(error, NSFWChannelRequired):
             error = discord.Embed(
-<<<<<<< Updated upstream
-                title='Hentai Failed', description="Hentai couldn't be sent in this channel", color=0xff0000)
-=======
                 title='NSFW Failed', description="NSFW material couldn't be sent in this channel", color=0xff0000)
->>>>>>> Stashed changes
             error.add_field(
                 name="Reason", value="Channel is not NSFW enabled")
             await ctx.send(embed=error)

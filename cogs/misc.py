@@ -30,7 +30,7 @@ class misc(commands.Cog):
             ),
             create_button(
                 style=ButtonStyle.URL,
-                label="HAZE Server",
+                label="HAZE",
                 url="https://discord.gg/VVxGUmqQhF"
             ),]
 
