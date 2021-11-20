@@ -1,9 +1,12 @@
-import discord, sys
+import discord
+import sys
+import time
 from discord.ext import commands
-from discord import Member
+from discord import Member, Embed
 from discord.ext.commands.errors import MemberNotFound
 
 format = "%a, %d %b %Y | %H:%M:%S %ZGMT"
+
 
 class info(commands.Cog):
     def __init__(self, bot):
@@ -17,8 +20,8 @@ class info(commands.Cog):
             member = ctx.author
         hasroles = [
             role.mention for role in member.roles][1:][:: -1]
-        embed = discord.Embed(title="{}'s Info".format(member.name),
-                              color=0xccff33)
+        embed = Embed(title="{}'s Info".format(member.name),
+                      color=0xccff33)
         embed.add_field(name="Name",
                         value=member,
                         inline=True)
@@ -43,10 +46,9 @@ class info(commands.Cog):
     @userinfo.error
     async def userinfo_error(self, ctx, error):
         if isinstance(error, MemberNotFound):
-            embed = discord.Embed(
+            embed = Embed(
                 title="Command failed", description="This person is not in this server", color=0xff0000)
             await ctx.send(embed=embed)
-
 
     @commands.command(aliases=['sinfo', 'guild', 'ginfo'], pass_context=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -69,30 +71,72 @@ class info(commands.Cog):
         embed.add_field(name="Verification",
                         value=ctx.guild.verification_level,
                         inline=True)
+        embed.add_field(name="Boosts",
+                        value=ctx.guild.premium_subscription_count,
+                        inline=True)
+
+        if ctx.guild.premium_subscription_count < 2:
+            boostlevel = "Level 0"
+        elif ctx.guild.premium_subscription_count < 3:
+            boostlevel="Level 1"
+        elif ctx.guild.premium_subscription_count < 8:
+            boostlevel = "Level 2"
+        elif ctx.guild.premium_subscription_count==14:
+            boostlevel = "Level 3"
+        elif ctx.guild.premium_subscription_count <14:
+            boostlevel = "Level 3"
+            
+        embed.add_field(name="Boost Level",
+                        value=boostlevel,
+                        inline=True)
         embed.add_field(name="Roles", value=len(ctx.guild.roles), inline=True)
-        embed.add_field(name="Features", value=features, inline=False)
         embed.add_field(name="Emojis", value=len(emojis), inline=True)
         if len(emojis) > 10:
             emojis = emojis[:10]
-        elif len(emojis)==0:
-            emojis="None"
+        elif len(emojis) == 0:
+            emojis = "None"
         embed.add_field(name='Emojis (first 10)',
                         value="".join(emojis), inline=False)
+        embed.add_field(name="Features", value=features, inline=False)
 
         embed.set_thumbnail(url=ctx.guild.icon_url)
         embed.set_image(url=ctx.guild.splash_url)
         await ctx.send(embed=embed)
 
+    @commands.command(aliases=['serverbanner', 'gbanner', 'sbanner'])
+    async def guildbanner(self, ctx):
+        guild = ctx.guild
+        banner = guild.banner_url
+
+        if guild.premium_subscription_count < 7:
+            nobanner = Embed(description="Server is not boosted at level 2")
+            await ctx.send(embed=nobanner)
+
+        else:
+
+            embed = Embed(colour=0x00B0ff)
+            embed.set_footer(text=f"{guild.name}'s banner")
+            embed.set_image(url=banner)
+            await ctx.send(embed=embed)
+
     @commands.command()
     async def ping(self, ctx):
-        embed = discord.Embed(color=0x236ce1)
+
+        start_time = time.time()
+        test = Embed(description="Testing Ping...", colour=0x236ce1)
+        message = await ctx.send(embed=test)
+        end_time = time.time()
+
+        embed = Embed(color=0x236ce1)
         embed.add_field(
-            name="Ping", value=f'{round(ctx.bot.latency * 1000)}ms', inline=False)
-        await ctx.send(embed=embed)
+            name="Ping Latency", value=f'{round(ctx.bot.latency * 1000)}ms', inline=False)
+        embed.add_field(
+            name="API Latency", value=f'{round((end_time - start_time) * 1000)}ms', inline=False)
+        await message.edit(embed=embed)
 
     @commands.command()
     async def stats(self, ctx):
-        embed = discord.Embed(title="Bot stats", color=0x236ce1)
+        embed = Embed(title="Bot stats", color=0x236ce1)
         embed.add_field(
             name="Name", value="<@!831993597166747679>", inline=True)
         embed.add_field(name="Bot ID", value="831993597166747679", inline=True)
@@ -110,8 +154,6 @@ class info(commands.Cog):
                         value=f'{round(ctx.bot.latency * 1000)}ms', inline=True)
         embed.add_field(
             name="Uptime", value="[Click Here](https://status.watchbot.app/bot/831993597166747679)\nPowered by [WatchBot](https://watchbot.app/)")
-        embed.add_field(name="License",
-                        value='[MIT License](https://github.com/ZaneRE544/JeanneBot/blob/main/LICENSE)', inline=True)
         embed.set_thumbnail(
             url="https://cdn.discordapp.com/avatars/831993597166747679/763c0da36ae6dec08433a01c58cf7e60.webp?size=1024")
         await ctx.send(embed=embed)
