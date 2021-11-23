@@ -29,7 +29,7 @@ class moderation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.command(aliases=['unb'])
     @commands.has_permissions(ban_members=True)
     async def unban(self, ctx, user : User, *, reason=None):
                 await ctx.guild.unban(user)
@@ -44,6 +44,18 @@ class moderation(commands.Cog):
                 embed.set_thumbnail(url=user.avatar_url)
                 await ctx.send(embed=embed)
 
+    @unban.error
+    async def unban_error(self, ctx, error):
+        if isinstance(error, MissingPermissions):
+            embed = Embed(
+                title="Unban failed", description="Sorry but you cannot unban this user", color=0xff0000)
+            embed.add_field(
+                name="Reason", value="Missing permissions: Ban Members", inline=False)
+            await ctx.send(embed=embed)
+        elif isinstance(error, MemberNotFound):
+            embed = Embed(
+                title="Unban failed", description="Invalid user ID given.", color=0xff0000)
+            await ctx.send(embed=embed)
 
     @commands.command()
     @commands.has_permissions(kick_members=True)
@@ -80,12 +92,7 @@ class moderation(commands.Cog):
                 embed=Embed(title="Warn failed", description="Sorry but you cannot warn this user", color=0xff0000)
                 embed.add_field(name="Reason", value="Missing permissions: Kick Members", inline=False)
                 await ctx.send(embed=embed)
-             elif isinstance(error, MemberNotFound):
-                embed = discord.Embed(
-                    Title="Warn failed", color=0xff0000)
-                embed.add_field(
-                    name="Reason", value="Member is not in this server or invalid user ID has been given", inline=False)
-                await ctx.send(embed=embed)
+
 
 
     @commands.command(pass_context=True, aliases=['b'])
@@ -146,10 +153,7 @@ class moderation(commands.Cog):
             embed=Embed(title="Kick failed", description="Sorry but you cannot kick this user", color=0xff0000)
             embed.add_field(name="Reason", value="Missing permissions: Kick Members", inline=False)
             await ctx.send(embed=embed)
-        elif isinstance(error, MemberNotFound):             
-            embed = Embed(
-                title="Kick failed", description="Member is not in this server", color=0xff0000)
-            await ctx.send(embed=embed)    
+   
         
     @commands.command()
     @commands.bot_has_permissions(manage_roles=True)
@@ -194,11 +198,32 @@ class moderation(commands.Cog):
             embed=discord.Embed(title="Mute failed", description="Sorry but you cannot mute this user", color=0xff0000)
             embed.add_field(name="Reason", value="Missing permissions: Kick Members", inline=False)
             await ctx.send(embed=embed)     
-        elif isinstance(error, MissingPermissions):
-            embed = discord.Embed(
-                title="Mute failed", description="Member is not in this server", color=0xff0000)
-            await ctx.send(embed=embed)
+
  
+    @commands.command(aliases=['nick', 'changenick', 'setnick'])
+    @commands.bot_has_permissions(manage_nicknames=True)
+    async def change_nickname(self, ctx, member: Member, *, nickname=None):
+
+        if not nickname:
+            nonick = discord.Embed(description="Please add a nickname")
+            await ctx.send(embed=nonick)
+
+        else:
+            await member.edit(nick=nickname)
+            setnick = Embed(color=0x00FF68)
+            setnick.add_field(name="Nickname changed",
+                        value=f"{member}'s nickname is now `{nickname}`", inline=False)
+            await ctx.send(embed=setnick)
+
+    @change_nickname.error
+    async def change_nickname_error(self, ctx, error):
+        if isinstance(error, MissingPermissions):
+            embed = discord.Embed(
+                title="Change Nickname failed", description="Sorry but you cannot change this member's nickname", color=0xff0000)
+            embed.add_field(
+                name="Reason", value="Missing permissions: Manage Nicknames", inline=False)
+            await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(moderation(bot))

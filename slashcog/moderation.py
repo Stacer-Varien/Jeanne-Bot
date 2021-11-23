@@ -195,5 +195,28 @@ class moderation(commands.Cog):
                 embed.add_field(name="Reason", value="Missing permissions: Manage Messages", inline=False)
                 await ctx.send(embed=embed) 
 
+    @cog_ext.cog_slash(description="Change someone's nickname")
+    async def change_nickname(self, ctx, member: Member, nickname=None):
+
+        if not nickname:
+            nonick = discord.Embed(description="Please add a nickname")
+            await ctx.send(embed=nonick)
+
+        else:
+            await member.edit(nick=nickname)
+            setnick = Embed(color=0x00FF68)
+            setnick.add_field(name="Nickname changed",
+                              value=f"{member}'s nickname is now `{nickname}`", inline=False)
+            await ctx.send(embed=setnick)
+
+    @change_nickname.error
+    async def change_nickname_error(self, ctx, error):
+        if isinstance(error, MissingPermissions):
+            embed = discord.Embed(
+                title="Change Nickname failed", description="Sorry but you cannot change this member's nickname", color=0xff0000)
+            embed.add_field(
+                name="Reason", value="Missing permissions: Manage Nicknames", inline=False)
+            await ctx.send(embed=embed)
+
 def setup(bot):
     bot.add_cog(moderation(bot))
