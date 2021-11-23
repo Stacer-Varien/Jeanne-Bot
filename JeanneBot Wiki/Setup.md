@@ -10,7 +10,7 @@ Before inviting Jeanne into the server, make sure she has the following permissi
 **Moderation Permissions**
 
 * The `manage messages` permission allows Jeanne to delete messages if a `purge` command has been used. It is also needed for certain fun commands.
-* The `kick members` permission allows Jeanne to warn, mute, unmute and kick members. 
+* The `kick members` permission allows Jeanne to warn, mute, unmute and kick members.
 * The `ban members` permission allows Jeaane to ban and unban members.
 
 **Manage Role Permission**
@@ -23,4 +23,4 @@ Before inviting Jeanne into the server, make sure she has the following permissi
 
 **Manage Nicknames Permission**
 
-* I have plans to allow users to change their own nickname with Jeanne or anyone who has the `manage nicknames` permission can change nicknames of other users.
+* This allows Jeanne to change a member's nickname
