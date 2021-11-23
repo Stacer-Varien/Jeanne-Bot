@@ -19,16 +19,17 @@ class fun(commands.Cog):
             'Concentrate and ask again.', 'Dont count on it.', 'My reply is no.',
             'My sources say no.', 'Outlook not so good.', 'Very doubtful.'
         ]
-        embed = discord.Embed(color=0x0000FF)
-        embed.add_field(name="Question:", value=f'{question}', inline=False)
-        embed.add_field(
-            name="Answer:", value=f'{random.choice(responses)}', inline=False)
-        await ctx.send(embed=embed)
-
-        if question==None:
+        if not question:
             noquestion = discord.Embed(
                 description="Please add a question")
-        await ctx.send(embed=noquestion)
+            await ctx.send(embed=noquestion)
+        else:
+            embed = discord.Embed(color=0x0000FF)
+            embed.add_field(name="Question:", value=f'{question}', inline=False)
+            embed.add_field(
+                name="Answer:", value=f'{random.choice(responses)}', inline=False)
+            await ctx.send(embed=embed)
+
 
     @commands.command(aliases=['rd', 'dice'])
     @commands.cooldown(1, 5, commands.BucketType.user)

@@ -125,7 +125,7 @@ class manage(commands.Cog):
                         value=f"`{category}` has been deleted", inline=False)
         await ctx.send(embed=embed)
 
-    @commands.command(pass_context=True, aliases=['rncat', 'renamecat', 'rncategory', 'renamecategory'])
+    @commands.command(aliases=['rncat', 'renamecat', 'rncategory', 'renamecategory'])
     @commands.has_permissions(manage_channels=True)
     async def rename_category(self, ctx, category: CategoryChannel, *, new_name):
         await category.edit(name=new_name)
@@ -133,8 +133,6 @@ class manage(commands.Cog):
         embed.add_field(name="Category renamed",
                         value=f"Category is now `{new_name}`", inline=False)
         await ctx.send(embed=embed)
-
-
 
 def setup(bot):
     bot.add_cog(manage(bot))
