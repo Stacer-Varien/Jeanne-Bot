@@ -5,7 +5,7 @@ Before inviting Jeanne into the server, make sure she has the following permissi
 
 **Main Permissions**
 
-* Jeanne needs the `send messages`, `embed links`, `attach files` and `use application commands` permissions to be enabled as almost all of the responses are in embed. She also needs the `attach files` permission in case I make a command that requires it. The `use application commands` allows her to have slash commands installed in the server.
+* Jeanne needs the `send messages`, `embed links`, `attach files` and `use application commands` permissions to be enabled as almost all of the responses are in embed. She also needs the `attach files` permission for certain commands.
 
 **Moderation Permissions**
 
