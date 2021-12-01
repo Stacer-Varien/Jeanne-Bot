@@ -10,7 +10,8 @@
 
 >**Kick**
 
-* Kicks a user out of the server. They are able to come back to the server. You can add a reason for what they did
+* Kicks a user out of the server. You can add a reason for what they did
+* **NOTE:**  They are able to come back to the server if they have the invite
 * **Required permissions:** Kick Members
 * **Aliases:** kick, k
 
