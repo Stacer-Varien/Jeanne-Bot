@@ -10,7 +10,8 @@
 
 >**Kick**
 
-* Kicks a user out of the server. They are able to come back to the server. You can add a reason for what they did
+* Kicks a user out of the server. You can add a reason for what they did
+* **NOTE:**  They are able to come back to the server if they have the invite
 * **Required permissions:** Kick Members
 * **Aliases:** kick, k
 
@@ -20,7 +21,6 @@
 
 * Bans a user permanently. You can add a reason for what they did
 * **Required permissions:** Ban Members
-* **NOTE:** For an outside ban, use the prefixed ban command
 * **Aliases:** ban, b
 
     Example: `j!b USER REASON`
@@ -29,7 +29,6 @@
 
 * Unbans a user so they can be able to come back to the server. You can add a reason why they are unbanned
 * **Required permissions:** Ban Members
-* **NOTE:**This command can only work by a prefixed unban command
 * **Aliases:** unban, unb
 
     Example: `j!unb USER REASON`
