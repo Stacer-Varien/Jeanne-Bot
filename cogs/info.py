@@ -25,9 +25,6 @@ class info(commands.Cog):
         else:
             botr = ":x:"
 
-        if len(hasroles) > 20:
-            hasroles = hasroles[:20]
-
         userinfo = Embed(title="{}'s Info".format(member.name),
                          color=0xccff33)
         userinfo.add_field(name="General Information",
@@ -37,7 +34,7 @@ class info(commands.Cog):
                            value=f"**>** **Joined Server:** {member.joined_at.strftime(format)}\n**>** **Number of Roles:** {len(member.roles)}",
                            inline=True)
         userinfo.add_field(name="Roles Held",
-                           value=''.join(hasroles) + '@everyone', inline=False)
+                           value=''.join(hasroles[:20]) + '@everyone', inline=False)
         userinfo.set_thumbnail(url=member.avatar_url)
         await ctx.send(embed=userinfo)
 
@@ -48,12 +45,8 @@ class info(commands.Cog):
         guild=ctx.guild
         emojis = [str(x) for x in guild.emojis]
         features = [str(x) for x in guild.features]
-
-        if len(emojis) > 10:
-            emojis=emojis[:10]
-
-        if len(emojis) == 0:
-            emojis = "None"
+        true_member_count = len([m for m in guild.members if not m.bot])
+        bots = len([m for m in guild.members if m.bot])
 
         if guild.premium_subscription_count < 2:
             boostlevel = "Level 0"
@@ -68,14 +61,14 @@ class info(commands.Cog):
 
         embed = Embed(title="Server's Info", color=0x00B0ff)
         embed.add_field(name="General Information",
-                        value=f"**>** **Name:** {guild.name}\n**>** **ID:** {guild.id}\n**>** **Creation Date:** {guild.created_at.strftime(format)}\n**>** **Member Count:** {len(guild.members)}\n**>** **Verification:** {guild.verification_level}\n**>** **Roles:** {len(guild.roles)}", inline=True)
+                        value=f"**>** **Name:** {guild.name}\n**>** **ID:** {guild.id}\n**>** **Creation Date:** {guild.created_at.strftime(format)}\n**>** **Member Count:** {len(guild.members)}\n**>** **Verification:** {guild.verification_level}\n**>** **Roles:** {len(guild.roles)}\n**>** **Emojis:** {len(emojis)}\n{''.join(emojis[:10])}", inline=True)
         embed.add_field(
-            name="Owner", value=f"**>** **Name:**{guild.owner}\n**>** **ID:** {guild.owner.id}", inline=True)
+            name="Owner", value=f"**>** **Name:** {guild.owner}\n**>** **ID:** {guild.owner.id}", inline=True)
         embed.add_field(name="_ _", value="_ _", inline=False)
         embed.add_field(name="Boost Status",
                         value=f"**>** **Boosters:** {len(guild.premium_subscribers)}\n**>** **Boosts:** {guild.premium_subscription_count}\n**>** **Boost Level:** {boostlevel}",
                         inline=True)
-        embed.add_field(name="Emojis", value=f"**>** **Number of Emojis:** {len(emojis)}\n{''.join(emojis)}", inline=True)
+        embed.add_field(name="Members", value=f"**>** **Humans:** {true_member_count}\n**>** **Bots:** {bots}")
         embed.add_field(name="_ _", value="_ _", inline=False)
         embed.add_field(name='Features',
                         value=features, inline=False)
@@ -84,8 +77,6 @@ class info(commands.Cog):
         embed.set_thumbnail(url=guild.icon_url)
         embed.set_image(url=guild.splash_url)
         await ctx.send(embed=embed)
-
-
 
     @commands.command(aliases=['serverbanner', 'gbanner', 'sbanner'])
     async def guildbanner(self, ctx):
@@ -152,3 +143,5 @@ class info(commands.Cog):
 
 def setup(bot):
     bot.add_cog(info(bot))
+
+
