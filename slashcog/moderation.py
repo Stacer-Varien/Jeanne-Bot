@@ -1,7 +1,7 @@
 import discord, asyncio, re
-from discord import Member, Embed
+from discord import Member, Embed, NotFound
 from discord.ext import commands
-from discord_slash import cog_ext, SlashContext
+from discord_slash import cog_ext
 from discord.ext.commands import MissingPermissions
 from discord.ext.commands.errors import MemberNotFound
 from discord.utils import get
@@ -67,29 +67,63 @@ class moderation(commands.Cog):
                 embed.add_field(name="Reason", value="Missing permissions: Kick Members", inline=False)
                 await ctx.send(embed=embed) 
 
-    @cog_ext.cog_slash(description="Ban a user")
+    @cog_ext.cog_slash(description="Ban a member in the server")
     @commands.has_permissions(ban_members=True)
-    async def ban(self, ctx:SlashContext, user_id, reason=None):
-        user= await self.bot.fetch_user(user_id)
+    async def memberban(self, ctx, member=Member, reason=None):
         if reason == None:
             reason = "Unspecified"
 
         try:
             banmsg = Embed(
                 description=f"You are banned from **{ctx.guild.name}** for **{reason}**")
-            await user.send(embed=banmsg)
+            await member.send(embed=banmsg)
         except:
             pass
         ban = discord.Embed(title="Member Banned", color=0xFF0000)
         ban.add_field(name="Member",
-                        value=f"**>** **Name:** {user}\n**>** **ID:** {user.id}",
+                        value=f"**>** **Name:** {member}\n**>** **ID:** {member.id}",
                         inline=True)
         ban.add_field(
             name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.author}\n**>** **Reason:** {reason}", inline=True)
+        ban.set_thumbnail(url=member.avatar_url)
         await ctx.send(embed=ban)
-        await ctx.guild.ban(user, reason=reason)
+        await member.ban(reason=reason)
 
-    @ban.error
+    @cog_ext.cog_slash(description="Ban a user before they join your server")
+    @commands.has_permissions(ban_members=True)
+    async def outsideban(self, ctx, user_id, reason=None):
+        user=await self.bot.fetch_user(user_id)
+        guild = ctx.guild
+        if reason == None:
+            reason = "Unspecified"
+
+        try:
+            banned = await guild.fetch_ban(user)
+        except NotFound:
+            banned = False
+
+        if banned:
+            already_banned = Embed(description="User is already banned here")
+            await ctx.send(embed=already_banned)
+
+        else:
+            try:
+                banmsg = Embed(
+                    description=f"You are banned from **{ctx.guild.name}** for **{reason}**")
+                await user.send(embed=banmsg)
+            except:
+                pass
+            ban = Embed(title="Member Banned", color=0xFF0000)
+            ban.add_field(name="Member",
+                          value=f"**>** **Name:** {user}\n**>** **ID:** {user.id}",
+                          inline=True)
+            ban.add_field(
+                name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.author}\n**>** **Reason:** {reason}", inline=True)
+            ban.set_thumbnail(url=user.avatar_url)
+            await ctx.send(embed=ban)
+            await guild.ban(user, reason=reason)
+
+    @memberban.error
     async def ban_error(self, ctx, error):
              if isinstance(error, MissingPermissions):
                 embed=discord.Embed(title="Ban failed", description="Sorry but you cannot ban this user", color=0xff0000)

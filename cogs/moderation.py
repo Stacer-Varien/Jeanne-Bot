@@ -1,5 +1,5 @@
 import asyncio, re
-from discord import User, Member, Embed
+from discord import User, Member, Embed, NotFound
 from discord.ext import commands
 from discord.ext.commands import MissingPermissions
 from discord.ext.commands.errors import MemberNotFound
@@ -102,19 +102,30 @@ class moderation(commands.Cog):
             reason = "Unspecified"
 
         try:
-            banmsg = Embed(
-                description=f"You are banned from **{ctx.guild.name}** for **{reason}**")
-            await user.send(embed=banmsg)
-        except:
-            pass
-        ban = Embed(title="Member Banned", color=0xFF0000)
-        ban.add_field(name="Member",
-                      value=f"**>** **Name:** {user}\n**>** **ID:** {user.id}",
-                      inline=True)
-        ban.add_field(
-            name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.author}\n**>** **Reason:** {reason}", inline=True)
-        await ctx.send(embed=ban)
-        await guild.ban(user, reason=reason)
+            banned = await guild.fetch_ban(user)
+        except NotFound:
+            banned = False
+
+        if banned:
+            already_banned = Embed(description="User is already banned here")
+            await ctx.send(embed=already_banned)
+        
+        else:
+            try:
+                banmsg = Embed(
+                    description=f"You are banned from **{ctx.guild.name}** for **{reason}**")
+                await user.send(embed=banmsg)
+            except:
+                pass
+            ban = Embed(title="Member Banned", color=0xFF0000)
+            ban.add_field(name="Member",
+                        value=f"**>** **Name:** {user}\n**>** **ID:** {user.id}",
+                        inline=True)
+            ban.add_field(
+                name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.author}\n**>** **Reason:** {reason}", inline=True)
+            ban.set_thumbnail(url=user.avatar_url)
+            await ctx.send(embed=ban)
+            await guild.ban(user, reason=reason)
 
 
     @ban.error
