@@ -25,6 +25,22 @@
 
     Example: `j!b USER REASON`
 
+>**Memberban**
+
+* Bans a user permanently. You can add a reason for what they did
+* **NOTE:** This is a slash command that bans a user from the server
+* **Required permissions:** Ban Members
+
+    Example: `/memberban USER REASON`
+
+>**Outsideban**
+
+* Bans a user permanently and prevents them from entering your server. You can add a reason for what they did
+* **NOTE:** This is a slash command that bans a user outside the server
+* **Required permissions:** Ban Members
+
+    Example: `/outsideban USER REASON`
+
 >**Unban**
 
 * Unbans a user so they can be able to come back to the server. You can add a reason why they are unbanned

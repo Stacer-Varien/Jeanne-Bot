@@ -25,3 +25,9 @@
 * Get a random Saber image from Jeanne
 
     Example: `j!saber`
+
+>**Neko**
+
+* Get a random neko image from Jeanne
+
+    Example: `j!neko`
