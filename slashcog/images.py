@@ -48,6 +48,16 @@ class images(commands.Cog):
         saber.set_footer(text="Powered by JeanneBot")
         await ctx.send(file=file, embed=saber)
 
+    @cog_ext.cog_slash(description="Get a random neko image")
+    async def neko(self, ctx):
+        file_path_type = ["./Images/Neko/*.jpg"]
+        images = glob.glob(random.choice(file_path_type))
+        random_image = random.choice(images)
+        file = File(random_image)
+        neko = Embed(color=0xFFC0CB)
+        neko.set_footer(text="Powered by JeanneBot")
+        await ctx.send(file=file, embed=neko)
+
 
 def setup(bot):
     bot.add_cog(images(bot))
