@@ -1,10 +1,11 @@
-import discord, sys, time
+import discord, sys, time, datetime
 from discord.ext import commands
 from discord.ext.commands import BucketType
 from discord import Member, Embed
 
 
 format = "%d %b %Y | %H:%M:%S"
+start_time = time.time()
 
 
 class info(commands.Cog):
@@ -126,8 +127,11 @@ class info(commands.Cog):
         embed.add_field(name="_ _", value="_ _", inline=False)
         embed.add_field(name="Ping",
                         value=f"**>** **Bot Latency:** {round(ctx.bot.latency * 1000)}ms", inline=True)
+        current_time = time.time()
+        difference = int(round(current_time - start_time))
+        uptime = str(datetime.timedelta(seconds=difference))
         embed.add_field(
-            name="Uptime", value="[Click Here](https://status.watchbot.app/bot/831993597166747679)\nPowered by [WatchBot](https://watchbot.app/)")
+            name="Uptime", value=f"{uptime} hours")
         embed.set_thumbnail(
             url=self.bot.user.avatar_url)
         await ctx.send(embed=embed)
