@@ -30,7 +30,19 @@ class owner(commands.Cog):
             await ctx.send(f"Bot's activity changed to `listening to {activity}`")
         elif activitytype=="play":
             await ctx.bot.change_presence(activity=discord.Game(name=activity))
-            await ctx.send(f"Bot's activity changed to `playing with {activity}`")
+            await ctx.send(f"Bot's activity changed to `playing {activity}`")
+
+    @cog_ext.cog_slash(description="Get mutuals of a user")
+    @commands.is_owner()
+    async def mutuals(self, ctx, user_id):
+        user=await self.bot.fetch_user(user_id)
+        embed = Embed(title="Mutual Servers",
+                      color=0xF7FF00)
+        embed.add_field(name="Name", value=user, inline=True)
+        embed.add_field(name="Mutuals", value=len(
+            user.mutual_guilds), inline=True)
+        embed.add_field(name="Servers", value=user.mutual_guilds, inline=False)
+        await ctx.send(embed=embed)
 
     @cog_ext.cog_slash(description="Finds a user")
     @commands.is_owner()
