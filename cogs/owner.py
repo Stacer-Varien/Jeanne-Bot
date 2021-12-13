@@ -1,7 +1,10 @@
-import discord
+import discord, sys, os
 from discord import Embed, Activity, ActivityType
 from discord.ext import commands
 from discord import User, Guild
+
+def restart_bot():
+  os.execv(sys.executable, ['python'] + sys.argv)
 
 format = "%a, %d %b %Y | %H:%M:%S %ZGMT"
 class owner(commands.Cog):
@@ -74,6 +77,12 @@ class owner(commands.Cog):
         elif activitytype=="play":
             await ctx.bot.change_presence(activity=discord.Game(name=activity))
             await ctx.send(f"Bot's activity changed to `playing {activity}`")
+
+    @commands.command()
+    @commands.is_owner()
+    async def update(self, ctx):
+        await ctx.send(f"YAY! NEW UPDATE!")
+        restart_bot()              
 
 def setup(bot):
     bot.add_cog(owner(bot))
