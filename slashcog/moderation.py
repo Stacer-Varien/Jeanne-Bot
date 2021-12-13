@@ -69,7 +69,7 @@ class moderation(commands.Cog):
 
     @cog_ext.cog_slash(description="Ban a member in the server")
     @commands.has_permissions(ban_members=True)
-    async def memberban(self, ctx, member=Member, reason=None):
+    async def memberban(self, ctx, member: Member, reason=None):
         if reason == None:
             reason = "Unspecified"
 
@@ -107,12 +107,6 @@ class moderation(commands.Cog):
             await ctx.send(embed=already_banned)
 
         else:
-            try:
-                banmsg = Embed(
-                    description=f"You are banned from **{ctx.guild.name}** for **{reason}**")
-                await user.send(embed=banmsg)
-            except:
-                pass
             ban = Embed(title="Member Banned", color=0xFF0000)
             ban.add_field(name="Member",
                           value=f"**>** **Name:** {user}\n**>** **ID:** {user.id}",
