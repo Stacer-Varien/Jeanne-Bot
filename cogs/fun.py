@@ -1,13 +1,15 @@
-import discord
-import random
+import discord, random
+from asyncio import TimeoutError
+from discord import Embed
 from discord.ext import commands
 from discord.ext.commands.converter import clean_content
+
 
 class fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=['8ball', 'test', '8b'])
+    @commands.command(aliases=['8ball', '8b'])
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def _8ball(self, ctx, *, question=None):
         responses = [
@@ -57,20 +59,50 @@ class fun(commands.Cog):
     @commands.command(aliases=["pick"])
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def choose(self, ctx, *choices: str):
-        if len(choices) > 1:
+        if len(choices) == 1:
+            nochoices = discord.Embed(
+                description="Please add more than 1 choices")
+            await ctx.send(embed=nochoices)
+        
+        else:
             choose = discord.Embed(
                 description=f"I chose **{random.choice(choices)}**")
             await ctx.send(embed=choose)
 
-        elif len(choices) == 1:
-            nochoices = discord.Embed(
-                description="Please add more than 1 choices")
-        await ctx.send(embed=nochoices)
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def reverse(self, ctx, *, text):
-        await ctx.send(text[::-1])    
+        await ctx.send(text[::-1])   
+
+    @commands.command()
+    async def guess(self, ctx):
+        guessit=Embed(description="Guess my number!\nYou have 5 seconds to guess it")
+        await ctx.send(embed=guessit)
+        if ctx.author.id == self.bot.user.id:
+            return
+
+        def is_correct(m):
+                return m.author == ctx.author and m.content.isdigit()
+
+        answer = random.randint(1, 10)
+
+
+        try:
+            guess = await self.bot.wait_for("message", check=is_correct, timeout=5.0)
+        except TimeoutError:
+            timeout=Embed(description=f"Sorry but you took too long. It was {answer}")
+            timeout.set_thumbnail(url="https://cdn.discordapp.com/attachments/809862945684717644/920222496324734996/86052023e81b59d10c95b44ce2751273.jpg")
+            return await ctx.send(embed=timeout)
+
+        if int(guess.content) == answer:
+            correct=Embed(description="YES!")
+            correct.set_image(url="https://cdn.discordapp.com/attachments/809862945684717644/920227513827999744/ezgif.com-gif-maker.gif")
+            await ctx.send(embed=correct)
+        else:
+            wrong=Embed(description=f"Wrong answer. It was {answer}")
+            wrong.set_thumbnail(url="https://cdn.discordapp.com/attachments/809862945684717644/920222496324734996/86052023e81b59d10c95b44ce2751273.jpg")
+            await ctx.send(embed=wrong) 
 
 
 
