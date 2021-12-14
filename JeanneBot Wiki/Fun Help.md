@@ -40,3 +40,10 @@
 * Say something and I will say it in reversed text
 
  Example: `j!reverse TEXT`
+
+>**Guess**
+
+* Guess my number and I will reward you with a hug!
+* **NOTE:** You have to pick a number between 1 to 10. After executing the command, you have to guess the number after she starts asking. You have 5 seconds to guess the correct one.
+
+ Example: `j!guess` then after she asks, `NUMBER`
