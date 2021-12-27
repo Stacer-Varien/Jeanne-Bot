@@ -1,56 +1,49 @@
-import discord, random
 from asyncio import TimeoutError
-from discord import Embed
-from discord.ext import commands
-from discord_slash import cog_ext
+from random import choice, randint
+from discord import Embed, File
+from glob import glob
+from discord.ext.commands import Cog
+from discord_slash.cog_ext import cog_slash as jeanne_slash
+from assets.needed import eight_ball_answers
 
-class fun(commands.Cog):
+class fun(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @cog_ext.cog_slash(name='8ball', description="Ask 8 ball anything and you will get your awnser")
+    @jeanne_slash(name='8ball', description="Ask 8 ball anything and you will get your awnser")
     async def _8ball(self, ctx, question):
-        responses = [
-            'It is certain.', 'It is decidedly so.', 'Without a doubt.',
-            'Yes – definitely.', 'You may rely on it.', 'As I see it, yes.',
-            'Most likely.', 'Outlook good.', 'Yes.', 'Signs point to yes.',
-            'Reply hazy, try again.', 'Ask again later.',
-            'Better not tell you now.', 'Cannot predict now.',
-            'Concentrate and ask again.', 'Dont count on it.', 'My reply is no.',
-            'My sources say no.', 'Outlook not so good.', 'Very doubtful.'
-        ]
-        embed = discord.Embed(color=0x0000FF)
+        embed = Embed(color=0x0000FF)
         embed.add_field(name="Question:", value=f'{question}', inline=False)
         embed.add_field(
-            name="Answer:", value=f'{random.choice(responses)}', inline=False)
+            name="Answer:", value=f'{choice(eight_ball_answers)}', inline=False)
         await ctx.send(embed=embed)
 
-    @cog_ext.cog_slash(description="Roll a dice")
+    @jeanne_slash(description="Roll a dice")
     async def dice(self, ctx):
-        embed = discord.Embed(color=0x0000FF)
+        embed = Embed(color=0x0000FF)
         embed.add_field(name="Dice Rolled", value="You rolled a {}!".format(
-            random.randint(1, 6)), inline=False)
+            randint(1, 6)), inline=False)
         await ctx.send(embed=embed)
 
-    @cog_ext.cog_slash(description="Type two words to get one combined word")
+    @jeanne_slash(description="Type two words to get one combined word")
     async def combine(self, ctx, name1, name2):
         name1letters = name1[:round(len(name1) / 2)]
         name2letters = name2[round(len(name2) / 2):]
         ship = "".join([name1letters, name2letters])
-        emb = (discord.Embed(color=0x36393e, description=f"{ship}"))
+        emb = (Embed(color=0x36393e, description=f"{ship}"))
         emb.set_author(name=f"{name1} + {name2}")
         await ctx.send(embed=emb)
 
-    @cog_ext.cog_slash(description="Flip a coin")
+    @jeanne_slash(description="Flip a coin")
     async def flip(self, ctx):
-        await ctx.send(embed=discord.Embed(color=0x0000FF,
-                                           description=f"`{random.choice(['Heads', 'Tails'])}`"))
+        await ctx.send(embed=Embed(color=0x0000FF,
+                                           description=f"`{choice(['Heads', 'Tails'])}`"))
 
-    @cog_ext.cog_slash(description="Say something and I will say it in reversed text")
+    @jeanne_slash(description="Say something and I will say it in reversed text")
     async def reverse(self, ctx, text):
         await ctx.send(text[::-1])
 
-    @cog_ext.cog_slash(description="Guess my number")
+    @jeanne_slash(description="Guess my number")
     async def guess(self, ctx):
         guessit=Embed(description="Guess my number!\nYou have 5 seconds to guess it")
         await ctx.send(embed=guessit)
@@ -60,7 +53,7 @@ class fun(commands.Cog):
         def is_correct(m):
                 return m.author == ctx.author and m.content.isdigit()
 
-        answer = random.randint(1, 10)
+        answer = randint(1, 10)
 
 
         try:
@@ -79,7 +72,15 @@ class fun(commands.Cog):
             wrong.set_thumbnail(url="https://cdn.discordapp.com/attachments/809862945684717644/920222496324734996/86052023e81b59d10c95b44ce2751273.jpg")
             await ctx.send(embed=wrong) 
 
-
+    @jeanne_slash(description="Get a random animeme")
+    async def animeme(self, ctx):
+            file_path_type = ["./Media/animemes/*.mp4", "./Media/animemes/*.jpg"]
+            animemes = glob(choice(file_path_type))
+            random_animeme = choice(animemes)
+            file = File(random_animeme)
+            animeme = Embed(color=0x0000FF)
+            animeme.set_footer(text="Powered by JeanneBot")
+            await ctx.send(file=file, embed=animeme)
 
 def setup(bot):
     bot.add_cog(fun(bot))
