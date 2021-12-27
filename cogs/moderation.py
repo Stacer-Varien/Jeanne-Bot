@@ -1,36 +1,36 @@
-import asyncio, re
 from discord import User, Member, Embed, NotFound
-from discord.ext import commands
-from discord.ext.commands import MissingPermissions
+from re import findall, compile
+from asyncio import sleep
+from discord.ext.commands import MissingPermissions, command as jeanne, Cog, Converter, BadArgument, has_permissions as perms, bot_has_permissions as bot_perms
 from discord.ext.commands.errors import MemberNotFound
 from discord.utils import get
 
 
-time_regex = re.compile("(?:(\d{1,5})(h|s|m|d))+?")
+time_regex = compile("(?:(\d{1,5})(h|s|m|d))+?")
 time_dict = {"h": 3600, "s": 1, "m": 60, "d": 86400}
 
-class TimeConverter(commands.Converter):
+class TimeConverter(Converter):
     async def convert(self, ctx, argument):
         args = argument.lower()
-        matches = re.findall(time_regex, args)
+        matches = findall(time_regex, args)
         time = 0
         for v, k in matches:
             try:
                 time += time_dict[k]*float(v)
             except KeyError:
-                raise commands.BadArgument(
+                raise BadArgument(
                     "{} is an invalid time-key! h/m/s/d are valid!".format(k))
             except ValueError:
-                raise commands.BadArgument("{} is not a number!".format(v))
+                raise BadArgument("{} is not a number!".format(v))
         return time
 
 
-class moderation(commands.Cog):
+class moderation(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=['unb'])
-    @commands.has_permissions(ban_members=True)
+    @jeanne(aliases=['unb'])
+    @perms(ban_members=True)
     async def unban(self, ctx, user : User, *, reason=None):
         await ctx.guild.unban(user)
         embed = Embed(title="User Unbanned", color=0xFF0000)
@@ -55,8 +55,8 @@ class moderation(commands.Cog):
                 title="Unban failed", description="Invalid user ID given.", color=0xff0000)
             await ctx.send(embed=embed)
 
-    @commands.command()
-    @commands.has_permissions(kick_members=True)
+    @jeanne()
+    @perms(kick_members=True)
     async def unmute(self, ctx, member: Member):
         mutedRole = get(ctx.guild.roles, name="Muted")
 
@@ -71,8 +71,8 @@ class moderation(commands.Cog):
         unmute.set_thumbnail(url=member.avatar_url)
         await ctx.send(embed=unmute)
 
-    @commands.command(pass_context=True, aliases=['w'])
-    @commands.has_permissions(kick_members=True)
+    @jeanne(pass_context=True, aliases=['w'])
+    @perms(kick_members=True)
     async def warn(self, ctx, member: Member, reason=None):
         if reason == None:
             reason = "Unspecified"
@@ -94,8 +94,8 @@ class moderation(commands.Cog):
 
 
 
-    @commands.command(pass_context=True, aliases=['b'])
-    @commands.has_permissions(ban_members=True)
+    @jeanne(aliases=['b'])
+    @perms(ban_members=True)
     async def ban(self, ctx, user: User, *, reason=None):
         guild = ctx.guild
         if reason == None:
@@ -141,8 +141,8 @@ class moderation(commands.Cog):
             
    
 
-    @commands.command(pass_context=True, aliases=['k'])
-    @commands.has_permissions(kick_members=True)
+    @jeanne(aliases=['k'])
+    @perms(kick_members=True)
     async def kick(self, ctx, member: Member, *, reason=None):
         guild=ctx.guild
         try:
@@ -169,8 +169,8 @@ class moderation(commands.Cog):
             await ctx.send(embed=embed)
    
         
-    @commands.command()
-    @commands.bot_has_permissions(manage_roles=True)
+    @jeanne()
+    @bot_perms(manage_roles=True)
     async def muterole(self, ctx):
         guild=ctx.guild
         await guild.create_role(name="Muted")
@@ -183,8 +183,8 @@ class moderation(commands.Cog):
 
         
 
-    @commands.command()
-    @commands.has_permissions(kick_members=True)
+    @jeanne()
+    @perms(kick_members=True)
     async def mute(self, ctx, member: Member, time: TimeConverter = None, *, reason=None):
         guild = ctx.guild
         mutedRole = get(guild.roles, name="Muted")
@@ -199,7 +199,7 @@ class moderation(commands.Cog):
         mute.set_thumbnail(url=member.avatar_url)
         await ctx.send(embed=mute)
         if time:
-            await asyncio.sleep(time)
+            await sleep(time)
             await member.remove_roles(mutedRole)
         
     @mute.error
@@ -210,8 +210,8 @@ class moderation(commands.Cog):
             await ctx.send(embed=embed)     
 
  
-    @commands.command(aliases=['nick', 'changenick', 'setnick'])
-    @commands.bot_has_permissions(manage_nicknames=True)
+    @jeanne(aliases=['nick', 'changenick', 'setnick'])
+    @perms(manage_nicknames=True)
     async def change_nickname(self, ctx, member: Member, *, nickname=None):
 
         if not nickname:

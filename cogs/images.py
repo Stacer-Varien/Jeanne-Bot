@@ -1,67 +1,67 @@
-import random, requests, glob
+from glob import glob
+from requests import get
+from random import choice
 from discord import Embed, File
-from discord.ext import commands
+from discord.ext.commands import command as jeanne, Cog, cooldown, BucketType
+from assets.needed import kitsune_nekoslife
 
-
-class images(commands.Cog):
+class images(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
-    @commands.cooldown(1, 5, commands.BucketType.user)
+    @jeanne()
+    @cooldown(1, 5, BucketType.user)
+    async def neko(self, ctx):
+        file_path_type = ["./Media/Neko/*.jpg"]
+        images = glob(choice(file_path_type))
+        random_image = choice(images)
+        file = File(random_image)
+        neko = Embed(color=0xFFC0CB)
+        neko.set_footer(text="Powered by JeanneBot")
+        await ctx.send(file=file, embed=neko)
+
+    @jeanne()
+    @cooldown(1, 5, BucketType.user)
     async def kitsune(self, ctx):
-        kistune_api = requests.get("https://nekos.life/api/v2/img/fox_girl").json()
+        kistune_api = get(kitsune_nekoslife).json()
         kitsune = Embed(color=0xFFC0CB)
         kitsune.set_footer(text="Fetched from nekos.life")
         kitsune.set_image(url=kistune_api["url"])
         await ctx.send(embed=kitsune)
 
-    @commands.command()
-    @commands.cooldown(1, 5, commands.BucketType.user)
+    @jeanne()
+    @cooldown(1, 5, BucketType.user)
     async def wallpaper(self, ctx):
-        file_path_type = ["./Images/Wallpaper/*.jpg"]
-        images = glob.glob(random.choice(file_path_type))
-        random_image = random.choice(images)
+        file_path_type = ["./Media/Wallpaper/*.jpg"]
+        images = glob(choice(file_path_type))
+        random_image = choice(images)
         file = File(random_image)
         wallpaper = Embed(color=0xFFC0CB)
         wallpaper.set_footer(text="Powered by JeanneBot")
         await ctx.send(file=file, embed=wallpaper)
 
 
-    @commands.command()
-    @commands.cooldown(1, 5, commands.BucketType.user)
+    @jeanne()
+    @cooldown(1, 5, BucketType.user)
     async def saber(self, ctx):
-        file_path_type = ["./Images/Saber/*.jpg"]
-        images = glob.glob(random.choice(file_path_type))
-        random_image = random.choice(images)
+        file_path_type = ["./Media/Saber/*.jpg"]
+        images = glob.glob(choice(file_path_type))
+        random_image = choice(images)
         file = File(random_image)
         saber = Embed(color=0xFFC0CB)
         saber.set_footer(text="Powered by JeanneBot")
         await ctx.send(file=file, embed=saber)
 
-    @commands.command()
-    @commands.cooldown(1, 5, commands.BucketType.user)
+    @jeanne()
+    @cooldown(1, 5, BucketType.user)
     async def jeanne(self, ctx):
-        file_path_type = ["./Images/Jeanne/*.jpg"]
-        images = glob.glob(random.choice(file_path_type))
-        random_image = random.choice(images)
-        file = File(random_image)
+        jeanne_folder = ["./Media/Jeanne/*.jpg"]
+        jeanne_images = glob(choice(jeanne_folder))
+        random_image = choice(jeanne_images)
+        jeanne_pic = File(random_image)        
         jeanne = Embed(color=0xFFC0CB)
         jeanne.set_footer(text="Powered by JeanneBot")
-        await ctx.send(file=file, embed=jeanne)
-
-    @commands.command()
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    async def neko(self, ctx):
-        file_path_type = ["./Images/Neko/*.jpg"]
-        images = glob.glob(random.choice(file_path_type))
-        random_image = random.choice(images)
-        file = File(random_image)
-        neko = Embed(color=0xFFC0CB)
-        neko.set_footer(text="Powered by JeanneBot")
-        await ctx.send(file=file, embed=neko)
-
-
+        await ctx.send(file=jeanne_pic, embed=jeanne)
 
 def setup(bot):
     bot.add_cog(images(bot))

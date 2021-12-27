@@ -1,17 +1,21 @@
-import discord, time, sys, datetime
-from discord.ext import commands
-from discord_slash import cog_ext
-from discord import Member, Embed
+from time import time
+from datetime import timedelta
+from sys import version_info as py_version
+from discord.ext.commands import Cog
+from discord import Member, Embed, __version__ as discord_version
+from discord_slash import __version__ as di_version
+from discord_slash.cog_ext import cog_slash as jeanne_slash
+
 
 
 format = "%a, %d %b %Y | %H:%M:%S"
-start_time = time.time()
+start_time = time()
 
-class info(commands.Cog):
+class info(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @cog_ext.cog_slash(description="See the bot's status from development to now")
+    @jeanne_slash(description="See the bot's status from development to now")
     async def stats(self, ctx):
         botowner = self.bot.get_user(597829930964877369)
         embed = Embed(title="Bot stats", color=0x236ce1)
@@ -22,23 +26,23 @@ class info(commands.Cog):
         # this is an empty field
         embed.add_field(name="_ _", value="_ _", inline=False)
         embed.add_field(
-            name="Version", value=f"**>** **Python Version:** {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}\n**>** **Discord.py Version:** {discord.__version__}", inline=True)
+            name="Version", value=f"**>** **Python Version:** {py_version.major}.{py_version.minor}.{py_version.micro}\n**>** **Discord.py Version:** {discord_version}\n**>** **Discord-Interactions Version:** {di_version}", inline=True)
         embed.add_field(name="Count",
                         value=f"**>** **Server Count:** {len(ctx.bot.guilds)} servers\n**>** **User Count:** {len(set(ctx.bot.get_all_members()))}", inline=True)
         # this is an empty field
         embed.add_field(name="_ _", value="_ _", inline=False)
         embed.add_field(name="Ping",
                         value=f"**>** **Bot Latency:** {round(ctx.bot.latency * 1000)}ms", inline=True)
-        current_time = time.time()
+        current_time = time()
         difference = int(round(current_time - start_time))
-        uptime = str(datetime.timedelta(seconds=difference))
+        uptime = str(timedelta(seconds=difference))
         embed.add_field(
             name="Uptime", value=f"{uptime} hours")
         embed.set_thumbnail(
             url=self.bot.user.avatar_url)
         await ctx.send(embed=embed)
 
-    @cog_ext.cog_slash(description="See the information of a member or yourself")
+    @jeanne_slash(description="See the information of a member or yourself")
     async def userinfo(self, ctx, member: Member = None):
         if member == None:
             member = ctx.author
@@ -63,7 +67,7 @@ class info(commands.Cog):
         userinfo.set_thumbnail(url=member.avatar_url)
         await ctx.send(embed=userinfo)
 
-    @cog_ext.cog_slash(description="Get information about this server")
+    @jeanne_slash(description="Get information about this server")
     async def serverinfo(self, ctx):
         guild = ctx.guild
         emojis = [str(x) for x in guild.emojis]
@@ -103,7 +107,7 @@ class info(commands.Cog):
 
 
 
-    @cog_ext.cog_slash(description="Check how fast I respond to a command")
+    @jeanne_slash(description="Check how fast I respond to a command")
     async def ping(self, ctx):
         start_time = time.time()
         test = Embed(description="Testing Ping...", colour=0x236ce1)
@@ -117,7 +121,7 @@ class info(commands.Cog):
             name="**>** API Latency", value=f'{round((end_time - start_time) * 1000)}ms', inline=False)
         await message.edit(content="Ping results", embed=ping)
 
-    @cog_ext.cog_slash(description="See the server's banner")
+    @jeanne_slash(description="See the server's banner")
     async def guildbanner(self, ctx):
         guild = ctx.guild
         banner = guild.banner_url
@@ -134,7 +138,7 @@ class info(commands.Cog):
             embed.set_image(url=banner)
             await ctx.send(embed=embed)
 
-    @cog_ext.cog_slash(description="See your avatar or another member's avatar")
+    @jeanne_slash(description="See your avatar or another member's avatar")
     async def avatar(self, ctx, member:Member = None):
         if member==None:
             member=ctx.author

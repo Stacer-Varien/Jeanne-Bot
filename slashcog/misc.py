@@ -1,21 +1,20 @@
-import discord
 from discord import Embed
-from discord.ext import commands
-from discord_slash import cog_ext, SlashContext
+from discord.ext.commands import Cog, has_permissions as perms
 from discord_slash.utils.manage_components import create_button, create_actionrow
 from discord_slash.model import ButtonStyle
+from discord_slash.cog_ext import cog_slash as jeanne_slash
 
-class misc(commands.Cog):
+class misc(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @cog_ext.cog_slash(description="Invite me to your server or join my creator's servers")
-    async def invite(self, ctx:SlashContext):
+    @jeanne_slash(description="Invite me to your server or join my creator's servers")
+    async def invite(self, ctx):
         buttons = [
             create_button(
                 style=ButtonStyle.URL,
                 label="Bot Invite",
-                url="https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=2550197270&redirect_uri=https%3A%2F%2Fdiscord.com%2Foauth2%2Fauthorize%3Fclient_id%3D831993597166747679%26scope%3Dbot&scope=bot%20applications.commands"
+                url="https://com/api/oauth2/authorize?client_id=831993597166747679&permissions=2550197270&redirect_uri=https%3A%2F%2Fdiscord.com%2Foauth2%2Fauthorize%3Fclient_id%3D831993597166747679%26scope%3Dbot&scope=bot%20applications.commands"
             ),
             create_button(
                 style=ButtonStyle.URL,
@@ -25,12 +24,12 @@ class misc(commands.Cog):
             create_button(
                 style=ButtonStyle.URL,
                 label="DiscordBots",
-                url="https://discord.bots.gg/bots/831993597166747679"
+                url="https://bots.gg/bots/831993597166747679"
             ),
             create_button(
                 style=ButtonStyle.URL,
                 label="HAZE Server",
-                url="https://discord.gg/VVxGUmqQhF"
+                url="https://gg/VVxGUmqQhF"
             ),]
 
         action_row=create_actionrow(*buttons)
@@ -42,15 +41,15 @@ class misc(commands.Cog):
 
         await ctx.send(embed=embed, components=[action_row])
 
-    @cog_ext.cog_slash(description="Type a message and I will say it but it will be in plain text")
-    @commands.has_permissions(administrator=True)
-    async def say(self, ctx:SlashContext, text):
+    @jeanne_slash(description="Type a message and I will say it but it will be in plain text")
+    @perms(administrator=True)
+    async def say(self, ctx, text):
         await ctx.send(text)
 
-    @cog_ext.cog_slash(description="Type a message and I will say it but it will be in embed")
-    @commands.has_permissions(administrator=True)
-    async def sayembed(self, ctx:SlashContext, text):
-        say = discord.Embed(description=f"{text}", color=0xADD8E6)
+    @jeanne_slash(description="Type a message and I will say it but it will be in embed")
+    @perms(administrator=True)
+    async def sayembed(self, ctx, text):
+        say = Embed(description=f"{text}", color=0xADD8E6)
         await ctx.send(embed=say)
 
 

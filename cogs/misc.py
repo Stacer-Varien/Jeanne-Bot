@@ -1,16 +1,15 @@
-import discord
 from discord import Embed
-from discord.ext import commands
+from discord.ext.commands import command as jeanne, Cog, has_permissions as perms
 from discord_slash.utils.manage_components import create_button, create_actionrow
 from discord_slash.model import ButtonStyle
 
 
 
-class misc(commands.Cog):
+class misc(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @jeanne()
     async def invite(self, ctx):
         buttons = [
             create_button(
@@ -43,18 +42,18 @@ class misc(commands.Cog):
 
         await ctx.send(embed=embed, components=[action_row])
 
-    @commands.command()
-    @commands.has_permissions(administrator=True)
+    @jeanne()
+    @perms(administrator=True)
     async def say(self, ctx, *, text):
         message = ctx.message
         await message.delete()
         await ctx.send(text)
 
-    @commands.group(name='saye')
-    @commands.has_permissions(administrator=True)
+    @jeanne(name='saye')
+    @perms(administrator=True)
     async def sayembed(self, ctx, *, text):
         message = ctx.message
-        say = discord.Embed(description=f"{text}", color=0xADD8E6)
+        say = Embed(description=f"{text}", color=0xADD8E6)
         await message.delete()
         await ctx.send(embed=say)
 

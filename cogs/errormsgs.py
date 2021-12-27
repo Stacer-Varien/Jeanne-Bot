@@ -1,13 +1,13 @@
 from discord import Embed
-from discord.ext import commands
+from discord.ext.commands import Cog
 from discord.ext.commands.errors import MemberNotFound, NotOwner, UserNotFound, GuildNotFound, NSFWChannelRequired, CommandOnCooldown
 
 
-class errors(commands.Cog):
+class errors(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.Cog.listener()
+    @Cog.listener()
     async def on_command_error(self, ctx, error):
         if isinstance(error, NotOwner):
             embed = Embed(
@@ -27,9 +27,10 @@ class errors(commands.Cog):
             await ctx.send(embed=embed)
         elif isinstance(error, NSFWChannelRequired):
             error = Embed(
-                title='Command Failed', description="NSFW material couldn't be sent in this channel", color=0xff0000)
+                title='Hentai Failed', description="Hentai couldn't be sent in this channel", color=0xff0000)
             error.add_field(
                 name="Reason", value="Channel is not NSFW enabled")
+            await ctx.send(embed=error)
         elif isinstance(error, MemberNotFound):
             embed = Embed(description="Member is not in this server")
             await ctx.send(embed=error)

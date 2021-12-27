@@ -1,39 +1,39 @@
-import discord, asyncio, re
-from discord import Member, Embed, NotFound
-from discord.ext import commands
-from discord_slash import cog_ext
-from discord.ext.commands import MissingPermissions
+from discord import User, Member, Embed, NotFound
+from re import findall, compile
+from asyncio import sleep
+from discord.ext.commands import MissingPermissions, Cog, Converter, BadArgument, has_permissions as perms, bot_has_permissions as bot_perms
 from discord.ext.commands.errors import MemberNotFound
 from discord.utils import get
+from discord_slash.cog_ext import cog_slash as jeanne_slash
 
 
 
-time_regex = re.compile("(?:(\d{1,5})(h|s|m|d))+?")
+time_regex = compile("(?:(\d{1,5})(h|s|m|d))+?")
 time_dict = {"h": 3600, "s": 1, "m": 60, "d": 86400}
 
-class TimeConverter(commands.Converter):
+class TimeConverter(Converter):
     async def convert(self, ctx, argument):
         args = argument.lower()
-        matches = re.findall(time_regex, args)
+        matches = findall(time_regex, args)
         time = 0
         for v, k in matches:
             try:
                 time += time_dict[k]*float(v)
             except KeyError:
-                raise commands.BadArgument(
+                raise BadArgument(
                     "{} is an invalid time-key! h/m/s/d are valid!".format(k))
             except ValueError:
-                raise commands.BadArgument("{} is not a number!".format(v))
+                raise BadArgument("{} is not a number!".format(v))
         return time
 
 
-class moderation(commands.Cog):
+class moderation(Cog):
     def __init__(self, bot):
         self.bot = bot
 
 
-    @cog_ext.cog_slash(description="Unmute a member")
-    @commands.has_permissions(kick_members=True)
+    @jeanne_slash(description="Unmute a member")
+    @perms(kick_members=True)
     async def unmute(self, ctx, member: Member):
         mutedRole = get(ctx.guild.roles, name="Muted")
 
@@ -47,8 +47,8 @@ class moderation(commands.Cog):
         embed.set_thumbnail(url=member.avatar_url)
         await ctx.send(embed=embed)
 
-    @cog_ext.cog_slash(description="Warn a member")
-    @commands.has_permissions(kick_members=True)
+    @jeanne_slash(description="Warn a member")
+    @perms(kick_members=True)
     async def warn(self, ctx, member: Member, reason=None):
         if reason==None:
             reason="Unspecified"
@@ -63,12 +63,12 @@ class moderation(commands.Cog):
     @warn.error
     async def warn_error(self, ctx, error):
              if isinstance(error, MissingPermissions):
-                embed=discord.Embed(title="Warn failed", description="Sorry but you cannot warn this user", color=0xff0000)
+                embed=Embed(title="Warn failed", description="Sorry but you cannot warn this user", color=0xff0000)
                 embed.add_field(name="Reason", value="Missing permissions: Kick Members", inline=False)
                 await ctx.send(embed=embed) 
 
-    @cog_ext.cog_slash(description="Ban a member in the server")
-    @commands.has_permissions(ban_members=True)
+    @jeanne_slash(description="Ban a member in the server")
+    @perms(ban_members=True)
     async def memberban(self, ctx, member: Member, reason=None):
         if reason == None:
             reason = "Unspecified"
@@ -79,7 +79,7 @@ class moderation(commands.Cog):
             await member.send(embed=banmsg)
         except:
             pass
-        ban = discord.Embed(title="Member Banned", color=0xFF0000)
+        ban = Embed(title="Member Banned", color=0xFF0000)
         ban.add_field(name="Member",
                         value=f"**>** **Name:** {member}\n**>** **ID:** {member.id}",
                         inline=True)
@@ -89,8 +89,8 @@ class moderation(commands.Cog):
         await ctx.send(embed=ban)
         await member.ban(reason=reason)
 
-    @cog_ext.cog_slash(description="Ban a user before they join your server")
-    @commands.has_permissions(ban_members=True)
+    @jeanne_slash(description="Ban a user before they join your server")
+    @perms(ban_members=True)
     async def outsideban(self, ctx, user_id, reason=None):
         user=await self.bot.fetch_user(user_id)
         guild = ctx.guild
@@ -120,14 +120,14 @@ class moderation(commands.Cog):
     @memberban.error
     async def ban_error(self, ctx, error):
              if isinstance(error, MissingPermissions):
-                embed=discord.Embed(title="Ban failed", description="Sorry but you cannot ban this user", color=0xff0000)
+                embed=Embed(title="Ban failed", description="Sorry but you cannot ban this user", color=0xff0000)
                 embed.add_field(name="Reason", value="Missing permissions: Ban Members", inline=False)
                 await ctx.send(embed=embed) 
    
 
-    @cog_ext.cog_slash(description="Kick a member out of the server")
-    @commands.has_permissions(kick_members=True)
-    async def kick(self, ctx, member: discord.Member, reason=None):
+    @jeanne_slash(description="Kick a member out of the server")
+    @perms(kick_members=True)
+    async def kick(self, ctx, member: Member, reason=None):
         try:
             kickmsg = Embed(
                 description=f"You are kicked from **{ctx.guild.name}** for **{reason}**")
@@ -147,12 +147,12 @@ class moderation(commands.Cog):
     @kick.error
     async def kick_error(self, ctx, error):
              if isinstance(error, MissingPermissions):
-                embed=discord.Embed(title="Kick failed", description="Sorry but you cannot kick this user", color=0xff0000)
+                embed=Embed(title="Kick failed", description="Sorry but you cannot kick this user", color=0xff0000)
                 embed.add_field(name="Reason", value="Missing permissions: Kick Members", inline=False)
                 await ctx.send(embed=embed) 
 
-    @cog_ext.cog_slash(description="Creates a mute role")
-    @commands.bot_has_permissions(manage_roles=True)
+    @jeanne_slash(description="Creates a mute role")
+    @bot_perms(manage_roles=True)
     async def muterole(self, ctx):
         guild = ctx.guild
         await guild.create_role(name="Muted")
@@ -163,8 +163,8 @@ class moderation(commands.Cog):
             await channel.set_permissions(mute_role, speak=False, send_messages=False, read_message_history=True, read_messages=False)
 
 
-    @cog_ext.cog_slash(description="Mute a member")
-    @commands.has_permissions(kick_members=True)
+    @jeanne_slash(description="Mute a member")
+    @perms(kick_members=True)
     async def mute(self, ctx, member: Member, time: TimeConverter = None, reason=None):
         guild = ctx.guild
         mutedRole = get(guild.roles, name="Muted")
@@ -179,18 +179,18 @@ class moderation(commands.Cog):
         mute.set_thumbnail(url=member.avatar_url)
         await ctx.send(embed=mute)
         if time:
-            await asyncio.sleep(time)
+            await sleep(time)
             await member.remove_roles(mutedRole)
         
     @mute.error
     async def mute_error(self, ctx, error):
              if isinstance(error, MissingPermissions):
-                embed=discord.Embed(title="Mute failed", description="Sorry but you cannot mute this user", color=0xff0000)
+                embed=Embed(title="Mute failed", description="Sorry but you cannot mute this user", color=0xff0000)
                 embed.add_field(name="Reason", value="Missing permissions: Kick Members", inline=False)
                 await ctx.send(embed=embed)     
  
-    @cog_ext.cog_slash(description="Bulk delete messages")
-    @commands.has_permissions(manage_messages=True)
+    @jeanne_slash(description="Bulk delete messages")
+    @perms(manage_messages=True)
     async def purge(self, ctx, member: Member = None, *, limit=100):
         msg = []
         try:
@@ -211,15 +211,15 @@ class moderation(commands.Cog):
     @purge.error
     async def purge_error(self, ctx, error):
              if isinstance(error, MissingPermissions):
-                embed=discord.Embed(title="Purge failed", description="Sorry but you cannot purge messages", color=0xff0000)
+                embed=Embed(title="Purge failed", description="Sorry but you cannot purge messages", color=0xff0000)
                 embed.add_field(name="Reason", value="Missing permissions: Manage Messages", inline=False)
                 await ctx.send(embed=embed) 
 
-    @cog_ext.cog_slash(description="Change someone's nickname")
+    @jeanne_slash(description="Change someone's nickname")
     async def change_nickname(self, ctx, member: Member, nickname=None):
 
         if not nickname:
-            nonick = discord.Embed(description="Please add a nickname")
+            nonick = Embed(description="Please add a nickname")
             await ctx.send(embed=nonick)
 
         else:
@@ -232,14 +232,14 @@ class moderation(commands.Cog):
     @change_nickname.error
     async def change_nickname_error(self, ctx, error):
         if isinstance(error, MissingPermissions):
-            embed = discord.Embed(
+            embed = Embed(
                 title="Change Nickname failed", description="Sorry but you cannot change this member's nickname", color=0xff0000)
             embed.add_field(
                 name="Reason", value="Missing permissions: Manage Nicknames", inline=False)
             await ctx.send(embed=embed)
 
-    @cog_ext.cog_slash(description="Unbans a user")
-    @commands.has_permissions(ban_members=True)
+    @jeanne_slash(description="Unbans a user")
+    @perms(ban_members=True)
     async def unban(self, ctx, user_id, reason=None):
         user=await self.bot.fetch_user(user_id)
         await ctx.guild.unban(user)

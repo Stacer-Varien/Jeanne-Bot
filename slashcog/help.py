@@ -1,16 +1,15 @@
 from discord import Embed
-from discord.ext import commands
-from discord_slash.context import SlashContext
+from discord.ext.commands import Cog
 from discord_slash.utils.manage_components import create_button, create_actionrow
-from discord_slash import cog_ext
+from discord_slash.cog_ext import cog_slash as jeanne_slash
 from discord_slash.model import ButtonStyle
 
 
-class help(commands.Cog):
+class help(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @cog_ext.cog_slash(description="See how you can use the bot's command")
+    @jeanne_slash(description="See how you can use the bot's command")
     async def help(self, ctx):
         buttons = [
             create_button(

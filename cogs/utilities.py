@@ -1,18 +1,18 @@
-import discord
-import aiohttp
-from discord.ext import commands
+from discord import Embed
+from aiohttp import ClientSession
+from discord.ext.commands import command as jeanne, cooldown, BucketType, Cog
 
 
-class utilities(commands.Cog):
+class utilities(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
-    @commands.cooldown(1, 5, commands.BucketType.user)
+    @jeanne()
+    @cooldown(1, 5, BucketType.user)
     async def weather(self, ctx, *, city):
         city = city
         urlil = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid=' #Certain APIs are private
-        async with aiohttp.ClientSession() as session:
+        async with ClientSession() as session:
             async with session.get(urlil) as r:
                 if r.status == 200:
                     js = await r.json()
@@ -21,7 +21,7 @@ class utilities(commands.Cog):
                     count = js['sys']['country']
                     hum = js['main']['humidity']
                     pres = js['wind']['speed']
-                    embed = discord.Embed(
+                    embed = Embed(
                         title=f'⛅ Weather details of {city} ⛅', description=f':earth_africa: Country: {count}', colour=0x00FFFF)
                     embed.add_field(name=':thermometer: Temperature:',
                                     value=f'{tempp}° Celsius', inline=True)

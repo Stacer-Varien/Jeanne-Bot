@@ -1,15 +1,14 @@
-import discord
 from discord import Embed
-from discord.ext import commands
+from discord.ext.commands import command as jeanne, Cog
 from discord_slash.utils.manage_components import create_actionrow, create_button
 from discord_slash.model import ButtonStyle
 
 
-class help(commands.Cog):
+class help(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @jeanne()
     async def help(self, ctx):
         buttons = [
             create_button(

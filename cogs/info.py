@@ -1,20 +1,21 @@
-import discord, sys, time, datetime
-from discord.ext import commands
-from discord.ext.commands import BucketType
-from discord import Member, Embed
+from time import time
+from datetime import timedelta
+from sys import version_info as py_version
+from discord.ext.commands import BucketType, command as jeanne, Cog, cooldown
+from discord import Member, Embed, __version__ as discord_version
+from discord_slash import __version__ as di_version
 
 
 format = "%d %b %Y | %H:%M:%S"
-start_time = time.time()
+start_time = time()
 
 
-class info(commands.Cog):
+class info(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=['uinfo', 'minfo'])
-    @commands.guild_only()
-    @commands.cooldown(1, 5, BucketType.user)
+    @jeanne(aliases=['uinfo', 'minfo'])
+    @cooldown(1, 5, BucketType.user)
     async def userinfo(self, ctx, *, member: Member = None):
         if member == None:
             member = ctx.author
@@ -39,9 +40,8 @@ class info(commands.Cog):
         userinfo.set_thumbnail(url=member.avatar_url)
         await ctx.send(embed=userinfo)
 
-    @commands.command(aliases=['sinfo', 'guild', 'ginfo'])
-    @commands.cooldown(1, 5, BucketType.user)
-    @commands.guild_only()
+    @jeanne(aliases=['sinfo', 'guild', 'ginfo'])
+    @cooldown(1, 5, BucketType.user)
     async def serverinfo(self, ctx):
         guild=ctx.guild
         emojis = [str(x) for x in guild.emojis]
@@ -79,7 +79,8 @@ class info(commands.Cog):
         embed.set_image(url=guild.splash_url)
         await ctx.send(embed=embed)
 
-    @commands.command(aliases=['serverbanner', 'gbanner', 'sbanner'])
+    @jeanne(aliases=['serverbanner', 'gbanner', 'sbanner'])
+    @cooldown(1, 5, BucketType.user)
     async def guildbanner(self, ctx):
         guild = ctx.guild
         banner = guild.banner_url
@@ -95,12 +96,13 @@ class info(commands.Cog):
             embed.set_image(url=banner)
             await ctx.send(embed=embed)
 
-    @commands.command()
+    @jeanne()
+    @cooldown(1, 5, BucketType.user)
     async def ping(self, ctx):
-        start_time = time.time()
+        start_time = time()
         test = Embed(description="Testing Ping...", colour=0x236ce1)
         message = await ctx.send(embed=test)
-        end_time = time.time()
+        end_time = time()
 
         ping = Embed(color=0x236ce1)
         ping.add_field(
@@ -109,7 +111,7 @@ class info(commands.Cog):
             name="**>** API Latency", value=f'{round((end_time - start_time) * 1000)}ms', inline=False)
         await message.edit(content="Ping results", embed=ping)
 
-    @commands.command()
+    @jeanne()
     async def stats(self, ctx):
         botowner = self.bot.get_user(597829930964877369)
         embed = Embed(title="Bot stats", color=0x236ce1)
@@ -120,23 +122,23 @@ class info(commands.Cog):
         # this is an empty field
         embed.add_field(name="_ _", value="_ _", inline=False)
         embed.add_field(
-            name="Version", value=f"**>** **Python Version:** {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}\n**>** **Discord.py Version:** {discord.__version__}", inline=True)
+            name="Version", value=f"**>** **Python Version:** {py_version.major}.{py_version.minor}.{py_version.micro}\n**>** **Discord.py Version:** {discord_version}\n**>** **Discord-Interactions Version:** {di_version}", inline=True)
         embed.add_field(name="Count",
                         value=f"**>** **Server Count:** {len(ctx.bot.guilds)} servers\n**>** **User Count:** {len(set(ctx.bot.get_all_members()))}", inline=True)
         # this is an empty field
         embed.add_field(name="_ _", value="_ _", inline=False)
         embed.add_field(name="Ping",
                         value=f"**>** **Bot Latency:** {round(ctx.bot.latency * 1000)}ms", inline=True)
-        current_time = time.time()
+        current_time = time()
         difference = int(round(current_time - start_time))
-        uptime = str(datetime.timedelta(seconds=difference))
+        uptime = str(timedelta(seconds=difference))
         embed.add_field(
             name="Uptime", value=f"{uptime} hours")
         embed.set_thumbnail(
             url=self.bot.user.avatar_url)
         await ctx.send(embed=embed)
 
-    @commands.command(aliases=['av','pfp'])
+    @jeanne(aliases=['av','pfp'])
     async def avatar(self, ctx, *, member: Member = None):
         if member==None:
             member=ctx.author
