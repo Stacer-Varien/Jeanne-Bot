@@ -47,3 +47,10 @@
 * **NOTE:** You have to pick a number between 1 to 10. After executing the command, you have to guess the number after she starts asking. You have 5 seconds to guess the correct one.
 
  Example: `j!guess` then after she asks, `NUMBER`
+
+>**Animeme**
+
+* Get a random animeme
+* **NOTE:** The animemes are in JPG and in MP4. They have been reduced to 8MB or lower.
+
+  Example: `j!animeme`
