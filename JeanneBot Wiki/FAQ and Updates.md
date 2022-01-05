@@ -10,4 +10,3 @@
 
 > [**2022 Plans**](https://github.com/ZaneRE544/ZaneRE544/blob/main/2022%20plans.md)
 
-> [**Discord's Mute Feature is Rubbish**](https://github.com/ZaneRE544/ZaneRE544/blob/main/Discord's%20New%20Mute%20Feature%20is%20Rubbish.md)
