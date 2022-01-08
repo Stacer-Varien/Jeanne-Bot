@@ -1,9 +1,9 @@
 from time import time
+from asyncio import sleep
 from datetime import timedelta
 from sys import version_info as py_version
-from discord.ext.commands import BucketType, command as jeanne, Cog, cooldown
-from discord import Member, Embed, __version__ as discord_version
-from discord_slash import __version__ as di_version
+from nextcord.ext.commands import BucketType, command as jeanne, Cog, cooldown
+from nextcord import Member, Embed, __version__ as nextcord_version
 
 
 format = "%d %b %Y | %H:%M:%S"
@@ -37,7 +37,7 @@ class info(Cog):
                            inline=True)
         userinfo.add_field(name="Roles Held",
                            value=''.join(hasroles[:20]) + '@everyone', inline=False)
-        userinfo.set_thumbnail(url=member.avatar_url)
+        userinfo.set_thumbnail(url=member.display_avatar)
         await ctx.send(embed=userinfo)
 
     @jeanne(aliases=['sinfo', 'guild', 'ginfo'])
@@ -51,13 +51,11 @@ class info(Cog):
 
         if guild.premium_subscription_count < 2:
             boostlevel = "Level 0"
-        elif guild.premium_subscription_count < 3:
+        elif guild.premium_tier_1:
             boostlevel = "Level 1"
-        elif guild.premium_subscription_count < 8:
+        elif guild.premium_tier_2:
             boostlevel = "Level 2"
-        elif guild.premium_subscription_count == 14:
-            boostlevel = "Level 3"
-        elif guild.premium_subscription_count < 14:
+        elif guild.premium_tier_3:
             boostlevel = "Level 3"
 
         embed = Embed(title="Server's Info", color=0x00B0ff)
@@ -74,23 +72,27 @@ class info(Cog):
         embed.add_field(name='Features',
                         value=features, inline=False)
 
+        if guild.icon==None:
+            pass
+        else:
+            embed.set_thumbnail(url=guild.icon)
 
-        embed.set_thumbnail(url=guild.icon_url)
-        embed.set_image(url=guild.splash_url)
+        if guild.splash==None:
+            pass
+        else:
+            embed.set_image(url=guild.splash)
         await ctx.send(embed=embed)
 
     @jeanne(aliases=['serverbanner', 'gbanner', 'sbanner'])
     @cooldown(1, 5, BucketType.user)
     async def guildbanner(self, ctx):
         guild = ctx.guild
-        banner = guild.banner_url
+        banner = guild.banner
 
-        if guild.premium_subscription_count < 7:
+        if guild.premium_subscription_count < 2 or guild.premium_tier_1:
             nobanner = Embed(description="Server is not boosted at level 2")
             await ctx.send(embed=nobanner)
-
         else:
-
             embed = Embed(colour=0x00B0ff)
             embed.set_footer(text=f"{guild.name}'s banner")
             embed.set_image(url=banner)
@@ -99,16 +101,22 @@ class info(Cog):
     @jeanne()
     @cooldown(1, 5, BucketType.user)
     async def ping(self, ctx):
-        start_time = time()
+        _1st_start_time = time()
         test = Embed(description="Testing Ping...", colour=0x236ce1)
         message = await ctx.send(embed=test)
-        end_time = time()
+        _1st_end_time = time()
+
+        _2nd_start_time = time()
+        await sleep(0.5)
+        _2nd_end_time = time()
 
         ping = Embed(color=0x236ce1)
         ping.add_field(
-            name="**>** Bot Latency", value=f'{round(ctx.bot.latency * 1000)}ms', inline=False)
+            name="**>** Bot Latency", value=f'{round(self.bot.latency * 1000)}ms', inline=False)
         ping.add_field(
-            name="**>** API Latency", value=f'{round((end_time - start_time) * 1000)}ms', inline=False)
+            name="**>** 1st API Latency", value=f'{round((_1st_end_time - _1st_start_time) * 1000)}ms', inline=False)
+        ping.add_field(
+            name="**>** 2nd API Latency", value=f'{round((_2nd_end_time - _2nd_start_time) * 1000)}ms', inline=False)
         await message.edit(content="Ping results", embed=ping)
 
     @jeanne()
@@ -122,7 +130,7 @@ class info(Cog):
         # this is an empty field
         embed.add_field(name="_ _", value="_ _", inline=False)
         embed.add_field(
-            name="Version", value=f"**>** **Python Version:** {py_version.major}.{py_version.minor}.{py_version.micro}\n**>** **Discord.py Version:** {discord_version}\n**>** **Discord-Interactions Version:** {di_version}", inline=True)
+            name="Version", value=f"**>** **Python Version:** {py_version.major}.{py_version.minor}.{py_version.micro}\n**>** **nextcord.py Version:** {nextcord_version}", inline=True)
         embed.add_field(name="Count",
                         value=f"**>** **Server Count:** {len(ctx.bot.guilds)} servers\n**>** **User Count:** {len(set(ctx.bot.get_all_members()))}", inline=True)
         # this is an empty field
@@ -135,7 +143,7 @@ class info(Cog):
         embed.add_field(
             name="Uptime", value=f"{uptime} hours")
         embed.set_thumbnail(
-            url=self.bot.user.avatar_url)
+            url=self.bot.user.display_avatar)
         await ctx.send(embed=embed)
 
     @jeanne(aliases=['av','pfp'])
@@ -144,8 +152,41 @@ class info(Cog):
             member=ctx.author
 
         avatar = Embed(title=f"{member}'s Avatar", color=0x236ce1)
-        avatar.set_image(url=member.avatar_url)
+        avatar.set_image(url=member.display_avatar)
         await ctx.send(embed=avatar)
+
+    @jeanne(aliases=['gav', 'gpfp', 'gavatar'])
+    async def guildavatar(self, ctx, *, member: Member = None):
+
+        if member == None:
+            member = ctx.author
+
+        guild_avatar = Embed(title=f"{member}'s Avatar", color=0x236ce1)
+        try: 
+            guild_avatar.set_image(url=member.guild_avatar)
+            await ctx.send(embed=guild_avatar)
+        except:
+            guild_avatar.set_image(url=member.display_avatar)
+            guild_avatar.set_footer(text="Member has no server avatar. Passed normal avatar instead")
+            await ctx.send(embed=guild_avatar)
+
+    @jeanne(aliases=['mbanner','banner','memberbanner'])
+    async def member_banner(self, ctx,*, member:Member=None):
+        if member==None:
+            member=ctx.author
+
+        member_id=member.id
+        user= await self.bot.fetch_user(member_id)
+
+        try: 
+            mbanner = Embed(title=f"{user}'s Banner", color=0x236ce1)
+            mbanner.set_image(url=user.banner)
+            await ctx.send(embed=mbanner)
+        except:
+            mbanner = Embed(description="Member has no banner", color=0x236ce1)
+            await ctx.send(embed=mbanner)
+        
+
 
 def setup(bot):
     bot.add_cog(info(bot))
