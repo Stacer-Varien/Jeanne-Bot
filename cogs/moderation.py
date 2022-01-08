@@ -1,29 +1,9 @@
-from discord import User, Member, Embed, NotFound
-from re import findall, compile
-from asyncio import sleep
-from discord.ext.commands import MissingPermissions, command as jeanne, Cog, Converter, BadArgument, has_permissions as perms, bot_has_permissions as bot_perms
-from discord.ext.commands.errors import MemberNotFound
-from discord.utils import get
-
-
-time_regex = compile("(?:(\d{1,5})(h|s|m|d))+?")
-time_dict = {"h": 3600, "s": 1, "m": 60, "d": 86400}
-
-class TimeConverter(Converter):
-    async def convert(self, ctx, argument):
-        args = argument.lower()
-        matches = findall(time_regex, args)
-        time = 0
-        for v, k in matches:
-            try:
-                time += time_dict[k]*float(v)
-            except KeyError:
-                raise BadArgument(
-                    "{} is an invalid time-key! h/m/s/d are valid!".format(k))
-            except ValueError:
-                raise BadArgument("{} is not a number!".format(v))
-        return time
-
+from datetime import timedelta
+import humanfriendly
+from nextcord import User, Member, Embed, NotFound
+from nextcord.ext.commands import MissingPermissions, command as jeanne, Cog, has_permissions as perms, bot_has_permissions
+from nextcord.ext.commands.errors import MemberNotFound
+from nextcord.utils import get, utcnow
 
 class moderation(Cog):
     def __init__(self, bot):
@@ -39,7 +19,7 @@ class moderation(Cog):
                         inline=True)
         embed.add_field(
             name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.author}\n**>** **Reason:** {reason}", inline=True)
-        embed.set_thumbnail(url=user.avatar_url)
+        embed.set_thumbnail(url=user.display_avatar)
         await ctx.send(embed=embed)
 
     @unban.error
@@ -68,7 +48,7 @@ class moderation(Cog):
                         inline=True)
         unmute.add_field(
             name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.author}", inline=True)
-        unmute.set_thumbnail(url=member.avatar_url)
+        unmute.set_thumbnail(url=member.display_avatar)
         await ctx.send(embed=unmute)
 
     @jeanne(pass_context=True, aliases=['w'])
@@ -82,7 +62,7 @@ class moderation(Cog):
                         inline=True)
         warn.add_field(
             name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.author}\n**>** **Reason:** {reason}", inline=True)
-        warn.set_thumbnail(url=member.avatar_url)
+        warn.set_thumbnail(url=member.display_avatar)
         await ctx.send(embed=warn)
 
     @warn.error
@@ -123,7 +103,7 @@ class moderation(Cog):
                         inline=True)
             ban.add_field(
                 name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.author}\n**>** **Reason:** {reason}", inline=True)
-            ban.set_thumbnail(url=user.avatar_url)
+            ban.set_thumbnail(url=user.display_avatar)
             await ctx.send(embed=ban)
             await guild.ban(user, reason=reason)
 
@@ -157,7 +137,7 @@ class moderation(Cog):
                        inline=True)
         kick.add_field(
             name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.author}\n**>** **Reason:** {reason}", inline=True)
-        kick.set_thumbnail(url=member.avatar_url)
+        kick.set_thumbnail(url=member.display_avatar)
         await ctx.send(embed=kick)
         await guild.kick(member, reason=reason)
 
@@ -169,47 +149,6 @@ class moderation(Cog):
             await ctx.send(embed=embed)
    
         
-    @jeanne()
-    @bot_perms(manage_roles=True)
-    async def muterole(self, ctx):
-        guild=ctx.guild
-        await guild.create_role(name="Muted")
-        await ctx.send("Mute role created")
-
-
-        for channel in guild.channels:
-                mute_role=get(guild.roles, name="Muted")
-                await channel.set_permissions(mute_role, speak=False, send_messages=False, read_message_history=True, read_messages=False)
-
-        
-
-    @jeanne()
-    @perms(kick_members=True)
-    async def mute(self, ctx, member: Member, time: TimeConverter = None, *, reason=None):
-        guild = ctx.guild
-        mutedRole = get(guild.roles, name="Muted")
-
-        await member.add_roles(mutedRole)
-        mute = Embed(title="Member Muted", color=0xff0000)
-        mute.add_field(name="Member",
-                       value=f"**>** **Name:** {member}\n**>** **ID:** {member.id}",
-                       inline=True)
-        mute.add_field(
-            name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.author}\n**>** **Reason:** {reason}\n**>** **Duration:** {time}", inline=True)
-        mute.set_thumbnail(url=member.avatar_url)
-        await ctx.send(embed=mute)
-        if time:
-            await sleep(time)
-            await member.remove_roles(mutedRole)
-        
-    @mute.error
-    async def mute_error(self, ctx, error):
-        if isinstance(error, MissingPermissions):
-            embed=Embed(title="Mute failed", description="Sorry but you cannot mute this user", color=0xff0000)
-            embed.add_field(name="Reason", value="Missing permissions: Kick Members", inline=False)
-            await ctx.send(embed=embed)     
-
- 
     @jeanne(aliases=['nick', 'changenick', 'setnick'])
     @perms(manage_nicknames=True)
     async def change_nickname(self, ctx, member: Member, *, nickname=None):
@@ -234,6 +173,50 @@ class moderation(Cog):
                 name="Reason", value="Missing permissions: Manage Nicknames", inline=False)
             await ctx.send(embed=embed)
 
+    @jeanne()
+    @perms(moderate_members=True)
+    async def mute(self, ctx, member:Member, time=f"{28}d", *, reason=None):
+        time=humanfriendly.parse_timespan(time)
+        await member.edit(timeout=utcnow()+timedelta(seconds=time))            
+        embed = Embed(
+            title="Member Muted", color=0xFF0000)
+        embed.add_field(name="Member",
+                        value=f"**>** **Name:** {member}\n**>** **ID:** {member.id}",
+                        inline=True)
+        embed.add_field(name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.author}\n**>** **Duration:** {time}\n**>** **Reason:** {reason}", inline=True)
+        embed.set_thumbnail(url=member.display_avatar)
+        await ctx.send(embed=embed)
+
+    @mute.error
+    async def mute_error(self, ctx, error):
+        if isinstance(error, MissingPermissions):
+            embed = Embed(
+                title="Mute failed", description="Sorry but you cannot mute this member", color=0xff0000)
+            embed.add_field(
+                name="Reason", value="Missing permissions: Moderate Members", inline=False)
+            await ctx.send(embed=embed)
+
+    @jeanne()
+    @perms(moderate_members=True)
+    async def unmute(self, ctx, member:Member, *, reason=None):
+        await member.edit(timeout=None)            
+        embed = Embed(
+            title="Member Unmuted", color=0xFF0000)
+        embed.add_field(name="Member",
+                        value=f"**>** **Name:** {member}\n**>** **ID:** {member.id}",
+                        inline=True)
+        embed.add_field(name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.author}\n**>** **Reason:** {reason}", inline=True)
+        embed.set_thumbnail(url=member.display_avatar)
+        await ctx.send(embed=embed)
+
+    @unmute.error
+    async def mute_error(self, ctx, error):
+        if isinstance(error, MissingPermissions):
+            embed = Embed(
+                title="Unmute failed", description="Sorry but you cannot mute this member", color=0xff0000)
+            embed.add_field(
+                name="Reason", value="Missing permissions: Moderate Members", inline=False)
+            await ctx.send(embed=embed)        
 
 def setup(bot):
     bot.add_cog(moderation(bot))
