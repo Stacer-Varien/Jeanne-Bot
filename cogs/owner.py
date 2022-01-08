@@ -1,7 +1,12 @@
+import contextlib
+import io
 from os import execv
+import re
 from sys import executable, argv
-from discord.ext.commands import command as jeanne, Cog, is_owner
-from discord import User, Guild, Game, Embed, Activity, ActivityType
+from nextcord.ext.commands import command as jeanne, Cog, is_owner
+from nextcord import User, Guild, Game, Embed, Activity, ActivityType
+
+
 
 def restart_bot():
   execv(executable, ['python'] + argv)
@@ -23,7 +28,7 @@ class owner(Cog):
         fuser.add_field(name="User Information",
                            value=f"**>** **Name:** {user}\n**>** **ID:** {user.id}\n**>** **Creation Date:** {user.created_at.strftime(format)}\n**>** **Mutuals:** {len(user.mutual_guilds)}\n**>** **Is Bot?:** {botr}",
                            inline=True)
-        fuser.set_image(url=user.avatar_url)
+        fuser.set_image(url=user.display_avatar)
         await ctx.send(embed=fuser)
 
     
@@ -66,7 +71,7 @@ class owner(Cog):
     @is_owner()
     async def update(self, ctx):
         await ctx.send(f"YAY! NEW UPDATE!")
-        restart_bot()              
+        restart_bot()      
 
 def setup(bot):
     bot.add_cog(owner(bot))

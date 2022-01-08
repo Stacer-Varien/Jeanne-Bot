@@ -1,8 +1,8 @@
-from discord import Member, Embed
-from discord.ext.commands import command as jeanne, Cog, cooldown, BucketType
-from discord.ext.commands.errors import MemberNotFound
+from nextcord import Member, Embed
+from nextcord.ext.commands import command as jeanne, Cog, cooldown, BucketType
+from nextcord.ext.commands.errors import MemberNotFound
 from requests import get
-from assets.needed import poke_nekoslife, tickle_nekoslife, baka_nekoslife, feed_nekoslife, slap_nekoslife, smug_nekoslife, hug_nekoslife, pat_nekoslife, kiss_nekoslife
+from config import poke_nekoslife, tickle_nekoslife, baka_nekoslife, feed_nekoslife, slap_nekoslife, smug_nekoslife, hug_nekoslife, pat_nekoslife, kiss_nekoslife
 
 
 class reactions(Cog):

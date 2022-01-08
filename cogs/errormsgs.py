@@ -1,6 +1,8 @@
-from discord import Embed
-from discord.ext.commands import Cog
-from discord.ext.commands.errors import MemberNotFound, NotOwner, UserNotFound, GuildNotFound, NSFWChannelRequired, CommandOnCooldown
+#error messages raised for the prefix commands
+
+from nextcord import Embed
+from nextcord.ext.commands import Cog
+from nextcord.ext.commands.errors import MemberNotFound, NotOwner, UserNotFound, GuildNotFound, NSFWChannelRequired, CommandOnCooldown
 
 
 class errors(Cog):
@@ -33,7 +35,7 @@ class errors(Cog):
             await ctx.send(embed=error)
         elif isinstance(error, MemberNotFound):
             embed = Embed(description="Member is not in this server")
-            await ctx.send(embed=error)
+            await ctx.send(embed=embed)
 
 
 def setup(bot):

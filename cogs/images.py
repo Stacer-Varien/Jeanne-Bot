@@ -1,9 +1,9 @@
 from glob import glob
 from requests import get
 from random import choice
-from discord import Embed, File
-from discord.ext.commands import command as jeanne, Cog, cooldown, BucketType
-from assets.needed import kitsune_nekoslife
+from nextcord import Embed, File
+from nextcord.ext.commands import command as jeanne, Cog, cooldown, BucketType
+from config import kitsune_nekoslife
 
 class images(Cog):
     def __init__(self, bot):

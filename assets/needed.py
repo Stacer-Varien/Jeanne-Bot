@@ -14,16 +14,5 @@ illegal_tags=["loli", "shota", "cub", "scat", "shit", "vore", "gore", "guro", "c
 correct_answer = "https://cdn.discordapp.com/attachments/809862945684717644/920227513827999744/ezgif.com-gif-maker.gif"
 wrong_answer_or_timeout = "https://cdn.discordapp.com/attachments/809862945684717644/920222496324734996/86052023e81b59d10c95b44ce2751273.jpg"
 
-kitsune_nekoslife="https://nekos.life/api/v2/img/fox_girl"
-hug_nekoslife="https://nekos.life/api/v2/img/hug"
-slap_nekoslife="https://nekos.life/api/v2/img/slap"
-smug_nekoslife="https://nekos.life/api/v2/img/smug"
-poke_nekoslife="https://nekos.life/api/v2/img/poke"
-pat_nekoslife="https://nekos.life/api/v2/img/pat"
-kiss_nekoslife="https://nekos.life/api/v2/img/kiss"
-tickle_nekoslife="https://nekos.life/api/v2/img/tickle"
-baka_nekoslife="https://nekos.life/api/v2/img/baka"
-feed_nekoslife="https://nekos.life/api/v2/img/feed"
-
-
-
+test_server=809862945211285555 #server I use to test slash commands
+bot_owner=597829930964877369 #my user ID required for the owner only slash commands

@@ -1,39 +1,23 @@
 Jeanne is a multipurpose bot with miscellaneous, moderation, management and some fun commands. Later, she will have new commands implemented in the nearby future
 
-FEATURES
+**FEATURES**
 
-• Some slash commands
+* Available slash commands
+* Moderation such as purge, warn, mute, kick, ban and unban
+* Create, delete and rename categories, roles and text and voice channels
+* Fun commands you can play with
+* Getting information of a user and server
+* A say command that will make Jeanne say the message the user wants
+* A reaction system such as slap, hug and pat
 
-• Moderation such as purge, warn, mute, kick, ban and unban
+**PLANNED FEATURES**
 
-• Create, delete and rename categories, roles and text and voice channels
-
-• Fun commands you can play with
-
-• Getting information of a user and server
-
-• A say command that will make Jeanne say the message the user wants
-
-PLANNED FEATURES
-
-• Implementing a currency and leveling system that will be global
-
-• Implementing a welcoming, leaving and modlogging system
-
-• Changing role colour
-
-• Changing the server’s name and profile picture
-
-• Editing channel topics
-
-• Adding a softban command that will have the user to be banned for a specific amount of time
-
-• Adding more error messages in case of missing permissions, if a command has been committed poorly and Discord hierarchy rules
-
-KNOWN BUGS AND FAULTS
-
-• Jeanne will ‘ban’ the user even though they have been banned already instead of raising an error message
-
+* Implementing a currency and leveling system that will be global
+* Implementing a welcoming, leaving and modlogging system
+* Changing role colour
+* Changing the server’s name and profile picture
+* Editing channel topics
+* Adding a softban command that will have the user to be banned for a specific amount of time
 
 NOTE: THIS IS FOR EDUCATIONAL PURPORSES. ALSO I WOULD NOT RECOMMENDEND SELFHOSTING THE BOT AS THERE CAN BE CHANGES TO IT SUCH AS ADDING APIS THAT WILL MAKE YOU RUN ALMOST ALL FEAUTURES OF THE BOT
 

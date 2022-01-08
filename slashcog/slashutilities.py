@@ -1,17 +1,16 @@
-from discord import Embed
+from nextcord import Embed, Interaction, slash_command as jeanne_slash
 from aiohttp import ClientSession
-from discord.ext.commands import Cog
-from discord_slash.cog_ext import cog_slash as jeanne_slash
+from nextcord.ext.commands import Cog
+from config import WEATHER
 
-
-class utilities(Cog):
+class slashutilities(Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @jeanne_slash(description="Get weather information on a city")
-    async def weather(self, ctx, city):
+    async def weather(self, interaction : Interaction, city):
         city = city
-        urlil = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid=' #Certain APIs are private
+        urlil = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={WEATHER}&units=metric'
         async with ClientSession() as session:
             async with session.get(urlil) as r:
                 if r.status == 200:
@@ -31,8 +30,8 @@ class utilities(Cog):
                                     value=f'{hum}', inline=True)
                     embed.add_field(name=":cloud: Pressure:",
                                     value=f'{pres} Pa', inline=True)
-                    await ctx.send(embed=embed)
+                    await interaction.response.send_message.send(embed=embed)
 
 
 def setup(bot):
-    bot.add_cog(utilities(bot))
+    bot.add_cog(slashutilities(bot))
