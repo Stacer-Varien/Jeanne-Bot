@@ -61,15 +61,15 @@
 >**Mute**
 
 * Mute someone and they will not talk. You can add a reason why they are muted
-* **Required Permission:** Kick Members
-* **NOTE:** If a mute role doesn't exist, make a new 'Muted' role or use the `muterole` command and Jeanne will make a new one or she will ignore the command and will not mute the member. If there is no time given, it will be infinite. All times displayed by Jeanne will be in seconds instead of actual time duration.
+* **Required Permission:** Moderate Members
+* **NOTE:** If no mute time has been given, time will be 28 days. You cannout mute someone for more than 28 days due to Discord's API.
 
     Example: `j!mute MEMBER TIME REASON`
 
 >**Unmute**
 
 * Unmute a muted member so they can talk.
-* **Required Permission:** Kick Members
+* **Required Permission:** Moderate Members
 
     Example: `j!unmute MEMBER`
 

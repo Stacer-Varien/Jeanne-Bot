@@ -99,3 +99,10 @@
 * **Aliases:** rncat, renamecat, rncategory, renamecategory
 
     Example:`j!rncat CATEGORY NAME NEW_NAME`(with category name) / `j!rncat CATEGORY ID NEW_NAME` (with category ID)
+
+>**Create Channel**
+
+* Create a text channel, voice channel or category. You will given 3 options to pick when creating them
+* **NOTE:** This is a slash only command
+
+    Example: `/create_channel CHANNEL_TYPE(text, voice or category) NAME`

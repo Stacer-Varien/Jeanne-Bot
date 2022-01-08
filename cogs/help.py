@@ -1,7 +1,16 @@
-from discord import Embed
-from discord.ext.commands import command as jeanne, Cog
-from discord_slash.utils.manage_components import create_actionrow, create_button
-from discord_slash.model import ButtonStyle
+from nextcord import Embed, ButtonStyle
+from nextcord.ext.commands import command as jeanne, Cog
+from nextcord.ui import Button, View
+
+class help_button(View):
+    def __init__(self):
+        super().__init__()
+
+        wiki_url='https://github.com/ZaneRE544/Jeanne-Bot/wiki/JeanneBot-Wiki#welcome-to-the-jeanne-bot-wiki'
+        haze_url='https://discord.gg/VVxGUmqQhF'
+        
+        self.add_item(Button(style=ButtonStyle.url, label="Jeanne Wiki", url=wiki_url))
+        self.add_item(Button(style=ButtonStyle.url, label="Support Server", url=haze_url))
 
 
 class help(Cog):
@@ -10,24 +19,9 @@ class help(Cog):
 
     @jeanne()
     async def help(self, ctx):
-        buttons = [
-            create_button(
-                style=ButtonStyle.URL,
-                label="Jeanne Wiki",
-                url="https://github.com/ZaneRE544/Jeanne-Bot/wiki/JeanneBot-Wiki#welcome-to-the-jeanne-bot-wiki"
-            ),
-            create_button(
-                style=ButtonStyle.URL,
-                label="Support Server",
-                url="https://discord.gg/VVxGUmqQhF"
-            ),
-            ]
-
-        action_row=create_actionrow(*buttons)
-
         help=Embed(description="Click on one of the buttons to open the documentation or get help on the support server")
 
-        await ctx.send(embed=help, components=[action_row])
+        await ctx.send(embed=help, view=help_button())
 
 
 def setup(bot):
