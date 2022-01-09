@@ -51,11 +51,11 @@ class info(Cog):
 
         if guild.premium_subscription_count < 2:
             boostlevel = "Level 0"
-        elif guild.premium_tier_1:
+        elif guild.premium_tier == 1:
             boostlevel = "Level 1"
-        elif guild.premium_tier_2:
+        elif guild.premium_tier == 2:
             boostlevel = "Level 2"
-        elif guild.premium_tier_3:
+        elif guild.premium_tier == 3:
             boostlevel = "Level 3"
 
         embed = Embed(title="Server's Info", color=0x00B0ff)
@@ -89,14 +89,18 @@ class info(Cog):
         guild = ctx.guild
         banner = guild.banner
 
-        if guild.premium_subscription_count < 2 or guild.premium_tier_1:
+        if guild.premium_subscription_count < 2:
             nobanner = Embed(description="Server is not boosted at level 2")
             await ctx.send(embed=nobanner)
         else:
-            embed = Embed(colour=0x00B0ff)
-            embed.set_footer(text=f"{guild.name}'s banner")
-            embed.set_image(url=banner)
-            await ctx.send(embed=embed)
+            try:
+                embed = Embed(colour=0x00B0ff)
+                embed.set_footer(text=f"{guild.name}'s banner")
+                embed.set_image(url=banner)
+                await ctx.send(embed=embed)
+            except:
+                embed = Embed(description='Guild has no banner')
+                await ctx.send(embed=embed)
 
     @jeanne()
     @cooldown(1, 5, BucketType.user)
