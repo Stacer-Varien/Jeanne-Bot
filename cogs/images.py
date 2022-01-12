@@ -44,7 +44,7 @@ class images(Cog):
     @jeanne()
     @cooldown(1, 5, BucketType.user)
     async def saber(self, ctx):
-        file_path_type = ["./Media/Saber/*.jpg"]
+        file_path_type = ["./Media/Saber/*.jpg", "./Media/Saber/*.png"]
         images = glob.glob(choice(file_path_type))
         random_image = choice(images)
         file = File(random_image)
