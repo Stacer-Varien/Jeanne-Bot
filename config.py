@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 TOKEN = getenv("token")
-WEATHER=getenv("weather")
+WEATHER=getenv("weather_api")
 
 aliases = ['j!', 'jeanne ', 'J!', 'Jeanne ']
 
