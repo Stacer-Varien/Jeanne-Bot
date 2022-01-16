@@ -117,7 +117,6 @@ class slashmoderation(Cog):
                 return await interaction.response.send_message("Please pass in an integer as limit")
             if not member:
                 await interaction.channel.purge(limit=limit)
-                return await interaction.response.send_message(f"Purged {limit} messages", delete_after=3)
             async for m in interaction.channel.history():
                 if len(msg) == limit:
                     break
@@ -143,7 +142,7 @@ class slashmoderation(Cog):
     async def unban(self, interaction : Interaction, user_id, reason=SlashOption(description="Give a reason", required=False)):
         if interaction.permissions.ban_members is True:          
             user=await self.bot.fetch_user(user_id)
-            await interaction.guild.unban(user)
+            await interaction.guild.unban(user, reason=reason)
             embed = Embed(title="User Unbanned", color=0xFF0000)
             embed.add_field(name="Member",
                             value=f"**>** **Name:** {user}\n**>** **ID:** {user.id}",
@@ -169,7 +168,7 @@ class slashmoderation(Cog):
 
 
             time=parse_timespan(time)
-            await member.edit(timeout=utcnow()+timedelta(seconds=time))            
+            await member.edit(timeout=utcnow()+timedelta(seconds=time), reason=reason)            
             embed = Embed(
                 title="Member Muted", color=0xFF0000)
             embed.add_field(name="Member",
@@ -186,7 +185,7 @@ class slashmoderation(Cog):
         if interaction.permissions.moderate_members is True:
             if reason==None:
                 reason="Unspecified"
-            await member.edit(timeout=None)            
+            await member.edit(timeout=None, reason=reason)            
             embed = Embed(
                 title="Member Unmuted", color=0xFF0000)
             embed.add_field(name="Member",
