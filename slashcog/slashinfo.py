@@ -23,14 +23,10 @@ class slashinfo(Cog):
             name="General Information", value=f"**>** **Name:** {self.bot.user}\n**>** **ID:** {self.bot.user.id}", inline=False)
         embed.add_field(
             name="Developer", value=f"**>** **Name:** {botowner}\n**>** **ID:** {botowner.id}")
-        # this is an empty field
-        embed.add_field(name="_ _", value="_ _", inline=False)
         embed.add_field(
             name="Version", value=f"**>** **Python Version:** {py_version.major}.{py_version.minor}.{py_version.micro}\n**>** **Nextcord Version:** {discord_version}", inline=True)
         embed.add_field(name="Count",
                         value=f"**>** **Server Count:** {len(self.bot.guilds)} servers\n**>** **User Count:** {len(set(self.bot.get_all_members()))}", inline=True)
-        # this is an empty field
-        embed.add_field(name="_ _", value="_ _", inline=False)
         embed.add_field(name="Ping",
                         value=f"**>** **Bot Latency:** {round(self.bot.latency * 1000)}ms", inline=True)
         current_time = time()
@@ -63,7 +59,7 @@ class slashinfo(Cog):
                            value=f"**>** **Joined Server:** {member.joined_at.strftime(format)}\n**>** **Number of Roles:** {len(member.roles)}",
                            inline=True)
         userinfo.add_field(name="Roles Held",
-                           value=''.join(hasroles[:20]) + '@everyone', inline=False)
+                           value=''.join(hasroles[:20]) + '@everyone', inline=True)
         userinfo.set_thumbnail(url=member.display_avatar)
         await interaction.response.send_message(embed=userinfo)
 
@@ -89,13 +85,11 @@ class slashinfo(Cog):
                         value=f"**>** **Name:** {guild.name}\n**>** **ID:** {guild.id}\n**>** **Creation Date:** {guild.created_at.strftime(format)}\n**>** **Member Count:** {len(guild.members)}\n**>** **Verification:** {guild.verification_level}\n**>** **Roles:** {len(guild.roles)}\n**>** **Emojis:** {len(emojis)}\n{''.join(emojis[:10])}", inline=True)
         embed.add_field(
             name="Owner", value=f"**>** **Name:** {guild.owner}\n**>** **ID:** {guild.owner.id}", inline=True)
-        embed.add_field(name="_ _", value="_ _", inline=False)
         embed.add_field(name="Boost Status",
                         value=f"**>** **Boosters:** {len(guild.premium_subscribers)}\n**>** **Boosts:** {guild.premium_subscription_count}\n**>** **Boost Level:** {boostlevel}",
                         inline=True)
         embed.add_field(
             name="Members", value=f"**>** **Humans:** {true_member_count}\n**>** **Bots:** {bots}")
-        embed.add_field(name="_ _", value="_ _", inline=False)
         embed.add_field(name='Features',
                         value=features, inline=False)
 
