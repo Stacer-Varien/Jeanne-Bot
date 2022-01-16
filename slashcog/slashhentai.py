@@ -10,7 +10,7 @@ class slashnsfw(Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    @jeanne_slash(description="Get a random hentai from Jeanne", guild_ids=[test_server])
+    @jeanne_slash(description="Get a random hentai from Jeanne")
     async def hentai(self, interaction : Interaction):
         file_path_type = ["./Media/Hentai/*.jpg", "./Media/Hentai/*.mp4"]
         images = glob(choice(file_path_type))
