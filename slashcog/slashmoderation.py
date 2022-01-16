@@ -117,13 +117,13 @@ class slashmoderation(Cog):
                 return await interaction.response.send_message("Please pass in an integer as limit")
             if not member:
                 await interaction.channel.purge(limit=limit)
+                await interaction.response.send_message(f"{limit} messages deleted", ephemeral=True)
             async for m in interaction.channel.history():
                 if len(msg) == limit:
                     break
                 if m.author == member:
                     msg.append(m)
             await interaction.channel.delete_messages(msg)
-            await self.bot.process_commands(m)
         else:
             await interaction.response.send_message(embed=message_perm)          
 
