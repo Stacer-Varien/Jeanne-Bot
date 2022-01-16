@@ -25,14 +25,14 @@ class slashmisc(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @jeanne_slash()
+    @jeanne_slash(description="Invite me to your server or join the support server")
     async def invite(self, interaction : Interaction):
         invite = Embed(
             title="Invite me!",
             description="Click on one of these buttons to invite me to you server or join my creator's server",
             color=0x00bfff)
 
-        await interaction.response.send_message(embed=invite, view=invite_button)
+        await interaction.response.send_message(embed=invite, view=invite_button())
 
     @jeanne_slash(description="Type something and I will say it")
     async def say(self, interaction : Interaction, type=SlashOption(description="Plain text or Embed", choices=["Plain text", "Embed"], required=True), text=SlashOption(required=True)):

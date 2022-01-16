@@ -32,7 +32,7 @@ class misc(Cog):
             description="Click on one of these buttons to invite me to you server or join my creator's server",
             color=0x00bfff)
 
-        await ctx.send(embed=invite, view=invite_button)
+        await ctx.send(embed=invite, view=invite_button())
 
     @jeanne()
     @perms(administrator=True)
