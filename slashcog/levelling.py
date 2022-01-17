@@ -35,7 +35,6 @@ class levelling(Cog):
             with open('users.json', 'w') as f:
                 dump(users, f)
 
-        await self.bot.process_commands(message)
 
 
     async def update_data(self, users, user):
