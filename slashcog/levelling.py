@@ -2,9 +2,6 @@ import imp
 from nextcord import SlashOption, Member, slash_command as jeanne_slash, Interaction, Embed
 from nextcord.ext.commands import Cog
 from json import load, dump
-from asyncio import sleep
-
-
 
 class levelling(Cog):
     def __init__(self, bot):
@@ -46,7 +43,6 @@ class levelling(Cog):
 
     async def add_experience(self, users, user, exp):
         users[f'{user.id}']['experience'] += exp
-        await sleep(60)
 
 
     async def level_up(self, users, user):
@@ -65,21 +61,27 @@ class levelling(Cog):
             member = interaction.user
         
         member_id=member.id
+
         with open('users.json','r') as f:
                 users = load(f)
-        lvl = users[str(member_id)]['level']
-        exp = users[str(member_id)]['experience']
+        
+        try:
+            lvl = users[str(member_id)]['level']
+            exp = users[str(member_id)]['experience']
 
-        boxes = int((exp/(100*((1/2) * lvl)))*10)
+            boxes = int((exp/(100*((1/2) * lvl)))*10)
+            embed = Embed(title=f"{member}'s Level Stats", color=0x00FF00)
+            embed.add_field(
+                name="XP", value=f"{exp}/{int(100*((1/2)*lvl))}", inline=True)
+            embed.add_field(name="Level", value=f"Level {lvl}")
+            embed.add_field(name="Progress Bar", value=boxes * ":blue_square:" + (
+                10-boxes) * ":white_large_square:", inline=False)
+            embed.set_thumbnail(url=member.display_avatar)
+            await interaction.response.send_message(embed=embed)
 
-        embed = Embed(title=f"{member}'s Level Stats", color=0x00FF00)
-        embed.add_field(
-            name="XP", value=f"{exp}/{int(100*((1/2)*lvl))}", inline=True)
-        embed.add_field(name="Level", value=f"Level {lvl}")
-        embed.add_field(name="Progress Bar", value=boxes * ":blue_square:" + (
-            10-boxes) * ":white_large_square:", inline=False)
-        embed.set_thumbnail(url=member.display_avatar)
-        await interaction.response.send_message(embed=embed)
+        except KeyError:
+            noxp = Embed(description="Member has no XP")
+            await interaction.response.send_message(embed=noxp)
 
 
 def setup(bot):
