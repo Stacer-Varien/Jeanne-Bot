@@ -74,7 +74,8 @@ class slashfun(Cog):
             file = File(random_animeme)
             animeme = Embed(color=0x0000FF)
             animeme.set_footer(text="Powered by JeanneBot")
-            await interaction.response.send_message(file=file, embed=animeme)
+            await interaction.response.defer()
+            await interaction.followup.send(file=file, embed=animeme)
 
     @jeanne_slash(description="Combine 2 words to get 2 combined words")
     async def combine(self, interaction: Interaction, first_word, second_word):
