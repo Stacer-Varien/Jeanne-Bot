@@ -1,21 +1,12 @@
 from os import listdir
 from nextcord import Intents
 from nextcord.ext.commands import Bot as Jeanne
-from config import TOKEN, aliases
+from config import TOKEN
 
 intents = Intents().all()
-bot = Jeanne(case_insensitive=True, command_prefix=aliases, intents=intents)
+bot = Jeanne(command_prefix="/", intents=intents)
 bot.remove_command('help')
 
-
-#prefixed cog commands
-for filename in listdir('./cogs'):
-  if filename.endswith('.py'):
-    bot.load_extension(f'cogs.{filename[:-3]}')
-    print(f"{filename} loaded")
-    
-  else:
-    print(f'Unable to load {filename[:-3]}')
 
 #slash cog commands
 for filename in listdir('./slashcog'):
