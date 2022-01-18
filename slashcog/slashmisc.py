@@ -4,17 +4,17 @@ from nextcord.ui import Button, View
 from nextcord import Embed, ButtonStyle
 from assets.errormsgs import admin_perm
 
+bot_invite_url = "https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=2550197270&redirect_uri=https%3A%2F%2Fdiscord.com%2Foauth2%2Fauthorize%3Fclient_id%3D831993597166747679%26scope%3Dbot&scope=bot%20applications.commands"
+
+topgg_invite = "https://top.gg/bot/831993597166747679"
+
+discordbots_url = "https://discord.bots.gg/bots/831993597166747679"
+
+haze_url = "https://discord.gg/VVxGUmqQhF"
+
 class invite_button(View):
     def __init__(self):
         super().__init__()
-
-        bot_invite_url="https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=2550197270&redirect_uri=https%3A%2F%2Fdiscord.com%2Foauth2%2Fauthorize%3Fclient_id%3D831993597166747679%26scope%3Dbot&scope=bot%20applications.commands"
-
-        topgg_invite="https://top.gg/bot/831993597166747679"
-
-        discordbots_url="https://discord.bots.gg/bots/831993597166747679"
-
-        haze_url="https://discord.gg/VVxGUmqQhF"
 
         self.add_item(Button(style=ButtonStyle.url, label="Bot Invite", url=bot_invite_url))
         self.add_item(Button(style=ButtonStyle.url, label="Top.gg", url=topgg_invite))
