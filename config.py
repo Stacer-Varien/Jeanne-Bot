@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 load_dotenv()
 TOKEN = getenv("token")
 WEATHER=getenv("weather_api")
+BOT_VERSION = getenv("botversion")
 
-aliases = ['j!', 'jeanne ', 'J!', 'Jeanne ']
 
 kitsune_nekoslife="https://nekos.life/api/v2/img/fox_girl"
 hug_nekoslife="https://nekos.life/api/v2/img/hug"

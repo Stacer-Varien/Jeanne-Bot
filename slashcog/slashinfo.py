@@ -4,8 +4,8 @@ from datetime import timedelta
 from sys import version_info as py_version
 from nextcord.ext.commands import Cog
 from nextcord import Member, Embed, __version__ as discord_version, Interaction, slash_command as jeanne_slash, SlashOption
-
-
+from config import BOT_VERSION
+from slashcog.slashmisc import haze_url, bot_invite_url
 
 
 format = "%a, %d %b %Y | %H:%M:%S"
@@ -20,9 +20,9 @@ class slashinfo(Cog):
         botowner = self.bot.get_user(597829930964877369)
         embed = Embed(title="Bot stats", color=0x236ce1)
         embed.add_field(
-            name="General Information", value=f"**>** **Name:** {self.bot.user}\n**>** **ID:** {self.bot.user.id}", inline=False)
+            name="General Information", value=f"**>** **Name:** {self.bot.user}\n**>** **ID:** {self.bot.user.id}\n**>** **Bot Version:** {BOT_VERSION}", inline=True)
         embed.add_field(
-            name="Developer", value=f"**>** **Name:** {botowner}\n**>** **ID:** {botowner.id}")
+            name="Developer", value=f"**>** **Name:** {botowner}\n**>** **ID:** {botowner.id}", inline=True)
         embed.add_field(
             name="Version", value=f"**>** **Python Version:** {py_version.major}.{py_version.minor}.{py_version.micro}\n**>** **Nextcord Version:** {discord_version}", inline=True)
         embed.add_field(name="Count",
@@ -154,7 +154,7 @@ class slashinfo(Cog):
         avatar.set_image(url=member.display_avatar)
         await interaction.response.send_message(embed=avatar)
 
-    @jeanne_slash()
+    @jeanne_slash(description="See your guild avatar or a member's guild avatar")
     async def guildavatar(self, interaction : Interaction, member: Member = SlashOption(required=False)):
 
         if member == None:
@@ -170,8 +170,8 @@ class slashinfo(Cog):
                 text="Member has no server avatar. Passed normal avatar instead")
             await interaction.response.send_message(embed=guild_avatar)
 
-    @jeanne_slash()
-    async def member_banner(self, interaction : Interaction, member: Member = SlashOption(required=False)):
+    @jeanne_slash(description="See your banner or someone's banner")
+    async def memberbanner(self, interaction : Interaction, member: Member = SlashOption(required=False)):
         if member == None:
             member = interaction.user
 
