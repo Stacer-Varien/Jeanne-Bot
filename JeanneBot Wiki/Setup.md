@@ -11,7 +11,7 @@ Before inviting Jeanne into the server, make sure she has the following permissi
 
 * The `manage messages` permission allows Jeanne to delete messages if a `purge` command has been used. It is also needed for certain fun commands.
 * The `kick members` permission allows Jeanne to warn and kick members.
-* The `moderate members` permission allows Jeanen to mute and unmute members
+* The `moderate members` permission allows Jeanen to mute and unmute members by using the Discord timeout feature
 * The `ban members` permission allows Jeaane to ban and unban members.
 
 **Manage Role Permission**

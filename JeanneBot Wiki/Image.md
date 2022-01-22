@@ -6,28 +6,28 @@
 
 * Get a random kitsune (foxgirl) image from nekos.life
 
-    Example: `j!kitsune`
+    Example: `/kitsune`
 
 >**Wallpaper**
 
 * Need a wallpaper? Get a random wallpaper from Jeanne
 
-    Example: `j!wallpaper`
+    Example: `/wallpaper`
 
 >**Jeanne**
 
 * Get a random Jeanne d'Arc image from Jeanne
 
-    Exapmle: `j!jeanne`
+    Exapmle: `/jeanne`
 
 >**Saber**
 
 * Get a random Saber image from Jeanne
 
-    Example: `j!saber`
+    Example: `/saber`
 
 >**Neko**
 
 * Get a random neko image from Jeanne
 
-    Example: `j!neko`
+    Example: `/neko`

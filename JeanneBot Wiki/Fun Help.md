@@ -3,54 +3,50 @@
 > **8 Ball**
 
 * Ask 8 ball anything and you will get your answer
-* **Aliases:** 8b, 8ball
 
- Example: `j!8b QUESTION`
+ Example: `/8ball QUESTION`
 
 > **Dice**
 
 * Roll a dice
-* **Aliases:** rd, dice
 
- Example: `j!roll`
+ Example: `/dice`
 
 > **Combine**
 
 * Type two words to get one combined word"
 
- Example: `j!combine WORD_1 WORD_2`
+ Example: `/combine WORD_1 WORD_2`
 
 >**Flip**
 
 * Flip a coin and get your result
-* **Aliases:** coinflip, headsortails, piece, flip
 
-  Example:  `j!flip`
+  Example:  `/flip`
 
 >**Choose**
 
 * Add some choices and I will choose for you
-* **NOTE:** You need to put more than 1 choices. This only works on a prefixed command. To separate the choices, use as this format: `"CHOICE"`. For slash commands, you need to put 2 choices.
-* **Aliases:** pick, choose
+* **NOTE:** You need to put more than 1 choices. For now in slash commands, you need to put 2 choices.
 
- Example: `j!pick CHOICE_1 CHOICE_2`
+ Example: `/pick CHOICE_1 CHOICE_2`
 
 >**Reverse**
 
 * Say something and I will say it in reversed text
 
- Example: `j!reverse TEXT`
+ Example: `/reverse TEXT`
 
 >**Guess**
 
 * Guess my number and I will reward you with a hug!
 * **NOTE:** You have to pick a number between 1 to 10. After executing the command, you have to guess the number after she starts asking. You have 5 seconds to guess the correct one.
 
- Example: `j!guess` then after she asks, `NUMBER`
+ Example: `/guess` then after she asks, `NUMBER`
 
 >**Animeme**
 
 * Get a random animeme
 * **NOTE:** The animemes are in JPG and in MP4. They have been reduced to 8MB or lower.
 
-  Example: `j!animeme`
+  Example: `/animeme`
