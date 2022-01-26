@@ -4,29 +4,28 @@ from datetime import timedelta
 from sys import version_info as py_version
 from nextcord.ext.commands import Cog
 from nextcord import Member, Embed, __version__ as discord_version, Interaction, slash_command as jeanne_slash, SlashOption
-from config import BOT_VERSION
-from slashcog.slashmisc import haze_url, bot_invite_url
 
 
 format = "%a, %d %b %Y | %H:%M:%S"
 start_time = time()
+
 
 class slashinfo(Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @jeanne_slash(description="See the bot's status from development to now")
-    async def stats(self, interaction : Interaction):
+    async def stats(self, interaction: Interaction):
         botowner = self.bot.get_user(597829930964877369)
         embed = Embed(title="Bot stats", color=0x236ce1)
         embed.add_field(
-            name="General Information", value=f"**>** **Name:** {self.bot.user}\n**>** **ID:** {self.bot.user.id}\n**>** **Bot Version:** {BOT_VERSION}", inline=True)
+            name="General Information", value=f"**>** **Name:** {self.bot.user}\n**>** **ID:** {self.bot.user.id}\n**>** **Bot Version:** v2.0.2", inline=True)
         embed.add_field(
             name="Developer", value=f"**>** **Name:** {botowner}\n**>** **ID:** {botowner.id}", inline=True)
         embed.add_field(
             name="Version", value=f"**>** **Python Version:** {py_version.major}.{py_version.minor}.{py_version.micro}\n**>** **Nextcord Version:** {discord_version}", inline=True)
         embed.add_field(name="Count",
-                        value=f"**>** **Server Count:** {len(self.bot.guilds)} servers\n**>** **User Count:** {len(set(self.bot.get_all_members()))}", inline=True)
+                        value=f"**>** **Server Count:** {len(self.bot.guilds)} servers\n**>** **User Count:** {len(set(self.bot.get_all_members()))}\n**>** **Goal to verification:** {len(self.bot.guilds)}/100 servers", inline=True)
         embed.add_field(name="Ping",
                         value=f"**>** **Bot Latency:** {round(self.bot.latency * 1000)}ms", inline=True)
         current_time = time()
@@ -39,7 +38,7 @@ class slashinfo(Cog):
         await interaction.response.send_message(embed=embed)
 
     @jeanne_slash(description="See the information of a member or yourself")
-    async def userinfo(self, interaction : Interaction, member: Member = SlashOption(required=False)):
+    async def userinfo(self, interaction: Interaction, member: Member = SlashOption(required=False)):
         if member == None:
             member = interaction.user
         hasroles = [
@@ -64,7 +63,7 @@ class slashinfo(Cog):
         await interaction.response.send_message(embed=userinfo)
 
     @jeanne_slash(description="Get information about this server")
-    async def serverinfo(self, interaction : Interaction):
+    async def serverinfo(self, interaction: Interaction):
         guild = interaction.guild
         emojis = [str(x) for x in guild.emojis]
         features = [str(x) for x in guild.features]
@@ -93,21 +92,20 @@ class slashinfo(Cog):
         embed.add_field(name='Features',
                         value=features, inline=False)
 
-        if guild.icon==None:
+        if guild.icon == None:
             pass
         else:
             embed.set_thumbnail(url=guild.icon)
 
-        if guild.splash==None:
+        if guild.splash == None:
             pass
         else:
             embed.set_image(url=guild.splash)
-            
+
         await interaction.response.send_message(embed=embed)
 
-
     @jeanne_slash(description="Check how fast I respond to a command")
-    async def ping(self, interaction : Interaction):
+    async def ping(self, interaction: Interaction):
         _1st_start_time = time()
         await interaction.response.defer()
         _1st_end_time = time()
@@ -126,14 +124,13 @@ class slashinfo(Cog):
         await interaction.followup.send(embed=ping)
 
     @jeanne_slash(description="See the server's banner")
-    async def guildbanner(self, interaction : Interaction):
+    async def guildbanner(self, interaction: Interaction):
         guild = interaction.guild
         banner = guild.banner
 
         if guild.premium_subscription_count < 2:
             nobanner = Embed(description="Server is not boosted at level 2")
             await interaction.response.send_message(embed=nobanner)
-        
 
         else:
             try:
@@ -142,20 +139,20 @@ class slashinfo(Cog):
                 embed.set_image(url=banner)
                 await interaction.response.send_message(embed=embed)
             except:
-                embed=Embed(description='Guild has no banner')
+                embed = Embed(description='Guild has no banner')
                 await interaction.response.send_message(embed=embed)
 
     @jeanne_slash(description="See your avatar or another member's avatar")
-    async def avatar(self, interaction : Interaction, member:Member = SlashOption(required=False)):
-        if member==None:
-            member=interaction.user
+    async def avatar(self, interaction: Interaction, member: Member = SlashOption(required=False)):
+        if member == None:
+            member = interaction.user
 
         avatar = Embed(title=f"{member}'s Avatar", color=0x236ce1)
-        avatar.set_image(url=member.display_avatar)
+        avatar.set_image(url=member.avatar)
         await interaction.response.send_message(embed=avatar)
 
     @jeanne_slash(description="See your guild avatar or a member's guild avatar")
-    async def guildavatar(self, interaction : Interaction, member: Member = SlashOption(required=False)):
+    async def guildavatar(self, interaction: Interaction, member: Member = SlashOption(required=False)):
 
         if member == None:
             member = interaction.user
@@ -165,13 +162,13 @@ class slashinfo(Cog):
             guild_avatar.set_image(url=member.guild_avatar)
             await interaction.response.send_message(embed=guild_avatar)
         except:
-            guild_avatar.set_image(url=member.display_avatar)
+            guild_avatar.set_image(url=member.avatar)
             guild_avatar.set_footer(
                 text="Member has no server avatar. Passed normal avatar instead")
             await interaction.response.send_message(embed=guild_avatar)
 
     @jeanne_slash(description="See your banner or someone's banner")
-    async def memberbanner(self, interaction : Interaction, member: Member = SlashOption(required=False)):
+    async def memberbanner(self, interaction: Interaction, member: Member = SlashOption(required=False)):
         if member == None:
             member = interaction.user
 
@@ -185,6 +182,7 @@ class slashinfo(Cog):
         except:
             mbanner = Embed(description="Member has no banner", color=0x236ce1)
             await interaction.response.send_message(embed=mbanner)
+
 
 def setup(bot):
     bot.add_cog(slashinfo(bot))
