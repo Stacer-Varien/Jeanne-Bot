@@ -1,3 +1,4 @@
+from aiosqlite import connect
 from nextcord import Member, Embed, NotFound, Interaction, slash_command as jeanne_slash, Interaction, SlashOption
 from nextcord.ext.commands import Cog
 from nextcord.ext.commands.errors import MissingPermissions, UserNotFound
@@ -23,7 +24,7 @@ class slashmoderation(Cog):
                             value=f"**>** **Name:** {member}\n**>** **ID:** {member.id}",
                             inline=True)
             embed.add_field(name="Moderation", value=f"**>** **Responsible Moderator:** {interaction.user}\n**>** **Reason:** {reason}", inline=True)
-            embed.set_thumbnail(url=member.avatar_url)
+            embed.set_thumbnail(url=member.display_avatar)
             await interaction.response.send_message(embed=embed)
         else:
             await interaction.response.send_message(embed=warn_perm)
@@ -46,7 +47,7 @@ class slashmoderation(Cog):
                             inline=True)
             ban.add_field(
                 name="Moderation", value=f"**>** **Responsible Moderator:** {interaction.user}\n**>** **Reason:** {reason}", inline=True)
-            ban.set_thumbnail(url=member.avatar_url)
+            ban.set_thumbnail(url=member.display_avatar)
             await interaction.response.send_message(embed=ban)
             await member.ban(reason=reason)
         else:
@@ -100,7 +101,7 @@ class slashmoderation(Cog):
                             inline=True)
             kick.add_field(
                 name="Moderation", value=f"**>** **Responsible Moderator:** {interaction.user}\n**>** **Reason:** {reason}", inline=True)
-            kick.set_thumbnail(url=member.avatar_url)
+            kick.set_thumbnail(url=member.display_avatar)
             await interaction.response.send_message(embed=kick)
             await member.kick(reason=reason)
         else:
@@ -149,7 +150,7 @@ class slashmoderation(Cog):
                             inline=True)
             embed.add_field(
                 name="Moderation", value=f"**>** **Responsible Moderator:** {interaction.user}\n**>** **Reason:** {reason}", inline=True)
-            embed.set_thumbnail(url=user.avatar_url)
+            embed.set_thumbnail(url=user.display_avatar)
             await interaction.response.send_message(embed=embed)
         else:
             try:
