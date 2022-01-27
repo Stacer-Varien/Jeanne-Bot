@@ -20,7 +20,7 @@ Jeanne is a multipurpose bot with miscellaneous, moderation, management and some
 * Editing channel topics
 * Adding a softban command that will have the user to be banned for a specific amount of time
 
-NOTE: THIS IS FOR EDUCATIONAL PURPORSES. ALSO I WOULD NOT RECOMMENDEND SELFHOSTING THE BOT AS THERE CAN BE CHANGES TO IT SUCH AS ADDING APIS THAT WILL MAKE YOU RUN ALMOST ALL FEAUTURES OF THE BOT
+NOTE: THIS IS FOR EDUCATIONAL PURPORSES. ALSO I WOULD NOT RECOMMENDEND SELFHOSTING THE BOT AS THERE CAN BE CHANGES TO IT SUCH AS ADDING APIS THAT WILL MAKE YOU RUN ALMOST ALL FEATURES OF THE BOT
 
 [Invite Jeanne](https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=2550197270&redirect_uri=https%3A%2F%2Fdiscord.com%2Foauth2%2Fauthorize%3Fclient_id%3D831993597166747679%26scope%3Dbot&scope=bot%20applications.commands)
 
