@@ -27,9 +27,9 @@
 >**Choose**
 
 * Add some choices and I will choose for you
-* **NOTE:** You need to put more than 1 choices. For now in slash commands, you need to put 2 choices.
+* **NOTE:** You need to put more than 1 choices. This only works on a prefixed command. To separate the choices, use as this format: `"CHOICE"`. For slash commands, you need to put 2 choices.
 
- Example: `/pick CHOICE_1 CHOICE_2`
+ Example: `/choose CHOICE_1 CHOICE_2`
 
 >**Reverse**
 

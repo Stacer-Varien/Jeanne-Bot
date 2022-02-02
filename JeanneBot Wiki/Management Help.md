@@ -20,7 +20,6 @@
 
     Example: `/rename_text_channel CHANNEL_NAME NEW_NAME`
 
-
 >**Rename Voice Channel**
 
 * Renames the voice channel
@@ -50,5 +49,3 @@
 * Renames the category
 
     Example:`/rename_category CATEGORY NAME NEW_NAME`
-
-

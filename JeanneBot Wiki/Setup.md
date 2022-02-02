@@ -16,7 +16,7 @@ Before inviting Jeanne into the server, make sure she has the following permissi
 
 **Manage Role Permission**
 
-* This permission allows Jeanne to manage roles such as making new roles, deleting roles and renaming roles. This is also required since the `muterole` command requires this permission. If someone uses the `mute` command and a mute role doesn't exist, she will not mute the user.
+* This permission allows Jeanne to manage roles such as making new roles, deleting roles and renaming roles.
 
 **Manage Channel Permission**
 

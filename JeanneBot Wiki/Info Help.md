@@ -10,7 +10,6 @@
 >**Serverinfo**
 
 * Get information about this server
-* **Aliases:** serverinfo, sinfo, guild, guildinfo, ginfo
 
  Example: `/serverinfo`
 
@@ -51,6 +50,5 @@
 
 * See your banner or someone's banner
 * **NOTE:** It must be someone present in the server. If the member has no banner set, it will return with an error message.
-* **Aliases:** memberbanner, mbanner
 
  Example: `/memberbanner` (if for yourself) / `/memberbanner MEMBER` (if for a member)
