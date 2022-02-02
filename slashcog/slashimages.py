@@ -42,7 +42,7 @@ class slashimages(Cog):
 
     @jeanne_slash(description="Get a random Saber image")
     async def saber(self, interaction : Interaction):
-        file_path_type = ["./Media/Saber/*.jpg", "./Media/Saber/*.png"]
+        file_path_type = ["./Media/Saber/*.jpg"]
         images = glob(choice(file_path_type))
         random_image = choice(images)
         file = File(random_image)

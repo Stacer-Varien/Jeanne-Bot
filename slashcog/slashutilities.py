@@ -30,7 +30,7 @@ class slashutilities(Cog):
                                     value=f'{hum}', inline=True)
                     embed.add_field(name=":cloud: Pressure:",
                                     value=f'{pres} Pa', inline=True)
-                    await interaction.response.send_message.send(embed=embed)
+                    await interaction.response.send_message(embed=embed)
 
 
 def setup(bot):

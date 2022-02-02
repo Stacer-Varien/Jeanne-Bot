@@ -3,10 +3,6 @@ from nextcord.ext.commands import Cog
 from nextcord.ui import Button, View
 
 
-class slashhelp(Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
 class help_button(View):
     def __init__(self):
         super().__init__()
@@ -18,11 +14,11 @@ class help_button(View):
         self.add_item(Button(style=ButtonStyle.url, label="Support Server", url=haze_url))
 
 
-class help(Cog):
+class slashhelp(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @jeanne_slash()
+    @jeanne_slash(description="Get help from the wiki or join the support server for further help")
     async def help(self, interaction : Interaction):
         help=Embed(description="Click on one of the buttons to open the documentation or get help on the support server")
 
