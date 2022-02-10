@@ -1,5 +1,6 @@
 from asyncio import sleep
 from random import randint
+from discord import Forbidden
 from nextcord import Member, Embed, NotFound, Interaction, slash_command as jeanne_slash, Interaction, SlashOption
 from nextcord.ext.commands import Cog
 from nextcord.ext.commands.errors import MissingPermissions, UserNotFound
@@ -7,7 +8,7 @@ from nextcord.utils import utcnow
 from datetime import timedelta
 from humanfriendly import parse_timespan
 from sqlite3 import connect
-from assets.errormsgs import kick_perm, ban_perm, warn_perm, unban_perm, failed_unban, failed_ban, nick_perm, mute_perm, message_perm, unmute_perm
+from assets.errormsgs import *
 
 
 format = "%d %b %Y | %H:%M:%S"
@@ -59,10 +60,10 @@ class slashmoderation(Cog):
                 title=f"Current warnings in server", colour=0xFF0000)
             embed.description = ""
             for i in record:
-                warned_member = await self.bot.fetch_user(i[0])
                 moderator = await self.bot.fetch_user(i[2])
                 warn_id = i[4]
-                embed.description += f"**{warned_member}**\n**Warn ID**:{warn_id}\n\n"
+                warned_member = await self.bot.fetch_user(i[0])
+                embed.description += f"**{warned_member}**\n**Warnings**:{len(warn_id)}\n\n"
             await interaction.followup.send(embed=embed)
 
         else:
@@ -121,15 +122,19 @@ class slashmoderation(Cog):
                 await member.send(embed=banmsg)
             except:
                 pass
-            ban = Embed(title="Member Banned", color=0xFF0000)
-            ban.add_field(name="Member",
-                          value=f"**>** **Name:** {member}\n**>** **ID:** {member.id}",
-                          inline=True)
-            ban.add_field(
-                name="Moderation", value=f"**>** **Responsible Moderator:** {interaction.user}\n**>** **Reason:** {reason}", inline=True)
-            ban.set_thumbnail(url=member.display_avatar)
-            await interaction.response.send_message(embed=ban)
-            await member.ban(reason=reason)
+            try:
+                await member.ban(reason=reason)
+                ban = Embed(title="Member Banned", color=0xFF0000)
+                ban.add_field(name="Member",
+                            value=f"**>** **Name:** {member}\n**>** **ID:** {member.id}",
+                            inline=True)
+                ban.add_field(
+                    name="Moderation", value=f"**>** **Responsible Moderator:** {interaction.user}\n**>** **Reason:** {reason}", inline=True)
+                ban.set_thumbnail(url=member.display_avatar)
+                await interaction.response.send_message(embed=ban)
+            except (Forbidden, MissingPermissions):
+                failed=Embed(description="Failed to ban member\nPlease check if you have permission to ban, I have permission to ban or my role is higher than the member")
+                await interaction.response.send_message(embed=failed)
         else:
             await interaction.response.send_message(embed=ban_perm)
 
@@ -152,15 +157,20 @@ class slashmoderation(Cog):
                 await interaction.response.send_message(embed=already_banned)
 
             else:
-                ban = Embed(title="Member Banned", color=0xFF0000)
-                ban.add_field(name="Member",
-                              value=f"**>** **Name:** {user}\n**>** **ID:** {user.id}",
-                              inline=True)
-                ban.add_field(
-                    name="Moderation", value=f"**>** **Responsible Moderator:** {interaction.user}\n**>** **Reason:** {reason}", inline=True)
-                ban.set_thumbnail(url=user.display_avatar)
-                await interaction.response.send_message(embed=ban)
-                await guild.ban(user, reason=reason)
+                try:
+                    await guild.ban(user, reason=reason)
+                    ban = Embed(title="Member Banned", color=0xFF0000)
+                    ban.add_field(name="Member",
+                                value=f"**>** **Name:** {user}\n**>** **ID:** {user.id}",
+                                inline=True)
+                    ban.add_field(
+                        name="Moderation", value=f"**>** **Responsible Moderator:** {interaction.user}\n**>** **Reason:** {reason}", inline=True)
+                    ban.set_thumbnail(url=user.display_avatar)
+                    await interaction.response.send_message(embed=ban)
+                except (Forbidden, MissingPermissions):
+                    failed = Embed(
+                        description="Failed to ban member\nPlease check if you have permission to ban or I have permission to ban")
+                    await interaction.response.send_message(embed=failed)
         else:
             try:
                 await interaction.response.send_message(embed=ban_perm)
@@ -176,15 +186,21 @@ class slashmoderation(Cog):
                 await member.send(embed=kickmsg)
             except:
                 pass
-            kick = Embed(title="Member Kicked", color=0xFF0000)
-            kick.add_field(name="Member",
-                           value=f"**>** **Name:** {member}\n**>** **ID:** {member.id}",
-                           inline=True)
-            kick.add_field(
-                name="Moderation", value=f"**>** **Responsible Moderator:** {interaction.user}\n**>** **Reason:** {reason}", inline=True)
-            kick.set_thumbnail(url=member.display_avatar)
-            await interaction.response.send_message(embed=kick)
-            await member.kick(reason=reason)
+            try:
+                await member.kick(reason=reason)
+                kick = Embed(title="Member Kicked", color=0xFF0000)
+                kick.add_field(name="Member",
+                            value=f"**>** **Name:** {member}\n**>** **ID:** {member.id}",
+                            inline=True)
+                kick.add_field(
+                    name="Moderation", value=f"**>** **Responsible Moderator:** {interaction.user}\n**>** **Reason:** {reason}", inline=True)
+                kick.set_thumbnail(url=member.display_avatar)
+                await interaction.response.send_message(embed=kick)
+            except Forbidden or MissingPermissions:
+                failed = Embed(
+                    description="Failed to kick member\nPlease check if you have permission to kick, I have permission to kick or my role is higher than the member")
+                await interaction.response.send_message(embed=failed)
+            
         else:
             await interaction.response.send_message(embed=kick_perm)
 
