@@ -1,7 +1,6 @@
-from random import choices
 from nextcord.ext.commands import Cog
 from nextcord import Game, Embed, Activity, ActivityType, slash_command as jeanne_slash, Interaction, SlashOption
-from assets.needed import test_server, bot_owner, test_server
+from assets.needed import bot_owner
 from assets.errormsgs import owner_only
 from os import execv
 from sys import executable, argv
@@ -18,13 +17,13 @@ class slashowner(Cog):
 
     @jeanne_slash(description="Changes the bot's play activity")
     async def activity(self, interaction : Interaction, activitytype=SlashOption(description="Choose an activity type", choices=['listen', 'play'], required=True), activity=SlashOption(description="What is the new activity")):
-        if interaction.user==self.bot.get_user(bot_owner):                
+        if interaction.user==self.bot.get_user(bot_owner):        
             if activitytype=="listen":
                 await self.bot.change_presence(activity=Activity(type=ActivityType.listening, name=activity))
-                await interaction.response.send_message(f"Bot's activity changed to `listening to {activity}`")
+                await interaction.response.send_message(f"Bot's activity changed to `listening to {activity}`")            
             elif activitytype=="play":
                 await self.bot.change_presence(activity=Game(name=activity))
-                await interaction.response.send_message(f"Bot's activity changed to `playing {activity}`")
+                await interaction.response.send_message(f"Bot's activity changed to `playing {activity}`")            
         else:
             await interaction.response.send_message(embed=owner_only)                
             

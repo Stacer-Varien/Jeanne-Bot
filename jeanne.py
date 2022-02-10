@@ -1,12 +1,13 @@
 from os import listdir
-from nextcord import Intents
+from nextcord import Game, Intents
 from nextcord.ext.commands import Bot as Jeanne
 from config import TOKEN
+from sqlite3 import connect
 
-intents = Intents().all()
-bot = Jeanne(command_prefix="/", intents=intents)
+intents = Intents(guilds=True, members=True, messages=True,
+                  typing=True, presences=True)
+bot = Jeanne(case_insensitive=True, command_prefix='/', intents=intents)
 bot.remove_command('help')
-
 
 #slash cog commands
 for filename in listdir('./slashcog'):
@@ -17,9 +18,14 @@ for filename in listdir('./slashcog'):
   else:
     print(f'Unable to load {filename[:-3]}')
 
+
 @bot.event
 async def on_ready():
-    print('Connected to bot: {}'.format(bot.user.name))
-    print('Bot ID: {}'.format(bot.user.id))
+  await bot.change_presence(activity=Game(name="Playing with Saber"))
+  print('Connected to bot: {}'.format(bot.user.name))
+  print('Bot ID: {}'.format(bot.user.id))
+
+
+
 
 bot.run(TOKEN)
