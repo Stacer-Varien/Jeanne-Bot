@@ -1,7 +1,7 @@
 from sqlite3 import connect
 from nextcord.ext.commands import Cog
 from nextcord import slash_command as jeanne_slash, Embed, Interaction, Member, SlashOption
-from random import randint
+from random import randrange
 
 db = connect("database.db")
 
@@ -24,7 +24,7 @@ class levelling(Cog):
                 current_cumulative_exp = current_exp_data[1]
                 current_lvl = current_exp_data[2]
 
-                xp = randint(5, 10)
+                xp = randrange(5, 10)
                 updated_exp = current_exp + xp
                 updated_cumulative_exp = current_cumulative_exp + xp
                 next_lvl_exp = ((current_lvl * 100) +
