@@ -33,8 +33,7 @@
 
 >**Memberban**
 
-* Bans a user permanently. You can add a reason for what they did
-* **NOTE:** This is a slash command that bans a user from the server
+* Bans a member of the server permanently. You can add a reason for what they did
 * **Required permissions:** Ban Members
 
     Example: `/memberban USER REASON`
@@ -42,10 +41,10 @@
 >**Outsideban**
 
 * Bans a user permanently and prevents them from entering your server. You can add a reason for what they did
-* **NOTE:** This is a slash command that bans a user outside the server
+* **NOTE:** A user ID must be used for the command
 * **Required permissions:** Ban Members
 
-    Example: `/outsideban USER REASON`
+    Example: `/outsideban USER_ID REASON`
 
 >**Unban**
 
