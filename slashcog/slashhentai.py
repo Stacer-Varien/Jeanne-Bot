@@ -1,4 +1,5 @@
 from json import loads
+from weakref import finalize
 from nextcord import Embed, File, slash_command as jeanne_slash, Interaction, SlashOption
 from glob import glob
 from nextcord.ext.commands import Cog
@@ -34,11 +35,6 @@ class slashnsfw(Cog):
                     yandere_api = choice(get(
                         "https://yande.re/post.json?limit=100&tags=rating:explicit+-loli+-shota+-cub").json())
 
-                elif any(word in tag.lower() for word in illegal_tags):
-                    blacklisted_tags = Embed(
-                        description="This tag is currently blacklisted")
-                    await interaction.response.send_message(embed=blacklisted_tags)
-                
                 elif tag=="02":
                     await interaction.response.send_message("Tag has been blacklisted due to it returning extreme content and guro")
 
@@ -61,48 +57,35 @@ class slashnsfw(Cog):
     @jeanne_slash(description="Get hentai from Gelbooru")
     async def gelbooru(self, interaction:Interaction, tag=SlashOption(required=None)):
         if interaction.channel.is_nsfw():
-            try:
-                await interaction.response.defer()            
-                if tag == None:
+            await interaction.response.defer()
+            if tag == None:
                     gelbooru_api = f"https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&tags=rating:explicit+-loli+-shota+-cub"
-                    response = get(gelbooru_api)
-                    json_api_url = loads(response.text)
-                    image_url = choice(json_api_url['post'])["file_url"]
 
-                elif any(word in tag for word in illegal_tags):
-                        blacklisted_tags = Embed(
-                            description="This tag is currently blacklisted")
-                        await interaction.followup.send(embed=blacklisted_tags)
-                else:
+            else:
                     gelbooru_api = f"https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&tags=rating:explicit+-loli+-shota+-cub+{tag}"
+            try:
                     response = get(gelbooru_api)
                     json_api_url = loads(response.text)
                     image_url = choice(json_api_url['post'])["file_url"]
-                gelbooru = Embed(color=0xFFC0CB)
-                gelbooru.set_image(url=image_url)
-                gelbooru.set_footer(text="Fetched from Gelbooru")
-                await interaction.followup.send(embed=gelbooru)
-
-            except IndexError:
-                    notag = Embed(
-                        description=f"{tag} doesn't exist. Please make sure the tag format is the same as the Gelbooru tag format or if the tag exists")
-                    await interaction.followup.send(embed=notag)
+                    gelbooru = Embed(color=0xFFC0CB)
+                    gelbooru.set_image(url=image_url)
+                    gelbooru.set_footer(text="Fetched from Gelbooru")
+                    await interaction.followup.send(embed=gelbooru)
+            except KeyError:
+                    invalid = Embed(
+                        description="This tag either doesn't exist in Gelbooru, not formatted or is blacklisted")
+                    await interaction.followup.send(embed=invalid)             
         else:
-            await interaction.response.send_message(embed=no_hentai)                
+            await interaction.followup.send(embed=no_hentai)                
 
     @jeanne_slash(description="Get a random hentai from Danbooru")
     async def danbooru(self, interaction: Interaction, tag=SlashOption(description="Put a tag but note that some are blacklisted", required=False)):
         if interaction.channel.is_nsfw():
             try:
-                await interaction.response.defer()
                 if tag == None:
                     danbooru_api = choice(get(
                         "https://danbooru.donmai.us/posts.json?limit=100&tags=rating:explicit-loli-shota-cub").json())
 
-                elif any(word in tag for word in illegal_tags):
-                    blacklisted_tags = Embed(
-                        description="This tag is currently blacklisted")
-                    await interaction.followup.send(embed=blacklisted_tags)
                 else:
                     danbooru_api = choice(get(
                         f"https://danbooru.donmai.us/posts.json?limit=100&tags=rating:explicit-loli-shota-cub+{tag}").json())
@@ -110,11 +93,11 @@ class slashnsfw(Cog):
                 danbooru = Embed(color=0xFFC0CB)
                 danbooru.set_image(url=danbooru_api['file_url'])
                 danbooru.set_footer(text="Fetched from Danbooru")
-                await interaction.followup.send(embed=danbooru)
+                await interaction.response.send_message(embed=danbooru)
             except IndexError:
                 notag = Embed(
                     description=f"{tag} doesn't exist. Please make sure the tag format is the same as the Danbooru tag format or if the tag exists")
-                await interaction.followup.send(embed=notag)
+                await interaction.response.send_message(embed=notag)
         else:
             await interaction.response.send_message(embed=no_hentai)
 
@@ -123,7 +106,6 @@ class slashnsfw(Cog):
     async def konachan(self, interaction: Interaction, tag=SlashOption(description="Put a tag but note that some are blacklisted", required=False)):
         if interaction.channel.is_nsfw():
             try:
-                await interaction.response.defer()
                 if tag == None:
                     konachan_api = choice(get(
                         "https://konachan.com/post.json?s=post&q=index&limit=100&tags=rating:explicit+-loli+-shota+-cub").json())
@@ -131,7 +113,7 @@ class slashnsfw(Cog):
                 elif any(word in tag for word in illegal_tags):
                     blacklisted_tags = Embed(
                         description="This tag is currently blacklisted")
-                    await interaction.followup.send(embed=blacklisted_tags)
+                    await interaction.response.send_message(embed=blacklisted_tags)
                 else:
                     konachan_api = choice(get(
                         f"https://konachan.com/post.json?s=post&q=index&limit=100&tags=rating:explicit+-loli+-shota+-cub+{tag}").json())
@@ -139,11 +121,11 @@ class slashnsfw(Cog):
                 konachan = Embed(color=0xFFC0CB)
                 konachan.set_image(url=konachan_api['file_url'])
                 konachan.set_footer(text="Fetched from Konachan")
-                await interaction.followup.send(embed=konachan)
+                await interaction.response.send_message(embed=konachan)
             except IndexError:
                 notag = Embed(
-                    description=f"{tag} doesn't exist. Please make sure the tag format is the same as the Danbooru tag format or if the tag exists")
-                await interaction.followup.send(embed=notag)
+                    description=f"{tag} doesn't exist. Please make sure the tag format is the same as the Konachan tag format or if the tag exists")
+                await interaction.response.send_message(embed=notag)
         else:
             await interaction.response.send_message(embed=no_hentai)
 
