@@ -8,11 +8,11 @@
 
 >**Say**
 
-* Type a message and I will say it
+* Type a message and I will say it in a specific channel
 * **Required Permission:** Administrator
-* **NOTE:** If used in a slash command, you can't make a new line but this is for now. The command will improve later. The slash command gives you 2 options whether it should be said in plain text or in embed.
+* **NOTE:** You will be given 2 options if you want it in plain text or in embed. You also have to chose a text channel where Jeanne will say your message. Jeanne will ask you to type something first so you can make new lines and after typing the text, she will say it and delete it.
 
-    Example: `/say TEXT`
+    Example: `/say TYPE TEXT_CHANNEL` then when she asks, `TEXT`.
 
 >**Report**
 
