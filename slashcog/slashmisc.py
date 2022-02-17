@@ -1,4 +1,5 @@
-from nextcord import Embed, Interaction, slash_command as jeanne_slash, SlashOption
+from nextcord import Embed, Interaction, slash_command as jeanne_slash, SlashOption, ChannelType
+from nextcord.abc import GuildChannel
 from nextcord.ext.commands import Cog
 from nextcord.ui import Button, View
 from nextcord import Embed, ButtonStyle
