@@ -35,15 +35,35 @@ class slashmisc(Cog):
         await interaction.response.send_message(embed=invite, view=invite_button())
 
     @jeanne_slash(description="Type something and I will say it")
-    async def say(self, interaction : Interaction, type=SlashOption(description="Plain text or Embed", choices=["Plain text", "Embed"], required=True), text=SlashOption(required=True)):
+    async def say(self, interaction: Interaction, type=SlashOption(description="Plain text or embed?", choices=["plain", "embed"]), channel: GuildChannel = SlashOption(description="Which channel should I send the message?",
+                                                                                                                                                                        channel_types=[ChannelType.text])):
         if interaction.permissions.administrator is True:
-            if type == "Plain text":
-                await interaction.response.send_message(text)
-            if type == "Embed":
-                say = Embed(description=f"{text}", color=0xADD8E6)
-                await interaction.response.send_message(embed=say)
+
+            if type == "plain":
+                await interaction.response.defer(ephemeral=True)
+                await interaction.followup.send("Type something!", ephemeral=True)
+
+                msg = await self.bot.wait_for('message')
+                
+                await interaction.followup.send("Sent", ephemeral=True)
+                await msg.delete()
+                await channel.send(msg.content)
+
+            elif type == "embed":
+                await interaction.response.defer(ephemeral=True)
+                ask = Embed(
+                    description="Type something\nMaxinum characters allowed is 4096")
+                await interaction.followup.send(embed=ask)
+
+                msg = await self.bot.wait_for('message')
+
+                await interaction.followup.send("Sent", ephemeral=True)
+                
+                embed_text = Embed(description=msg.content, color=0x4169E1)
+                await msg.delete()
+                await channel.send(embed=embed_text)
         else:
-            await interaction.response.send_message(embed=admin_perm)
+            await interactions.response.send_message(embed=admin_perm)
 
 
     @jeanne_slash()
