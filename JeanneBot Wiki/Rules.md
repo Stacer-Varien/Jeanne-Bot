@@ -16,8 +16,16 @@
 
 > Defamation and reputational harm
 
-* Spreading rumours and false reports about Jeanne (such as calling it a nuke bot), causing unwanted drama or attacking me or contributers and Jeanne is punishable.
+* Spreading rumours and false reports about Jeanne (such as calling it a nuke bot), me or contributers is punishable.
 
 > Use of illicit tags
 
 * If you are caught using illicit tags while using the NSFW commands (such as using loli, shota, children, etc), it will result in an immediate botban.
+
+# Harassment Policy
+
+All kinds of harassment will not be tolerated. This includes attacking contributors to stop helping or me to stop working on the bot. If you harass the contributors and myself, severe punishments will be made such as:
+
+* Immediate botban (both you and your server)
+* Reported to Discord or any soical media platform if we have reportable objects
+* Jeanne will be removed from your server (I will force her to leave the server but if you bring her back, the botban will take effect and she will not collect ANY data from it)
