@@ -1,11 +1,8 @@
-from sqlite3 import connect
 from nextcord.ext.commands import Cog
 from nextcord import *
 from nextcord import slash_command as jeanne_slash
 from random import randrange
-
-db = connect("database.db")
-
+from config import db
 
 class levelling(Cog):
     def __init__(self, bot):
@@ -29,45 +26,58 @@ class levelling(Cog):
                 cursor2 = db.execute(
                     "INSERT OR IGNORE INTO globalxpData (user_id, lvl, exp, cumulative_exp) VALUES (?,?,?,?)", (message.author.id, 0, 5, 5))
 
+                xp = randrange(5, 10)
                 if cursor1.rowcount == 0:
-                    current_exp_query = db.execute(
+                    scurrent_exp_query = db.execute(
                         f"SELECT exp, cumulative_exp, lvl FROM serverxpData WHERE user_id = {message.author.id}")
-                    current_exp_data = current_exp_query.fetchone()
-                    current_exp = current_exp_data[0]
-                    current_cumulative_exp = current_exp_data[1]
-                    current_lvl = current_exp_data[2]
+                    scurrent_exp_data = scurrent_exp_query.fetchone()
+                    scurrent_exp = scurrent_exp_data[0]
+                    scurrent_cumulative_exp = scurrent_exp_data[1]
+                    scurrent_lvl = scurrent_exp_data[2]
+
+                    supdated_exp = scurrent_exp + xp
+                    supdated_cumulative_exp = scurrent_cumulative_exp + xp
+                    snext_lvl_exp = ((scurrent_lvl * 100) +
+                                     ((scurrent_lvl - 1) * 50) + 100)
+
+                    if supdated_cumulative_exp >= snext_lvl_exp:
+                        supdated_exp = supdated_cumulative_exp - snext_lvl_exp
+                        db.execute(
+                            f"UPDATE serverxpData SET lvl = lvl + 1, exp = {supdated_exp} WHERE guild_id = {message.guild.id} AND user_id = {message.author.id}")
+
+                    db.execute(
+                        f"UPDATE serverxpData SET exp = {supdated_exp}, cumulative_exp = {supdated_cumulative_exp} WHERE guild_id = {message.guild.id} AND user_id = {message.author.id}")
+
+                db.commit()
 
                 if cursor2.rowcount == 0:
-                    current_exp_query = db.execute(
+                    gcurrent_exp_query = db.execute(
                         f"SELECT exp, cumulative_exp, lvl FROM globalxpData WHERE user_id = {message.author.id}")
-                    current_exp_data = current_exp_query.fetchone()
-                    current_exp = current_exp_data[0]
-                    current_cumulative_exp = current_exp_data[1]
-                    current_lvl = current_exp_data[2]
+                    gcurrent_exp_data = gcurrent_exp_query.fetchone()
+                    gcurrent_exp = gcurrent_exp_data[0]
+                    gcurrent_cumulative_exp = gcurrent_exp_data[1]
+                    gcurrent_lvl = gcurrent_exp_data[2]
 
-                    xp = randrange(5, 10)
-                    updated_exp = current_exp + xp
-                    updated_cumulative_exp = current_cumulative_exp + xp
-                    next_lvl_exp = ((current_lvl * 100) +
-                                    ((current_lvl - 1) * 50) + 100)
-                    if updated_cumulative_exp >= next_lvl_exp:
-                        updated_exp = updated_cumulative_exp - next_lvl_exp
+                    gupdated_exp = gcurrent_exp + xp
+                    gupdated_cumulative_exp = gcurrent_cumulative_exp + xp
+                    gnext_lvl_exp = ((gcurrent_lvl * 100) +
+                                     ((gcurrent_lvl - 1) * 50) + 100)
+
+                    if gupdated_cumulative_exp >= gnext_lvl_exp:
+                        gupdated_exp = gupdated_cumulative_exp - gnext_lvl_exp
                         db.execute(
-                            f"UPDATE serverxpData SET lvl = lvl + 1, exp = {updated_exp} WHERE guild_id = {message.guild.id} AND user_id = {message.author.id}")
-                        db.execute(
-                            f"UPDATE globalxpData SET lvl = lvl + 1, exp = {updated_exp} WHERE user_id = {message.author.id}")
+                            f"UPDATE globalxpData SET lvl = lvl + 1, exp = {gupdated_exp} WHERE user_id = {message.author.id}")
 
                     db.execute(
-                        f"UPDATE serverxpData SET exp = {updated_exp}, cumulative_exp = {updated_cumulative_exp} WHERE guild_id = {message.guild.id} AND user_id = {message.author.id}")
+                        f"UPDATE globalxpDATA SET exp = {gupdated_exp}, cumulative_exp = {gupdated_cumulative_exp} WHERE user_id = {message.author.id}")
 
-                    db.execute(
-                        f"UPDATE globalxpDATA SET exp = {updated_exp}, cumulative_exp = {updated_cumulative_exp} WHERE user_id = {message.author.id}")
-                        
                 db.commit()
+
             await self.bot.process_commands(message)
 
     @jeanne_slash(description="See your level or someone else's level")
     async def level(self, interaction: Interaction, member: Member = SlashOption(description="Which member?", required=False)):
+        await interaction.response.defer()
         try:
             botbanquery = db.execute(
                 f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
@@ -77,7 +87,7 @@ class levelling(Cog):
 
             botbanned_user = await self.bot.fetch_user(botbanned)
             if interaction.user.id == botbanned_user.id:
-                await interaction.response.send_message(f"You have been botbanned for:\n{reason}", ephemeral=True)
+                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
             if member is None:
                 member = interaction.user
@@ -115,13 +125,14 @@ class levelling(Cog):
                                 value=f"\n**>** **Level:** {glvl}\n**>** **Experience:** {gexp}\{g_next_lvl_exp}XP\n**>** **Experience to Next Level:** {g_next_lvl_exp - gexp}XP", inline=True)
                 embed.add_field(
                     name="**__Progress__**", value=f"**>** **Server:** {blue_box * ':blue_square:' + swhite_box * ':white_large_square:'}\n**>** **Global:** {red_box * ':red_square:' + gwhite_box * ':white_large_square:'}", inline=False)
-                await interaction.response.send_message(embed=embed)
+                await interaction.followup.send(embed=embed)
             except:
                 no_exp = Embed(description="Failed to get level stats")
-                await interaction.response.send_message(embed=no_exp)
+                await interaction.followup.send(embed=no_exp)
 
     @jeanne_slash(description="Check the users with the most XP in the server")
     async def rank(self, interaction: Interaction, type=SlashOption(description="Server or Global specific?", choices=["server", "global"])):
+        await interaction.response.defer()
         try:
             botbanquery = db.execute(
                 f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
@@ -131,29 +142,43 @@ class levelling(Cog):
 
             botbanned_user = await self.bot.fetch_user(botbanned)
             if interaction.user.id == botbanned_user.id:
-                await interaction.response.send_message(f"You have been botbanned for:\n{reason}", ephemeral=True)
+                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
             if type == "server":
 
                 leaders_query = db.execute(
-                    f"SELECT user_id FROM serverxpData WHERE guild_id = {interactions.guild.id} ORDER BY cumulative_exp DESC LIMIT 10"
+                    f"SELECT user_id FROM serverxpData WHERE guild_id = {interaction.guild.id} ORDER BY cumulative_exp DESC LIMIT 15"
                 )
+
+                embed = Embed(color=0xFFD700)
+                embed.set_author(name="XP Leaderboard")
+
+                r = 1
+                for i in leaders_query:
+                    p = await self.bot.fetch_user(i[0])
+                    embed.add_field(name="_ _", value=f"**{r}**. {p}")
+                    r += 1
+
+                await interaction.followup.send(embed=embed)
+
+                
+
             elif type == "global":
                 leaders_query = db.execute(
-                    f"SELECT user_id FROM globalxpData ORDER BY cumulative_exp DESC LIMIT 10"
+                    f"SELECT user_id FROM globalxpData ORDER BY cumulative_exp DESC LIMIT 15"
                 )
 
-            embed = Embed(color=0xFFD700)
-            embed.set_author(name="XP Leaderboard")
-            embed.description = ""
 
-            r = 1
-            for i in leaders_query:
-                p = await self.bot.fetch_user(i[0])
-                embed.description += f"**{r}**. {p}\t\t"
-                r += 1
+                embed = Embed(color=0xFFD700)
+                embed.set_author(name="XP Leaderboard")
 
-            await interaction.response.send_message(embed=embed)
+                r = 1
+                for i in leaders_query:
+                    p = await self.bot.fetch_user(i[0])
+                    embed.add_field(name="_ _", value=f"**{r}**. {p}")
+                    r += 1
+
+                await interaction.followup.send(embed=embed)
 
 
 def setup(bot):
