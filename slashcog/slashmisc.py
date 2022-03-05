@@ -1,4 +1,4 @@
-from sqlite3 import connect
+from config import db
 from nextcord import *
 from nextcord import slash_command as jeanne_slash
 from nextcord.abc import GuildChannel
@@ -14,7 +14,6 @@ discordbots_url = "https://discord.bots.gg/bots/831993597166747679"
 
 haze_url = "https://discord.gg/VVxGUmqQhF"
 
-db=connect("database.db")
 
 class invite_button(View):
     def __init__(self):
@@ -31,6 +30,7 @@ class slashmisc(Cog):
 
     @jeanne_slash(description="Invite me to your server or join the support server")
     async def invite(self, interaction : Interaction):
+        await interaction.response.defer()
         try:
             botbanquery = db.execute(
                 f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
@@ -40,17 +40,18 @@ class slashmisc(Cog):
 
             botbanned_user = await self.bot.fetch_user(botbanned)
             if interaction.user.id == botbanned_user.id:
-                await interaction.response.send_message(f"You have been botbanned for:\n{reason}", ephemeral=True)
+                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
             invite = Embed(
                 title="Invite me!",
                 description="Click on one of these buttons to invite me to you server or join my creator's server",
                 color=0x00bfff)
 
-            await interaction.response.send_message(embed=invite, view=invite_button())
+            await interaction.followup.send(embed=invite, view=invite_button())
 
     @jeanne_slash(description="Type something and I will say it")
     async def say(self, interaction: Interaction, type=SlashOption(description="Plain text or embed?", choices=["plain", "embed"]), channel: GuildChannel = SlashOption(description="Which channel should I send the message?", channel_types=[ChannelType.text])):
+        await interaction.response.defer()
         try:
             botbanquery = db.execute(
                 f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
@@ -60,7 +61,7 @@ class slashmisc(Cog):
 
             botbanned_user = await self.bot.fetch_user(botbanned)
             if interaction.user.id == botbanned_user.id:
-                await interaction.response.send_message(f"You have been botbanned for:\n{reason}", ephemeral=True)
+                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
             if interaction.permissions.administrator is True:
 
@@ -71,7 +72,7 @@ class slashmisc(Cog):
                     def check(m):
                         return m.author == interaction.user and m.content
 
-                    msg = await self.bot.wait_for('message', check=check)
+                    msg = await self.bot.wait_for('message', check=check, timeout=180)
                     
                     await interaction.followup.send("Sent", ephemeral=True)
                     await msg.delete()
@@ -86,7 +87,7 @@ class slashmisc(Cog):
                     def check(m):
                         return m.author == interaction.user and m.content
                         
-                    msg = await self.bot.wait_for('message')
+                    msg = await self.bot.wait_for('message', check=check, timeout=180)
 
                     await interaction.followup.send("Sent", ephemeral=True)
                     
@@ -94,11 +95,12 @@ class slashmisc(Cog):
                     await msg.delete()
                     await channel.send(embed=embed_text)
             else:
-                await interaction.response.send_message(embed=admin_perm)
+                await interaction.followup.send(embed=admin_perm)
 
 
     @jeanne_slash()
     async def report(self, interaction : Interaction):
+        await interaction.response.defer()
         try:
             botbanquery = db.execute(
                 f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
@@ -108,9 +110,9 @@ class slashmisc(Cog):
 
             botbanned_user = await self.bot.fetch_user(botbanned)
             if interaction.user.id == botbanned_user.id:
-                await interaction.response.send_message(f"You have been botbanned for:\n{reason}", ephemeral=True)
+                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:        
-            await interaction.response.send_message("Please fill in this form to submit your report.\nPlease note that I will not be collecting any of your personal information.\nhttps://forms.gle/wNcEiTN7wYPji4Xh9", ephemeral=True)
+            await interaction.followup.send("Please [click here](https://forms.gle/DvGiJWXjbZWK3iy88) to submit your report.\nPlease note that I will not be collecting any of your personal information.", ephemeral=True)
 
 def setup(bot):
     bot.add_cog(slashmisc(bot))
