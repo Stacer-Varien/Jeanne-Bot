@@ -1,7 +1,7 @@
 from os import listdir
 from nextcord import *
 from nextcord.ext.commands import Bot as Jeanne
-from config import TOKEN
+from config import TOKEN, db
 
 intents = Intents(guilds=True, members=True, messages=True,
                   typing=True, presences=True)
