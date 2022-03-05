@@ -7,10 +7,7 @@ from assets.needed import bot_owner
 from assets.errormsgs import owner_only
 from os import execv
 from sys import executable, argv
-from sqlite3 import connect
-
-db=connect("database.db")
-
+from config import db
 
 format = "%a, %d %b %Y | %H:%M:%S %ZGMT"
 
@@ -24,6 +21,7 @@ class slashowner(Cog):
 
     @jeanne_slash(description="Changes the bot's play activity")
     async def activity(self, interaction : Interaction, activitytype=SlashOption(description="Choose an activity type", choices=['listen', 'play'], required=True), activity=SlashOption(description="What is the new activity")):
+        await interaction.response.defer()
         try:
             botbanquery = db.execute(
                 f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
@@ -33,47 +31,22 @@ class slashowner(Cog):
 
             botbanned_user = await self.bot.fetch_user(botbanned)
             if interaction.user.id == botbanned_user.id:
-                await interaction.response.send_message(f"You have been botbanned for:\n{reason}", ephemeral=True)
+                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
             if interaction.user==self.bot.get_user(bot_owner):        
                 if activitytype=="listen":
                     await self.bot.change_presence(activity=Activity(type=ActivityType.listening, name=activity))
-                    await interaction.response.send_message(f"Bot's activity changed to `listening to {activity}`")            
+                    await interaction.followup.send(f"Bot's activity changed to `listening to {activity}`")            
                 elif activitytype=="play":
                     await self.bot.change_presence(activity=Game(name=activity))
-                    await interaction.response.send_message(f"Bot's activity changed to `playing {activity}`")            
+                    await interaction.followup.send(f"Bot's activity changed to `playing {activity}`")            
             else:
-                await interaction.response.send_message(embed=owner_only)                
-            
-
-    @jeanne_slash(description="Get mutuals of a user")
-    async def mutuals(self, interaction : Interaction, user_id=SlashOption(description="Which user?", required=None)):
-        try:
-            botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
-
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.response.send_message(f"You have been botbanned for:\n{reason}", ephemeral=True)
-        except:
-            if interaction.user==self.bot.get_user(bot_owner):
+                await interaction.followup.send(embed=owner_only)                
                 
-                if user_id == None:
-                    user_id=self.bot.user.id
-
-                user=await self.bot.fetch_user(user_id)
-
-                mutuals = f"______\nName: {user}\nMutuals: {len(user.mutual_guilds)}\nServers: {user.mutual_guilds}\n______"
-                print(mutuals)
-                await interaction.response.send_message(f"`Check console log for {user.name}'s mutuals`", ephemeral=True)
-            else:
-                await interaction.response.send_message(embed=owner_only)        
 
     @jeanne_slash(description="Finds a user")
     async def finduser(self, interaction: Interaction, user_id=SlashOption(description="Which user?")):
+        await interaction.response.defer()
         try:
             botbanquery = db.execute(
                 f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
@@ -83,7 +56,7 @@ class slashowner(Cog):
 
             botbanned_user = await self.bot.fetch_user(botbanned)
             if interaction.user.id == botbanned_user.id:
-                await interaction.response.send_message(f"You have been botbanned for:\n{reason}", ephemeral=True)
+                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
             if interaction.user==self.bot.get_user(bot_owner):
                 user = await self.bot.fetch_user(user_id)
@@ -96,12 +69,13 @@ class slashowner(Cog):
                                 value=f"**>** **Name:** {user}\n**>** **ID:** {user.id}\n**>** **Creation Date:** {user.created_at.strftime(format)}\n**>** **Mutuals:** {len(user.mutual_guilds)}\n**>** **Is Bot?:** {botr}",
                                 inline=True)
                 fuser.set_image(url=user.display_avatar)
-                await interaction.response.send_message(embed=fuser)
+                await interaction.followup.send(embed=fuser)
             else:
-                await interaction.response.send_message(embed=owner_only)             
+                await interaction.followup.send(embed=owner_only)             
 
     @jeanne_slash(description="Restart me to be updated")
     async def update(self, interaction:Interaction):
+        await interaction.response.defer()
         try:
             botbanquery = db.execute(
                 f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
@@ -111,16 +85,17 @@ class slashowner(Cog):
 
             botbanned_user = await self.bot.fetch_user(botbanned)
             if interaction.user.id == botbanned_user.id:
-                await interaction.response.send_message(f"You have been botbanned for:\n{reason}", ephemeral=True)
+                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
             if interaction.user == self.bot.get_user(bot_owner):
-                await interaction.response.send_message(f"YAY! NEW UPDATE!")
+                await interaction.followup.send(f"YAY! NEW UPDATE!")
                 restart_bot()
             else:
-                await interaction.response.send_message(embed=owner_only)
+                await interaction.followup.send(embed=owner_only)
     
     @jeanne_slash(description="Botban a user from using the bot")
     async def botban(self, interaction: Interaction, user_id=SlashOption(description="Which user?"), reason = SlashOption(description="Add a reason")):
+        await interaction.response.defer()
         try:
             botbanquery = db.execute(
                 f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
@@ -130,7 +105,7 @@ class slashowner(Cog):
 
             botbanned_user = await self.bot.fetch_user(botbanned)
             if interaction.user.id == botbanned_user.id:
-                await interaction.response.send_message(f"You have been botbanned for:\n{reason}", ephemeral=True)
+                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
             if interaction.user == self.bot.get_user(bot_owner):
                 user=await self.bot.fetch_user(user_id)
@@ -182,6 +157,7 @@ class slashowner(Cog):
 
     @jeanne_slash(description="Evaluates a code", guild_ids=[809862945211285555])
     async def evaluate(self, interaction: Interaction):
+        await interaction.response.defer()
         try:
             botbanquery = db.execute(
                 f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
@@ -191,7 +167,7 @@ class slashowner(Cog):
 
             botbanned_user = await self.bot.fetch_user(botbanned)
             if interaction.user.id == botbanned_user.id:
-                await interaction.response.send_message(f"You have been botbanned for:\n{reason}", ephemeral=True)
+                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
             if interaction.user == self.bot.get_user(bot_owner):
                 await interaction.response.defer()
