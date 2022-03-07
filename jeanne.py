@@ -1,7 +1,7 @@
 from os import listdir
 from nextcord import *
 from nextcord.ext.commands import Bot as Jeanne
-from config import TOKEN, db
+from config import TOKEN
 
 intents = Intents(guilds=True, members=True, messages=True,
                   typing=True, presences=True)
@@ -19,7 +19,7 @@ for filename in listdir('./slashcog'):
 
 @bot.event
 async def on_ready():
-  await bot.change_presence(activity=Game(name="Playing with Saber"))
+  await bot.change_presence(activity=Game(name="with Saber"))
   print('Connected to bot: {}'.format(bot.user.name))
   print('Bot ID: {}'.format(bot.user.id))
 
