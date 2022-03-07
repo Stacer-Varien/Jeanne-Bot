@@ -33,7 +33,6 @@ class slashnsfw(Cog):
             file = File(random_image)
             hentai = Embed(color=0xFFC0CB)
             hentai.set_footer(text="Powered by JeanneBot")
-            await interaction.response.defer()
             if interaction.channel.is_nsfw():
                 await interaction.followup.send(file=file, embed=hentai)
             else:

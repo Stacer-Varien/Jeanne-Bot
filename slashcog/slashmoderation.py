@@ -38,10 +38,6 @@ class slashmoderation(Cog):
                     failed=Embed(description="You can't warn yourself")
                     await interaction.followup.send(embed=failed)
 
-                elif member.top_role >= interaction.user.top_role:
-                    failed=Embed(description="You can't this user due to role hierarchy")
-                    await interaction.followup.send(embed=failed)
-
 
                 else:
                     warn_id = f"{randint(0,100000)}"
@@ -83,7 +79,6 @@ class slashmoderation(Cog):
                 cur.execute(
                     f"SELECT * FROM warnDATA user WHERE(guild_id = {interaction.guild.id})")
                 record = cur.fetchall()
-                await interaction.response.defer()
                 if len(record) == 0:
                     await interaction.followup.send(f"No warnings up to date")
                     return
@@ -114,7 +109,6 @@ class slashmoderation(Cog):
                     reason = i[3]
                     warn_id = i[4]
                     embed.description += f"**Warn ID**:{warn_id}\n**Moderator:** {moderator}\n**Reason:** {reason}\n\n"
-                await interaction.response.defer()
                 await interaction.followup.send(embed=embed)
 
     @jeanne_slash(description="Revoke a warn by warn ID")
@@ -307,10 +301,6 @@ class slashmoderation(Cog):
                 if limit==None:
                     limit=100
 
-                if limit>100:
-                    not_allowed=Embed(description="You are not allowed to delete more that 100 messages")
-                    await interaction.followup.send(embed=not_allowed)
-
                 else:
                     msg = []
                     try:
@@ -401,9 +391,6 @@ class slashmoderation(Cog):
                 if time is None:
                     time = f'{28}d'
                 
-                if time > 28:
-                    not_allowed=Embed(description="You are not allowed to mute someone over 28 days")
-                    await interaction.followup.send(embed=not_allowed)
                 else:
                     if reason is None:
                         reason = "Unspecified"

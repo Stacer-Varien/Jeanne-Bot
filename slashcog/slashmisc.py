@@ -51,7 +51,7 @@ class slashmisc(Cog):
 
     @jeanne_slash(description="Type something and I will say it")
     async def say(self, interaction: Interaction, type=SlashOption(description="Plain text or embed?", choices=["plain", "embed"]), channel: GuildChannel = SlashOption(description="Which channel should I send the message?", channel_types=[ChannelType.text])):
-        await interaction.response.defer()
+        await interaction.response.defer(ephemeral=True)
         try:
             botbanquery = db.execute(
                 f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
@@ -66,7 +66,6 @@ class slashmisc(Cog):
             if interaction.permissions.administrator is True:
 
                 if type == "plain":
-                    await interaction.response.defer(ephemeral=True)
                     await interaction.followup.send("Type something!", ephemeral=True)
 
                     def check(m):
@@ -79,7 +78,6 @@ class slashmisc(Cog):
                     await channel.send(msg.content)
 
                 elif type == "embed":
-                    await interaction.response.defer(ephemeral=True)
                     ask = Embed(
                         description="Type something\nMaxinum characters allowed is 4096")
                     await interaction.followup.send(embed=ask)

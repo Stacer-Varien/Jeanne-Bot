@@ -155,7 +155,7 @@ class slashowner(Cog):
                     await channel.send(embed=botbanned)
                     db.commit()
 
-    @jeanne_slash(description="Evaluates a code", guild_ids=[809862945211285555])
+    @jeanne_slash(description="Evaluates a code")
     async def evaluate(self, interaction: Interaction):
         await interaction.response.defer()
         try:
@@ -170,7 +170,6 @@ class slashowner(Cog):
                 await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
             if interaction.user == self.bot.get_user(bot_owner):
-                await interaction.response.defer()
                 await interaction.followup.send('Insert your code')
                 def check(m):
                     return m.author == interaction.user and m.content

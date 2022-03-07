@@ -155,7 +155,6 @@ class slashinfo(Cog):
                 await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
             start_time = time()
-            await interaction.response.defer()
             end_time = time()
 
             ping = Embed(color=0x236ce1)
