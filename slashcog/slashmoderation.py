@@ -77,7 +77,7 @@ class slashmoderation(Cog):
             if member == None:
                 cur = db.cursor()
                 cur.execute(
-                    f"SELECT * FROM warnDATA user WHERE(guild_id = {interaction.guild.id})")
+                    f"SELECT * FROM warnDATA WHERE guild_id = {interaction.guild.id}")
                 record = cur.fetchall()
                 if len(record) == 0:
                     await interaction.followup.send(f"No warnings up to date")
