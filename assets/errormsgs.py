@@ -51,3 +51,8 @@ message_perm.add_field(name="Reason", value="Missing permissions: Manage Message
 
 admin_perm=Embed(title="Say failed", description="Sorry but I cannot say this message", color=0xff0000)
 admin_perm.add_field(name="Reason", value="Missing permissions: Administrator", inline=False)
+
+manage_server_perm = Embed(title="Set Modlog failed",
+                   description="Sorry but you cannot set that channel as a modlog channel", color=0xff0000)
+manage_server_perm.add_field(
+    name="Reason", value="Missing permissions: Manage Server", inline=False)

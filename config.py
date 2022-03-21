@@ -1,9 +1,12 @@
 from os import getenv
 from dotenv import load_dotenv
+from sqlite3 import connect
 
 load_dotenv()
 TOKEN = getenv("token")
 WEATHER=getenv("weather")
+
+db=connect('database.db')
 
 kitsune_nekoslife="https://nekos.life/api/v2/img/fox_girl"
 hug_nekoslife="https://nekos.life/api/v2/img/hug"

@@ -5,13 +5,14 @@ from config import TOKEN
 
 intents = Intents(guilds=True, members=True, messages=True,
                   typing=True, presences=True)
-bot = Jeanne(command_prefix='/', intents=intents)
+bot = Jeanne(command_prefix='/', intents=intents,
+             allowed_mentions=AllowedMentions.all())
 bot.remove_command('help')
 
-for filename in listdir('./slashcog'):
+for filename in listdir('./cogs'):
   if filename.endswith('.py'):
-    bot.load_extension(f'slashcog.{filename[:-3]}')
-    print(f"Slash {filename} loaded")
+    bot.load_extension(f'cogs.{filename[:-3]}')
+    print(f"{filename} loaded")
 
   else:
     print(f'Unable to load {filename[:-3]}')
@@ -19,7 +20,7 @@ for filename in listdir('./slashcog'):
 
 @bot.event
 async def on_ready():
-  await bot.change_presence(activity=Game(name="Playing with Saber"))
+  await bot.change_presence(activity=Game(name="with Saber"))
   print('Connected to bot: {}'.format(bot.user.name))
   print('Bot ID: {}'.format(bot.user.id))
 
