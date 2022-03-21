@@ -4,7 +4,6 @@ from nextcord import slash_command as jeanne_slash
 from nextcord.ext.commands import Cog
 from nextcord.abc import GuildChannel
 from assets.errormsgs import *
-from assets.needed import test_server
 
 class slashmanage(Cog):
     def __init__(self, bot):
@@ -268,7 +267,7 @@ class slashmanage(Cog):
             elif interaction.permissions.manage_guild is False:
                 await interaction.followup.send(embed=manage_server_perm)
 
-    @jeanne_slash(description="Choose a channel to welcome members", guild_ids=[test_server])
+    @jeanne_slash(description="Choose a channel to welcome members")
     async def set_welcomer(self, interaction: Interaction,
                          channel: GuildChannel = SlashOption(
                              channel_types=[ChannelType.text],
