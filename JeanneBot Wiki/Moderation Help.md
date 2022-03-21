@@ -3,7 +3,7 @@
 >**Warn**
 
 * Warn a user for violating a rule. You can add a reason for what they did.
-* **NOTE:** A warn ID is given. This warn ID is server specific
+* **NOTE:** A warn ID is given. This warn ID is server specific. This command can work if you have roles set in your server. You won't be able to warn someone higher than you but you can warn people lower than you
 * **Required permissions:** Kick Members
 
     Exapmle: `/warn USER REASON`
@@ -40,7 +40,7 @@
 
 >**Outsideban**
 
-* Bans a user permanently and prevents them from entering your server. You can add a reason for what they did
+* Bans a user permanently and prevents them from entering your server before they could. You can add a reason for what they did
 * **NOTE:** A user ID must be used for the command
 * **Required permissions:** Ban Members
 
@@ -49,6 +49,7 @@
 >**Unban**
 
 * Unbans a user so they can be able to come back to the server. You can add a reason why they are unbanned
+* **NOTE:** A user ID must be used for the command
 * **Required permissions:** Ban Members
 
     Example: `/unban USER_ID REASON`
@@ -57,7 +58,7 @@
 
 * Bulk delete messages
 * **Required Permission:** Manage Messages
-* **NOTE:** This will delete up to 100 messages. You can also mention a member or add a number less than 100 to delete the messages.
+* **NOTE:** This will delete up to 100 messages. You can also mention a member and/or add a number less than 100 to delete the messages.
 
     Example: `/purge 20 MEMBER`
     **NOTE**: For purging messages up to the limit, use `/purge`
@@ -66,7 +67,7 @@
 
 * Mute someone and they will not talk. You can add a reason why they are muted
 * **Required Permission:** Moderate Members
-* **NOTE:** If no mute time has been given, time will be 28 days. You cannout mute someone for more than 28 days due to Discord's API.
+* **NOTE:** If no mute time has been given, time will be 28 days. You cannout mute someone for more than 28 days due to Discord's API. You also cannot mute bots.
 
     Example: `/mute MEMBER TIME REASON`
 

@@ -2,7 +2,7 @@
 
 >**Userinfo**
 
-* See the information of a member or yourself
+* See the information of a member or yourself. It will also show the member's banner if applicable.
 * **NOTE:** It must be someone present in the server.
 
  Example: `/userinfo` (if for yourself) \ `/userinfo MEMBER` (if for a member)
@@ -45,10 +45,3 @@
 * **NOTE:** It must be someone present in the server. If the member has no guild avatar set, it will return with their normal avatar.
 
  Example: `/guildavatar` (if for yourself) / `/guildavatar MEMBER` (if for a member)
-
->**Member Banner**
-
-* See your banner or someone's banner
-* **NOTE:** It must be someone present in the server. If the member has no banner set, it will return with an error message.
-
- Example: `/memberbanner` (if for yourself) / `/memberbanner MEMBER` (if for a member)

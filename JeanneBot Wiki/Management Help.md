@@ -1,6 +1,6 @@
 # Management Commands
 
-*Text Channel commands, Voice Channel commands and Category commands require the `manage channels` permisson and Role commands require the `manage roles` permisson*
+*Text Channel commands, Voice Channel commands and Category commands require the `manage channels` permisson, Role commands require the `manage roles` permisson and modlog, welcomer and leaver commands requires the `manage server` permission.*
 
 >**Create Channel**
 
@@ -49,3 +49,42 @@
 * Renames the category
 
     Example:`/rename_category CATEGORY NAME NEW_NAME`
+
+>**Set Modlog**
+
+* Sets a modlog channel for the server
+* **NOTE:** It will only set one modlog channel. If you want to switch modlog channels, use the command again and select a different channel. All warnings, mutes, bans and unbans are logged in there
+
+    Example:`/set_modlog CHANNEL`
+
+>**Remove Modlog**
+
+* Removes a modlog channel from the databse
+
+    Example:`/remove_modlog`
+
+>**Set Welcomer**
+
+* Sets a welcoming channel for the server
+* **NOTE:** It will only set one welcoming channel. The welcoming message is uncustomisable for now.
+
+    Example:`/set_welcomer CHANNEL`
+
+>**Remove Welcomer**
+
+* Removes a welcoming channel from the databse
+
+    Example:`/remove_welcomer`
+
+>**Set Leaver**
+
+* Sets a leaving channel for the server
+* **NOTE:** It will only set one leaving channel. The leaving message is uncustomisable for now.
+
+    Example:`/set_leaver CHANNEL`
+
+>**Remove Leaver**
+
+* Removes a leaving channel from the databse
+
+    Example:`/remove_leaving`

@@ -1,7 +1,6 @@
 # Setup
 
 Before inviting Jeanne into the server, make sure she has the following permissions enabled:
-![image](https://i.ibb.co/kcfTSRf/image.png)
 
 **Main Permissions**
 
@@ -25,3 +24,7 @@ Before inviting Jeanne into the server, make sure she has the following permissi
 **Manage Nicknames Permission**
 
 * This allows Jeanne to change a member's nickname
+
+**Manage Server Permission**
+
+* This allows Jeanne to set a modlog, welcomer and leaver channels
