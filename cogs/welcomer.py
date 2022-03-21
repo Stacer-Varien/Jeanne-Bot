@@ -30,14 +30,14 @@ class welcomer(Cog):
                         welcome.set_footer(text=f"Now there is {len(server.members)} members")
                         welcome.set_thumbnail(url=member.avatar)
                         await channel.send(embed=welcome)
-                    except Exception as e:
-                        raise e
-                except Exception as e:
-                    raise e
+                    except:
+                        pass
+                except:
+                    pass
             else:
                 pass
-        except Exception as e:
-            raise e
+        except:
+            pass
 
     @Cog.listener()
     async def on_member_remove(self, member):
@@ -65,14 +65,14 @@ class welcomer(Cog):
                         leave.set_footer(text=f"Now there is {len(server.members)} members")
                         leave.set_thumbnail(url=member.avatar)
                         await channel.send(embed=leave)
-                    except Exception as e:
-                        raise e
-                except Exception as e:
-                    raise e
+                    except:
+                        pass
+                except:
+                    pass
             else:
                 pass
-        except Exception as e:
-            raise e
+        except:
+            pass
 
 def setup(bot):
     bot.add_cog(welcomer(bot))
