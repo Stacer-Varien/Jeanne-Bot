@@ -5,6 +5,7 @@ from nextcord.abc import GuildChannel
 from nextcord.ext.commands import Cog
 from nextcord.ui import Button, View
 from assets.errormsgs import admin_perm
+from nextcord.ext.application_checks import *
 
 bot_invite_url = "https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=2550197270&redirect_uri=https%3A%2F%2Fdiscord.com%2Foauth2%2Fauthorize%3Fclient_id%3D831993597166747679%26scope%3Dbot&scope=bot%20applications.commands"
 
@@ -50,6 +51,7 @@ class slashmisc(Cog):
             await interaction.followup.send(embed=invite, view=invite_button())
 
     @jeanne_slash(description="Type something and I will say it")
+    @has_permissions(administrator=True)
     async def say(self, interaction: Interaction, type=SlashOption(description="Plain text or embed?", choices=["plain", "embed"]), channel: GuildChannel = SlashOption(description="Which channel should I send the message?", channel_types=[ChannelType.text, ChannelType.news])):
         await interaction.response.defer(ephemeral=True)
         try:
@@ -63,8 +65,6 @@ class slashmisc(Cog):
             if interaction.user.id == botbanned_user.id:
                 await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
-            if interaction.permissions.administrator is True:
-
                 if type == "plain":
                     await interaction.followup.send("Type something!", ephemeral=True)
 
@@ -92,8 +92,12 @@ class slashmisc(Cog):
                     embed_text = Embed(description=msg.content, color=0x4169E1)
                     await msg.delete()
                     await channel.send(embed=embed_text)
-            elif interaction.permissions.administrator is False:
-                await interaction.followup.send(embed=admin_perm)
+
+    @say.error
+    async def say_error(self, ctx: Interaction, error):
+        if isinstance(error, ApplicationMissingPermissions):
+            await ctx.response.defer()
+            await ctx.followup.send(embed=admin_perm)
 
 
     @jeanne_slash()

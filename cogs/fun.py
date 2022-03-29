@@ -1,10 +1,10 @@
 from asyncio import TimeoutError
-from random import choice, randint
+from random import *
 from nextcord import *
 from nextcord import slash_command as jeanne_slash
 from glob import glob
 from nextcord.ext.commands import Cog
-from assets.needed import eight_ball_answers, wrong_answer_or_timeout, correct_answer
+from assets.needed import *
 from config import db
 
 class slashfun(Cog):

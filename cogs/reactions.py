@@ -27,9 +27,9 @@ class slashreactions(Cog):
         except:
             hug_api = get(hug_nekoslife).json()
             if member == None:
-                msg=f"*Hugging {interaction.user.mention}*"
+                msg=f"*Hugging {interaction.user}*"
             else:
-                msg=f"*{interaction.user.mention} hugged {member.mention}*"
+                msg=f"*{interaction.user} hugged {member.mention}*"
             hug = Embed(color=0xFFC0CB)
             hug.set_footer(text="Fetched from nekos.life")
             hug.set_image(url=hug_api["url"])
@@ -55,9 +55,9 @@ class slashreactions(Cog):
             slap.set_footer(text="Fetched from nekos.life")
             slap.set_image(url=slap_api["url"])
             if member == None:
-                    msg=f"*Slapping {interaction.user.mention}*"
+                    msg=f"*Slapping {interaction.user}*"
             else:
-                    msg=f"*{interaction.user.mention} slapped {member.mention}*"
+                    msg=f"*{interaction.user} slapped {member.mention}*"
             await interaction.followup.send(msg, embed=slap)
 
     @jeanne_slash(description="Show a smuggy look")
@@ -79,7 +79,7 @@ class slashreactions(Cog):
             smug = Embed(color=0xFFC0CB)
             smug.set_footer(text="Fetched from nekos.life")
             smug.set_image(url=smug_api["url"])
-            await interaction.followup.send(f"*{interaction.user.mention} is smugging*", embed=smug) 
+            await interaction.followup.send(f"*{interaction.user} is smugging*", embed=smug) 
 
     @jeanne_slash(description="Poke someone or yourself")
     async def poke(self, interaction: Interaction, member: Member = SlashOption(description="Who do you want to poke?", required=False)):
@@ -100,9 +100,9 @@ class slashreactions(Cog):
             poke.set_footer(text="Fetched from nekos.life")
             poke.set_image(url=poke_api["url"])
             if member == None:
-                    msg=f"*Poking {interaction.user.mention}*"
+                    msg=f"*Poking {interaction.user}*"
             else:
-                    msg=f"*{interaction.user.mention} poked {member.mention}*"
+                    msg=f"*{interaction.user} poked {member.mention}*"
             await interaction.followup.send(msg, embed=poke)
 
     @jeanne_slash(description="Pat someone or yourself")
@@ -124,9 +124,9 @@ class slashreactions(Cog):
             pat.set_footer(text="Fetched from nekos.life")
             pat.set_image(url=pat_api["url"])
             if member == None:
-                    msg=f"*Patting {interaction.user.mention}*"
+                    msg=f"*Patting {interaction.user}*"
             else:
-                    msg=f"*{interaction.user.mention} patted {member.mention}*"
+                    msg=f"*{interaction.user} patted {member.mention}*"
             await interaction.followup.send(msg, embed=pat)
 
     @jeanne_slash(description="Kiss someone or yourself")
@@ -145,9 +145,9 @@ class slashreactions(Cog):
         except:
             kiss_api = get(kiss_nekoslife).json()
             if member == None:
-                msg=f"*Kissing {interaction.user.mention}*"
+                msg=f"*Kissing {interaction.user}*"
             else:
-                msg=f"*{interaction.user.mention} kissed {member.mention}*"
+                msg=f"*{interaction.user} kissed {member.mention}*"
             kiss = Embed(color=0xFFC0CB)
             kiss.set_footer(text="Fetched from nekos.life")
             kiss.set_image(url=kiss_api["url"])
@@ -169,9 +169,9 @@ class slashreactions(Cog):
         except:
             tickle_api = get(tickle_nekoslife).json()
             if member == None:
-                msg=f"*Tickling {interaction.user.mention}*"
+                msg=f"*Tickling {interaction.user}*"
             else:
-                msg=f"*{interaction.user.mention} tickled {member.mention}*"
+                msg=f"*{interaction.user} tickled {member.mention}*"
             tickle = Embed(color=0xFFC0CB)
             tickle.set_footer(text="Fetched from nekos.life")
             tickle.set_image(url=tickle_api["url"])
@@ -193,9 +193,9 @@ class slashreactions(Cog):
         except:
             baka_api = get(baka_nekoslife).json()
             if member == None:
-                msg=f"*{interaction.user.mention}, you are a baka!*"
+                msg=f"*{interaction.user}, you are a baka!*"
             else:
-                msg=f"*{member.mention}, {interaction.user.mention} called you a baka!*"
+                msg=f"*{member.mention}, {interaction.user} called you a baka!*"
             baka = Embed(color=0xFFC0CB)
             baka.set_footer(text="Fetched from nekos.life")
             baka.set_image(url=baka_api["url"])
@@ -217,9 +217,9 @@ class slashreactions(Cog):
         except:
             feed_api = get(feed_nekoslife).json()
             if member == None:
-                msg = f"*Feeding {interaction.user.mention}*"
+                msg = f"*Feeding {interaction.user}*"
             else:
-                msg = f"*{interaction.user.mention} fed {member.mention}*"
+                msg = f"*{interaction.user} fed {member.mention}*"
             feed = Embed(color=0xFFC0CB)
             feed.set_footer(text="Fetched from nekos.life")
             feed.set_image(url=feed_api["url"])

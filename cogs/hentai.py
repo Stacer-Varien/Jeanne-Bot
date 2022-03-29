@@ -5,8 +5,10 @@ from glob import glob
 from nextcord.ext.commands import Cog
 from random import choice
 from requests import get
-from assets.errormsgs import no_hentai
+from nextcord.ext.application_checks import *
 from config import db
+
+
 
 
 class slashnsfw(Cog):
@@ -14,6 +16,7 @@ class slashnsfw(Cog):
         self.bot = bot
 
     @jeanne_slash(description="Get a random hentai from Jeanne")
+    @is_nsfw()
     async def hentai(self, interaction: Interaction):
         await interaction.response.defer()
         try:
@@ -27,18 +30,17 @@ class slashnsfw(Cog):
             if interaction.user.id == botbanned_user.id:
                 await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
-            file_path_type = ["./Media/Hentai/*.jpg", "./Media/Hentai/*.mp4"]
+            file_path_type = ["/Media/Hentai/*.*"]
             images = glob(choice(file_path_type))
             random_image = choice(images)
             file = File(random_image)
             hentai = Embed(color=0xFFC0CB)
             hentai.set_footer(text="Powered by JeanneBot")
-            if interaction.channel.is_nsfw():
-                await interaction.followup.send(file=file, embed=hentai)
-            else:
-                await interaction.followup.send(embed=no_hentai)
+            await interaction.followup.send(file, embed=hentai)
+
 
     @jeanne_slash(description="Get a random hentai from Yande.re")
+    @is_nsfw()
     async def yandere(self, interaction: Interaction, tag=SlashOption(description="Add a tag for something specific", required=False)):
         await interaction.response.defer()
         try:
@@ -52,7 +54,6 @@ class slashnsfw(Cog):
             if interaction.user.id == botbanned_user.id:
                 await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
-            if interaction.channel.is_nsfw():
                 try:
                     if tag == None:
                         yandere_api = choice(get(
@@ -71,10 +72,9 @@ class slashnsfw(Cog):
                     await interaction.followup.send(embed=yandere)
                 except IndexError:
                     pass
-            else:
-                await interaction.followup.send(embed=no_hentai)
 
     @jeanne_slash(description="Get hentai from Gelbooru")
+    @is_nsfw()
     async def gelbooru(self, interaction: Interaction, tag=SlashOption(description="Add a tag for something specific", required=False)):
         await interaction.response.defer()
         try:
@@ -88,9 +88,6 @@ class slashnsfw(Cog):
             if interaction.user.id == botbanned_user.id:
                 await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
-            if interaction.channel.is_nsfw():
-
-
                 if tag == None:
                     gelbooru_api = f"https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&tags=rating:explicit+-loli+-shota+-cub"
 
@@ -108,10 +105,9 @@ class slashnsfw(Cog):
                     await interaction.followup.send(embed=gelbooru)
                 except KeyError:
                     pass
-            else:
-                await interaction.followup.send(embed=no_hentai)
 
     @jeanne_slash(description="Get a random hentai from Konachan")
+    @is_nsfw()
     async def konachan(self, interaction: Interaction, tag=SlashOption(description="Add a tag for something specific", required=False)):
         await interaction.response.defer()
         try:
@@ -125,7 +121,6 @@ class slashnsfw(Cog):
             if interaction.user.id == botbanned_user.id:
                 await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
-            if interaction.channel.is_nsfw():
                 try:
                     if tag == None:
                         konachan_api = choice(get(
@@ -141,8 +136,6 @@ class slashnsfw(Cog):
                     await interaction.followup.send(embed=konachan)
                 except IndexError:
                     pass
-            else:
-                await interaction.followup.send(embed=no_hentai)
 
 
 def setup(bot):

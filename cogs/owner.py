@@ -8,6 +8,7 @@ from assets.errormsgs import owner_only
 from os import execv
 from sys import executable, argv
 from config import db
+from nextcord.ext.application_checks import *
 
 format = "%a, %d %b %Y | %H:%M:%S %ZGMT"
 
@@ -20,6 +21,7 @@ class slashowner(Cog):
 
 
     @jeanne_slash(description="Changes the bot's play activity")
+    @is_owner()
     async def activity(self, interaction : Interaction, activitytype=SlashOption(description="Choose an activity type", choices=['listen', 'play'], required=True), activity=SlashOption(description="What is the new activity")):
         await interaction.response.defer()
         try:
@@ -33,18 +35,17 @@ class slashowner(Cog):
             if interaction.user.id == botbanned_user.id:
                 await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
-            if interaction.user==self.bot.get_user(bot_owner):        
                 if activitytype=="listen":
                     await self.bot.change_presence(activity=Activity(type=ActivityType.listening, name=activity))
                     await interaction.followup.send(f"Bot's activity changed to `listening to {activity}`")            
                 elif activitytype=="play":
                     await self.bot.change_presence(activity=Game(name=activity))
                     await interaction.followup.send(f"Bot's activity changed to `playing {activity}`")            
-            elif interaction.user!= self.bot.get_user(bot_owner):
-                await interaction.followup.send(embed=owner_only)                
+             
                 
 
     @jeanne_slash(description="Finds a user")
+    @is_owner()
     async def finduser(self, interaction: Interaction, user_id=SlashOption(description="Which user?")):
         await interaction.response.defer()
         try:
@@ -58,7 +59,6 @@ class slashowner(Cog):
             if interaction.user.id == botbanned_user.id:
                 await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
-            if interaction.user==self.bot.get_user(bot_owner):
                 user = await self.bot.fetch_user(user_id)
                 if user.bot == True:
                     botr = ":o:"
@@ -69,11 +69,10 @@ class slashowner(Cog):
                                 value=f"**>** **Name:** {user}\n**>** **ID:** {user.id}\n**>** **Creation Date:** {user.created_at.strftime(format)}\n**>** **Mutuals:** {len(user.mutual_guilds)}\n**>** **Is Bot?:** {botr}",
                                 inline=True)
                 fuser.set_image(url=user.display_avatar)
-                await interaction.followup.send(embed=fuser)
-            elif interaction.user != self.bot.get_user(bot_owner):
-                await interaction.followup.send(embed=owner_only)             
+                await interaction.followup.send(embed=fuser)            
 
     @jeanne_slash(description="Restart me to be updated")
+    @is_owner()
     async def update(self, interaction:Interaction):
         await interaction.response.defer()
         try:
@@ -87,13 +86,11 @@ class slashowner(Cog):
             if interaction.user.id == botbanned_user.id:
                 await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
-            if interaction.user == self.bot.get_user(bot_owner):
                 await interaction.followup.send(f"YAY! NEW UPDATE!")
                 restart_bot()
-            elif interaction.user != self.bot.get_user(bot_owner):
-                await interaction.followup.send(embed=owner_only)
     
     @jeanne_slash(description="Botban a user from using the bot")
+    @is_owner()
     async def botban(self, interaction: Interaction, user_id=SlashOption(description="Which user?"), reason = SlashOption(description="Add a reason")):
         await interaction.response.defer()
         try:
@@ -107,9 +104,8 @@ class slashowner(Cog):
             if interaction.user.id == botbanned_user.id:
                 await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
-            if interaction.user == self.bot.get_user(bot_owner):
                 user=await self.bot.fetch_user(user_id)
-                channel = self.bot.get_channel(928962613939949618)
+                botbanned_channel = interaction.guild.get_channel(928962613939949618)
                 cur = db.execute("INSERT OR IGNORE INTO botbannedData (user_id, reason) VALUES (?,?)", (user.id, reason))
 
                 if cur.rowcount==0:
@@ -152,12 +148,11 @@ class slashowner(Cog):
                                         inline=False)
                     botbanned.set_footer(text="Due to this user botbanned, any data except warnings are immediatley deleted from the database! They will have no chance of appealing their botban.")
                     botbanned.set_thumbnail(url=user.avatar)
-                    await channel.send(embed=botbanned)
+                    await botbanned_channel.send(embed=botbanned)
                     db.commit()
-            elif interaction.user != self.bot.get_user(bot_owner):
-                await interaction.followup.send(embed=owner_only)
 
     @jeanne_slash(description="Evaluates a code")
+    @is_owner()
     async def evaluate(self, interaction: Interaction):
         await interaction.response.defer()
         try:
@@ -171,7 +166,6 @@ class slashowner(Cog):
             if interaction.user.id == botbanned_user.id:
                 await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
-            if interaction.user == self.bot.get_user(bot_owner):
                 await interaction.followup.send("Insert your code.\nType 'cancel' if you don't want to evaluate")
                 def check(m):
                     return m.author == interaction.user and m.content
@@ -197,8 +191,6 @@ class slashowner(Cog):
                     embed1.set_footer(
                             text=f"Compiled in {round(self.bot.latency * 1000)}ms")
                     await interaction.followup.send(embed=embed1)
-            elif interaction.user != self.bot.get_user(bot_owner):
-                await interaction.followup.send(embed=owner_only)
 
 def setup(bot):
     bot.add_cog(slashowner(bot))

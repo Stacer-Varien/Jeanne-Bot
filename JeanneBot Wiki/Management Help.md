@@ -50,41 +50,17 @@
 
     Example:`/rename_category CATEGORY NAME NEW_NAME`
 
->**Set Modlog**
 
-* Sets a modlog channel for the server
-* **NOTE:** It will only set one modlog channel. If you want to switch modlog channels, use the command again and select a different channel. All warnings, mutes, bans and unbans are logged in there
+>**Set**
 
-    Example:`/set_modlog CHANNEL`
+* Sets a welcomer/leaving/modlog channel for the server
+* **NOTE:** Three options will be given to you. You can pick one for a channel then do it again after executing the command. It will only set one channel depending on what you have chosen. The welcomng and leaving message is uncustomisable for now. Channels set for modlog will have warns, mutes and bans posted in there.
 
->**Remove Modlog**
+    Example:`/set TYPE CHANNEL`
 
-* Removes a modlog channel from the databse
+>**Remove**
 
-    Example:`/remove_modlog`
+* Removes a welcomer/leaving/modlog channel for the server
+* **NOTE:** Four options will be given to you. You can pick an option then do it again after executing the command. If you want all to be removed, use the `all` option.
 
->**Set Welcomer**
-
-* Sets a welcoming channel for the server
-* **NOTE:** It will only set one welcoming channel. The welcoming message is uncustomisable for now.
-
-    Example:`/set_welcomer CHANNEL`
-
->**Remove Welcomer**
-
-* Removes a welcoming channel from the databse
-
-    Example:`/remove_welcomer`
-
->**Set Leaver**
-
-* Sets a leaving channel for the server
-* **NOTE:** It will only set one leaving channel. The leaving message is uncustomisable for now.
-
-    Example:`/set_leaver CHANNEL`
-
->**Remove Leaver**
-
-* Removes a leaving channel from the databse
-
-    Example:`/remove_leaving`
+    Example:`/remove TYPE`
