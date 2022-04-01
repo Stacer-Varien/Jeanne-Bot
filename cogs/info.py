@@ -30,7 +30,7 @@ class slashinfo(Cog):
             botowner = self.bot.get_user(597829930964877369)
             embed = Embed(title="Bot stats", color=0x236ce1)
             embed.add_field(
-                name="General Information", value=f"**>** **Name:** {self.bot.user}\n**>** **ID:** {self.bot.user.id}\n**>** **Bot Version:** v2.9", inline=True)
+                name="General Information", value=f"**>** **Name:** {self.bot.user}\n**>** **ID:** {self.bot.user.id}\n**>** **Bot Version:** v2.9.2", inline=True)
             embed.add_field(
                 name="Developer", value=f"**>** **Name:** {botowner}\n**>** **ID:** {botowner.id}", inline=True)
             embed.add_field(

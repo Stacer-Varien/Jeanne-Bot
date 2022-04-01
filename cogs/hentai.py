@@ -73,39 +73,6 @@ class slashnsfw(Cog):
                 except IndexError:
                     pass
 
-    @jeanne_slash(description="Get hentai from Gelbooru")
-    @is_nsfw()
-    async def gelbooru(self, interaction: Interaction, tag=SlashOption(description="Add a tag for something specific", required=False)):
-        await interaction.response.defer()
-        try:
-            botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
-
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
-        except:
-                if tag == None:
-                    gelbooru_api = f"https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&tags=rating:explicit+-loli+-shota+-cub"
-
-                else:
-                    gelbooru_api = f"https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&tags=rating:explicit+-loli+-shota+-cub+{tag}"
-                try:
-                    response = get(gelbooru_api)
-                    json_api_url = loads(response.text)
-                    image_url = choice(json_api_url['post'])["file_url"]
-
-
-                    gelbooru = Embed(color=0xFFC0CB)
-                    gelbooru.set_image(url=image_url)
-                    gelbooru.set_footer(text="Fetched from Gelbooru")
-                    await interaction.followup.send(embed=gelbooru)
-                except KeyError:
-                    pass
-
     @jeanne_slash(description="Get a random hentai from Konachan")
     @is_nsfw()
     async def konachan(self, interaction: Interaction, tag=SlashOption(description="Add a tag for something specific", required=False)):
