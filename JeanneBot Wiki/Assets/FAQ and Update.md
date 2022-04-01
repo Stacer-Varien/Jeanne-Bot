@@ -40,7 +40,7 @@ Someone used a guess or say command and I want to troll them by ruining the comm
 
 * **Answer**
 
-    The guess and say command is waiting for the response from the person who used the command. A third parties will be unable to type a message for them as it is author target.
+    The guess and say command is waiting for the response from the person who used the command. Third parties will be unable to type a message for them as it is author target.
 
 # Question
 
