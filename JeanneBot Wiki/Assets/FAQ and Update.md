@@ -56,7 +56,7 @@ When will the currency system be implemented?
 
 * **Answer**
 
-    It will take some time to have the currency system working. It is still under testing stage but the 'incomplete but operational' version of it is not yet ready to be published. The daily command still needs attention and the other thing is to sort out the vote rewards. I am confident that before July 2022, the system will be implemented and before December 2022, they system is fully operational. For the vote rewards, the problem is that TopGG depends on the Discord.py library and it is the one used for the 2nd instance but since I am hearing that Rapptz has made a return, I might rewrite her back to Discord.py if it is similar to Nextcord so a little of work can be done on her.
+    It will take some time to have the currency system working. It is still under testing stage but the 'incomplete but operational' version of it is not yet ready to be published. The daily command still needs attention and the other thing is to sort out the vote rewards. I am confident that before July 2022, the system will be implemented and before December 2022, the system is fully operational. For the vote rewards, the problem is that TopGG depends on the Discord.py library and it is the one used for the 2nd instance but since I am hearing that Rapptz has made a return, I might rewrite her back to Discord.py if it is similar to Nextcord so a little of work can be done on her.
 
 # Question
 
