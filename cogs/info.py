@@ -30,20 +30,26 @@ class slashinfo(Cog):
             botowner = self.bot.get_user(597829930964877369)
             embed = Embed(title="Bot stats", color=0x236ce1)
             embed.add_field(
-                name="General Information", value=f"**>** **Name:** {self.bot.user}\n**>** **ID:** {self.bot.user.id}\n**>** **Bot Version:** v2.9.2", inline=True)
+                name="Developer", value=f"• **Name:** {botowner}\n• **ID:** {botowner.id}", inline=True)
+            embed.add_field(name="Bot ID", value=self.bot.user.id, inline=True)
+            embed.add_field(name="Creation Date", value=self.bot.user.created_at.strftime(format), inline=True)
             embed.add_field(
-                name="Developer", value=f"**>** **Name:** {botowner}\n**>** **ID:** {botowner.id}", inline=True)
-            embed.add_field(
-                name="Version", value=f"**>** **Python Version:** {py_version.major}.{py_version.minor}.{py_version.micro}\n**>** **Nextcord Version:** {discord_version}", inline=True)
+                name="Version", value=f"• **Python Version:** {py_version.major}.{py_version.minor}.{py_version.micro}\n• **Nextcord Version:** {discord_version}\n• **Bot:** 2.9.2a", inline=True)
+
+            cur=db.execute("SELECT * FROM globalxpData")
+            all_users=len(cur.fetchall())
             embed.add_field(name="Count",
-                            value=f"**>** **Server Count:** {len(self.bot.guilds)} servers\n**>** **User Count:** {len(set(self.bot.get_all_members()))}\n**>** **Goal to verification:** {len(self.bot.guilds)}/100 servers", inline=True)
-            embed.add_field(name="Ping",
-                            value=f"**>** **Bot Latency:** {round(self.bot.latency * 1000)}ms", inline=True)
+                            value=f"• **Server Count:** {len(self.bot.guilds)} servers\n• **User Count:** {len(set(self.bot.get_all_members()))}\n• **Cached Members:** {all_users}", inline=True)
+
             current_time = time()
             difference = int(round(current_time - start_time))
             uptime = str(timedelta(seconds=difference))
             embed.add_field(
-                name="Uptime", value=f"{uptime} hours")
+                name="Uptime", value=f"{uptime} hours", inline=True)
+
+            embed.add_field(name="Invites",
+                            value="• [Invite me to your server](https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=1565918620726&scope=bot%20applications.commands)\n• [Vote for me](https://top.gg/bot/831993597166747679)\n• [Join the support server](https://discord.gg/VVxGUmqQhF)", inline=True)
+
             embed.set_thumbnail(
                 url=self.bot.user.avatar)
             await interaction.followup.send(embed=embed)
@@ -69,18 +75,19 @@ class slashinfo(Cog):
                 role.mention for role in member.roles][1:][:: -1]
 
             if member.bot == True:
-                botr = ":o:"
+                botr = "Yes"
             else:
-                botr = ":x:"
+                botr = "No"
 
             userinfo = Embed(title="{}'s Info".format(member.name),
                             color=0xccff33)
-            userinfo.add_field(name="General Information",
-                            value=f"**>** **Name:** {member}\n**>** **Nickname:** {member.nick}\n**>** **ID:** {member.id}\n**>** **Creation Date:** {member.created_at.strftime(format)}\n**>** **Is Bot?:** {botr}",
-                            inline=True)
-            userinfo.add_field(name="Member Information",
-                            value=f"**>** **Joined Server:** {member.joined_at.strftime(format)}\n**>** **Number of Roles:** {len(member.roles)}",
-                            inline=True)
+            userinfo.add_field(name="Name", value=member, inline=True)
+            userinfo.add_field(name="ID", value=member.id, inline=True)
+            userinfo.add_field(name="Is Bot?", value=botr, inline=True)
+            userinfo.add_field(
+                name="Joined Server", value=member.joined_at.strftime(format), inline=True)
+            userinfo.add_field(name="Number of Roles",
+                               value=(len(hasroles) + 1), inline=True)
             userinfo.add_field(name="Roles Held",
                             value=''.join(hasroles[:20]) + '@everyone', inline=False)
             userinfo.set_thumbnail(url=member.display_avatar)
@@ -107,8 +114,6 @@ class slashinfo(Cog):
             guild = interaction.guild
             emojis = [str(x) for x in guild.emojis]
             features = guild.features
-            true_member_count = len([m for m in guild.members if not m.bot])
-            bots = len([m for m in guild.members if m.bot])
 
             if guild.premium_subscription_count < 2:
                 boostlevel = "Level 0"
@@ -119,32 +124,41 @@ class slashinfo(Cog):
             elif guild.premium_tier == 3:
                 boostlevel = "Level 3"
 
-            embed = Embed(title="Server's Info", color=0x00B0ff)
-            embed.add_field(name="General Information",
-                            value=f"**>** **Name:** {guild.name}\n**>** **ID:** {guild.id}\n**>** **Creation Date:** {guild.created_at.strftime(format)}\n**>** **Member Count:** {len(guild.members)}\n**>** **Verification:** {guild.verification_level}\n**>** **Roles:** {len(guild.roles)}\n**>** **Emojis:** {len(emojis)}\n{''.join(emojis[:10])}", inline=True)
-            embed.add_field(
-                name="Owner", value=f"**>** **Name:** {guild.owner}\n**>** **ID:** {guild.owner.id}", inline=True)
-            embed.add_field(
-                name="Members", value=f"**>** **Humans:** {true_member_count}\n**>** **Bots:** {bots}")
-            embed.add_field(name="Boost Status",
-                            value=f"**>** **Boosters:** {len(guild.premium_subscribers)}\n**>** **Boosts:** {guild.premium_subscription_count}\n**>** **Boost Level:** {boostlevel}",
+            serverinfo = Embed(title="Server's Info", color=0x00B0ff)
+            serverinfo.add_field(name="Name", value=guild.name, inline=True)
+            serverinfo.add_field(name="ID", value=guild.id, inline=True)
+            serverinfo.add_field(name="Owner", value=f"• **Name: ** {guild.owner}\n• ** ID: ** {guild.owner_id}", inline=True)
+            serverinfo.add_field(
+                name="Creation Date", value=guild.created_at.strftime(format), inline=True)
+            serverinfo.add_field(
+                name="Members", value=f"• **Humans:** {len(guild.humans)}\n• **Bots:** {len(guild.bots)}\n• **Total Members:** {guild.member_count}")
+            serverinfo.add_field(name="Boost Status",
+                                 value=f"• **Boosters:** {len(guild.premium_subscribers)}\n• **Boosts:** {guild.premium_subscription_count}\n• **Boost Level:** {boostlevel}",
                             inline=True)
-            embed.add_field(name='Features',
+            serverinfo.add_field(name='Features',
                             value=features, inline=False)
 
             if guild.icon==None:
                 pass
             elif guild.icon.is_animated() is True:
-                embed.set_thumbnail(url=guild.icon.with_size(512))
+                serverinfo.set_thumbnail(url=guild.icon.with_size(512))
             else:
-                embed.set_thumbnail(url=guild.icon)
+                serverinfo.set_thumbnail(url=guild.icon)
 
             if guild.splash==None:
                 pass
             else:
-                embed.set_image(url=guild.splash)
+                serverinfo.set_image(url=guild.splash)
+
+            if len(emojis) == 0:
+                await interaction.followup.send(embed=serverinfo)
+
+            else:
+                emojie = Embed(title="Emojis", description=''.join(emojis[:40]), color=0x00B0ff)
+
+                e=[serverinfo, emojie]
                 
-            await interaction.followup.send(embed=embed)
+                await interaction.followup.send(embeds=e)
 
 
     @jeanne_slash(description="Check how fast I respond to a command")
