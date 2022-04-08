@@ -12,42 +12,42 @@ class slashreactions(Cog):
         self.bot = bot
 
     @jeanne_slash(description="Hug someone or yourself")
-    async def hug(self, interaction: Interaction, member: Member = SlashOption(description="Who do you want to hug?", required=False)):
-        await interaction.response.defer()
+    async def hug(self, ctx: Interaction, member: Member = SlashOption(description="Who do you want to hug?", required=False)):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
             reason = botbanned_data[1]
 
             botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id == botbanned_user.id:
+                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
             hug_api = get(hug_nekoslife).json()
             if member == None:
-                msg=f"*Hugging {interaction.user}*"
+                msg=f"*Hugging {ctx.user}*"
             else:
-                msg=f"*{interaction.user} hugged {member.mention}*"
+                msg=f"*{ctx.user} hugged {member.mention}*"
             hug = Embed(color=0xFFC0CB)
             hug.set_footer(text="Fetched from nekos.life")
             hug.set_image(url=hug_api["url"])
-            await interaction.followup.send(msg, embed=hug)
+            await ctx.channel.send(msg, embed=hug)
 
     @jeanne_slash(description="Slap someone or yourself")
-    async def slap(self, interaction: Interaction, member: Member = SlashOption(description="Who do you want to slap?", required=False)):
-        await interaction.response.defer()
+    async def slap(self, ctx: Interaction, member: Member = SlashOption(description="Who do you want to slap?", required=False)):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
             reason = botbanned_data[1]
 
             botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id == botbanned_user.id:
+                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:        
             slap_api = get(slap_nekoslife).json()
 
@@ -55,175 +55,175 @@ class slashreactions(Cog):
             slap.set_footer(text="Fetched from nekos.life")
             slap.set_image(url=slap_api["url"])
             if member == None:
-                    msg=f"*Slapping {interaction.user}*"
+                    msg=f"*Slapping {ctx.user}*"
             else:
-                    msg=f"*{interaction.user} slapped {member.mention}*"
-            await interaction.followup.send(msg, embed=slap)
+                    msg=f"*{ctx.user} slapped {member.mention}*"
+            await ctx.channel.send(msg, embed=slap)
 
     @jeanne_slash(description="Show a smuggy look")
-    async def smug(self, interaction : Interaction):
-        await interaction.response.defer()
+    async def smug(self, ctx : Interaction):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
             reason = botbanned_data[1]
 
             botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id == botbanned_user.id:
+                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
             smug_api = get(smug_nekoslife).json()
 
             smug = Embed(color=0xFFC0CB)
             smug.set_footer(text="Fetched from nekos.life")
             smug.set_image(url=smug_api["url"])
-            await interaction.followup.send(f"*{interaction.user} is smugging*", embed=smug) 
+            await ctx.followup.send(f"*{ctx.user} is smugging*", embed=smug) 
 
     @jeanne_slash(description="Poke someone or yourself")
-    async def poke(self, interaction: Interaction, member: Member = SlashOption(description="Who do you want to poke?", required=False)):
-        await interaction.response.defer()
+    async def poke(self, ctx: Interaction, member: Member = SlashOption(description="Who do you want to poke?", required=False)):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
             reason = botbanned_data[1]
 
             botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id == botbanned_user.id:
+                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
             poke_api = get(poke_nekoslife).json()
             poke = Embed(color=0xFFC0CB)
             poke.set_footer(text="Fetched from nekos.life")
             poke.set_image(url=poke_api["url"])
             if member == None:
-                    msg=f"*Poking {interaction.user}*"
+                    msg=f"*Poking {ctx.user}*"
             else:
-                    msg=f"*{interaction.user} poked {member.mention}*"
-            await interaction.followup.send(msg, embed=poke)
+                    msg=f"*{ctx.user} poked {member.mention}*"
+            await ctx.channel.send(msg, embed=poke)
 
     @jeanne_slash(description="Pat someone or yourself")
-    async def pat(self, interaction: Interaction, member: Member = SlashOption(description="Who do you want to pat?", required=False)):
-        await interaction.response.defer()
+    async def pat(self, ctx: Interaction, member: Member = SlashOption(description="Who do you want to pat?", required=False)):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
             reason = botbanned_data[1]
 
             botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id == botbanned_user.id:
+                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
             pat_api = get(pat_nekoslife).json()
             pat = Embed(color=0xFFC0CB)
             pat.set_footer(text="Fetched from nekos.life")
             pat.set_image(url=pat_api["url"])
             if member == None:
-                    msg=f"*Patting {interaction.user}*"
+                    msg=f"*Patting {ctx.user}*"
             else:
-                    msg=f"*{interaction.user} patted {member.mention}*"
-            await interaction.followup.send(msg, embed=pat)
+                    msg=f"*{ctx.user} patted {member.mention}*"
+            await ctx.channel.send(msg, embed=pat)
 
     @jeanne_slash(description="Kiss someone or yourself")
-    async def kiss(self, interaction: Interaction, member: Member = SlashOption(description="Who do you want to kiss?", required=False)):
-        await interaction.response.defer()
+    async def kiss(self, ctx: Interaction, member: Member = SlashOption(description="Who do you want to kiss?", required=False)):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
             reason = botbanned_data[1]
 
             botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id == botbanned_user.id:
+                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
             kiss_api = get(kiss_nekoslife).json()
             if member == None:
-                msg=f"*Kissing {interaction.user}*"
+                msg=f"*Kissing {ctx.user}*"
             else:
-                msg=f"*{interaction.user} kissed {member.mention}*"
+                msg=f"*{ctx.user} kissed {member.mention}*"
             kiss = Embed(color=0xFFC0CB)
             kiss.set_footer(text="Fetched from nekos.life")
             kiss.set_image(url=kiss_api["url"])
-            await interaction.followup.send(msg, embed=kiss)
+            await ctx.channel.send(msg, embed=kiss)
 
     @jeanne_slash(description="Tickle someone or yourself")
-    async def tickle(self, interaction: Interaction, member: Member = SlashOption(description="Who do you want to tickle?", required=False)):
-        await interaction.response.defer()
+    async def tickle(self, ctx: Interaction, member: Member = SlashOption(description="Who do you want to tickle?", required=False)):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
             reason = botbanned_data[1]
 
             botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id == botbanned_user.id:
+                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
             tickle_api = get(tickle_nekoslife).json()
             if member == None:
-                msg=f"*Tickling {interaction.user}*"
+                msg=f"*Tickling {ctx.user}*"
             else:
-                msg=f"*{interaction.user} tickled {member.mention}*"
+                msg=f"*{ctx.user} tickled {member.mention}*"
             tickle = Embed(color=0xFFC0CB)
             tickle.set_footer(text="Fetched from nekos.life")
             tickle.set_image(url=tickle_api["url"])
-            await interaction.followup.send(msg, embed=tickle)
+            await ctx.channel.send(msg, embed=tickle)
 
     @jeanne_slash(description="Call someone or yourself a baka!")
-    async def baka(self, interaction: Interaction, member: Member = SlashOption(description="Who do you calling a baka?", required=False)):
-        await interaction.response.defer()
+    async def baka(self, ctx: Interaction, member: Member = SlashOption(description="Who do you calling a baka?", required=False)):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
             reason = botbanned_data[1]
 
             botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id == botbanned_user.id:
+                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
             baka_api = get(baka_nekoslife).json()
             if member == None:
-                msg=f"*{interaction.user}, you are a baka!*"
+                msg=f"*{ctx.user}, you are a baka!*"
             else:
-                msg=f"*{member.mention}, {interaction.user} called you a baka!*"
+                msg=f"*{member.mention}, {ctx.user} called you a baka!*"
             baka = Embed(color=0xFFC0CB)
             baka.set_footer(text="Fetched from nekos.life")
             baka.set_image(url=baka_api["url"])
-            await interaction.followup.send(msg, embed=baka)
+            await ctx.channel.send(msg, embed=baka)
 
     @jeanne_slash(description="Feed someone or yourself")
-    async def feed(self, interaction: Interaction, *, member: Member = SlashOption(description="Who do you want to feed?", required=False)):
-        await interaction.response.defer()
+    async def feed(self, ctx: Interaction, *, member: Member = SlashOption(description="Who do you want to feed?", required=False)):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
             reason = botbanned_data[1]
 
             botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id == botbanned_user.id:
+                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
             feed_api = get(feed_nekoslife).json()
             if member == None:
-                msg = f"*Feeding {interaction.user}*"
+                msg = f"*Feeding {ctx.user}*"
             else:
-                msg = f"*{interaction.user} fed {member.mention}*"
+                msg = f"*{ctx.user} fed {member.mention}*"
             feed = Embed(color=0xFFC0CB)
             feed.set_footer(text="Fetched from nekos.life")
             feed.set_image(url=feed_api["url"])
-            await interaction.followup.send(msg, embed=feed)
+            await ctx.channel.send(msg, embed=feed)
 
 
 def setup(bot):

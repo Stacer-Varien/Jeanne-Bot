@@ -210,8 +210,7 @@ class slashowner(Cog):
             guild=await self.bot.fetch_guild(server_id)
             
             try:
-                confirm=Embed(description="Is this the server you want me to leave?")
-                confirm.add_field(name=guild.name, value=f"Owned by {guild.owner}")
+                confirm = Embed(title="Is this the server you want me to leave?", description=guild.name)
 
                 if guild.icon == None:
                     pass
@@ -220,7 +219,7 @@ class slashowner(Cog):
                 else:
                     confirm.set_thumbnail(url=guild.icon)
 
-                confirm.set_footer(text="Type Yes to confirm or No to cancel. You have 1 minute")
+                confirm.set_footer(text="Type 'yes' to confirm or 'no' to cancel. You have 1 minute")
 
                 confirmation=await ctx.followup.send(embed=confirm)
 
@@ -228,20 +227,25 @@ class slashowner(Cog):
                     return m.author == ctx.user and m.content
                 try:
                     msg = await self.bot.wait_for("message", check=is_correct, timeout=60.0)
+
+                    if "Yes".lower() in msg.content:
+                        confirmed = Embed(
+                            description="Successfully left the server")
+                        await guild.leave()
+                        await confirmation.edit(embed=confirmed)
+
+                    if "No".lower() in msg.content:
+                        confirmed = Embed(
+                            description="Okay then I'm staying in the server")
+                        await confirmation.edit(embed=confirmed)
+
                 except TimeoutError:
                     timeout = Embed(
                         description=f"Timeout", color=0xFF0000)
                     return await ctx.followup.send(embed=timeout)
 
-                if "Yes" in msg.content:
-                    confirmed=Embed(description="Successfully left the server")
-                    await confirmation.edit(embed=confirmed)
-
-                if "No" in msg.content:
-                    confirmed=Embed(description="Okay then I'm staying in the server")
-                    await confirmation.edit(embed=confirmed)
-            except NotFound:
-                await ctx.followup.send(embed=Embed(description="Server not found"))                    
+            except Exception as e:
+                await ctx.followup.send(embed=Embed(description=e))                    
 
 
 def setup(bot):

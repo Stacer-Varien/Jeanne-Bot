@@ -10,6 +10,7 @@ from config import db
 from assets.errormsgs import *
 from nextcord.ext.application_checks.errors import *
 from nextcord.ext.commands.errors import *
+from assets.needed import test_server
 
 
 format = "%d %b %Y | %H:%M:%S"
@@ -199,7 +200,7 @@ class slashmoderation(Cog):
 
     @jeanne_slash(description="Ban a member in the server")
     @has_permissions(ban_members=True)
-    async def memberban(self, ctx: Interaction, member: Member = SlashOption(description="Who do you want to ban?"), reason=SlashOption(description="Give a reason", required=False)):
+    async def ban(self, ctx: Interaction, where=SlashOption(description="Is it someone in this server or outside the server?", choices=['inside', 'outside']), member: Member = SlashOption(description="Who do you want to ban in the server? (for inside option)", required=False), user_id=SlashOption(description="Who do you want to ban with ID? (for outside option)", required=False) , reason=SlashOption(description="Give a reason", required=False)):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
@@ -215,108 +216,88 @@ class slashmoderation(Cog):
                 if reason == None:
                     reason = "Unspecified"
 
-                if member == ctx.user:
-                    failed = Embed(description="You can't ban yourself")
-                    await ctx.followup.send(embed=failed)
-                else:
-                    try:
-                        banmsg = Embed(
-                            description=f"You are banned from **{ctx.guild.name}** for **{reason}**")
-                        await member.send(embed=banmsg)
-                    except:
-                        pass
-                    
-                    await member.ban(reason=reason)
-                    ban = Embed(title="Member Banned", color=0xFF0000)
-                    ban.add_field(name="Member",
-                                    value=f"**>** **Name:** {member}\n**>** **ID:** {member.id}",
-                                    inline=True)
-                    ban.add_field(
-                            name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.user}\n**>** **Reason:** {reason}", inline=True)
-                    ban.set_thumbnail(url=member.display_avatar)
-                    try:
-                        modlog_channel_query = db.execute(
-                                f'SELECT channel_id FROM modlogData WHERE guild_id = {ctx.guild.id}')
-                        modlog_channel_id = modlog_channel_query.fetchone()[0]
-                        modlog = ctx.guild.get_channel(
-                                modlog_channel_id)
-                        await modlog.send(embed=ban)
-                        banned = Embed(
-                                description=f"Member has been banned. Check {modlog.mention}", color=0xFF0000)
-                        await ctx.followup.send(embed=banned)
-                    except:
-                        await ctx.followup.send(embed=ban)
-
-    @memberban.error
-    async def memberban_error(self, ctx:Interaction, error):
-        if isinstance(error, ApplicationMissingPermissions):
-            await ctx.response.defer()
-            await ctx.followup.send(embed=ban_perm)
-
-
-    @jeanne_slash(description="Ban a user before they join your server")
-    @has_permissions(ban_members=True)
-    async def outsideban(self, ctx: Interaction, user_id=SlashOption(description="Who do you want to ban with ID?", required=True), reason=SlashOption(description="Give a reason", required=False)):
-        await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
-
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
-        except:
-                user = await self.bot.fetch_user(user_id)
-                guild = ctx.guild
-                if reason == None:
-                    reason = "Unspecified"
-
-                try:
-                    banned = await guild.fetch_ban(user)
-                except NotFound:
-                    banned = False
-
-                if banned:
-                    already_banned = Embed(
-                        description="User is already banned here")
-                    await ctx.followup.send(embed=already_banned)
-
-                else:
-                        await guild.ban(user, reason=reason)
+                if where=='inside':
+                    if member == ctx.user:
+                        failed = Embed(description="You can't ban yourself")
+                        await ctx.followup.send(embed=failed)
+                    else:
+                        try:
+                            banmsg = Embed(
+                                description=f"You are banned from **{ctx.guild.name}** for **{reason}**")
+                            await member.send(embed=banmsg)
+                        except:
+                            pass
+                        
+                        await member.ban(reason=reason)
                         ban = Embed(title="Member Banned", color=0xFF0000)
                         ban.add_field(name="Member",
-                                    value=f"**>** **Name:** {user}\n**>** **ID:** {user.id}",
-                                    inline=True)
+                                        value=f"**>** **Name:** {member}\n**>** **ID:** {member.id}",
+                                        inline=True)
                         ban.add_field(
-                            name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.user}\n**>** **Reason:** {reason}", inline=True)
-                        ban.set_thumbnail(url=user.display_avatar)
+                                name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.user}\n**>** **Reason:** {reason}", inline=True)
+                        ban.set_thumbnail(url=member.display_avatar)
                         try:
                             modlog_channel_query = db.execute(
-                                f'SELECT channel_id FROM modlogData WHERE guild_id = {ctx.guild.id}')
-                            modlog_channel_id = modlog_channel_query.fetchone()[
-                                0]
+                                    f'SELECT channel_id FROM modlogData WHERE guild_id = {ctx.guild.id}')
+                            modlog_channel_id = modlog_channel_query.fetchone()[0]
                             modlog = ctx.guild.get_channel(
-                                modlog_channel_id)
+                                    modlog_channel_id)
                             await modlog.send(embed=ban)
                             banned = Embed(
-                                description=f"User has been banned. Check {modlog.mention}", color=0xFF0000)
+                                    description=f"Member has been banned. Check {modlog.mention}", color=0xFF0000)
                             await ctx.followup.send(embed=banned)
                         except:
                             await ctx.followup.send(embed=ban)
 
+                elif where=='outside':
+                    user = await self.bot.fetch_user(user_id)
+                    guild = ctx.guild
+                    if reason == None:
+                        reason = "Unspecified"
 
-    @outsideban.error
-    async def outsideban_error(self, ctx:Interaction, error):
+                    try:
+                        banned = await guild.fetch_ban(user)
+                    except NotFound:
+                        banned = False
+
+                    if banned:
+                        already_banned = Embed(
+                            description="User is already banned here")
+                        await ctx.followup.send(embed=already_banned)
+
+                    else:
+                            await guild.ban(user, reason=reason)
+                            ban = Embed(title="Member Banned", color=0xFF0000)
+                            ban.add_field(name="Member",
+                                        value=f"**>** **Name:** {user}\n**>** **ID:** {user.id}",
+                                        inline=True)
+                            ban.add_field(
+                                name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.user}\n**>** **Reason:** {reason}", inline=True)
+                            ban.set_thumbnail(url=user.display_avatar)
+                            try:
+                                modlog_channel_query = db.execute(
+                                    f'SELECT channel_id FROM modlogData WHERE guild_id = {ctx.guild.id}')
+                                modlog_channel_id = modlog_channel_query.fetchone()[
+                                    0]
+                                modlog = ctx.guild.get_channel(
+                                    modlog_channel_id)
+                                await modlog.send(embed=ban)
+                                banned = Embed(
+                                    description=f"User has been banned. Check {modlog.mention}", color=0xFF0000)
+                                await ctx.followup.send(embed=banned)
+                            except:
+                                await ctx.followup.send(embed=ban)
+
+    @ban.error
+    async def ban_error(self, ctx:Interaction, error):
         if isinstance(error, ApplicationMissingPermissions):
             await ctx.response.defer()
             await ctx.followup.send(embed=ban_perm)
 
-        elif isinstance(error, UserNotFound):
+        elif isinstance(error, Exception):
             await ctx.response.defer()
             await ctx.followup.send("Invalid user ID")
+
 
     @jeanne_slash(description="Kick a member out of the server")
     @has_permissions(kick_members=True)

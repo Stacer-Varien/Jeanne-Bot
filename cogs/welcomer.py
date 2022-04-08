@@ -60,8 +60,6 @@ class welcomer(Cog):
                 f"SELECT guild_id FROM leaverData where channel_id = {channel_id}")
             server_id = guild_id_query.fetchone()[0]
 
-            server = self.bot.get_guild(server_id)
-
             if member.guild.id == server_id:
                 try:
                     channel = self.bot.get_channel(channel_id)

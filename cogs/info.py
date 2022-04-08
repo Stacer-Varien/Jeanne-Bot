@@ -127,9 +127,9 @@ class slashinfo(Cog):
             serverinfo = Embed(title="Server's Info", color=0x00B0ff)
             serverinfo.add_field(name="Name", value=guild.name, inline=True)
             serverinfo.add_field(name="ID", value=guild.id, inline=True)
-            serverinfo.add_field(name="Owner", value=f"• **Name: ** {guild.owner}\n• ** ID: ** {guild.owner_id}", inline=True)
             serverinfo.add_field(
                 name="Creation Date", value=guild.created_at.strftime(format), inline=True)
+            serverinfo.add_field(name="Owner", value=f"• **Name: ** {guild.owner}\n• ** ID: ** {guild.owner_id}", inline=True)
             serverinfo.add_field(
                 name="Members", value=f"• **Humans:** {len(guild.humans)}\n• **Bots:** {len(guild.bots)}\n• **Total Members:** {guild.member_count}")
             serverinfo.add_field(name="Boost Status",
