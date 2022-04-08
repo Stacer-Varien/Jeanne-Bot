@@ -1,76 +1,46 @@
 from nextcord import *
 from nextcord.ui import *
 
-hentai = Embed(title="Hentai Module", description="All of the commands listed are NSFW commands. They need to be executed in an NSFW enabled channel", color=0x7DF9FF)
+hentai = Embed(title="Hentai Module", description="All commands in this module requires an NSFW enabled channel. Certain tags have been blacklisted for the sake of the viewer and/or due to Discord's ToS. All tags must be put in the format the APIs requires. If the channel is not NSFW enabled, expect an NSFW error message", color=0x7DF9FF)
 hentai.add_field(name='Available commands',
               value="• Hentai\n• Yandere\n• Konachan")
 hentai.set_footer(
     text="If you need extended help about the use of commands, use the drop menu below")
 
-class hentai_help(ui.Select):
+class hentaihelp(ui.Select):
     def __init__(self):
 
         options=[
-            SelectOption(label="8 Ball"), SelectOption(
-                label="Dice"), SelectOption(label="Combine"), SelectOption(label="Flip"), SelectOption(label="Choose"), SelectOption(label="Reverse"), SelectOption(label="Guess"), SelectOption(label="Animeme")
+            SelectOption(label="Hentai"), SelectOption(
+                label="Yandere"), SelectOption(label="Konachan")
         ]
 
         super().__init__(placeholder='What command you need help on?', options=options)
 
     async def callback(self, ctx: Interaction):
-        if self.values[0]=="8 Ball":
+        if self.values[0]=="Hentai":
             await ctx.response.defer(ephemeral=True)
-            _8ball = Embed(color=0x7DF9FF)
-            _8ball.add_field(
-                name="Ask 8 ball anything and you will get your answer", value="• **Example:** `/8ball QUESTION`\n• **Expected result**: `ANSWER FROM JEANNE`")
-            await ctx.followup.send(embed=_8ball, ephemeral=True)
-        if self.values[0] == "Dice":
+            hentai = Embed(color=0x7DF9FF)
+            hentai.add_field(
+                name="Get a random hentai image/video from Jeanne.\n• **NOTE:** There will no API to fetch images as it is fetched from the local storage (aka, my 'homework' folder). The files are JPEG and MP4 and reduced to 8MB or less for storage and Discord reasons.", value="• **Example:** `/hentai`\n• **Expected result**: `HENTAI PICTURE/VIDEO`")
+            await ctx.followup.send(embed=hentai, ephemeral=True)
+        if self.values[0] == "Yandere":
             await ctx.response.defer(ephemeral=True)
-            dice = Embed(color=0x7DF9FF)
-            dice.add_field(
-                name="Roll a dice", value="• **Example:** `/dice`\n• **Expected result**: `RANDOM NUMBER BETWEEN 1 AND 6`")
-            await ctx.followup.send(embed=dice, ephemeral=True)
-        if self.values[0] == "Combine":
+            yandere = Embed(color=0x7DF9FF)
+            yandere.add_field(
+                name="Get a random hentai image from Yande.re. You can include a tag too for a specific hentai", value="• **Example:** `/yandere (FOR A RANDOM HENTAI)` \ `/yandere TAG (FOR A SPECIFIC TAG)`\n• **Expected result**: `HENTAI GIVEN WITH OR WITHOUT TAG`\n• **Expected failure**: TAG IS NOT API FORMATED")
+            await ctx.followup.send(embed=yandere, ephemeral=True)
+        if self.values[0] == "Konachan":
             await ctx.response.defer(ephemeral=True)
-            combine = Embed(color=0x7DF9FF)
-            combine.add_field(
-                name="Type two words to get one combined word", value="• **Example:** `/combine FIRST_WORD SECOND_WORD`\n• **Expected result**: `2 WORDS SHOWING A DIFFERENT COMBINED WORD`")
-            await ctx.followup.send(embed=combine, ephemeral=True)
-        if self.values[0] == "Flip":
-            await ctx.response.defer(ephemeral=True)
-            flip = Embed(color=0x7DF9FF)
-            flip.add_field(
-                name="Flip a coin and get your result", value="• **Example:** `/flip`\n• **Expected result**: `HEADS/TAILS`")
-            await ctx.followup.send(embed=flip, ephemeral=True)
-        if self.values[0] == "Choose":
-            await ctx.response.defer(ephemeral=True)
-            choose = Embed(color=0x7DF9FF)
-            choose.add_field(
-                name="Add 2 choices and I will pick for you\n•", value="• **Example:** `/choose CHOICE 1 CHOICE 2`\n• **Expected result**: `ONE OF YOUR CHOICES WERE PICKED`")
-            await ctx.followup.send(embed=choose, ephemeral=True)
-        if self.values[0] == "Reverse":
-            await ctx.response.defer(ephemeral=True)
-            reverse = Embed(color=0x7DF9FF)
-            reverse.add_field(
-                name="Say something and I will say it in reversed text", value="• **Example:** `/reverse TEXT`\n• **Expected result**: `REVERSED TEXT`")
-            await ctx.followup.send(embed=reverse, ephemeral=True)
-        if self.values[0] == "Guess":
-            await ctx.response.defer(ephemeral=True)
-            guess = Embed(color=0x7DF9FF)
-            guess.add_field(
-                name="Guess my number and I will reward you with a hug!\n• **NOTE:** You have to pick a number between 1 to 10. After executing the command, you have to guess the number after she starts asking. You have 5 seconds to guess the correct one.", value="• **Example:** `/guess`\n• **Expected result**: `JEANNE ASKS FOR THE NUMBER. PUT IN THE NUMBER AND IF GUESSED CORRECTLY, SHE WILL SHOW A HUG GIF`\n• **Expected Failure:** `IF YOU TAKE MORE THAN 10 SECONDS OR GUESSED THE WRONG NUMBER")
-            await ctx.followup.send(embed=guess, ephemeral=True)
-        if self.values[0] == "Animeme":
-            await ctx.response.defer(ephemeral=True)
-            guess = Embed(color=0x7DF9FF)
-            guess.add_field(
-                name="Get a random animeme", value="• ** Example: ** `/animeme`")
-            await ctx.followup.send(embed=guess, ephemeral=True)
+            konachan = Embed(color=0x7DF9FF)
+            konachan.add_field(
+                name="Get a random hentai image from Konachan You can include a tag too for a specific hentai", value="• **Example:** `/konachan (FOR A RANDOM HENTAI)` \ `/konachan TAG (FOR A SPECIFIC TAG)`\n• **Expected result**: `HENTAI GIVEN WITH OR WITHOUT TAG`\n• **Expected failure**: TAG IS NOT API FORMATED")
+            await ctx.followup.send(embed=konachan, ephemeral=True)
 
 class hentaiview(View):
     def __init__(self):
         super().__init__()
-        self.add_item(hentai_help())
+        self.add_item(hentaihelp())
 
         
 
