@@ -67,7 +67,7 @@ class fun_help(ui.Select):
                 name="Get a random animeme", value="• ** Example: ** `/animeme`")
             await ctx.followup.send(embed=guess, ephemeral=True)
 
-class DropdownView(View):
+class funview(View):
     def __init__(self):
         super().__init__()
         self.add_item(fun_help())

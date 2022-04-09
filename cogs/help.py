@@ -37,11 +37,8 @@ class slashhelp(Cog):
                 await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
             if help_module==None:
-                help=Embed(description="Click on one of the buttons to open the documentation or get help on the support server")
+                help=Embed(description="Click on the drop menu below for more help on the ")
                 await ctx.followup.send(embed=help, view=link_button())
-            else:
-                if help_module=='Fun':
-                    await ctx.followup.send(embed=fun, view=DropdownView())
 
 def setup(bot):
     bot.add_cog(slashhelp(bot))
