@@ -7,17 +7,6 @@ from assets.needed import test_server
 from assets.help_menu.help import *
 
 
-
-class link_button(View):
-    def __init__(self):
-        super().__init__()
-
-        wiki_url='https://github.com/ZaneRE544/Jeanne-Bot/wiki/JeanneBot-Wiki#welcome-to-the-jeanne-bot-wiki'
-        haze_url='https://discord.gg/VVxGUmqQhF'
-        
-        self.add_item(Button(style=ButtonStyle.url, label="Jeanne Wiki", url=wiki_url))
-        self.add_item(Button(style=ButtonStyle.url, label="Support Server", url=haze_url))
-
 class slashhelp(Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -37,8 +26,8 @@ class slashhelp(Cog):
                 await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
         except:
             if help_module==None:
-                help=Embed(description="Click on the drop menu below for more help on the ")
-                await ctx.followup.send(embed=help, view=link_button())
+                help=Embed(description="Click on the drop menu below for more help on the dropmenu")
+                await ctx.followup.send(embed=help, view=helpview())
 
 def setup(bot):
     bot.add_cog(slashhelp(bot))
