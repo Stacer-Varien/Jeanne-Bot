@@ -19,23 +19,23 @@ class hentaihelp(ui.Select):
 
     async def callback(self, ctx: Interaction):
         if self.values[0]=="Hentai":
-            await ctx.response.defer(ephemeral=True)
+            await ctx.response.defer()
             hentai = Embed(color=0x7DF9FF)
             hentai.add_field(
                 name="Get a random hentai image/video from Jeanne.\n• **NOTE:** There will no API to fetch images as it is fetched from the local storage (aka, my 'homework' folder). The files are JPEG and MP4 and reduced to 8MB or less for storage and Discord reasons.", value="• **Example:** `/hentai`\n• **Expected result**: `HENTAI PICTURE/VIDEO`")
-            await ctx.followup.send(embed=hentai)
+            await ctx.edit_original_message(embed=hentai)
         if self.values[0] == "Yandere":
-            await ctx.response.defer(ephemeral=True)
+            await ctx.response.defer()
             yandere = Embed(color=0x7DF9FF)
             yandere.add_field(
                 name="Get a random hentai image from Yande.re. You can include a tag too for a specific hentai", value="• **Example:** `/yandere (FOR A RANDOM HENTAI)` \ `/yandere TAG (FOR A SPECIFIC TAG)`\n• **Expected result**: `HENTAI GIVEN WITH OR WITHOUT TAG`\n• **Expected failure**: `TAG IS NOT API FORMATED`")
-            await ctx.followup.send(embed=yandere)
+            await ctx.edit_original_message(embed=yandere)
         if self.values[0] == "Konachan":
-            await ctx.response.defer(ephemeral=True)
+            await ctx.response.defer()
             konachan = Embed(color=0x7DF9FF)
             konachan.add_field(
                 name="Get a random hentai image from Konachan You can include a tag too for a specific hentai", value="• **Example:** `/konachan (FOR A RANDOM HENTAI)` \ `/konachan TAG (FOR A SPECIFIC TAG)`\n• **Expected result**: `HENTAI GIVEN WITH OR WITHOUT TAG`\n• **Expected failure**: `TAG IS NOT API FORMATED`")
-            await ctx.followup.send(embed=konachan)
+            await ctx.edit_original_message(embed=konachan)
 
 class hentaiview(View):
     def __init__(self):
