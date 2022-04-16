@@ -1,0 +1,19 @@
+There is a major reason why I have decided to extended the partial development of the Currency System to August 2022 and it is very important. (I am using a library computer for this)
+
+# Hijack Incident
+
+On 10 April 2022, I was hijacked after buying groceries. 2 men (one with a gun who went to the passenger's side and other with gun on the driver's side) threatened to kill me if I do not get out of the car. I did and they took the car leaving me behind (they only wanted the car and not my personal items such as my phone or cash). After I went to the nearest supermarket so I can try and make a call to my mom/brother, a call came to me 10 minutes later that the car that looked like mine was found upside down near the RDP houses and after going to the police station and reporting it, my brother called and said he found the car upside down and he is guarding it until we (me, mom and police) arrive to see it. I was very traumatised after seeing the car upside down and they men who took it were not there, fearing that my life is now in danger(if they see me again, they would kill me). The police took my statement but they wanted the other person's statement who found the car but then... something took a 180 turn.
+
+# Conspiracy
+
+On 11 April 2022, there was a conspiracy raised that the hijacking was orchestrated by me and my friends, which I believe is weakening the case. The police started questioning anyone who I know and they said that they didn't know that I was hijacked or was nowhere nearby the car until one of them said they found the car. This happened when my phone failed to expand the call logs and they were focusing on the most recent calls and they believe it took almost 30 minutes for the incident to happen and a major misunderstanding (they couldn't know the difference between outgoing and incomming calls). Now they have focused all their attention on me thinking I have given someone the car and they went wild with it (again, I was the driver, the hijackers are the one who took the car).
+
+Then on 12 April 2022, all my devices (my phone, laptop and PC) are tapped. The police and my family are hoping for me to say something that will convince that I did orchestrated it. It will be for a whole month. The police can read my every move and if all my devices are off, they will come over to my house and start asking me questions. I am also going for interrogations almost every day. They are also questioning themselves if I am able to cross the provincial borders during the investigation (if they do allow me to cross the borders).
+
+# And how does this affect Jeanne?
+
+Since all my devices are tapped, the police can see every message I send and recieve and activity I do on them. The one thing I am scared they will get is my DigitalOceans login details which they can go everything in the VPS Jeanne is running.
+
+So I have temporarly handed it to Alyx who is collaborating with me to work on her for the meantime until a month has passed. I don't want any of my sensative information being grabbed so now I am forced to use ATMs instead of the banking app, use public PCs if I need to log into something that requires my password or OTP even thought they said they won't collect it, I do not trust them about it.
+
+If the outcome after a month takes an unexpected turn, then Alyx will be fully incharge of Jeanne meaning I have to give the login details to her. I can't entirely give it to her now since she hasn't learnt SQLite yet. I cannot focus on working on Jeanne during this time and the partial currency system is almost completed and I was the only one working on it until this happened and since I have a lot of plans for her, they will be forced on hold. For now, Alyx will focus on the simple tasks and I will deal with the complex ones when I return. I believe this will be the biggest backlog that I will face since I am out for a month due to this conspiracy.
