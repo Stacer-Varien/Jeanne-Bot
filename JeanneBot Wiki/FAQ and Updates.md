@@ -10,4 +10,4 @@
 
 >[**FAQ Part Two**](https://github.com/Varien-1936/Jeanne-Bot/blob/main/JeanneBot%20Wiki/Assets/FAQ%20and%20Update.md)
 
->[**Reason of the extension of Currency System**](https://github.com/Varien-1936/Jeanne-Bot/blob/main/JeanneBot%20Wiki/Assets/Reason%20of%20Extension.md)
+>[**Reason of the extension of Currency System**](https://github.com/Varien-1936/Jeanne-Bot/blob/2.9.2a/JeanneBot%20Wiki/Assets/Reason%20of%20Extension.md)
