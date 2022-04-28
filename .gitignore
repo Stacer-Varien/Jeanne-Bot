@@ -131,3 +131,6 @@ dmypy.json
 #databases
 database.db
 logging.db
+
+#files
+/assets/media.py

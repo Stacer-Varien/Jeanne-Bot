@@ -32,9 +32,9 @@ class helpmenu(ui.Select):
             await ctx.edit_original_message(embed=fun, view=imageview())
         if self.values[0] == "Info":
             await ctx.edit_original_message(embed=fun, view=infoview())
-        if self.values[0] == "Level":
+        if self.values[0] == "Manage":
             await ctx.edit_original_message(embed=fun, view=funview())
-        if self.values[0] == "Hentai":
+        if self.values[0] == "Misc":
             await ctx.edit_original_message(embed=fun, view=hentaiview())
 
 

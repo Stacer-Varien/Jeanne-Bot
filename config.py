@@ -5,6 +5,7 @@ from sqlite3 import connect
 load_dotenv()
 TOKEN = getenv("token")
 WEATHER=getenv("weather_api")
+TOPGG=getenv("topgg")
 
 db=connect('database.db')
 

@@ -31,15 +31,15 @@
 
     Example: `/kick USER REASON`
 
->**Memberban**
+>**Ban**
 
+*Member*
 * Bans a member of the server permanently. You can add a reason for what they did
 * **Required permissions:** Ban Members
 
     Example: `/memberban USER REASON`
 
->**Outsideban**
-
+*User*
 * Bans a user permanently and prevents them from entering your server before they could. You can add a reason for what they did
 * **NOTE:** A user ID must be used for the command
 * **Required permissions:** Ban Members

@@ -116,13 +116,13 @@ class slashinfo(Cog):
             features = guild.features
 
             if guild.premium_subscription_count < 2:
-                boostlevel = "Level 0"
+                boostlevel = "0"
             elif guild.premium_tier == 1:
-                boostlevel = "Level 1"
+                boostlevel = "1"
             elif guild.premium_tier == 2:
-                boostlevel = "Level 2"
+                boostlevel = "2"
             elif guild.premium_tier == 3:
-                boostlevel = "Level 3"
+                boostlevel = "3"
 
             serverinfo = Embed(title="Server's Info", color=0x00B0ff)
             serverinfo.add_field(name="Name", value=guild.name, inline=True)
@@ -133,7 +133,7 @@ class slashinfo(Cog):
             serverinfo.add_field(
                 name="Members", value=f"• **Humans:** {len(guild.humans)}\n• **Bots:** {len(guild.bots)}\n• **Total Members:** {guild.member_count}")
             serverinfo.add_field(name="Boost Status",
-                                 value=f"• **Boosters:** {len(guild.premium_subscribers)}\n• **Boosts:** {guild.premium_subscription_count}\n• **Boost Level:** {boostlevel}",
+                                 value=f"• **Boosters:** {len(guild.premium_subscribers)}\n• **Boosts:** {guild.premium_subscription_count}\n• **Tier:** {boostlevel}",
                             inline=True)
             serverinfo.add_field(name='Features',
                             value=features, inline=False)
@@ -205,7 +205,7 @@ class slashinfo(Cog):
             banner = guild.banner
 
             if guild.premium_subscription_count < 2:
-                nobanner = Embed(description="Server is not boosted at level 2")
+                nobanner = Embed(description="Server is not boosted at tier 2")
                 await interaction.followup.send(embed=nobanner)
             
             else:

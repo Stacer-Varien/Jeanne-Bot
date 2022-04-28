@@ -10,7 +10,6 @@ from config import db
 from assets.errormsgs import *
 from nextcord.ext.application_checks.errors import *
 from nextcord.ext.commands.errors import *
-from assets.needed import test_server
 
 
 format = "%d %b %Y | %H:%M:%S"
@@ -63,10 +62,22 @@ class slashmoderation(Cog):
 
                     warn = Embed(title="Member warned", color=0xFF0000)
                     warn.add_field(name="Member",
-                                    value=f"**>** **Name:** {member}\n**>** **ID:** {member.id}",
+                                    value=member,
                                     inline=True)
+                    warn.add_field(name="Member",
+                                    value=member.id,
+                                    inline=True)                                    
                     warn.add_field(
-                        name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.user}\n**>** **Reason:** {reason}\n**>** **Warn ID:** {warn_id}\n**>** **Date:** {date}", inline=True)
+                        name="Moderator", value=ctx.user, inline=True)
+                    warn.add_field(name="Reason",
+                                    value=reason,
+                                    inline=False)
+                    warn.add_field(name="Warn ID",
+                                    value=member,
+                                    inline=True)
+                    warn.add_field(name="Date",
+                                    value=date,
+                                    inline=True)
                     warn.set_thumbnail(url=member.display_avatar)
 
                     try:
@@ -174,6 +185,12 @@ class slashmoderation(Cog):
 
                     try:
                         cur.execute(f"UPDATE warnDatav2 SET warn_points = warn_points - 1 WHERE user_id = {result[0]} AND guild_id = {ctx.guild.id}")
+
+                        wp_query=cur.execute(f"SELECT warn_points FROM warnDatav2 WHERE user_id = {result[0]} AND guild_id = {ctx.guild.id}")
+                        warnpoints=wp_query.fetchone()[0]
+
+                        if warnpoints==0:
+                            cur.execute(f"DELETE FROM warnDatav2 WHERE user_id = {result[0]} AND guild_id = {ctx.guild.id}")
                     except:
                         pass
                     
@@ -186,7 +203,7 @@ class slashmoderation(Cog):
                         modlog = ctx.guild.get_channel(modlog_channel_id)
                         await modlog.send(embed=revoked_warn)
                         revoke = Embed(
-                            description=f"Member has been warned. Check {modlog.mention}", color=0xFF0000)
+                            description=f"Warn revoked. Check {modlog.mention}", color=0xFF0000)
                         await ctx.followup.send(embed=revoke)
                     except:
                         await ctx.followup.send(embed=revoked_warn)                    
@@ -230,8 +247,10 @@ class slashmoderation(Cog):
 
                 await member.ban(reason=reason)
                 ban = Embed(title="Member Banned", color=0xFF0000)
-                ban.add_field(name="Member", value=f"**>** **Name:** {member}\n**>** **ID:** {member.id}", inline=True)
-                ban.add_field(name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.user}\n**>** **Reason:** {reason}", inline=True)
+                ban.add_field(name="Name", value=member, inline=True)
+                ban.add_field(name="ID", value=member.id, inline=True)
+                ban.add_field(name="Moderator", value=ctx.user, inline=True)
+                ban.add_field(name="Reason", value=reason, inline=False)
                 ban.set_thumbnail(url=member.display_avatar)
 
                 try:
@@ -276,8 +295,10 @@ class slashmoderation(Cog):
             else:
                 await guild.ban(user, reason=reason)
                 ban = Embed(title="User Banned", color=0xFF0000)
-                ban.add_field(name="User", value=f"**>** **Name:** {user}\n**>** **ID:** {user.id}", inline=True)
-                ban.add_field(name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.user}\n**>** **Reason:** {reason}", inline=True)
+                ban.add_field(name="Name", value=user, inline=True)
+                ban.add_field(name="ID", value=user.id, inline=True)
+                ban.add_field(name="Moderator", value=ctx.user, inline=True)
+                ban.add_field(name="Reason", value=reason, inline=False)
                 ban.set_thumbnail(url=user.display_avatar)
                 
                 try:
@@ -442,11 +463,10 @@ class slashmoderation(Cog):
                 user = await self.bot.fetch_user(user_id)
                 await ctx.guild.unban(user, reason=reason)
                 unban = Embed(title="User Unbanned", color=0xFF0000)
-                unban.add_field(name="Member",
-                                value=f"**>** **Name:** {user}\n**>** **ID:** {user.id}",
-                                inline=True)
-                unban.add_field(
-                    name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.user}\n**>** **Reason:** {reason}", inline=True)
+                unban.add_field(name="Name", value=user, inline=True)
+                unban.add_field(name="ID", value=user.id, inline=True)
+                unban.add_field(name="Moderator", value=ctx.user, inline=True)
+                unban.add_field(name="Reason", value=reason, inline=False)
                 unban.set_thumbnail(url=user.display_avatar)
                 try:
                     modlog_channel_query = db.execute(
@@ -502,11 +522,14 @@ class slashmoderation(Cog):
                             await member.edit(timeout=utcnow()+timedelta(seconds=timed), reason=reason)
                             mute = Embed(
                                 title="Member Muted", color=0xFF0000)
-                            mute.add_field(name="Member",
-                                            value=f"**>** **Name:** {member}\n**>** **ID:** {member.id}",
-                                            inline=True)
+                            mute.add_field(name="Member", value=member, inline=True)
+                            mute.add_field(name="ID", value=member.id, inline=True)
                             mute.add_field(
-                                name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.user}\n**>** **Reason:** {reason}\n**>** **Duration:** {time}", inline=True)
+                                name="Moderator", value=ctx.user, inline=True)
+                            mute.add_field(
+                                name="Duration", value=time, inline=True)
+                            mute.add_field(
+                                name="Reason", value=reason, inline=False)
                             mute.set_thumbnail(url=member.display_avatar)
                             try:
                                 modlog_channel_query = db.execute(
@@ -554,11 +577,12 @@ class slashmoderation(Cog):
                     await member.edit(timeout=None, reason=reason)
                     unmute = Embed(
                         title="Member Unmuted", color=0xFF0000)
-                    unmute.add_field(name="Member",
-                                    value=f"**>** **Name:** {member}\n**>** **ID:** {member.id}",
-                                    inline=True)
+                    unmute.add_field(name="Member", value=member, inline=True)
+                    unmute.add_field(name="ID", value=member.id, inline=True)
                     unmute.add_field(
-                        name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.user}\n**>** **Reason:** {reason}", inline=True)
+                        name="Moderator", value=ctx.user, inline=True)
+                    unmute.add_field(
+                        name="Reason", value=reason, inline=False)
                     unmute.set_thumbnail(url=member.display_avatar)
                     try:
                         modlog_channel_query = db.execute(

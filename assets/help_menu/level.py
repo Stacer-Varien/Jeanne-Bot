@@ -23,13 +23,13 @@ class infohelp(ui.Select):
             await ctx.response.defer(ephemeral=True)
             level = Embed(color=0x7DF9FF)
             level.add_field(
-                name="See your level or someone's level", value="• **Example:** `/level (IF YOURSELF)` \ `/level MEMBER` (IF MEMBER)\n• **Expected result**: `MEMBER'S LEVEL STATS BOTH GLOBAL AND SERVER`\n• **Expected failure**: `FAILED TO GET LEVEL STATS MESSAGE. THIS IS BECAUSE THE MEMBER HASN'T SAID A MESSAGE YET`")
+                name="See your level or someone's level", value="• **Example:** `/level (IF YOURSELF)` \ `/level MEMBER` (IF MEMBER)\n• **Expected failure**: Failed to get member's level stats. This is because the member hasn't chatted in the server yet")
             await ctx.edit_original_message(embed=level)
         if self.values[0] == "Rank":
             await ctx.response.defer(ephemeral=True)
             rank = Embed(color=0x7DF9FF)
             rank.add_field(
-                name="Check who is the top 15 users (if applicable) of the server. You might be lucky if your name shows\n• **NOTE:** You will be given 2 options whether to see the server or global rank.", value="• **Example:** `/rank SERVER` (IF YOU WANT THE RANK OF THE SERVER) / `/rank GLOBAL` (IF FOR EVERYONE IN THE XP DATABASE)\n• **Expected result**: `RANKED MEMBERS IN THE SERVER OR GLOBALY`")
+                name="Check who is the top 15 users (if applicable) of the server. You might be lucky if your name shows\n• **NOTE:** You will be given 2 options whether to see the server or global rank.", value="• **Example:** `/rank SERVER` (IF YOU WANT THE RANK OF THE SERVER) / `/rank GLOBAL` (IF FOR EVERYONE IN THE XP DATABASE)")
             await ctx.edit_original_message(embed=rank)
 
 

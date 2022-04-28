@@ -1,6 +1,6 @@
 # Image Commands
 
-**NOTE:** Saber, Jeanne, Neko and Wallpaper commands uses the bot's API. All images returned by these commands are JPG in order to save space.
+**NOTE:** Saber and Jeanne commands uses the bot's API. All images returned by these commands are JPG in order to save space.
 
 >**Kitsune**
 
