@@ -64,7 +64,7 @@ class slashmoderation(Cog):
                     warn.add_field(name="Member",
                                     value=member,
                                     inline=True)
-                    warn.add_field(name="Member",
+                    warn.add_field(name="ID",
                                     value=member.id,
                                     inline=True)                                    
                     warn.add_field(
@@ -73,7 +73,7 @@ class slashmoderation(Cog):
                                     value=reason,
                                     inline=False)
                     warn.add_field(name="Warn ID",
-                                    value=member,
+                                    value=warn_id,
                                     inline=True)
                     warn.add_field(name="Date",
                                     value=date,
