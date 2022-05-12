@@ -17,11 +17,11 @@ class slashmanage(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
+            botbanned=botbanned_data[0]
+
+            if ctx.user.id==botbanned:
                 pass
         except:
                 guild = ctx.guild
@@ -43,11 +43,11 @@ class slashmanage(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
+            botbanned=botbanned_data[0]
+
+            if ctx.user.id==botbanned:
                 pass
         except:
                 await role.edit(name=new_name)
@@ -68,11 +68,11 @@ class slashmanage(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
+            botbanned=botbanned_data[0]
+
+            if ctx.user.id==botbanned:
                 pass
         except:
                 await role.delete()
@@ -93,11 +93,11 @@ class slashmanage(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
+            botbanned=botbanned_data[0]
+
+            if ctx.user.id==botbanned:
                 pass
         except:
                 await member.add_roles(role)
@@ -118,11 +118,11 @@ class slashmanage(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
+            botbanned=botbanned_data[0]
+
+            if ctx.user.id==botbanned:
                 pass
         except:
                 await member.remove_roles(role)
@@ -147,11 +147,11 @@ class slashmanage(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
+            botbanned=botbanned_data[0]
+
+            if ctx.user.id==botbanned:
                 pass
         except:
                 await channel.edit(name=new_name)
@@ -176,11 +176,11 @@ class slashmanage(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
+            botbanned=botbanned_data[0]
+
+            if ctx.user.id==botbanned:
                 pass
         except:
                 await channel.delete()
@@ -201,11 +201,11 @@ class slashmanage(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
+            botbanned=botbanned_data[0]
+
+            if ctx.user.id==botbanned:
                 pass
         except:
                 if channel_type == 'Text Channel':
@@ -239,11 +239,11 @@ class slashmanage(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
+            botbanned=botbanned_data[0]
+
+            if ctx.user.id==botbanned:
                 pass
         except:
             if type == 'welcomer':
@@ -399,11 +399,11 @@ class slashmanage(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
+            botbanned=botbanned_data[0]
+
+            if ctx.user.id==botbanned:
                 pass
         except:
                 if type == 'welcomer':

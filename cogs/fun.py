@@ -19,11 +19,9 @@ class slashfun(Cog):
                 f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if interaction.user.id == botbanned:
+                pass
         except:
             embed = Embed(color=0x0000FF)
             embed.add_field(name="Question:", value=f'{question}', inline=False)
@@ -39,11 +37,9 @@ class slashfun(Cog):
                 f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if interaction.user.id == botbanned:
+                pass
         except:
             rolled = randint(1, 6)
             embed = Embed(color=0x0000FF)
@@ -59,11 +55,9 @@ class slashfun(Cog):
                 f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if interaction.user.id == botbanned:
+                pass
         except:
             await interaction.followup.send(embed=Embed(color=0x0000FF,
                                                             description=f"`{choice(['Heads', 'Tails'])}`"))
@@ -76,11 +70,9 @@ class slashfun(Cog):
                 f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if interaction.user.id == botbanned:
+                pass
         except:
             await interaction.followup.send(text[::-1])
 
@@ -92,11 +84,9 @@ class slashfun(Cog):
                 f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if interaction.user.id == botbanned:
+                pass
         except:
             guessit = Embed(
                 description="I'm thinking of a number between 1 to 10.\nYou have 5 seconds to guess it!", color=0x00FFFF)
@@ -133,11 +123,9 @@ class slashfun(Cog):
                 f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if interaction.user.id == botbanned:
+                pass
         except:
             file_path_type = ["./Media/Animemes/*.mp4", "./Media/Animemes/*.jpg"]
             animemes = glob(choice(file_path_type))
@@ -155,11 +143,9 @@ class slashfun(Cog):
                 f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if interaction.user.id == botbanned:
+                pass
         except:
             option_name1letters = first_word[:round(len(first_word) / 2)]
             option_name2letters = second_word[round(len(second_word) / 2):]
@@ -183,11 +169,9 @@ class slashfun(Cog):
                 f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if interaction.user.id == botbanned:
+                pass
         except:
             pick = [choice1, choice2]
             choose = Embed(

@@ -14,18 +14,16 @@ class slashinfo(Cog):
         self.bot = bot
 
     @jeanne_slash(description="See the bot's status from development to now")
-    async def stats(self, interaction : Interaction):
-        await interaction.response.defer()
+    async def stats(self, ctx : Interaction):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
             botowner = self.bot.get_user(597829930964877369)
             embed = Embed(title="Bot stats", color=0x236ce1)
@@ -52,24 +50,22 @@ class slashinfo(Cog):
 
             embed.set_thumbnail(
                 url=self.bot.user.avatar)
-            await interaction.followup.send(embed=embed)
+            await ctx.followup.send(embed=embed)
 
     @jeanne_slash(description="See the information of a member or yourself")
-    async def userinfo(self, interaction : Interaction, member: Member = SlashOption(description="Add a member", required=False)):
-        await interaction.response.defer()
+    async def userinfo(self, ctx : Interaction, member: Member = SlashOption(description="Add a member", required=False)):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
             if member == None:
-                member = interaction.user
+                member = ctx.user
             user = await self.bot.fetch_user(member.id)
             hasroles = [
                 role.mention for role in member.roles][1:][:: -1]
@@ -95,23 +91,21 @@ class slashinfo(Cog):
                 pass
             else:
                 userinfo.set_image(url=user.banner)
-            await interaction.followup.send(embed=userinfo)
+            await ctx.followup.send(embed=userinfo)
 
     @jeanne_slash(description="Get information about this server")
-    async def serverinfo(self, interaction : Interaction):
-        await interaction.response.defer()
+    async def serverinfo(self, ctx : Interaction):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:        
-            guild = interaction.guild
+            guild = ctx.guild
             emojis = [str(x) for x in guild.emojis]
             features = guild.features
 
@@ -151,33 +145,31 @@ class slashinfo(Cog):
                 serverinfo.set_image(url=guild.splash)
 
             if len(emojis) == 0:
-                await interaction.followup.send(embed=serverinfo)
+                await ctx.followup.send(embed=serverinfo)
 
             else:
                 emojie = Embed(title="Emojis", description=''.join(emojis[:40]), color=0x00B0ff)
 
                 e=[serverinfo, emojie]
                 
-                await interaction.followup.send(embeds=e)
+                await ctx.followup.send(embeds=e)
 
 
     @jeanne_slash(description="Check how fast I respond to a command")
-    async def ping(self, interaction : Interaction):
-        await interaction.response.defer()
+    async def ping(self, ctx : Interaction):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
             start_time = time()
             test = Embed(description="Testing ping", color=0x236ce1)
-            msg= await interaction.followup.send(embed=test)
+            msg= await ctx.followup.send(embed=test)
 
             ping = Embed(color=0x236ce1)
             ping.add_field(
@@ -188,84 +180,78 @@ class slashinfo(Cog):
             await msg.edit(embed=ping)
 
     @jeanne_slash(description="See the server's banner")
-    async def guildbanner(self, interaction : Interaction):
-        await interaction.response.defer()
+    async def guildbanner(self, ctx : Interaction):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
-            guild = interaction.guild
+            guild = ctx.guild
             banner = guild.banner
 
             if guild.premium_subscription_count < 2:
                 nobanner = Embed(description="Server is not boosted at tier 2")
-                await interaction.followup.send(embed=nobanner)
+                await ctx.followup.send(embed=nobanner)
             
             else:
                 try:
                     embed = Embed(colour=0x00B0ff)
                     embed.set_footer(text=f"{guild.name}'s banner")
                     embed.set_image(url=banner)
-                    await interaction.followup.send(embed=embed)
+                    await ctx.followup.send(embed=embed)
                 except:
                     embed=Embed(description='Guild has no banner')
-                    await interaction.followup.send(embed=embed)
+                    await ctx.followup.send(embed=embed)
 
     @jeanne_slash(description="See your avatar or another member's avatar")
-    async def avatar(self, interaction: Interaction, member: Member = SlashOption(description="Add a member", required=False)):
-        await interaction.response.defer()
+    async def avatar(self, ctx: Interaction, member: Member = SlashOption(description="Add a member", required=False)):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
             if member==None:
-                member=interaction.user
+                member=ctx.user
 
             avatar = Embed(title=f"{member}'s Avatar", color=0x236ce1)
             avatar.set_image(url=member.avatar)
-            await interaction.followup.send(embed=avatar)
+            await ctx.followup.send(embed=avatar)
 
     @jeanne_slash(description="See your guild avatar or a member's guild avatar")
-    async def guildavatar(self, interaction: Interaction, member: Member = SlashOption(description="Add a member", required=False)):
-        await interaction.response.defer()
+    async def guildavatar(self, ctx: Interaction, member: Member = SlashOption(description="Add a member", required=False)):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
             if member == None:
-                member = interaction.user
+                member = ctx.user
 
             guild_avatar = Embed(title=f"{member}'s Avatar", color=0x236ce1)
 
             try:
                 guild_avatar.set_image(url=member.guild_avatar)
-                await interaction.followup.send(embed=guild_avatar)
+                await ctx.followup.send(embed=guild_avatar)
             except:
                 guild_avatar.set_image(url=member.avatar)
                 guild_avatar.set_footer(
                     text="Member has no server avatar. Passed normal avatar instead")
-                await interaction.followup.send(embed=guild_avatar)
+                await ctx.followup.send(embed=guild_avatar)
 
 
 def setup(bot):

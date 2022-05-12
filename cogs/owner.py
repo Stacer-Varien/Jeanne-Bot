@@ -3,8 +3,6 @@ from io import StringIO
 from nextcord.ext.commands import Cog
 from nextcord import *
 from nextcord import slash_command as jeanne_slash
-from assets.needed import test_server
-from assets.errormsgs import owner_only
 from os import execv
 from sys import executable, argv
 from config import db
@@ -23,17 +21,14 @@ class slashowner(Cog):
     @jeanne_slash(description="Changes the bot's play activity")
     @is_owner()
     async def activity(self, ctx : Interaction, activitytype=SlashOption(description="Choose an activity type", choices=['listen', 'play'], required=True), activity=SlashOption(description="What is the new activity")):
-        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
                 if activitytype=="listen":
                     await self.bot.change_presence(activity=Activity(type=ActivityType.listening, name=activity))
@@ -47,17 +42,14 @@ class slashowner(Cog):
     @jeanne_slash(description="Finds a user")
     @is_owner()
     async def finduser(self, ctx: Interaction, user_id=SlashOption(description="Which user?")):
-        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
                 user = await self.bot.fetch_user(user_id)
                 if user.bot == True:
@@ -74,17 +66,14 @@ class slashowner(Cog):
     @jeanne_slash(description="Restart me to be updated")
     @is_owner()
     async def update(self, ctx:Interaction):
-        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
                 await ctx.followup.send(f"YAY! NEW UPDATE!")
                 restart_bot()
@@ -92,17 +81,14 @@ class slashowner(Cog):
     @jeanne_slash(description="Botban a user from using the bot")
     @is_owner()
     async def botban(self, ctx: Interaction, user_id=SlashOption(description="Which user?"), reason = SlashOption(description="Add a reason")):
-        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
                 user=await self.bot.fetch_user(user_id)
                 botbanned_channel = ctx.guild.get_channel(928962613939949618)
@@ -154,17 +140,14 @@ class slashowner(Cog):
     @jeanne_slash(description="Evaluates a code")
     @is_owner()
     async def evaluate(self, ctx: Interaction):
-        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
                 await ctx.followup.send("Insert your code.\nType 'cancel' if you don't want to evaluate")
                 def check(m):
@@ -195,17 +178,14 @@ class slashowner(Cog):
     @jeanne_slash(description="Makes me leave a server")
     @is_owner()
     async def leave_server(self, ctx: Interaction, server_id=SlashOption(description="What is the server's ID?", required=True)):
-        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
             guild=await self.bot.fetch_guild(server_id)
             

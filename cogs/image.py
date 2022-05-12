@@ -19,14 +19,12 @@ class slashimages(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
             kistune_api = get(kitsune_nekoslife).json()
             kitsune = Embed(color=0xFFC0CB)
@@ -39,14 +37,12 @@ class slashimages(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
             wallpaper = Embed(color=0xFFC0CB)
             wallpaper.set_image(url=choice(wallpaper1936))
@@ -58,14 +54,12 @@ class slashimages(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
             file_path_type = ["./Media/Jeanne/*.jpg"]
             images = glob(choice(file_path_type))
@@ -80,14 +74,12 @@ class slashimages(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
             file_path_type = ["./Media/Saber/*.jpg"]
             images = glob(choice(file_path_type))
@@ -102,14 +94,12 @@ class slashimages(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
             neko = Embed(color=0xFFC0CB)
             neko.set_image(url=choice(neko1936))

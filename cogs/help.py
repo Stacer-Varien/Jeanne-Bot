@@ -19,11 +19,9 @@ class slashhelp(Cog):
                     f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
             botbanned=botbanned_data[0]
-            reason=botbanned_data[1]
 
-            botbanned_user=await self.bot.fetch_user(botbanned)
-            if ctx.user.id==botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
             if help_module==None:
                 help=Embed(description="Click on the drop menu below for more help on the dropmenu")

@@ -76,24 +76,22 @@ class levelling(Cog):
             await self.bot.process_commands(message)
 
     @jeanne_slash(description="See your level or someone else's level")
-    async def level(self, interaction: Interaction, member: Member = SlashOption(description="Which member?", required=False)):
-        await interaction.response.defer()
+    async def level(self, ctx: Interaction, member: Member = SlashOption(description="Which member?", required=False)):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
             if member is None:
-                member = interaction.user
+                member = ctx.user
             try:
                 query1 = db.execute(
-                    f"SELECT * FROM serverxpData where guild_id = {interaction.guild.id} AND user_id = {member.id}")
+                    f"SELECT * FROM serverxpData where guild_id = {ctx.guild.id} AND user_id = {member.id}")
                 query1_data = query1.fetchone()
                 slvl = query1_data[2]
                 sexp = query1_data[3]
@@ -125,29 +123,27 @@ class levelling(Cog):
                                 value=f"\n**>** **Level:** {glvl}\n**>** **Experience:** {gexp}\{g_next_lvl_exp}XP\n**>** **Experience to Next Level:** {g_next_lvl_exp - gexp}XP", inline=True)
                 embed.add_field(
                     name="**__Progress__**", value=f"**>** **Server:** {blue_box * ':blue_square:' + swhite_box * ':white_large_square:'}\n**>** **Global:** {red_box * ':red_square:' + gwhite_box * ':white_large_square:'}", inline=False)
-                await interaction.followup.send(embed=embed)
+                await ctx.followup.send(embed=embed)
             except:
                 no_exp = Embed(description="Failed to get level stats")
-                await interaction.followup.send(embed=no_exp)
+                await ctx.followup.send(embed=no_exp)
 
     @jeanne_slash(description="Check the users with the most XP in the server")
-    async def rank(self, interaction: Interaction, type=SlashOption(description="Server or Global specific?", choices=["server", "global"])):
-        await interaction.response.defer()
+    async def rank(self, ctx: Interaction, type=SlashOption(description="Server or Global specific?", choices=["server", "global"])):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
             if type == "server":
 
                 leaders_query = db.execute(
-                    f"SELECT user_id FROM serverxpData WHERE guild_id = {interaction.guild.id} ORDER BY cumulative_exp DESC LIMIT 15"
+                    f"SELECT user_id FROM serverxpData WHERE guild_id = {ctx.guild.id} ORDER BY cumulative_exp DESC LIMIT 15"
                 )
 
                 embed = Embed(color=0xFFD700)
@@ -159,7 +155,7 @@ class levelling(Cog):
                     embed.add_field(name="_ _", value=f"**{r}**. {p}")
                     r += 1
 
-                await interaction.followup.send(embed=embed)
+                await ctx.followup.send(embed=embed)
 
                 
 
@@ -178,7 +174,7 @@ class levelling(Cog):
                     embed.add_field(name="_ _", value=f"**{r}**. {p}")
                     r += 1
 
-                await interaction.followup.send(embed=embed)
+                await ctx.followup.send(embed=embed)
 
 
 def setup(bot):

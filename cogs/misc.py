@@ -35,14 +35,12 @@ class slashmisc(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
             invite = Embed(
                 title="Invite me!",
@@ -62,14 +60,12 @@ class slashmisc(Cog):
         await ctx.response.defer(ephemeral=True)
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
             await ctx.followup.send("Type something!", ephemeral=True)
 
@@ -77,7 +73,7 @@ class slashmisc(Cog):
                 return m.author == ctx.user and m.content
 
             try:
-                msg = await self.bot.wait_for('message', check=check, timeout=10)
+                msg = await self.bot.wait_for('message', check=check, timeout=300)
 
                 await ctx.followup.send("Sent", ephemeral=True)
                 await msg.delete()
@@ -93,14 +89,12 @@ class slashmisc(Cog):
         await ctx.response.defer(ephemeral=True)
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
             ask = Embed(description="Type something\nMaxinum characters allowed is 4096")
             await ctx.followup.send(embed=ask)
@@ -109,7 +103,7 @@ class slashmisc(Cog):
                 return m.author == ctx.user and m.content
 
             try:
-                msg = await self.bot.wait_for('message', check=check, timeout=180)
+                msg = await self.bot.wait_for('message', check=check, timeout=300)
 
                 await ctx.followup.send("Sent", ephemeral=True)
 
@@ -140,14 +134,12 @@ class slashmisc(Cog):
         await ctx.response.defer(ephemeral=True)
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:        
             await ctx.followup.send("Please [click here](https://forms.gle/DvGiJWXjbZWK3iy88) to submit your report.\nPlease note that I will not be collecting any of your personal information.", ephemeral=True)
 
