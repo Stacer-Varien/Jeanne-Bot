@@ -25,14 +25,12 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
                 if reason == None:
                     reason = "Unspecified"
@@ -45,20 +43,10 @@ class slashmoderation(Cog):
                     warn_id = f"{randint(0,100000)}"
                     date=datetime.now().strftime('%Y-%m-%d %H:%M')
 
-                    cursor1 = db.execute("INSERT OR IGNORE INTO warnData (guild_id, user_id, moderator_id, reason, warn_id, date) VALUES (?,?,?,?,?,?)", (ctx.guild.id, member.id, ctx.user.id, reason, warn_id, date))
+                    db.execute("INSERT OR IGNORE INTO warnData (guild_id, user_id, moderator_id, reason, warn_id, date) VALUES (?,?,?,?,?,?)", (ctx.guild.id, member.id, ctx.user.id, reason, warn_id, date))
 
-                    cursor2 = db.execute("INSERT OR IGNORE INTO warnDatav2 (guild_id, user_id, warn_points) VALUES (?,?,?)", (
+                    db.execute("INSERT OR IGNORE INTO warnDatav2 (guild_id, user_id, warn_points) VALUES (?,?,?)", (
                         ctx.guild.id, member.id, 1))
-
-                    if cursor1.rowcount == 0:
-                        db.execute(
-                            f"UPDATE warnData SET moderator_id = {ctx.user.id}, reason = {reason}, warn_id = {warn_id} and date = {date} WHERE guild_id = {ctx.guild.id} AND user_id = {member.id}")
-                    db.commit()
-
-                    if cursor2.rowcount==0:
-                        db.execute(
-                            f"UPDATE warnDatav2 SET warn_points = warn_points + 1 WHERE guild_id = {ctx.guild.id} AND user_id = {member.id}")
-                    db.commit()
 
                     warn = Embed(title="Member warned", color=0xFF0000)
                     warn.add_field(name="Member",
@@ -97,22 +85,23 @@ class slashmoderation(Cog):
         if isinstance(error, ApplicationMissingPermissions):
             await ctx.response.defer()
             await ctx.followup.send(embed=warn_perm)
+    
+    @jeanne_slash(description="Main list_warns command")
+    async def list_warns(self, ctx: Interaction):
+        pass
 
-    @jeanne_slash(description="View warnings in the server or a member")
-    async def list_warns(self, ctx: Interaction, member: Member = SlashOption(description="Who's warnings you wanna see?", required=False)):
+    @list_warns.subcommand(description="View warnings in the server or a member")
+    async def guild(self, ctx: Interaction, member: Member = SlashOption(description="Who's warnings you wanna see?", required=False)):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
-            if member == None:
                 cur = db.cursor()
                 cur.execute(
                     f"SELECT * FROM warnDATAv2 WHERE guild_id = {ctx.guild.id}")
@@ -130,29 +119,45 @@ class slashmoderation(Cog):
                         embed.description += f"**{warned_member}**\n**Warn points**: {warn_points}\n\n"
                     await ctx.followup.send(embed=embed)
 
-            else:
-                cur = db.cursor()
-                cur.execute(
+    @list_warns.subcommand(description="View warnings in the server or a member")
+    async def member(self, ctx: Interaction, member: Member = SlashOption(description="Who's warnings you wanna see?", required=False)):
+        await ctx.response.defer()
+        try:
+            botbanquery = db.execute(
+                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+            botbanned_data = botbanquery.fetchone()
+            botbanned = botbanned_data[0]
+
+            if ctx.user.id == botbanned:
+                pass
+        except:
+            if member == None:
+                member = ctx.user
+
+            cur = db.cursor()
+            cur.execute(
                     f"SELECT * FROM warnDATA user WHERE user_id = {member.id} AND guild_id = {member.guild.id}")
-                record = cur.fetchall()
-                if len(record) == 0:
+            record = cur.fetchall()
+            if len(record) == 0:
                     await ctx.followup.send(f"{member} has no warn IDs")
                     return
-                embed = Embed(
+            embed = Embed(
                     title=f"{member}'s warnings", colour=0xFF0000)
-                embed.description = ""
-                embed.set_thumbnail(url=member.display_avatar)
-                for i in record:
+            embed.description = ""
+            embed.set_thumbnail(url=member.display_avatar)
+            for i in record:
                     moderator = await self.bot.fetch_user(i[2])
                     reason = i[3]
                     warn_id = i[4]
                     date = i[5]
 
-                    if date==None:
-                        date="Unspecified due to new update"
+                    if date == None:
+                        date = "Unspecified due to new update"
 
-                    embed.add_field(name=f"`{warn_id}`", value=f"**Moderator:** {moderator}\n**Reason:** {reason}\n**Date:** {date}", inline=False)
-                await ctx.followup.send(embed=embed)
+                    embed.add_field(
+                        name=f"`{warn_id}`", value=f"**Moderator:** {moderator}\n**Reason:** {reason}\n**Date:** {date}", inline=False)
+            await ctx.followup.send(embed=embed)
+
 
     @jeanne_slash(description="Revoke a warn by warn ID")
     @has_permissions(kick_members=True)
@@ -160,14 +165,12 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
                 cur = db.cursor()
                 cur.execute(
@@ -226,14 +229,12 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
             if member == ctx.user:
                 failed = Embed(description="You can't ban yourself")
@@ -269,14 +270,12 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
             user = await self.bot.fetch_user(user_id)
             guild = ctx.guild
@@ -336,14 +335,12 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
                 if member == ctx.user:
                     failed = Embed(description="You can't kick yourself out")
@@ -389,14 +386,12 @@ class slashmoderation(Cog):
         await ctx.response.defer(ephemeral=True)
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
                     if limit==None:
                         limit=100
@@ -424,14 +419,12 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
                 await member.edit(nick=nickname)
                 setnick = Embed(color=0x00FF68)
@@ -451,14 +444,12 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
                 user = await self.bot.fetch_user(user_id)
                 await ctx.guild.unban(user, reason=reason)
@@ -498,14 +489,12 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
                     if time == None:
                         time = '28d'
@@ -557,14 +546,12 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
                 if reason == None:
                     reason = "Unspecified"
