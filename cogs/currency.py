@@ -13,7 +13,7 @@ class currencysys(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @jeanne_slash(description="Register to use the currency system", guild_ids=[test_server])
+    @jeanne_slash(description="Register to use the currency system")
     async def register(self, ctx: Interaction):
         await ctx.response.defer(ephemeral=True)
         try:
@@ -99,7 +99,7 @@ class currencysys(Cog):
             await ctx.send(embed=daily)
 
     @daily.error
-    async def warn_error(self, ctx: Interaction, error):
+    async def daily_error(self, ctx: Interaction, error):
         if isinstance(error, CallableOnCooldown):
             reset_date = error.resets_at
             await ctx.response.defer()
@@ -107,6 +107,126 @@ class currencysys(Cog):
                 description=f"You have already claimed your daily.\nYour next claim is on `{reset_date.strftime('%Y-%m-%d %H:%M')}`", color=Color.red())
             await ctx.followup.send(embed=cooldown)
 
+    @jeanne_slash(description="Main guess command")
+    async def guess(self, ctx: Interaction):
+        pass
+
+    @guess.subcommand(description="Guess my number and you can win 20 credits")
+    @cooldown(1, 3600, bucket=SlashBucket.author)
+    async def free(self, ctx: Interaction):
+        await ctx.response.defer()
+        try:
+            botbanquery = db.execute(
+                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+            botbanned_data = botbanquery.fetchone()
+            botbanned = botbanned_data[0]
+
+            if ctx.user.id == botbanned:
+                pass
+        except:
+            guessit = Embed(
+                description="I'm thinking of a number between 1 to 10.\nYou have 5 seconds to guess it!", color=0x00FFFF)
+            await ctx.followup.send(embed=guessit)
+
+            def is_correct(m):
+                return m.author == ctx.user and m.content.isdigit()
+
+            answer = randint(1, 10)
+
+            try:
+                guess = await self.bot.wait_for("message", check=is_correct, timeout=5.0)
+            except TimeoutError:
+                timeout = Embed(
+                    description=f"Sorry but you took too long. It was {answer}", color=0xFF0000)
+                timeout.set_thumbnail(url=wrong_answer_or_timeout)
+                return await ctx.followup.send(embed=timeout)
+
+            if int(guess.content) == answer:
+                try:
+                    db.execute(f"UPDATE bankData SET amount = amount + 10 WHERE user_id = {ctx.user.id}")
+                    db.commit()
+                    correct = Embed(description="YES! YOU GUESSED IT CORRECTLY!\nYou have been given 20 credits", color=0x008000)
+                except:
+                    correct = Embed(
+                        description="YES!", color=0x008000)
+                correct.set_image(url=correct_answer)
+                await ctx.followup.send(embed=correct)
+            else:
+                wrong = Embed(
+                    description=f"Wrong answer. It was {answer}", color=0xFF0000)
+                wrong.set_thumbnail(url=wrong_answer_or_timeout)
+                await ctx.followup.send(embed=wrong)
+
+    @free.error
+    async def free_error(self, ctx: Interaction, error):
+        if isinstance(error, CallableOnCooldown):
+            reset_date = error.resets_at.strftime('%H:%M')
+            await ctx.response.defer()
+            cooldown = Embed(
+                description=f"You have already guessed the correct number\nYou can try again after `{reset_date}`\n\nIf you want, you can bet with your cash which has a lower cooldown by using the `/guess bet` command", color=Color.red())
+            await ctx.followup.send(embed=cooldown)
+
+    @guess.subcommand(description="Guess my number and you can win 20 credits")
+    @cooldown(1, 30, bucket=SlashBucket.author)
+    async def bet(self, ctx: Interaction, bet=SlashOption(required=True)):
+        await ctx.response.defer()
+        try:
+            botbanquery = db.execute(
+                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+            botbanned_data = botbanquery.fetchone()
+            botbanned = botbanned_data[0]
+
+            if ctx.user.id == botbanned:
+                pass
+        except:
+            if int(bet) < 5:
+                bethigher=Embed(description='Please bet an amount higher than 5')
+                await ctx.followup.send(embed=bethigher)
+            else:
+                guessit = Embed(
+                description="I'm thinking of a number between 1 to 10.\nYou have 5 seconds to guess it!", color=0x00FFFF)
+                await ctx.followup.send(embed=guessit)
+
+                def is_correct(m):
+                    return m.author == ctx.user and m.content.isdigit()
+
+                answer = randint(1, 10)
+
+                try:
+                    guess = await self.bot.wait_for("message", check=is_correct, timeout=5.0)
+                except TimeoutError:
+                    timeout = Embed(
+                    description=f"Sorry but you took too long. It was {answer}", color=0xFF0000)
+                    timeout.set_thumbnail(url=wrong_answer_or_timeout)
+                    return await ctx.followup.send(embed=timeout)
+
+                if int(guess.content) == 4:
+                    try:
+                        db.execute(
+                            f"UPDATE bankData SET amount = amount + 10 WHERE user_id = {ctx.user.id}")
+                        db.commit()
+                        correct = Embed(
+                            description="YES! YOU GUESSED IT CORRECTLY!\nYou have been given 20 credits", color=0x008000)
+                    except:
+                        correct = Embed(
+                            description="YES!", color=0x008000)
+                    correct.set_image(url=correct_answer)
+                    await ctx.followup.send(embed=correct)
+                else:
+                    db.execute(f"UPDATE bankData SET amount = amount - {int(bet)} WHERE user_id = {ctx.user.id}")
+                    db.commit()
+                    wrong = Embed(
+                        description=f"Wrong answer. It was {answer}", color=0xFF0000)
+                    wrong.set_thumbnail(url=wrong_answer_or_timeout)
+                    await ctx.followup.send(embed=wrong)
+
+    @bet.error
+    async def bet_error(self, ctx: Interaction, error):
+        if isinstance(error, CallableOnCooldown):
+            await ctx.response.defer()
+            cooldown = Embed(
+                description=f"Calm down. Please wait for a bit\nYou can try again after `{error.retry_after} seconds`", color=Color.red())
+            await ctx.followup.send(embed=cooldown)
 
 def setup(bot):
     bot.add_cog(currencysys(bot))

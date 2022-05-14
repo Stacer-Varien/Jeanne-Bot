@@ -76,45 +76,6 @@ class slashfun(Cog):
         except:
             await interaction.followup.send(text[::-1])
 
-    @jeanne_slash(description="Guess my number")
-    async def guess(self, interaction: Interaction):
-        await interaction.response.defer()
-        try:
-            botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if interaction.user.id == botbanned:
-                pass
-        except:
-            guessit = Embed(
-                description="I'm thinking of a number between 1 to 10.\nYou have 5 seconds to guess it!", color=0x00FFFF)
-            await interaction.followup.send(embed=guessit)
-
-            def is_correct(m):
-                return m.author == interaction.user and m.content.isdigit()
-
-            answer = randint(1, 10)
-
-            try:
-                guess = await self.bot.wait_for("message", check=is_correct, timeout=5.0)
-            except TimeoutError:
-                timeout = Embed(
-                    description=f"Sorry but you took too long. It was {answer}", color=0xFF0000)
-                timeout.set_thumbnail(url=wrong_answer_or_timeout)
-                return await interaction.followup.send(embed=timeout)
-
-            if int(guess.content) == answer:
-                correct = Embed(description="YES!", color=0x008000)
-                correct.set_image(url=correct_answer)
-                await interaction.followup.send(embed=correct)
-            else:
-                wrong = Embed(
-                    description=f"Wrong answer. It was {answer}", color=0xFF0000)
-                wrong.set_thumbnail(url=wrong_answer_or_timeout)
-                await interaction.followup.send(embed=wrong)
-
     @jeanne_slash(description="Get a random animeme")
     async def animeme(self, interaction: Interaction):
         await interaction.response.defer()
