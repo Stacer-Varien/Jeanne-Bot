@@ -20,46 +20,22 @@ class mischelp(ui.Select):
     async def callback(self, ctx: Interaction):
         if self.values[0]=="Invite":
             await ctx.response.defer(ephemeral=True)
-            userinfo = Embed(color=0x7DF9FF)
-            userinfo.add_field(
-                name="Invite me to your server or join my creator's server", value="• **Example:** `/userinfo (IF YOURSELF)` \ `/userinfo MEMBER` (IF MEMBER)\n• **Expected result**: `MEMBER'S DISCORD INFORMATION INCLUDING THEIR SERVER JOIN DATE`")
-            await ctx.edit_original_message(embed=userinfo, ephemeral=True)
-        if self.values[0] == "Serverinfo":
+            invite = Embed(color=0x7DF9FF)
+            invite.add_field(
+                name="Invite me to your server or join my creator's server", value="• **Example:** `/invite`")
+            await ctx.edit_original_message(embed=invite, ephemeral=True)
+        if self.values[0] == "Say":
             await ctx.response.defer(ephemeral=True)
-            Serverinfo = Embed(color=0x7DF9FF)
-            Serverinfo.add_field(
-                name="Get information about this server", value="• **Example:** `/serverinfo`\n• **Expected result**: `INFORMATION ABOUT THE SERVER AND EMOJIS IN A SEPERATE EMBED IF APPLICABLE`")
-            await ctx.edit_original_message(embed=Serverinfo, ephemeral=True)
-        if self.values[0] == "Ping":
+            say = Embed(color=0x7DF9FF)
+            say.add_field(
+                name="Type a message and I will say it in a specific channel\n• **NOTE:** The command is split into 2 subcommands. `say plain` is just plain text and `say embed` is text with embed\n\n• **Required Permission:** Administrator", value="• **Example:** `/say TEXT`")
+            await ctx.edit_original_message(embed=say, ephemeral=True)
+        if self.values[0] == "Report":
             await ctx.response.defer(ephemeral=True)
-            ping = Embed(color=0x7DF9FF)
-            ping.add_field(
-                name="Check how fast I can respond to commands", value="• **Example:** `/ping`\n• **Expected result**: `JEANNE FIRST CHECKS LATENCY THEN EDITS THE MESSAGE WITH 2 PING RESULTS (ONE WITH BOT AND OTHER WITH API)`")
-            await ctx.edit_original_message(embed=ping, ephemeral=True)
-        if self.values[0] == "Stats":
-            await ctx.response.defer(ephemeral=True)
-            saber = Embed(color=0x7DF9FF)
-            saber.add_field(
-                name="See the bot's status from development to now", value="• **Example:** `/stats`\n• **Expected result**: `JEANNE SHOWS AS MUCH INFO OF HERSELF`")
-            await ctx.edit_original_message(embed=saber, ephemeral=True)
-        if self.values[0] == "Guild Banner":
-            await ctx.response.defer(ephemeral=True)
-            saber = Embed(color=0x7DF9FF)
-            saber.add_field(
-                name="See the server's banner\n• **NOTE:** If the server is not boosted to Level 2, it will return with a `Not boosted to Level 2` error. If the server doesn't have a banner, it will return with a footer text only.", value="• **Example:** `/guildbanner`\n• **Expected result**: `SERVER'S BANNER IF APPLICABLE`\n• **Expected failure**: `SERVER NOT BOOSTED TO LEVEL 2 ERROR OR NO SERVER BANNER FOUND`")
-            await ctx.edit_original_message(embed=saber, ephemeral=True)
-        if self.values[0] == "Avatar":
-            await ctx.response.defer(ephemeral=True)
-            saber = Embed(color=0x7DF9FF)
-            saber.add_field(
-                name="See your avatar or a member's avatar", value="• **Example:** `/avatar` (IF YOURSELF) / `/avatar MEMBER` (IF MEMBER)\n• **Expected result**: `MEMBERS'S AVATAR`")
-            await ctx.edit_original_message(embed=saber, ephemeral=True)
-        if self.values[0] == "Guild Avatar":
-            await ctx.response.defer(ephemeral=True)
-            saber = Embed(color=0x7DF9FF)
-            saber.add_field(
-                name="See your guild avatar or a member's guild avatar\n• **NOTE:** If the member has no guild avatar set, it will return with their normal avatar.", value="• **Example:** `/guildavatar` (IF YOURSELF) / `/guildavatar MEMBER` (IF MEMBER)\n• **Expected result**: `MEMBERS'S SERVER AVATAR`\n• **Expected failure**: `MEMBERS'S NORMAL AVATAR WITH FOOTER TEXT`")
-            await ctx.edit_original_message(embed=saber, ephemeral=True)
+            report = Embed(color=0x7DF9FF)
+            report.add_field(
+                name="Found a bug or fault? Please report to me\n• **NOTE:** You can't use this to appeal a botban", value="• **Example:** `/report`")
+            await ctx.edit_original_message(embed=report, ephemeral=True)
 
 
 class miscview(View):
