@@ -16,12 +16,6 @@
     Example: `/yandere` (for a random hentai) \ `/yandere TAG` (for a specific tag)
 
 
->**Danbooru**
-
-* Get a random hentai image from Danbooru. You can include a tag too for a specific hentai
-
-    Example: `/danbooru` (for a random hentai) \ `/danbooru TAG` (for a specific tag)
-
 >**Konachan**
 
 * Get a random hentai image from Konachan. You can include a tag too for a specific hentai

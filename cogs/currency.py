@@ -143,7 +143,7 @@ class currencysys(Cog):
 
             if int(guess.content) == answer:
                 try:
-                    db.execute(f"UPDATE bankData SET amount = amount + 10 WHERE user_id = {ctx.user.id}")
+                    db.execute(f"UPDATE bankData SET amount = amount + 20 WHERE user_id = {ctx.user.id}")
                     db.commit()
                     correct = Embed(description="YES! YOU GUESSED IT CORRECTLY!\nYou have been given 20 credits", color=0x008000)
                 except:
@@ -163,10 +163,10 @@ class currencysys(Cog):
             reset_date = error.resets_at.strftime('%H:%M')
             await ctx.response.defer()
             cooldown = Embed(
-                description=f"You have already guessed the correct number\nYou can try again after `{reset_date}`\n\nIf you want, you can bet with your cash which has a lower cooldown by using the `/guess bet` command", color=Color.red())
+                description=f"You have already used the free chance\nYou can try again after `{reset_date}`\n\nIf you want, you can bet with your cash which has a lower cooldown by using the `/guess bet` command", color=Color.red())
             await ctx.followup.send(embed=cooldown)
 
-    @guess.subcommand(description="Guess my number and you can win 20 credits")
+    @guess.subcommand(description="Guess my number and you can win 20 credits with betting")
     @cooldown(1, 30, bucket=SlashBucket.author)
     async def bet(self, ctx: Interaction, bet=SlashOption(required=True)):
         await ctx.response.defer()
@@ -227,6 +227,73 @@ class currencysys(Cog):
             cooldown = Embed(
                 description=f"Calm down. Please wait for a bit\nYou can try again after `{error.retry_after} seconds`", color=Color.red())
             await ctx.followup.send(embed=cooldown)
+
+    @jeanne_slash(description="Main dice command")
+    async def dice(self, ctx: Interaction):
+        pass
+
+    @dice.subcommand(description="Roll a dice for free 20 credits")
+    @cooldown(1, 3600, bucket=SlashBucket.author)
+    async def free(self, ctx: Interaction, digit=SlashOption(description="What number are you guessing?",required=True)):
+        await ctx.response.defer()
+        try:
+            botbanquery = db.execute(
+                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+            botbanned_data = botbanquery.fetchone()
+            botbanned = botbanned_data[0]
+
+            if ctx.user.id == botbanned:
+                pass
+        except:
+            rolled = randint(1, 6)
+
+            if rolled==int(digit):
+                db.execute(
+                    f"UPDATE bankData SET amount = amount + 20 WHERE user_id = {ctx.user.id}")
+                db.commit()
+                embed = Embed(color=0x0000FF)
+                embed.add_field(name="YAY! You got it!\n20 credits has been added",
+                            value=f"Rolled: **{rolled}**\nResult: **{digit}**!", inline=False)
+                await ctx.followup.send(embed=embed)            
+
+            else:
+                embed = Embed(color=Color.red())
+                embed.add_field(name="Oh no!",
+                                value=f"Rolled: **{rolled}**\nResult: **{digit}**!", inline=False)
+                await ctx.followup.send(embed=embed)
+
+    @dice.subcommand(description="Roll a dice with betting")
+    @cooldown(1, 3600, bucket=SlashBucket.author)
+    async def bet(self, ctx: Interaction, digit=SlashOption(description="What number are you guessing?", required=True)):
+        await ctx.response.defer()
+        try:
+            botbanquery = db.execute(
+                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+            botbanned_data = botbanquery.fetchone()
+            botbanned = botbanned_data[0]
+
+            if ctx.user.id == botbanned:
+                pass
+        except:
+            rolled = randint(1, 6)
+
+            if rolled == int(digit):
+                db.execute(
+                    f"UPDATE bankData SET amount = amount + {int(digit)} WHERE user_id = {ctx.user.id}")
+                db.commit()
+                embed = Embed(color=0x0000FF)
+                embed.add_field(name="YAY! You got it!\n20 credits has been added",
+                                value=f"Rolled: **{rolled}**\nResult: **{digit}**!", inline=False)
+                await ctx.followup.send(embed=embed)
+
+            else:
+                db.execute(
+                    f"UPDATE bankData SET amount = amount - {int(digit)} WHERE user_id = {ctx.user.id}")
+                db.commit()
+                embed = Embed(color=Color.red())
+                embed.add_field(name="Oh no!",
+                                value=f"Rolled: **{rolled}**\nResult: **{digit}**!", inline=False)
+                await ctx.followup.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(currencysys(bot))

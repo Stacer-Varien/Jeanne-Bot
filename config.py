@@ -8,6 +8,7 @@ WEATHER=getenv("weather_api")
 TOPGG=getenv("topgg")
 
 db=connect('database.db')
+TOPGG_AUTH=getenv("auth")
 
 kitsune_nekoslife="https://nekos.life/api/v2/img/fox_girl"
 hug_nekoslife="https://nekos.life/api/v2/img/hug"

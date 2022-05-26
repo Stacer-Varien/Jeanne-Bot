@@ -6,11 +6,6 @@
 
  Example: `/8ball QUESTION`
 
-> **Dice**
-
-* Roll a dice
-
- Example: `/dice`
 
 > **Combine**
 
@@ -27,7 +22,6 @@
 >**Choose**
 
 * Add some choices and I will choose for you
-* **NOTE:** You need to put more than 1 choices. This only works on a prefixed command. To separate the choices, use as this format: `"CHOICE"`. For slash commands, you need to put 2 choices.
 
  Example: `/choose CHOICE_1 CHOICE_2`
 
@@ -37,12 +31,6 @@
 
  Example: `/reverse TEXT`
 
->**Guess**
-
-* Guess my number and I will reward you with a hug!
-* **NOTE:** You have to pick a number between 1 to 10. After executing the command, you have to guess the number after she starts asking. You have 5 seconds to guess the correct one.
-
- Example: `/guess` then after she asks, `NUMBER`
 
 >**Animeme**
 

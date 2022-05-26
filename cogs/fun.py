@@ -29,23 +29,6 @@ class slashfun(Cog):
                 name="Answer:", value=f'{choice(eight_ball_answers)}', inline=False)
             await interaction.followup.send(embed=embed)
 
-    @jeanne_slash(description="Roll a dice")
-    async def dice(self, interaction: Interaction):
-        await interaction.response.defer()
-        try:
-            botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if interaction.user.id == botbanned:
-                pass
-        except:
-            rolled = randint(1, 6)
-            embed = Embed(color=0x0000FF)
-            embed.add_field(name="Dice Rolled",
-                            value=f"You rolled a **{rolled}**!", inline=False)
-            await interaction.followup.send(embed=embed)
 
     @jeanne_slash(description="Flip a coin")
     async def flip(self, interaction: Interaction):

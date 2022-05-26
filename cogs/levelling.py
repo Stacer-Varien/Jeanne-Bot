@@ -143,7 +143,7 @@ class levelling(Cog):
             if type == "server":
 
                 leaders_query = db.execute(
-                    f"SELECT user_id FROM serverxpData WHERE guild_id = {ctx.guild.id} ORDER BY cumulative_exp DESC LIMIT 15"
+                    f"SELECT user_id FROM serverxpData WHERE guild_id = {ctx.guild.id} ORDER BY cumulative_exp DESC LIMIT 0,15"
                 )
 
                 embed = Embed(color=0xFFD700)
@@ -161,7 +161,7 @@ class levelling(Cog):
 
             elif type == "global":
                 leaders_query = db.execute(
-                    f"SELECT user_id FROM globalxpData ORDER BY cumulative_exp DESC LIMIT 15"
+                    f"SELECT user_id FROM globalxpData ORDER BY cumulative_exp DESC LIMIT 0,15"
                 )
 
 

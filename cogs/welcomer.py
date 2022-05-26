@@ -22,7 +22,7 @@ class welcomer(Cog):
             try:
                     channel = self.bot.get_channel(channel_id)
                     try:
-                        welcome = Embed(color=0x00FFFF)
+                        welcome = Embed(color=member.color)
 
                         if member.avatar !=None:
                             if member.guild.icon.is_animated() is True:
