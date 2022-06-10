@@ -5,7 +5,7 @@ from nextcord import *
 from nextcord import slash_command as jeanne_slash
 from os import execv
 from sys import executable, argv
-from config import db
+from config import BB_WEBHOOK, db
 from nextcord.ext.application_checks import *
 
 format = "%a, %d %b %Y | %H:%M:%S %ZGMT"
@@ -21,6 +21,7 @@ class slashowner(Cog):
     @jeanne_slash(description="Changes the bot's play activity")
     @is_owner()
     async def activity(self, ctx : Interaction, activitytype=SlashOption(description="Choose an activity type", choices=['listen', 'play'], required=True), activity=SlashOption(description="What is the new activity")):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
                     f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
@@ -42,6 +43,7 @@ class slashowner(Cog):
     @jeanne_slash(description="Finds a user")
     @is_owner()
     async def finduser(self, ctx: Interaction, user_id=SlashOption(description="Which user?")):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
                     f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
@@ -57,15 +59,29 @@ class slashowner(Cog):
                 else:
                     botr = ":x:"
                 fuser = Embed(title="User Found", color=0xccff33)
-                fuser.add_field(name="User Information",
-                                value=f"**>** **Name:** {user}\n**>** **ID:** {user.id}\n**>** **Creation Date:** {user.created_at.strftime(format)}\n**>** **Mutuals:** {len(user.mutual_guilds)}\n**>** **Is Bot?:** {botr}",
+                fuser.add_field(name="Name",
+                                value=user,
                                 inline=True)
+                fuser.add_field(name="Creation Date", value=user.created_at.strftime(format), inline=True)
+                fuser.add_field(
+                    name="Mutuals", value=len(user.mutual_guilds), inline=True)
+                fuser.add_field(
+                    name="Bot?", value=botr, inline=True)
                 fuser.set_image(url=user.display_avatar)
-                await ctx.followup.send(embed=fuser)            
+                if user.banner==None:
+                    await ctx.followup.send(embed=fuser)
+                else:
+                    userbanner = Embed(title="User Banner", color=0xccff33)
+                    userbanner.set_image(url=user.banner)
+
+                    e = [fuser, userbanner]
+                    await ctx.followup.send(embeds=e)
+           
 
     @jeanne_slash(description="Restart me to be updated")
     @is_owner()
     async def update(self, ctx:Interaction):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
                     f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
@@ -81,6 +97,7 @@ class slashowner(Cog):
     @jeanne_slash(description="Botban a user from using the bot")
     @is_owner()
     async def botban(self, ctx: Interaction, user_id=SlashOption(description="Which user?"), reason = SlashOption(description="Add a reason")):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
                     f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
@@ -91,7 +108,6 @@ class slashowner(Cog):
                 pass
         except:
                 user=await self.bot.fetch_user(user_id)
-                botbanned_channel = ctx.guild.get_channel(928962613939949618)
                 cur = db.execute("INSERT OR IGNORE INTO botbannedData (user_id, reason) VALUES (?,?)", (user.id, reason))
 
                 if cur.rowcount==0:
@@ -101,19 +117,19 @@ class slashowner(Cog):
                     
                 cur1=db.cursor()
                 cur2=db.cursor()
+                cur3=db.cursor()
                 cur1.execute(
                         f"SELECT * FROM serverxpData WHERE user_id = {user.id}")
                 result1=cur1.fetchall()
                 cur2.execute(f"SELECT * FROM globalxpData WHERE user_id = {user.id}")
                 result2=cur2.fetchone()
+                cur3.execute(f"SELECT * FROM bankData WHERE user_id = {user.id}")
+                result3=cur3.fetchone()
 
                 if result1 == None:
                     pass
 
                 else:
-                    cur1.execute(
-                            f"SELECT user_id FROM serverxpData")
-                    result1 = cur1.fetchall()
                     cur1.execute(f"DELETE FROM serverxpData WHERE user_id = {user.id}")
                     
                 if result2 == None:
@@ -121,25 +137,34 @@ class slashowner(Cog):
 
                 else:
                     cur2.execute(
-                            f"SELECT * FROM globalxpData WHERE user_id = {user.id}")
-                    result2 = cur1.fetchone()
-                    cur2.execute(
                             f"DELETE FROM globalxpData WHERE user_id = {user.id}")
-                    botbanned=Embed(title="User has been botbanned!", description="They will no longer use Jeanne, permanently!")
-                    botbanned.add_field(name="User",
-                                value=f"**>** **Name:** {user}\n**>** **ID:** {user.id}",
+
+                if result3 == None:
+                    pass
+
+                else:
+                    cur3.execute(
+                            f"DELETE FROM bankData WHERE user_id = {user.id}")                         
+
+                botbanned=Embed(title="User has been botbanned!", description="They will no longer use Jeanne, permanently!")
+                botbanned.add_field(name="User",
+                                value=user)
+                botbanned.add_field(name="ID", value=user.id,
                                 inline=True)
-                    botbanned.add_field(name="Reason of ban",
+                botbanned.add_field(name="Reason of ban",
                                         value=reason,
                                         inline=False)
-                    botbanned.set_footer(text="Due to this user botbanned, any data except warnings are immediatley deleted from the database! They will have no chance of appealing their botban.")
-                    botbanned.set_thumbnail(url=user.avatar)
-                    await botbanned_channel.send(embed=botbanned)
-                    db.commit()
+                botbanned.set_footer(text="Due to this user botbanned, all data except warnings are immediatley deleted from the database! They will have no chance of appealing their botban.")
+                botbanned.set_thumbnail(url=user.avatar)
+                webhook = SyncWebhook.from_url(BB_WEBHOOK)
+                webhook.send(embed=botbanned)
+                db.commit()
+                await ctx.followup.send("User botbanned", ephemeral=True)
 
     @jeanne_slash(description="Evaluates a code")
     @is_owner()
     async def evaluate(self, ctx: Interaction):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
                     f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
@@ -178,6 +203,7 @@ class slashowner(Cog):
     @jeanne_slash(description="Makes me leave a server")
     @is_owner()
     async def leave_server(self, ctx: Interaction, server_id=SlashOption(description="What is the server's ID?", required=True)):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
                     f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
