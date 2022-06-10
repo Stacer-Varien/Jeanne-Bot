@@ -17,18 +17,16 @@ class slashnsfw(Cog):
 
     @jeanne_slash(description="Get a random hentai from Jeanne")
     @is_nsfw()
-    async def hentai(self, interaction: Interaction):
-        await interaction.response.defer()
+    async def hentai(self, ctx: Interaction):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
             file_path_type = ["/Media/Hentai/*.*"]
             images = glob(choice(file_path_type))
@@ -36,23 +34,21 @@ class slashnsfw(Cog):
             file = File(random_image)
             hentai = Embed(color=0xFFC0CB)
             hentai.set_footer(text="Powered by JeanneBot")
-            await interaction.followup.send(file, embed=hentai)
+            await ctx.followup.send(file, embed=hentai)
 
 
     @jeanne_slash(description="Get a random hentai from Yande.re")
     @is_nsfw()
-    async def yandere(self, interaction: Interaction, tag=SlashOption(description="Add a tag for something specific", required=False)):
-        await interaction.response.defer()
+    async def yandere(self, ctx: Interaction, tag=SlashOption(description="Add a tag for something specific", required=False)):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
                 try:
                     if tag == None:
@@ -60,7 +56,7 @@ class slashnsfw(Cog):
                             "https://yande.re/post.json?limit=100&tags=rating:explicit+-loli+-shota+-cub").json())
 
                     elif tag == "02":
-                        await interaction.followup.send("Tag has been blacklisted due to it returning extreme content and guro")
+                        await ctx.followup.send("Tag has been blacklisted due to it returning extreme content and guro")
 
                     else:
                         yandere_api = choice(get(
@@ -69,24 +65,22 @@ class slashnsfw(Cog):
                     yandere = Embed(color=0xFFC0CB)
                     yandere.set_image(url=yandere_api['file_url'])
                     yandere.set_footer(text="Fetched from Yande.re")
-                    await interaction.followup.send(embed=yandere)
+                    await ctx.followup.send(embed=yandere)
                 except IndexError:
                     pass
 
     @jeanne_slash(description="Get a random hentai from Konachan")
     @is_nsfw()
-    async def konachan(self, interaction: Interaction, tag=SlashOption(description="Add a tag for something specific", required=False)):
-        await interaction.response.defer()
+    async def konachan(self, ctx: Interaction, tag=SlashOption(description="Add a tag for something specific", required=False)):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if interaction.user.id == botbanned_user.id:
-                await interaction.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
                 try:
                     if tag == None:
@@ -100,7 +94,7 @@ class slashnsfw(Cog):
                     konachan = Embed(color=0xFFC0CB)
                     konachan.set_image(url=konachan_api['file_url'])
                     konachan.set_footer(text="Fetched from Konachan")
-                    await interaction.followup.send(embed=konachan)
+                    await ctx.followup.send(embed=konachan)
                 except IndexError:
                     pass
 

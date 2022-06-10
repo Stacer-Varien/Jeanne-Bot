@@ -6,11 +6,6 @@
 
  Example: `/8ball QUESTION`
 
-> **Dice**
-
-* Roll a dice
-
- Example: `/dice`
 
 > **Combine**
 
@@ -36,12 +31,6 @@
 
  Example: `/reverse TEXT`
 
->**Guess**
-
-* Guess my number and I will reward you with a hug!
-* **NOTE:** You have to pick a number between 1 to 10. After executing the command, you have to guess the number after she starts asking. You have 5 seconds to guess the correct one.
-
- Example: `/guess` then after she asks, `NUMBER`
 
 >**Animeme**
 

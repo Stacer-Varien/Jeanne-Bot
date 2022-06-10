@@ -25,14 +25,12 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
                 if reason == None:
                     reason = "Unspecified"
@@ -45,27 +43,29 @@ class slashmoderation(Cog):
                     warn_id = f"{randint(0,100000)}"
                     date=datetime.now().strftime('%Y-%m-%d %H:%M')
 
-                    cursor1 = db.execute("INSERT OR IGNORE INTO warnData (guild_id, user_id, moderator_id, reason, warn_id, date) VALUES (?,?,?,?,?,?)", (ctx.guild.id, member.id, ctx.user.id, reason, warn_id, date))
+                    db.execute("INSERT OR IGNORE INTO warnData (guild_id, user_id, moderator_id, reason, warn_id, date) VALUES (?,?,?,?,?,?)", (ctx.guild.id, member.id, ctx.user.id, reason, warn_id, date))
 
-                    cursor2 = db.execute("INSERT OR IGNORE INTO warnDatav2 (guild_id, user_id, warn_points) VALUES (?,?,?)", (
+                    db.execute("INSERT OR IGNORE INTO warnDatav2 (guild_id, user_id, warn_points) VALUES (?,?,?)", (
                         ctx.guild.id, member.id, 1))
-
-                    if cursor1.rowcount == 0:
-                        db.execute(
-                            f"UPDATE warnData SET moderator_id = {ctx.user.id}, reason = {reason}, warn_id = {warn_id} and date = {date} WHERE guild_id = {ctx.guild.id} AND user_id = {member.id}")
-                    db.commit()
-
-                    if cursor2.rowcount==0:
-                        db.execute(
-                            f"UPDATE warnDatav2 SET warn_points = warn_points + 1 WHERE guild_id = {ctx.guild.id} AND user_id = {member.id}")
-                    db.commit()
 
                     warn = Embed(title="Member warned", color=0xFF0000)
                     warn.add_field(name="Member",
-                                    value=f"**>** **Name:** {member}\n**>** **ID:** {member.id}",
+                                    value=member,
                                     inline=True)
+                    warn.add_field(name="ID",
+                                    value=member.id,
+                                    inline=True)                                    
                     warn.add_field(
-                        name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.user}\n**>** **Reason:** {reason}\n**>** **Warn ID:** {warn_id}\n**>** **Date:** {date}", inline=True)
+                        name="Moderator", value=ctx.user, inline=True)
+                    warn.add_field(name="Reason",
+                                    value=reason,
+                                    inline=False)
+                    warn.add_field(name="Warn ID",
+                                    value=warn_id,
+                                    inline=True)
+                    warn.add_field(name="Date",
+                                    value=date,
+                                    inline=True)
                     warn.set_thumbnail(url=member.display_avatar)
 
                     try:
@@ -85,22 +85,23 @@ class slashmoderation(Cog):
         if isinstance(error, ApplicationMissingPermissions):
             await ctx.response.defer()
             await ctx.followup.send(embed=warn_perm)
+    
+    @jeanne_slash(description="Main list_warns command")
+    async def list_warns(self, ctx: Interaction):
+        pass
 
-    @jeanne_slash(description="View warnings in the server or a member")
-    async def list_warns(self, ctx: Interaction, member: Member = SlashOption(description="Who's warnings you wanna see?", required=False)):
+    @list_warns.subcommand(description="View warnings in the server or a member")
+    async def guild(self, ctx: Interaction):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
-            if member == None:
                 cur = db.cursor()
                 cur.execute(
                     f"SELECT * FROM warnDATAv2 WHERE guild_id = {ctx.guild.id}")
@@ -118,29 +119,45 @@ class slashmoderation(Cog):
                         embed.description += f"**{warned_member}**\n**Warn points**: {warn_points}\n\n"
                     await ctx.followup.send(embed=embed)
 
-            else:
-                cur = db.cursor()
-                cur.execute(
+    @list_warns.subcommand(description="View warnings in the server or a member")
+    async def member(self, ctx: Interaction, member: Member = SlashOption(description="Who's warnings you wanna see?", required=False)):
+        await ctx.response.defer()
+        try:
+            botbanquery = db.execute(
+                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+            botbanned_data = botbanquery.fetchone()
+            botbanned = botbanned_data[0]
+
+            if ctx.user.id == botbanned:
+                pass
+        except:
+            if member == None:
+                member = ctx.user
+
+            cur = db.cursor()
+            cur.execute(
                     f"SELECT * FROM warnDATA user WHERE user_id = {member.id} AND guild_id = {member.guild.id}")
-                record = cur.fetchall()
-                if len(record) == 0:
+            record = cur.fetchall()
+            if len(record) == 0:
                     await ctx.followup.send(f"{member} has no warn IDs")
                     return
-                embed = Embed(
+            embed = Embed(
                     title=f"{member}'s warnings", colour=0xFF0000)
-                embed.description = ""
-                embed.set_thumbnail(url=member.display_avatar)
-                for i in record:
+            embed.description = ""
+            embed.set_thumbnail(url=member.display_avatar)
+            for i in record:
                     moderator = await self.bot.fetch_user(i[2])
                     reason = i[3]
                     warn_id = i[4]
                     date = i[5]
 
-                    if date==None:
-                        date="Unspecified due to new update"
+                    if date == None:
+                        date = "Unspecified due to new update"
 
-                    embed.add_field(name=f"`{warn_id}`", value=f"**Moderator:** {moderator}\n**Reason:** {reason}\n**Date:** {date}", inline=False)
-                await ctx.followup.send(embed=embed)
+                    embed.add_field(
+                        name=f"`{warn_id}`", value=f"**Moderator:** {moderator}\n**Reason:** {reason}\n**Date:** {date}", inline=False)
+            await ctx.followup.send(embed=embed)
+
 
     @jeanne_slash(description="Revoke a warn by warn ID")
     @has_permissions(kick_members=True)
@@ -148,14 +165,12 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
                 cur = db.cursor()
                 cur.execute(
@@ -173,6 +188,12 @@ class slashmoderation(Cog):
 
                     try:
                         cur.execute(f"UPDATE warnDatav2 SET warn_points = warn_points - 1 WHERE user_id = {result[0]} AND guild_id = {ctx.guild.id}")
+
+                        wp_query=cur.execute(f"SELECT warn_points FROM warnDatav2 WHERE user_id = {result[0]} AND guild_id = {ctx.guild.id}")
+                        warnpoints=wp_query.fetchone()[0]
+
+                        if warnpoints==0:
+                            cur.execute(f"DELETE FROM warnDatav2 WHERE user_id = {result[0]} AND guild_id = {ctx.guild.id}")
                     except:
                         pass
                     
@@ -185,7 +206,7 @@ class slashmoderation(Cog):
                         modlog = ctx.guild.get_channel(modlog_channel_id)
                         await modlog.send(embed=revoked_warn)
                         revoke = Embed(
-                            description=f"Member has been warned. Check {modlog.mention}", color=0xFF0000)
+                            description=f"Warn revoked. Check {modlog.mention}", color=0xFF0000)
                         await ctx.followup.send(embed=revoke)
                     except:
                         await ctx.followup.send(embed=revoked_warn)                    
@@ -197,126 +218,116 @@ class slashmoderation(Cog):
             await ctx.response.defer()
             await ctx.followup.send(embed=warn_perm)
 
-    @jeanne_slash(description="Ban a member in the server")
+    @jeanne_slash(description="Main ban command")
+    async def ban(self, ctx: Interaction):
+        pass        
+
+
+    @ban.subcommand(description="Ban someone in this server")
     @has_permissions(ban_members=True)
-    async def memberban(self, ctx: Interaction, member: Member = SlashOption(description="Who do you want to ban?"), reason=SlashOption(description="Give a reason", required=False)):
+    async def member(self, ctx:Interaction, member:Member=SlashOption(description="Who do you want to ban?", required=True), reason=SlashOption(description='What is the reason?', required=False)):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
-        except:        
-                if reason == None:
-                    reason = "Unspecified"
-
-                if member == ctx.user:
-                    failed = Embed(description="You can't ban yourself")
-                    await ctx.followup.send(embed=failed)
-                else:
-                    try:
-                        banmsg = Embed(
-                            description=f"You are banned from **{ctx.guild.name}** for **{reason}**")
-                        await member.send(embed=banmsg)
-                    except:
-                        pass
-                    
-                    await member.ban(reason=reason)
-                    ban = Embed(title="Member Banned", color=0xFF0000)
-                    ban.add_field(name="Member",
-                                    value=f"**>** **Name:** {member}\n**>** **ID:** {member.id}",
-                                    inline=True)
-                    ban.add_field(
-                            name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.user}\n**>** **Reason:** {reason}", inline=True)
-                    ban.set_thumbnail(url=member.display_avatar)
-                    try:
-                        modlog_channel_query = db.execute(
-                                f'SELECT channel_id FROM modlogData WHERE guild_id = {ctx.guild.id}')
-                        modlog_channel_id = modlog_channel_query.fetchone()[0]
-                        modlog = ctx.guild.get_channel(
-                                modlog_channel_id)
-                        await modlog.send(embed=ban)
-                        banned = Embed(
-                                description=f"Member has been banned. Check {modlog.mention}", color=0xFF0000)
-                        await ctx.followup.send(embed=banned)
-                    except:
-                        await ctx.followup.send(embed=ban)
-
-    @memberban.error
-    async def memberban_error(self, ctx:Interaction, error):
-        if isinstance(error, ApplicationMissingPermissions):
-            await ctx.response.defer()
-            await ctx.followup.send(embed=ban_perm)
-
-
-    @jeanne_slash(description="Ban a user before they join your server")
-    @has_permissions(ban_members=True)
-    async def outsideban(self, ctx: Interaction, user_id=SlashOption(description="Who do you want to ban with ID?", required=True), reason=SlashOption(description="Give a reason", required=False)):
-        await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
-
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
-                user = await self.bot.fetch_user(user_id)
-                guild = ctx.guild
-                if reason == None:
-                    reason = "Unspecified"
+            if member == ctx.user:
+                failed = Embed(description="You can't ban yourself")
+                await ctx.followup.send(embed=failed)
+            else:
+                try:
+                    banmsg = Embed(description=f"You are banned from **{ctx.guild.name}** for **{reason}**")
+                    await member.send(embed=banmsg)
+                except:
+                    pass
+
+                await member.ban(reason=reason)
+                ban = Embed(title="Member Banned", color=0xFF0000)
+                ban.add_field(name="Name", value=member, inline=True)
+                ban.add_field(name="ID", value=member.id, inline=True)
+                ban.add_field(name="Moderator", value=ctx.user, inline=True)
+                ban.add_field(name="Reason", value=reason, inline=False)
+                ban.set_thumbnail(url=member.display_avatar)
 
                 try:
-                    banned = await guild.fetch_ban(user)
-                except NotFound:
-                    banned = False
+                    modlog_channel_query = db.execute(f'SELECT channel_id FROM modlogData WHERE guild_id = {ctx.guild.id}')
+                    modlog_channel_id = modlog_channel_query.fetchone()[0]
+                    modlog = ctx.guild.get_channel(modlog_channel_id)
+                    await modlog.send(embed=ban)
+                    banned = Embed(description=f"Member has been banned. Check {modlog.mention}", color=0xFF0000)
+                    await ctx.followup.send(embed=banned)
+                except:
+                    await ctx.followup.send(embed=ban)
 
-                if banned:
-                    already_banned = Embed(
-                        description="User is already banned here")
-                    await ctx.followup.send(embed=already_banned)
+    @ban.subcommand(description="Ban someone outside the server")
+    @has_permissions(ban_members=True)
+    async def user(self, ctx:Interaction, user_id=SlashOption(description="What is the User ID?", required=True), reason=SlashOption(description="What is the reason", required=False)):
+        await ctx.response.defer()
+        try:
+            botbanquery = db.execute(
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+            botbanned_data = botbanquery.fetchone()
+            botbanned=botbanned_data[0]
 
-                else:
-                        await guild.ban(user, reason=reason)
-                        ban = Embed(title="Member Banned", color=0xFF0000)
-                        ban.add_field(name="Member",
-                                    value=f"**>** **Name:** {user}\n**>** **ID:** {user.id}",
-                                    inline=True)
-                        ban.add_field(
-                            name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.user}\n**>** **Reason:** {reason}", inline=True)
-                        ban.set_thumbnail(url=user.display_avatar)
-                        try:
-                            modlog_channel_query = db.execute(
-                                f'SELECT channel_id FROM modlogData WHERE guild_id = {ctx.guild.id}')
-                            modlog_channel_id = modlog_channel_query.fetchone()[
-                                0]
-                            modlog = ctx.guild.get_channel(
-                                modlog_channel_id)
-                            await modlog.send(embed=ban)
-                            banned = Embed(
-                                description=f"User has been banned. Check {modlog.mention}", color=0xFF0000)
-                            await ctx.followup.send(embed=banned)
-                        except:
-                            await ctx.followup.send(embed=ban)
+            if ctx.user.id==botbanned:
+                pass
+        except:
+            user = await self.bot.fetch_user(user_id)
+            guild = ctx.guild
+            if reason == None:
+                reason = "Unspecified"
+
+            try:
+                banned = await guild.fetch_ban(user)
+            except NotFound:
+                banned = False
+
+            if banned:
+                already_banned = Embed(description="User is already banned here")
+                await ctx.followup.send(embed=already_banned)
+
+            else:
+                await guild.ban(user, reason=reason)
+                ban = Embed(title="User Banned", color=0xFF0000)
+                ban.add_field(name="Name", value=user, inline=True)
+                ban.add_field(name="ID", value=user.id, inline=True)
+                ban.add_field(name="Moderator", value=ctx.user, inline=True)
+                ban.add_field(name="Reason", value=reason, inline=False)
+                ban.set_thumbnail(url=user.display_avatar)
+                
+                try:
+                    modlog_channel_query = db.execute(f'SELECT channel_id FROM modlogData WHERE guild_id = {ctx.guild.id}')
+                    modlog_channel_id = modlog_channel_query.fetchone()[0]
+                    modlog = ctx.guild.get_channel(
+                    modlog_channel_id)
+                    await modlog.send(embed=ban)
+                    banned = Embed(description=f"User has been banned. Check {modlog.mention}", color=0xFF0000)
+                    await ctx.followup.send(embed=banned)
+                except:
+                    await ctx.followup.send(embed=ban)
 
 
-    @outsideban.error
-    async def outsideban_error(self, ctx:Interaction, error):
+    @member.error
+    async def ban_error(self, ctx:Interaction, error):
         if isinstance(error, ApplicationMissingPermissions):
             await ctx.response.defer()
             await ctx.followup.send(embed=ban_perm)
 
-        elif isinstance(error, UserNotFound):
+    @user.error
+    async def ban_error(self, ctx: Interaction, error):
+        if isinstance(error, ApplicationMissingPermissions):
+            await ctx.response.defer()
+            await ctx.followup.send(embed=ban_perm)
+
+        elif isinstance(error, Exception):
             await ctx.response.defer()
             await ctx.followup.send("Invalid user ID")
+
 
     @jeanne_slash(description="Kick a member out of the server")
     @has_permissions(kick_members=True)
@@ -324,14 +335,12 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
                 if member == ctx.user:
                     failed = Embed(description="You can't kick yourself out")
@@ -377,14 +386,12 @@ class slashmoderation(Cog):
         await ctx.response.defer(ephemeral=True)
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
                     if limit==None:
                         limit=100
@@ -412,14 +419,12 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
                 await member.edit(nick=nickname)
                 setnick = Embed(color=0x00FF68)
@@ -439,23 +444,20 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
                 user = await self.bot.fetch_user(user_id)
                 await ctx.guild.unban(user, reason=reason)
                 unban = Embed(title="User Unbanned", color=0xFF0000)
-                unban.add_field(name="Member",
-                                value=f"**>** **Name:** {user}\n**>** **ID:** {user.id}",
-                                inline=True)
-                unban.add_field(
-                    name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.user}\n**>** **Reason:** {reason}", inline=True)
+                unban.add_field(name="Name", value=user, inline=True)
+                unban.add_field(name="ID", value=user.id, inline=True)
+                unban.add_field(name="Moderator", value=ctx.user, inline=True)
+                unban.add_field(name="Reason", value=reason, inline=False)
                 unban.set_thumbnail(url=user.display_avatar)
                 try:
                     modlog_channel_query = db.execute(
@@ -487,14 +489,12 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
                     if time == None:
                         time = '28d'
@@ -511,11 +511,14 @@ class slashmoderation(Cog):
                             await member.edit(timeout=utcnow()+timedelta(seconds=timed), reason=reason)
                             mute = Embed(
                                 title="Member Muted", color=0xFF0000)
-                            mute.add_field(name="Member",
-                                            value=f"**>** **Name:** {member}\n**>** **ID:** {member.id}",
-                                            inline=True)
+                            mute.add_field(name="Member", value=member, inline=True)
+                            mute.add_field(name="ID", value=member.id, inline=True)
                             mute.add_field(
-                                name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.user}\n**>** **Reason:** {reason}\n**>** **Duration:** {time}", inline=True)
+                                name="Moderator", value=ctx.user, inline=True)
+                            mute.add_field(
+                                name="Duration", value=time, inline=True)
+                            mute.add_field(
+                                name="Reason", value=reason, inline=False)
                             mute.set_thumbnail(url=member.display_avatar)
                             try:
                                 modlog_channel_query = db.execute(
@@ -543,14 +546,12 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
             botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-            reason = botbanned_data[1]
+            botbanned=botbanned_data[0]
 
-            botbanned_user = await self.bot.fetch_user(botbanned)
-            if ctx.user.id == botbanned_user.id:
-                await ctx.followup.send(f"You have been botbanned for:\n{reason}", ephemeral=True)
+            if ctx.user.id==botbanned:
+                pass
         except:
                 if reason == None:
                     reason = "Unspecified"
@@ -563,11 +564,12 @@ class slashmoderation(Cog):
                     await member.edit(timeout=None, reason=reason)
                     unmute = Embed(
                         title="Member Unmuted", color=0xFF0000)
-                    unmute.add_field(name="Member",
-                                    value=f"**>** **Name:** {member}\n**>** **ID:** {member.id}",
-                                    inline=True)
+                    unmute.add_field(name="Member", value=member, inline=True)
+                    unmute.add_field(name="ID", value=member.id, inline=True)
                     unmute.add_field(
-                        name="Moderation", value=f"**>** **Responsible Moderator:** {ctx.user}\n**>** **Reason:** {reason}", inline=True)
+                        name="Moderator", value=ctx.user, inline=True)
+                    unmute.add_field(
+                        name="Reason", value=reason, inline=False)
                     unmute.set_thumbnail(url=member.display_avatar)
                     try:
                         modlog_channel_query = db.execute(

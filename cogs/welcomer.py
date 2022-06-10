@@ -22,7 +22,7 @@ class welcomer(Cog):
             try:
                     channel = self.bot.get_channel(channel_id)
                     try:
-                        welcome = Embed(color=0x00FFFF)
+                        welcome = Embed(color=member.color)
 
                         if member.avatar !=None:
                             if member.guild.icon.is_animated() is True:
@@ -59,8 +59,6 @@ class welcomer(Cog):
             guild_id_query = db.execute(
                 f"SELECT guild_id FROM leaverData where channel_id = {channel_id}")
             server_id = guild_id_query.fetchone()[0]
-
-            server = self.bot.get_guild(server_id)
 
             if member.guild.id == server_id:
                 try:
