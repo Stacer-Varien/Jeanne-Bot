@@ -1,11 +1,10 @@
-from config import TOPGG, db, TOPGG_AUTH
+from config import TOPGG, db
 from topgg import *
 from nextcord.ext import tasks
 from nextcord.ext.commands import Cog
 from datetime import *
 
 dbl_token = TOPGG
-
 
 
 class topgg(Cog):
