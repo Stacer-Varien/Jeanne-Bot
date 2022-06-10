@@ -32,7 +32,7 @@ class slashinfo(Cog):
             embed.add_field(name="Bot ID", value=self.bot.user.id, inline=True)
             embed.add_field(name="Creation Date", value=self.bot.user.created_at.strftime(format), inline=True)
             embed.add_field(
-                name="Version", value=f"• **Python Version:** {py_version.major}.{py_version.minor}.{py_version.micro}\n• **Nextcord Version:** {discord_version}\n• **Bot:** 2.9.2b", inline=True)
+                name="Version", value=f"• **Python Version:** {py_version.major}.{py_version.minor}.{py_version.micro}\n• **Nextcord Version:** {discord_version}\n• **Bot:** 3.0", inline=True)
 
             cur=db.execute("SELECT * FROM globalxpData")
             all_users=len(cur.fetchall())
@@ -53,7 +53,7 @@ class slashinfo(Cog):
             await ctx.followup.send(embed=embed)
 
     @jeanne_slash(description="See the information of a member or yourself")
-    async def userinfo(self, ctx : Interaction, member: Member = SlashOption(description="Add a member", required=False)):
+    async def userinfo(self, ctx : Interaction, member: Member = SlashOption(description="Which member?", required=False)):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
@@ -209,7 +209,7 @@ class slashinfo(Cog):
                     await ctx.followup.send(embed=embed)
 
     @jeanne_slash(description="See your avatar or another member's avatar")
-    async def avatar(self, ctx: Interaction, member: Member = SlashOption(description="Add a member", required=False)):
+    async def avatar(self, ctx: Interaction, member: Member = SlashOption(description="Which member?", required=False)):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
@@ -228,7 +228,7 @@ class slashinfo(Cog):
             await ctx.followup.send(embed=avatar)
 
     @jeanne_slash(description="See your guild avatar or a member's guild avatar")
-    async def guildavatar(self, ctx: Interaction, member: Member = SlashOption(description="Add a member", required=False)):
+    async def guildavatar(self, ctx: Interaction, member: Member = SlashOption(description="Which member?", required=False)):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(

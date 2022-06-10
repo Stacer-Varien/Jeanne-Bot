@@ -15,12 +15,6 @@ class errormsgs(Cog):
         if isinstance(error, ApplicationNSFWChannelRequired):
             await ctx.response.defer()
             await ctx.followup.send(embed=no_hentai)
-<<<<<<< Updated upstream
-        
-        elif isinstance(error, CommandNotFound):
-            pass
-=======
->>>>>>> Stashed changes
 
         elif isinstance(error, ApplicationNotOwner):
             await ctx.response.defer()

@@ -28,11 +28,8 @@ class slashreactions(Cog):
             hug_api = get(hug_nekoslife).json()
             if member == None:
                 msg=f"*Hugging {ctx.user}*"
-<<<<<<< Updated upstream
-=======
             elif member == ctx.user:
                 msg = f"*Hugging {ctx.user}*"
->>>>>>> Stashed changes
             else:
                 msg=f"*{ctx.user} hugged {member.mention}*"
             hug = Embed(color=0xFFC0CB)
@@ -42,10 +39,7 @@ class slashreactions(Cog):
 
     @jeanne_slash(description="Slap someone or yourself")
     async def slap(self, ctx: Interaction, member: Member = SlashOption(description="Who do you want to slap?", required=False)):
-<<<<<<< Updated upstream
-=======
         await ctx.response.defer()
->>>>>>> Stashed changes
         try:
             botbanquery = db.execute(
                     f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
@@ -63,13 +57,9 @@ class slashreactions(Cog):
             slap.set_footer(text="Fetched from nekos.life")
             slap.set_image(url=slap_api["url"])
             if member == None:
-<<<<<<< Updated upstream
-                    msg=f"*Slapping {ctx.user}*"
-=======
                 msg=f"*Slapping {ctx.user}*"
             elif member==ctx.user:
                 msg = f"*Slapping {ctx.user}*"
->>>>>>> Stashed changes
             else:
                     msg=f"*{ctx.user} slapped {member.mention}*"
             await ctx.channel.send(msg, embed=slap)
@@ -115,11 +105,8 @@ class slashreactions(Cog):
             poke.set_image(url=poke_api["url"])
             if member == None:
                     msg=f"*Poking {ctx.user}*"
-<<<<<<< Updated upstream
-=======
             elif member == ctx.user:
                 msg = f"*Poking {ctx.user}*"
->>>>>>> Stashed changes
             else:
                     msg=f"*{ctx.user} poked {member.mention}*"
             await ctx.channel.send(msg, embed=poke)
@@ -144,11 +131,8 @@ class slashreactions(Cog):
             pat.set_image(url=pat_api["url"])
             if member == None:
                     msg=f"*Patting {ctx.user}*"
-<<<<<<< Updated upstream
-=======
             elif member == ctx.user:
                 msg = f"*Patting {ctx.user}*"
->>>>>>> Stashed changes
             else:
                     msg=f"*{ctx.user} patted {member.mention}*"
             await ctx.channel.send(msg, embed=pat)
@@ -170,11 +154,8 @@ class slashreactions(Cog):
             kiss_api = get(kiss_nekoslife).json()
             if member == None:
                 msg=f"*Kissing {ctx.user}*"
-<<<<<<< Updated upstream
-=======
             if member == ctx.user:
                 msg = f"*Kissing {ctx.user}*"
->>>>>>> Stashed changes
             else:
                 msg=f"*{ctx.user} kissed {member.mention}*"
             kiss = Embed(color=0xFFC0CB)
@@ -199,11 +180,8 @@ class slashreactions(Cog):
             tickle_api = get(tickle_nekoslife).json()
             if member == None:
                 msg=f"*Tickling {ctx.user}*"
-<<<<<<< Updated upstream
-=======
             elif member == ctx.user:
                 msg = f"*Tickling {ctx.user}*"
->>>>>>> Stashed changes
             else:
                 msg=f"*{ctx.user} tickled {member.mention}*"
             tickle = Embed(color=0xFFC0CB)
@@ -228,11 +206,8 @@ class slashreactions(Cog):
             baka_api = get(baka_nekoslife).json()
             if member == None:
                 msg=f"*{ctx.user}, you are a baka!*"
-<<<<<<< Updated upstream
-=======
             if member == ctx.user:
                 msg = f"*{ctx.user}, you are a baka!*"
->>>>>>> Stashed changes
             else:
                 msg=f"*{member.mention}, {ctx.user} called you a baka!*"
             baka = Embed(color=0xFFC0CB)
@@ -257,11 +232,8 @@ class slashreactions(Cog):
             feed_api = get(feed_nekoslife).json()
             if member == None:
                 msg = f"*Feeding {ctx.user}*"
-<<<<<<< Updated upstream
-=======
             elif member == ctx.user:
                 msg = f"*Feeding {ctx.user}*"
->>>>>>> Stashed changes
             else:
                 msg = f"*{ctx.user} fed {member.mention}*"
             feed = Embed(color=0xFFC0CB)
