@@ -91,7 +91,7 @@ class slashmoderation(Cog):
         pass
 
     @list_warns.subcommand(description="View warnings in the server or a member")
-    async def guild(self, ctx: Interaction, member: Member = SlashOption(description="Who's warnings you wanna see?", required=False)):
+    async def guild(self, ctx: Interaction):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
