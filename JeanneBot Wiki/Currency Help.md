@@ -2,12 +2,6 @@
 
 **NOTE:** The currency system is on partial release. It will improve later in time. When using this system, respect the rules. 
 
->**Register**
-
-* Register to use the currency system.
-**NOTE:** Jeanne will ask you to accept or deny after executing the command. This command is temporary until there is a permanent solution. This is majorly required to use the currency system 
-
-    Example: `/register` then type `accept` or `deny
 
 >**Daily**
 
