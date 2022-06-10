@@ -1,18 +1,9 @@
-<<<<<<< Updated upstream
-from config import db
-=======
->>>>>>> Stashed changes
+from json import load
+from secrets import choice
 from nextcord import *
 from nextcord import slash_command as jeanne_slash
 from aiohttp import ClientSession
 from nextcord.ext.commands import Cog
-<<<<<<< Updated upstream
-from config import WEATHER
-from py_expression_eval import Parser
-
-parser = Parser()
-
-=======
 from config import db, WEBHOOK, WEATHER
 from nextcord.abc import GuildChannel
 from nextcord.ui import Button, View
@@ -41,15 +32,11 @@ class invite_button(View):
                       label="DiscordBots", url=discordbots_url))
         self.add_item(Button(style=ButtonStyle.url,
                       label="HAZE", url=haze_url))
->>>>>>> Stashed changes
 
 class slashutilities(Cog):
     def __init__(self, bot):
         self.bot = bot
-<<<<<<< Updated upstream
-=======
         self.parser = Parser()
->>>>>>> Stashed changes
 
     @jeanne_slash(description="Main weather command")
     async def weather(self, ctx: Interaction):
@@ -143,11 +130,7 @@ class slashutilities(Cog):
                 pass
         except:
             try:
-<<<<<<< Updated upstream
-                answer = parser.parse(calculate).evaluate({})
-=======
                 answer = self.parser.parse(calculate).evaluate({})
->>>>>>> Stashed changes
                 calculation = Embed(title="Result", color=0x00FFFF)
                 calculation.add_field(name=calculate, value=answer)
                 await ctx.followup.send(embed=calculation)
@@ -156,8 +139,6 @@ class slashutilities(Cog):
                     description=f"{e}\nPlease refer to [Python Operators](https://www.geeksforgeeks.org/python-operators/?ref=lbp) if you don't know how to use the command")
                 await ctx.followup.send(embed=failed)
 
-<<<<<<< Updated upstream
-=======
     @jeanne_slash(description="Invite me to your server or join the support server")
     async def invite(self, ctx: Interaction):
         await ctx.response.defer()
@@ -234,10 +215,10 @@ class slashutilities(Cog):
                 msg = await self.bot.wait_for('message', check=check, timeout=300)
 
                 await ctx.followup.send("Sent", ephemeral=True)
-
-                embed_text = Embed(description=msg.content, color=0x4169E1)
                 await msg.delete()
+                embed_text=Embed(description=msg.content, color=Color.blue())
                 await channel.send(embed=embed_text)
+                
             except TimeoutError:
                 timeout = Embed(
                     description=f"Guess you have nothing to say", color=0xFF0000)
@@ -256,7 +237,7 @@ class slashutilities(Cog):
             await ctx.followup.send(embed=admin_perm)
 
     @jeanne_slash()
-    async def report(self, ctx: Interaction):
+    async def report(self, ctx: Interaction, type=SlashOption(choices=['bug', 'fault', 'exploit', 'violator'])):
         await ctx.response.defer(ephemeral=True)
         try:
             botbanquery = db.execute(
@@ -267,38 +248,39 @@ class slashutilities(Cog):
             if ctx.user.id == botbanned:
                 pass
         except:
-            await ctx.followup.send("This command has been disabled due to troll reports of users requesting illicit material. Will be up and running after the v3.0 update")
+            if type=='bug':
+                report_type="Bug"
+            elif type == 'fault':
+                report_type = "Fault"
+            elif type == 'exploit':
+                report_type = "Exploit"
+            elif type == 'violator':
+                report_type = "Violator"
 
-    @jeanne_slash(force_global=False)
-    @is_owner()
-    async def report_test(self, ctx: Interaction):
-        await ctx.response.defer(ephemeral=True)
-        try:
-            botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
-            await ctx.followup.send("Please go to your DMs to report", ephemeral=True)
-            asktype = Embed(title="Hi, what are you reporting?")
             await ctx.user.send("What do you want to report?")
+
+            await ctx.followup.send("Please go to your DMs to report", ephemeral=True)
+
 
             def check(m):
                 return m.author == ctx.user and m.content
+            try:
+                msg = await self.bot.wait_for('message', check=check, timeout=300)
 
-            msg = await self.bot.wait_for('message', check=check, timeout=300)
+                report = Embed(title=f"{report_type} Report",
+                           description=msg.content, color=Color.blurple())
+                report.set_footer(text=f"Reporter: {ctx.user}\t{ctx.user.id}")
 
-            await ctx.user.send("Thank you")
+                webhook = SyncWebhook.from_url(WEBHOOK)
+                webhook.send(embed=report)
 
-            report = Embed(title="Report", description=msg.content)
-            report.set_footer(text=f"Reporter: {ctx.user}\t{ctx.user.id}")
-            webhook = SyncWebhook.from_url(WEBHOOK)
-            webhook.send(embed=report)
+                await ctx.user.send("Thank you for your report. I will look into it. Unfortunately, you have to wait for the outcome if it was successful or not.")
+                
+            except Exception as e:
+                print(e)
 
->>>>>>> Stashed changes
+
+
 
 def setup(bot):
     bot.add_cog(slashutilities(bot))
