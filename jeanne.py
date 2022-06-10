@@ -1,9 +1,8 @@
 from os import listdir
 from nextcord import *
-from nextcord.ext.commands import Bot as Jeanne
+from nextcord.ext.commands import AutoShardedBot as Jeanne
 from config import TOKEN
 from nextcord.gateway import DiscordWebSocket
-
 
 class MyDiscordWebSocket(DiscordWebSocket):
 
@@ -17,9 +16,8 @@ class MyDiscordWebSocket(DiscordWebSocket):
 
 DiscordWebSocket.from_client = MyDiscordWebSocket.from_client
 
-intents = Intents(guilds=True, members=True, messages=True,
-                  typing=True, presences=True)
-bot = Jeanne(command_prefix='/', intents=intents,
+intents = Intents(guilds=True, members=True, messages=True, typing=True)
+bot = Jeanne(intents=intents,
              allowed_mentions=AllowedMentions.all())
 bot.remove_command('help')
 
