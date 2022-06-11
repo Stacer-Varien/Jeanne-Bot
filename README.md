@@ -10,11 +10,11 @@ Jeanne is a multipurpose bot with miscellaneous, moderation, management and some
 * Getting information of a user and server
 * A say command that will make Jeanne say the message the user wants
 * A reaction system such as slap, hug and pat
-* * Implementing a welcoming, leaving and modlogging system
+* A welcoming, leaving and modlogging system
+* A partial currency system
 
 **PLANNED FEATURES**
 
-* Implementing a currency system
 * Changing role colour
 * Changing the server’s name and profile picture
 * Editing channel topics
