@@ -14,7 +14,6 @@ class currencysys(Cog):
         self.bot = bot
 
     @jeanne_slash(description="Claim your daily")
-    @cooldown(1, 10, bucket=SlashBucket.author)
     async def daily(self, ctx: Interaction):
         await ctx.response.defer()
         try:
@@ -26,33 +25,60 @@ class currencysys(Cog):
             if ctx.user.id == botbanned:
                 pass
         except:
-            current_time = datetime.now()
+            current_time = date.today()
             tomorrow = (current_time + timedelta(days=1))
 
-            cur = db.execute("INSERT OR IGNORE INTO bankData (user_id, amount) VALUES (?,?)", (ctx.user.id, 100))
+            try:
+                claimed=db.execute(f"SELECT claimed_date FROM bankData WHERE user_id = {ctx.user.id}").fetchone()
+            except:
+                pass
 
-            if cur.rowcount==0:
-                db.execute(
-                f"UPDATE bankData SET amount = amount + 100 WHERE user_id = {ctx.user.id}")
+            if claimed == None:
+                cur = db.execute("INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)", (ctx.user.id, 100, current_time))
 
-            db.commit()
-            daily = Embed(
+                if cur.rowcount==0:
+                    db.execute(
+                f"UPDATE bankData SET amount = amount + 100 AND claimed_date = {current_time} WHERE user_id = {ctx.user.id}")
+            
+                db.commit()
+
+                balance = db.execute(
+                    f"SELECT amount FROM bankData WHERE user_id = {ctx.user.id}").fetchone()[0]
+                daily = Embed(
                 title="Daily", description=f"**{ctx.user}**, you claimed your daily reward.", color=ctx.user.color)
-            daily.add_field(name="Rewards:",
+                daily.add_field(name="Rewards:",
                                 value=f"You received 100 <:quantumpiece:980772736861343774>")
-            daily.add_field(name="Next Daily:",
-                            value=tomorrow.strftime('%Y-%m-%d %H:%M'))
-            await ctx.send(embed=daily)
+                daily.add_field(
+                    name='Balance', value=f"{balance} <:quantumpiece:980772736861343774>")
+                daily.add_field(name="Next Daily:",
+                            value=tomorrow)
+                await ctx.send(embed=daily)
 
+            elif (date.today() - date.fromisoformat(str(claimed[0]))).days > 0:
+                db.execute(
+                f"UPDATE bankData SET amount = amount + 100 AND claimed_date = {current_time} WHERE user_id = {ctx.user.id}")
+                db.commit()
 
-    @daily.error
-    async def daily_error(self, ctx: Interaction, error):
-        if isinstance(error, CallableOnCooldown):
-            reset_date = error.resets_at
-            await ctx.response.defer()
-            cooldown = Embed(
-                description=f"You have already claimed your daily.\nYour next claim is on `{reset_date.strftime('%Y-%m-%d %H:%M')}`", color=Color.red())
-            await ctx.followup.send(embed=cooldown)
+                balance = db.execute(
+                    f"SELECT amount FROM bankData WHERE user_id = {ctx.user.id}").fetchone()[0]
+                    
+                daily = Embed(
+                    title="Daily", description=f"**{ctx.user}**, you claimed your daily reward.", color=ctx.user.color)
+                daily.add_field(name="Rewards:",
+                                value=f"You received 100 <:quantumpiece:980772736861343774>")
+                daily.add_field(
+                    name='Balance', value=f"{balance} <:quantumpiece:980772736861343774>")
+                daily.add_field(name="Next Daily:",
+                                value=tomorrow)
+                await ctx.send(embed=daily)
+                 
+            else:
+                cooldown = Embed(
+                description=f"You have already claimed your daily.\nYour next claim is on `{tomorrow}`", color=Color.red())
+                await ctx.followup.send(embed=cooldown)
+
+            
+
 
     @jeanne_slash(description="Main guess command")
     async def guess(self, ctx: Interaction):
@@ -286,7 +312,12 @@ class currencysys(Cog):
                 description=f"You have {amount} <:quantumpiece:980772736861343774>", color=Color.blue())
                 await ctx.followup.send(embed=balance)
 
-
+    @balance.error
+    async def balance_error(self, ctx: Interaction, error):
+        if isinstance(error, CallableOnCooldown):
+            cooldown = Embed(
+                description=f"WOAH! Calm down! Why keep checking again quickly\nTry again after `{error.retry_after} seconds`", color=0xff0000)
+            await ctx.followup.send(embed=cooldown)
 
     @free.error
     async def free_error(self, ctx:Interaction, error):
