@@ -10,7 +10,7 @@ class Generator:
         self.font1      = os.path.join(os.path.dirname(__file__), 'assets', 'font.ttf')
         self.font2      = os.path.join(os.path.dirname(__file__), 'assets', 'font2.ttf')
 
-    def generate_profile(self, bg_image: str = None, profile_image: str = None, server_level: int = 0, server_current_xp: int = 5, server_user_xp: int = 5, server_next_xp: int = 100, global_level: int = 0, global_current_xp: int = 5, global_user_xp: int = 5, global_next_xp: int = 100, user_name: str = 'Varien#1956'):
+    def generate_profile(self, bg_image: str = None, profile_image: str = None, server_level: int = 0, server_current_xp: int = 0, server_user_xp: int = 0, server_next_xp: int = 0, global_level: int = 0, global_current_xp: int = 0, global_user_xp: int = 0, global_next_xp: int = 0, user_name: str = 'Varien#1956'):
         if not bg_image:
             card = Image.open(self.default_bg).convert("RGBA")
         else:
@@ -105,7 +105,7 @@ class Generator:
         global_xphave = global_user_xp - global_current_xp
 
         global_current_percentage = (global_xphave / global_xpneed) * 100
-        global_length_of_bar = (global_current_percentage * 4.9) + 318
+        global_length_of_bar = (global_current_percentage * 4.9) + 208
 
         blank_draw.rectangle((248, 268, global_length_of_bar, 272), fill=DARK)
 
