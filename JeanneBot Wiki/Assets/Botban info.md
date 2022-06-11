@@ -13,6 +13,7 @@ Botban means that you are banned from using Jeanne and all commands are rendered
 > If someone is botbanned, can they report any bug, faults, exploits or someone breaking the rules they have seen?
 
 * **ANSWER:** It will depend on the accuracy of the report.
+  **UPDATE:** Not anymore since it has been switch to webhook method after the v3.0 update
 
 > Will they be a chance that my botban will be revoked?
 

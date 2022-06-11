@@ -24,7 +24,7 @@
 >**Bot Ban**
 
 * Bans a user from using Jeanne **EVER** again.
-* **NOTE:** When a user is botbanned, all their data in the database except warnings they have will be deleted. They will no longer farm XP and use any command in the bot. They are botbanned **PERMANENTLY** as their will not appeal their botbans.
+* **NOTE:** When a user is botbanned, all their data in the database except warnings they have will be deleted. They will no longer farm XP and QP and use any command in the bot. They are botbanned **PERMANENTLY** as their will not appeal their botbans.
 
     Example: `/botban USER REASON`
 

@@ -4,7 +4,7 @@
 
 > Selfbotting activity
 
-* Selfbotting for intends of farming XP or currency is prohibited. This also includes autotypers, macros or anything that enables automation of commands.
+* Selfbotting for intends of farming XP or QP is prohibited. This also includes autotypers, macros or anything that enables automation of commands.
 
 > Use of alt accounts
 
