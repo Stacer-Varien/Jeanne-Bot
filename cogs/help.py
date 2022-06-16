@@ -23,20 +23,20 @@ class slashhelp(Cog):
         self.bot = bot
 
     @jeanne_slash(description="Get help from the wiki or join the support server for further help")
-    async def help(self, interaction: Interaction):
-        await interaction.response.defer()
+    async def help(self, ctx: Interaction):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
 
-            if interaction.user.id == botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
             help = Embed(
                 description="Click on one of the buttons to open the documentation or get help on the support server")
-            await interaction.followup.send(embed=help, view=help_button())
+            await ctx.followup.send(embed=help, view=help_button())
 
 
 def setup(bot):

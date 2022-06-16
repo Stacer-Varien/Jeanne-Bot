@@ -12,63 +12,63 @@ class slashfun(Cog):
         self.bot = bot
 
     @jeanne_slash(name='8ball', description="Ask 8 ball anything and you will get your awnser")
-    async def _8ball(self, interaction: Interaction, question=SlashOption(description="What question do you have?")):
-        await interaction.response.defer()
+    async def _8ball(self, ctx: Interaction, question=SlashOption(description="What question do you have?")):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
 
-            if interaction.user.id == botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
             embed = Embed(color=0x0000FF)
             embed.add_field(name="Question:", value=f'{question}', inline=False)
             embed.add_field(
                 name="Answer:", value=f'{choice(eight_ball_answers)}', inline=False)
-            await interaction.followup.send(embed=embed)
+            await ctx.followup.send(embed=embed)
 
 
     @jeanne_slash(description="Flip a coin")
-    async def flip(self, interaction: Interaction):
-        await interaction.response.defer()
+    async def flip(self, ctx: Interaction):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
 
-            if interaction.user.id == botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
-            await interaction.followup.send(embed=Embed(color=0x0000FF,
+            await ctx.followup.send(embed=Embed(color=0x0000FF,
                                                             description=f"`{choice(['Heads', 'Tails'])}`"))
 
     @jeanne_slash(description="Say something and I will say it in reversed text")
-    async def reverse(self, interaction: Interaction, text=SlashOption(description="Type something")):
-        await interaction.response.defer()
+    async def reverse(self, ctx: Interaction, text=SlashOption(description="Type something")):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
 
-            if interaction.user.id == botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
-            await interaction.followup.send(text[::-1])
+            await ctx.followup.send(text[::-1])
 
     @jeanne_slash(description="Get a random animeme")
-    async def animeme(self, interaction: Interaction):
-        await interaction.response.defer()
+    async def animeme(self, ctx: Interaction):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
 
-            if interaction.user.id == botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
             file_path_type = ["./Media/Animemes/*.mp4", "./Media/Animemes/*.jpg"]
@@ -77,18 +77,18 @@ class slashfun(Cog):
             file = File(random_animeme)
             animeme = Embed(color=0x0000FF)
             animeme.set_footer(text="Powered by JeanneBot")
-            await interaction.followup.send(file=file, embed=animeme)
+            await ctx.followup.send(file=file, embed=animeme)
 
     @jeanne_slash(description="Combine 2 words to get 2 combined words")
-    async def combine(self, interaction: Interaction, first_word=SlashOption(description="Enter first word"), second_word=SlashOption(description="Enter second word")):
-        await interaction.response.defer()
+    async def combine(self, ctx: Interaction, first_word=SlashOption(description="Enter first word"), second_word=SlashOption(description="Enter second word")):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
 
-            if interaction.user.id == botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
             option_name1letters = first_word[:round(len(first_word) / 2)]
@@ -103,24 +103,24 @@ class slashfun(Cog):
             combine = Embed(
                 description=f"**1st combine word**: {combine1}\n**2nd combined word**:{combine2}", color=0x0000FF)
             combine.set_author(name=f"{first_word} + {second_word}")
-            await interaction.followup.send(embed=combine)
+            await ctx.followup.send(embed=combine)
 
     @jeanne_slash(description="Give me 2 choices and I will pick for you")
-    async def choose(self, interaction: Interaction, choice1=SlashOption(description="Enter first choice"), choice2=SlashOption(description="Enter second word")):
-        await interaction.response.defer()
+    async def choose(self, ctx: Interaction, choice1=SlashOption(description="Enter first choice"), choice2=SlashOption(description="Enter second word")):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {interaction.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
 
-            if interaction.user.id == botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
             pick = [choice1, choice2]
             choose = Embed(
                 description=f"I chose **{choice(pick)}**", color=0x0000FF)
-            await interaction.followup.send(embed=choose)
+            await ctx.followup.send(embed=choose)
 
 
 def setup(bot):

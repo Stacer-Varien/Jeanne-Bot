@@ -24,7 +24,7 @@ class levelling(Cog):
     async def on_message(self, message):
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {message.author.id}")
+                f"SELECT * FROM botbannedData WHERE user_id = ?", (message.author.id,))
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
             botbanned_user = await self.bot.fetch_user(botbanned)
@@ -42,7 +42,7 @@ class levelling(Cog):
                 xp = 5
                 if cursor1.rowcount == 0:
                         scurrent_exp_query = db.execute(
-                        f"SELECT exp, cumulative_exp, lvl FROM serverxpData WHERE user_id = {message.author.id}")
+                        "SELECT exp, cumulative_exp, lvl FROM serverxpData WHERE user_id = ?", (message.author.id,))
                         scurrent_exp_data = scurrent_exp_query.fetchone()
                         scurrent_exp = scurrent_exp_data[0]
                         scurrent_cumulative_exp = scurrent_exp_data[1]
@@ -56,16 +56,16 @@ class levelling(Cog):
                         if supdated_cumulative_exp >= snext_lvl_exp:
                             supdated_exp = supdated_cumulative_exp - snext_lvl_exp
                             db.execute(
-                            f"UPDATE serverxpData SET lvl = lvl + 1, exp = {supdated_exp} WHERE guild_id = {message.guild.id} AND user_id = {message.author.id}")
+                            "UPDATE serverxpData SET lvl = lvl + 1, exp = ? WHERE guild_id = ? AND user_id = ?", (supdated_exp, message.guild.id, message.author.id,))
 
                         db.execute(
-                        f"UPDATE serverxpData SET exp = {supdated_exp}, cumulative_exp = {supdated_cumulative_exp} WHERE guild_id = {message.guild.id} AND user_id = {message.author.id}")
+                            "UPDATE serverxpData SET exp = ?, cumulative_exp = ? WHERE guild_id = ? AND user_id = ?", (supdated_exp, supdated_cumulative_exp, message.guild.id, message.author.id,))
 
                 db.commit()
 
                 if cursor2.rowcount == 0:
                         gcurrent_exp_query = db.execute(
-                            f"SELECT exp, cumulative_exp, lvl FROM globalxpData WHERE user_id = {message.author.id}")
+                            "SELECT exp, cumulative_exp, lvl FROM globalxpData WHERE user_id = ?", (message.author.id,))
                         gcurrent_exp_data = gcurrent_exp_query.fetchone()
                         gcurrent_exp = gcurrent_exp_data[0]
                         gcurrent_cumulative_exp = gcurrent_exp_data[1]
@@ -79,10 +79,10 @@ class levelling(Cog):
                         if gupdated_cumulative_exp >= gnext_lvl_exp:
                             gupdated_exp = gupdated_cumulative_exp - gnext_lvl_exp
                             db.execute(
-                                f"UPDATE globalxpData SET lvl = lvl + 1, exp = {gupdated_exp} WHERE user_id = {message.author.id}")
+                                "UPDATE globalxpData SET lvl = lvl + 1, exp = ? WHERE user_id = ?", (gupdated_exp, message.author.id,))
 
                         db.execute(
-                            f"UPDATE globalxpDATA SET exp = {gupdated_exp}, cumulative_exp = {gupdated_cumulative_exp} WHERE user_id = {message.author.id}")
+                            "UPDATE globalxpDATA SET exp = ?, cumulative_exp = ? WHERE user_id = ?", (gupdated_exp, gupdated_cumulative_exp, message.author.id))
 
                 db.commit()
             await self.bot.process_commands(message)
@@ -92,7 +92,7 @@ class levelling(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                    "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
             botbanned=botbanned_data[0]
 
@@ -103,13 +103,13 @@ class levelling(Cog):
                     member = ctx.user
             try:
                 squery = db.execute(
-                    f"SELECT * FROM serverxpData where guild_id = {ctx.guild.id} AND user_id = {member.id}")
+                    "SELECT * FROM serverxpData where guild_id = ? AND user_id = ?", (ctx.guild.id, member.id,))
                 squery_data = squery.fetchone()
                 slvl = squery_data[2]
                 sexp = squery_data[3]
 
                 gquery = db.execute(
-                    f"SELECT * FROM globalxpData where user_id = {member.id}")
+                    "SELECT * FROM globalxpData where user_id = ?", (member.id,))
                 gquery_data = gquery.fetchone()
                 glvl = gquery_data[1]
                 gexp = gquery_data[2]
@@ -142,17 +142,17 @@ class levelling(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
+            botbanned = botbanned_data[0]
 
-            if ctx.user.id==botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
             if type == "server":
 
                 leaders_query = db.execute(
-                    f"SELECT user_id FROM serverxpData WHERE guild_id = {ctx.guild.id} ORDER BY cumulative_exp DESC LIMIT 0,15"
+                    "SELECT user_id FROM serverxpData WHERE guild_id = ? ORDER BY cumulative_exp DESC LIMIT 15", (ctx.guild.id)
                 )
 
                 embed = Embed(color=0xFFD700)

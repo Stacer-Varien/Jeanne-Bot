@@ -21,11 +21,11 @@ class slashnsfw(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
+            botbanned = botbanned_data[0]
 
-            if ctx.user.id==botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
             file_path_type = ["/Media/Hentai/*.*"]
@@ -43,11 +43,11 @@ class slashnsfw(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
+            botbanned = botbanned_data[0]
 
-            if ctx.user.id==botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
                 try:
@@ -75,11 +75,11 @@ class slashnsfw(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
+            botbanned = botbanned_data[0]
 
-            if ctx.user.id==botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
                 try:

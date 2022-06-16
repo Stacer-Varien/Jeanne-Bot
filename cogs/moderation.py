@@ -25,11 +25,11 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
+            botbanned = botbanned_data[0]
 
-            if ctx.user.id==botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
                 if reason == None:
@@ -95,11 +95,11 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
+            botbanned = botbanned_data[0]
 
-            if ctx.user.id==botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
                 cur = db.cursor()
@@ -124,7 +124,7 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
             botbanned = botbanned_data[0]
 
@@ -165,11 +165,11 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
+            botbanned = botbanned_data[0]
 
-            if ctx.user.id==botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
                 cur = db.cursor()
@@ -229,11 +229,11 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
+            botbanned = botbanned_data[0]
 
-            if ctx.user.id==botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
             if member == ctx.user:
@@ -270,11 +270,11 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
+            botbanned = botbanned_data[0]
 
-            if ctx.user.id==botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
             user = await self.bot.fetch_user(user_id)
@@ -335,11 +335,11 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
+            botbanned = botbanned_data[0]
 
-            if ctx.user.id==botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
                 if member == ctx.user:
@@ -386,11 +386,11 @@ class slashmoderation(Cog):
         await ctx.response.defer(ephemeral=True)
         try:
             botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
+            botbanned = botbanned_data[0]
 
-            if ctx.user.id==botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
                     if limit==None:
@@ -419,11 +419,11 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
+            botbanned = botbanned_data[0]
 
-            if ctx.user.id==botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
                 await member.edit(nick=nickname)
@@ -444,11 +444,11 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
+            botbanned = botbanned_data[0]
 
-            if ctx.user.id==botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
                 user = await self.bot.fetch_user(user_id)
@@ -489,11 +489,11 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
+            botbanned = botbanned_data[0]
 
-            if ctx.user.id==botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
                     if time == None:
@@ -546,11 +546,11 @@ class slashmoderation(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
+            botbanned = botbanned_data[0]
 
-            if ctx.user.id==botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
                 if reason == None:

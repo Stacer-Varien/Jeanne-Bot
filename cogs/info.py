@@ -18,11 +18,11 @@ class slashinfo(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
+            botbanned = botbanned_data[0]
 
-            if ctx.user.id==botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
             botowner = self.bot.get_user(597829930964877369)
@@ -57,11 +57,11 @@ class slashinfo(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
+            botbanned = botbanned_data[0]
 
-            if ctx.user.id==botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
             if member == None:
@@ -98,11 +98,11 @@ class slashinfo(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
+            botbanned = botbanned_data[0]
 
-            if ctx.user.id==botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:        
             guild = ctx.guild
@@ -160,11 +160,11 @@ class slashinfo(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
+            botbanned = botbanned_data[0]
 
-            if ctx.user.id==botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
             start_time = time()
@@ -184,11 +184,11 @@ class slashinfo(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
+            botbanned = botbanned_data[0]
 
-            if ctx.user.id==botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
             guild = ctx.guild
@@ -213,11 +213,11 @@ class slashinfo(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
+            botbanned = botbanned_data[0]
 
-            if ctx.user.id==botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
             if member==None:
@@ -232,11 +232,11 @@ class slashinfo(Cog):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
             botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
+            botbanned = botbanned_data[0]
 
-            if ctx.user.id==botbanned:
+            if ctx.user.id == botbanned:
                 pass
         except:
             if member == None:
