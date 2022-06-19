@@ -4,7 +4,7 @@ Before inviting Jeanne into the server, make sure she has the following permissi
 
 **Main Permissions**
 
-* Jeanne needs the `send messages`, `embed links`, `attach files` and `use application commands` permissions to be enabled as almost all of the responses are in embed. She also needs the `attach files` permission for the image module, hentai command, animeme command and level command.
+* Jeanne needs the `send messages`, `embed links`, `attach files`, `external emojis` and `use application commands` permissions to be enabled as almost all of the responses are in embed. She also needs the `attach files` permission for the image module, hentai command, animeme command and level command and `external emojis` permission to allow her to use emojis from other servers she is in.
 
 **Moderation Permissions**
 
