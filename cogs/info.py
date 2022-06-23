@@ -32,7 +32,7 @@ class slashinfo(Cog):
             embed.add_field(name="Bot ID", value=self.bot.user.id, inline=True)
             embed.add_field(name="Creation Date", value=self.bot.user.created_at.strftime(format), inline=True)
             embed.add_field(
-                name="Version", value=f"• **Python Version:** {py_version.major}.{py_version.minor}.{py_version.micro}\n• **Nextcord Version:** {discord_version}\n• **Bot:** 3.1", inline=True)
+                name="Version", value=f"• **Python Version:** {py_version.major}.{py_version.minor}.{py_version.micro}\n• **Nextcord Version:** {discord_version}\n• **Bot:** 3.2", inline=True)
 
             cur=db.execute("SELECT * FROM globalxpData")
             all_users=len(cur.fetchall())

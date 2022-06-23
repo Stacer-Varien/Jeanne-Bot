@@ -8,15 +8,15 @@ class MyDiscordWebSocket(DiscordWebSocket):
 
     async def send_as_json(self, data):
         if data.get('op') == self.IDENTIFY:
-            if data.get('d', {}).get('properties', {}).get('$browser') is not None:
-                data['d']['properties']['$browser'] = 'Discord Android'
-                data['d']['properties']['$device'] = 'Discord Android'
+            if data.get('d', {}).get('properties', {}).get('browser') is not None:
+                data['d']['properties']['browser'] = 'Discord Android'
+                data['d']['properties']['device'] = 'Discord Android'
         await super().send_as_json(data)
 
 
 DiscordWebSocket.from_client = MyDiscordWebSocket.from_client
 
-intents = Intents(guilds=True, members=True, messages=True, typing=True)
+intents = Intents(guilds=True, members=True, messages=True, typing=True, emojis_and_stickers=True)
 bot = Jeanne(intents=intents,
              allowed_mentions=AllowedMentions.all())
 bot.remove_command('help')
@@ -35,5 +35,8 @@ async def on_ready():
   await bot.change_presence(activity=Game(name="Cool, I'm on mobile"))
   print('Connected to bot: {}'.format(bot.user.name))
   print('Bot ID: {}'.format(bot.user.id))
+
+
+
 
 bot.run(TOKEN)

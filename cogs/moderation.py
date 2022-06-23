@@ -104,7 +104,7 @@ class slashmoderation(Cog):
         except:
                 cur = db.cursor()
                 cur.execute(
-                    f"SELECT * FROM warnDATAv2 WHERE guild_id = {ctx.guild.id}")
+                    "SELECT * FROM warnDATAv2 WHERE guild_id = ?", (ctx.guild.id))
                 record = cur.fetchall()
                 if len(record) == 0:
                     await ctx.followup.send(f"No warnings up to date")
@@ -120,7 +120,7 @@ class slashmoderation(Cog):
                     await ctx.followup.send(embed=embed)
 
     @list_warns.subcommand(description="View warnings in the server or a member")
-    async def member(self, ctx: Interaction, member: Member = SlashOption(description="Who's warnings you wanna see?", required=False)):
+    async def server_user(self, ctx: Interaction, member: Member = SlashOption(description="Who's warnings you wanna see?", required=False)):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
@@ -174,7 +174,7 @@ class slashmoderation(Cog):
         except:
                 cur = db.cursor()
                 cur.execute(
-                    f"SELECT * FROM warnData WHERE guild_id = {ctx.guild.id} AND warn_id = {warn_id}")
+                    "SELECT * FROM warnData WHERE guild_id = ? AND warn_id = ?", (ctx.guild.id, warn_id,))
                 result = cur.fetchone()
 
                 if result == None:
