@@ -164,7 +164,7 @@ class slashmanage(Cog):
     async def rename_channel_error(self, ctx:Interaction, error):
         if isinstance(error, ApplicationMissingPermissions):
             await ctx.response.defer()
-            await ctx.followup.send(channel_perm)
+            await ctx.followup.send(embed=channel_perm)
 
     @jeanne_slash(description="Delete a channel")
     @has_permissions(manage_channels=True)
@@ -193,7 +193,7 @@ class slashmanage(Cog):
     async def delete_channel_error(self, ctx: Interaction, error):
         if isinstance(error, ApplicationMissingPermissions):
             await ctx.response.defer()
-            await ctx.followup.send(channel_perm)
+            await ctx.followup.send(embed=channel_perm)
 
     @jeanne_slash(description='Create a channel')
     @has_permissions(manage_channels=True)
@@ -231,7 +231,7 @@ class slashmanage(Cog):
     async def create_channel_error(self, ctx: Interaction, error):
         if isinstance(error, ApplicationMissingPermissions):
             await ctx.response.defer()
-            await ctx.followup.send(channel_perm)
+            await ctx.followup.send(embed=channel_perm)
 
     @jeanne_slash(description="Removes a modlog channel that was set from the database")
     @has_permissions(manage_guild=True)
