@@ -4,6 +4,7 @@ import requests
 import math
 import os
 
+
 class Generator:
     def __init__(self):
         self.default_bg = os.path.join(os.path.dirname(__file__), 'assets', 'card.png')
