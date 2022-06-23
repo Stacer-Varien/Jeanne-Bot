@@ -36,6 +36,31 @@ class slashnsfw(Cog):
             hentai.set_footer(text="Powered by JeanneBot")
             await ctx.followup.send(file, embed=hentai)
 
+    @jeanne_slash(description="Get a random hentai from Gelbooru")
+    @is_nsfw()
+    async def yandere(self, ctx: Interaction, tag=SlashOption(description="Add a tag for something specific", required=False)):
+        await ctx.response.defer()
+        try:
+            botbanquery = db.execute(
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
+            botbanned_data = botbanquery.fetchone()
+            botbanned = botbanned_data[0]
+
+            if ctx.user.id == botbanned:
+                pass
+        except:
+            if tag == None:
+                gelbooru_api = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=rating:explicit+-loli+-shota+-cub"
+            else:
+                gelbooru_api = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=rating:explicit+-loli+-shota+-cub" + tag
+            
+            response = get(gelbooru_api)
+            ret = loads(response.text)
+            image = choice(ret['post'])["file_url"]
+
+            embed = Embed(title="Gelbooru API").set_image(url=image).set_footer(text="Fetched from Gelbooru")
+            await ctx.followup.send(embed=embed)
+
 
     @jeanne_slash(description="Get a random hentai from Yande.re")
     @is_nsfw()
@@ -60,7 +85,7 @@ class slashnsfw(Cog):
 
                     else:
                         yandere_api = choice(get(
-                            f"https://yande.re/post.json?limit=100&tags=rating:explicit+-loli+-shota+-cub+{tag}").json())
+                            f"https://yande.re/post.json?limit=100&tags=rating:explicit+-loli+-shota+-cub" + tag).json())
 
                     yandere = Embed(color=0xFFC0CB)
                     yandere.set_image(url=yandere_api['file_url'])
