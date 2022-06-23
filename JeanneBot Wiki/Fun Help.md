@@ -13,11 +13,6 @@
 
  Example: `/combine WORD_1 WORD_2`
 
->**Flip**
-
-* Flip a coin and get your result
-
-  Example:  `/flip`
 
 >**Choose**
 
