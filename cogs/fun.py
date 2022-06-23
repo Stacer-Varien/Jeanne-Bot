@@ -29,22 +29,6 @@ class slashfun(Cog):
                 name="Answer:", value=f'{choice(eight_ball_answers)}', inline=False)
             await ctx.followup.send(embed=embed)
 
-
-    @jeanne_slash(description="Flip a coin")
-    async def flip(self, ctx: Interaction):
-        await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
-            await ctx.followup.send(embed=Embed(color=0x0000FF,
-                                                            description=f"`{choice(['Heads', 'Tails'])}`"))
-
     @jeanne_slash(description="Say something and I will say it in reversed text")
     async def reverse(self, ctx: Interaction, text=SlashOption(description="Type something")):
         await ctx.response.defer()
@@ -106,7 +90,7 @@ class slashfun(Cog):
             await ctx.followup.send(embed=combine)
 
     @jeanne_slash(description="Give me 2 choices and I will pick for you")
-    async def choose(self, ctx: Interaction, choice1=SlashOption(description="Enter first choice"), choice2=SlashOption(description="Enter second word")):
+    async def choose(self, ctx: Interaction, first_choice=SlashOption(description="Enter first choice"), second_choice=SlashOption(description="Enter second word")):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
@@ -117,7 +101,7 @@ class slashfun(Cog):
             if ctx.user.id == botbanned:
                 pass
         except:
-            pick = [choice1, choice2]
+            pick = [first_choice, second_choice]
             choose = Embed(
                 description=f"I chose **{choice(pick)}**", color=0x0000FF)
             await ctx.followup.send(embed=choose)

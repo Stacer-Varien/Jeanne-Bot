@@ -27,8 +27,7 @@ class currencysys(Cog):
             if ctx.user.id == botbanned:
                 pass
         except:
-            qpe = utils.get(self.bot.emojis, name='quantumpiece')
-            qp = str(qpe)
+            qp=self.bot.get_emoji(980772736861343774)
             current_time = date.today()
             tomorrow = (current_time + timedelta(days=1))
 
@@ -97,8 +96,7 @@ class currencysys(Cog):
             if ctx.user.id == botbanned:
                 pass
         except:
-            qpe = utils.get(self.bot.emojis, name='quantumpiece')
-            qp = str(qpe)
+            qp=str(self.bot.get_emoji(980772736861343774))
             guessit = Embed(
                 description="I'm thinking of a number between 1 to 10.\nYou have 5 seconds to guess it!", color=0x00FFFF)
             await ctx.followup.send(embed=guessit)
@@ -146,8 +144,7 @@ class currencysys(Cog):
             if ctx.user.id == botbanned:
                 pass
         except:
-            qpe = utils.get(self.bot.emojis, name='quantumpiece')
-            qp = str(qpe)
+            qp=str(self.bot.get_emoji(980772736861343774))
             balance = db.execute(
                 "SELECT amount FROM bankData WHERE user_id = ?", (ctx.user.id,)).fetchone()[0]
             if int(bet) < 5:
@@ -219,8 +216,7 @@ class currencysys(Cog):
             if ctx.user.id == botbanned:
                 pass
         except:
-            qpe = utils.get(self.bot.emojis, name='quantumpiece')
-            qp = str(qpe)
+            qp=str(self.bot.get_emoji(980772736861343774))
             rolled = randint(1, 6)
 
             if rolled == int(digit):
@@ -256,8 +252,7 @@ class currencysys(Cog):
                 pass
         except:
          try:
-            qpe = utils.get(self.bot.emojis, name='quantumpiece')
-            qp = str(qpe)
+            qp=str(self.bot.get_emoji(980772736861343774))
             rolled = randint(1, 6)
             balance = db.execute(
                 "SELECT amount FROM bankData WHERE user_id = ?", (ctx.user.id,)).fetchone()[0]
@@ -309,8 +304,7 @@ class currencysys(Cog):
             if ctx.user.id == botbanned:
                 pass
         except:
-            qpe = utils.get(self.bot.emojis, name='quantumpiece')
-            qp = str(qpe)
+            qp=str(self.bot.get_emoji(980772736861343774))
             cur = db.execute(
                 "SELECT amount FROM bankData WHERE user_id = ?", (ctx.user.id,))
             data = cur.fetchone()
@@ -326,6 +320,7 @@ class currencysys(Cog):
 
     @balance.error
     async def balance_error(self, ctx: Interaction, error):
+        await ctx.response.defer()
         if isinstance(error, CallableOnCooldown):
             cooldown = Embed(
                 description=f"WOAH! Calm down! Why keep checking again quickly?\nTry again after `{error.retry_after} seconds`", color=0xff0000)
@@ -333,6 +328,7 @@ class currencysys(Cog):
 
     @free.error
     async def free_error(self, ctx: Interaction, error):
+        await ctx.response.defer()
         if isinstance(error, CallableOnCooldown):
             reset_hour = error.resets_at.strftime('%H:%M')
             cooldown = Embed(
@@ -341,6 +337,7 @@ class currencysys(Cog):
 
     @bet.error
     async def bet_error(self, ctx: Interaction, error):
+        await ctx.response.defer()
         if isinstance(error, CallableOnCooldown):
             cooldown = Embed(
                 description=f"WOAH! Calm down!\nTry again after `{error.retry_after} seconds`", color=0xff0000)
@@ -348,6 +345,7 @@ class currencysys(Cog):
 
     @_free.error
     async def _free_error(self, ctx: Interaction, error):
+        await ctx.response.defer()
         if isinstance(error, CallableOnCooldown):
             reset_hour = error.resets_at.strftime('%H:%M')
             cooldown = Embed(
@@ -356,11 +354,121 @@ class currencysys(Cog):
 
     @_bet.error
     async def _bet_error(self, ctx: Interaction, error):
+        await ctx.response.defer()
         if isinstance(error, CallableOnCooldown):
             cooldown = Embed(
                 description=f"WOAH! Calm down!\nTry again after `{error.retry_after} seconds`", color=0xff0000)
             await ctx.followup.send(embed=cooldown)
 
+    @jeanne_slash(description="Main coinflip command")
+    async def flip(self, ctx: Interaction):
+        pass
+
+    @flip.subcommand(name='free', description="Flip a coin and earn 20 QP for free")
+    @cooldown(1, 3600, bucket=SlashBucket.author)
+    async def _free_(self, ctx: Interaction, pick=SlashOption(choices=['heads', 'tails'])):
+        await ctx.response.defer()
+        try:
+            botbanquery = db.execute(
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
+            botbanned_data = botbanquery.fetchone()
+            botbanned = botbanned_data[0]
+
+            if ctx.user.id == botbanned:
+                pass
+        except:
+            qp = str(self.bot.get_emoji(980772736861343774))
+            jeannes_pick=['heads', 'tails']
+
+            if pick == choice(jeannes_pick):
+                cur = db.execute("INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)", (
+                    ctx.user.id, 20, (current_time - timedelta(days=1))))
+
+                if cur.rowcount == 0:
+                    db.execute(
+                        f"UPDATE bankData SET amount = amount + 20 WHERE user_id = ?", (ctx.user.id,))
+                db.commit()
+
+                embed=Embed(description="YAY! You got it!\n20 {} has been added".format(qp))
+
+                await ctx.followup.send(embed=embed)
+
+            else:
+                embed = Embed(color=Color.red())
+                embed = Embed(
+                    description="Oh no, it was {}".format(jeannes_pick), color=Color.red())
+                await ctx.followup.send(embed=embed)
+
+    @flip.subcommand(name='bet', description='Flip a coin and earn with betting')
+    @cooldown(1, 30, bucket=SlashBucket.author)
+    async def _bet_(self, ctx:Interaction, bet=SlashOption(required=True), pick=SlashOption(choices=['heads', 'tails'])):
+        await ctx.response.defer()
+        try:
+            botbanquery = db.execute(
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
+            botbanned_data = botbanquery.fetchone()
+            botbanned = botbanned_data[0]
+
+            if ctx.user.id == botbanned:
+                pass
+        except:
+            try:
+                qp = str(self.bot.get_emoji(980772736861343774))
+                jeannes_pick = choice['heads', 'tails']
+                balance = db.execute(
+                    "SELECT amount FROM bankData WHERE user_id = ?", (ctx.user.id,)).fetchone()[0]
+                if int(bet) < 5:
+                    bethigher = Embed(
+                        description=f'Please bet an amount higher than 5 {qp}')
+                    await ctx.followup.send(embed=bethigher)
+
+                elif int(bet) > int(balance):
+                    betlower = Embed(
+                        description=f'Your balance is too low!\nPlease bet lower than {balance} {qp}')
+                    await ctx.followup.send(embed=betlower)
+                elif int(balance) == 0:
+                    zerobal = Embed(
+                        description=f'Unfortunately, you have 0 {qp}.\nPlease do a daily and/or wait for a free     chance to do `/guess free` and/or `/dice free`')
+                    await ctx.followup.send(embed=zerobal)
+
+                else:
+                    if pick == jeannes_pick:
+                        db.execute(
+                                "UPDATE bankData SET amount = amount + {} WHERE user_id = ?", (int(bet), ctx.user.id,))
+                        db.commit()
+
+                        embed = Embed(
+                            description="YAY! You got it!\n{} {} has been added".format(int(bet), qp))
+
+                        await ctx.followup.send(embed=embed)
+
+                    else:
+                        db.execute(
+                            "UPDATE bankData SET amount = amount - ? WHERE user_id = ?", (int(bet), ctx.user.id,))
+                        db.commit()
+                        embed = Embed(color=Color.red())
+                        embed = Embed(
+                           description="Oh no, it was {}".format(jeannes_pick), color=Color.red())
+                        await ctx.followup.send(embed=embed)
+            except:
+                await ctx.followup.send('Please run `/daily')
+
+    @_free_.error
+    async def _freeerror(self, ctx: Interaction, error):
+        await ctx.response.defer()
+        if isinstance(error, CallableOnCooldown):
+            reset_hour = error.resets_at.strftime('%H:%M')
+            cooldown = Embed(
+                description=f"You have already used your free chance\nTry again after {reset_hour}", color=0xff0000)
+            await ctx.followup.send(embed=cooldown)
+
+    @_bet_.error
+    async def _beterror(self, ctx: Interaction, error):
+        await ctx.response.defer()
+        if isinstance(error, CallableOnCooldown):
+            cooldown = Embed(
+                description=f"WOAH! Calm down!\nTry again after `{error.retry_after} seconds`", color=0xff0000)
+            await ctx.followup.send(embed=cooldown)                
 
 def setup(bot):
     bot.add_cog(currencysys(bot))
