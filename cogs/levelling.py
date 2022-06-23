@@ -1,5 +1,6 @@
 from asyncio import get_event_loop
 from functools import partial
+from sqlite3 import connect
 from nextcord.ext.commands import Cog, CooldownMapping, BucketType
 from nextcord import *
 from nextcord import slash_command as jeanne_slash
@@ -114,9 +115,16 @@ class levelling(Cog):
                 glvl = gquery_data[1]
                 gexp = gquery_data[2]
 
+                user_inv=connect("./User_Inventories/{}.db".format(member.id))
+                cur=user_inv.cursor()
+
+                try:
+                    bg=cur.execute("SELECT link_bg FROM backgrounds WHERE selected = ?", (1,)).fetchone()[0]
+                except:
+                    bg=''
 
                 args = {
-                    'bg_image': '',
+                        'bg_image': bg,
  			            'profile_image': str(member.avatar.with_format('png')),
  			            'server_level': slvl,
  			            'server_user_xp': sexp,
@@ -126,6 +134,8 @@ class levelling(Cog):
  			            'global_next_xp': ((glvl * 50) + ((glvl - 1) * 25) + 50),
  			            'user_name': str(member),
                         }
+
+
 
                 func = partial(self.get_card, args)
                 image = await get_event_loop().run_in_executor(None, func)
