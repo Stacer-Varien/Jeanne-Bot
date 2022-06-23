@@ -76,8 +76,6 @@ class slashreactions(Cog):
             if ctx.user.id==botbanned:
                 pass
         except:
-            wait = await ctx.followup.send("Showing smug")
-            await wait.delete()
             smug_api = get(smug_nekoslife).json()
 
             smug = Embed(color=0xFFC0CB)
@@ -99,10 +97,10 @@ class slashreactions(Cog):
         except:
             wait = await ctx.followup.send("Sending poke")
             await wait.delete()
-            poke_api = get(poke_nekoslife).json()
+            poke_api = get(poke_nekosfun).json()
             poke = Embed(color=0xFFC0CB)
-            poke.set_footer(text="Fetched from nekos.life")
-            poke.set_image(url=poke_api["url"])
+            poke.set_footer(text="Fetched from nekos.fun")
+            poke.set_image(url=poke_api["image"])
             if member == None:
                     msg=f"*Poking {ctx.user}*"
             elif member == ctx.user:
@@ -151,7 +149,7 @@ class slashreactions(Cog):
         except:
             wait = await ctx.followup.send("Giving kiss")
             await wait.delete()
-            kiss_api = get(kiss_nekoslife).json()
+            kiss_api = get(kiss_nekosfun).json()
             if member == None:
                 msg=f"*Kissing {ctx.user}*"
             if member == ctx.user:
@@ -160,7 +158,7 @@ class slashreactions(Cog):
                 msg=f"*{ctx.user} kissed {member.mention}*"
             kiss = Embed(color=0xFFC0CB)
             kiss.set_footer(text="Fetched from nekos.life")
-            kiss.set_image(url=kiss_api["url"])
+            kiss.set_image(url=kiss_api["image"])
             await ctx.channel.send(msg, embed=kiss)
 
     @jeanne_slash(description="Tickle someone or yourself")
@@ -203,16 +201,16 @@ class slashreactions(Cog):
         except:
             wait = await ctx.followup.send("Shouting baka")
             await wait.delete()
-            baka_api = get(baka_nekoslife).json()
+            baka_api = get(baka_nekosfun).json()
             if member == None:
                 msg=f"*{ctx.user}, you are a baka!*"
-            if member == ctx.user:
+            elif member == ctx.user:
                 msg = f"*{ctx.user}, you are a baka!*"
             else:
                 msg=f"*{member.mention}, {ctx.user} called you a baka!*"
             baka = Embed(color=0xFFC0CB)
-            baka.set_footer(text="Fetched from nekos.life")
-            baka.set_image(url=baka_api["url"])
+            baka.set_footer(text="Fetched from nekos.fun")
+            baka.set_image(url=baka_api['image'])
             await ctx.channel.send(msg, embed=baka)
 
     @jeanne_slash(description="Feed someone or yourself")
