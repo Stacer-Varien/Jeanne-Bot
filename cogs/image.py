@@ -16,6 +16,7 @@ class slashimages(Cog):
 
     @jeanne_slash(description="Get a kitsune image")
     async def kitsune(self, ctx : Interaction):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
                 "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
@@ -33,6 +34,7 @@ class slashimages(Cog):
             
     @jeanne_slash(description="Need a wallpaper for your PC or phone?")
     async def wallpaper(self, ctx : Interaction):
+        await ctx.response.defer()
         try:
             botbanquery = db.execute(
                 "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))

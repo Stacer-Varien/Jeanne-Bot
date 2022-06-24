@@ -120,7 +120,7 @@ class slashmoderation(Cog):
                     await ctx.followup.send(embed=embed)
 
     @list_warns.subcommand(description="View warnings in the server or a member")
-    async def server_user(self, ctx: Interaction, member: Member = SlashOption(description="Who's warnings you wanna see?", required=False)):
+    async def client(self, ctx: Interaction, member: Member = SlashOption(description="Who's warnings you wanna see?", required=False)):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(

@@ -5,7 +5,7 @@
 >**Hentai**
 
 * Get a random hentai image from Jeanne.
-* **NOTE:** There is no API to fetch images as it is fetched from the local storage (aka, my 'homework' folder). The files are JPEG and MP4 and reduced to 8MB or less for storage and Discord reasons.
+* **NOTE:** They are randomly picked from Gelbooru, Yande.re and Konachan
 
     Example: `/hentai`
 

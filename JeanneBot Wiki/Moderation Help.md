@@ -6,14 +6,14 @@
 * **NOTE:** A warn ID is given. This warn ID is server specific. This command can work if you have roles set in your server. You won't be able to warn someone higher than you but you can warn people lower than you
 * **Required permissions:** Kick Members
 
-    Exapmle: `/warn USER REASON`
+    Example: `/warn USER REASON`
 
 >**List Warns**
 
 * List warnings of members in the server or of a member. Their warn IDs are shown
 * **NOTE:** Everyone can use this command
 
-    Exapmle: `/list_warns` (if for all members in the server) / `/list_warns MEMBER` (if for a member)
+    Exapmle: `/list_warns` (if for all members in the server) / `/list_warns CLIENT` (if for a member)
 
 >**Revoke Warn**
 
