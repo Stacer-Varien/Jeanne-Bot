@@ -28,17 +28,38 @@ class slashnsfw(Cog):
             if ctx.user.id == botbanned:
                 pass
         except:
-            file_path_type = ["/Media/Hentai/*.*"]
-            images = glob(choice(file_path_type))
-            random_image = choice(images)
-            file = File(random_image)
-            hentai = Embed(color=0xFFC0CB)
-            hentai.set_footer(text="Powered by JeanneBot")
-            await ctx.followup.send(file, embed=hentai)
+
+            gelbooru_api = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=rating:explicit+-loli+-shota+-cub"
+            response = get(gelbooru_api)
+            ret = loads(response.text)
+            gelbooru_image = choice(ret['post'])["file_url"] 
+
+            yandere_image = choice(get("https://yande.re/post.json?limit=100&tags=rating:explicit+-loli+-shota+-cub").json())['file_url']
+
+            konachan_image = choice(get("https://konachan.com/post.json?s=post&q=index&limit=100&tags=rating:explicit+-loli+-shota+-cub").json())['file_url']
+
+            h=[gelbooru_image, yandere_image, konachan_image]
+
+            hentai=choice(h)
+
+            if hentai == gelbooru_image:
+                source='Gelbooru'
+
+            elif hentai == yandere_image:
+                source='Yande.re'
+
+            elif hentai == konachan_image:
+                source='Konachan'
+
+            embed = Embed(color=0xFFC0CB).set_image(url=hentai).set_footer(text="Fetched from {}".format(source))
+            await ctx.followup.send(embed=embed)            
+
+            
+            
 
     @jeanne_slash(description="Get a random hentai from Gelbooru")
     @is_nsfw()
-    async def yandere(self, ctx: Interaction, tag=SlashOption(description="Add a tag for something specific", required=False)):
+    async def gelbooru(self, ctx: Interaction, tag=SlashOption(description="Add a tag for something specific", required=False)):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
@@ -58,7 +79,8 @@ class slashnsfw(Cog):
             ret = loads(response.text)
             image = choice(ret['post'])["file_url"]
 
-            embed = Embed(title="Gelbooru API").set_image(url=image).set_footer(text="Fetched from Gelbooru")
+            embed = Embed(color=0xFFC0CB).set_image(
+                url=image).set_footer(text="Fetched from Gelbooru")
             await ctx.followup.send(embed=embed)
 
 
