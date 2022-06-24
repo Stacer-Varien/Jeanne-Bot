@@ -3,7 +3,7 @@ from io import StringIO
 from nextcord.ext.commands import Cog
 from nextcord import *
 from nextcord import slash_command as jeanne_slash
-from os import execv
+from os import execv, remove
 from sys import executable, argv
 from config import BB_WEBHOOK, db
 from nextcord.ext.application_checks import *
@@ -97,7 +97,7 @@ class slashowner(Cog):
     @jeanne_slash(description="Botban a user from using the bot")
     @is_owner()
     async def botban(self, ctx: Interaction, user_id=SlashOption(description="Which user?"), reason = SlashOption(description="Add a reason")):
-        await ctx.response.defer()
+        await ctx.response.defer(ephemeral=True)
         try:
             botbanquery = db.execute(
                     f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
@@ -125,6 +125,11 @@ class slashowner(Cog):
                 result2=cur2.fetchone()
                 cur3.execute(f"SELECT * FROM bankData WHERE user_id = {user.id}")
                 result3=cur3.fetchone()
+
+                try:
+                    remove("./User_Inventories/{}.db".format(user.id))
+                except:
+                    pass
 
                 if result1 == None:
                     pass
@@ -154,7 +159,7 @@ class slashowner(Cog):
                 botbanned.add_field(name="Reason of ban",
                                         value=reason,
                                         inline=False)
-                botbanned.set_footer(text="Due to this user botbanned, all data except warnings are immediatley deleted from the database! They will have no chance of appealing their botban.")
+                botbanned.set_footer(text="Due to this user botbanned, all data except warnings are immediatley deleted from the database! They will have no chance of appealing their botban and all the commands executed by them are now rendered USELESS!")
                 botbanned.set_thumbnail(url=user.avatar)
                 webhook = SyncWebhook.from_url(BB_WEBHOOK)
                 webhook.send(embed=botbanned)
