@@ -7,6 +7,7 @@ from nextcord import slash_command as jeanne_slash
 from config import db
 from typing import Optional
 from assets.levelcard.generator import Generator
+from cooldowns import *
 
 class levelling(Cog):
     def __init__(self, bot):
@@ -89,6 +90,7 @@ class levelling(Cog):
             await self.bot.process_commands(message)
 
     @jeanne_slash(description="See your level or someone else's level")
+    @cooldown(1, 60, bucket=SlashBucket.author)
     async def level(self, ctx: Interaction, member: Member = SlashOption(description="Which member?", required=False)):
         await ctx.response.defer()
         try:
@@ -148,6 +150,7 @@ class levelling(Cog):
 
 
     @jeanne_slash(description="Check the users with the most XP in the server")
+    @cooldown(1, 60, bucket=SlashBucket.author)
     async def rank(self, ctx: Interaction, type=SlashOption(description="Server or Global specific?", choices=["server", "global"])):
         await ctx.response.defer()
         try:
@@ -162,7 +165,8 @@ class levelling(Cog):
             if type == "server":
 
                 leaders_query = db.execute(
-                    "SELECT user_id FROM serverxpData WHERE guild_id = ? ORDER BY cumulative_exp DESC LIMIT 15", (ctx.guild.id)
+                    "SELECT user_id FROM serverxpData WHERE guild_id = ? ORDER BY cumulative_exp DESC LIMIT 15;", (
+                        ctx.guild.id,)
                 )
 
                 embed = Embed(color=0xFFD700)
