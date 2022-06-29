@@ -8,7 +8,7 @@
 
 > Use of alt accounts
 
-* There is no limits to the use of alt accounts. However, if you are caught using alts to bypass botbans or farming currency (implemented in the future) and asking to transfer to your alt frequently (such as 'I lost my account password' stories), you will be botbanned.
+* There is no limits to the use of alt accounts. However, if you are caught using alts to bypass botbans or farming currency and asking to transfer to your alt frequently (such as 'I lost my account password' stories), you will be botbanned.
 
 > Racism, homophobia and sexism
 
