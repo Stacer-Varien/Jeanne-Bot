@@ -15,7 +15,7 @@ class welcomer(Cog):
 
             server = self.bot.get_guild(server_id)
 
-            if member.guild.id == server_id:
+            if member.guild.id == server.id:
                 channel_id_query = db.execute(
                     "SELECT channel_id FROM welcomerData where guild_id = ?", (member.guild.id))
                 channel_id = channel_id_query.fetchone()[0]
@@ -26,8 +26,8 @@ class welcomer(Cog):
                 await channel.send(embed=welcome)
             else:
                 pass
-        except:
-            pass
+        except Exception as e:
+            print(e)
 
     @Cog.listener()
     async def on_member_remove(self, member):
