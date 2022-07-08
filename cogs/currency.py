@@ -352,9 +352,9 @@ class currencysys(Cog):
     async def _free_error(self, ctx: Interaction, error):
         await ctx.response.defer()
         if isinstance(error, CallableOnCooldown):
-            reset_hour = error.resets_at.strftime('%H:%M')
+            reset_hour = round(error.resets_at.timestamp())
             cooldown = Embed(
-                description=f"You have already used your free chance\nTry again after {reset_hour}", color=0xff0000)
+                description=f"You have already used your free chance\nTry again after <t:{str(reset_hour)}:t>", color=0xff0000)
             await ctx.followup.send(embed=cooldown)
 
     @_bet.error
@@ -402,7 +402,7 @@ class currencysys(Cog):
             else:
                 embed = Embed(color=Color.red())
                 embed = Embed(
-                    description="Oh no, it was {}".format(jeannes_pick), color=Color.red())
+                    description="Oh no, it was {}".format(choice(jeannes_pick)), color=Color.red())
                 await ctx.followup.send(embed=embed)
 
     @flip.subcommand(name='bet', description='Flip a coin and earn with betting')
@@ -420,7 +420,7 @@ class currencysys(Cog):
         except:
             try:
                 qp = str(self.bot.get_emoji(980772736861343774))
-                jeannes_pick = choice['heads', 'tails']
+                jeannes_pick = ['heads', 'tails']
                 balance = db.execute(
                     "SELECT amount FROM bankData WHERE user_id = ?", (ctx.user.id,)).fetchone()[0]
                 if int(bet) < 5:
@@ -438,7 +438,7 @@ class currencysys(Cog):
                     await ctx.followup.send(embed=zerobal)
 
                 else:
-                    if pick == jeannes_pick:
+                    if pick == choice(jeannes_pick):
                         db.execute(
                             "UPDATE bankData SET amount = amount + {} WHERE user_id = ?", (int(bet), ctx.user.id,))
                         db.commit()
@@ -454,7 +454,7 @@ class currencysys(Cog):
                         db.commit()
                         embed = Embed(color=Color.red())
                         embed = Embed(
-                            description="Oh no, it was {}".format(jeannes_pick), color=Color.red())
+                            description="Oh no, it was {}".format(choice(jeannes_pick)), color=Color.red())
                         await ctx.followup.send(embed=embed)
             except:
                 await ctx.followup.send('Please run `/daily')
