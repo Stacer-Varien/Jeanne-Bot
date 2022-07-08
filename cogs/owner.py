@@ -168,7 +168,7 @@ class slashowner(Cog):
 
     @jeanne_slash(description="Evaluates a code")
     @is_owner()
-    async def evaluate(self, ctx: Interaction):
+    async def evaluate(self, ctx: Interaction, raw=SlashOption(choices=["True", "False"], required=False)):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
@@ -199,13 +199,16 @@ class slashowner(Cog):
                         embed.set_footer(
                             text=f"Compiled in {round(self.bot.latency * 1000)}ms")
                         return await ctx.followup.send(embed=embed)
-                    embed1 = Embed(title="Evaluation suscessful! :white_check_mark: \nResults:",
+                    if raw == None:
+                        embed1 = Embed(title="Evaluation suscessful! :white_check_mark: \nResults:",
                                 description=f'```{str_obj.getvalue()}```', color=0x008000)
-                    embed1.set_footer(
+                        embed1.set_footer(
                             text=f"Compiled in {round(self.bot.latency * 1000)}ms")
-                    await ctx.followup.send(embed=embed1)
+                        await ctx.followup.send(embed=embed1)
+                    else:
+                        await ctx.followup.send(str_obj.getvalue())
 
-    @jeanne_slash(description="Makes me leave a server")
+    @jeanne_slash(description="Make me leave a server")
     @is_owner()
     async def leave_server(self, ctx: Interaction, server_id=SlashOption(description="What is the server's ID?", required=True)):
         await ctx.response.defer()
