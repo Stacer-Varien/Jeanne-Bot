@@ -12,7 +12,7 @@ class topgg(Cog):
         self.bot = bot
         self.update_stats.start()
         self.topggpy = DBLClient(self.bot, dbl_token)
-        self.topgg_webhook = WebhookManager(self.bot).dbl_webhook("/dblwebhook", "password")
+        self.topgg_webhook = WebhookManager(self.bot).dbl_webhook("/dblwebhook", 'password')
         self.topgg_webhook.run(5000)
 
     @tasks.loop(minutes=30)

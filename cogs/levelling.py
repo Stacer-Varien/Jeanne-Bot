@@ -137,8 +137,6 @@ class levelling(Cog):
  			            'user_name': str(member),
                         }
 
-
-
                 func = partial(self.get_card, args)
                 image = await get_event_loop().run_in_executor(None, func)
 

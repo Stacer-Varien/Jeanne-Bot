@@ -75,22 +75,24 @@ class slashinfo(Cog):
             else:
                 botr = "No"
 
+            date = round(member.joined_at.timestamp())
             userinfo = Embed(title="{}'s Info".format(member.name),
                             color=0xccff33)
             userinfo.add_field(name="Name", value=member, inline=True)
             userinfo.add_field(name="ID", value=member.id, inline=True)
             userinfo.add_field(name="Is Bot?", value=botr, inline=True)
             userinfo.add_field(
-                name="Joined Server", value=member.joined_at.strftime(format), inline=True)
+                name="Joined Server", value='<t:{}:f>'.format(str(date)), inline=True)
             userinfo.add_field(name="Number of Roles",
                                value=(len(hasroles) + 1), inline=True)
             userinfo.add_field(name="Roles Held",
                             value=''.join(hasroles[:20]) + '@everyone', inline=False)
             userinfo.set_thumbnail(url=member.display_avatar)
-            if user.banner==None:
-                pass
-            else:
+            
+            try:
                 userinfo.set_image(url=user.banner)
+            except:
+                pass
             await ctx.followup.send(embed=userinfo)
 
     @jeanne_slash(description="Get information about this server")

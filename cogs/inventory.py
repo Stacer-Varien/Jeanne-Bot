@@ -1,3 +1,4 @@
+from assets.db_functions import add_user_custom_wallpaper, add_user_wallpaper, fetch_user_inventory, fetch_wallpapers, get_balance, get_user_inventory, get_wallpaper
 from config import inv_db, db
 from nextcord import *
 from nextcord import slash_command as jeanne_slash
@@ -15,19 +16,11 @@ class Confirm(ui.View):
 
     @ui.button(label="Confirm", style=ButtonStyle.green)
     async def confirm(self, button: ui.Button, ctx: Interaction):
-        def is_author():
-            return ctx.user
-        
-        if is_author:
             self.value = True
             self.stop()
 
     @ui.button(label="Cancel", style=ButtonStyle.grey)
     async def cancel(self, button: ui.Button, ctx: Interaction):
-        def is_author():
-            return ctx.user
-        
-        if is_author:
             self.value = False
             self.stop()
 
@@ -56,14 +49,7 @@ class inventory(Cog):
             if ctx.user.id == botbanned:
                 pass
         except:
-            w=inv_db.execute("SELECT * FROM wallpapers").fetchall()
-
-            backgrounds=Embed(title='Avaliable Background Pictures for Level Cards', color=Color.blue()).set_footer(text="To view them, click on the hyperlinked names")
-
-            for a in w:
-                backgrounds.add_field(name=f"{a[1]}", value='[Item ID: {}]({})'.format(a[0], a[2]), inline=True)
-
-            await ctx.followup.send(embed=backgrounds)
+            await ctx.followup.send(embed=fetch_wallpapers())
 
     @shop.subcommand(description="Buy a background pic for your level card")
     async def buy_background(self, ctx:Interaction, item_id):
@@ -77,22 +63,21 @@ class inventory(Cog):
             if ctx.user.id == botbanned:
                 pass
         except:
-            balance=db.execute("SELECT amount FROM bankData WHERE user_id = ?", (ctx.user.id,)).fetchone()
+            balance = get_balance(ctx.user.id)
             
 
-            if balance == None:
+            if int(balance) == 0:
                 nomoney = Embed(description='You have no QP.\nPlease get QP by doing `/daily`, `/guess` and/or `/dice`')
                 await ctx.followup.send(embed=nomoney)
             
-            elif int(balance[0]) < 1000:
+            elif int(balance) < 1000:
                 notenough = Embed(
                     description='You do not have enough QP.\nPlease get more QP by doing `/daily`, `/guess` and/or `/dice`')
                 await ctx.followup.send(embed=notenough)
 
             else:
                 qp = self.bot.get_emoji(980772736861343774)
-                wallpaper = inv_db.execute(
-                    'SELECT * FROM wallpapers WHERE id = ?', (item_id,)).fetchone()
+                wallpaper=get_wallpaper(item_id)
                         
                 if wallpaper == None:
                     nonexist=Embed(description='Invalid item ID passed')
@@ -125,114 +110,14 @@ class inventory(Cog):
                     if view.value is None:
                         pass
                     elif view.value is True:
-                        user_inv=connect("./User_Inventories/{}.db".format(ctx.user.id))
-                        cur=user_inv.cursor()
-                        cur.execute("CREATE TABLE IF NOT EXISTS backgrounds (item_id int, link_bg text, selected int)")
-                        cur.execute("INSERT OR IGNORE INTO backgrounds (item_id, link_bg, selected) VALUES (?,?,?)", (item_id, wallpaper[2], 0,))
-                        user_inv.commit()
-
-                        db.execute("UPDATE bankData SET amount = amount - ? WHERE user_id = ?", (1000, ctx.user.id,))
-                        db.commit()
-
+                        get_user_inventory(ctx.user.id)
+                        add_user_wallpaper(ctx.user.id, item_id)
                         embed1 = Embed(description="Background wallpaper bought. Don't forget to use `/use ITEM_ID` to set it",color=Color.blue())
                         await ctx.followup.send(embed=embed1)
 
                     elif view.value is False:
                         await ctx.followup.send("Cancelled")
-
-    @shop.subcommand(description="Buy a custom background pic for your level card")
-    async def buy_custom_background(self, ctx: Interaction, name=SlashOption(description='Name your background', required=True), link=SlashOption(description="Make sure the link is permanent", required=True)):
-        await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
-            balance = db.execute(
-                "SELECT amount FROM bankData WHERE user_id = ?", (ctx.user.id,)).fetchone()
-
-            if balance == None:
-                nomoney = Embed(
-                    description='You have no QP.\nPlease get QP by doing `/daily`, `/guess` and/or `/dice`')
-                await ctx.followup.send(embed=nomoney)
-
-            elif int(balance[0]) < 1000:
-                notenough = Embed(
-                    description='You do not have enough QP.\nPlease get more QP by doing `/daily`, `/guess` and/or `/dice`')
-                await ctx.followup.send(embed=notenough)
-
-            else:
-                qp = self.bot.get_emoji(980772736861343774)
-                view = Confirm()
-
-                wait=Embed(description="Before you buy a custom background for your level card, did you make sure that it is:\n• Set on a 9:5 ratio\njeannebot.nicepages.io\n• At least 900x500 for better quality\n• Does not violate ToS or contains any NSFW or TW imagery").set_footer(text="If it doesn't meet one of the requirements, it would end up with undesirable results")
-                await ctx.followup.send(embed=wait, view=view)
-
-                if view.value is None:
-                    pass
-                elif view.value is True:
-                    if link.startswith("http"):
-                     try:
-                        args = {
-                            'bg_image': link,
-             	    	    'profile_image': str(ctx.user.avatar.with_format('png')),
-                         			'server_level': 100,
-                         			'server_user_xp': 50,
-                         			'server_next_xp': 100,
-                            'global_level': 100,
-                         			'global_user_xp': 100,
-                         			'global_next_xp': 100,
-                         			'user_name': str(ctx.user),
-                        }
-
-                        func = partial(self.get_card, args)
-                        image = await get_event_loop().run_in_executor(None, func)
-
-                        file = File(fp=image, filename=f'preview_level_card.png')
-
-                        preview = Embed(description="This is the preview of the level card.", color=Color.blue()).add_field(name="Cost", value=f"1000 {qp}").set_footer(
-                        text="Is this the background you wanted?").set_footer(text="Please note that if the custom background violates ToS or is NSFW, it will be removed with NO REFUNDS!")
-                        view = Confirm()
-                        await ctx.followup.send(file=file, embed=preview, view=view)
-                        await view.wait()
-
-                        if view.value is None:
-                            pass
-                        elif view.value is True:
-                            user_inv = connect(
-                                "./User_Inventories/{}.db".format(ctx.user.id))
-                            cur = user_inv.cursor()
-                            cur.execute(
-                                "CREATE TABLE IF NOT EXISTS backgrounds (item_id text, link_bg text, selected int)")
-                            cur.execute(
-                                "INSERT OR IGNORE INTO backgrounds (item_id, link_bg, selected) VALUES (?,?,?)", (name, link, 0,))
-                            user_inv.commit()
-
-                            db.execute(
-                                "UPDATE bankData SET amount = amount - ? WHERE user_id = ?", (1000, ctx.user.id,))
-                            db.commit()
-
-                            embed1 = Embed(
-                                description="Background wallpaper bought. Don't forget to use `/use ITEM_ID` (which is the  name you've set) to set it", color=Color.blue())
-                            await ctx.followup.send(embed=embed1)
-                            view.stop()
-
-                        elif view.value is False:
-                            await ctx.followup.send("Cancelled")
-                            view.stop()
-                     except:
-                        await ctx.followup.send("Invalid image link")
-                    else:
-                        await ctx.followup.send("Invalid image link")
-
-                elif view.value is False:
-                    try_again=Embed(description="Cancelled")
-                    await ctx.followup.send(embed=try_again)
-                    view.stop()
+                inv_db.commit()
     
     @jeanne_slash(description='Use a background picture')
     async def use(self, ctx:Interaction, item_id):
@@ -267,8 +152,100 @@ class inventory(Cog):
             except:
                 await ctx.followup.send("You have no items in your inventory")
 
+    @shop.subcommand(description="Buy a custom background pic for your level card")
+    async def buy_custom_background(self, ctx:Interaction, name=SlashOption(description='Name your background', required=True), link=SlashOption(description="Make sure the link is permanent", required=True)):
+        await ctx.response.defer()
+        try:
+            botbanquery = db.execute(
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
+            botbanned_data = botbanquery.fetchone()
+            botbanned = botbanned_data[0]
 
+            if ctx.user.id == botbanned:
+                pass
+        except:
+            balance=db.execute("SELECT amount FROM bankData WHERE user_id = ?", (ctx.user.id,)).fetchone()
+            
 
+            if balance == None:
+                nomoney = Embed(description='You have no QP.\nPlease get QP by doing `/daily`, `/guess` and/or `/dice`')
+                await ctx.followup.send(embed=nomoney)
+            
+            elif int(balance[0]) < 1000:
+                notenough = Embed(
+                    description='You do not have enough QP.\nPlease get more QP by doing `/daily`, `/guess` and/or `/dice`')
+                await ctx.followup.send(embed=notenough)
 
+            else:
+                qp = self.bot.get_emoji(980772736861343774)
+                        
+                if link.startswith("http"):
+                 try:
+                    args = {
+                        'bg_image': link,
+             	    	'profile_image': str(ctx.user.avatar.with_format('png')),
+             			'server_level': 100,
+             			'server_user_xp': 50,
+             			'server_next_xp': 100,
+                        'global_level': 100,
+             			'global_user_xp': 100,
+             			'global_next_xp': 100,
+             			'user_name': str(ctx.user),
+                    }
+
+                    func = partial(self.get_card, args)
+                    image = await get_event_loop().run_in_executor(None, func)
+
+                    file = File(fp=image, filename=f'preview_level_card.png')
+
+                    preview = Embed(description="This is the preview of the level card.", color=Color.blue()).add_field(name="Cost", value=f"1000 {qp}").set_footer(
+                        text="Is this the background you wanted?").set_footer(text="Please note that if the custom background violates ToS or is NSFW, it will be removed with NO REFUNDS!")
+                    view = Confirm()
+                    await ctx.followup.send(file=file, embed=preview, view=view)
+                    await view.wait()
+
+                    if view.value is None:
+                        pass
+                    elif view.value is True:
+                        add_user_custom_wallpaper(ctx.user.id, name, link)
+
+                        embed1 = Embed(
+                            description="Background wallpaper bought. Don't forget to use `/use ITEM_ID` (which is the name you've set) to set it", color=Color.blue())
+                        await ctx.followup.send(embed=embed1)
+
+                    elif view.value is False:
+                        await ctx.followup.send("Cancelled")
+                    
+                 except:
+                    await ctx.followup.send("Invalid image link")
+                else:
+                    await ctx.followup.send("Invalid image link")
+
+    @jeanne_slash(description='Check which backgrounds you have')
+    async def inventory(self, ctx:Interaction):
+        await ctx.response.defer()
+        try:
+            botbanquery = db.execute(
+                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
+            botbanned_data = botbanquery.fetchone()
+            botbanned = botbanned_data[0]
+
+            if ctx.user.id == botbanned:
+                pass
+        except:
+            a = fetch_user_inventory(ctx.user.id, 'bg')
+            for b in a:
+                if b is None:
+                    await ctx.followup.send("You dont have anything available")
+                
+                else:
+                    inv=Embed(color=Color.blue()).set_footer(text='To view them, click on the hyperlink')
+                    r=1
+                    for b in a:
+                        inv.add_field(name="Item ID: {}".format(b[0]), value="[View]({})".format(b[1]), inline=True)
+                        r+=1
+
+                    await ctx.followup.send(embed=inv)
+               
 def setup(bot):
     bot.add_cog(inventory(bot))

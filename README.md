@@ -15,7 +15,6 @@ Jeanne is a multipurpose bot with miscellaneous, moderation, management and some
 
 **PLANNED FEATURES**
 
-* Changing role colour
 * Changing the server’s name and profile picture
 * Editing channel topics
 * Adding a softban command that will have the user to be banned for a specific amount of time

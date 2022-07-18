@@ -3,6 +3,7 @@ from nextcord import slash_command as jeanne_slash
 from nextcord.ext.commands import Cog
 from nextcord.ui import Button, View
 from config import db
+from assets.db_functions import check_botbanned_user
 
 
 class help_button(View):
@@ -25,15 +26,10 @@ class slashhelp(Cog):
     @jeanne_slash(description="Get help from the wiki or join the support server for further help")
     async def help(self, ctx: Interaction):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             help = Embed(
                 description="Click on one of the buttons to open the documentation or get help on the support server")
             await ctx.followup.send(embed=help, view=help_button())
