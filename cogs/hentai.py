@@ -145,6 +145,14 @@ class slashnsfw(Cog):
                 except IndexError:
                     pass
 
+    @Cog.listener()
+    async def on_application_command_error(self, ctx: Interaction, error):
+        if isinstance(error, ApplicationNSFWChannelRequired):
+            no_hentai = Embed(
+                title='Hentai Failed', description="Hentai couldn't be sent in this channel", color=0xff0000)
+            no_hentai.add_field(
+                name="Reason", value=ApplicationNSFWChannelRequired(ctx.channel))
+            await ctx.send(embed=no_hentai)
 
 def setup(bot):
     bot.add_cog(slashnsfw(bot))

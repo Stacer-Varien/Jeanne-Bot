@@ -7,8 +7,9 @@ from os import execv, remove
 from sys import executable, argv
 from config import BB_WEBHOOK, db
 from nextcord.ext.application_checks import *
+from assets.errormsgs import owner_only, no_user
 
-format = "%a, %d %b %Y | %H:%M:%S %ZGMT"
+format = "%a, %d %b %Y | %H:%M:%S"
 
 def restart_bot():
   execv(executable, ['python'] + argv)
@@ -259,7 +260,16 @@ class slashowner(Cog):
                     return await ctx.followup.send(embed=timeout)
 
             except Exception as e:
-                await ctx.followup.send(embed=Embed(description=e))                    
+                await ctx.followup.send(embed=Embed(description=e))
+
+    @Cog.listener()
+    async def on_application_command_error(self, ctx: Interaction, error):
+        if isinstance(error, ApplicationNotOwner):
+            await ctx.send(embed=owner_only)
+        elif isinstance(error, NotFound):
+            await ctx.send(embed=no_user)
+
+
 
 
 def setup(bot):
