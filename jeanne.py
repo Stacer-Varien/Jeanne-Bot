@@ -16,7 +16,13 @@ class MyDiscordWebSocket(DiscordWebSocket):
 
 DiscordWebSocket.from_client = MyDiscordWebSocket.from_client
 
-intents = Intents(guilds=True, members=True, messages=True, typing=True, emojis_and_stickers=True)
+intents = Intents().all()
+intents.presences = False
+intents.webhooks = False
+intents.voice_states = False
+intents.reactions = False
+intents.scheduled_events = False
+
 bot = Jeanne(intents=intents,
              allowed_mentions=AllowedMentions.all())
 bot.remove_command('help')
@@ -30,13 +36,11 @@ for filename in listdir('./cogs'):
     print(f'Unable to load {filename[:-3]}')
 
 
+
 @bot.event
 async def on_ready():
   await bot.change_presence(activity=Game(name="Cool, I'm on mobile"))
   print('Connected to bot: {}'.format(bot.user.name))
   print('Bot ID: {}'.format(bot.user.id))
-
-
-
 
 bot.run(TOKEN)
