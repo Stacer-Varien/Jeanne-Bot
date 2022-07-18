@@ -4,6 +4,7 @@ from nextcord import *
 from nextcord import slash_command as jeanne_slash
 from aiohttp import ClientSession
 from nextcord.ext.commands import Cog
+from pkg_resources import require
 from config import db, WEBHOOK, WEATHER
 from nextcord.abc import GuildChannel
 from nextcord.ui import Button, View
@@ -19,6 +20,17 @@ topgg_invite = "https://top.gg/bot/831993597166747679"
 discordbots_url = "https://discord.bots.gg/bots/831993597166747679"
 
 haze_url = "https://discord.gg/VVxGUmqQhF"
+
+
+class Cancel(ui.View):
+    def __init__(self):
+        super().__init__()
+        self.value = None
+
+    @ui.button(label="Cancel", style=ButtonStyle.red)
+    async def cancel(self, button: ui.Button, ctx: Interaction):
+        self.value = False
+        self.stop()
 
 class invite_button(View):
     def __init__(self):
@@ -237,7 +249,7 @@ class slashutilities(Cog):
             await ctx.followup.send(embed=admin_perm)
 
     @jeanne_slash()
-    async def report(self, ctx: Interaction, type=SlashOption(choices=['bug', 'fault', 'exploit', 'violator'])):
+    async def bot_report(self, ctx: Interaction, type=SlashOption(choices=['bug', 'fault', 'exploit', 'violator'])):
         await ctx.response.defer(ephemeral=True)
         try:
             botbanquery = db.execute(
@@ -279,8 +291,63 @@ class slashutilities(Cog):
             except Exception as e:
                 print(e)
 
+    @jeanne_slash(description="Report a member in your server")
+    async def report(self, ctx:Interaction, member:Member=SlashOption(description="Who are you reporting?", required=True), anonymous=SlashOption(description=("What to have your name hidden while reporting?"), choices=['True', 'False'], required=False)):
+        await ctx.response.defer(ephemeral=True)
+        try:
+            botbanquery = db.execute(
+                f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
+            botbanned_data = botbanquery.fetchone()
+            botbanned = botbanned_data[0]
 
+            if ctx.user.id == botbanned:
+                pass
+        except:
+            report_channel = db.execute(
+                "SELECT channel_id FROM reportData WHERE guild_id = ?", (ctx.guild.id,)).fetchone()
+            if report_channel == None:
+                await ctx.followup.send("The server doesn't have a report channel set")
+            else:
+                try:
+                    await ctx.user.send("Why are you reporting this member?\nYou have 5 minutes to type it out and please use media links instead of actual files", view=Cancel())
 
+                    if Cancel().value is False:
+                        await ctx.user.send("Report cancelled")
+                
+                    else:
+                        await ctx.followup.send("Please go to your DMs to report. Please remember that it is private and only authorised personal can view your report", ephemeral=True)
+
+                        def check(m):
+                            return m.author == ctx.user and m.content
+                        try:
+                            msg = await self.bot.wait_for('message', check=check, timeout=300)
+
+                            report_channel_id = report_channel[0]
+                            channel = self.bot.get_channel(report_channel_id) 
+
+                            await ctx.user.send("Thank you for reporting the member.\nFor security purposes, your report was logged to the bot developer's PC.")
+
+                            db.execute("INSERT OR IGNORE INTO report_data (user_id, message)", (ctx.user.id, msg.content))
+                            db.commit()
+                            report=Embed(title='Member reported', color=Color.brand_red())
+                            report.add_field(name="Reported Member", value=(member + '\n' + member.id), inline=False)
+                            report.add_field(name='Reason', value=msg.content, inline=False)
+
+                            if anonymous == 'True':
+                                report.set_footer(text="Made by an anonymous member of {}".format(ctx.guild.name))
+
+                            if anonymous == 'False':
+                                report.set_footer(text="Made by {} of {}".format((ctx.user + '\n' + ctx.user.id), ctx.guild.name))
+
+                            await channel.send(embed=report)         
+                        except Exception as e:
+                            print(e)
+                except Exception as e:
+                    print(e)
+
+   # @jeanne_slash(description="Creates an invite")
+   # @has_permissions(create_instant_invite=True)
+   # async def create_invite(self, ctx:Interaction, reason = SlashOption(description="What is the reason for the invite?", required=True), )
 
 def setup(bot):
     bot.add_cog(slashutilities(bot))
