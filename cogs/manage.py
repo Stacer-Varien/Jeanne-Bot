@@ -1,4 +1,3 @@
-from urllib import response
 from config import db
 from nextcord import *
 from nextcord import slash_command as jeanne_slash
@@ -7,13 +6,15 @@ from nextcord.abc import GuildChannel
 from assets.errormsgs import *
 from nextcord.ext.application_checks import *
 
+#, 
+
 class slashmanage(Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @jeanne_slash(description="Create a new role")
     @has_permissions(manage_roles=True)
-    async def create_role(self, ctx: Interaction, role_name=SlashOption(description="What will it be named?")):
+    async def create_role(self, ctx: Interaction, role_name=SlashOption(description="What will it be named?", required=True), color=SlashOption(description="What color would you like it to be? (use HEX codes)", required=False)):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
@@ -24,22 +25,23 @@ class slashmanage(Cog):
             if ctx.user.id == botbanned:
                 pass
         except:
-                guild = ctx.guild
-                await guild.create_role(name=role_name)
-                embed = Embed(color=0x00FF68)
-                embed.add_field(name="Role create",
-                                value=f"The role named `{role_name}` has been made", inline=False)
-                await ctx.followup.send(embed=embed)
+            
+            guild = ctx.guild
+            await guild.create_role(name=role_name, color=int(color, 16))
+            embed = Embed(color=0x00FF68)
+            embed.add_field(name="Role create",
+                            value=f"The role named `{role_name}` has been made", inline=False)
+            await ctx.followup.send(embed=embed)
 
     @create_role.error
-    async def create_role_error(self, ctxs:Interaction, error):
+    async def create_role_error(self, ctxs: Interaction, error):
         if isinstance(error, ApplicationBotMissingPermissions):
             await ctxs.response.defer()
             await ctxs.followup.send(embed=role_perm)
 
-    @jeanne_slash(description="Rename a role")
+    @jeanne_slash(description="Edit a role to change its name and/or color")
     @has_permissions(manage_roles=True)
-    async def rename_role(self, ctx: Interaction, role: Role = SlashOption(description="Which role are you renaming?"), new_name=SlashOption(description="What will it be named?")):
+    async def edit_role(self, ctx: Interaction, role: Role = SlashOption(description="Which role are you editing?"), new_name=SlashOption(description="What will it be named?", required=False), color=SlashOption(description="What will it's new color be (use HEX codes)", required=False)):
         await ctx.response.defer()
         try:
             botbanquery = db.execute(
@@ -50,14 +52,22 @@ class slashmanage(Cog):
             if ctx.user.id == botbanned:
                 pass
         except:
-                await role.edit(name=new_name)
-                embed = Embed(color=0x00FF68)
-                embed.add_field(name="Role renamed",
-                                value=f"Role has been renamed to `{new_name}`", inline=False)
-                await ctx.followup.send(embed=embed)
+            embed = Embed(title="Role `{}` has been edited".format(role), color=role.color)
 
-    @rename_role.error
-    async def rename_role_error(self, ctxs:Interaction, error):
+            if new_name:
+                await role.edit(name=new_name)
+                embed.add_field(name="Name changed to:",
+                                value=f"`{new_name}`", inline=True)
+
+            if color:
+                await role.edit(color=int(color, 16))
+                embed.add_field(name="Color changed to:",
+                                value=f"`{color}`", inline=True)
+
+            await ctx.followup.send(embed=embed)
+
+    @edit_role.error
+    async def edit_role_error(self, ctxs: Interaction, error):
         if isinstance(error, ApplicationMissingPermissions):
             await ctxs.response.defer()
             await ctxs.followup.send(embed=role_perm)
@@ -75,11 +85,11 @@ class slashmanage(Cog):
             if ctx.user.id == botbanned:
                 pass
         except:
-                await role.delete()
-                embed = Embed(color=0x00FF68)
-                embed.add_field(name=f"Role deleted",
-                                value=f"`{role}` has been deleted", inline=False)
-                await ctx.followup.send(embed=embed)
+            await role.delete()
+            embed = Embed(color=0x00FF68)
+            embed.add_field(name=f"Role deleted",
+                            value=f"`{role}` has been deleted", inline=False)
+            await ctx.followup.send(embed=embed)
 
     @delete_role.error
     async def delete_role_error(self, ctxs: Interaction, error):
@@ -100,17 +110,18 @@ class slashmanage(Cog):
             if ctx.user.id == botbanned:
                 pass
         except:
-                await member.add_roles(role)
-                embed = Embed(color=0x00FF68)
-                embed.add_field(name=f"Role given",
-                                value=f"`{role}` was given to `{member}`", inline=False)
-                await ctx.followup.send(embed=embed)
+            await member.add_roles(role)
+            embed = Embed(color=0x00FF68)
+            embed.add_field(name=f"Role given",
+                            value=f"`{role}` was given to `{member}`", inline=False)
+            await ctx.followup.send(embed=embed)
 
     @add_role.error
     async def add_role_error(self, ctxs: Interaction, error):
+        await ctxs.response.defer()
         if isinstance(error, ApplicationMissingPermissions):
-            await ctxs.response.defer()
             await ctxs.followup.send(embed=role_perm)
+        
 
     @jeanne_slash(description="Remove a role from a member")
     @has_permissions(manage_roles=True)
@@ -125,11 +136,11 @@ class slashmanage(Cog):
             if ctx.user.id == botbanned:
                 pass
         except:
-                await member.remove_roles(role)
-                embed = Embed(color=0x00FF68)
-                embed.add_field(name=f"Role removed",
-                                value=f"`{role}` was removed from `{member}`", inline=False)
-                await ctx.followup.send(embed=embed)
+            await member.remove_roles(role)
+            embed = Embed(color=0x00FF68)
+            embed.add_field(name=f"Role removed",
+                            value=f"`{role}` was removed from `{member}`", inline=False)
+            await ctx.followup.send(embed=embed)
 
     @remove_role.error
     async def remove_role_error(self, ctxs: Interaction, error):
@@ -154,14 +165,14 @@ class slashmanage(Cog):
             if ctx.user.id == botbanned:
                 pass
         except:
-                await channel.edit(name=new_name)
-                embed = Embed(color=0x00FF68)
-                embed.add_field(name="Channel renamed",
-                                value=f"Channel is now `{new_name}`", inline=False)
-                await ctx.followup.send(embed=embed)
+            await channel.edit(name=new_name)
+            embed = Embed(color=0x00FF68)
+            embed.add_field(name="Channel renamed",
+                            value=f"Channel is now `{new_name}`", inline=False)
+            await ctx.followup.send(embed=embed)
 
     @rename_channel.error
-    async def rename_channel_error(self, ctx:Interaction, error):
+    async def rename_channel_error(self, ctx: Interaction, error):
         if isinstance(error, ApplicationMissingPermissions):
             await ctx.response.defer()
             await ctx.followup.send(embed=channel_perm)
@@ -183,11 +194,11 @@ class slashmanage(Cog):
             if ctx.user.id == botbanned:
                 pass
         except:
-                await channel.delete()
-                embed = Embed(color=0x00FF68)
-                embed.add_field(name="Channel deleted",
-                                value=f"`{channel}` has been deleted", inline=False)
-                await ctx.followup.send(embed=embed)
+            await channel.delete()
+            embed = Embed(color=0x00FF68)
+            embed.add_field(name="Channel deleted",
+                            value=f"`{channel}` has been deleted", inline=False)
+            await ctx.followup.send(embed=embed)
 
     @delete_channel.error
     async def delete_channel_error(self, ctx: Interaction, error):
@@ -208,19 +219,19 @@ class slashmanage(Cog):
             if ctx.user.id == botbanned:
                 pass
         except:
-                if channel_type == 'Text Channel':
+            if channel_type == 'Text Channel':
                     await ctx.guild.create_text_channel(channel_name)
                     embed = Embed(color=0x00FF68)
                     embed.add_field(name="Text channel created",
                                     value=f"A new text channel called **{channel_name}** was created", inline=False)
                     await ctx.followup.send(embed=embed)
-                elif channel_type == 'Voice Channel':
+            elif channel_type == 'Voice Channel':
                     await ctx.guild.create_voice_channel(channel_name)
                     embed = Embed(color=0x00FF68)
                     embed.add_field(name="Voice channel created",
                                     value=f"A new voice channel called `{channel_name}` was created", inline=False)
                     await ctx.followup.send(embed=embed)
-                elif channel_type == 'Category':
+            elif channel_type == 'Category':
                     await ctx.guild.create_category_channel(channel_name)
                     embed = Embed(color=0x00FF68)
                     embed.add_field(name="Category created",
@@ -307,9 +318,8 @@ class slashmanage(Cog):
                     result = cur.fetchone()
                     cur.execute(
                         f"DELETE FROM modlogData WHERE channel_id = {result[0]}")
-                    channel=ctx.guild.get_channel(result[0])
+                    channel = ctx.guild.get_channel(result[0])
                     db.commit()
-
 
                 modlog = Embed(color=0x00FF68)
                 modlog.add_field(
@@ -317,7 +327,7 @@ class slashmanage(Cog):
                 await ctx.followup.send(embed=modlog)
 
             elif type == 'all':
-                
+
                 try:
                     cur = db.cursor()
                     cur.execute(
@@ -333,12 +343,12 @@ class slashmanage(Cog):
                         result = cur.fetchone()
                         cur.execute(
                             f"DELETE FROM modlogData WHERE channel_id = {result[0]}")
-                        channel=ctx.guild.get_channel(result[0])
-                        db.commit() 
+                        channel = ctx.guild.get_channel(result[0])
+                        db.commit()
                 except:
                     pass
 
-                try:     
+                try:
                     cur = db.cursor()
                     cur.execute(
                         f"SELECT * FROM leaverData WHERE guild_id = {ctx.guild.id}")
@@ -380,7 +390,7 @@ class slashmanage(Cog):
 
                 all = Embed(color=0x00FF68)
                 all.add_field(
-                    name="Leaver channel removed", value="All channels that were set for the server have been removed from the database.") 
+                    name="Leaver channel removed", value="All channels that were set for the server have been removed from the database.")
 
                 await ctx.followup.send(embed=all)
 
@@ -392,9 +402,10 @@ class slashmanage(Cog):
 
     @jeanne_slash(description="Choose a channel to welcome members")
     @has_permissions(manage_guild=True)
-    async def set(self, ctx: Interaction, type=SlashOption(choices=['welcomer', 'leaver', 'modlog'], description="Which one are you setting?", required=True),
-                         channel: GuildChannel = SlashOption(
-                             channel_types=[ChannelType.text, ChannelType.news],
+    async def set(self, ctx: Interaction, type=SlashOption(choices=['welcomer', 'leaver', 'modlog', 'report_channel'], description="Which one are you setting?", required=True),
+                  channel: GuildChannel = SlashOption(
+                             channel_types=[
+                                 ChannelType.text, ChannelType.news],
                              description="Choose a channel")):
         await ctx.response.defer()
         try:
@@ -406,13 +417,13 @@ class slashmanage(Cog):
             if ctx.user.id == botbanned:
                 pass
         except:
-                if type == 'welcomer':
+            if type == 'welcomer':
                     cursor = db.execute(
                         "INSERT OR IGNORE INTO welcomerData (guild_id, channel_id) VALUES (?,?)", (ctx.guild.id, channel.id))
 
                     if cursor.rowcount == 0:
                         db.execute(
-                            f"UPDATE welcomerData SET channel_id = {channel.id} WHERE guild_id = {ctx.guild.id}")
+                            f"UPDATE welcomerData SET channel_id = ? WHERE guild_id = ?", (channel.id, ctx.guild.id,))
                     db.commit()
 
                     welcomer = Embed(color=0x00FF68)
@@ -420,13 +431,13 @@ class slashmanage(Cog):
                         name="Welcomer channel set", value=f"{channel.mention} has been selected to welcomer members in the server.")
                     await ctx.followup.send(embed=welcomer)
 
-                elif type == 'leaver':
+            elif type == 'leaver':
                     cursor = db.execute(
                         "INSERT OR IGNORE INTO leaverData (guild_id, channel_id) VALUES (?,?)", (ctx.guild.id, channel.id))
 
                     if cursor.rowcount == 0:
                         db.execute(
-                            f"UPDATE leaverData SET channel_id = {channel.id} WHERE guild_id = {ctx.guild.id}")
+                            f"UPDATE leaverData SET channel_id = ? WHERE guild_id = ?", (channel.id, ctx.guild.id,))
                     db.commit()
 
                     leaver = Embed(color=0x00FF68)
@@ -434,27 +445,41 @@ class slashmanage(Cog):
                         name="Leave channel set", value=f"{channel.mention} has been selected if someone left the server")
                     await ctx.followup.send(embed=leaver)
 
-                elif type == 'modlog':
+            elif type == 'modlog':
 
                     cursor = db.execute(
                         "INSERT OR IGNORE INTO modlogData (guild_id, channel_id) VALUES (?,?)", (ctx.guild.id, channel.id))
 
                     if cursor.rowcount == 0:
                         db.execute(
-                            f"UPDATE modlogData SET channel_id = {channel.id} WHERE guild_id = {ctx.guild.id}")
+                            f"UPDATE modlogData SET channel_id = ? WHERE guild_id = ?", (channel.id, ctx.guild.id,))
                     db.commit()
 
                     modlog = Embed(color=0x00FF68)
                     modlog.add_field(
                         name="Modlog channel set", value=f"{channel.mention} has been selected to have all moderation actions updated in there.")
                     await ctx.followup.send(embed=modlog)
+            
+            elif type == 'report_channel':
+                cursor = db.execute(
+                    "INSERT OR IGNORE INTO reportData (guild_id, channel_id) VALUES (?,?)", (ctx.guild.id, channel.id))
+
+                if cursor.rowcount == 0:
+                        db.execute(
+                            f"UPDATE reportData SET channel_id = ? WHERE guild_id = ?", (channel.id, ctx.guild.id,))
+                db.commit()
+
+                modlog = Embed(color=0x00FF68)
+                modlog.add_field(
+                        name="Report channel set", value=f"{channel.mention} has been selected to have all reported members in there.")
+                await ctx.followup.send(embed=modlog)
+
 
     @set.error
-    async def set_error(self, ctx:Interaction, error):
+    async def set_error(self, ctx: Interaction, error):
         if isinstance(error, ApplicationMissingPermissions):
             await ctx.response.defer()
             await ctx.followup.send(embed=manage_server_perm)
-
 
 
 def setup(bot):
