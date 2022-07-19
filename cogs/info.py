@@ -82,7 +82,7 @@ class slashinfo(Cog):
             userinfo.add_field(name="ID", value=member.id, inline=True)
             userinfo.add_field(name="Is Bot?", value=botr, inline=True)
             userinfo.add_field(
-                name="Joined Server", value='<t:{}:f>'.format(str(date)), inline=True)
+                name="Joined Server", value='<t:{}:F>'.format(str(date)), inline=True)
             userinfo.add_field(name="Number of Roles",
                                value=(len(hasroles) + 1), inline=True)
             userinfo.add_field(name="Roles Held",
@@ -120,11 +120,12 @@ class slashinfo(Cog):
             elif guild.premium_tier == 3:
                 boostlevel = "3"
 
+            date = round(guild.created_at.timestamp())
             serverinfo = Embed(title="Server's Info", color=0x00B0ff)
             serverinfo.add_field(name="Name", value=guild.name, inline=True)
             serverinfo.add_field(name="ID", value=guild.id, inline=True)
             serverinfo.add_field(
-                name="Creation Date", value=guild.created_at.strftime(format), inline=True)
+                name="Creation Date", value='<t:{}:F>'.format(str(date)), inline=True)
             serverinfo.add_field(name="Owner", value=f"• **Name: ** {guild.owner}\n• ** ID: ** {guild.owner_id}", inline=True)
             serverinfo.add_field(
                 name="Members", value=f"• **Humans:** {len(guild.humans)}\n• **Bots:** {len(guild.bots)}\n• **Total Members:** {guild.member_count}")

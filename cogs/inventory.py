@@ -1,4 +1,4 @@
-from assets.db_functions import add_user_custom_wallpaper, add_user_wallpaper, fetch_user_inventory, fetch_wallpapers, get_balance, get_user_inventory, get_wallpaper
+from assets.db_functions import add_user_custom_wallpaper, add_user_wallpaper, check_botbanned_user, fetch_user_inventory, fetch_wallpapers, get_balance, get_user_inventory, get_wallpaper
 from config import inv_db, db
 from nextcord import *
 from nextcord import slash_command as jeanne_slash
@@ -40,29 +40,19 @@ class inventory(Cog):
     @shop.subcommand(description="Check all the wallpapers available")
     async def background(self, ctx:Interaction):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             await ctx.followup.send(embed=fetch_wallpapers())
 
     @shop.subcommand(description="Buy a background pic for your level card")
     async def buy_background(self, ctx:Interaction, item_id):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             balance = get_balance(ctx.user.id)
             
 
@@ -122,15 +112,10 @@ class inventory(Cog):
     @jeanne_slash(description='Use a background picture')
     async def use(self, ctx:Interaction, item_id):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             user_inv = connect("./User_Inventories/{}.db".format(ctx.user.id))
             cur = user_inv.cursor()
             try:
@@ -155,15 +140,10 @@ class inventory(Cog):
     @shop.subcommand(description="Buy a custom background pic for your level card")
     async def buy_custom_background(self, ctx:Interaction, name=SlashOption(description='Name your background', required=True), link=SlashOption(description="Make sure the link is permanent", required=True)):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             balance=db.execute("SELECT amount FROM bankData WHERE user_id = ?", (ctx.user.id,)).fetchone()
             
 
@@ -224,16 +204,11 @@ class inventory(Cog):
     @jeanne_slash(description='Check which backgrounds you have')
     async def inventory(self, ctx:Interaction):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
-            a = fetch_user_inventory(ctx.user.id, 'bg')
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
+            a = fetch_user_inventory(ctx.user.id)
             for b in a:
                 if b is None:
                     await ctx.followup.send("You dont have anything available")

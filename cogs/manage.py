@@ -1,3 +1,4 @@
+from assets.db_functions import *
 from config import db
 from nextcord import *
 from nextcord import slash_command as jeanne_slash
@@ -5,8 +6,6 @@ from nextcord.ext.commands import Cog
 from nextcord.abc import GuildChannel
 from assets.errormsgs import *
 from nextcord.ext.application_checks import *
-
-#, 
 
 class slashmanage(Cog):
     def __init__(self, bot):
@@ -16,16 +15,10 @@ class slashmanage(Cog):
     @has_permissions(manage_roles=True)
     async def create_role(self, ctx: Interaction, role_name=SlashOption(description="What will it be named?", required=True), color=SlashOption(description="What color would you like it to be? (use HEX codes)", required=False)):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
-            
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             guild = ctx.guild
             await guild.create_role(name=role_name, color=int(color, 16))
             embed = Embed(color=0x00FF68)
@@ -43,15 +36,10 @@ class slashmanage(Cog):
     @has_permissions(manage_roles=True)
     async def edit_role(self, ctx: Interaction, role: Role = SlashOption(description="Which role are you editing?"), new_name=SlashOption(description="What will it be named?", required=False), color=SlashOption(description="What will it's new color be (use HEX codes)", required=False)):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             embed = Embed(title="Role `{}` has been edited".format(role), color=role.color)
 
             if new_name:
@@ -76,15 +64,10 @@ class slashmanage(Cog):
     @has_permissions(manage_roles=True)
     async def delete_role(self, ctx: Interaction, role: Role = SlashOption(description="Which one are you deleting?")):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             await role.delete()
             embed = Embed(color=0x00FF68)
             embed.add_field(name=f"Role deleted",
@@ -101,15 +84,10 @@ class slashmanage(Cog):
     @has_permissions(manage_roles=True)
     async def add_role(self, ctx: Interaction, member: Member = SlashOption(description="Which member?"), role: Role = SlashOption(description="Which role will you add?")):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             await member.add_roles(role)
             embed = Embed(color=0x00FF68)
             embed.add_field(name=f"Role given",
@@ -127,15 +105,10 @@ class slashmanage(Cog):
     @has_permissions(manage_roles=True)
     async def remove_role(self, ctx: Interaction, member: Member = SlashOption(description="Which member?"), role: Role = SlashOption(description="Which role will you delete?")):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             await member.remove_roles(role)
             embed = Embed(color=0x00FF68)
             embed.add_field(name=f"Role removed",
@@ -156,15 +129,10 @@ class slashmanage(Cog):
                            ChannelType.voice, ChannelType.category, ChannelType.news, ChannelType.public_thread],
             description="Choose a channel to rename", required=True), new_name=SlashOption(description="Which channel are you renaming?")):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             await channel.edit(name=new_name)
             embed = Embed(color=0x00FF68)
             embed.add_field(name="Channel renamed",
@@ -185,15 +153,10 @@ class slashmanage(Cog):
                            ChannelType.voice, ChannelType.category, ChannelType.news, ChannelType.public_thread, ChannelType.private_thread],
             description="Choose a channel to delete")):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             await channel.delete()
             embed = Embed(color=0x00FF68)
             embed.add_field(name="Channel deleted",
@@ -210,15 +173,10 @@ class slashmanage(Cog):
     @has_permissions(manage_channels=True)
     async def create_channel(self, ctx: Interaction, channel_type=SlashOption(description='Type of channel', choices=['Text Channel', 'Voice Channel', 'Category'], required=True), channel_name=SlashOption(description="Which will you name it?", required=True)):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             if channel_type == 'Text Channel':
                     await ctx.guild.create_text_channel(channel_name)
                     embed = Embed(color=0x00FF68)
@@ -248,37 +206,19 @@ class slashmanage(Cog):
     @has_permissions(manage_guild=True)
     async def remove(self, ctx: Interaction, type=SlashOption(choices=['welcomer', 'leaver', 'modlog', 'all'], description='Which one or all?')):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             if type == 'welcomer':
-                cur = db.cursor()
-                cur.execute(
-                    f"SELECT * FROM welcomerData WHERE guild_id = {ctx.guild.id}")
-                result = cur.fetchone()
+                wel=remove_welcomer(ctx.guild.id)
 
-                if result == None:
-                    await ctx.followup.send("You have no welcomer channel set")
-
+                if wel == False:
+                    await ctx.followup.send("You don't have a welcomer channel")
                 else:
-                    cur.execute(
-                        f"SELECT channel_id FROM welcomerData WHERE guild_id = {ctx.guild.id}")
-                    result = cur.fetchone()
-                    cur.execute(
-                        f"DELETE FROM welcomerData WHERE channel_id = {result[0]}")
-                    channel = ctx.guild.get_channel(result[0])
-                    db.commit()
-
-                welcomer = Embed(color=0x00FF68)
-                welcomer.add_field(
-                    name="Welcomer channel removed", value=f"{channel.name} been removed from the welcomer database.")
-                await ctx.followup.send(embed=welcomer)
+                    welcomer = Embed(
+                        description="Welcomer channel removed", color=0x00FF68)
+                    await ctx.followup.send(embed=welcomer)
 
             elif type == 'leaver':
                 cur = db.cursor()
@@ -408,23 +348,12 @@ class slashmanage(Cog):
                                  ChannelType.text, ChannelType.news],
                              description="Choose a channel")):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             if type == 'welcomer':
-                    cursor = db.execute(
-                        "INSERT OR IGNORE INTO welcomerData (guild_id, channel_id) VALUES (?,?)", (ctx.guild.id, channel.id))
-
-                    if cursor.rowcount == 0:
-                        db.execute(
-                            f"UPDATE welcomerData SET channel_id = ? WHERE guild_id = ?", (channel.id, ctx.guild.id,))
-                    db.commit()
+                    set_welcomer(ctx.guild.id, channel.id)
 
                     welcomer = Embed(color=0x00FF68)
                     welcomer.add_field(
@@ -432,13 +361,7 @@ class slashmanage(Cog):
                     await ctx.followup.send(embed=welcomer)
 
             elif type == 'leaver':
-                    cursor = db.execute(
-                        "INSERT OR IGNORE INTO leaverData (guild_id, channel_id) VALUES (?,?)", (ctx.guild.id, channel.id))
-
-                    if cursor.rowcount == 0:
-                        db.execute(
-                            f"UPDATE leaverData SET channel_id = ? WHERE guild_id = ?", (channel.id, ctx.guild.id,))
-                    db.commit()
+                    set_leaver(ctx.guild.id, channel.id)
 
                     leaver = Embed(color=0x00FF68)
                     leaver.add_field(
@@ -446,14 +369,7 @@ class slashmanage(Cog):
                     await ctx.followup.send(embed=leaver)
 
             elif type == 'modlog':
-
-                    cursor = db.execute(
-                        "INSERT OR IGNORE INTO modlogData (guild_id, channel_id) VALUES (?,?)", (ctx.guild.id, channel.id))
-
-                    if cursor.rowcount == 0:
-                        db.execute(
-                            f"UPDATE modlogData SET channel_id = ? WHERE guild_id = ?", (channel.id, ctx.guild.id,))
-                    db.commit()
+                    set_modloger(ctx.guild.id, channel.id)
 
                     modlog = Embed(color=0x00FF68)
                     modlog.add_field(
@@ -461,13 +377,7 @@ class slashmanage(Cog):
                     await ctx.followup.send(embed=modlog)
             
             elif type == 'report_channel':
-                cursor = db.execute(
-                    "INSERT OR IGNORE INTO reportData (guild_id, channel_id) VALUES (?,?)", (ctx.guild.id, channel.id))
-
-                if cursor.rowcount == 0:
-                        db.execute(
-                            f"UPDATE reportData SET channel_id = ? WHERE guild_id = ?", (channel.id, ctx.guild.id,))
-                db.commit()
+                set_reporter(ctx.guild.id, channel.id)
 
                 modlog = Embed(color=0x00FF68)
                 modlog.add_field(
@@ -478,8 +388,7 @@ class slashmanage(Cog):
     @set.error
     async def set_error(self, ctx: Interaction, error):
         if isinstance(error, ApplicationMissingPermissions):
-            await ctx.response.defer()
-            await ctx.followup.send(embed=manage_server_perm)
+            await ctx.send(embed=manage_server_perm)
 
 
 def setup(bot):

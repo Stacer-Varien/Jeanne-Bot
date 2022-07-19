@@ -2,7 +2,6 @@ from nextcord import *
 from nextcord import slash_command as jeanne_slash
 from nextcord.ext.commands import Cog
 from nextcord.ui import Button, View
-from config import db
 from assets.db_functions import check_botbanned_user
 
 
