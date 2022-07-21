@@ -1,4 +1,5 @@
-from config import TOPGG, db
+from assets.db_functions import add_qp, check_botbanned_user
+from config import TOPGG
 from topgg import *
 from nextcord.ext import tasks
 from nextcord.ext.commands import Cog
@@ -12,7 +13,8 @@ class topgg(Cog):
         self.bot = bot
         self.update_stats.start()
         self.topggpy = DBLClient(self.bot, dbl_token)
-        self.topgg_webhook = WebhookManager(self.bot).dbl_webhook("/dblwebhook", 'password')
+        self.topgg_webhook = WebhookManager(
+            self.bot).dbl_webhook("/dblwebhook")
         self.topgg_webhook.run(5000)
 
     @tasks.loop(minutes=30)
@@ -25,15 +27,20 @@ class topgg(Cog):
             print(f"Failed to post server count\n{e.__class__.__name__}: {e}")
 
     @Cog.listener()
-    async def on_dbl_vote(self, data):        
-        if data["type"] == "test":
-            return self.bot.dispatch("dbl_test", data)
+    async def on_dbl_vote(self, data):
+        if data["type"] == "upvote":
+            voter = await self.bot.fetch_user(data['user'])
+            check = check_botbanned_user(voter.id)
+            if check == voter.id:
+                pass
+            else:
+                if await self.topggpy.get_weekend_status() is True:
+                    credits = 100
+                else:
+                    credits = 50
 
-        print(f"Received a vote:\n{data}")
-
-    @Cog.listener()
-    async def on_dbl_test(data):
-        print(f"Received a test vote:\n{data}")
+                add_qp(voter.id, credits)
+                print(f"Received a vote:\n{data}")
 
 
 def setup(bot):
