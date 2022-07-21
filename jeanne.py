@@ -4,17 +4,16 @@ from nextcord.ext.commands import AutoShardedBot as Jeanne
 from config import TOKEN
 from nextcord.gateway import DiscordWebSocket
 
-class MyDiscordWebSocket(DiscordWebSocket):
+#class MyDiscordWebSocket(DiscordWebSocket):
 
-    async def send_as_json(self, data):
-        if data.get('op') == self.IDENTIFY:
-            if data.get('d', {}).get('properties', {}).get('browser') is not None:
-                data['d']['properties']['browser'] = 'Discord Android'
-                data['d']['properties']['device'] = 'Discord Android'
-        await super().send_as_json(data)
+#    async def send_as_json(self, data):
+#        if data.get('op') == self.IDENTIFY:
+#            if data.get('d', {}).get('properties', {}).get('browser') is not None:
+#                data['d']['properties']['browser'] = 'Discord Android'
+#                data['d']['properties']['device'] = 'Discord Android'
+#        await super().send_as_json(data)
 
-
-DiscordWebSocket.from_client = MyDiscordWebSocket.from_client
+#DiscordWebSocket.from_client = MyDiscordWebSocket.from_client
 
 intents = Intents().all()
 intents.presences = False
@@ -39,7 +38,7 @@ for filename in listdir('./cogs'):
 
 @bot.event
 async def on_ready():
-  await bot.change_presence(activity=Game(name="Cool, I'm on mobile"))
+  await bot.change_presence(activity=Game(name="New Update"))
   print('Connected to bot: {}'.format(bot.user.name))
   print('Bot ID: {}'.format(bot.user.id))
 
