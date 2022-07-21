@@ -204,7 +204,7 @@ class slashmanage(Cog):
 
     @jeanne_slash(description="Removes a modlog channel that was set from the database")
     @has_permissions(manage_guild=True)
-    async def remove(self, ctx: Interaction, type=SlashOption(choices=['welcomer', 'leaver', 'modlog', 'all'], description='Which one or all?')):
+    async def remove(self, ctx: Interaction, type=SlashOption(choices=['welcomer', 'leaver', 'modlog', 'report', 'all'], description='Which one or all?')):
         await ctx.response.defer()
         check = check_botbanned_user(ctx.user.id)
         if check == ctx.user.id:
@@ -221,117 +221,59 @@ class slashmanage(Cog):
                     await ctx.followup.send(embed=welcomer)
 
             elif type == 'leaver':
-                cur = db.cursor()
-                cur.execute(
-                    f"SELECT * FROM leaverData WHERE guild_id = {ctx.guild.id}")
-                result = cur.fetchone()
+                leave = remove_leaver(ctx.guild.id)
 
-                if result == None:
-                    await ctx.followup.send("You have no welcomer channel set")
-
+                if leave == False:
+                    await ctx.followup.send("You don't have a leaver channel")
                 else:
-                    cur.execute(
-                        f"SELECT channel_id FROM leaverData WHERE guild_id = {ctx.guild.id}")
-                    result = cur.fetchone()
-                    cur.execute(
-                        f"DELETE FROM leaverData WHERE channel_id = {result[0]}")
-                    channel = ctx.guild.get_channel(result[0])
-                    db.commit()
-
-                leaver = Embed(color=0x00FF68)
-                leaver.add_field(
-                    name="Leaver channel removed", value=f"{channel.name} been removed from the leaver database.")
-                await ctx.followup.send(embed=leaver)
+                    leaver = Embed(
+                        description="Leaver channel removed", color=0x00FF68)
+                    await ctx.followup.send(embed=leaver)
 
             elif type == 'modlog':
-                cur = db.cursor()
-                cur.execute(
-                    f"SELECT * FROM modlogData WHERE guild_id = {ctx.guild.id}")
-                result = cur.fetchone()
+                modloger = remove_modloger(ctx.guild.id)
 
-                if result == None:
-                    await ctx.followup.send("You have no modlog channel set")
-
+                if modloger == False:
+                    await ctx.followup.send("You don't have a modlog channel")
                 else:
-                    cur.execute(
-                        f"SELECT channel_id FROM modlogData WHERE guild_id = {ctx.guild.id}")
-                    result = cur.fetchone()
-                    cur.execute(
-                        f"DELETE FROM modlogData WHERE channel_id = {result[0]}")
-                    channel = ctx.guild.get_channel(result[0])
-                    db.commit()
+                    modlog = Embed(
+                        description="Modlog channel removed", color=0x00FF68)
+                    await ctx.followup.send(embed=modlog)
 
-                modlog = Embed(color=0x00FF68)
-                modlog.add_field(
-                    name="Modlog channel removed", value=f"{channel.name} been removed from the modlog database.")
-                await ctx.followup.send(embed=modlog)
+            elif type == 'report':
+                reporter = remove_reporter(ctx.guild.id)
+
+                if reporter == False:
+                    await ctx.followup.send("You don't have a report channel")
+                else:
+                    report = Embed(
+                        description="Report channel removed", color=0x00FF68)
+                    await ctx.followup.send(embed=report)
 
             elif type == 'all':
 
                 try:
-                    cur = db.cursor()
-                    cur.execute(
-                        f"SELECT * FROM modlogData WHERE guild_id = {ctx.guild.id}")
-                    result = cur.fetchone()
-
-                    if result == None:
-                        pass
-
-                    else:
-                        cur.execute(
-                            f"SELECT channel_id FROM modlogData WHERE guild_id = {ctx.guild.id}")
-                        result = cur.fetchone()
-                        cur.execute(
-                            f"DELETE FROM modlogData WHERE channel_id = {result[0]}")
-                        channel = ctx.guild.get_channel(result[0])
-                        db.commit()
+                    remove_welcomer(ctx.guild.id) is True
                 except:
                     pass
 
                 try:
-                    cur = db.cursor()
-                    cur.execute(
-                        f"SELECT * FROM leaverData WHERE guild_id = {ctx.guild.id}")
-                    result = cur.fetchone()
-
-                    if result == None:
-                        pass
-
-                    else:
-                        cur.execute(
-                            f"SELECT channel_id FROM leaverData WHERE guild_id = {ctx.guild.id}")
-                        result = cur.fetchone()
-                        cur.execute(
-                            f"DELETE FROM leaverData WHERE channel_id = {result[0]}")
-                        channel = ctx.guild.get_channel(result[0])
-                        db.commit()
+                    remove_leaver(ctx.guild.id) is True
                 except:
                     pass
 
                 try:
-                    cur = db.cursor()
-                    cur.execute(
-                        f"SELECT * FROM welcomerData WHERE guild_id = {ctx.guild.id}")
-                    result = cur.fetchone()
-
-                    if result == None:
-                        pass
-
-                    else:
-                        cur.execute(
-                            f"SELECT channel_id FROM welcomerData WHERE guild_id = {ctx.guild.id}")
-                        result = cur.fetchone()
-                        cur.execute(
-                            f"DELETE FROM welcomerData WHERE channel_id = {result[0]}")
-                        channel = ctx.guild.get_channel(result[0])
-                        db.commit()
+                    remove_modloger(ctx.guild.id) is True
                 except:
                     pass
 
-                all = Embed(color=0x00FF68)
-                all.add_field(
-                    name="Leaver channel removed", value="All channels that were set for the server have been removed from the database.")
+                try:
+                    remove_reporter(ctx.guild.id) is True
+                except:
+                    pass
 
+                all = Embed(
+                    description='All channels that were set for the server have been removed from the database.', color=0x00FF68)
                 await ctx.followup.send(embed=all)
 
     @remove.error
