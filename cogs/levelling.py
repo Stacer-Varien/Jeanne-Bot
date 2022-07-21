@@ -30,9 +30,11 @@ class levelling(Cog):
             ratelimit = self.get_ratelimit(message)
             if ratelimit is None:
                 if not message.author.bot:
-                    if not self.bot.user.dm_channel:
+                    try: 
                         add_xp(message.author.id, message.guild.id)
                         add_level(message.author.id, message.guild.id)
+                    except:
+                        pass 
         await self.bot.process_commands(message)
 
     @jeanne_slash(description="See your level or someone else's level")
