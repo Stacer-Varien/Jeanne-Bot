@@ -59,13 +59,10 @@ class slashimages(Cog):
         if check == ctx.user.id:
             pass
         else:
-            file_path_type = ["./Media/Saber/*.jpg"]
-            images = glob(choice(file_path_type))
-            random_image = choice(images)
-            file = File(random_image)
             saber = Embed(color=0xFFC0CB)
-            saber.set_footer(text="Powered by JeanneBot")
-            await ctx.followup.send(file=file, embed=saber)
+            saber.set_image(url=choice(saber_1936))
+            saber.set_footer(text="Fetched from Saber_1936")
+            await ctx.followup.send(embed=saber)
 
     @jeanne_slash(description="Get a neko image")
     async def neko(self, ctx : Interaction):
