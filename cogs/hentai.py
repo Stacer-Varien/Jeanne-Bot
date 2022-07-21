@@ -49,10 +49,6 @@ class slashnsfw(Cog):
             embed = Embed(color=0xFFC0CB).set_image(url=hentai).set_footer(text="Fetched from {}".format(source))
             await ctx.followup.send(embed=embed)
 
-
-            
-            
-
     @jeanne_slash(description="Get a random hentai from Gelbooru")
     @is_nsfw()
     async def gelbooru(self, ctx: Interaction, tag=SlashOption(description="Add a tag for something specific", required=False)):
@@ -65,7 +61,9 @@ class slashnsfw(Cog):
                 if tag == None:
                     gelbooru_api = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=rating:explicit+-loli+-shota+-cub"
                 else:
-                    gelbooru_api = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=rating:explicit+-loli+-shota+-cub" + tag
+                    formated_tag=tag.replace(" ","_")
+                    print(formated_tag)
+                    gelbooru_api = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=rating:explicit+-loli+-shota+-cub+" + formated_tag
             
                 response = get(gelbooru_api)
                 ret = loads(response.text)
@@ -97,8 +95,9 @@ class slashnsfw(Cog):
                     await ctx.followup.send("Tag has been blacklisted due to it returning extreme content and guro")
 
                 else:
+                    formated_tag = tag.replace(" ", "_")
                     yandere_api = choice(get(
-                        f"https://yande.re/post.json?limit=100&tags=rating:explicit+-loli+-shota+-cub" + tag).json())
+                        f"https://yande.re/post.json?limit=100&tags=rating:explicit+-loli+-shota+-cub+" + formated_tag).json())
 
                 yandere = Embed(color=0xFFC0CB)
                 yandere.set_image(url=yandere_api['file_url'])
@@ -123,8 +122,9 @@ class slashnsfw(Cog):
                         "https://konachan.com/post.json?s=post&q=indexlimit=100&tags=rating:explicit+-loli+-shota+-cub").json())
 
                 else:
+                    formated_tag = tag.replace(" ", "_")
                     konachan_api = choice(get(
-                        f"https://konachan.com/post.json?s=post&q=indexlimit=100&tags=rating:explicit+-loli+-shota+-cub+{tag}").json())
+                        f"https://konachan.com/post.json?s=post&q=indexlimit=100&tags=rating:explicit+-loli+-shota+-cub+{formated_tag}").json())
 
                 konachan = Embed(color=0xFFC0CB)
                 konachan.set_image(url=konachan_api['file_url'])
