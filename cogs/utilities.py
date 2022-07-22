@@ -326,9 +326,8 @@ class slashutilities(Cog):
 
                         elif view.value == True:
 
-                            await ctx.user.send("Thank you for reporting the member.\nFor security purposes, your report was logged to the bot developer's PC.")
+                            await ctx.user.send("Thank you for reporting the member.\nYour report has been sent to the dedicated report channel in {}.".format(ctx.guild.name))
 
-                            add_report(member.id, "{}\n{}".format(msg.content, image_urls), ctx.user.id)
 
                             report = Embed(title='Member reported',
                                            color=Color.brand_red())
