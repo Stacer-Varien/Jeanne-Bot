@@ -496,10 +496,6 @@ def get_report_channel(server: int):
         "SELECT channel_id FROM reportData WHERE guild_id = ?", (server,)).fetchone()
     return data
 
-def add_report(member:int, report:str, author:int):
-    db.execute("INSERT OR IGNORE INTO report_data (user_id, message) VALUES (?, ?)", (member, report, author,))
-    db.commit()
-
 def fetch_welcomer(channel:int):
     data = db.execute(
             "SELECT guild_id FROM welcomerData where channel_id = ?", (channel,)).fetchone()
