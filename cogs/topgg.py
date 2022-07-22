@@ -1,4 +1,5 @@
-from config import TOPGG, db, TOPGG_AUTH
+from assets.db_functions import add_qp, check_botbanned_user
+from config import TOPGG
 from topgg import *
 from nextcord.ext import tasks
 from nextcord.ext.commands import Cog
@@ -12,7 +13,8 @@ class topgg(Cog):
         self.bot = bot
         self.update_stats.start()
         self.topggpy = DBLClient(self.bot, dbl_token)
-        self.topgg_webhook = WebhookManager(bot).dbl_webhook("/dblwebhook", TOPGG_AUTH)
+        self.topgg_webhook = WebhookManager(
+            self.bot).dbl_webhook("/dblwebhook")
         self.topgg_webhook.run(5000)
 
     @tasks.loop(minutes=30)
@@ -25,31 +27,19 @@ class topgg(Cog):
             print(f"Failed to post server count\n{e.__class__.__name__}: {e}")
 
     @Cog.listener()
-    async def on_dbl_vote(self, data):        
+    async def on_dbl_vote(self, data):
         if data["type"] == "upvote":
             voter = await self.bot.fetch_user(data['user'])
-            try:
-                botbanquery = db.execute(
-                    "SELECT * FROM botbannedData WHERE user_id = ?", (voter.id,))
-                botbanned_data = botbanquery.fetchone()
-                botbanned = botbanned_data[0]
-
-                if voter.id == botbanned:
-                    pass
-            except:
+            check = check_botbanned_user(voter.id)
+            if check == voter.id:
+                pass
+            else:
                 if await self.topggpy.get_weekend_status() is True:
-                    credits=100
+                    credits = 100
                 else:
-                    credits=50
+                    credits = 50
 
-            
-                cur = db.execute(
-                "INSERT OR IGNORE INTO bankData (user_id, amount) VALUES (?,?)", (voter.id, int(credits)))
-
-                if cur.rowcount == 0:
-                    db.execute(
-                    f"UPDATE bankData SET amount = amount + 100 WHERE user_id = ?", (voter.id))
-                    db.commit()
+                add_qp(voter.id, credits)
                 print(f"Received a vote:\n{data}")
 
 

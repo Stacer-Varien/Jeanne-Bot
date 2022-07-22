@@ -4,19 +4,24 @@ from nextcord.ext.commands import AutoShardedBot as Jeanne
 from config import TOKEN
 from nextcord.gateway import DiscordWebSocket
 
-class MyDiscordWebSocket(DiscordWebSocket):
+#class MyDiscordWebSocket(DiscordWebSocket):
 
-    async def send_as_json(self, data):
-        if data.get('op') == self.IDENTIFY:
-            if data.get('d', {}).get('properties', {}).get('browser') is not None:
-                data['d']['properties']['browser'] = 'Discord Android'
-                data['d']['properties']['device'] = 'Discord Android'
-        await super().send_as_json(data)
+#    async def send_as_json(self, data):
+#        if data.get('op') == self.IDENTIFY:
+#            if data.get('d', {}).get('properties', {}).get('browser') is not None:
+#                data['d']['properties']['browser'] = 'Discord Android'
+#                data['d']['properties']['device'] = 'Discord Android'
+#        await super().send_as_json(data)
 
+#DiscordWebSocket.from_client = MyDiscordWebSocket.from_client
 
-DiscordWebSocket.from_client = MyDiscordWebSocket.from_client
+intents = Intents().all()
+intents.presences = False
+intents.webhooks = False
+intents.voice_states = False
+intents.reactions = False
+intents.scheduled_events = False
 
-intents = Intents(guilds=True, members=True, messages=True, typing=True, emojis_and_stickers=True)
 bot = Jeanne(intents=intents,
              allowed_mentions=AllowedMentions.all())
 bot.remove_command('help')
@@ -30,13 +35,11 @@ for filename in listdir('./cogs'):
     print(f'Unable to load {filename[:-3]}')
 
 
+
 @bot.event
 async def on_ready():
-  await bot.change_presence(activity=Game(name="Cool, I'm on mobile"))
+  await bot.change_presence(activity=Game(name="New Update"))
   print('Connected to bot: {}'.format(bot.user.name))
   print('Bot ID: {}'.format(bot.user.id))
-
-
-
 
 bot.run(TOKEN)

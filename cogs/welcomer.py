@@ -1,5 +1,6 @@
 from nextcord import *
 from nextcord.ext.commands import Cog
+from assets.db_functions import *
 from config import db
 
 class welcomer(Cog):
@@ -9,36 +10,25 @@ class welcomer(Cog):
     @Cog.listener()
     async def on_member_join(self, member):
         try:
-            guild_id_query = db.execute(
-                f"SELECT guild_id FROM welcomerData where channel_id = {channel_id}")
-            server_id = guild_id_query.fetchone()[0]
-
-            server = self.bot.get_guild(server_id)
+            channel_id=get_welcomer(member.guild.id)
+            server_id = fetch_welcomer(channel_id)
 
             if member.guild.id == server_id:
-                channel_id_query = db.execute(
-                    "SELECT channel_id FROM welcomerData where guild_id = ?", (member.guild.id))
-                channel_id = channel_id_query.fetchone()[0]
                 channel = self.bot.get_channel(channel_id)
             
-                welcome = Embed(description=f"Hi {member} and welcome to {server.name}!",color=member.color).set_thumbnail(url=member.display_avatar)
+                welcome = Embed(description=f"Hi {member} and welcome to {member.guild.name}!",color=member.color).set_thumbnail(url=member.display_avatar)
                                 
                 await channel.send(embed=welcome)
             else:
                 pass
-        except:
-            pass
+        except Exception as e:
+            print(e)
 
     @Cog.listener()
     async def on_member_remove(self, member):
         try:
-            channel_id_query = db.execute(
-                f"SELECT channel_id FROM leaverData where guild_id = {member.guild.id}")
-            channel_id = channel_id_query.fetchone()[0]
-
-            guild_id_query = db.execute(
-                f"SELECT guild_id FROM leaverData where channel_id = {channel_id}")
-            server_id = guild_id_query.fetchone()[0]
+            channel_id = get_leaver(member.guild.id)
+            server_id= fetch_leaver(channel_id)
 
             if member.guild.id == server_id:
                 channel = self.bot.get_channel(channel_id)

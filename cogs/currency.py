@@ -5,8 +5,8 @@ from nextcord import slash_command as jeanne_slash
 from datetime import *
 from nextcord.ext.commands import Cog
 from assets.needed import *
-from config import db
 from cooldowns import *
+from assets.db_functions import add_qp, check_botbanned_user, get_balance, give_daily, remove_qp
 
 current_time = date.today()
 
@@ -18,54 +18,16 @@ class currencysys(Cog):
     @jeanne_slash(description="Claim your daily")
     async def daily(self, ctx: Interaction):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             qp = self.bot.get_emoji(980772736861343774)
             current_time = date.today()
             tomorrow = (current_time + timedelta(days=1))
 
-            try:
-                claimed = db.execute(
-                    "SELECT claimed_date FROM bankData WHERE user_id = ?", (ctx.user.id,)).fetchone()
-            except:
-                pass
-
-            if claimed == None:
-                cur = db.execute(
-                    "INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)", (ctx.user.id, 100, current_time))
-
-                if cur.rowcount == 0:
-                    db.execute(
-                        "UPDATE bankData SET claimed_date = ? , amount = amount + 100 WHERE user_id = ?", (current_time, ctx.user.id,))
-
-                db.commit()
-
-                balance = db.execute(
-                    f"SELECT amount FROM bankData WHERE user_id = ?", (ctx.user.id,)).fetchone()[0]
-                daily = Embed(
-                    title="Daily", description=f"**{ctx.user}**, you claimed your daily reward.", color=ctx.user.color)
-                daily.add_field(name="Rewards:",
-                                value=f"You received 100 {qp}")
-                daily.add_field(
-                    name='Balance', value=f"{balance} {qp}")
-                daily.add_field(name="Next Daily:",
-                                value=tomorrow)
-                await ctx.send(embed=daily)
-
-            elif (date.today() - date.fromisoformat(str(claimed[0]))).days > 0:
-                db.execute(
-                    "UPDATE bankData SET claimed_date = ? , amount = amount + 100 WHERE user_id = ?", (current_time, ctx.user.id,))
-                db.commit()
-
-                balance = db.execute(
-                    f"SELECT amount FROM bankData WHERE user_id = ?", (ctx.user.id,)).fetchone()[0]
+            if give_daily(ctx.user.id) == True:
+                balance=get_balance(ctx.user.id)
 
                 daily = Embed(
                     title="Daily", description=f"**{ctx.user}**, you claimed your daily reward.", color=ctx.user.color)
@@ -77,7 +39,7 @@ class currencysys(Cog):
                                 value=tomorrow)
                 await ctx.send(embed=daily)
 
-            else:
+            elif give_daily(ctx.user.id) == False:
                 cooldown = Embed(
                     description=f"You have already claimed your daily.\nYour next claim is on `{tomorrow}`", color=Color.red())
                 await ctx.followup.send(embed=cooldown)
@@ -90,15 +52,10 @@ class currencysys(Cog):
     @cooldown(1, 3600, bucket=SlashBucket.author)
     async def free(self, ctx: Interaction):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             qp = str(self.bot.get_emoji(980772736861343774))
             guessit = Embed(
                 description="I'm thinking of a number between 1 to 10.\nYou have 5 seconds to guess it!", color=0x00FFFF)
@@ -118,14 +75,7 @@ class currencysys(Cog):
                 return await ctx.followup.send(embed=timeout)
 
             if int(guess.content) == answer:
-                cur = db.execute("INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)", (
-                    ctx.user.id, 20, (current_time - timedelta(days=1))))
-
-                if cur.rowcount == 0:
-                    db.execute(
-                        f"UPDATE bankData SET amount = amount + 20 WHERE user_id = ?", (ctx.user.id,))
-
-                db.commit()
+                add_qp(ctx.user.id, 20)
 
                 correct = Embed(
                     description=f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given 20 {qp}!", color=0x008000).set_image(url=correct_answer)
@@ -140,18 +90,12 @@ class currencysys(Cog):
     @cooldown(1, 15, bucket=SlashBucket.author)
     async def bet(self, ctx: Interaction, bet=SlashOption(description="How much are you betting?", required=True)):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             qp = str(self.bot.get_emoji(980772736861343774))
-            balance = db.execute(
-                "SELECT amount FROM bankData WHERE user_id = ?", (ctx.user.id,)).fetchone()[0]
+            balance=get_balance(ctx.user.id)
             if int(bet) < 5:
                 bethigher = Embed(
                     description=f'Please bet an amount higher than 5 {qp}')
@@ -163,7 +107,7 @@ class currencysys(Cog):
                 await ctx.followup.send(embed=betlower)
             elif int(balance) == 0:
                 zerobal = Embed(
-                    description=f'Unfortunately, you have 0 {qp}.\nPlease do a daily and/or wait for a free chance to do `/guess free` and/or `/dice free`')
+                    description=f'Unfortunately, you have 0 {qp}.\nPlease do a daily and/or wait for a free chance to do `/guess free`, `/flip free` and/or `/dice free`')
                 await ctx.followup.send(embed=zerobal)
             else:
                 guessit = Embed(
@@ -185,9 +129,7 @@ class currencysys(Cog):
 
                 if int(guess.content) == answer:
                     try:
-                        db.execute(
-                            "UPDATE bankData SET amount = amount + ? WHERE user_id = ?", (int(bet), ctx.user.id,))
-                        db.commit()
+                        add_qp(ctx.user.id, int(bet))
                         correct = Embed(
                             description=f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given {int(bet)} {qp}!", color=0x008000)
                     except:
@@ -196,9 +138,7 @@ class currencysys(Cog):
                     correct.set_image(url=correct_answer)
                     await ctx.followup.send(embed=correct)
                 else:
-                    db.execute(
-                        f"UPDATE bankData SET amount = amount - ? WHERE user_id = ?", (int(bet), ctx.user.id,))
-                    db.commit()
+                    remove_qp(ctx.user.id, int(bet))
                     wrong = Embed(
                         description=f"Wrong answer. It was {answer}\nAfraid I have to take {int(bet)} {qp} from you...", color=0xFF0000)
                     wrong.set_thumbnail(url=wrong_answer_or_timeout)
@@ -212,26 +152,15 @@ class currencysys(Cog):
     @cooldown(1, 3600, bucket=SlashBucket.author)
     async def _free(self, ctx: Interaction, digit=SlashOption(description="What number are you guessing?", required=True)):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             qp = str(self.bot.get_emoji(980772736861343774))
             rolled = randint(1, 6)
 
             if rolled == int(digit):
-                cur = db.execute("INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)", (
-                    ctx.user.id, 20, (current_time - timedelta(days=1))))
-
-                if cur.rowcount == 0:
-                    db.execute(
-                        f"UPDATE bankData SET amount = amount + 20 WHERE user_id = ?", (ctx.user.id,))
-                db.commit()
+                add_qp(ctx.user.id, 20)
 
                 embed = Embed(color=0x0000FF)
                 embed.add_field(name=f"YAY! You got it!\n20 {qp} has been added",
@@ -247,20 +176,14 @@ class currencysys(Cog):
     @cooldown(1, 15, bucket=SlashBucket.author)
     async def _bet(self, ctx: Interaction, bet=SlashOption(description='How much are you betting?', required=True), digit=SlashOption(description="What number are you guessing?", required=True)):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
          try:
             qp = str(self.bot.get_emoji(980772736861343774))
             rolled = randint(1, 6)
-            balance = db.execute(
-                "SELECT amount FROM bankData WHERE user_id = ?", (ctx.user.id,)).fetchone()[0]
+            balance = get_balance(ctx.user.id)
             if int(bet) < 5:
                 bethigher = Embed(
                     description=f'Please bet an amount higher than 5 {qp}')
@@ -276,19 +199,14 @@ class currencysys(Cog):
                 await ctx.followup.send(embed=zerobal)
 
             if rolled == int(digit):
-
-                db.execute(
-                    "UPDATE bankData SET amount = amount + ? WHERE user_id = ?", (int(bet), ctx.user.id,))
-                db.commit()
+                add_qp(ctx.user.id, int(bet))
                 embed = Embed(color=0x0000FF)
                 embed.add_field(name=f"YAY! You got it!\n20 {qp} has been added",
                                 value=f"Dice rolled: **{rolled}**\nYou guessed: **{digit}**", inline=False)
                 await ctx.followup.send(embed=embed)
 
             else:
-                db.execute(
-                    "UPDATE bankData SET amount = amount - ? WHERE user_id = ?", (int(bet), ctx.user.id,))
-                db.commit()
+                remove_qp(ctx.user.id, int(bet))
                 embed = Embed(color=Color.red())
                 embed = Embed(
                     description=f"Oh no. It rolled a **{rolled}**", color=Color.red())
@@ -300,70 +218,55 @@ class currencysys(Cog):
     @cooldown(1, 30, bucket=SlashBucket.author)
     async def balance(self, ctx: Interaction):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             qp = str(self.bot.get_emoji(980772736861343774))
-            cur = db.execute(
-                "SELECT amount FROM bankData WHERE user_id = ?", (ctx.user.id,))
-            data = cur.fetchone()
-            if data == None:
-                notthere = Embed(
-                    description="You are not in the database\nPlease do `/daily`", color=Color.red())
-                await ctx.followup.send(embed=notthere)
-            else:
-                amount = data[0]
-                balance = Embed(
-                    description=f"You have {amount} {qp}", color=Color.blue())
-                await ctx.followup.send(embed=balance)
+            bal=get_balance(ctx.user.id)
+
+            balance = Embed(
+                    description=f"You have {bal} {qp}", color=Color.blue())
+            balance.add_field(
+                name=f"If you want more {qp}:", value="[Vote for me in TopGG](https://top.gg/bot/831993597166747679/vote)", inline=True)
+            await ctx.followup.send(embed=balance)
 
     @balance.error
     async def balance_error(self, ctx: Interaction, error):
-        await ctx.response.defer()
         if isinstance(error, CallableOnCooldown):
             cooldown = Embed(
                 description=f"WOAH! Calm down! Why keep checking again quickly?\nTry again after `{error.retry_after} seconds`", color=0xff0000)
-            await ctx.followup.send(embed=cooldown)
+            await ctx.send(embed=cooldown)
 
     @free.error
     async def free_error(self, ctx: Interaction, error):
-        await ctx.response.defer()
         if isinstance(error, CallableOnCooldown):
             reset_hour = error.resets_at.strftime('%H:%M')
             cooldown = Embed(
                 description=f"You have already used your free chance\nTry again after {reset_hour}", color=0xff0000)
-            await ctx.followup.send(embed=cooldown)
+            await ctx.send(embed=cooldown)
 
     @bet.error
     async def bet_error(self, ctx: Interaction, error):
-        await ctx.response.defer()
         if isinstance(error, CallableOnCooldown):
             cooldown = Embed(
                 description=f"WOAH! Calm down!\nTry again after `{error.retry_after} seconds`", color=0xff0000)
-            await ctx.followup.send(embed=cooldown)
+            await ctx.send(embed=cooldown)
 
     @_free.error
     async def _free_error(self, ctx: Interaction, error):
-        await ctx.response.defer()
         if isinstance(error, CallableOnCooldown):
-            reset_hour = error.resets_at.strftime('%H:%M')
+            reset_hour = round(error.resets_at.timestamp())
             cooldown = Embed(
-                description=f"You have already used your free chance\nTry again after {reset_hour}", color=0xff0000)
-            await ctx.followup.send(embed=cooldown)
+                description=f"You have already used your free chance\nTry again after <t:{str(reset_hour)}:t>", color=0xff0000)
+            await ctx.send(embed=cooldown)
 
     @_bet.error
     async def _bet_error(self, ctx: Interaction, error):
-        await ctx.response.defer()
         if isinstance(error, CallableOnCooldown):
             cooldown = Embed(
                 description=f"WOAH! Calm down!\nTry again after `{error.retry_after} seconds`", color=0xff0000)
-            await ctx.followup.send(embed=cooldown)
+            await ctx.send(embed=cooldown)
 
     @jeanne_slash(description="Main coinflip command")
     async def flip(self, ctx: Interaction):
@@ -373,26 +276,15 @@ class currencysys(Cog):
     @cooldown(1, 3600, bucket=SlashBucket.author)
     async def _free_(self, ctx: Interaction, pick=SlashOption(choices=['heads', 'tails'])):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             qp = str(self.bot.get_emoji(980772736861343774))
             jeannes_pick = ['heads', 'tails']
 
             if pick == choice(jeannes_pick):
-                cur = db.execute("INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)", (
-                    ctx.user.id, 20, (current_time - timedelta(days=1))))
-
-                if cur.rowcount == 0:
-                    db.execute(
-                        f"UPDATE bankData SET amount = amount + 20 WHERE user_id = ?", (ctx.user.id,))
-                db.commit()
+                add_qp(ctx.user.id, 20)
 
                 embed = Embed(
                     description="YAY! You got it!\n20 {} has been added".format(qp))
@@ -402,27 +294,21 @@ class currencysys(Cog):
             else:
                 embed = Embed(color=Color.red())
                 embed = Embed(
-                    description="Oh no, it was {}".format(jeannes_pick), color=Color.red())
+                    description="Oh no, it was {}".format(choice(jeannes_pick)), color=Color.red())
                 await ctx.followup.send(embed=embed)
 
     @flip.subcommand(name='bet', description='Flip a coin and earn with betting')
     @cooldown(1, 15, bucket=SlashBucket.author)
     async def _bet_(self, ctx: Interaction, bet=SlashOption(required=True), pick=SlashOption(choices=['heads', 'tails'])):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             try:
                 qp = str(self.bot.get_emoji(980772736861343774))
-                jeannes_pick = choice['heads', 'tails']
-                balance = db.execute(
-                    "SELECT amount FROM bankData WHERE user_id = ?", (ctx.user.id,)).fetchone()[0]
+                jeannes_pick = ['heads', 'tails']
+                balance = get_balance(ctx.user.id)
                 if int(bet) < 5:
                     bethigher = Embed(
                         description=f'Please bet an amount higher than 5 {qp}')
@@ -438,10 +324,8 @@ class currencysys(Cog):
                     await ctx.followup.send(embed=zerobal)
 
                 else:
-                    if pick == jeannes_pick:
-                        db.execute(
-                            "UPDATE bankData SET amount = amount + {} WHERE user_id = ?", (int(bet), ctx.user.id,))
-                        db.commit()
+                    if pick == choice(jeannes_pick):
+                        add_qp(ctx.user.id, int(bet))
 
                         embed = Embed(
                             description="YAY! You got it!\n{} {} has been added".format(int(bet), qp))
@@ -449,32 +333,28 @@ class currencysys(Cog):
                         await ctx.followup.send(embed=embed)
 
                     else:
-                        db.execute(
-                            "UPDATE bankData SET amount = amount - ? WHERE user_id = ?", (int(bet), ctx.user.id,))
-                        db.commit()
+                        remove_qp(ctx.user.id, int(bet))
                         embed = Embed(color=Color.red())
                         embed = Embed(
-                            description="Oh no, it was {}".format(jeannes_pick), color=Color.red())
+                            description="Oh no, it was {}".format(choice(jeannes_pick)), color=Color.red())
                         await ctx.followup.send(embed=embed)
             except:
                 await ctx.followup.send('Please run `/daily')
 
     @_free_.error
     async def _freeerror(self, ctx: Interaction, error):
-        await ctx.response.defer()
         if isinstance(error, CallableOnCooldown):
             reset_hour = error.resets_at.strftime('%H:%M')
             cooldown = Embed(
                 description=f"You have already used your free chance\nTry again after {reset_hour}", color=0xff0000)
-            await ctx.followup.send(embed=cooldown)
+            await ctx.send(embed=cooldown)
 
     @_bet_.error
     async def _beterror(self, ctx: Interaction, error):
-        await ctx.response.defer()
         if isinstance(error, CallableOnCooldown):
             cooldown = Embed(
                 description=f"WOAH! Calm down!\nTry again after `{error.retry_after} seconds`", color=0xff0000)
-            await ctx.followup.send(embed=cooldown)
+            await ctx.send(embed=cooldown)
 
 
 def setup(bot):

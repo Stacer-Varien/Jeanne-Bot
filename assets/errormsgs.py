@@ -6,9 +6,6 @@ no_bot_mutual = Embed(description="Bot is not in this server", color=0xff0000)
 
 no_user = Embed(title="User does not exist", description="Please make sure the USER_ID is valid.", color=0xff0000)
 
-no_hentai = Embed(title='Hentai Failed', description="Hentai couldn't be sent in this channel", color=0xff0000)
-no_hentai.add_field(name="Reason", value="Channel is not NSFW enabled")
-
 no_member = Embed(description="Member is not in this server")
 
 channel_perm=Embed(title='Manage Channel Failed', description="This channel couldn't be managed", color=0xff0000)

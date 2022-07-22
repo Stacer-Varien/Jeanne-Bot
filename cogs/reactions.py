@@ -1,4 +1,4 @@
-from config import db
+from assets.db_functions import check_botbanned_user
 from nextcord import *
 from nextcord import slash_command as jeanne_slash
 from nextcord.ext.commands import Cog
@@ -14,15 +14,10 @@ class slashreactions(Cog):
     @jeanne_slash(description="Hug someone or yourself")
     async def hug(self, ctx: Interaction, member: Member = SlashOption(description="Who do you want to hug?", required=False)):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
-            botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
-
-            if ctx.user.id==botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             wait=await ctx.followup.send("Sending hug")
             await wait.delete()
             hug_api = get(hug_nekoslife).json()
@@ -67,15 +62,10 @@ class slashreactions(Cog):
     @jeanne_slash(description="Show a smuggy look")
     async def smug(self, ctx : Interaction):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
-            botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
-
-            if ctx.user.id==botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             smug_api = get(smug_nekoslife).json()
 
             smug = Embed(color=0xFFC0CB)
@@ -86,15 +76,10 @@ class slashreactions(Cog):
     @jeanne_slash(description="Poke someone or yourself")
     async def poke(self, ctx: Interaction, member: Member = SlashOption(description="Who do you want to poke?", required=False)):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
-            botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
-
-            if ctx.user.id==botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             wait = await ctx.followup.send("Sending poke")
             await wait.delete()
             poke_api = get(poke_nekosfun).json()
@@ -112,15 +97,10 @@ class slashreactions(Cog):
     @jeanne_slash(description="Pat someone or yourself")
     async def pat(self, ctx: Interaction, member: Member = SlashOption(description="Who do you want to pat?", required=False)):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
-            botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
-
-            if ctx.user.id==botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             wait = await ctx.followup.send("Sending headpat")
             await wait.delete()
             pat_api = get(pat_nekoslife).json()
@@ -138,15 +118,10 @@ class slashreactions(Cog):
     @jeanne_slash(description="Kiss someone or yourself")
     async def kiss(self, ctx: Interaction, member: Member = SlashOption(description="Who do you want to kiss?", required=False)):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
-            botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
-
-            if ctx.user.id==botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             wait = await ctx.followup.send("Giving kiss")
             await wait.delete()
             kiss_api = get(kiss_nekosfun).json()
@@ -164,15 +139,10 @@ class slashreactions(Cog):
     @jeanne_slash(description="Tickle someone or yourself")
     async def tickle(self, ctx: Interaction, member: Member = SlashOption(description="Who do you want to tickle?", required=False)):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
-            botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
-
-            if ctx.user.id==botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             wait = await ctx.followup.send("Giving tickle")
             await wait.delete()
             tickle_api = get(tickle_nekoslife).json()
@@ -190,15 +160,10 @@ class slashreactions(Cog):
     @jeanne_slash(description="Call someone or yourself a baka!")
     async def baka(self, ctx: Interaction, member: Member = SlashOption(description="Who do you calling a baka?", required=False)):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
-            botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
-
-            if ctx.user.id==botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             wait = await ctx.followup.send("Shouting baka")
             await wait.delete()
             baka_api = get(baka_nekosfun).json()
@@ -216,15 +181,10 @@ class slashreactions(Cog):
     @jeanne_slash(description="Feed someone or yourself")
     async def feed(self, ctx: Interaction, *, member: Member = SlashOption(description="Who do you want to feed?", required=False)):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                    f"SELECT * FROM botbannedData WHERE user_id = {ctx.user.id}")
-            botbanned_data = botbanquery.fetchone()
-            botbanned=botbanned_data[0]
-
-            if ctx.user.id==botbanned:
-                pass
-        except:
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
             wait = await ctx.followup.send("Giving food")
             await wait.delete()
             feed_api = get(feed_nekoslife).json()
