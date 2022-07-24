@@ -54,7 +54,7 @@ class levelling(Cog):
                 glvl = get_user_level(member.id)
                 gexp = get_user_xp(member.id)
 
-                bg = get_used_wallpaper(ctx.user.id)
+                bg = get_used_wallpaper(member.id)
 
                 args = {
                         'bg_image': bg,
