@@ -186,6 +186,9 @@ class slashmoderation(Cog):
             else:
                 if reason == None:
                     reason = 'Unspecified'
+                
+                else:
+                    reason=reason
                 try:
                     banmsg = Embed(
                         description=f"You are banned from **{ctx.guild.name}** for **{reason}**")
@@ -193,7 +196,7 @@ class slashmoderation(Cog):
                 except:
                     pass
 
-                await member.ban(reason="{} | {}".format(reason, ctx.user))
+                await member.ban(reason="{} | {}".format(reason, ctx.user.id))
 
                 ban = Embed(title="Member Banned", color=0xFF0000)
                 ban.add_field(name="Name", value=member, inline=True)
@@ -225,6 +228,8 @@ class slashmoderation(Cog):
             guild = ctx.guild
             if reason == None:
                 reason = "Unspecified"
+            else:
+                reason=reason
 
             try:
                 banned = await guild.fetch_ban(user)
@@ -239,17 +244,17 @@ class slashmoderation(Cog):
             else:
                 view = Confirmation()
                 confirm = Embed(description="Is {} the one you want to ban from your server?".format(
-                    user), color=Color.dark_red())
+                    user), color=Color.dark_red()).set_thumbnail(url=user.display_avatar)
                 m = await ctx.followup.send(embed=confirm, view=view)
                 await view.wait()
 
                 if view.value is None:
                     cancelled = Embed(
-                        description="Ban cancelled due to timeout", color=Color.red())
+                        description="Ban cancelled", color=Color.red())
                     await m.edit(embed=cancelled, view=None)
 
                 elif view.value is True:
-                    await guild.ban(user, reason="{} | {}".format(reason, ctx.user))
+                    await guild.ban(user, reason="{} | {}".format(reason, ctx.user.id))
 
                     ban = Embed(title="User Banned", color=0xFF0000)
                     ban.add_field(name="Name", value=user, inline=True)
@@ -262,12 +267,12 @@ class slashmoderation(Cog):
                     modlog_id = get_modlog_channel(ctx.guild.id)
 
                     if modlog_id == None:
-                        await m.edit(embed=ban, view=None)
+                        await m.edit(embed=ban)
                     else:
                         modlog = ctx.guild.get_channel(modlog_id)
                         banned = Embed(
                             description=f"{user} has been banned. Check {modlog.mention}", color=0xFF0000)
-                        await m.edit(embed=banned, view=None)
+                        await m.edit(embed=banned)
                         await modlog.send(embed=ban)
 
                 elif view.value is False:
@@ -305,6 +310,8 @@ class slashmoderation(Cog):
             else:
                 if reason == None:
                     reason = 'Unspecified'
+                else:
+                    reason = reason
 
                 try:
                     kickmsg = Embed(
@@ -317,8 +324,8 @@ class slashmoderation(Cog):
                 kick = Embed(title="Member Kicked", color=0xFF0000)
                 kick.add_field(name='Member', value=member, inline=True)
                 kick.add_field(name='ID', value=member.id, inline=True)
-                kick.add_field(name='Moderator',
-                               value=ctx.user, inline=True)
+                kick.add_field(name='Resposible Moderator',
+                               value=ctx.user.id, inline=True)
                 kick.add_field(name='Reason', value=reason, inline=True)
                 kick.set_thumbnail(url=member.display_avatar)
 
@@ -355,11 +362,11 @@ class slashmoderation(Cog):
                     return m.author == member
 
                 await ctx.channel.purge(limit=int(limit), check=is_member)
-                await ctx.followup.send(f"Done bulk Deleted messages from {member}")
+                await ctx.followup.send("Done bulk deleting messages")
 
             elif not member:
                 await ctx.channel.purge(limit=int(limit))
-                await ctx.followup.send("Done bulk deleted messages")
+                await ctx.followup.send("Done bulk deleting messages")
 
     @purge.error
     async def purge_error(self, ctx: Interaction, error):
@@ -396,50 +403,33 @@ class slashmoderation(Cog):
             pass
         else:
             user = await self.bot.fetch_user(user_id)
+            await ctx.guild.unban(user, reason="{} | {}".format(reason, ctx.user))
+            unban = Embed(title="User Unbanned", color=0xFF0000)
+            unban.add_field(name="Name", value=user, inline=True)
+            unban.add_field(name="ID", value=user.id, inline=True)
+            unban.add_field(name="Moderator", value=ctx.user, inline=True)
+            unban.add_field(name="Reason", value=reason, inline=False)
+            unban.set_thumbnail(url=user.display_avatar)
 
-            confirm=Embed(description=f"Are you sure you want to unban {user}?", color=Color.brand_red())
-            view=Confirmation()
-            m=await ctx.followup.send(embed=confirm, view=view)
-            await view.wait()
+            modlog_id = get_modlog_channel(ctx.guild.id)
 
-            if view.value==None:
-                cancelled = Embed(
-                    description="Unban cancelled due to timeout", color=Color.red())
-                await m.edit(embed=cancelled, view=None)
-
-            elif view.value == True:
-                await ctx.guild.unban(user, reason="{} | {}".format(reason, ctx.user))
-                unban = Embed(title="User Unbanned", color=0xFF0000)
-                unban.add_field(name="Name", value=user, inline=True)
-                unban.add_field(name="ID", value=user.id, inline=True)
-                unban.add_field(name="Moderator", value=ctx.user, inline=True)
-                unban.add_field(name="Reason", value=reason, inline=False)
-                unban.set_thumbnail(url=user.display_avatar)
-
-                modlog_id = get_modlog_channel(ctx.guild.id)
-
-                if modlog_id == None:
-                    await ctx.followup.send(embed=unban)
-                else:
-                    modlog = ctx.guild.get_channel(modlog_id)
-                    unbanned = Embed(
-                        description=f"{user} has been unbanned. Check {modlog.mention}", color=0xFF0000)
-                    await ctx.followup.send(embed=unbanned)
-                    await modlog.send(embed=unban)
-
-            elif view.value == False:
-                cancelled = Embed(
-                    description="Unban cancelled", color=Color.red())
-                await m.edit(embed=cancelled, view=None)
-
+            if modlog_id == None:
+                await ctx.followup.send(embed=unban)
+            else:
+                modlog = ctx.guild.get_channel(modlog_id)
+                unbanned = Embed(
+                    description=f"{user} has been unbanned. Check {modlog.mention}", color=0xFF0000)
+                await ctx.followup.send(embed=unbanned)
+                await modlog.send(embed=unban)
 
     @unban.error
     async def unban_error(self, ctx: Interaction, error):
         if isinstance(error, ApplicationMissingPermissions):
-            await ctx.send(embed=unban_perm)
+            await ctx.response.defer()
+            await ctx.followup.send(embed=unban_perm)
 
         elif isinstance(error, UserNotFound):
-            await ctx.send("Invalid user ID")
+            await ctx.followup.send("Invalid user ID")
 
     @jeanne_slash(description="Mute a member")
     @has_permissions(moderate_members=True)
@@ -449,19 +439,22 @@ class slashmoderation(Cog):
         if check == ctx.user.id:
             pass
         else:
-            if time == None:
-                time = '28d'
-
-            if reason is None:
-                reason = "Unspecified"
-
-            elif member == ctx.user:
+            if member == ctx.user:
                 failed = Embed(description="You can't mute yourself")
                 await ctx.followup.send(embed=failed)
 
             else:
+                if time == None:
+                    time = '28d'
+
+                if reason is None:
+                    reason = "Unspecified"
+                else:
+                    reason = reason
+
+
                 timed = parse_timespan(time)
-                await member.edit(timeout=utcnow()+timedelta(seconds=timed), reason=reason)
+                await member.edit(timeout=utcnow()+timedelta(seconds=timed), reason="{} | {}".format(reason, ctx.user))
                 mute = Embed(
                     title="Member Muted", color=0xFF0000)
                 mute.add_field(name="Member", value=member, inline=True)
@@ -500,13 +493,15 @@ class slashmoderation(Cog):
         else:
             if reason == None:
                 reason = "Unspecified"
+            else:
+                reason=reason
 
             if member == ctx.user:
                 failed = Embed(description="You can't unmute yourself")
                 await ctx.followup.send(embed=failed)
 
             else:
-                await member.edit(timeout=None, reason=reason)
+                await member.edit(timeout=None, reason="{} | {}".format(reason, ctx.user))
                 unmute = Embed(
                     title="Member Unmuted", color=0xFF0000)
                 unmute.add_field(name="Member", value=member, inline=True)
