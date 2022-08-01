@@ -19,8 +19,12 @@ class slashmanage(Cog):
         if check == ctx.user.id:
             pass
         else:
+            if color == None:
+                color=Color.default()
+            else:
+                color = int(color, 16)
             guild = ctx.guild
-            await guild.create_role(name=role_name, color=int(color, 16))
+            await guild.create_role(name=role_name, color=color)
             embed = Embed(color=0x00FF68)
             embed.add_field(name="Role create",
                             value=f"The role named `{role_name}` has been made", inline=False)
