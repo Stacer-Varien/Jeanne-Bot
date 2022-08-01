@@ -77,7 +77,52 @@ class slashfun(Cog):
             choose = Embed(
                 description=f"I chose **{choice(pick)}**", color=0x0000FF)
             await ctx.followup.send(embed=choose)
+    
+    @jeanne_slash(description="Check how much of a simp you are")
+    async def simp_rate(self, ctx:Interaction, member:Member=SlashOption(description="Which member you want to check their simp rate?", required=False)):
+        await ctx.response.defer()
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
+            perc=randint(0,100)
 
+            if member == None:
+                member = ctx.user
+
+            simp = Embed(description="{} simp rate is {}%", color=ctx.user.color)
+
+            if perc > 60:
+                simp.set_image(url="https://i.imgur.com/W4u4Igk.jpg")
+            
+            elif perc > 40:
+                simp.set_image(url="https://i.imgur.com/Rs1IP2I.jpg")
+            
+            await ctx.followup.send(embed=simp)
+
+    @jeanne_slash(description="Check how gay you are")
+    async def gay_rate(self, ctx:Interaction, member:Member=SlashOption(description="Which member do you want to check their gay rate?", required=False)):
+        await ctx.response.defer()
+        check = check_botbanned_user(ctx.user.id)
+        if check == ctx.user.id:
+            pass
+        else:
+            perc = randint(0, 100)
+
+            if member==None:
+                member = ctx.user
+
+            gay = Embed(description="{} gay rate is {}%".format(member, perc),
+                         color=ctx.user.color)
+
+            if perc > 60:
+                gay.set_image(url="https://i.imgur.com/itOD0Da.png?1")
+
+            elif perc > 40:
+                gay.set_image(url="https://i.imgur.com/tYAbWCl.jpg")
+
+            await ctx.followup.send(embed=gay)
+                
 
 def setup(bot):
     bot.add_cog(slashfun(bot))
