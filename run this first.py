@@ -12,12 +12,12 @@ elif system() == "Linux":  # If you are using a Linux Operating System
     upgrade_pip = "python3 -m pip install --upgrade pip"
 
 # Required packages for the bot to use. Also upgrades it if a new release is found
-essentails = "pip install --upgrade nextcord requests function-cooldowns python-dotenv humanfriendly datetime pillow py-expression-eval"
+essentials = "pip install --upgrade nextcord requests function-cooldowns python-dotenv humanfriendly datetime pillow py-expression-eval"
 
 # TopGG package with the '--no-deps' argument so discord.py doesn't get installed
 topgg = "pip install topggpy --no-deps"
 
-packages = [upgrade_pip, essentails, topgg]
+packages = [upgrade_pip, essentials, topgg]
 
 for a in packages:
     console(a)
