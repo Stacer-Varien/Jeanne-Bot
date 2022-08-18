@@ -10,7 +10,7 @@ User IDs, server IDs and channel IDs are the main data stored and kept privately
 
 ## Data Accessing
 
-Data can be accessed but limited to anyone except the bot developer. Level and rank data can be accessed freely but data such as inventory or credit balance can only be accessed by the main user. Sensitive data such as reports made on users violating rules of the server are private or public depending on how authorised personnel see fit to it and will only be logged to their own servers.
+Data can be accessed but limited to anyone except the bot developer as he has full access to all kinds of data. Level and rank data can be accessed freely but data such as inventory or credit balance can only be accessed by the main user. Sensitive data such as reports made on users violating rules of the server are private or public depending on how authorised personnel see fit to it and will only be logged to their own servers.
 
 ## Removal of Data
 

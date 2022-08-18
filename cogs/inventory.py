@@ -1,3 +1,4 @@
+from assets.buttons import Confirmation
 from assets.db_functions import add_user_custom_wallpaper, add_user_wallpaper, check_botbanned_user, fetch_user_inventory, fetch_wallpapers, get_balance, get_user_inventory, get_wallpaper
 from config import inv_db, db
 from nextcord import *
@@ -7,23 +8,6 @@ from assets.levelcard.generator import Generator
 from asyncio import get_event_loop
 from functools import partial
 from sqlite3 import connect
-
-
-class Confirm(ui.View):
-    def __init__(self):
-        super().__init__()
-        self.value = None
-
-    @ui.button(label="Confirm", style=ButtonStyle.green)
-    async def confirm(self, button: ui.Button, ctx: Interaction):
-            self.value = True
-            self.stop()
-
-    @ui.button(label="Cancel", style=ButtonStyle.grey)
-    async def cancel(self, button: ui.Button, ctx: Interaction):
-            self.value = False
-            self.stop()
-
 
 class inventory(Cog):
     def __init__(self, bot):
@@ -40,8 +24,7 @@ class inventory(Cog):
     @shop.subcommand(description="Check all the wallpapers available")
     async def background(self, ctx:Interaction):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             await ctx.followup.send(embed=fetch_wallpapers())
@@ -49,8 +32,7 @@ class inventory(Cog):
     @shop.subcommand(description="Buy a background pic for your level card")
     async def buy_background(self, ctx:Interaction, item_id):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             balance = get_balance(ctx.user.id)
@@ -93,7 +75,7 @@ class inventory(Cog):
                     file = File(fp=image, filename=f'preview_level_card.png')
 
                     preview=Embed(description="This is the preview of the level card.", color=Color.blue()).add_field(name="Cost", value=f"{wallpaper[3]} {qp}").set_footer(text="Is this the background you wanted?")
-                    view=Confirm()
+                    view=Confirmation()
                     await ctx.followup.send(file=file, embed=preview, view=view)
                     await view.wait()
 
@@ -102,7 +84,7 @@ class inventory(Cog):
                     elif view.value is True:
                         get_user_inventory(ctx.user.id)
                         add_user_wallpaper(ctx.user.id, item_id)
-                        embed1 = Embed(description="Background wallpaper bought. Don't forget to use `/use ITEM_ID` to set it",color=Color.blue())
+                        embed1 = Embed(description=f"Background wallpaper bought. Don't forget to use `/use {item_id}` to set it",color=Color.blue())
                         await ctx.followup.send(embed=embed1)
 
                     elif view.value is False:
@@ -112,8 +94,7 @@ class inventory(Cog):
     @jeanne_slash(description='Use a background picture')
     async def use(self, ctx:Interaction, item_id):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             user_inv = connect("./User_Inventories/{}.db".format(ctx.user.id))
@@ -140,8 +121,7 @@ class inventory(Cog):
     @shop.subcommand(description="Buy a custom background pic for your level card")
     async def buy_custom_background(self, ctx:Interaction, name=SlashOption(description='Name your background', required=True), link=SlashOption(description="Make sure the link is permanent", required=True)):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             balance=db.execute("SELECT amount FROM bankData WHERE user_id = ?", (ctx.user.id,)).fetchone()
@@ -180,7 +160,7 @@ class inventory(Cog):
 
                     preview = Embed(description="This is the preview of the level card.", color=Color.blue()).add_field(name="Cost", value=f"1000 {qp}").set_footer(
                         text="Is this the background you wanted?").set_footer(text="Please note that if the custom background violates ToS or is NSFW, it will be removed with NO REFUNDS!")
-                    view = Confirm()
+                    view = Confirmation()
                     await ctx.followup.send(file=file, embed=preview, view=view)
                     await view.wait()
 
@@ -190,7 +170,7 @@ class inventory(Cog):
                         add_user_custom_wallpaper(ctx.user.id, name, link)
 
                         embed1 = Embed(
-                            description="Background wallpaper bought. Don't forget to use `/use ITEM_ID` (which is the name you've set) to set it", color=Color.blue())
+                            description=f"Background wallpaper bought. Don't forget to use `/use {name}` to set it", color=Color.blue())
                         await ctx.followup.send(embed=embed1)
 
                     elif view.value is False:
@@ -204,8 +184,7 @@ class inventory(Cog):
     @jeanne_slash(description='Check which backgrounds you have')
     async def inventory(self, ctx:Interaction):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             a = fetch_user_inventory(ctx.user.id)

@@ -23,8 +23,7 @@ class levelling(Cog):
 
     @Cog.listener()
     async def on_message(self, message):
-        check = check_botbanned_user(message.author.id)
-        if check == message.author.id:
+        if check_botbanned_user(message.author.id) == True:
             pass
         else:
             ratelimit = self.get_ratelimit(message)
@@ -41,8 +40,7 @@ class levelling(Cog):
     @cooldown(1, 60, bucket=SlashBucket.author)
     async def level(self, ctx: Interaction, member: Member = SlashOption(description="Which member?", required=False)):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             if member is None:
@@ -82,8 +80,7 @@ class levelling(Cog):
     @cooldown(1, 60, bucket=SlashBucket.author)
     async def rank(self, ctx: Interaction, type=SlashOption(description="Server or Global specific?", choices=["server", "global"])):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             if type == "server":
@@ -114,9 +111,6 @@ class levelling(Cog):
                     r += 1
 
                 await ctx.followup.send(embed=embed)
-
-
-
 
 def setup(bot):
     bot.add_cog(levelling(bot))

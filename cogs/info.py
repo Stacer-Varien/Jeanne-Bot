@@ -1,3 +1,4 @@
+from assets.db_functions import check_botbanned_user
 from config import db
 from time import time
 from datetime import timedelta
@@ -12,19 +13,14 @@ start_time = time()
 class slashinfo(Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.bot_version="3.3 VarPacth"
 
     @jeanne_slash(description="See the bot's status from development to now")
     async def stats(self, ctx : Interaction):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
             botowner = self.bot.get_user(597829930964877369)
             embed = Embed(title="Bot stats", color=0x236ce1)
             embed.add_field(
@@ -32,12 +28,14 @@ class slashinfo(Cog):
             embed.add_field(name="Bot ID", value=self.bot.user.id, inline=True)
             embed.add_field(name="Creation Date", value=self.bot.user.created_at.strftime(format), inline=True)
             embed.add_field(
-                name="Version", value=f"• **Python Version:** {py_version.major}.{py_version.minor}.{py_version.micro}\n• **Nextcord Version:** {discord_version}\n• **Bot:** 3.3 AlyxPatch", inline=True)
+                name="Version", value=f"• **Python Version:** {py_version.major}.{py_version.minor}.{py_version.micro}\n• **Nextcord Version:** {discord_version}\n• **Bot:** {self.bot_version}", inline=True)
 
-            cur=db.execute("SELECT * FROM globalxpData")
-            all_users=len(cur.fetchall())
+            cur=db.execute("SELECT * FROM globalxpData").fetchall()
+            all_users=len(cur)
+            cur1=db.execute("SELECT * FROM bankData").fetchall()
+            true_users=len(cur1)
             embed.add_field(name="Count",
-                            value=f"• **Server Count:** {len(self.bot.guilds)} servers\n• **User Count:** {len(set(self.bot.get_all_members()))}\n• **Cached Members:** {all_users}", inline=True)
+                            value=f"• **Server Count:** {len(self.bot.guilds)} servers\n• **User Count:** {len(set(self.bot.get_all_members()))}\n• **Cached Members:** {all_users}\n• **True Members:** {true_users}", inline=True)
 
             current_time = time()
             difference = int(round(current_time - start_time))
@@ -46,7 +44,7 @@ class slashinfo(Cog):
                 name="Uptime", value=f"{uptime} hours", inline=True)
 
             embed.add_field(name="Invites",
-                            value="• [Invite me to your server](https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=1565918620726&scope=bot%20applications.commands)\n• [Vote for me](https://top.gg/bot/831993597166747679)\n• [Join the support server](https://discord.gg/VVxGUmqQhF)", inline=True)
+                            value="• [Invite me to your server](https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=1378013736054&scope=bot)\n• [Vote for me](https://top.gg/bot/831993597166747679)\n• [Join the support server](https://discord.gg/VVxGUmqQhF)", inline=True)
 
             embed.set_thumbnail(
                 url=self.bot.user.avatar)
@@ -55,20 +53,13 @@ class slashinfo(Cog):
     @jeanne_slash(description="See the information of a member or yourself")
     async def userinfo(self, ctx : Interaction, member: Member = SlashOption(description="Which member?", required=False)):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
             if member == None:
                 member = ctx.user
             user = await self.bot.fetch_user(member.id)
-            hasroles = [
-                role.mention for role in member.roles][1:][:: -1]
+            hasroles = [role.mention for role in member.roles][1:][:: -1]
 
             if member.bot == True:
                 botr = "Yes"
@@ -77,7 +68,7 @@ class slashinfo(Cog):
 
             date = round(member.joined_at.timestamp())
             userinfo = Embed(title="{}'s Info".format(member.name),
-                            color=0xccff33)
+                            color=member.color)
             userinfo.add_field(name="Name", value=member, inline=True)
             userinfo.add_field(name="ID", value=member.id, inline=True)
             userinfo.add_field(name="Is Bot?", value=botr, inline=True)
@@ -98,30 +89,15 @@ class slashinfo(Cog):
     @jeanne_slash(description="Get information about this server")
     async def serverinfo(self, ctx : Interaction):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:        
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
             guild = ctx.guild
             emojis = [str(x) for x in guild.emojis]
             features = guild.features
 
-            if guild.premium_subscription_count < 2:
-                boostlevel = "0"
-            elif guild.premium_tier == 1:
-                boostlevel = "1"
-            elif guild.premium_tier == 2:
-                boostlevel = "2"
-            elif guild.premium_tier == 3:
-                boostlevel = "3"
-
             date = round(guild.created_at.timestamp())
-            serverinfo = Embed(title="Server's Info", color=0x00B0ff)
+            serverinfo = Embed(title="Server's Info", color=member.color)
             serverinfo.add_field(name="Name", value=guild.name, inline=True)
             serverinfo.add_field(name="ID", value=guild.id, inline=True)
             serverinfo.add_field(
@@ -130,7 +106,7 @@ class slashinfo(Cog):
             serverinfo.add_field(
                 name="Members", value=f"• **Humans:** {len(guild.humans)}\n• **Bots:** {len(guild.bots)}\n• **Total Members:** {guild.member_count}")
             serverinfo.add_field(name="Boost Status",
-                                 value=f"• **Boosters:** {len(guild.premium_subscribers)}\n• **Boosts:** {guild.premium_subscription_count}\n• **Tier:** {boostlevel}",
+                                 value=f"• **Boosters:** {len(guild.premium_subscribers)}\n• **Boosts:** {guild.premium_subscription_count}\n• **Tier:** {guild.premium_tier}",
                             inline=True)
             serverinfo.add_field(name='Features',
                             value=features, inline=False)
@@ -161,20 +137,14 @@ class slashinfo(Cog):
     @jeanne_slash(description="Check how fast I respond to a command")
     async def ping(self, ctx : Interaction):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
             start_time = time()
-            test = Embed(description="Testing ping", color=0x236ce1)
+            test = Embed(description="Testing ping", color=ctx.user.color)
             msg= await ctx.followup.send(embed=test)
 
-            ping = Embed(color=0x236ce1)
+            ping = Embed(color=ctx.user.color)
             ping.add_field(
                 name="**>** Bot Latency", value=f'{round(self.bot.latency * 1000)}ms', inline=False)
             end_time = time()
@@ -185,15 +155,9 @@ class slashinfo(Cog):
     @jeanne_slash(description="See the server's banner")
     async def guildbanner(self, ctx : Interaction):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
             guild = ctx.guild
             banner = guild.banner
 
@@ -203,7 +167,7 @@ class slashinfo(Cog):
             
             else:
                 try:
-                    embed = Embed(colour=0x00B0ff)
+                    embed = Embed(colour=ctx.user.color)
                     embed.set_footer(text=f"{guild.name}'s banner")
                     embed.set_image(url=banner)
                     await ctx.followup.send(embed=embed)
@@ -214,44 +178,33 @@ class slashinfo(Cog):
     @jeanne_slash(description="See your avatar or another member's avatar")
     async def avatar(self, ctx: Interaction, member: Member = SlashOption(description="Which member?", required=False)):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
             if member==None:
                 member=ctx.user
 
-            avatar = Embed(title=f"{member}'s Avatar", color=0x236ce1)
+            avatar = Embed(title=f"{member}'s Avatar", color=member.color)
             avatar.set_image(url=member.avatar)
             await ctx.followup.send(embed=avatar)
 
     @jeanne_slash(description="See your guild avatar or a member's guild avatar")
     async def guildavatar(self, ctx: Interaction, member: Member = SlashOption(description="Which member?", required=False)):
         await ctx.response.defer()
-        try:
-            botbanquery = db.execute(
-                "SELECT * FROM botbannedData WHERE user_id = ?", (ctx.user.id,))
-            botbanned_data = botbanquery.fetchone()
-            botbanned = botbanned_data[0]
-
-            if ctx.user.id == botbanned:
-                pass
-        except:
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
             if member == None:
                 member = ctx.user
+            
 
-            guild_avatar = Embed(title=f"{member}'s Avatar", color=0x236ce1)
+            guild_avatar = Embed(title=f"{member}'s Avatar", color=member.color)
 
             try:
                 guild_avatar.set_image(url=member.guild_avatar)
                 await ctx.followup.send(embed=guild_avatar)
             except:
-                guild_avatar.set_image(url=member.avatar)
+                guild_avatar.set_image(url=member.display_avatar)
                 guild_avatar.set_footer(
                     text="Member has no server avatar. Passed normal avatar instead")
                 await ctx.followup.send(embed=guild_avatar)

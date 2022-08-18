@@ -25,8 +25,7 @@ class slashhelp(Cog):
     @jeanne_slash(description="Get help from the wiki or join the support server for further help")
     async def help(self, ctx: Interaction):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             help = Embed(

@@ -6,6 +6,7 @@ load_dotenv()
 TOKEN = getenv("token")
 WEATHER = getenv("weather_api")
 TOPGG = getenv("topgg")
+TOPGG_AUTH = getenv("topgg_auth")
 WEBHOOK=getenv("report_webhook")
 BB_WEBHOOK = getenv("botban_webhook")
 

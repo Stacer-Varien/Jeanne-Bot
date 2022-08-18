@@ -1,4 +1,4 @@
-from nextcord import Embed
+from nextcord import Embed, Color
 
 owner_only = Embed(title="Owner only command", description="This command failed to commit because you are not the bot owner", color=0xff0000)
 
@@ -53,3 +53,5 @@ manage_server_perm = Embed(title="Set Modlog failed",
                    description="Sorry but you cannot set that channel as a modlog channel", color=0xff0000)
 manage_server_perm.add_field(
     name="Reason", value="Missing permissions: Manage Server", inline=False)
+
+nsfw_perm = Embed(title="Hentai command failed", description="Please make sure this channel is NSFW enabled", color=Color.red())

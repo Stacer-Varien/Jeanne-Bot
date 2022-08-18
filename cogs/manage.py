@@ -15,8 +15,7 @@ class slashmanage(Cog):
     @has_permissions(manage_roles=True)
     async def create_role(self, ctx: Interaction, role_name=SlashOption(description="What will it be named?", required=True), color=SlashOption(description="What color would you like it to be? (use HEX codes)", required=False)):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             if color == None:
@@ -40,8 +39,7 @@ class slashmanage(Cog):
     @has_permissions(manage_roles=True)
     async def edit_role(self, ctx: Interaction, role: Role = SlashOption(description="Which role are you editing?"), new_name=SlashOption(description="What will it be named?", required=False), color=SlashOption(description="What will it's new color be (use HEX codes)", required=False)):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             embed = Embed(title="Role `{}` has been edited".format(role), color=role.color)
@@ -68,8 +66,7 @@ class slashmanage(Cog):
     @has_permissions(manage_roles=True)
     async def delete_role(self, ctx: Interaction, role: Role = SlashOption(description="Which one are you deleting?")):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             await role.delete()
@@ -88,8 +85,7 @@ class slashmanage(Cog):
     @has_permissions(manage_roles=True)
     async def add_role(self, ctx: Interaction, member: Member = SlashOption(description="Which member?"), role: Role = SlashOption(description="Which role will you add?")):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             await member.add_roles(role)
@@ -109,8 +105,7 @@ class slashmanage(Cog):
     @has_permissions(manage_roles=True)
     async def remove_role(self, ctx: Interaction, member: Member = SlashOption(description="Which member?"), role: Role = SlashOption(description="Which role will you delete?")):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             await member.remove_roles(role)
@@ -130,11 +125,10 @@ class slashmanage(Cog):
     async def rename_channel(self, ctx: Interaction,
                              channel: GuildChannel = SlashOption(
             channel_types=[ChannelType.text,
-                           ChannelType.voice, ChannelType.category, ChannelType.news, ChannelType.public_thread],
+                           ChannelType.voice, ChannelType.category, ChannelType.news, ChannelType.public_thread, ChannelType.private_thread],
             description="Choose a channel to rename", required=True), new_name=SlashOption(description="Which channel are you renaming?")):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             await channel.edit(name=new_name)
@@ -157,8 +151,7 @@ class slashmanage(Cog):
                            ChannelType.voice, ChannelType.category, ChannelType.news, ChannelType.public_thread, ChannelType.private_thread],
             description="Choose a channel to delete")):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             await channel.delete()
@@ -177,8 +170,7 @@ class slashmanage(Cog):
     @has_permissions(manage_channels=True)
     async def create_channel(self, ctx: Interaction, channel_type=SlashOption(description='Type of channel', choices=['Text Channel', 'Voice Channel', 'Category'], required=True), channel_name=SlashOption(description="Which will you name it?", required=True)):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             if channel_type == 'Text Channel':
@@ -210,8 +202,7 @@ class slashmanage(Cog):
     @has_permissions(manage_guild=True)
     async def remove(self, ctx: Interaction, type=SlashOption(choices=['welcomer', 'leaver', 'modlog', 'report', 'all'], description='Which one or all?')):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             if type == 'welcomer':
@@ -294,8 +285,7 @@ class slashmanage(Cog):
                                  ChannelType.text, ChannelType.news],
                              description="Choose a channel")):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             if type == 'welcomer':

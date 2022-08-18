@@ -1,10 +1,8 @@
 from assets.db_functions import check_botbanned_user
-from config import db
 from nextcord import *
 from nextcord import slash_command as jeanne_slash
 from nextcord.ext.commands import Cog
 from config import kitsune_nekoslife
-from glob import glob
 from random import choice
 from requests import get
 from assets.media import *
@@ -18,8 +16,7 @@ class slashimages(Cog):
     @jeanne_slash(description="Get a kitsune image")
     async def kitsune(self, ctx : Interaction):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             kistune_api = get(kitsune_nekoslife).json()
@@ -31,8 +28,7 @@ class slashimages(Cog):
     @jeanne_slash(description="Need a wallpaper for your PC or phone?")
     async def wallpaper(self, ctx : Interaction):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             wallpaper = Embed(color=0xFFC0CB)
@@ -43,20 +39,18 @@ class slashimages(Cog):
     @jeanne_slash(description="Get a Jeanne d'Arc image")
     async def jeanne(self, ctx : Interaction):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             jeanne = Embed(color=0xFFC0CB)
             jeanne.set_image(url=choice(jeanne_1936))
             jeanne.set_footer(text="Fetched from Jeanne_1936")
-            await ctx.followup.send(file=file, embed=jeanne)
+            await ctx.followup.send(embed=jeanne)
 
     @jeanne_slash(description="Get a Saber image")
     async def saber(self, ctx : Interaction):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             saber = Embed(color=0xFFC0CB)
@@ -67,8 +61,7 @@ class slashimages(Cog):
     @jeanne_slash(description="Get a neko image")
     async def neko(self, ctx : Interaction):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             neko = Embed(color=0xFFC0CB)
