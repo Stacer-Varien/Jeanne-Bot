@@ -3,7 +3,8 @@ from nextcord import slash_command as jeanne_slash
 from aiohttp import ClientSession
 from nextcord.ext.commands import Cog
 from assets.db_functions import add_report, check_botbanned_user, get_report_channel
-from assets.confirmation import Confirmation
+from assets.buttons import Confirmation
+from assets.modals import Bot_Report_Modal
 from config import WEBHOOK, WEATHER
 from nextcord.abc import GuildChannel
 from nextcord.ui import Button, View
@@ -21,12 +22,12 @@ discordbots_url = "https://discord.bots.gg/bots/831993597166747679"
 haze_url = "https://discord.gg/VVxGUmqQhF"
 
 
-def send_bot_report(report_type:str, report:str, reporter:str):
-    embed = Embed(title=f"{report_type} Report",
+def send_bot_report(report_type, report, reporter):
+    report = Embed(title=f"{report_type} Report",
                    description=report, color=Color.blurple())
-    embed.set_footer(text=f"Reporter: {reporter}")
+    report.set_footer(text=f"Reporter: {reporter}")
 
-    return embed
+    return report
 
 
 class invite_button(View):
@@ -59,29 +60,39 @@ class slashutilities(Cog):
         if check == ctx.user.id:
             pass
         else:
+            min_tempe=self.bot.get_emoji(1009760796017963119)
+            max_tempe=self.bot.get_emoji(1009761541169618964)
+            guste=self.bot.get_emoji(1009766251431743569)
+            globe=self.bot.get_emoji(1009723165305491498)
+
             urlil = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={WEATHER}&units=metric'
             async with ClientSession() as session:
                 async with session.get(urlil) as r:
                     if r.status == 200:
                         js = await r.json()
-                        tempp = js['main']['temp']
+                        feels_like = js['main']['feels_like']
+                        min_temp=js['main']['temp_min']
+                        max_temp=js['main']['temp_max']
                         desc = js['weather'][0]["description"]
                         count = js['sys']['country']
                         hum = js['main']['humidity']
+                        visibility=js['visibility']
+                        clouds=js['clouds']['all']
                         pres = js['wind']['speed']
                         windir = js['wind']['deg']
+                        wind_gust=js['wind']['gust']
                         embed = Embed(
-                            title=f'⛅ Weather details of {city} ⛅', description=f':earth_africa: Country: {count}', colour=0x00FFFF)
-                        embed.add_field(name=':thermometer: Temperature:',
-                                        value=f'{tempp}° Celsius', inline=True)
-                        embed.add_field(name=':newspaper: Description:',
-                                        value=f'{desc}', inline=True)
-                        embed.add_field(name=":droplet: Humidity:",
-                                        value=f'{hum}', inline=True)
-                        embed.add_field(name=":cloud: Pressure:",
-                                        value=f'{pres} Pa', inline=True)
-                        embed.add_field(name=":arrow_right: Wind Direction:",
-                                        value=f'{windir}° degrees', inline=True)
+                            title=f'⛅ Weather details of {city} ⛅', description=f'{globe} Country: {count}', colour=ctx.user.color)
+                        embed.add_field(name=":newspaper: Description", value=desc, inline=True)
+                        embed.add_field(name=f"{min_tempe} Minimum Temperature", value=f"{min_temp}°C", inline=True)
+                        embed.add_field(name=f"{max_tempe} Maximum Temperature", value=f"{max_temp}°C", inline=True)
+                        embed.add_field(name=":raised_back_of_hand: Feels Like", value=f"{feels_like}°C", inline=True)
+                        embed.add_field(name=":droplet: Humidity", value=hum, inline=True)
+                        embed.add_field(name=":eye: Visibility", value=f"{visibility}m", inline=True)
+                        embed.add_field(name=":cloud: Clouds", value=f"{clouds}%", inline=True)
+                        embed.add_field(name=":cloud: Pressure", value=f"{pres}hPa", inline=True)
+                        embed.add_field(name=":arrow_right: Wind Direction", value=f"{windir}°", inline=True)
+                        embed.add_field(name=f"{guste} Wind Gust", value=f"{wind_gust}m/s", inline=True)
                         await ctx.followup.send(embed=embed)
 
     @weather.subcommand(description="Get weather information on a city but with a ZIP code and Country code")
@@ -91,30 +102,38 @@ class slashutilities(Cog):
         if check == ctx.user.id:
             pass
         else:
+            min_tempe=self.bot.get_emoji(1009760796017963119)
+            max_tempe=self.bot.get_emoji(1009761541169618964)
+            guste=self.bot.get_emoji(1009766251431743569)
+            globe=self.bot.get_emoji(1009723165305491498)            
             urlil = f'http://api.openweathermap.org/data/2.5/weather?zip={zip_code},{country_code}&appid={WEATHER}&units=metric'
             async with ClientSession() as session:
                 async with session.get(urlil) as r:
                     if r.status == 200:
                         js = await r.json()
-                        name = js['name']
-                        tempp = js['main']['temp']
+                        feels_like = js['main']['feels_like']
+                        min_temp=js['main']['temp_min']
+                        max_temp=js['main']['temp_max']
                         desc = js['weather'][0]["description"]
                         count = js['sys']['country']
                         hum = js['main']['humidity']
+                        visibility=js['visibility']
+                        clouds=js['clouds']['all']
                         pres = js['wind']['speed']
                         windir = js['wind']['deg']
+                        wind_gust=js['wind']['gust']
                         embed = Embed(
-                            title=f'⛅ Weather details of {name} ⛅', description=f':earth_africa: Country: {count}', colour=0x00FFFF)
-                        embed.add_field(name=':thermometer: Temperature:',
-                                        value=f'{tempp}° Celsius', inline=True)
-                        embed.add_field(name=':newspaper: Description:',
-                                        value=f'{desc}', inline=True)
-                        embed.add_field(name=":droplet: Humidity:",
-                                        value=f'{hum}', inline=True)
-                        embed.add_field(name=":cloud: Pressure:",
-                                        value=f'{pres} Pa', inline=True)
-                        embed.add_field(name=":arrow_right: Wind Direction:",
-                                        value=f'{windir}° degrees', inline=True)
+                            title=f'⛅ Weather details of {zip_code} ⛅', description=f':earth_africa: Country: {count}', colour=ctx.user.color)
+                        embed.add_field(name=":newspaper: Description", value=desc, inline=True)
+                        embed.add_field(name=f"{min_tempe} Minimum Temperature", value=f"{min_temp}°C", inline=True)
+                        embed.add_field(name=f"{max_tempe} Maximum Temperature", value=f"{max_temp}°C", inline=True)
+                        embed.add_field(name=":raised_back_of_hand: Feels Like", value=f"{feels_like}°C", inline=True)
+                        embed.add_field(name=":droplet: Humidity", value=hum, inline=True)
+                        embed.add_field(name=":eye: Visibility", value=f"{visibility}m", inline=True)
+                        embed.add_field(name=":cloud: Clouds", value=f"{clouds}%", inline=True)
+                        embed.add_field(name=":cloud: Pressure", value=f"{pres}hPa", inline=True)
+                        embed.add_field(name=":arrow_right: Wind Direction", value=f"{windir}°", inline=True)
+                        embed.add_field(name=f"{guste} Wind Gust", value=f"{wind_gust}m/s", inline=True)
                         await ctx.followup.send(embed=embed)
 
     @jeanne_slash(description="Do a calculation")
@@ -179,7 +198,6 @@ class slashutilities(Cog):
     @say.subcommand(description="Type something and I will say it in embed")
     @has_permissions(administrator=True)
     async def embed(self, ctx: Interaction, channel: GuildChannel = SlashOption(description="Which channel should I send the message?", channel_types=[ChannelType.text, ChannelType.news])):
-        await ctx.response.defer(ephemeral=True)
         check = check_botbanned_user(ctx.user.id)
         if check == ctx.user.id:
             pass
@@ -218,7 +236,6 @@ class slashutilities(Cog):
 
     @jeanne_slash()
     async def bot_report(self, ctx: Interaction, type=SlashOption(choices=['bug', 'fault', 'exploit', 'violator']), with_attachments=SlashOption(choices=["True", "False"], required=False)):
-        await ctx.response.defer(ephemeral=True)
         check = check_botbanned_user(ctx.user.id)
         if check == ctx.user.id:
             pass
@@ -232,60 +249,34 @@ class slashutilities(Cog):
             elif type == 'violator':
                 report_type = "Violator"
 
-            await ctx.user.send("What do you want to report?")
-
-            await ctx.followup.send("Please go to your DMs to report", ephemeral=True)
-
-            webhook = SyncWebhook.from_url(WEBHOOK)
-
             if with_attachments == None:
-                def check(m):
-                    return m.author == ctx.user and m.content
-                try:
-                    msg = await self.bot.wait_for('message', check=check, timeout=300)
-                    
-                    webhook.send(embed=send_bot_report(report_type, msg.content,
-                                    "{} | {}".format(ctx.user, ctx.user.id)))
-                
-                    await ctx.user.send("Thank you for your report. I will look into it. Unfortunately, you have to wait for the outcome if it was successful or not.")
-                except Exception as e:
-                    raise e
 
-            elif with_attachments == "True":
+                await ctx.response.send_modal(Bot_Report_Modal(report_type))
+
+            elif with_attachments == True:
+                msg = await ctx.user.send("What problem have you found?")
+                await ctx.response.send_message("Please go to your [DM]{} to continue".format(msg.jump_url), ephemeral=True)
                 def check(m):
                     return m.author == ctx.user and m.content and m.attachments
 
                 try:
                     msg = await self.bot.wait_for('message', check=check, timeout=300)
+                    text = send_bot_report(report_type, msg.content,"{} | {}".format(ctx.user, ctx.user.id))
                     image_urls = [x.url for x in msg.attachments]
-                    image_urls = "\n".join(image_urls)
-                    medias = Embed(description=image_urls,
+                    image_url_links = "\n".join(image_urls)
+                    medias = Embed(description=image_url_links,
                                    color=Color.blurple())
 
-                    emb = [send_bot_report(
-                        report_type, msg.content, "{} | {}".format(ctx.user, ctx.user.id)), medias]
-                    
-                    webhook.send(embeds=emb)
-
+                    SyncWebhook.from_url(WEBHOOK).send(embeds=[text, medias])
 
                     await ctx.user.send("Thank you for your report. I will look into it. Unfortunately, you have to wait for the outcome if it was successful or not.")
 
                 except Exception as e:
-                    raise e
+                    print(e)
 
-            elif with_attachments == "False":
-                def check(m):
-                    return m.author == ctx.user and m.content and m.attachments
-                try:
-                    msg = await self.bot.wait_for('message', check=check, timeout=300)
-                    
-                    webhook.send(embed=send_bot_report(report_type, msg.content,
-                                "{} | {}".format(ctx.user, ctx.user.id)))
-
-                    await ctx.user.send("Thank you for your report. I will look into it. Unfortunately, you have to wait for    the outcome if it was successful or not.")
-
-                except Exception as e:
-                    raise e
+            elif with_attachments == False:
+                
+                await ctx.response.send_modal(Bot_Report_Modal(report_type))
 
     @jeanne_slash(description="Report a member in your server")
     async def report(self, ctx: Interaction, member: Member = SlashOption(description="Who are you reporting?", required=True), anonymous=SlashOption(description=("What to have your name hidden while reporting?"), choices=['True', 'False'], required=False)):
@@ -325,9 +316,7 @@ class slashutilities(Cog):
                             await ctx.user.send("Timeout")
 
                         elif view.value == True:
-
-                            await ctx.user.send("Thank you for reporting the member.\nYour report has been sent to the dedicated report channel in {}.".format(ctx.guild.name))
-
+                            add_report(member.id, "{}\n{}".format(msg.content, image_urls), ctx.user.id)
 
                             report = Embed(title='Member reported',
                                            color=Color.brand_red())
