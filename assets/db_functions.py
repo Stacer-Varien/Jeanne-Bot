@@ -1,5 +1,4 @@
-from datetime import date, datetime, timedelta
-from random import randint
+from datetime import date, timedelta
 from sqlite3 import connect
 from nextcord import Embed, Color
 from config import db, inv_db
@@ -13,9 +12,10 @@ def check_botbanned_user(user: int):
         botbanquery = db.execute(
             "SELECT * FROM botbannedData WHERE user_id = ?", (user,))
         botbanned_data = botbanquery.fetchone()
-        return botbanned_data[0]
+        if user == botbanned_data[0]:
+            return(True)
     except:
-        pass
+        return(False)
 
 
 def get_balance(user: int):
@@ -496,22 +496,38 @@ def get_report_channel(server: int):
         "SELECT channel_id FROM reportData WHERE guild_id = ?", (server,)).fetchone()
     return data
 
-def fetch_welcomer(channel:int):
+def add_report(member:int, report:str, author:int):
+    db.execute("INSERT OR IGNORE INTO report_data (user_id, message) VALUES (?, ?)", (member, report, author,))
+    db.commit()
+
+
+def fetch_welcomer(channel: int):
     data = db.execute(
-            "SELECT guild_id FROM welcomerData where channel_id = ?", (channel,)).fetchone()
+        "SELECT guild_id FROM welcomerData where channel_id = ?", (channel,)).fetchone()
     return data[0]
 
-def get_welcomer(server:int):
+
+def get_welcomer(server: int):
     data = db.execute(
-                    "SELECT channel_id FROM welcomerData where guild_id = ?", (server,)).fetchone()
+        "SELECT channel_id FROM welcomerData where guild_id = ?", (server,)).fetchone()
     return data[0]
 
-def fetch_leaver(channel:int):
+
+def fetch_leaver(channel: int):
     data = db.execute(
-            "SELECT guild_id FROM leaverData where channel_id = ?", (channel,)).fetchone()
+        "SELECT guild_id FROM leaverData where channel_id = ?", (channel,)).fetchone()
     return data[0]
 
-def get_leaver(server:int):
+
+def get_leaver(server: int):
     data = db.execute(
-                    "SELECT channel_id FROM leaverData where guild_id = ?", (server,)).fetchone()
+        "SELECT channel_id FROM leaverData where guild_id = ?", (server,)).fetchone()
     return data[0]
+
+def get_user_bank(user:int):
+    data=db.execute("SELECT user_id FROM bankData WHERE user_id = ?", (user)).fetchone()
+    return data[0]
+
+def add_wallpaper(id, name, link):
+    inv_db.execute("INSERT OR IGNORE INTO wallpapers (id, name, link, price) VALUES (?,?,?,?)", (id, name, link, 1000,))
+    db.commit()

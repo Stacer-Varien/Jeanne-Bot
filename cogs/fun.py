@@ -13,8 +13,7 @@ class slashfun(Cog):
     @jeanne_slash(name='8ball', description="Ask 8 ball anything and you will get your awnser")
     async def _8ball(self, ctx: Interaction, question=SlashOption(description="What question do you have?")):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             embed = Embed(color=0x0000FF)
@@ -26,18 +25,20 @@ class slashfun(Cog):
     @jeanne_slash(description="Say something and I will say it in reversed text")
     async def reverse(self, ctx: Interaction, text=SlashOption(description="Type something")):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            msg=Embed(description=text[::-1], color=ctx.user.color)
-            await ctx.followup.send(embed=msg)
+            if any(word in text for word in filtered_words):
+                nope=Embed(description="I am not reversing that", color=Color.red())
+                await ctx.followup.send(embed=nope)
+            else:
+                msg=Embed(description=text[::-1], color=ctx.user.color)
+                await ctx.followup.send(embed=msg)
 
     @jeanne_slash(description="Get a random animeme")
     async def animeme(self, ctx: Interaction):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             animeme = Embed(color=0x0000FF)
@@ -48,8 +49,7 @@ class slashfun(Cog):
     @jeanne_slash(description="Combine 2 words to get 2 combined words")
     async def combine(self, ctx: Interaction, first_word=SlashOption(description="Enter first word"), second_word=SlashOption(description="Enter second word")):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             option_name1letters = first_word[:round(len(first_word) / 2)]
@@ -69,8 +69,7 @@ class slashfun(Cog):
     @jeanne_slash(description="Give me 2 choices and I will pick for you")
     async def choose(self, ctx: Interaction, first_choice=SlashOption(description="Enter first choice"), second_choice=SlashOption(description="Enter second word")):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             pick = [first_choice, second_choice]
@@ -81,8 +80,7 @@ class slashfun(Cog):
     @jeanne_slash(description="Check how much of a simp you are")
     async def simp_rate(self, ctx:Interaction, member:Member=SlashOption(description="Which member you want to check their simp rate?", required=False)):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             perc=randint(0,100)
@@ -90,7 +88,7 @@ class slashfun(Cog):
             if member == None:
                 member = ctx.user
 
-            simp = Embed(description="{} simp rate is {}%", color=ctx.user.color)
+            simp = Embed(description="{}'s simp rate is {}%".format(member, perc), color=ctx.user.color)
 
             if perc > 60:
                 simp.set_image(url="https://i.imgur.com/W4u4Igk.jpg")
@@ -103,8 +101,7 @@ class slashfun(Cog):
     @jeanne_slash(description="Check how gay you are")
     async def gay_rate(self, ctx:Interaction, member:Member=SlashOption(description="Which member do you want to check their gay rate?", required=False)):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             perc = randint(0, 100)
@@ -112,7 +109,7 @@ class slashfun(Cog):
             if member==None:
                 member = ctx.user
 
-            gay = Embed(description="{} gay rate is {}%".format(member, perc),
+            gay = Embed(description="{}'s gay rate is {}%".format(member, perc),
                          color=ctx.user.color)
 
             if perc > 60:

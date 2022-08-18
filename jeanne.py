@@ -2,7 +2,7 @@ from os import listdir
 from nextcord import *
 from nextcord.ext.commands import AutoShardedBot as Jeanne
 from config import TOKEN
-from nextcord.gateway import DiscordWebSocket
+#from nextcord.gateway import DiscordWebSocket
 
 #class MyDiscordWebSocket(DiscordWebSocket):
 
@@ -38,7 +38,6 @@ for filename in listdir('./cogs'):
 
 @bot.event
 async def on_ready():
-  await bot.change_presence(activity=Game(name="New Update"))
   print('Connected to bot: {}'.format(bot.user.name))
   print('Bot ID: {}'.format(bot.user.id))
 
