@@ -4,6 +4,7 @@ from nextcord import *
 from nextcord import slash_command as jeanne_slash
 from datetime import *
 from nextcord.ext.commands import Cog
+from assets.buttons import Heads_or_Tails
 from assets.needed import *
 from cooldowns import *
 from assets.db_functions import add_qp, check_botbanned_user, get_balance, give_daily, remove_qp
@@ -18,8 +19,7 @@ class currencysys(Cog):
     @jeanne_slash(description="Claim your daily")
     async def daily(self, ctx: Interaction):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             qp = self.bot.get_emoji(980772736861343774)
@@ -52,8 +52,7 @@ class currencysys(Cog):
     @cooldown(1, 3600, bucket=SlashBucket.author)
     async def free(self, ctx: Interaction):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             qp = str(self.bot.get_emoji(980772736861343774))
@@ -90,8 +89,7 @@ class currencysys(Cog):
     @cooldown(1, 15, bucket=SlashBucket.author)
     async def bet(self, ctx: Interaction, bet=SlashOption(description="How much are you betting?", required=True)):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             qp = str(self.bot.get_emoji(980772736861343774))
@@ -150,76 +148,71 @@ class currencysys(Cog):
 
     @dice.subcommand(name='free', description="Roll a dice for free 20 QP")
     @cooldown(1, 3600, bucket=SlashBucket.author)
-    async def _free(self, ctx: Interaction, digit=SlashOption(description="What number are you guessing?", required=True)):
+    async def _free(self, ctx: Interaction, digit=SlashOption(description="What number do you think it will roll?", required=True)):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            qp = str(self.bot.get_emoji(980772736861343774))
             rolled = randint(1, 6)
-
-            if rolled == int(digit):
+            qp = str(self.bot.get_emoji(980772736861343774))
+            if digit == rolled:
                 add_qp(ctx.user.id, 20)
-
                 embed = Embed(color=0x0000FF)
                 embed.add_field(name=f"YAY! You got it!\n20 {qp} has been added",
-                                value=f"Rolled: **{rolled}**\nResult: **{digit}**!", inline=False)
-                await ctx.followup.send(embed=embed)
-
+                                value=f"Rolled: **{rolled}**\nResult: **{self.values[0]}**!", inline=False)
+                await ctx.edit_original_message(embed=embed)
             else:
                 embed = Embed(
                     description=f"Oh no. It rolled a **{rolled}**", color=Color.red())
-                await ctx.followup.send(embed=embed)
+                await ctx.edit_original_message(embed=embed)
 
     @dice.subcommand(name='bet', description="Roll a dice with betting")
     @cooldown(1, 15, bucket=SlashBucket.author)
     async def _bet(self, ctx: Interaction, bet=SlashOption(description='How much are you betting?', required=True), digit=SlashOption(description="What number are you guessing?", required=True)):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-         try:
-            qp = str(self.bot.get_emoji(980772736861343774))
-            rolled = randint(1, 6)
-            balance = get_balance(ctx.user.id)
-            if int(bet) < 5:
-                bethigher = Embed(
-                    description=f'Please bet an amount higher than 5 {qp}')
-                await ctx.followup.send(embed=bethigher)
+            try:
+                qp = str(self.bot.get_emoji(980772736861343774))
+                rolled = randint(1, 6)
+                balance = get_balance(ctx.user.id)
+                if int(bet) < 5:
+                    bethigher = Embed(
+                        description=f'Please bet an amount higher than 5 {qp}')
+                    await ctx.followup.send(embed=bethigher)
 
-            elif int(bet) > int(balance):
-                betlower = Embed(
-                    description=f'Your balance is too low!\nPlease bet lower than {balance} {qp}')
-                await ctx.followup.send(embed=betlower)
-            elif int(balance) == 0:
-                zerobal = Embed(
-                    description=f'Unfortunately, you have 0 {qp}.\nPlease do a daily and/or wait for a free chance to do `/guess free` and/or `/dice free`')
-                await ctx.followup.send(embed=zerobal)
+                elif int(bet) > int(balance):
+                    betlower = Embed(
+                        description=f'Your balance is too low!\nPlease bet lower than {balance} {qp}')
+                    await ctx.followup.send(embed=betlower)
+                elif int(balance) == 0:
+                    zerobal = Embed(
+                        description=f'Unfortunately, you have 0 {qp}.\nPlease do a daily and/or wait for a free chance to do `/guess free` and/or `/dice free`')
+                    await ctx.followup.send(embed=zerobal)
 
-            if rolled == int(digit):
-                add_qp(ctx.user.id, int(bet))
-                embed = Embed(color=0x0000FF)
-                embed.add_field(name=f"YAY! You got it!\n20 {qp} has been added",
-                                value=f"Dice rolled: **{rolled}**\nYou guessed: **{digit}**", inline=False)
-                await ctx.followup.send(embed=embed)
+                else:
+                    if rolled == int(digit):
+                        add_qp(ctx.user.id, int(bet))
+                        embed = Embed(color=0x0000FF)
+                        embed.add_field(name=f"YAY! You got it!\n20 {qp} has been added",
+                                    value=f"Dice rolled: **{rolled}**\nYou guessed: **{digit}**", inline=False)
+                        await ctx.followup.send(embed=embed)
 
-            else:
-                remove_qp(ctx.user.id, int(bet))
-                embed = Embed(color=Color.red())
-                embed = Embed(
-                    description=f"Oh no. It rolled a **{rolled}**", color=Color.red())
-                await ctx.followup.send(embed=embed)
-         except:
-             await ctx.followup.send("Please run /daily")
+                    else:
+                        remove_qp(ctx.user.id, int(bet))
+                        embed = Embed(color=Color.red())
+                        embed = Embed(
+                            description=f"Oh no. It rolled a **{rolled}**", color=Color.red())
+                        await ctx.followup.send(embed=embed)
+            except:
+                await ctx.followup.send("Please run /daily")
 
     @jeanne_slash(description='Check how much QP you have')
     @cooldown(1, 30, bucket=SlashBucket.author)
     async def balance(self, ctx: Interaction):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             qp = str(self.bot.get_emoji(980772736861343774))
@@ -241,9 +234,10 @@ class currencysys(Cog):
     @free.error
     async def free_error(self, ctx: Interaction, error):
         if isinstance(error, CallableOnCooldown):
-            reset_hour = error.resets_at.strftime('%H:%M')
+            reset_hour_time = error.resets_at + timedelta(hours=2)  # compensate the 1 hour behind
+            reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
-                description=f"You have already used your free chance\nTry again after {reset_hour}", color=0xff0000)
+                description=f"You have already used your free chance\nTry again after <t:{reset_hour}:R>", color=0xff0000)
             await ctx.send(embed=cooldown)
 
     @bet.error
@@ -256,9 +250,10 @@ class currencysys(Cog):
     @_free.error
     async def _free_error(self, ctx: Interaction, error):
         if isinstance(error, CallableOnCooldown):
-            reset_hour = round(error.resets_at.timestamp())
+            reset_hour_time = error.resets_at + timedelta(hours=2)  # compensate the 1 hour behind
+            reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
-                description=f"You have already used your free chance\nTry again after <t:{str(reset_hour)}:t>", color=0xff0000)
+                description=f"You have already used your free chance\nTry again after <t:{reset_hour}:R>", color=0xff0000)
             await ctx.send(embed=cooldown)
 
     @_bet.error
@@ -274,40 +269,47 @@ class currencysys(Cog):
 
     @flip.subcommand(name='free', description="Flip a coin and earn 20 QP for free")
     @cooldown(1, 3600, bucket=SlashBucket.author)
-    async def _free_(self, ctx: Interaction, pick=SlashOption(choices=['heads', 'tails'])):
+    async def _free_(self, ctx: Interaction):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            jeannes_pick = ['Heads', 'Tails']
             qp = str(self.bot.get_emoji(980772736861343774))
-            jeannes_pick = ['heads', 'tails']
+            view=Heads_or_Tails()
+            ask=Embed(description="Heads or Tails?")
+            await ctx.followup.send(embed=ask, view=view)
+            await view.wait()
 
-            if pick == choice(jeannes_pick):
+            if view.value == choice(jeannes_pick):
                 add_qp(ctx.user.id, 20)
 
                 embed = Embed(
                     description="YAY! You got it!\n20 {} has been added".format(qp))
 
-                await ctx.followup.send(embed=embed)
+                await ctx.edit_original_message(embed=embed, view=None)
+
+            elif view.value == None:
+                timeout = Embed(
+                    description=f"Sorry but you took too long. It was {choice(jeannes_pick)}", color=0xFF0000)
+                await ctx.edit_original_message(embed=timeout, view=None)
 
             else:
                 embed = Embed(color=Color.red())
                 embed = Embed(
                     description="Oh no, it was {}".format(choice(jeannes_pick)), color=Color.red())
-                await ctx.followup.send(embed=embed)
+                await ctx.edit_original_message(embed=embed, view=None)
 
     @flip.subcommand(name='bet', description='Flip a coin and earn with betting')
     @cooldown(1, 15, bucket=SlashBucket.author)
-    async def _bet_(self, ctx: Interaction, bet=SlashOption(required=True), pick=SlashOption(choices=['heads', 'tails'])):
+    async def _bet_(self, ctx: Interaction, bet=SlashOption(required=True)):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             try:
                 qp = str(self.bot.get_emoji(980772736861343774))
-                jeannes_pick = ['heads', 'tails']
+                jeannes_pick = ['Heads', 'Tails']
                 balance = get_balance(ctx.user.id)
                 if int(bet) < 5:
                     bethigher = Embed(
@@ -324,29 +326,40 @@ class currencysys(Cog):
                     await ctx.followup.send(embed=zerobal)
 
                 else:
-                    if pick == choice(jeannes_pick):
+                    view = Heads_or_Tails()
+                    ask = Embed(description="Heads or Tails?", view=view)
+                    await ctx.followup.send(embed=ask, view=view)
+                    await view.wait()
+
+                    if view.value == choice(jeannes_pick):
                         add_qp(ctx.user.id, int(bet))
 
                         embed = Embed(
                             description="YAY! You got it!\n{} {} has been added".format(int(bet), qp))
 
-                        await ctx.followup.send(embed=embed)
+                        await ctx.edit_original_message(embed=embed, view=None)
+
+                    elif view.value==None:
+                        timeout = Embed(
+                            description=f"Sorry but you took too long. It was {choice(jeannes_pick)}", color=0xFF0000)
+                        await ctx.edit_original_message(embed=timeout, view=None)
 
                     else:
                         remove_qp(ctx.user.id, int(bet))
                         embed = Embed(color=Color.red())
                         embed = Embed(
-                            description="Oh no, it was {}".format(choice(jeannes_pick)), color=Color.red())
-                        await ctx.followup.send(embed=embed)
+                            description="Oh no, it was {}\nI'm afraid that I have to take {}{} from you".format(choice(jeannes_pick), int(bet), qp), color=Color.red())
+                        await ctx.edit_original_message(embed=embed, view=None)
             except:
                 await ctx.followup.send('Please run `/daily')
 
     @_free_.error
     async def _freeerror(self, ctx: Interaction, error):
         if isinstance(error, CallableOnCooldown):
-            reset_hour = error.resets_at.strftime('%H:%M')
+            reset_hour_time = error.resets_at + timedelta(hours=2) #compensate the 1 hour behind
+            reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
-                description=f"You have already used your free chance\nTry again after {reset_hour}", color=0xff0000)
+                description=f"You have already used your free chance\nTry again after <t:{reset_hour}:R>", color=0xff0000)
             await ctx.send(embed=cooldown)
 
     @_bet_.error

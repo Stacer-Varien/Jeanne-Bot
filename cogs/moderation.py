@@ -7,7 +7,7 @@ from nextcord.utils import utcnow
 from datetime import datetime, timedelta
 from humanfriendly import parse_timespan
 from assets.db_functions import *
-from assets.confirmation import Confirmation
+from assets.buttons import Confirmation
 from assets.errormsgs import *
 from nextcord.ext.application_checks.errors import *
 from nextcord.ext.commands.errors import *
@@ -21,8 +21,7 @@ class slashmoderation(Cog):
     @has_permissions(kick_members=True)
     async def warn(self, ctx: Interaction, member: Member = SlashOption(description="Who do you want to warn?", required=True), reason=SlashOption(description="Give a reason", required=False)):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             if reason == None:
@@ -82,8 +81,7 @@ class slashmoderation(Cog):
     @list_warns.subcommand(description="View warnings in the server or a member")
     async def guild(self, ctx: Interaction):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             record = fetch_warnings_server(ctx.guild.id)
@@ -100,11 +98,10 @@ class slashmoderation(Cog):
                     embed.description += f"**{warned_member}**\n**Warn points**: {warn_points}\n\n"
                 await ctx.followup.send(embed=embed)
 
-    @list_warns.subcommand(description="View warnings in the server or a member")
-    async def client(self, ctx: Interaction, member: Member = SlashOption(description="Who's warnings you wanna see?", required=False)):
+    @list_warns.subcommand(name="user", description="View warnings in the server or a member")
+    async def _user_(self, ctx: Interaction, member: Member = SlashOption(description="Who's warnings you wanna see?", required=False)):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             if member == None:
@@ -113,30 +110,30 @@ class slashmoderation(Cog):
             record = fetch_warnings_user(member.id, ctx.guild.id)
             if len(record) == 0:
                 await ctx.followup.send(f"{member} has no warn IDs")
-                return
-            embed = Embed(
-                title=f"{member}'s warnings", colour=0xFF0000)
-            embed.description = ""
-            embed.set_thumbnail(url=member.display_avatar)
-            for i in record:
-                moderator = await self.bot.fetch_user(i[2])
-                reason = i[3]
-                warn_id = i[4]
-                date = i[5]
+            
+            else:
+                embed = Embed(
+                    title=f"{member}'s warnings", colour=0xFF0000)
+                embed.description = ""
+                embed.set_thumbnail(url=member.display_avatar)
+                for i in record:
+                    moderator = await self.bot.fetch_user(i[2])
+                    reason = i[3]
+                    warn_id = i[4]
+                    date = i[5]
 
-                if date == None:
+                    if date == None:
                         date = "Unspecified due to new update"
 
-                embed.add_field(
-                        name=f"`{warn_id}`", value=f"**Moderator:** {moderator}\n**Reason:** {reason}\n**Date:** <t:{date}:F>", inline=False)
-            await ctx.followup.send(embed=embed)
+                    embed.add_field(
+                            name=f"`{warn_id}`", value=f"**Moderator:** {moderator}\n**Reason:** {reason}\n**Date:** <t:{date}:F>", inline=False)
+                await ctx.followup.send(embed=embed)
 
     @jeanne_slash(description="Revoke a warn by warn ID")
     @has_permissions(kick_members=True)
     async def revoke_warn(self, ctx: Interaction, warn_id=SlashOption(description="Provide the valid warn ID")):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             result = check_warn_id(ctx.guild.id, warn_id)
@@ -176,8 +173,7 @@ class slashmoderation(Cog):
     @has_permissions(ban_members=True)
     async def member(self, ctx: Interaction, member: Member = SlashOption(description="Who do you want to ban?", required=True), reason=SlashOption(description='What is the reason?', required=False)):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             if member == ctx.user:
@@ -196,7 +192,7 @@ class slashmoderation(Cog):
                 except:
                     pass
 
-                await member.ban(reason="{} | {}".format(reason, ctx.user.id))
+                await member.ban(reason="{} | {}".format(reason, ctx.user))
 
                 ban = Embed(title="Member Banned", color=0xFF0000)
                 ban.add_field(name="Name", value=member, inline=True)
@@ -220,8 +216,7 @@ class slashmoderation(Cog):
     @has_permissions(ban_members=True)
     async def user(self, ctx: Interaction, user_id=SlashOption(description="What is the User ID?", required=True), reason=SlashOption(description="What is the reason", required=False)):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             user = await self.bot.fetch_user(user_id)
@@ -245,16 +240,16 @@ class slashmoderation(Cog):
                 view = Confirmation()
                 confirm = Embed(description="Is {} the one you want to ban from your server?".format(
                     user), color=Color.dark_red()).set_thumbnail(url=user.display_avatar)
-                m = await ctx.followup.send(embed=confirm, view=view)
+                await ctx.followup.send(embed=confirm, view=view)
                 await view.wait()
 
                 if view.value is None:
                     cancelled = Embed(
                         description="Ban cancelled", color=Color.red())
-                    await m.edit(embed=cancelled, view=None)
+                    await ctx.edit_original_message(embed=cancelled, view=None)
 
                 elif view.value is True:
-                    await guild.ban(user, reason="{} | {}".format(reason, ctx.user.id))
+                    await guild.ban(user, reason="{} | {}".format(reason, ctx.user))
 
                     ban = Embed(title="User Banned", color=0xFF0000)
                     ban.add_field(name="Name", value=user, inline=True)
@@ -267,18 +262,18 @@ class slashmoderation(Cog):
                     modlog_id = get_modlog_channel(ctx.guild.id)
 
                     if modlog_id == None:
-                        await m.edit(embed=ban)
+                        await ctx.edit_original_message(embed=ban)
                     else:
                         modlog = ctx.guild.get_channel(modlog_id)
                         banned = Embed(
                             description=f"{user} has been banned. Check {modlog.mention}", color=0xFF0000)
-                        await m.edit(embed=banned)
+                        await ctx.edit_original_message(embed=banned)
                         await modlog.send(embed=ban)
 
                 elif view.value is False:
                     cancelled = Embed(
                         description="Ban cancelled", color=Color.red())
-                    await m.edit(embed=cancelled, view=None)
+                    await ctx.edit_original_message(embed=cancelled, view=None)
 
     @member.error
     async def ban_error(self, ctx: Interaction, error):
@@ -300,8 +295,7 @@ class slashmoderation(Cog):
     @has_permissions(kick_members=True)
     async def kick(self, ctx: Interaction, member: Member = SlashOption(description="Who do you want to kick?"), reason=SlashOption(description="Give a reason", required=False)):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             if member == ctx.user:
@@ -320,12 +314,12 @@ class slashmoderation(Cog):
                 except:
                     pass
 
-                await member.kick(reason="{} | {}".format(reason, ctx.user.id))
+                await member.kick(reason="{} | {}".format(reason, ctx.user))
                 kick = Embed(title="Member Kicked", color=0xFF0000)
                 kick.add_field(name='Member', value=member, inline=True)
                 kick.add_field(name='ID', value=member.id, inline=True)
                 kick.add_field(name='Resposible Moderator',
-                               value=ctx.user.id, inline=True)
+                               value=ctx.user, inline=True)
                 kick.add_field(name='Reason', value=reason, inline=True)
                 kick.set_thumbnail(url=member.display_avatar)
 
@@ -348,14 +342,17 @@ class slashmoderation(Cog):
 
     @jeanne_slash(description="Bulk delete messages")
     @has_permissions(manage_messages=True)
-    async def purge(self, ctx: Interaction, limit=SlashOption(description="How many messages are you deleting?", required=False), member: Member = SlashOption(description="Who's messages are you deleting?", required=False)):
+    async def prune(self, ctx: Interaction, limit=SlashOption(description="How many messages are you deleting?", required=False), member: Member = SlashOption(description="Who's messages are you deleting?", required=False)):
         await ctx.response.defer(ephemeral=True)
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             if limit == None:
                 limit = 100
+            
+            elif limit > 100:
+                nope=Embed(description="Can't delete that much due to Discord API", color=Color.red())
+                await ctx.followup.send(embed=nope, ephemeral=True)
 
             if member:
                 def is_member(m):
@@ -368,8 +365,8 @@ class slashmoderation(Cog):
                 await ctx.channel.purge(limit=int(limit))
                 await ctx.followup.send("Done bulk deleting messages")
 
-    @purge.error
-    async def purge_error(self, ctx: Interaction, error):
+    @prune.error
+    async def prune_error(self, ctx: Interaction, error):
         if isinstance(error, MissingPermissions):
             await ctx.response.defer()
             await ctx.followup.send(embed=message_perm)
@@ -378,8 +375,7 @@ class slashmoderation(Cog):
     @has_permissions(manage_nicknames=True)
     async def change_nickname(self, ctx: Interaction, member: Member = SlashOption(description="Who's nickname are you changing?", required=True), nickname=SlashOption(description="What will be their new name?", required=True)):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             await member.edit(nick=nickname)
@@ -398,8 +394,7 @@ class slashmoderation(Cog):
     @has_permissions(ban_members=True)
     async def unban(self, ctx: Interaction, user_id=SlashOption(description="Who do you want to unban with ID?", required=True), reason=SlashOption(description="Give a reason", required=False)):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             user = await self.bot.fetch_user(user_id)
@@ -435,8 +430,7 @@ class slashmoderation(Cog):
     @has_permissions(moderate_members=True)
     async def mute(self, ctx: Interaction, member: Member = SlashOption(description="Who are you muting?", required=True), time=SlashOption(description="How long will the member be muted?", required=False), reason=SlashOption(description="Give a reason", required=False)):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             if member == ctx.user:
@@ -487,8 +481,7 @@ class slashmoderation(Cog):
     @has_permissions(moderate_members=True)
     async def unmute(self, ctx: Interaction, member: Member = SlashOption(description="Who are you unmuting?", required=True), reason=SlashOption(description="Give a reason", required=False)):
         await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             if reason == None:
