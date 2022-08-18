@@ -1,7 +1,6 @@
 from nextcord import *
 from nextcord.ext.commands import Cog
 from assets.db_functions import *
-from config import db
 
 class welcomer(Cog):
     def __init__(self, bot):
@@ -16,7 +15,7 @@ class welcomer(Cog):
             if member.guild.id == server_id:
                 channel = self.bot.get_channel(channel_id)
             
-                welcome = Embed(description=f"Hi {member} and welcome to {member.guild.name}!",color=member.color).set_thumbnail(url=member.display_avatar)
+                welcome = Embed(description=f"Hi {member} and welcome to {member.guild.name}!",color=Color.og_blurple()).set_thumbnail(url=member.display_avatar)
                                 
                 await channel.send(embed=welcome)
             else:
