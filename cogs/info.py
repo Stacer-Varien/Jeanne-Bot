@@ -13,7 +13,7 @@ start_time = time()
 class slashinfo(Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.bot_version="3.3 VarPacth"
+        self.bot_version="3.3 VarPacth1"
 
     @jeanne_slash(description="See the bot's status from development to now")
     async def stats(self, ctx : Interaction):
@@ -80,11 +80,14 @@ class slashinfo(Cog):
                             value=''.join(hasroles[:20]) + '@everyone', inline=False)
             userinfo.set_thumbnail(url=member.display_avatar)
             
-            try:
+            banner=bool(user.banner)
+            
+            if banner == True:
                 userinfo.set_image(url=user.banner)
-            except:
-                pass
-            await ctx.followup.send(embed=userinfo)
+                await ctx.followup.send(embed=userinfo)
+            else:
+                await ctx.followup.send(embed=userinfo)
+            
 
     @jeanne_slash(description="Get information about this server")
     async def serverinfo(self, ctx : Interaction):
@@ -97,7 +100,7 @@ class slashinfo(Cog):
             features = guild.features
 
             date = round(guild.created_at.timestamp())
-            serverinfo = Embed(title="Server's Info", color=member.color)
+            serverinfo = Embed(title="Server's Info", color=ctx.user.color)
             serverinfo.add_field(name="Name", value=guild.name, inline=True)
             serverinfo.add_field(name="ID", value=guild.id, inline=True)
             serverinfo.add_field(
