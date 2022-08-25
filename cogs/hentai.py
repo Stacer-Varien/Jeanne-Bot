@@ -15,7 +15,7 @@ class slashnsfw(Cog):
 
     @jeanne_slash(description="Get a random hentai from Jeanne")
     @is_nsfw()
-    async def nsfw(self, ctx: Interaction):
+    async def hentai(self, ctx: Interaction):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -141,15 +141,6 @@ class slashnsfw(Cog):
                     description="The tag could not be found", color=Color.red())
                 await ctx.followup.send(embed=no_tag)
 
-    @Cog.listener()
-    async def on_application_command_error(self, ctx: Interaction, error):
-        if isinstance(error, ApplicationNSFWChannelRequired):
-            await ctx.response.defer()
-            no_hentai = Embed(
-                title='Hentai Failed', description="Hentai couldn't be sent in this channel", color=0xff0000)
-            no_hentai.add_field(
-                name="Reason", value=nsfw_perm)
-            await ctx.followup.send(embed=no_hentai)
 
 
 def setup(bot):

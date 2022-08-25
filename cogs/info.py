@@ -66,14 +66,17 @@ class slashinfo(Cog):
             else:
                 botr = "No"
 
-            date = round(member.joined_at.timestamp())
+            joined_date = round(member.joined_at.timestamp())
+            create_date = round(member.created_at.timestamp())
             userinfo = Embed(title="{}'s Info".format(member.name),
                             color=member.color)
             userinfo.add_field(name="Name", value=member, inline=True)
             userinfo.add_field(name="ID", value=member.id, inline=True)
             userinfo.add_field(name="Is Bot?", value=botr, inline=True)
             userinfo.add_field(
-                name="Joined Server", value='<t:{}:F>'.format(str(date)), inline=True)
+                name="Created Account", value='<t:{}:F>'.format(str(joined_date)), inline=True)
+            userinfo.add_field(
+                name="Joined Server", value='<t:{}:F>'.format(str(create_date)), inline=True)
             userinfo.add_field(name="Number of Roles",
                                value=(len(hasroles) + 1), inline=True)
             userinfo.add_field(name="Roles Held",

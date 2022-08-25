@@ -5,12 +5,14 @@ from nextcord.ui import Button, View
 from assets.db_functions import check_botbanned_user
 
 
-class help_button(View):
+class help_button(ui.View):
     def __init__(self):
         super().__init__()
 
-        wiki_url = 'https://github.com/ZaneRE544/Jeanne-Bot/wiki/JeanneBot-Wiki#welcome-to-the-jeanne-bot-wiki'
+        wiki_url = 'https://jeannebot.nicepage.io/Commands.html'
         haze_url = 'https://discord.gg/VVxGUmqQhF'
+
+
 
         self.add_item(Button(style=ButtonStyle.url,
                       label="Jeanne Wiki", url=wiki_url))
