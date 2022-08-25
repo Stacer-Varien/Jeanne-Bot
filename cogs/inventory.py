@@ -8,6 +8,7 @@ from assets.levelcard.generator import Generator
 from asyncio import get_event_loop
 from functools import partial
 from sqlite3 import connect
+import requests
 
 class inventory(Cog):
     def __init__(self, bot):
@@ -138,9 +139,9 @@ class inventory(Cog):
 
             else:
                 qp = self.bot.get_emoji(980772736861343774)
-                        
-                if link.startswith("http"):
-                 try:
+
+
+                if requests.get(link).status_code == 200:  
                     args = {
                         'bg_image': link,
              	    	'profile_image': str(ctx.user.avatar.with_format('png')),
@@ -174,12 +175,14 @@ class inventory(Cog):
                         await ctx.followup.send(embed=embed1)
 
                     elif view.value is False:
-                        await ctx.followup.send("Cancelled")
-                    
-                 except:
-                    await ctx.followup.send("Invalid image link")
-                else:
-                    await ctx.followup.send("Invalid image link")
+                        await ctx.edit_original_message(content="Cancelled", embed=None, file=None, view=None)
+
+    @Cog.listener()
+    async def on_application_command_error(self, ctx:Interaction, error):
+        if isinstance(error, ApplicationInvokeError):
+            embed=Embed(description=error, color=Color.red())
+            await ctx.send(embed=embed)
+            
 
     @jeanne_slash(description='Check which backgrounds you have')
     async def inventory(self, ctx:Interaction):
@@ -188,18 +191,16 @@ class inventory(Cog):
             pass
         else:
             a = fetch_user_inventory(ctx.user.id)
-            for b in a:
-                if b is None:
-                    await ctx.followup.send("You dont have anything available")
-                
-                else:
-                    inv=Embed(color=Color.blue()).set_footer(text='To view them, click on the hyperlink')
-                    r=1
-                    for b in a:
-                        inv.add_field(name="Item ID: {}".format(b[0]), value="[View]({})".format(b[1]), inline=True)
-                        r+=1
+            if a == None:
+                await ctx.followup.send("You dont have anything available")
+            else:
+                inv=Embed(color=Color.blue()).set_footer(text='To view them, click on the hyperlink')
+                r=1
+                for b in a:
+                    inv.add_field(name="Item ID: {}".format(b[0]), value="[View]({})".format(b[1]), inline=True)
+                    r+=1
 
-                    await ctx.followup.send(embed=inv)
+                await ctx.followup.send(embed=inv)
                
 def setup(bot):
     bot.add_cog(inventory(bot))
