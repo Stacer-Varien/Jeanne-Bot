@@ -29,11 +29,7 @@ class slashmanage(Cog):
                             value=f"The role named `{role_name}` has been made", inline=False)
             await ctx.followup.send(embed=embed)
 
-    @create_role.error
-    async def create_role_error(self, ctxs: Interaction, error):
-        if isinstance(error, ApplicationBotMissingPermissions):
-            await ctxs.response.defer()
-            await ctxs.followup.send(embed=role_perm)
+
 
     @jeanne_slash(description="Edit a role to change its name and/or color")
     @has_permissions(manage_roles=True)
@@ -56,11 +52,7 @@ class slashmanage(Cog):
 
             await ctx.followup.send(embed=embed)
 
-    @edit_role.error
-    async def edit_role_error(self, ctxs: Interaction, error):
-        if isinstance(error, ApplicationMissingPermissions):
-            await ctxs.response.defer()
-            await ctxs.followup.send(embed=role_perm)
+
 
     @jeanne_slash(description="Delete a role")
     @has_permissions(manage_roles=True)
@@ -75,11 +67,7 @@ class slashmanage(Cog):
                             value=f"`{role}` has been deleted", inline=False)
             await ctx.followup.send(embed=embed)
 
-    @delete_role.error
-    async def delete_role_error(self, ctxs: Interaction, error):
-        if isinstance(error, ApplicationMissingPermissions):
-            await ctxs.response.defer()
-            await ctxs.followup.send(embed=role_perm)
+
 
     @jeanne_slash(description="Add a role to a member")
     @has_permissions(manage_roles=True)
@@ -94,11 +82,7 @@ class slashmanage(Cog):
                             value=f"`{role}` was given to `{member}`", inline=False)
             await ctx.followup.send(embed=embed)
 
-    @add_role.error
-    async def add_role_error(self, ctxs: Interaction, error):
-        await ctxs.response.defer()
-        if isinstance(error, ApplicationMissingPermissions):
-            await ctxs.followup.send(embed=role_perm)
+
         
 
     @jeanne_slash(description="Remove a role from a member")
@@ -114,11 +98,7 @@ class slashmanage(Cog):
                             value=f"`{role}` was removed from `{member}`", inline=False)
             await ctx.followup.send(embed=embed)
 
-    @remove_role.error
-    async def remove_role_error(self, ctxs: Interaction, error):
-        if isinstance(error, ApplicationMissingPermissions):
-            await ctxs.response.defer()
-            await ctxs.followup.send(embed=role_perm)
+
 
     @jeanne_slash(description="Rename a channel")
     @has_permissions(manage_channels=True)
@@ -137,11 +117,7 @@ class slashmanage(Cog):
                             value=f"Channel is now `{new_name}`", inline=False)
             await ctx.followup.send(embed=embed)
 
-    @rename_channel.error
-    async def rename_channel_error(self, ctx: Interaction, error):
-        if isinstance(error, ApplicationMissingPermissions):
-            await ctx.response.defer()
-            await ctx.followup.send(embed=channel_perm)
+
 
     @jeanne_slash(description="Delete a channel")
     @has_permissions(manage_channels=True)
@@ -160,11 +136,7 @@ class slashmanage(Cog):
                             value=f"`{channel}` has been deleted", inline=False)
             await ctx.followup.send(embed=embed)
 
-    @delete_channel.error
-    async def delete_channel_error(self, ctx: Interaction, error):
-        if isinstance(error, ApplicationMissingPermissions):
-            await ctx.response.defer()
-            await ctx.followup.send(embed=channel_perm)
+
 
     @jeanne_slash(description='Create a channel')
     @has_permissions(manage_channels=True)
@@ -192,11 +164,7 @@ class slashmanage(Cog):
                                     value=f"A new category called **{channel_name}** was created", inline=False)
                     await ctx.followup.send(embed=embed)
 
-    @create_channel.error
-    async def create_channel_error(self, ctx: Interaction, error):
-        if isinstance(error, ApplicationMissingPermissions):
-            await ctx.response.defer()
-            await ctx.followup.send(embed=channel_perm)
+
 
     @jeanne_slash(description="Removes a modlog channel that was set from the database")
     @has_permissions(manage_guild=True)
@@ -271,11 +239,7 @@ class slashmanage(Cog):
                     description='All channels that were set for the server have been removed from the database.', color=0x00FF68)
                 await ctx.followup.send(embed=all)
 
-    @remove.error
-    async def remove_error(self, ctx: Interaction, error):
-        if isinstance(error, ApplicationMissingPermissions):
-            await ctx.response.defer()
-            await ctx.followup.send(embed=manage_server_perm)
+
 
     @jeanne_slash(description="Choose a channel to welcome members")
     @has_permissions(manage_guild=True)
@@ -320,12 +284,94 @@ class slashmanage(Cog):
                         name="Report channel set", value=f"{channel.mention} has been selected to have all reported members in there.")
                 await ctx.followup.send(embed=modlog)
 
+    @jeanne_slash(description="Make a channel NSFW enabled/disabled")
+    @has_permissions(manage_guild=True)
+    async def switch_nsfw(self, ctx:Interaction, channel=SlashOption(channel_types=[ChannelType.text, ChannelType.news])):
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            if channel.is_nsfw == False:
+                await channel.edit(nsfw=True)
+                switched = Embed(description="{} is now NSFW enabled".format(channel.name), color=0x00FF68)
+                await ctx.followup.send(embed=switched)
+            elif channel.is_nsfw == True:
+                await channel.edit(nsfw=False)
+                switched = Embed(description="{} is now NSFW disabled".format(
+                    channel.name), color=0x00FF68)
+                await ctx.followup.send(embed=switched)
+    
+    @jeanne_slash(description="Change the server's verification level")
+    @has_permissions(manage_guild=True)
+    async def change_verification(self, ctx:Interaction, level=SlashOption(choices=['none', 'low', 'medium', 'high', 'highest'])):
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            verification=Embed(title="Server Verification Changed", color=0x00FF68)
 
-    @set.error
-    async def set_error(self, ctx: Interaction, error):
-        if isinstance(error, ApplicationMissingPermissions):
-            await ctx.send(embed=manage_server_perm)
+            if level == 'none':
+                await ctx.guild.edit(verification_level=VerificationLevel.none)
+                verification.description="No verification required"
+                await ctx.followup.send(embed=verification)
+            
+            elif level == 'low':
+                await ctx.guild.edit(verification_level=VerificationLevel.low)
+                verification.description="Members must have a verified email"
+                await ctx.followup.send(embed=verification)
+               
+            elif level == 'medium':
+                await ctx.guild.edit(verification_level=VerificationLevel.medium)
+                verification.description="Members must have a verified email and be registered on Discord for more than 5 minutes"
+                await ctx.followup.send(embed=verification)
 
+            elif level == 'high':
+                await ctx.guild.edit(verification_level=VerificationLevel.high)
+                verification.description="Members must have a verified email, be registered on Discord for more than 5 minutes and stay in the server for more than 10 minutes"
+                await ctx.followup.send(embed=verification)
 
+            elif level == 'highest':
+                await ctx.guild.edit(verification_level=VerificationLevel.highest)
+                verification.description="Members must have a verified phone number"
+                await ctx.followup.send(embed=verification)
+
+    @jeanne_slash(description="Change the server's name and/or description")
+    @has_permissions(manage_guild=True)
+    async def edit_server(self, ctx: Interaction, name=SlashOption(required=False), description=SlashOption(required=False)):
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            edit=Embed(description="Changes made on the server", color=Color.brand_green())
+
+            if name:
+                await ctx.guild.edit(name=name)
+                edit.add_field("New Name:", value=name)
+
+            if description:
+                await ctx.guild.edit(description=description)
+                edit.add_field("New Name:", value=name)
+
+            await ctx.followup.send(embed=edit)
+
+    @jeanne_slash(description="Clone a channel")
+    @has_permissions(manage_channels=True)
+    async def clone(self, ctx:Interaction, channel=SlashOption(channel_types=[ChannelType.news, ChannelType.text, ChannelType.voice, ChannelType.stage_voice]), name=SlashOption(required=False)):
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            if name==None:
+                name=channel.name
+
+            await channel.clone(name=name)
+
+            cloned=Embed(description="{} was cloned as {}".format(channel, name))
+            await ctx.followup.send(embed=cloned)
+            await ctx.guild.create_custom_emoji()
+                
+
+        
+                
 def setup(bot):
     bot.add_cog(slashmanage(bot))
