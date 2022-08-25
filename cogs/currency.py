@@ -173,7 +173,6 @@ class currencysys(Cog):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            try:
                 qp = str(self.bot.get_emoji(980772736861343774))
                 rolled = randint(1, 6)
                 balance = get_balance(ctx.user.id)
@@ -205,8 +204,7 @@ class currencysys(Cog):
                         embed = Embed(
                             description=f"Oh no. It rolled a **{rolled}**", color=Color.red())
                         await ctx.followup.send(embed=embed)
-            except:
-                await ctx.followup.send("Please run /daily")
+
 
     @jeanne_slash(description='Check how much QP you have')
     @cooldown(1, 30, bucket=SlashBucket.author)
@@ -307,51 +305,49 @@ class currencysys(Cog):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            try:
-                qp = str(self.bot.get_emoji(980772736861343774))
-                jeannes_pick = ['Heads', 'Tails']
-                balance = get_balance(ctx.user.id)
-                if int(bet) < 5:
-                    bethigher = Embed(
-                        description=f'Please bet an amount higher than 5 {qp}')
-                    await ctx.followup.send(embed=bethigher)
+            qp = str(self.bot.get_emoji(980772736861343774))
+            jeannes_pick = ['Heads', 'Tails']
+            balance = get_balance(ctx.user.id)
+            if 5 > int(bet):
+                bethigher = Embed(
+                    description=f'Please bet an amount higher than 5 {qp}')
+                await ctx.followup.send(embed=bethigher)
 
-                elif int(bet) > int(balance):
-                    betlower = Embed(
-                        description=f'Your balance is too low!\nPlease bet lower than {balance} {qp}')
-                    await ctx.followup.send(embed=betlower)
-                elif int(balance) == 0:
-                    zerobal = Embed(
-                        description=f'Unfortunately, you have 0 {qp}.\nPlease do a daily and/or wait for a free     chance to do `/guess free` and/or `/dice free`')
-                    await ctx.followup.send(embed=zerobal)
+            elif int(balance) < int(bet) :
+                betlower = Embed(
+                    description=f'Your balance is too low!\nPlease bet lower than {balance} {qp}')
+                await ctx.followup.send(embed=betlower)
+            elif int(balance) == 0:
+                zerobal = Embed(
+                    description=f'Unfortunately, you have 0 {qp}.\nPlease do a daily and/or wait for a free chance to do `/guess free`, `/flip free` and/or `/dice free`')
+                await ctx.followup.send(embed=zerobal)
+
+            elif int(bet) <= int(balance):
+                view = Heads_or_Tails()
+                ask = Embed(description="Heads or Tails?")
+                await ctx.followup.send(embed=ask, view=view)
+                await view.wait()
+
+                if view.value == choice(jeannes_pick):
+                    add_qp(ctx.user.id, int(bet))
+
+                    embed = Embed(
+                        description="YAY! You got it!\n{} {} has been added".format(int(bet), qp))
+
+                    await ctx.edit_original_message(embed=embed, view=None)
+
+                elif view.value==None:
+                    timeout = Embed(
+                        description=f"Sorry but you took too long. It was {choice(jeannes_pick)}", color=0xFF0000)
+                    await ctx.edit_original_message(embed=timeout, view=None)
 
                 else:
-                    view = Heads_or_Tails()
-                    ask = Embed(description="Heads or Tails?", view=view)
-                    await ctx.followup.send(embed=ask, view=view)
-                    await view.wait()
+                    remove_qp(ctx.user.id, int(bet))
+                    embed = Embed(color=Color.red())
+                    embed = Embed(
+                        description="Oh no, it was {}\nI'm afraid that I have to take {}{} from you".format(choice(jeannes_pick), int(bet), qp), color=Color.red())
+                    await ctx.edit_original_message(embed=embed, view=None)
 
-                    if view.value == choice(jeannes_pick):
-                        add_qp(ctx.user.id, int(bet))
-
-                        embed = Embed(
-                            description="YAY! You got it!\n{} {} has been added".format(int(bet), qp))
-
-                        await ctx.edit_original_message(embed=embed, view=None)
-
-                    elif view.value==None:
-                        timeout = Embed(
-                            description=f"Sorry but you took too long. It was {choice(jeannes_pick)}", color=0xFF0000)
-                        await ctx.edit_original_message(embed=timeout, view=None)
-
-                    else:
-                        remove_qp(ctx.user.id, int(bet))
-                        embed = Embed(color=Color.red())
-                        embed = Embed(
-                            description="Oh no, it was {}\nI'm afraid that I have to take {}{} from you".format(choice(jeannes_pick), int(bet), qp), color=Color.red())
-                        await ctx.edit_original_message(embed=embed, view=None)
-            except:
-                await ctx.followup.send('Please run `/daily')
 
     @_free_.error
     async def _freeerror(self, ctx: Interaction, error):
