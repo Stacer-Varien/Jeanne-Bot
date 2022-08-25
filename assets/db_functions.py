@@ -455,21 +455,20 @@ def fetch_warnings_user(member: int, server: int):
     warnings = cur.execute(
         "SELECT * FROM warnDATA user WHERE user_id = ? AND guild_id = ?", (member, server,))
     db.commit()
-    return warnings.fetchall()
+    return warnings.fetchone()
 
 
 def check_warn_id(server: int, warn_id: int):
     cur = db.cursor()
     cur.execute(
-        "SELECT * FROM warnData WHERE guild_id = ?,  AND warn_id = ?", (server, warn_id,))
+        "SELECT * FROM warnData WHERE guild_id = ? AND warn_id = ?", (server, warn_id,))
     result = cur.fetchone()
+    db.commit()
 
     if result == None:
-        db.commit()
         return None
 
     else:
-        db.commit()
         return result[0]
 
 
