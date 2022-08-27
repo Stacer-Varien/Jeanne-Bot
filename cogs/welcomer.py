@@ -20,8 +20,8 @@ class welcomer(Cog):
                 await channel.send(embed=welcome)
             else:
                 pass
-        except Exception as e:
-            print(e)
+        except Exception:
+            pass
 
     @Cog.listener()
     async def on_member_remove(self, member):
