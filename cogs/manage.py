@@ -1,11 +1,14 @@
+from asyncio import get_event_loop
+from functools import partial
+from io import BytesIO
+import requests
 from assets.db_functions import *
-from config import db
 from nextcord import *
 from nextcord import slash_command as jeanne_slash
 from nextcord.ext.commands import Cog
 from nextcord.abc import GuildChannel
-from assets.errormsgs import *
 from nextcord.ext.application_checks import *
+from PIL import Image
 
 class slashmanage(Cog):
     def __init__(self, bot):
@@ -286,19 +289,19 @@ class slashmanage(Cog):
 
     @jeanne_slash(description="Make a channel NSFW enabled/disabled")
     @has_permissions(manage_guild=True)
-    async def switch_nsfw(self, ctx:Interaction, channel=SlashOption(channel_types=[ChannelType.text, ChannelType.news])):
+    async def switch_nsfw(self, ctx:Interaction, channel:GuildChannel=SlashOption(channel_types=[ChannelType.text, ChannelType.news])):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            if channel.is_nsfw == False:
+            if channel.is_nsfw() == False:
                 await channel.edit(nsfw=True)
-                switched = Embed(description="{} is now NSFW enabled".format(channel.name), color=0x00FF68)
+                switched = Embed(description="{} is now NSFW enabled".format(channel.mention), color=0x00FF68)
                 await ctx.followup.send(embed=switched)
-            elif channel.is_nsfw == True:
+            elif channel.is_nsfw() == True:
                 await channel.edit(nsfw=False)
                 switched = Embed(description="{} is now NSFW disabled".format(
-                    channel.name), color=0x00FF68)
+                    channel.mention), color=0x00FF68)
                 await ctx.followup.send(embed=switched)
     
     @jeanne_slash(description="Change the server's verification level")
@@ -346,17 +349,20 @@ class slashmanage(Cog):
 
             if name:
                 await ctx.guild.edit(name=name)
-                edit.add_field("New Name:", value=name)
+                edit.add_field(name="New Name:", value=name, inline=False)
 
             if description:
-                await ctx.guild.edit(description=description)
-                edit.add_field("New Name:", value=name)
+                if "COMMUNITY" in ctx.guild.features:
+                    await ctx.guild.edit(description=description)
+                    edit.add_field(name="New Description:", value=name, inline=False)
+                else:
+                    edit.add_field(name="Unable to change description", value="Server is not a community server", inline=False)
 
             await ctx.followup.send(embed=edit)
 
     @jeanne_slash(description="Clone a channel")
     @has_permissions(manage_channels=True)
-    async def clone(self, ctx:Interaction, channel=SlashOption(channel_types=[ChannelType.news, ChannelType.text, ChannelType.voice, ChannelType.stage_voice]), name=SlashOption(required=False)):
+    async def clone(self, ctx:Interaction, channel:GuildChannel=SlashOption(channel_types=[ChannelType.news, ChannelType.text, ChannelType.voice, ChannelType.stage_voice]), name=SlashOption(required=False)):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -364,14 +370,10 @@ class slashmanage(Cog):
             if name==None:
                 name=channel.name
 
-            await channel.clone(name=name)
+            c = await channel.clone(name=name)
 
-            cloned=Embed(description="{} was cloned as {}".format(channel, name))
+            cloned=Embed(description="{} was cloned as {}".format(channel.mention, c.mention))
             await ctx.followup.send(embed=cloned)
-            await ctx.guild.create_custom_emoji()
-                
 
-        
-                
 def setup(bot):
     bot.add_cog(slashmanage(bot))
