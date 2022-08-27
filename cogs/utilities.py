@@ -8,7 +8,6 @@ from assets.modals import Bot_Report_Modal
 from config import WEBHOOK, WEATHER
 from nextcord.abc import GuildChannel
 from nextcord.ui import Button, View
-from assets.errormsgs import admin_perm
 from asyncio import TimeoutError
 from nextcord.ext.application_checks import *
 from py_expression_eval import Parser
@@ -221,18 +220,6 @@ class slashutilities(Cog):
                 timeout = Embed(
                     description=f"Guess you have nothing to say", color=0xFF0000)
                 await ctx.followup.send(embed=timeout, ephemeral=True)
-
-    @plain.error
-    async def say_error(self, ctx: Interaction, error):
-        if isinstance(error, ApplicationMissingPermissions):
-            await ctx.response.defer()
-            await ctx.followup.send(embed=admin_perm)
-
-    @embed.error
-    async def say_error(self, ctx: Interaction, error):
-        if isinstance(error, ApplicationMissingPermissions):
-            await ctx.response.defer()
-            await ctx.followup.send(embed=admin_perm)
 
     @jeanne_slash()
     async def bot_report(self, ctx: Interaction, type=SlashOption(choices=['bug', 'fault', 'exploit', 'violator']), with_attachments=SlashOption(choices=["True", "False"], required=False)):

@@ -6,7 +6,6 @@ from nextcord.ext.application_checks import *
 from nextcord.ext.commands import Cog
 from requests import get
 from assets.db_functions import check_botbanned_user
-from assets.errormsgs import nsfw_perm
 
 
 class slashnsfw(Cog):
