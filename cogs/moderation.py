@@ -8,7 +8,6 @@ from datetime import datetime, timedelta
 from humanfriendly import parse_timespan
 from assets.db_functions import *
 from assets.buttons import Confirmation
-from assets.errormsgs import *
 from nextcord.ext.application_checks.errors import *
 from nextcord.ext.commands.errors import *
 
@@ -27,7 +26,7 @@ class slashmoderation(Cog):
             if reason == None:
                 reason = "Unspecified"
 
-            elif member == ctx.user:
+            if member == ctx.user:
                 failed = Embed(description="You can't warn yourself")
                 await ctx.followup.send(embed=failed)
 
@@ -68,11 +67,7 @@ class slashmoderation(Cog):
                     await ctx.followup.send(embed=warned)
                     await modlog.send(embed=warn)
 
-    @warn.error
-    async def warn_error(self, ctx: Interaction, error):
-        if isinstance(error, ApplicationMissingPermissions):
-            await ctx.response.defer()
-            await ctx.followup.send(embed=warn_perm)
+
 
     @jeanne_slash(description="Main list_warns command")
     async def list_warns(self, ctx: Interaction):
@@ -107,7 +102,7 @@ class slashmoderation(Cog):
             if member == None:
                 member = ctx.user
 
-            record = fetch_warnings_user(member.id, ctx.guild.id)
+            record = fetch_warnings_user(member.id, ctx.guild.id).fetchall()
             if len(record) == 0:
                 await ctx.followup.send(f"{member} has no warn IDs")
             
@@ -142,7 +137,7 @@ class slashmoderation(Cog):
                 await ctx.followup.send("Invalid warn ID")
 
             else:
-                member = fetch_warnings_server(ctx.guild.id)
+                member = check_warn_id(ctx.guild.id, warn_id)
                 revoke_warn(member[0], ctx.guild.id, warn_id)
 
                 revoked_warn = Embed(
@@ -151,7 +146,7 @@ class slashmoderation(Cog):
                 modlog_id = get_modlog_channel(ctx.guild.id)
 
                 if modlog_id == None:
-                    await ctx.followup.send(embed=revoke)
+                    await ctx.followup.send(embed=revoked_warn)
                 else:
                     modlog = ctx.guild.get_channel(modlog_id)
                     revoke = Embed(
@@ -159,11 +154,6 @@ class slashmoderation(Cog):
                     await modlog.send(embed=revoke)
                     await ctx.followup.send(embed=revoked_warn)
 
-    @revoke_warn.error
-    async def revoke_warn_error(self, ctx: Interaction, error):
-        if isinstance(error, ApplicationMissingPermissions):
-            await ctx.response.defer()
-            await ctx.followup.send(embed=warn_perm)
 
     @jeanne_slash(description="Main ban command")
     async def ban(self, ctx: Interaction):
@@ -275,21 +265,6 @@ class slashmoderation(Cog):
                         description="Ban cancelled", color=Color.red())
                     await ctx.edit_original_message(embed=cancelled, view=None)
 
-    @member.error
-    async def ban_error(self, ctx: Interaction, error):
-        if isinstance(error, ApplicationMissingPermissions):
-            await ctx.response.defer()
-            await ctx.followup.send(embed=ban_perm)
-
-    @user.error
-    async def ban_error(self, ctx: Interaction, error):
-        if isinstance(error, ApplicationMissingPermissions):
-            await ctx.response.defer()
-            await ctx.followup.send(embed=ban_perm)
-
-        elif isinstance(error, Exception):
-            await ctx.response.defer()
-            await ctx.followup.send("Invalid user ID")
 
     @jeanne_slash(description="Kick a member out of the server")
     @has_permissions(kick_members=True)
@@ -334,11 +309,6 @@ class slashmoderation(Cog):
                     await ctx.followup.send(embed=kicked)
                     await modlog.send(embed=kick)
 
-    @kick.error
-    async def kick_error(self, ctx: Interaction, error):
-        if isinstance(error, ApplicationMissingPermissions):
-            await ctx.response.defer()
-            await ctx.followup.send(embed=kick_perm)
 
     @jeanne_slash(description="Bulk delete messages")
     @has_permissions(manage_messages=True)
@@ -365,11 +335,6 @@ class slashmoderation(Cog):
                 await ctx.channel.purge(limit=int(limit))
                 await ctx.followup.send("Done bulk deleting messages")
 
-    @prune.error
-    async def prune_error(self, ctx: Interaction, error):
-        if isinstance(error, MissingPermissions):
-            await ctx.response.defer()
-            await ctx.followup.send(embed=message_perm)
 
     @jeanne_slash(description="Change someone's nickname")
     @has_permissions(manage_nicknames=True)
@@ -384,11 +349,6 @@ class slashmoderation(Cog):
                               value=f"{member}'s nickname is now `{nickname}`", inline=False)
             await ctx.followup.send(embed=setnick)
 
-    @change_nickname.error
-    async def change_nickname_error(self, ctx: Interaction, error):
-        if isinstance(error, ApplicationMissingPermissions):
-            await ctx.response.defer()
-            await ctx.followup.send(embed=nick_perm)
 
     @jeanne_slash(description="Unbans a user")
     @has_permissions(ban_members=True)
@@ -416,15 +376,6 @@ class slashmoderation(Cog):
                     description=f"{user} has been unbanned. Check {modlog.mention}", color=0xFF0000)
                 await ctx.followup.send(embed=unbanned)
                 await modlog.send(embed=unban)
-
-    @unban.error
-    async def unban_error(self, ctx: Interaction, error):
-        if isinstance(error, ApplicationMissingPermissions):
-            await ctx.response.defer()
-            await ctx.followup.send(embed=unban_perm)
-
-        elif isinstance(error, UserNotFound):
-            await ctx.followup.send("Invalid user ID")
 
     @jeanne_slash(description="Mute a member")
     @has_permissions(moderate_members=True)
@@ -472,10 +423,6 @@ class slashmoderation(Cog):
                     await ctx.followup.send(embed=muted)
                     await modlog.send(embed=mute)
 
-    @mute.error
-    async def mute_error(self, ctx: Interaction, error):
-        if isinstance(error, ApplicationMissingPermissions):
-            await ctx.send(embed=mute_perm)
 
     @jeanne_slash()
     @has_permissions(moderate_members=True)
@@ -515,12 +462,6 @@ class slashmoderation(Cog):
                         description=f"{member} has been unmuted. Check {modlog.mention}", color=0xFF0000)
                     await ctx.followup.send(embed=unmuted)
                     await modlog.send(embed=unmute)
-
-    @unmute.error
-    async def unmute_error(self, ctx: Interaction, error):
-        if isinstance(error, ApplicationMissingPermissions):
-            await ctx.send(embed=unmute_perm)
-
 
 def setup(bot):
     bot.add_cog(slashmoderation(bot))

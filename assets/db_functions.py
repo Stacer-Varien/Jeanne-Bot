@@ -447,7 +447,7 @@ def fetch_warnings_server(server: int):
     warnings = cur.execute(
         "SELECT * FROM warnDATAv2 WHERE guild_id = ?", (server,))
     db.commit()
-    return warnings.fetchall()
+    return warnings
 
 
 def fetch_warnings_user(member: int, server: int):
@@ -455,7 +455,7 @@ def fetch_warnings_user(member: int, server: int):
     warnings = cur.execute(
         "SELECT * FROM warnDATA user WHERE user_id = ? AND guild_id = ?", (member, server,))
     db.commit()
-    return warnings.fetchone()
+    return warnings
 
 
 def check_warn_id(server: int, warn_id: int):
@@ -469,15 +469,14 @@ def check_warn_id(server: int, warn_id: int):
         return None
 
     else:
-        return result[0]
+        return result
 
 
 def revoke_warn(member: int, server: int, warn_id: int):
     cur = db.cursor()
     cur.execute("DELETE FROM warnData WHERE warn_id = ?", (warn_id,))
 
-    cur.execute(
-        f"UPDATE warnDatav2 SET warn_points = warn_points - ? WHERE user_id = ? AND guild_id = ?", (1, member, server))
+    cur.execute("UPDATE warnDatav2 SET warn_points = warn_points - ? WHERE user_id = ? AND guild_id = ?", (1, member, server))
 
     wp_query = cur.execute(
         f"SELECT warn_points FROM warnDatav2 WHERE user_id = ? AND guild_id = ?", (member, server))
