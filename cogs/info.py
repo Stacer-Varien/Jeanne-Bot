@@ -7,13 +7,12 @@ from nextcord.ext.commands import Cog
 from nextcord import *
 from nextcord import slash_command as jeanne_slash, __version__ as discord_version
 
-format = "%a, %d %b %Y | %H:%M:%S"
 start_time = time()
 
 class slashinfo(Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.bot_version="3.3 VarPacth1"
+        self.bot_version="3.3 VarPacth2"
 
     @jeanne_slash(description="See the bot's status from development to now")
     async def stats(self, ctx : Interaction):
@@ -26,7 +25,7 @@ class slashinfo(Cog):
             embed.add_field(
                 name="Developer", value=f"• **Name:** {botowner}\n• **ID:** {botowner.id}", inline=True)
             embed.add_field(name="Bot ID", value=self.bot.user.id, inline=True)
-            embed.add_field(name="Creation Date", value=self.bot.user.created_at.strftime(format), inline=True)
+            embed.add_field(name="Creation Date", value="<t:{}:F>".format(round(self.bot.user.created_at.timestamp())), inline=True)
             embed.add_field(
                 name="Version", value=f"• **Python Version:** {py_version.major}.{py_version.minor}.{py_version.micro}\n• **Nextcord Version:** {discord_version}\n• **Bot:** {self.bot_version}", inline=True)
 
@@ -74,11 +73,11 @@ class slashinfo(Cog):
             userinfo.add_field(name="ID", value=member.id, inline=True)
             userinfo.add_field(name="Is Bot?", value=botr, inline=True)
             userinfo.add_field(
-                name="Created Account", value='<t:{}:F>'.format(str(joined_date)), inline=True)
+                name="Created Account", value='<t:{}:F>'.format(str(create_date)), inline=True)
             userinfo.add_field(
-                name="Joined Server", value='<t:{}:F>'.format(str(create_date)), inline=True)
+                name="Joined Server", value='<t:{}:F>'.format(str(joined_date)), inline=True)
             userinfo.add_field(name="Number of Roles",
-                               value=(len(hasroles) + 1), inline=True)
+                               value=len(member.roles), inline=True)
             userinfo.add_field(name="Roles Held",
                             value=''.join(hasroles[:20]) + '@everyone', inline=False)
             userinfo.set_thumbnail(url=member.display_avatar)

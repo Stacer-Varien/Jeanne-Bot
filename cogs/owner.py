@@ -8,10 +8,7 @@ from sys import executable, argv
 from assets.db_functions import add_botbanned_user, check_botbanned_user
 from config import BB_WEBHOOK
 from nextcord.ext.application_checks import *
-from assets.errormsgs import owner_only, no_user
 from time import time
-
-format = "%a, %d %b %Y | %H:%M:%S"
 
 def restart_bot():
   execv(executable, ['python'] + argv)
@@ -64,32 +61,28 @@ class slashowner(Cog):
             pass
         else:
             user = await self.bot.fetch_user(user_id)
-            try:
-                if user.bot == True:
+            if user.bot == True:
                     botr = ":o:"
-                else:
+            else:
                     botr = ":x:"
-                fuser = Embed(title="User Found", color=0xccff33)
-                fuser.add_field(name="Name",
+            fuser = Embed(title="User Found", color=0xccff33)
+            fuser.add_field(name="Name",
                                 value=user,
                                 inline=True)
-                fuser.add_field(name="Creation Date", value=user.created_at.strftime(format), inline=True)
-                fuser.add_field(
+            fuser.add_field(name="Creation Date", value="<t:{}:F>".format(round(user.created_at.timestamp())), inline=True)
+            fuser.add_field(
                     name="Mutuals", value=len(user.mutual_guilds), inline=True)
-                fuser.add_field(
+            fuser.add_field(
                     name="Bot?", value=botr, inline=True)
-                fuser.set_image(url=user.display_avatar)
-                if user.banner==None:
+            fuser.set_image(url=user.display_avatar)
+            if user.banner==None:
                     await ctx.followup.send(embed=fuser)
-                else:
-                    userbanner = Embed(title="User Banner", color=0xccff33)
-                    userbanner.set_image(url=user.banner)
+            else:
+                userbanner = Embed(title="User Banner", color=0xccff33)
+                userbanner.set_image(url=user.banner)
 
-                    e = [fuser, userbanner]
-                    await ctx.followup.send(embeds=e)
-            except:
-                await ctx.followup.send(embed=no_user)
-           
+                e = [fuser, userbanner]
+                await ctx.followup.send(embeds=e)
 
     @jeanne_slash(description="Restart me to be updated")
     @is_owner()
@@ -166,10 +159,5 @@ class slashowner(Cog):
                 else:
                     await ctx.followup.send(str_obj.getvalue())
     
-    @Cog.listener()
-    async def on_application_command_error(self, ctx: Interaction, error):
-        if isinstance(error, ApplicationNotOwner):
-            await ctx.send(embed=owner_only)
-
 def setup(bot):
     bot.add_cog(slashowner(bot))
