@@ -252,12 +252,12 @@ class slashmoderation(Cog):
                     modlog_id = get_modlog_channel(ctx.guild.id)
 
                     if modlog_id == None:
-                        await ctx.edit_original_message(embed=ban)
+                        await ctx.edit_original_message(embed=ban, view=None)
                     else:
                         modlog = ctx.guild.get_channel(modlog_id)
                         banned = Embed(
                             description=f"{user} has been banned. Check {modlog.mention}", color=0xFF0000)
-                        await ctx.edit_original_message(embed=banned)
+                        await ctx.edit_original_message(embed=banned, view=None)
                         await modlog.send(embed=ban)
 
                 elif view.value is False:
