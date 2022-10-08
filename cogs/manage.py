@@ -139,11 +139,13 @@ class slashmanage(Cog):
                             value=f"`{channel}` has been deleted", inline=False)
             await ctx.followup.send(embed=embed)
 
+    @jeanne_slash(description="Main create command")
+    async def create(self, ctx:Interaction):
+        pass
 
-
-    @jeanne_slash(description='Create a channel')
+    @create.subcommand(description='Create a channel')
     @has_permissions(manage_channels=True)
-    async def create_channel(self, ctx: Interaction, channel_type=SlashOption(description='Type of channel', choices=['Text Channel', 'Voice Channel', 'Category'], required=True), channel_name=SlashOption(description="Which will you name it?", required=True)):
+    async def channel(self, ctx: Interaction, channel_type=SlashOption(description='Type of channel', choices=['Text Channel', 'Voice Channel', 'Category'], required=True), channel_name=SlashOption(description="What will you name it?", required=False)):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -167,7 +169,18 @@ class slashmanage(Cog):
                                     value=f"A new category called **{channel_name}** was created", inline=False)
                     await ctx.followup.send(embed=embed)
 
-
+    @create.subcommand(description="Create a forum")
+    @has_permissions(manage_channels=True)
+    async def forum(self, ctx: Interaction, name=SlashOption(description="What will you name it?", required=True)):
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            await ctx.guild.create_forum_channel(name=name)
+            embed = Embed(color=0x00FF68)
+            embed.add_field(name="Forum created",
+                            value=f"A new forum called **{name}** was created", inline=False)
+            await ctx.followup.send(embed=embed)
 
     @jeanne_slash(description="Removes a modlog channel that was set from the database")
     @has_permissions(manage_guild=True)
@@ -374,6 +387,7 @@ class slashmanage(Cog):
 
             cloned=Embed(description="{} was cloned as {}".format(channel.mention, c.mention))
             await ctx.followup.send(embed=cloned)
+
 
 def setup(bot):
     bot.add_cog(slashmanage(bot))
