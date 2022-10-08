@@ -1,6 +1,6 @@
 import contextlib
 from io import StringIO
-from nextcord.ext.commands import Cog
+from nextcord.ext.commands import Cog, Bot
 from nextcord import *
 from nextcord import slash_command as jeanne_slash
 from os import execv
@@ -14,7 +14,7 @@ def restart_bot():
   execv(executable, ['python'] + argv)
 
 class slashowner(Cog):
-    def __init__(self, bot):
+    def __init__(self, bot:Bot):
         self.bot = bot
 
 
@@ -159,5 +159,5 @@ class slashowner(Cog):
                 else:
                     await ctx.followup.send(str_obj.getvalue())
     
-def setup(bot):
+def setup(bot:Bot):
     bot.add_cog(slashowner(bot))

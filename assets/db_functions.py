@@ -1,5 +1,7 @@
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
+from json import load
 from sqlite3 import connect
+from humanfriendly import parse_timespan
 from nextcord import Embed, Color
 from config import db, inv_db
 from os import remove
@@ -119,22 +121,22 @@ def add_botbanned_user(user: int, reason: str):
 
 
 def fetch_wallpapers():
-    w = inv_db.execute("SELECT * FROM wallpapers").fetchall()
+    json = open('assets/inventory.json')
+    data = load(json)
 
     backgrounds = Embed(title='Avaliable Background Pictures for Level Cards', color=Color.blue(
     )).set_footer(text="To view them, click on the hyperlinked names")
 
-    for a in w:
+    for a in data['wallpapers']:
         backgrounds.add_field(
-            name=f"{a[1]}", value='[Item ID: {}]({})'.format(a[0], a[2]), inline=True)
-    inv_db.commit()
+            name=f"{a['name']}", value='[Item ID: {}]({})'.format(a['id'], a['link']), inline=True)
     return backgrounds
 
 
 def get_wallpaper(item_id: str):
-    wallpaper = inv_db.execute(
-        'SELECT * FROM wallpapers WHERE id = ?', (item_id,)).fetchone()
-    inv_db.commit()
+    json=open('assets\inventory.json')
+    data=load(json)
+    wallpaper = data['wallpapers'][item_id - 1]
     return wallpaper
 
 
@@ -151,7 +153,7 @@ def add_user_wallpaper(user, item_id):
     cur = user_inv.cursor()
     wallpaper = get_wallpaper(item_id)
     cur.execute("INSERT OR IGNORE INTO backgrounds (item_id, link_bg, selected) VALUES (?,?,?)",
-                (item_id, wallpaper[2], 0,))
+                (item_id, wallpaper['link'], 0,))
     user_inv.commit()
     remove_qp(user, 1000)
 
@@ -529,3 +531,99 @@ def get_user_bank(user:int):
 def add_wallpaper(id, name, link):
     inv_db.execute("INSERT OR IGNORE INTO wallpapers (id, name, link, price) VALUES (?,?,?,?)", (id, name, link, 1000,))
     db.commit()
+
+def add_voter(user_id:int):
+    if check_botbanned_user(user_id) is True:
+        pass
+    else:
+
+        new_vote=int(round((datetime.now() + timedelta(hours=12)).timestamp()))
+        weekend = datetime.today().weekday()
+
+        voted=db.execute("SELECT voted FROM votersData WHERE user_id = ?", (user_id,)).fetchone()
+
+        if voted==None:
+            ids=db.execute("INSERT OR IGNORE INTO votersData (user_id, voted) VALUES (?,?)", (user_id, new_vote,))
+
+            if ids.rowcount==0:
+                db.execute("UPDATE votersData SET voted = ? WHERE user_id = ?", (new_vote, user_id,))
+
+            db.commit()
+
+            if weekend < 5:
+                add_qp(user_id, 50)
+            elif weekend > 5:
+                add_qp(user_id, 100)
+
+        
+        elif int(round(datetime.now().timestamp())) > new_vote:
+            db.execute("UPDATE votersData SET voted = ? WHERE user_id = ?", (new_vote, user_id,))
+            db.commit()
+
+            if weekend < 5:
+                add_qp(user_id, 50)
+            elif weekend > 5:
+                add_qp(user_id, 100)
+
+            
+        else:
+            pass
+
+def get_voters():
+    voters=db.execute("SELECT user_id FROM votersData").fetchall()
+
+    if voters==None:
+        pass
+    else:
+        for a in voters:
+            return a[0]
+
+
+def check_mute_role(guild_id: int):
+    role = db.execute("SELECT role_id FROM muteroleData WHERE guild_id = ?", (guild_id,)).fetchone()
+    db.commit()
+    if role ==None:
+        return(False)
+    else:
+        return(True)
+    
+
+def add_mute_role(guild:int, role_id:int):
+    role=db.execute("INSERT OR IGNORE INTO muteroleData (guild_id, role_id) VALUES (?,?)", (guild, role_id,))
+
+    if role.rowcount==0:
+        db.execute("UPDATE muteroleData SET role_id = ? WHERE guild_id = ?", (role_id, guild,))
+
+    db.commit()
+
+def mute_member(member:int, guild:int, starts:int,ends:str=None):
+    
+    if ends ==None:
+        ending=9999999999999999999999 #infinite value for now
+    else:
+        ending=round((datetime.now()+timedelta(parse_timespan(ends))).timestamp())
+    
+    data=db.execute("INSERT OR IGNORE INTO mutedMembers (user_id, guild_id, starts, end) VALUES (?,?,?,?)", (member, guild, starts, ending,))
+    
+    if data.rowcount==0:
+        db.execute("UPDATE mutedMembers SET starts = ? AND end = ? WHERE user_id = ? AND guild_id = ?", (starts, ends, member, guild,))
+
+    db.commit()
+
+def time_mute():
+    check_muted=db.execute("SELECT * FROM mutedMembers").fetchall()
+
+    if check_muted == None:
+        pass
+
+    else:
+        for a in check_muted:
+            if int(round(datetime.now().timestamp())) > int(a[3]):
+                db.execute(
+                    "DELETE FROM breakData WHERE user_id = ? AND guild_id = ?", (a[0], a[1],))
+                db.commit()
+            else:
+                pass
+
+
+

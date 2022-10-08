@@ -1,47 +1,33 @@
-from assets.db_functions import add_qp, check_botbanned_user
+from assets.db_functions import add_voter
 from config import TOPGG
-from topgg import *
+from assets.topgg import *
+from nextcord.ext.commands import Cog, AutoShardedBot as Bot
 from nextcord.ext import tasks
-from nextcord.ext.commands import Cog
 from datetime import *
-
-dbl_token = TOPGG
-
+from nextcord import *
 
 class topgg(Cog):
-    def __init__(self, bot):
+    def __init__(self, bot:Bot):
         self.bot = bot
-        self.update_stats.start()
-        self.topggpy = DBLClient(self.bot, dbl_token)
-        self.topgg_webhook = WebhookManager(
-            self.bot).dbl_webhook("/dblwebhook")
-        self.topgg_webhook.run(5000)
+        self.topgg = TopGGClient(TOPGG, self.bot.user.id)
+        self.update_guild_count.start()    
+        self.check_votes.start()
 
     @tasks.loop(minutes=30)
-    async def update_stats(self):
+    async def update_guild_count(self):
         try:
-            await self.topggpy.post_guild_count()
-            print(
-                f"Posted server count ({self.topggpy.guild_count}) at {datetime.now().strftime('%H:%M')}")
+            self.topgg.post_server_count(guild_count=len(self.bot.guilds))
+            print(self.bot.guilds)
+            print("{} servers on {}".format(len(self.bot.guilds), datetime.now()))
         except Exception as e:
-            print(f"Failed to post server count\n{e.__class__.__name__}: {e}")
+            print(e)
 
-    @Cog.listener()
-    async def on_dbl_vote(self, data):
-        if data["type"] == "upvote":
-            voter = await self.bot.fetch_user(data['user'])
-            check = check_botbanned_user(voter.id)
-            if check == voter.id:
-                pass
-            else:
-                if await self.topggpy.get_weekend_status() is True:
-                    credits = 100
-                else:
-                    credits = 50
+    @tasks.loop(seconds=10)
+    async def check_votes(self):
+        voters = self.topgg.fetch_bot_votes()
+        for a in voters:
+            add_voter(a['id'])
 
-                add_qp(voter.id, credits)
-                print(f"Received a vote:\n{data}")
-
-
-def setup(bot):
+def setup(bot:Bot):
     bot.add_cog(topgg(bot))
+

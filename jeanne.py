@@ -1,6 +1,10 @@
+from assets.handler import handler
+
+handler()
+
 from os import listdir
 from nextcord import *
-from nextcord.ext.commands import AutoShardedBot as Jeanne
+from nextcord.ext.commands import Bot as Jeanne
 from config import TOKEN
 #from nextcord.gateway import DiscordWebSocket
 

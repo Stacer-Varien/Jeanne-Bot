@@ -23,3 +23,9 @@ kiss_nekosfun = "http://api.nekos.fun:8080/api/kiss"
 tickle_nekoslife = "https://nekos.life/api/v2/img/tickle"
 baka_nekosfun = "http://api.nekos.fun:8080/api/baka"
 feed_nekoslife = "https://nekos.life/api/v2/img/feed"
+
+
+
+
+
+
