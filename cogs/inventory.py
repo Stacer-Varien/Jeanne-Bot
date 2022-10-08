@@ -59,7 +59,7 @@ class inventory(Cog):
                 else:
 
                     args = {
-                        'bg_image': wallpaper[2],
+                        'bg_image': wallpaper['link'],
              	    	'profile_image': str(ctx.user.avatar.with_format('png')),
      			        'server_level': 100,
      			        'server_user_xp': 50,

@@ -1,6 +1,6 @@
 from asyncio import get_event_loop
 from functools import partial
-from nextcord.ext.commands import Cog, CooldownMapping, BucketType
+from nextcord.ext.commands import Cog, CooldownMapping, BucketType, AutoShardedBot as Bot
 from nextcord import *
 from nextcord import slash_command as jeanne_slash
 from assets.db_functions import add_level, add_xp, check_botbanned_user, get_global_rank, get_member_level, get_member_xp, get_server_rank, get_used_wallpaper, get_user_level, get_user_xp
@@ -9,7 +9,7 @@ from assets.levelcard.generator import Generator
 from cooldowns import *
 
 class levelling(Cog):
-    def __init__(self, bot):
+    def __init__(self, bot:Bot):
         self.bot = bot
         self._cd = CooldownMapping.from_cooldown(1, 120, BucketType.member)
 
@@ -26,6 +26,7 @@ class levelling(Cog):
         if check_botbanned_user(message.author.id) == True:
             pass
         else:
+            await self.bot.process_commands(message)
             ratelimit = self.get_ratelimit(message)
             if ratelimit is None:
                 if not message.author.bot:
@@ -34,7 +35,7 @@ class levelling(Cog):
                         add_level(message.author.id, message.guild.id)
                     except:
                         pass 
-        await self.bot.process_commands(message)
+        
 
     @jeanne_slash(description="See your level or someone else's level")
     @cooldown(1, 60, bucket=SlashBucket.author)
@@ -112,5 +113,5 @@ class levelling(Cog):
 
                 await ctx.followup.send(embed=embed)
 
-def setup(bot):
+def setup(bot:Bot):
     bot.add_cog(levelling(bot))
