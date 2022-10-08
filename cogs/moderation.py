@@ -1,7 +1,7 @@
 from random import randint
 from nextcord import *
 from nextcord import slash_command as jeanne_slash
-from nextcord.ext.commands import Cog
+from nextcord.ext.commands import Cog, Bot
 from nextcord.ext.application_checks import *
 from nextcord.utils import utcnow
 from datetime import datetime, timedelta
@@ -10,11 +10,17 @@ from assets.db_functions import *
 from assets.buttons import Confirmation
 from nextcord.ext.application_checks.errors import *
 from nextcord.ext.commands.errors import *
+from nextcord.ext import tasks
 
 
 class slashmoderation(Cog):
-    def __init__(self, bot):
+    def __init__(self, bot:Bot):
         self.bot = bot
+        self.check_mutes.start()
+
+    @tasks.loop(seconds=10, reconnect=True)
+    async def check_mutes(self):
+        time_mute()
 
     @jeanne_slash(description="Warn a member")
     @has_permissions(kick_members=True)
@@ -66,8 +72,6 @@ class slashmoderation(Cog):
                         description=f"{member} has been warned. Check {modlog.mention}", color=0xFF0000)
                     await ctx.followup.send(embed=warned)
                     await modlog.send(embed=warn)
-
-
 
     @jeanne_slash(description="Main list_warns command")
     async def list_warns(self, ctx: Interaction):
@@ -265,7 +269,6 @@ class slashmoderation(Cog):
                         description="Ban cancelled", color=Color.red())
                     await ctx.edit_original_message(embed=cancelled, view=None)
 
-
     @jeanne_slash(description="Kick a member out of the server")
     @has_permissions(kick_members=True)
     async def kick(self, ctx: Interaction, member: Member = SlashOption(description="Who do you want to kick?"), reason=SlashOption(description="Give a reason", required=False)):
@@ -309,10 +312,9 @@ class slashmoderation(Cog):
                     await ctx.followup.send(embed=kicked)
                     await modlog.send(embed=kick)
 
-
     @jeanne_slash(description="Bulk delete messages")
     @has_permissions(manage_messages=True)
-    async def prune(self, ctx: Interaction, limit=SlashOption(description="How many messages are you deleting?", required=False), member: Member = SlashOption(description="Who's messages are you deleting?", required=False)):
+    async def prune(self, ctx: Interaction, limit:int=SlashOption(description="How many messages are you deleting?", required=False), member: Member = SlashOption(description="Who's messages are you deleting?", required=False)):
         await ctx.response.defer(ephemeral=True)
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -321,20 +323,18 @@ class slashmoderation(Cog):
                 limit = 100
             
             elif limit > 100:
-                nope=Embed(description="Can't delete that much due to Discord API", color=Color.red())
-                await ctx.followup.send(embed=nope, ephemeral=True)
-
+                limit = 100
+            
             if member:
                 def is_member(m):
                     return m.author == member
 
-                await ctx.channel.purge(limit=int(limit), check=is_member)
+                await ctx.channel.purge(limit=limit, check=is_member)
                 await ctx.followup.send("Done bulk deleting messages")
 
             elif not member:
-                await ctx.channel.purge(limit=int(limit))
+                await ctx.channel.purge(limit=limit)
                 await ctx.followup.send("Done bulk deleting messages")
-
 
     @jeanne_slash(description="Change someone's nickname")
     @has_permissions(manage_nicknames=True)
@@ -348,7 +348,6 @@ class slashmoderation(Cog):
             setnick.add_field(name="Nickname changed",
                               value=f"{member}'s nickname is now `{nickname}`", inline=False)
             await ctx.followup.send(embed=setnick)
-
 
     @jeanne_slash(description="Unbans a user")
     @has_permissions(ban_members=True)
@@ -377,9 +376,60 @@ class slashmoderation(Cog):
                 await ctx.followup.send(embed=unbanned)
                 await modlog.send(embed=unban)
 
-    @jeanne_slash(description="Mute a member")
+    @jeanne_slash(description="Main mute command")
+    async def mute(self, ctx:Interaction):
+        pass
+
+    @mute.subcommand(description="Create a mute role with default mute permissions")
+    @has_permissions(manage_guild=True)
+    async def create_role(self, ctx:Interaction):
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id)==True:
+            pass
+        else:
+            if check_mute_role(ctx.guild.id)==True:
+                e=Embed(description="Server already has a mute role called `{}`".format(ctx.guild.get_role(check_mute_role(ctx.guild.id))), color=Color.red())
+                await ctx.followup.send(embed=e)
+            else:
+                mute_perms=Permissions()
+                mute_perms.add_reactions=False
+                mute_perms.attach_files=False
+                mute_perms.send_messages=False
+                mute_perms.create_private_threads=False
+                mute_perms.create_public_threads = False
+                mute_perms.create_private_threads = False
+                mute_perms.send_messages_in_threads = False
+                mute_perms.send_tts_messages = False
+                mute_perms.speak = False
+                mute_perms.request_to_speak = False
+                mute_perms.connect = False
+
+                a= await ctx.guild.create_role(name="Muted", permissions=mute_perms, reason="Mute role created")
+
+                add_mute_role(ctx.guild.id, a.id)
+
+                for b in a.permissions:
+                    perms=b
+
+                em=Embed(title="Mute role created", description="A mute role has been created.\nHere are all the permissions disabled if a member is muted. You can customize it to your own fit\{}".format(perms), color=ctx.user.color)
+                await ctx.followup.send(embed=em)
+
+    @mute.subcommand(description="Create a mute role with default mute permissions")
+    @has_permissions(manage_guild=True)
+    async def set_role(self, ctx: Interaction, role:Role=SlashOption(required=True)):
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            add_mute_role(ctx.guild.id, role.id)
+
+            e=Embed(title="Mute role set", description="`{}` is the selected mute role".format(role.name), color=ctx.user.color)
+            await ctx.followup.send(embed=e)
+
+    @jeanne_slash(name="member", description="Mute a member")
     @has_permissions(moderate_members=True)
-    async def mute(self, ctx: Interaction, member: Member = SlashOption(description="Who are you muting?", required=True), time=SlashOption(description="How long will the member be muted?", required=False), reason=SlashOption(description="Give a reason", required=False)):
+    @bot_has_permissions(manage_roles=True)
+    async def __member__(self, ctx:Interaction, member:Member=SlashOption(required=True),time=SlashOption(description="How long (1h, 30 minutes, 2 days", required=False), reason=SlashOption(description="Reason for mute", required=False)):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -389,17 +439,18 @@ class slashmoderation(Cog):
                 await ctx.followup.send(embed=failed)
 
             else:
+                if reason == None:
+                    reason="Unspecified"
+                
                 if time == None:
-                    time = '28d'
-
-                if reason is None:
-                    reason = "Unspecified"
+                    mute_member(member.id, ctx.guild.id, round(datetime.now().timestamp))
                 else:
-                    reason = reason
+                    mute_member(member.id, ctx.guild.id, round(datetime.now().timestamp), time)
 
+                mute_role=ctx.guild.get_role(check_mute_role(ctx.guild.id))
 
-                timed = parse_timespan(time)
-                await member.edit(timeout=utcnow()+timedelta(seconds=timed), reason="{} | {}".format(reason, ctx.user))
+                await member.add_roles(mute_role, reason=reason)
+                
                 mute = Embed(
                     title="Member Muted", color=0xFF0000)
                 mute.add_field(name="Member", value=member, inline=True)
@@ -422,11 +473,73 @@ class slashmoderation(Cog):
                         description=f"{member} has been muted. Check {modlog.mention}", color=0xFF0000)
                     await ctx.followup.send(embed=muted)
                     await modlog.send(embed=mute)
-
-
-    @jeanne_slash()
+            
+    @jeanne_slash(description="Unmutes a member")
     @has_permissions(moderate_members=True)
-    async def unmute(self, ctx: Interaction, member: Member = SlashOption(description="Who are you unmuting?", required=True), reason=SlashOption(description="Give a reason", required=False)):
+    @bot_has_permissions(manage_roles=True)
+    async def unmute(self, ctx:Interaction, member:Member=SlashOption(required=True), reason=SlashOption(required=False)):
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            if reason == None:
+                reason = "Unspecified"
+            
+            
+            mute_role = ctx.guild.get_role(check_mute_role(ctx.guild.id))
+            await member.remove_roles(mute_role, reason=reason)
+
+
+    @jeanne_slash(description="Timeout a member using Discord's timeout feature")
+    @has_permissions(moderate_members=True)
+    async def timeout(self, ctx: Interaction, member: Member = SlashOption(description="Who are you muting?", required=True), time:str=SlashOption(description="How long will the member be muted?", required=False), reason=SlashOption(description="Give a reason", required=False)):
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            if member == ctx.user:
+                failed = Embed(description="You can't mute yourself")
+                await ctx.followup.send(embed=failed)
+
+            else:
+                if time == None:
+                    time = '28d'
+
+                if reason == None:
+                    reason = "Unspecified"
+                else:
+                    reason = reason
+
+
+                timed = parse_timespan(time)
+                await member.edit(timeout=utcnow()+timedelta(seconds=timed), reason="{} | {}".format(reason, ctx.user))
+                mute = Embed(
+                    title="Member Timeout", color=0xFF0000)
+                mute.add_field(name="Member", value=member, inline=True)
+                mute.add_field(name="ID", value=member.id, inline=True)
+                mute.add_field(
+                    name="Moderator", value=ctx.user, inline=True)
+                mute.add_field(
+                    name="Duration", value=time, inline=True)
+                mute.add_field(
+                    name="Reason", value=reason, inline=False)
+                mute.set_thumbnail(url=member.display_avatar)
+
+                modlog_id = get_modlog_channel(ctx.guild.id)
+
+                if modlog_id == None:
+                    await ctx.followup.send(embed=mute)
+                else:
+                    modlog = ctx.guild.get_channel(modlog_id)
+                    muted = Embed(
+                        description=f"{member} has been muted. Check {modlog.mention}", color=0xFF0000)
+                    await ctx.followup.send(embed=muted)
+                    await modlog.send(embed=mute)
+
+
+    @jeanne_slash(description="Untimeouts a member")
+    @has_permissions(moderate_members=True)
+    async def untimeout(self, ctx: Interaction, member: Member = SlashOption(description="Who are you unmuting?", required=True), reason=SlashOption(description="Give a reason", required=False)):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -463,5 +576,5 @@ class slashmoderation(Cog):
                     await ctx.followup.send(embed=unmuted)
                     await modlog.send(embed=unmute)
 
-def setup(bot):
+def setup(bot:Bot):
     bot.add_cog(slashmoderation(bot))
