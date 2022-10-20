@@ -1,8 +1,7 @@
-from assets.handler import handler
-
-handler()
 
 from os import listdir
+from assets.handler import handler
+handler()
 from nextcord import *
 from nextcord.ext.commands import Bot as Jeanne
 from config import TOKEN
@@ -30,19 +29,22 @@ bot = Jeanne(intents=intents,
              allowed_mentions=AllowedMentions.all())
 bot.remove_command('help')
 
-for filename in listdir('./cogs'):
+for filename in listdir('./slash cogs'):
   if filename.endswith('.py'):
-    bot.load_extension(f'cogs.{filename[:-3]}')
+    bot.load_extension(f'slash cogs.{filename[:-3]}')
     print(f"{filename} loaded")
 
   else:
     print(f'Unable to load {filename[:-3]}')
 
-
+#bot.load_extension('topgg.topgg_')
 
 @bot.event
 async def on_ready():
+  
   print('Connected to bot: {}'.format(bot.user.name))
   print('Bot ID: {}'.format(bot.user.id))
 
 bot.run(TOKEN)
+
+

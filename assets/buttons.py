@@ -30,3 +30,16 @@ class Heads_or_Tails(ui.View):
     async def cancel(self, button: ui.Button, ctx: Interaction):
         self.value = 'Tails'
         self.stop()
+
+class ViewRoles(ui.View):
+    def __init__(self):
+        super().__init__(timeout=60)
+        self.value = None
+
+    @ui.button(label="Roles", style=ButtonStyle.green)
+    async def roles(self, button: ui.Button, ctx: Interaction):
+        self.value = "roles"
+        self.stop()
+    
+
+    

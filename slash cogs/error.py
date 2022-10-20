@@ -1,10 +1,10 @@
-from nextcord.ext.commands import Cog
+from nextcord.ext.commands import Cog, Bot
 from nextcord import *
 from nextcord.ext.application_checks import ApplicationNSFWChannelRequired, ApplicationMissingPermissions, ApplicationNotOwner, ApplicationBotMissingPermissions
 from nextcord.ext.commands.errors import UserNotFound
 
 class errors(Cog):
-    def __init__(self, bot):
+    def __init__(self, bot:Bot):
         self.bot = bot
 
     @Cog.listener()
@@ -13,8 +13,6 @@ class errors(Cog):
             embed=Embed(description=error, color=Color.red())
             await ctx.send(embed=embed)
         elif isinstance(error, ApplicationNSFWChannelRequired):
-            await ctx.response.defer()
-            embed=Embed(description=error, color=Color.red())
             await ctx.send(embed=embed)
         elif isinstance(error, ApplicationNotOwner):
             embed=Embed(description=error, color=Color.red())
@@ -31,6 +29,7 @@ class errors(Cog):
             embed = Embed(description=error, color=Color.red())
             await ctx.send(embed=embed)
 
+        
 
-def setup(bot):
+def setup(bot:Bot):
     bot.add_cog(errors(bot))

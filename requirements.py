@@ -1,4 +1,4 @@
-#To run this bot, the packages are set and ready to install. Only TopGG is the only package that has the '--no-deps' argument added because discord.py and nextcord will not mix well and you will be expecting some errors
+#To run this bot, the packages are set and ready to install.
 
 from os import system as console
 from platform import system
