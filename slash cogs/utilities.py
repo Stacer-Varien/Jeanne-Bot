@@ -211,7 +211,7 @@ class slashutilities(Cog):
             else:
                     m = await ctx.user.send("Why are you reporting {}?".format(member))
 
-                    await ctx.followup.send("Please go to your [DMs]({}) to report. Please remember that it is private and only authorised personal can view your report".format(m.jump_url), ephemeral=True)
+                    await ctx.followup.send("Please go to your [DMs]({}) to report. Please remember that it is private and only authorised users can view your report".format(m.jump_url), ephemeral=True)
 
                     def check(m:Message):
                         attachments = bool(m.attachments)
