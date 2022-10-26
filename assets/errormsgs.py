@@ -1,4 +1,4 @@
-from nextcord import Embed, Color
+from discord import Embed, Color
 
 owner_only = Embed(title="Owner only command", description="This command failed to commit because you are not the bot owner", color=0xff0000)
 

@@ -2,8 +2,8 @@ import logging
 import sys
 
 def handler():
-    client_logger = logging.getLogger("nextcord.client")
-    state_logger = logging.getLogger("nextcord.state")
+    client_logger = logging.getLogger("discord.client")
+    state_logger = logging.getLogger("discord.state")
 
     FORMAT = "[{asctime}][{filename}][{lineno:3}][{funcName}][{levelname}] {message}"
     formatter = logging.Formatter(FORMAT, style="{")

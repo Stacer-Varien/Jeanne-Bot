@@ -1,8 +1,7 @@
 from datetime import date, datetime, timedelta
 from shutil import rmtree
-from sqlite3 import connect
 from humanfriendly import parse_timespan
-from nextcord import Embed, Color, Emoji
+from discord import Embed, Color, Emoji
 from config import db, inv_db
 from os import listdir, makedirs, path
 from requests import get

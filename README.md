@@ -1,4 +1,6 @@
-Jeanne is a multipurpose bot with miscellaneous, moderation, management and some fun commands. Later, she will have new commands implemented in the nearby future
+## DO NOT FORK AND TEST THIS BRANCH! MOST OF IT IS WRITTEN IN NEXTCORD AND MIGHT BREAK THE BOT ON YOUR SIDE. RATHER USE THE MAIN BRANCH
+
+Jeanne is a multipurpose bot with miscellaneous, moderation, management and some fun commands.
 
 **FEATURES**
 
@@ -13,11 +15,6 @@ Jeanne is a multipurpose bot with miscellaneous, moderation, management and some
 * A welcoming, leaving and modlogging system
 * A partial currency system
 
-**PLANNED FEATURES**
-
-* Changing the server’s name and profile picture
-* Editing channel topics
-* Adding a softban command that will have the user to be banned for a specific amount of time
 
 NOTE: THIS IS FOR EDUCATIONAL PURPORSES. ALSO I WOULD NOT RECOMMENDEND SELFHOSTING THE BOT AS THERE CAN BE CHANGES TO IT SUCH AS ADDING APIS THAT WILL MAKE YOU RUN ALMOST ALL FEATURES OF THE BOT
 

@@ -1,4 +1,4 @@
-from nextcord import ui, ButtonStyle, Interaction
+from discord import ui, ButtonStyle, Interaction
 
 class Confirmation(ui.View):
     def __init__(self):

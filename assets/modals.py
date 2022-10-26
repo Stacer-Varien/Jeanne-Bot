@@ -1,4 +1,4 @@
-from nextcord import *
+from discord import *
 
 from config import WEBHOOK
 
