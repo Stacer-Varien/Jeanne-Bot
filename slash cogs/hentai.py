@@ -1,9 +1,8 @@
 from json import loads
 from random import choice
-from nextcord import *
-from nextcord import slash_command as jeanne_slash
-from nextcord.ext.application_checks import *
-from nextcord.ext.commands import Cog, Bot
+from typing import Optional
+from discord import *
+from discord.ext.commands import Cog, Bot, hybrid_command, Context, is_nsfw
 from requests import get
 from db_functions import check_botbanned_user
 
@@ -12,11 +11,12 @@ class slashnsfw(Cog):
     def __init__(self, bot:Bot):
         self.bot = bot
 
-    @jeanne_slash(description="Get a random hentai from Jeanne")
+    @hybrid_command(name='hentai')
     @is_nsfw()
-    async def hentai(self, ctx: Interaction, rating: str = SlashOption(choices=["questionable", "explicit"], required=False)):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def hentai(self, ctx: Context, rating: Optional[Literal["questionable", "explicit"]]=None) -> None:
+        """Get a random hentai from Jeanne"""
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
 
@@ -37,7 +37,7 @@ class slashnsfw(Cog):
 
             h = [gelbooru_image, yandere_image, konachan_image]
 
-            hentai = choice(h)
+            hentai = str(choice(h))
 
             if hentai == gelbooru_image:
                 source = 'Gelbooru'
@@ -49,15 +49,16 @@ class slashnsfw(Cog):
                 source = 'Konachan'
 
             if hentai.endswith('mp4'):
-                await ctx.followup.send(hentai)
+                await ctx.send(hentai)
             else:
                 embed = Embed(color=0xFFC0CB).set_image(url=hentai).set_footer(text="Fetched from {}".format(source))
-                await ctx.followup.send(embed=embed)
+                await ctx.send(embed=embed)
 
-    @jeanne_slash(description="Get a random media content from Gelbooru")
+    @hybrid_command(name='gelbooru')
     @is_nsfw()
-    async def gelbooru(self, ctx: Interaction, rating:str=SlashOption(choices=["questionable", "explicit"], required=False), tag:str=SlashOption(description="Add a tag for something specific", required=False)):
-        await ctx.response.defer()
+    async def gelbooru(self, ctx: Context, rating:str=SlashOption(choices=["questionable", "explicit"], required=False), tag:str=SlashOption(description="Add a tag for something specific", required=False)):
+        """Get a random media content from Gelbooru"""
+        await ctx.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
