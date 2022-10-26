@@ -1,10 +1,10 @@
 from random import *
-from nextcord import *
-from nextcord import slash_command as jeanne_slash
-from nextcord.ext.commands import Cog, Bot
+from typing import Optional, Union
+from discord import *
+from discord.ext.commands import Cog, Bot, hybrid_command, Context
 from db_functions import add_botbanned_user, check_botbanned_user
 from assets.needed import *
-from config import BB_WEBHOOK, ANIMEME
+from config import BB_WEBHOOK
 from assets.imgur import get_animeme_pic
 
 
@@ -12,10 +12,10 @@ class slashfun(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @jeanne_slash(name='8ball', description="Ask 8 ball anything and you will get your awnser")
-    async def _8ball(self, ctx: Interaction, question=SlashOption(description="What question do you have?")):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    @hybrid_command(name='8ball', aliases=['8b'])
+    async def _8ball(self, ctx: Context, question):
+        """Ask 8 ball anything and you will get your awnser"""
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             embed = Embed(color=0x0000FF)
@@ -23,58 +23,57 @@ class slashfun(Cog):
                             value=f'{question}', inline=False)
             embed.add_field(
                 name="Answer:", value=f'{choice(eight_ball_answers)}', inline=False)
-            await ctx.followup.send(embed=embed)
+            await ctx.send(embed=embed)
 
-    @jeanne_slash(description="Say something and I will say it in reversed text")
-    async def reverse(self, ctx: Interaction, text=SlashOption(description="Type something")):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    @hybrid_command(name='reverse')
+    async def reverse(self, ctx: Context, text):
+        """Say something and I will say it in reversed text"""
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             if any(word in text for word in filtered_words):
                 nope = Embed(description="I am not reversing that",
                              color=Color.red())
-                await ctx.followup.send(embed=nope)
+                await ctx.send(embed=nope)
             elif "raffik" in text:
                 add_botbanned_user(
-                    ctx.user.id, "Using the reversed version of the 'k-word'")
+                    ctx.author.id, "Using the reversed version of the 'k-word'")
                 botbanned = Embed(title="User has been botbanned!",
                                   description="They will no longer use Jeanne,permanently!")
                 botbanned.add_field(name="User",
-                                    value=ctx.user)
-                botbanned.add_field(name="ID", value=ctx.user.id,
+                                    value=ctx.author)
+                botbanned.add_field(name="ID", value=ctx.author.id,
                                     inline=True)
                 botbanned.add_field(name="Reason of ban",
                                     value="Using the reversed version of the 'k-word'",
                                     inline=False)
                 botbanned.set_footer(
                     text="Due to this user botbanned, all data except warnings are immediatley deleted from the database! They will have no chance of appealing their botban and all the commands executed bythem are now rendered USELESS!")
-                botbanned.set_thumbnail(url=ctx.user.avatar)
+                botbanned.set_thumbnail(url=ctx.author.avatar)
                 webhook = SyncWebhook.from_url(BB_WEBHOOK)
                 webhook.send(embed=botbanned)
             else:
-                msg = Embed(description=text[::-1], color=ctx.user.color).set_footer(
-                    text="Author: {} | {}".format(ctx.user, ctx.user.id))
-                await ctx.followup.send(embed=msg)
+                msg = Embed(description=text[::-1], color=ctx.author.color).set_footer(
+                    text="Author: {} | {}".format(ctx.author, ctx.author.id))
+                await ctx.send(embed=msg)
 
-    @jeanne_slash(description="Get a random animeme")
-    async def animeme(self, ctx: Interaction):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    @hybrid_command(name='animeme', aliases=['meme'])
+    async def animeme(self, ctx: Context):
+        """Get a random animeme"""
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             animeme = Embed(color=0x0000FF)
             animeme.set_image(url=get_animeme_pic())
             animeme.set_footer(text="Fetched from animeme1936")
-            await ctx.followup.send(embed=animeme)
+            await ctx.send(embed=animeme)
 
-    @jeanne_slash(description="Combine 2 words to get 2 combined words")
-    async def combine(self, ctx: Interaction, first_word=SlashOption(description="Enter first word"), second_word=SlashOption(description="Enter second word")):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    @hybrid_command(name='combine', aliases=['join'])
+    async def combine(self, ctx: Context, first_word, second_word):
+        """Combine 2 words to get 2 combined words"""
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
-
             option_name1letters = first_word[:round(len(first_word) / 2)]
             option_name2letters = second_word[round(len(second_word) / 2):]
 
@@ -87,32 +86,32 @@ class slashfun(Cog):
             combine = Embed(
                 description=f"**1st combine word**: {combine1}\n**2nd combined word**:{combine2}", color=0x0000FF)
             combine.set_author(name=f"{first_word} + {second_word}")
-            await ctx.followup.send(embed=combine)
+            await ctx.send(embed=combine)
 
-    @jeanne_slash(description="Give me a lot of choices and I will pick one for you")
-    async def choose(self, ctx: Interaction, choices: str = SlashOption(description="Add your choices here. Seperate them with ',' to split them")):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    @hybrid_command(name='choose', aliases=['pick'])
+    async def choose(self, ctx: Context,*, choices: str):
+        """Give me a lot of choices and I will pick one for you. Seperate each choice with ','"""
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             choices = choices.split(sep=",")
             choose = Embed(
                 description=f"I chose **{choice(choices)}**", color=0x0000FF)
-            await ctx.followup.send(embed=choose)
+            await ctx.send(embed=choose)
 
-    @jeanne_slash(description="Check how much of a simp you are")
-    async def simp_rate(self, ctx: Interaction, member: Member = SlashOption(description="Which member you want to check their simp rate?", required=False)):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    @hybrid_command(name='simp_rate', aliases=['simp', 'howsimp', 'simprate'])
+    async def simp_rate(self, ctx: Context, member: Optional[Member]=None)-> None:
+        """Check how much of a simp you are"""
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             perc = randint(0, 100)
 
             if member == None:
-                member = ctx.user
+                member = ctx.author
 
             simp = Embed(description="{}'s simp rate is {}%".format(
-                member, perc), color=ctx.user.color)
+                member, perc), color=ctx.author.color)
 
             if perc > 60:
                 simp.set_image(url="https://i.imgur.com/W4u4Igk.jpg")
@@ -120,21 +119,22 @@ class slashfun(Cog):
             elif perc > 40:
                 simp.set_image(url="https://i.imgur.com/Rs1IP2I.jpg")
 
-            await ctx.followup.send(embed=simp)
+            await ctx.send(embed=simp)
 
-    @jeanne_slash(description="Check how gay you are")
-    async def gay_rate(self, ctx: Interaction, member: Member = SlashOption(description="Which member do you want to check their gay rate?", required=False)):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    @hybrid_command(name='gay_rate')
+    async def gay_rate(self, ctx: Context, member: Optional[Member] = None)->None:
+        """Check how gay you are"""
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             perc = randint(0, 100)
 
             if member == None:
-                member = ctx.user
+                member = ctx.author
 
             gay = Embed(description="{}'s gay rate is {}%".format(member, perc),
-                        color=ctx.user.color)
+                        color=ctx.author.color)
 
             if perc > 60:
                 gay.set_image(url="https://i.imgur.com/itOD0Da.png?1")
@@ -142,8 +142,8 @@ class slashfun(Cog):
             elif perc > 40:
                 gay.set_image(url="https://i.imgur.com/tYAbWCl.jpg")
 
-            await ctx.followup.send(embed=gay)
+            await ctx.send(embed=gay)
 
 
-def setup(bot: Bot):
-    bot.add_cog(slashfun(bot))
+async def setup(bot: Bot):
+    await bot.add_cog(slashfun(bot))
