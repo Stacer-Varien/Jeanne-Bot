@@ -12,6 +12,7 @@ class errors(Cog):
             embed=Embed(description=error, color=Color.red())
             await ctx.send(embed=embed)
         elif isinstance(error, NSFWChannelRequired):
+            embed = Embed(description=error, color=Color.red())
             await ctx.send(embed=embed)
         elif isinstance(error, NotOwner):
             embed=Embed(description=error, color=Color.red())
