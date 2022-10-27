@@ -1,14 +1,13 @@
 import contextlib
 from io import StringIO
-from nextcord.ext.commands import Cog, Bot
-from nextcord import *
-from nextcord import slash_command as jeanne_slash
+from discord.ext.commands import Cog, Bot, hybrid_group, hybrid_command, is_owner, guild_only, Context, Greedy, command
+from discord import *
 from os import execv
 from sys import executable, argv
 from db_functions import add_botbanned_user, check_botbanned_user
 from config import BB_WEBHOOK
-from nextcord.ext.application_checks import *
 from time import time
+from typing import Literal, Optional
 
 def restart_bot():
   execv(executable, ['python'] + argv)
@@ -18,46 +17,52 @@ class slashowner(Cog):
         self.bot = bot
 
 
-    @jeanne_slash(description="Main Activity Command")
-    async def activity(self, ctx : Interaction):
-        pass
+    @hybrid_group(aliases=['act', 'pressence'])
+    async def activity(self, ctx : Context):
+        if check_botbanned_user(ctx.author.id) == True:
+            pass
+        else:
+            embed = Embed(title="This is a group command. However, the available commands for this is:",
+                          description="`activity play ACTIVITY`\n`activity listen ACTIVITY`\n`activity clear`")
+            await ctx.send(embed=embed)
 
-    @activity.subcommand(description="Make Jeanne play something as an activity")
+    @activity.command(aliases=['playing'])
     @is_owner()
-    async def play(self, ctx: Interaction, activity=SlashOption(description="What is the new activity")):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def play(self, ctx: Context, activity:str):
+        """Make Jeanne play something as an activity"""
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             await self.bot.change_presence(activity=Game(name=activity))
-            await ctx.followup.send(f"Bot's activity changed to `playing {activity}`")
+            await ctx.send(f"Jeanne is now playing `{activity}`")
 
-    @activity.subcommand(description="Make Jeanne listen to something as an activity")
+    @activity.command(aliases=['listening'])
     @is_owner()
-    async def listen(self, ctx: Interaction, activity=SlashOption(description="What is the new activity")):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def listen(self, ctx: Context, activity:str):
+        """Make Jeanne listen to something as an activity"""
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             await self.bot.change_presence(activity=Activity(type=ActivityType.listening, name=activity))
-            await ctx.followup.send(f"Bot's activity changed to `listening to {activity}`")
+            await ctx.send(f"Jeanne is now listening to `{activity}`")
 
-    @activity.subcommand(description="Clears the bot's activity")
+    @activity.command(aliases=['remove', 'clean', 'stop'])
     @is_owner()
-    async def clear(self, ctx: Interaction):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def clear(self, ctx: Context):
+        """Clears the bot's activity"""
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             await self.bot.change_presence(activity=None)
-            await ctx.followup.send(f"Bot's activity removed")
+            await ctx.send(f"Jeanne's activity has been removed")
 
 
-    @jeanne_slash(description="Finds a user")
+    @hybrid_command(aliases=['fuser'])
     @is_owner()
-    async def finduser(self, ctx: Interaction, user_id=SlashOption(description="Which user?")):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def finduser(self, ctx: Context, user_id:int):
+        """Finds a user"""
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             user = await self.bot.fetch_user(user_id)
@@ -76,33 +81,35 @@ class slashowner(Cog):
                     name="Bot?", value=botr, inline=True)
             fuser.set_image(url=user.display_avatar)
             if user.banner==None:
-                    await ctx.followup.send(embed=fuser)
+                    await ctx.send(embed=fuser)
             else:
                 userbanner = Embed(title="User Banner", color=0xccff33)
                 userbanner.set_image(url=user.banner)
 
                 e = [fuser, userbanner]
-                await ctx.followup.send(embeds=e)
+                await ctx.send(embeds=e)
 
-    @jeanne_slash(description="Restart me to be updated")
+    @hybrid_command(aliases=['restart', 'refresh'])
     @is_owner()
-    async def update(self, ctx:Interaction):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def update(self, ctx:Context):
+        """Restart me so I can be updated"""
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
-            await ctx.followup.send(f"YAY! NEW UPDATE!")
+            await ctx.send(f"YAY! NEW UPDATE!")
             restart_bot()
     
-    @jeanne_slash(description="Botban a user from using the bot")
+    @hybrid_command(aliases=['forbid', 'disallow', 'bban', 'bb'])
     @is_owner()
-    async def botban(self, ctx: Interaction, user_id=SlashOption(description="Which user?"), reason = SlashOption(description="Add a reason")):
-        await ctx.response.defer(ephemeral=True)
-        if check_botbanned_user(ctx.user.id) == True:
+    async def botban(self, ctx: Context, user_id:int, reason:str):
+        """Botban a user from using the bot"""
+        await ctx.defer(ephemeral=True)
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:   
             user= await self.bot.fetch_user(user_id)
-            add_botbanned_user(user_id, reason) is True                     
+            add_botbanned_user(user_id, reason)==True                     
 
             botbanned=Embed(title="User has been botbanned!", description="They will no longer use Jeanne,permanently!")
             botbanned.add_field(name="User",
@@ -117,25 +124,25 @@ class slashowner(Cog):
             webhook = SyncWebhook.from_url(BB_WEBHOOK)
             webhook.send(embed=botbanned)
 
-            await ctx.followup.send("User botbanned", ephemeral=True)
+            await ctx.send("User botbanned", ephemeral=True)
 
-    @jeanne_slash(description="Evaluates a code")
+    @hybrid_command(aliases=['eval', 'execute', 'exe'])
     @is_owner()
-    async def evaluate(self, ctx: Interaction, raw=SlashOption(choices=["True", "False"], required=False)):
-        await ctx.response.defer()
-        check = check_botbanned_user(ctx.user.id)
-        if check == ctx.user.id:
+    async def evaluate(self, ctx: Context, raw:Optional[Literal["True", "False"]]):
+        """Evaluates a code"""
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
-            await ctx.followup.send("Insert your code.\nType 'cancel' if you don't want to evaluate")
+            m = await ctx.send("Insert your code.\nType 'cancel' if you don't want to evaluate")
             def check(m:Message):
-                return m.author == ctx.user and m.content
+                return m.author == ctx.author and m.content
 
             code = await self.bot.wait_for('message', check=check)
             eval=str(code.content)
 
             if eval.startswith("cancel"):
-                await ctx.edit_original_message(content="Evaluation aborted")
+                await m.edit(content="Evaluation aborted")
             elif eval.startswith("```") and eval.endswith("```"):
                 str_obj = StringIO()
                 start_time = time()
@@ -149,18 +156,50 @@ class slashowner(Cog):
                     end_time = time()
                     embed.set_footer(
                         text=f"Compiled in {round((end_time - start_time) * 1000)}ms")
-                    return await ctx.followup.send(embed=embed)
+                    return await ctx.send(embed=embed)
                 if raw == None:
                     embed1 = Embed(title="Evaluation suscessful! :white_check_mark: \nResults:",
                             description=f'```{str_obj.getvalue()}```', color=0x008000)
                     end_time = time()
                     embed1.set_footer(
                         text=f"Compiled in {round((end_time - start_time) * 1000)}ms")
-                    await ctx.followup.send(embed=embed1)
+                    await ctx.send(embed=embed1)
                 else:
-                    await ctx.followup.send(str_obj.getvalue())
-    
+                    await ctx.send(str_obj.getvalue())
+
+    @command()
+    @guild_only()
+    @is_owner()
+    async def sync(self, ctx: Context, guilds: Greedy[Object], spec: Optional[Literal["~", "*", "^"]] = None) -> None:
+        if not guilds:
+            if spec == "~":
+                synced = await self.bot.tree.sync(guild=ctx.guild)
+            elif spec == "*":
+                self.bot.tree.copy_global_to(guild=ctx.guild)
+                synced = await self.bot.tree.sync(guild=ctx.guild)
+            elif spec == "^":
+                self.bot.tree.clear_commands(guild=ctx.guild)
+                await self.bot.tree.sync(guild=ctx.guild)
+                synced = []
+            else:
+                synced = await self.bot.tree.sync()
+
+            await ctx.send(
+                f"Synced {len(synced)} commands {'globally' if spec is None else 'to the current guild.'}"
+            )
+            return
+
+        ret = 0
+        for guild in guilds:
+            try:
+                await self.bot.tree.sync(guild=guild)
+            except HTTPException:
+                pass
+            else:
+                ret += 1
+
+        await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
 
 
-def setup(bot:Bot):
-    bot.add_cog(slashowner(bot))
+async def setup(bot:Bot):
+    await bot.add_cog(slashowner(bot))
