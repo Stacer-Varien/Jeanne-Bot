@@ -196,9 +196,9 @@ def use_wallpaper(name, user):
         "UPDATE userWallpaperInventory SET wallpaper = ? WHERE user_id = ?", (name, user,))
 
 def fetch_user_inventory(user: int):
-    inventory = listdir("./User_Inventories/{}/wallpapers/".format(user))
-    inventory.sort()
-    return '\n'.join(inventory)
+    for wallpaper in listdir("./User_Inventories/{}/wallpapers/".format(user)):
+        if wallpaper.endswith('.png'):
+            return wallpaper[:-3]
     
 
 

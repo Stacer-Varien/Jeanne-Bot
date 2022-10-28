@@ -6,12 +6,12 @@ class Confirmation(ui.View):
         self.value = None
 
     @ui.button(label="Confirm", style=ButtonStyle.green)
-    async def confirm(self, button: ui.Button, ctx: Interaction):
+    async def confirm(self, ctx: Interaction, button: ui.Button):
         self.value = True
         self.stop()
 
     @ui.button(label="Cancel", style=ButtonStyle.red)
-    async def cancel(self, button: ui.Button, ctx: Interaction):
+    async def cancel(self,ctx: Interaction, button: ui.Button) :
         self.value = False
         self.stop()
 

@@ -1,10 +1,8 @@
-
+from config import TOKEN, prefixes
+from discord.ext.commands import Bot
+from discord import *
 from os import listdir
 from assets.handler import handler
-handler()
-from discord import *
-from discord.ext.commands import Bot
-from config import TOKEN, prefixes
 #from discord.gateway import DiscordWebSocket
 
 #class MyDiscordWebSocket(DiscordWebSocket):
@@ -25,6 +23,7 @@ class Jeanne(Bot):
     async def setup_hook(self):
         self.tree.copy_global_to(guild=MY_GUILD)
         await self.tree.sync(guild=MY_GUILD)
+        #slash cogs
         for filename in listdir('./slash cogs'):
           if filename.endswith('.py'):
             await bot.load_extension(f'slash cogs.{filename[:-3]}')
@@ -32,8 +31,6 @@ class Jeanne(Bot):
 
           else:
             print(f'Unable to load {filename[:-3]}')
-              
-
 
 intents = Intents().all()
 intents.presences = False
@@ -53,4 +50,4 @@ async def on_ready():
   print('Connected to bot: {}'.format(bot.user.name))
   print('Bot ID: {}'.format(bot.user.id))
 
-bot.run(TOKEN)
+bot.run(TOKEN, log_handler=handler())
