@@ -1,5 +1,5 @@
 from random import *
-from typing import Optional, Union
+from typing import Optional
 from discord import *
 from discord.ext.commands import Cog, Bot, hybrid_command, Context
 from db_functions import add_botbanned_user, check_botbanned_user
