@@ -1,12 +1,10 @@
 from asyncio import get_event_loop
 from functools import partial
-from nextcord.ext.commands import Cog, CooldownMapping, BucketType, AutoShardedBot as Bot
-from nextcord import *
-from nextcord import slash_command as jeanne_slash
+from discord.ext.commands import Cog, CooldownMapping, BucketType, Bot, hybrid_command, hybrid_group, Context, cooldown
+from discord import *
 from db_functions import add_level, add_xp, check_botbanned_user, get_global_rank, get_member_level, get_member_xp, get_server_rank, selected_wallpaper, get_user_level, get_user_xp
-from typing import Optional
+from typing import Optional, Literal
 from assets.generators.level_card import Level
-from cooldowns import *
 
 class levelling(Cog):
     def __init__(self, bot:Bot):
@@ -37,15 +35,15 @@ class levelling(Cog):
                         pass 
         
 
-    @jeanne_slash(description="See your level or someone else's level")
-    @cooldown(1, 60, bucket=SlashBucket.author)
-    async def level(self, ctx: Interaction, member: Member = SlashOption(description="Which member?", required=False)):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    @hybrid_command(description="See your level or someone else's level")
+    @cooldown(1, 60, type=BucketType.user)
+    async def level(self, ctx: Context, member: Optional[Member] = None)->None:
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
-            if member is None:
-                    member = ctx.user
+            if member == None:
+                member = ctx.author
             try:
                 slvl = get_member_level(member.id, ctx.guild.id)
                 sexp = get_member_xp(member.id, ctx.guild.id)
@@ -71,20 +69,21 @@ class levelling(Cog):
                 image = await get_event_loop().run_in_executor(None, func)
 
                 file = File(fp=image, filename=f'{member.name}_level_card.png')
-                await ctx.followup.send(file=file)
+                await ctx.send(file=file)
             except:
                 no_exp = Embed(description="Failed to get level stats")
-                await ctx.followup.send(embed=no_exp)
+                await ctx.send(embed=no_exp)
 
 
-    @jeanne_slash(description="Check the users with the most XP in the server")
-    @cooldown(1, 60, bucket=SlashBucket.author)
-    async def rank(self, ctx: Interaction, type=SlashOption(description="Server or Global specific?", choices=["server", "global"])):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    @hybrid_group(description="Check the users with the most XP in the server")
+    @cooldown(1, 60, type=BucketType.user)
+    async def rank(self, ctx: Context, type:Optional[Literal["server", "global"]]=None)->None:
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
-            if type == "server":
+
+            if type == "server" or None:
 
                 embed = Embed(color=0xFFD700)
                 embed.set_author(name="XP Leaderboard")
@@ -97,7 +96,7 @@ class levelling(Cog):
                     embed.add_field(name="_ _", value=f"**{r}**. {p}")
                     r += 1
 
-                await ctx.followup.send(embed=embed)
+                await ctx.send(embed=embed)
             
             elif type == "global":
                 embed = Embed(color=0xFFD700)
@@ -111,7 +110,7 @@ class levelling(Cog):
                     embed.add_field(name="_ _", value=f"**{r}**. {p}")
                     r += 1
 
-                await ctx.followup.send(embed=embed)
+                await ctx.send(embed=embed)
 
-def setup(bot:Bot):
-    bot.add_cog(levelling(bot))
+async def setup(bot:Bot):
+    await bot.add_cog(levelling(bot))
