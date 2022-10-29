@@ -1,51 +1,54 @@
 from db_functions import *
-from nextcord import *
-from nextcord import slash_command as jeanne_slash
-from nextcord.ext.commands import Cog, Bot
-from nextcord.abc import GuildChannel
-from nextcord.ext.application_checks import *
+from discord import *
+from discord.ext.commands import Cog, Bot, Context, hybrid_group, hybrid_command, has_permissions
+from discord.abc import GuildChannel
 from humanfriendly import format_timespan, parse_timespan
+from typing import Optional, Literal
 
 
 class slashmanage(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @jeanne_slash(description="Add a role to a member")
+    @hybrid_command(description="Add a role to a member", aliases=['ar'])
     @has_permissions(manage_roles=True)
-    async def add_role(self, ctx: Interaction, member: Member = SlashOption(description="Which member?"), role: Role = SlashOption(description="Which role will you add?")):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def add_role(self, ctx: Context, member: Member, role: Role):
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             await member.add_roles(role)
             embed = Embed(color=0x00FF68)
             embed.add_field(name=f"Role given",
                             value=f"`{role}` was given to `{member}`", inline=False)
-            await ctx.followup.send(embed=embed)
+            await ctx.send(embed=embed)
 
-    @jeanne_slash(description="Remove a role from a member")
+    @hybrid_command(description="Remove a role from a member", aliases=['rr'])
     @has_permissions(manage_roles=True)
-    async def remove_role(self, ctx: Interaction, member: Member = SlashOption(description="Which member?"), role: Role = SlashOption(description="Which role will you delete?")):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def remove_role(self, ctx: Context, member: Member, role: Role):
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             await member.remove_roles(role)
             embed = Embed(color=0x00FF68)
             embed.add_field(name=f"Role removed",
                             value=f"`{role}` was removed from `{member}`", inline=False)
-            await ctx.followup.send(embed=embed)
+            await ctx.send(embed=embed)
 
-    @jeanne_slash(description="Main create command")
-    async def create(self, ctx: Interaction):
-        pass
+    @hybrid_group(description="Main create command")
+    async def create(self, ctx: Context):
+        if check_botbanned_user(ctx.author.id) == True:
+            pass
+        else:
+            embed = Embed(title="This is a group command. However, the available commands for this is:",
+                            description="```create text_channel NAME CATEGORY SLOWMODE\ncreate voice_channel NAME CATEGORY\ncreate category NAME\ncreate stage_channel NAME TOPIC CATEGORY\ncreate forum NAME TOPIC CATEGORY\ncreate role NAME COLOR HOISTED MENTIONABLE\ncreate thread NAME MESSAGE_ID SLOWMODE```")
+            await ctx.send(embed=embed)
 
-    @create.subcommand(description='Create a text channel')
+    @create.command(description='Create a text channel', aliases=['txtch', 'tc'])
     @has_permissions(manage_channels=True)
-    async def text_channel(self, ctx: Interaction, name: str = SlashOption(description="What will you name it?", required=True), category: GuildChannel = SlashOption(description="Which category will it be placed?", channel_types=[ChannelType.category], required=False), slowmode: str = SlashOption(description="How long is the slowmode (1s, 1h30m)? Maxinum is 6 hours", required=False)):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def text_channel(self, ctx: Context, name: str, *, category: Optional[CategoryChannel]=None, slowmode: str = None)->None:
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
 
@@ -53,14 +56,13 @@ class slashmanage(Cog):
             embed.color = Color.green()
             embed.description = "Text Channel `{}` has been created".format(
                 name)
+            
+            channel = await ctx.guild.create_text_channel(name=name)
 
             if category:
-                channel = await ctx.guild.create_text_channel(name=name, category=category)
+                await channel.edit(category=category)
                 embed.add_field(name="Added into category",
                                 value=category.name, inline=True)
-
-            else:
-                channel = await ctx.guild.create_text_channel(name)
 
             if slowmode:
                 delay = int(parse_timespan(slowmode))
@@ -70,36 +72,35 @@ class slashmanage(Cog):
                 embed.add_field(name="Slowmode",
                                 value=format_timespan(delay), inline=True)
 
-            await ctx.followup.send(embed=embed)
+            await ctx.send(embed=embed)
 
-    @create.subcommand(description='Create a text channel')
+    @create.command(description='Create a voice channel', aliases=['vch', 'vc'])
     @has_permissions(manage_channels=True)
-    async def voice_channel(self, ctx: Interaction, name: str = SlashOption(description="What will you name it?", required=True), category: GuildChannel = SlashOption(description="Which category will it be placed?", channel_types=[ChannelType.category], required=False)):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def voice_channel(self, ctx: Context, name: str, *,category: Optional[CategoryChannel] = None)->None:
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
-
             embed = Embed()
             embed.description = "Voice Channel `{}` has been created".format(
                 name)
             embed.color = Color.green()
 
+            channel=await ctx.guild.create_voice_channel(name=name)
+
             if category:
-                await ctx.guild.create_voice_channel(name=name, category=category)
+                await channel.edit(category=category)
                 embed.add_field(name="Added into category",
                                 value=category.name, inline=True)
 
-            else:
-                await ctx.guild.create_voice_channel(name)
 
-            await ctx.followup.send(embed=embed)
+            await ctx.send(embed=embed)
 
-    @create.subcommand(description='Create a category')
+    @create.command(description='Create a category', aliases=['cat', 'catch'])
     @has_permissions(manage_channels=True)
-    async def category(self, ctx: Interaction, name: str = SlashOption(description="What will you name it?", required=True)):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def category(self, ctx: Context, name: str):
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             await ctx.guild.create_category(name=name)
@@ -107,13 +108,13 @@ class slashmanage(Cog):
             embed.description = "Category `{}` has been created".format(name)
             embed.color = Color.green()
 
-            await ctx.followup.send(embed=embed)
+            await ctx.send(embed=embed)
 
-    @create.subcommand(description='Create a stage channel')
+    @create.command(description='Create a stage channel', aliases=['stage', 'stagech'])
     @has_permissions(manage_channels=True)
-    async def stage_channel(self, ctx: Interaction, name: str = SlashOption(description="What will you name it?", required=True), topic: str = SlashOption(required=True), category: GuildChannel = SlashOption(description="Which category will it be placed?", channel_types=[ChannelType.category], required=False)):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def stage_channel(self, ctx: Context, name: str, *,topic: str, category: Optional[CategoryChannel] = None)->None:
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             await ctx.guild.create_stage_channel(name=name, topic=topic, category=category)
@@ -122,16 +123,16 @@ class slashmanage(Cog):
                 name)
             embed.color = Color.green()
 
-            await ctx.followup.send(embed=embed)
+            await ctx.send(embed=embed)
 
-    @create.subcommand(description="Create a forum [experimental]. If you see an error message but it exists, it works but improperly")
+    @create.command(description="Create a forum [experimental]. If you see an error message but it exists, it works but improperly")
     @has_permissions(manage_channels=True)
-    async def forum(self, ctx: Interaction, name: str = SlashOption(description="What will you name it?", required=True), topic: str = SlashOption(description="What is the topic?", required=True), category: GuildChannel = SlashOption(description="Which category will it be placed?", channel_types=[ChannelType.category], required=False)):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def forum(self, ctx: Context, name: str, *,topic: str, category: Optional[CategoryChannel]=None)->None:
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
-            forum = await ctx.guild.create_forum_channel(name=name, topic=topic)
+            forum = await ctx.guild.create_forum(name=name, topic=topic)
             embed = Embed()
             embed.description = "Forum `{}` has been created".format(
                 forum.name)
@@ -141,13 +142,13 @@ class slashmanage(Cog):
                 embed.add_field(name="Added into category",
                                 value=category.name, inline=True)
 
-            await ctx.followup.send(embed=embed)
+            await ctx.send(embed=embed)
 
-    @create.subcommand(description="Create a role")
+    @create.command(description="Create a role", aliases=['r'])
     @has_permissions(manage_roles=True)
-    async def role(self, ctx: Interaction, name=SlashOption(description="What will you name it?", required=True), color=SlashOption(required=False), hoisted=SlashOption(choices=["True", "False"], description="Should it be displayed seperately in the members list?", required=False), mentionable=SlashOption(choices=["True", "False"], description="Should it be mentionable?", required=False)):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def role(self, ctx: Context, name:str,*, color, hoisted:Optional[Literal["True", "False"]]=None, mentionable:Optional[Literal["True", "False"]]=None)->None:
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             role = await ctx.guild.create_role(name=name)
@@ -174,13 +175,13 @@ class slashmanage(Cog):
                 elif mentionable == "False":
                     pass
 
-            await ctx.followup.send(embed=embed)
+            await ctx.send(embed=embed)
 
-    @create.subcommand(description="Makes a thread channel")
+    @create.command(description="Makes a thread channel")
     @has_permissions(create_public_threads=True)
-    async def thread(self, ctx: Interaction, name: str = SlashOption(required=True), message_id=SlashOption(description="Add the message ID here", required=True), slowmode: str = SlashOption(description="How long is the slowmode (1s, 1h30m)? Maxinum is 6 hours", required=False)):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def thread(self, ctx: Context, name: str, message_id:int, slowmode: Optional[str]=None)->None:
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             message = await ctx.channel.fetch_message(message_id)
@@ -199,45 +200,53 @@ class slashmanage(Cog):
                 embed.add_field(name="Slowmode",
                                 value=format_timespan(delay), inline=True)
 
-            await ctx.followup.send(embed=embed)
+            await ctx.send(embed=embed)
 
-    @jeanne_slash(description="Main delete command")
-    async def delete(self, ctx: Interaction):
-        pass
+    @hybrid_group(description="Main delete command", aliases='del')
+    async def delete(self, ctx: Context):
+        if check_botbanned_user(ctx.author.id) == True:
+            pass
+        else:
+            embed = Embed(title="This is a group command. However, the available commands for this is:",
+                          description="```delete channel CHANNEL\ndelete role ROLE```")
+            await ctx.send(embed=embed)
 
-    @delete.subcommand(description="Deletes a channel")
+    @delete.command(description="Deletes a channel", aliases=['ch'])
     @has_permissions(manage_channels=True)
-    async def channel(self, ctx: Interaction, channel: GuildChannel = SlashOption(channel_types=[ChannelType.text,   ChannelType.voice, ChannelType.category, ChannelType.news, ChannelType.public_thread, ChannelType.private_thread], description="Choose a channel to delete", required=True)):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def channel(self, ctx: Context, channel: GuildChannel):
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             await channel.delete()
             embed = Embed(description="{} has been deleted".format(
                 channel.name), color=0x00FF68)
-            await ctx.followup.send(embed=embed)
+            await ctx.send(embed=embed)
 
-    @delete.subcommand(name="role", description="Deletes a role")
+    @delete.command(name="role", description="Deletes a role", aliases=['r', 'role'])
     @has_permissions(manage_channels=True)
-    async def role_1(self, ctx: Interaction, role: Role = SlashOption(description="Choose a role to delete", required=True)):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def role_1(self, ctx: Context, role: Role):
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             await role.delete()
             embed = Embed(description="{} has been deleted".format(
                 role.name), color=0x00FF68)
-            await ctx.followup.send(embed=embed)
+            await ctx.send(embed=embed)
 
-    @jeanne_slash(description="Main edit command")
-    async def edit(self, ctx: Interaction):
-        pass
+    @hybrid_group(description="Main edit command")
+    async def edit(self, ctx: Context):
+        if check_botbanned_user(ctx.author.id) == True:
+            pass
+        else:
+            embed = Embed(title="This is a group command. However, the available commands for this is:",
+                          description="```edit text_channel CHANNEL NAME NSFW_ENABLED SLOWMODE CATEGORY\nedit thread THREAD NAME SLOWMODE```")
+            await ctx.send(embed=embed)
 
     @edit.subcommand(name="text_channel", description="Edits a text/news channel")
     @has_permissions(manage_channels=True)
-    async def text_channel_1(self, ctx: Interaction, channel: GuildChannel = SlashOption(channel_types=[ChannelType.news, ChannelType.text], required=True), name: str = SlashOption(required=False), nsfw_enabled=SlashOption(choices=["True", "False"], required=False), slowmode: str = SlashOption(description="How long is the slowmode (1s, 1h30m)? Maxinum is 6 hours", required=False), category: GuildChannel = SlashOption(channel_types=[ChannelType.category], required=False)):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def text_channel_1(self, ctx: Context, channel: TextChannel, name: Optional[str]=None,*, nsfw_enabled:Literal["True", "False"]=None, slowmode: Optional[str]=None, category: Optional[CategoryChannel]=None)->None:
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             embed = Embed()
@@ -272,13 +281,13 @@ class slashmanage(Cog):
                 embed.add_field(name="Slowmode",
                                 value=format_timespan(delay), inline=True)
 
-            await ctx.followup.send(embed=embed)
+            await ctx.send(embed=embed)
 
     @edit.subcommand(name="thread", description="Edits a thread")
     @has_permissions(manage_channels=True)
-    async def thread_1(self, ctx: Interaction, thread: GuildChannel = SlashOption(channel_types=[ChannelType.private_thread, ChannelType.public_thread], required=True), name: str = SlashOption(required=False), slowmode: str = SlashOption(description="How long is the slowmode (1s, 1h30m)? Maxinum is 6 hours", required=False)):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def thread_1(self, ctx: Context, thread: Thread, name: Optional[str]=None, slowmode: Optional[str]=None)->None:
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             embed = Embed()
@@ -298,13 +307,13 @@ class slashmanage(Cog):
                 embed.add_field(name="Slowmode",
                                 value=format_timespan(delay), inline=True)
 
-            await ctx.followup.send(embed=embed)
+            await ctx.send(embed=embed)
 
     @edit.subcommand(name="role", description="Edit a role")
     @has_permissions(manage_roles=True)
-    async def role_2(self, ctx: Interaction, role: Role = SlashOption(required=True), name: str = SlashOption(description="What will you name it?", required=False), color=SlashOption(required=False), hoisted=SlashOption(choices=["True", "False"], description="Should it be displayed seperately in the members list?", required=False), mentionable=SlashOption(choices=["True", "False"], description="Should it be mentionable?", required=False)):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def role_2(self, ctx: Context, role: Role, name: Optional[str] = None, *,color=None, hoisted:Literal["True", "False"]=None, mentionable:Literal["True", "False"]=None)->None:
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             embed = Embed()
@@ -337,13 +346,13 @@ class slashmanage(Cog):
                     embed.add_field(name="Mentionable",
                                     value="No", inline=True)
 
-            await ctx.followup.send(embed=embed)
+            await ctx.send(embed=embed)
 
-    @edit.subcommand(description="Edits the server")
+    @edit.command(description="Edits the server")
     @has_permissions(manage_guild=True)
-    async def server(self, ctx: Interaction, name: str = SlashOption(required=False), description: str = SlashOption(required=False), verification_level=SlashOption(choices=['none', 'low', 'medium', 'high', 'highest'], required=False)):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def server(self, ctx: Context, name: Optional[str] = None, description: Optional[str] = None, verification_level:Literal['none', 'low', 'medium', 'high', 'highest']=None)->None:
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             embed = Embed()
@@ -390,7 +399,7 @@ class slashmanage(Cog):
                     embed.add_field(name="Verification Level", value="{}\nMembers must have a verified phone number".format(
                         verification_level), inline=True)
 
-            await ctx.followup.send(embed=embed)
+            await ctx.send(embed=embed)
 
     @edit.subcommand(name="forum", description="Edits a forum")
     @has_permissions(manage_channels=True)
