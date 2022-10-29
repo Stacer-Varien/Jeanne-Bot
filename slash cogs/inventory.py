@@ -140,8 +140,8 @@ class inventory(Cog):
                    description="This background image is not in your inventory", color=Color.red())
                await ctx.send(embed=embed)
 
-    @background.command(description="Buy a custom background pic for your level card", aliases=['buy custom', 'custom'])
-    async def buy_custom(self, ctx:Context, name:str, *,link:Optional[str]=None, attachment:Optional[Attachment]=None)->None:
+    @background.command(description="Buy a custom background pic for your level card", aliases=['custom'])
+    async def buy_custom(self, ctx:Context, name:str, link:str)->None:
         await ctx.defer()
         if check_botbanned_user(ctx.author.id) == True:
             pass
@@ -157,17 +157,8 @@ class inventory(Cog):
                     description='You do not have enough QP.\nPlease get more QP by doing `/daily`, `/guess` and/or `/dice`')
                 await ctx.send(embed=notenough)
             
-            elif attachment and link ==None:
-                nothing = Embed(
-                    description='There is no link or attachment...\nPlease add a valid image link or attachement')
-                await ctx.send(embed=nothing)
 
             else:
-                if not attachment:
-                    link=link
-
-                if not link:
-                    link=attachment.url
 
                 alert="""
 Before you buy a custom background picture, did you make sure the image is:
