@@ -24,7 +24,6 @@ class levelling(Cog):
         if check_botbanned_user(message.author.id) == True:
             pass
         else:
-            await self.bot.process_commands(message)
             ratelimit = self.get_ratelimit(message)
             if ratelimit is None:
                 if not message.author.bot:
