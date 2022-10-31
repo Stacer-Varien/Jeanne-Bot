@@ -10,7 +10,7 @@ class slashmanage(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @hybrid_command(description="Add a role to a member", aliases=['ar'])
+    @hybrid_command(description="Add a role to a member", aliases=['ar', 'addrole'])
     @has_permissions(manage_roles=True)
     async def add_role(self, ctx: Context, member: Member, role: Role):
         if check_botbanned_user(ctx.author.id) == True:
@@ -22,7 +22,7 @@ class slashmanage(Cog):
                             value=f"`{role}` was given to `{member}`", inline=False)
             await ctx.send(embed=embed)
 
-    @hybrid_command(description="Remove a role from a member", aliases=['rr'])
+    @hybrid_command(description="Remove a role from a member", aliases=['rr', 'removerole'])
     @has_permissions(manage_roles=True)
     async def remove_role(self, ctx: Context, member: Member, role: Role):
         await ctx.defer()
@@ -44,7 +44,7 @@ class slashmanage(Cog):
                             description="```create text_channel NAME CATEGORY SLOWMODE\ncreate voice_channel NAME CATEGORY\ncreate category NAME\ncreate stage_channel NAME TOPIC CATEGORY\ncreate forum NAME TOPIC CATEGORY\ncreate role NAME COLOR HOISTED MENTIONABLE\ncreate thread NAME MESSAGE_ID SLOWMODE```")
             await ctx.send(embed=embed)
 
-    @create.command(description='Create a text channel', aliases=['txtch', 'tc'])
+    @create.command(description='Create a text channel', aliases=['txtch', 'tc', 'textchannel'])
     @has_permissions(manage_channels=True)
     async def text_channel(self, ctx: Context, name: str, *, category: Optional[CategoryChannel]=None, slowmode: str = None)->None:
         await ctx.defer()
@@ -74,7 +74,7 @@ class slashmanage(Cog):
 
             await ctx.send(embed=embed)
 
-    @create.command(description='Create a voice channel', aliases=['vch', 'vc'])
+    @create.command(description='Create a voice channel', aliases=['vch', 'vc', 'voicechannel'])
     @has_permissions(manage_channels=True)
     async def voice_channel(self, ctx: Context, name: str, *,category: Optional[CategoryChannel] = None)->None:
         await ctx.defer()
@@ -110,7 +110,7 @@ class slashmanage(Cog):
 
             await ctx.send(embed=embed)
 
-    @create.command(description='Create a stage channel', aliases=['stage', 'stagech'])
+    @create.command(description='Create a stage channel', aliases=['stage', 'stagech', 'stagechannel'])
     @has_permissions(manage_channels=True)
     async def stage_channel(self, ctx: Context, name: str, *,topic: str, category: Optional[CategoryChannel] = None)->None:
         await ctx.defer()
@@ -202,7 +202,7 @@ class slashmanage(Cog):
 
             await ctx.send(embed=embed)
 
-    @hybrid_group(description="Main delete command", aliases='del')
+    @hybrid_group(description="Main delete command", aliases=['del'])
     async def delete(self, ctx: Context):
         if check_botbanned_user(ctx.author.id) == True:
             pass
@@ -222,9 +222,9 @@ class slashmanage(Cog):
                 channel.name), color=0x00FF68)
             await ctx.send(embed=embed)
 
-    @delete.command(name="role", description="Deletes a role", aliases=['r', 'role'])
+    @delete.command(description="Deletes a role", aliases=['r'])
     @has_permissions(manage_channels=True)
-    async def role_1(self, ctx: Context, role: Role):
+    async def role(self, ctx: Context, role: Role):
         if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
@@ -242,9 +242,9 @@ class slashmanage(Cog):
                           description="```edit text_channel CHANNEL NAME NSFW_ENABLED SLOWMODE CATEGORY\nedit thread THREAD NAME SLOWMODE```")
             await ctx.send(embed=embed)
 
-    @edit.subcommand(name="text_channel", description="Edits a text/news channel")
+    @edit.command(description="Edits a text/news channel", aliases=['txtch', 'textchannel', 'tch'])
     @has_permissions(manage_channels=True)
-    async def text_channel_1(self, ctx: Context, channel: TextChannel, name: Optional[str]=None,*, nsfw_enabled:Literal["True", "False"]=None, slowmode: Optional[str]=None, category: Optional[CategoryChannel]=None)->None:
+    async def text_channel(self, ctx: Context, channel: TextChannel, *, name: Optional[str]=None, nsfw_enabled:Literal["True", "False"]=None, slowmode: Optional[str]=None, category: Optional[CategoryChannel]=None)->None:
         await ctx.defer()
         if check_botbanned_user(ctx.author.id) == True:
             pass
@@ -283,9 +283,9 @@ class slashmanage(Cog):
 
             await ctx.send(embed=embed)
 
-    @edit.subcommand(name="thread", description="Edits a thread")
+    @edit.command(description="Edits a thread")
     @has_permissions(manage_channels=True)
-    async def thread_1(self, ctx: Context, thread: Thread, name: Optional[str]=None, slowmode: Optional[str]=None)->None:
+    async def thread(self, ctx: Context, thread: Thread,*, name: Optional[str]=None, slowmode: Optional[str]=None)->None:
         await ctx.defer()
         if check_botbanned_user(ctx.author.id) == True:
             pass
@@ -309,9 +309,9 @@ class slashmanage(Cog):
 
             await ctx.send(embed=embed)
 
-    @edit.subcommand(name="role", description="Edit a role")
+    @edit.command(description="Edit a role", aliases=['r'])
     @has_permissions(manage_roles=True)
-    async def role_2(self, ctx: Context, role: Role, name: Optional[str] = None, *,color=None, hoisted:Literal["True", "False"]=None, mentionable:Literal["True", "False"]=None)->None:
+    async def role(self, ctx: Context, role: Role, *, name: Optional[str] = None,color=None, hoisted:Literal["True", "False"]=None, mentionable:Literal["True", "False"]=None)->None:
         await ctx.defer()
         if check_botbanned_user(ctx.author.id) == True:
             pass
@@ -350,7 +350,7 @@ class slashmanage(Cog):
 
     @edit.command(description="Edits the server")
     @has_permissions(manage_guild=True)
-    async def server(self, ctx: Context, name: Optional[str] = None, description: Optional[str] = None, verification_level:Literal['none', 'low', 'medium', 'high', 'highest']=None)->None:
+    async def server(self, ctx: Context,*, name: Optional[str] = None, description: Optional[str] = None, verification_level:Literal['none', 'low', 'medium', 'high', 'highest']=None)->None:
         await ctx.defer()
         if check_botbanned_user(ctx.author.id) == True:
             pass
@@ -401,11 +401,11 @@ class slashmanage(Cog):
 
             await ctx.send(embed=embed)
 
-    @edit.subcommand(name="forum", description="Edits a forum")
+    @edit.command(name="forum", description="Edits a forum")
     @has_permissions(manage_channels=True)
-    async def forum_1(self, ctx: Interaction, forum: GuildChannel = SlashOption(channel_types=[ChannelType.forum]), name: str = SlashOption(description="What will you name it?", required=False), topic: str = SlashOption(description="What is the topic?", required=False), category: GuildChannel = SlashOption(description="Which category will it be placed?", channel_types=[ChannelType.category], required=False)):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def forum_1(self, ctx: Context, forum: ForumChannel, *, name: Optional[str] = None, topic: Optional[str]=None, category: Optional[CategoryChannel]= None) ->None:
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
 
@@ -428,54 +428,54 @@ class slashmanage(Cog):
                 embed.add_field(name="Category",
                                 value=category, inline=True)
 
-            await ctx.followup.send(embed=embed)
+            await ctx.send(embed=embed)
 
-    @jeanne_slash(description="Removes a welcoming/modlog/report channel that was set from the database")
+    @hybrid_command(description="Removes a welcoming/modlog/report channel that was set from the database")
     @has_permissions(manage_guild=True)
-    async def remove(self, ctx: Interaction, type=SlashOption(choices=['welcomer', 'leaver', 'modlog', 'report', 'all'], description='Which one or all?')):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def remove(self, ctx: Context, type:Literal['welcomer', 'leaver', 'modlog', 'report', 'all']):
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             if type == 'welcomer':
                 wel = remove_welcomer(ctx.guild.id)
 
                 if wel == False:
-                    await ctx.followup.send("You don't have a welcomer channel")
+                    await ctx.send("You don't have a welcomer channel")
                 else:
                     welcomer = Embed(
                         description="Welcomer channel removed", color=0x00FF68)
-                    await ctx.followup.send(embed=welcomer)
+                    await ctx.send(embed=welcomer)
 
             elif type == 'leaver':
                 leave = remove_leaver(ctx.guild.id)
 
                 if leave == False:
-                    await ctx.followup.send("You don't have a leaver channel")
+                    await ctx.send("You don't have a leaver channel")
                 else:
                     leaver = Embed(
                         description="Leaver channel removed", color=0x00FF68)
-                    await ctx.followup.send(embed=leaver)
+                    await ctx.send(embed=leaver)
 
             elif type == 'modlog':
                 modloger = remove_modloger(ctx.guild.id)
 
                 if modloger == False:
-                    await ctx.followup.send("You don't have a modlog channel")
+                    await ctx.send("You don't have a modlog channel")
                 else:
                     modlog = Embed(
                         description="Modlog channel removed", color=0x00FF68)
-                    await ctx.followup.send(embed=modlog)
+                    await ctx.send(embed=modlog)
 
             elif type == 'report':
                 reporter = remove_reporter(ctx.guild.id)
 
                 if reporter == False:
-                    await ctx.followup.send("You don't have a report channel")
+                    await ctx.send("You don't have a report channel")
                 else:
                     report = Embed(
                         description="Report channel removed", color=0x00FF68)
-                    await ctx.followup.send(embed=report)
+                    await ctx.send(embed=report)
 
             elif type == 'all':
 
@@ -501,21 +501,23 @@ class slashmanage(Cog):
 
                 all = Embed(
                     description='All channels that were set for the server have been removed from the database.', color=0x00FF68)
-                await ctx.followup.send(embed=all)
+                await ctx.send(embed=all)
 
-    @jeanne_slash(description="Main set command")
-    async def set(self, ctx: Interaction):
-        pass
+    @hybrid_group(description="Main set command")
+    async def set(self, ctx: Context):
+        if check_botbanned_user(ctx.author.id) == True:
+            pass
+        else:
+            embed = Embed(title="This is a group command. However, the available commands for this is:",
+                          description="```set welcomer CHANNEL\nset leaver CHANNEL\nset modlog CHANNEL\nset report_channel CHANNEL```")
+            await ctx.send(embed=embed)
 
-    @set.subcommand(description="Set a welcomer/modlog/report channel")
+    @set.command(description="Set a welcomer/modlog/report channel")
     @has_permissions(manage_guild=True)
-    async def log_channel(self, ctx: Interaction, type=SlashOption(choices=['welcomer', 'leaver', 'modlog', 'report_channel'], description="Which one are you setting?", required=True),
-                  channel: GuildChannel = SlashOption(
-            channel_types=[
-                ChannelType.text, ChannelType.news],
-            description="Choose a channel")):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def log_channel(self, ctx: Context, type:Literal['welcomer', 'leaver', 'modlog', 'report_channel'],*,
+                  channel: TextChannel):
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             if type == 'welcomer':
@@ -524,7 +526,7 @@ class slashmanage(Cog):
                 welcomer = Embed(color=0x00FF68)
                 welcomer.add_field(
                     name="Welcomer channel set", value=f"{channel.mention} has been selected to welcomer members in the server.")
-                await ctx.followup.send(embed=welcomer)
+                await ctx.send(embed=welcomer)
 
             elif type == 'leaver':
                 set_leaver(ctx.guild.id, channel.id)
@@ -532,7 +534,7 @@ class slashmanage(Cog):
                 leaver = Embed(color=0x00FF68)
                 leaver.add_field(
                     name="Leave channel set", value=f"{channel.mention} has been selected if someone left the server")
-                await ctx.followup.send(embed=leaver)
+                await ctx.send(embed=leaver)
 
             elif type == 'modlog':
                 set_modloger(ctx.guild.id, channel.id)
@@ -540,7 +542,7 @@ class slashmanage(Cog):
                 modlog = Embed(color=0x00FF68)
                 modlog.add_field(
                     name="Modlog channel set", value=f"{channel.mention} has been selected to have all moderation actions updated in there.")
-                await ctx.followup.send(embed=modlog)
+                await ctx.send(embed=modlog)
 
             elif type == 'report_channel':
                 set_reporter(ctx.guild.id, channel.id)
@@ -548,13 +550,13 @@ class slashmanage(Cog):
                 modlog = Embed(color=0x00FF68)
                 modlog.add_field(
                     name="Report channel set", value=f"{channel.mention} has been selected to have all reported members in there.")
-                await ctx.followup.send(embed=modlog)
+                await ctx.send(embed=modlog)
 
-    @jeanne_slash(description="Clone a channel")
+    @hybrid_command(description="Clone a channel", aliases=['copy'])
     @has_permissions(manage_channels=True)
-    async def clone(self, ctx: Interaction, channel: GuildChannel = SlashOption(channel_types=[ChannelType.news, ChannelType.text, ChannelType.voice, ChannelType.stage_voice]), name=SlashOption(required=False)):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    async def clone(self, ctx: Context, channel: GuildChannel, name:Optional[str]=None)->None:
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             if name == None:
@@ -564,8 +566,11 @@ class slashmanage(Cog):
 
             cloned = Embed(description="{} was cloned as {}".format(
                 channel.mention, c.mention))
-            await ctx.followup.send(embed=cloned)
+            await ctx.send(embed=cloned)
 
 
-def setup(bot: Bot):
-    bot.add_cog(slashmanage(bot))
+async def setup(bot: Bot):
+    await bot.add_cog(slashmanage(bot))
+
+#needs more work
+#must not forget about https://github.com/lukeciel/discord-argparse
