@@ -76,7 +76,6 @@ class slashutilities(Cog):
                         hum = js['main']['humidity']
                         visibility=js['visibility']
                         clouds=js['clouds']['all']
-                        pres = js['wind']['pressure']
                         windir = js['wind']['deg']
                         wind_gust=js['wind']['speed']
 
@@ -89,7 +88,6 @@ class slashutilities(Cog):
                         embed.add_field(name=":droplet: Humidity", value=hum, inline=True)
                         embed.add_field(name=":eye: Visibility", value=f"{visibility}m", inline=True)
                         embed.add_field(name=":cloud: Clouds", value=f"{clouds}%", inline=True)
-                        embed.add_field(name=":cloud: Pressure", value=f"{pres}hPa", inline=True)
                         embed.add_field(name=":arrow_right: Wind Direction", value=f"{windir}°", inline=True)
                         embed.add_field(name=f"{guste} Wind Gust", value=f"{wind_gust}m/s", inline=True)
                         await ctx.followup.send(embed=embed)
@@ -116,7 +114,6 @@ class slashutilities(Cog):
                         hum = js['main']['humidity']
                         visibility=js['visibility']
                         clouds=js['clouds']['all']
-                        pres = js['wind']['pressure']
                         windir = js['wind']['deg']
                         wind_gust=js['wind']['speed']
                         embed = Embed(
@@ -128,7 +125,6 @@ class slashutilities(Cog):
                         embed.add_field(name=":droplet: Humidity", value=hum, inline=True)
                         embed.add_field(name=":eye: Visibility", value=f"{visibility}m", inline=True)
                         embed.add_field(name=":cloud: Clouds", value=f"{clouds}%", inline=True)
-                        embed.add_field(name=":cloud: Pressure", value=f"{pres}hPa", inline=True)
                         embed.add_field(name=":arrow_right: Wind Direction", value=f"{windir}°", inline=True)
                         embed.add_field(name=f"{guste} Wind Gust", value=f"{wind_gust}m/s", inline=True)
                         await ctx.followup.send(embed=embed)
