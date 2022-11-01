@@ -51,10 +51,9 @@ class currencysys(Cog):
                           description="`guess free`\n`guess bet AMOUNT`\n\nSubstitute AMOUNT with how much you are betting")
             await ctx.send(embed=embed)
 
-    @guess.command(name='free')
+    @guess.command(name='free', description="Guess my number and you can win 20 QP")
     @cooldown(1, 3600, type=BucketType.user)
     async def free(self, ctx: Context):
-        """Guess my number and you can win 20 QP"""
         if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
@@ -211,7 +210,7 @@ class currencysys(Cog):
                         await ctx.send(embed=embed)
 
 
-    @hybrid_command(name='balance')
+    @hybrid_command(name='balance', aliases=['bal'])
     @cooldown(1, 30, type=BucketType.user)
     async def balance(self, ctx: Context):
         """Check how much QP you have"""

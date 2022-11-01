@@ -1,16 +1,15 @@
-from nextcord import *
-from nextcord import slash_command as jeanne_slash
+from discord import *
 from aiohttp import ClientSession
-from nextcord.ext.commands import Cog, Bot
+from discord.ext.commands import Cog, Bot, hybrid_command, hybrid_group, Context, has_permissions
 from db_functions import check_botbanned_user, get_report_channel
 from assets.buttons import Confirmation
 from assets.modals import Bot_Report_Modal, Say_Modal
 from config import WEATHER
-from nextcord.abc import GuildChannel
-from nextcord.ui import Button, View
+from discord.abc import GuildChannel
+from discord.ui import View
 from asyncio import TimeoutError
-from nextcord.ext.application_checks import *
 from py_expression_eval import Parser
+from typing import Optional, Literal
 
 bot_invite_url = "https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=2550197270&redirect_uri=https%3A%2F%2Fdiscord.com%2Foauth2%2Fauthorize%3Fclient_id%3D831993597166747679%26scope%3Dbot&scope=bot%20applications.commands"
 
@@ -33,13 +32,13 @@ class invite_button(View):
     def __init__(self):
         super().__init__()
 
-        self.add_item(Button(style=ButtonStyle.url,
+        self.add_item(ui.Button(style=ButtonStyle.url,
                       label="Bot Invite", url=bot_invite_url))
-        self.add_item(Button(style=ButtonStyle.url,
+        self.add_item(ui.Button(style=ButtonStyle.url,
                       label="Top.gg", url=topgg_invite))
-        self.add_item(Button(style=ButtonStyle.url,
+        self.add_item(ui.Button(style=ButtonStyle.url,
                       label="DiscordBots", url=discordbots_url))
-        self.add_item(Button(style=ButtonStyle.url,
+        self.add_item(ui.Button(style=ButtonStyle.url,
                       label="HAZE", url=haze_url))
 
 
@@ -48,14 +47,19 @@ class slashutilities(Cog):
         self.bot = bot
         self.parser = Parser()
 
-    @jeanne_slash(description="Main weather command")
-    async def weather(self, ctx: Interaction):
-        pass
+    @hybrid_group(description="Main weather command")
+    async def weather(self, ctx: Context):
+        if check_botbanned_user(ctx.author.id) == True:
+            pass
+        else:
+            embed = Embed(title="This is a group command. However, the available commands for this is:",
+                          description="```weather city CITY`\n`weather zip_code ZIP_CODE COUNTRY_CODE```")
+            await ctx.send(embed=embed)
 
-    @weather.subcommand(description="Get weather information on a city")
-    async def city(self, ctx: Interaction, city=SlashOption(description="Which city are you looking for weather info", required=True)):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    @weather.command(description="Get weather information on a city")
+    async def city(self, ctx: Context, city:str):
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             min_tempe=self.bot.get_emoji(1009760796017963119)
@@ -76,12 +80,11 @@ class slashutilities(Cog):
                         hum = js['main']['humidity']
                         visibility=js['visibility']
                         clouds=js['clouds']['all']
-                        pres = js['wind']['pressure']
                         windir = js['wind']['deg']
                         wind_gust=js['wind']['speed']
 
                         embed = Embed(
-                            title=f'⛅ Weather details of {city} ⛅', description=f'{globe} Country: {count}', colour=ctx.user.color)
+                            title=f'⛅ Weather details of {city} ⛅', description=f'{globe} Country: {count}', colour=ctx.author.color)
                         embed.add_field(name=":newspaper: Description", value=desc, inline=True)
                         embed.add_field(name=f"{min_tempe} Minimum Temperature", value=f"{min_temp}°C", inline=True)
                         embed.add_field(name=f"{max_tempe} Maximum Temperature", value=f"{max_temp}°C", inline=True)
@@ -89,15 +92,14 @@ class slashutilities(Cog):
                         embed.add_field(name=":droplet: Humidity", value=hum, inline=True)
                         embed.add_field(name=":eye: Visibility", value=f"{visibility}m", inline=True)
                         embed.add_field(name=":cloud: Clouds", value=f"{clouds}%", inline=True)
-                        embed.add_field(name=":cloud: Pressure", value=f"{pres}hPa", inline=True)
                         embed.add_field(name=":arrow_right: Wind Direction", value=f"{windir}°", inline=True)
                         embed.add_field(name=f"{guste} Wind Gust", value=f"{wind_gust}m/s", inline=True)
-                        await ctx.followup.send(embed=embed)
+                        await ctx.send(embed=embed)
 
-    @weather.subcommand(description="Get weather information on a city but with a ZIP code and Country code")
-    async def zip_code(self, ctx: Interaction, zip_code=SlashOption(description="Enter the ZIP Code for weather info", required=True), country_code=SlashOption(required=True)):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    @weather.command(description="Get weather information on a city but with a ZIP code and Country code", aliases=['zp', 'zip'])
+    async def zip_code(self, ctx: Context, zip_code:str, country_code:str):
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             min_tempe=self.bot.get_emoji(1009760796017963119)
@@ -120,7 +122,7 @@ class slashutilities(Cog):
                         windir = js['wind']['deg']
                         wind_gust=js['wind']['speed']
                         embed = Embed(
-                            title=f'⛅ Weather details of {zip_code} ⛅', description=f':earth_africa: Country: {count}', colour=ctx.user.color)
+                            title=f'⛅ Weather details of {zip_code} ⛅', description=f':earth_africa: Country: {count}', colour=ctx.author.color)
                         embed.add_field(name=":newspaper: Description", value=desc, inline=True)
                         embed.add_field(name=f"{min_tempe} Minimum Temperature", value=f"{min_temp}°C", inline=True)
                         embed.add_field(name=f"{max_tempe} Maximum Temperature", value=f"{max_temp}°C", inline=True)
@@ -131,28 +133,28 @@ class slashutilities(Cog):
                         embed.add_field(name=":cloud: Pressure", value=f"{pres}hPa", inline=True)
                         embed.add_field(name=":arrow_right: Wind Direction", value=f"{windir}°", inline=True)
                         embed.add_field(name=f"{guste} Wind Gust", value=f"{wind_gust}m/s", inline=True)
-                        await ctx.followup.send(embed=embed)
+                        await ctx.send(embed=embed)
 
-    @jeanne_slash(description="Do a calculation")
-    async def calculator(self, ctx: Interaction, calculate=SlashOption(description="What do you want to calculate?")):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    @hybrid_command(description="Do a calculation")
+    async def calculator(self, ctx: Context, calculate):
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             try:
                 answer = self.parser.parse(calculate).evaluate({})
                 calculation = Embed(title="Result", color=0x00FFFF)
                 calculation.add_field(name=calculate, value=answer)
-                await ctx.followup.send(embed=calculation)
+                await ctx.send(embed=calculation)
             except Exception as e:
                 failed = Embed(
                     description=f"{e}\nPlease refer to [Python Operators](https://www.geeksforgeeks.org/python-operators/?ref=lbp) if you don't know how to use the command")
-                await ctx.followup.send(embed=failed)
+                await ctx.send(embed=failed)
 
-    @jeanne_slash(description="Invite me to your server or join the support server")
-    async def invite(self, ctx: Interaction):
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+    @hybrid_command(description="Invite me to your server or join the support server")
+    async def invite(self, ctx: Context):
+        await ctx.defer()
+        if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             invite = Embed(
@@ -160,30 +162,35 @@ class slashutilities(Cog):
                 description="Click on one of these buttons to invite me to you server or join my creator's server",
                 color=0x00bfff)
 
-            await ctx.followup.send(embed=invite, view=invite_button())
+            await ctx.send(embed=invite, view=invite_button())
 
-    @jeanne_slash(description="Main say command")
-    async def say(self, ctx: Interaction):
-        pass
+    @hybrid_group(description="Main say command")
+    async def say(self, ctx: Context):
+        if check_botbanned_user(ctx.author.id) == True:
+            pass
+        else:
+            embed = Embed(title="This is a group command. However, the available commands for this is:",
+                          description="```say plain`\n`say embed```")
+            await ctx.send(embed=embed)
 
-    @say.subcommand(description="Type something and I will say it in plain text")
+    @say.command(name='plain', description="Type something and I will say it in plain text")
     @has_permissions(administrator=True)
-    async def plain(self, ctx: Interaction, channel: GuildChannel = SlashOption(description="Which channel should I send the message?", channel_types=[ChannelType.text, ChannelType.news])):
+    async def say_plain(self, ctx: Interaction, channel: Literal[ChannelType.text, ChannelType.news]):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             await ctx.response.send_modal(Say_Modal('plain', channel))
 
-    @say.subcommand(description="Type something and I will say it in embed")
+    @say.command(name='embed', description="Type something and I will say it in embed")
     @has_permissions(administrator=True)
-    async def embed(self, ctx: Interaction, channel: GuildChannel = SlashOption(description="Which channel should I send the message?", channel_types=[ChannelType.text, ChannelType.news])):
+    async def say_embed(self, ctx: Interaction, channel: Literal[ChannelType.text, ChannelType.news]):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             await ctx.response.send_modal(Say_Modal('embed', channel))
 
-    @jeanne_slash()
-    async def bot_report(self, ctx: Interaction, type:str=SlashOption(choices=['bug', 'fault', 'exploit', 'violator'])):
+    @hybrid_command(name='bot_report')
+    async def bot_report(self, ctx: Interaction, type:Literal['bug', 'fault', 'exploit', 'violator']):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
@@ -199,8 +206,8 @@ class slashutilities(Cog):
             await ctx.response.send_modal(Bot_Report_Modal(report_type))
 
 
-    @jeanne_slash(description="Report a member in your server")
-    async def report(self, ctx: Interaction, member: Member = SlashOption(description="Who are you reporting?", required=True), anonymous=SlashOption(description=("What to have your name hidden while reporting?"), choices=['True', 'False'], required=False)):
+    @hybrid_command(description="Report a member in your server")
+    async def report(self, ctx: Interaction, member: Member, anonymous:Literal['True', 'False']):
         await ctx.response.defer(ephemeral=True)
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -274,5 +281,5 @@ class slashutilities(Cog):
 
 
 
-def setup(bot:Bot):
-    bot.add_cog(slashutilities(bot))
+async def setup(bot:Bot):
+    await bot.add_cog(slashutilities(bot))

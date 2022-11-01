@@ -1,3 +1,4 @@
+from optparse import Option
 from db_functions import check_botbanned_user
 from discord import *
 from discord.ext.commands import Cog, Bot, hybrid_command, Context
@@ -59,7 +60,7 @@ class slashreactions(Cog):
             await ctx.send(f"*{ctx.author} is smugging*", embed=smug) 
 
     @hybrid_command(description="Poke someone or yourself")
-    async def poke(self, ctx: Context, member: Member = SlashOption(description="Who do you want to poke?", required=False)):
+    async def poke(self, ctx: Context, member: Optional[Member]=None)->None:
         if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
@@ -76,7 +77,7 @@ class slashreactions(Cog):
             await ctx.send(msg, embed=poke)
 
     @hybrid_command(description="Pat someone or yourself")
-    async def pat(self, ctx: Context, member: Member = SlashOption(description="Who do you want to pat?", required=False)):
+    async def pat(self, ctx: Context, member: Optional[Member]=None)->None:
         if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
@@ -93,7 +94,7 @@ class slashreactions(Cog):
             await ctx.send(msg, embed=pat)
 
     @hybrid_command(description="Kiss someone or yourself")
-    async def kiss(self, ctx: Context, member: Member = SlashOption(description="Who do you want to kiss?", required=False)):
+    async def kiss(self, ctx: Context, member: Optional[Member] = None) -> None:
         if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
@@ -110,7 +111,7 @@ class slashreactions(Cog):
             await ctx.send(msg, embed=kiss)
 
     @hybrid_command(description="Tickle someone or yourself")
-    async def tickle(self, ctx: Context, member: Member = SlashOption(description="Who do you want to tickle?", required=False)):
+    async def tickle(self, ctx: Context, member: Optional[Member] = None) -> None:
         if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
@@ -127,7 +128,7 @@ class slashreactions(Cog):
             await ctx.send(msg, embed=tickle)
 
     @hybrid_command(description="Call someone or yourself a baka!")
-    async def baka(self, ctx: Context, member: Member = SlashOption(description="Who do you calling a baka?", required=False)):
+    async def baka(self, ctx: Context, member: Optional[Member] = None) -> None:
         if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
@@ -144,7 +145,7 @@ class slashreactions(Cog):
             await ctx.send(msg, embed=baka)
 
     @hybrid_command(description="Feed someone or yourself")
-    async def feed(self, ctx: Context, *, member: Member = SlashOption(description="Who do you want to feed?", required=False)):
+    async def feed(self, ctx: Context, member: Optional[Member] = None) -> None:
         if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
@@ -161,5 +162,5 @@ class slashreactions(Cog):
             await ctx.send(msg, embed=feed)
 
 
-def setup(bot:Bot):
-    bot.add_cog(slashreactions(bot))
+async def setup(bot:Bot):
+    await bot.add_cog(slashreactions(bot))
