@@ -69,7 +69,6 @@ class currencysys(Cog):
             except TimeoutError:
                 timeout = Embed(
                     description=f"Sorry but you took too long. It was {answer}", color=0xFF0000)
-                timeout.set_thumbnail(url=wrong_answer_or_timeout)
                 return await ctx.followup.send(embed=timeout)
 
             if int(guess.content) == answer:
@@ -81,7 +80,6 @@ class currencysys(Cog):
             else:
                 wrong = Embed(
                     description=f"Wrong answer. It was {answer}", color=0xFF0000)
-                wrong.set_thumbnail(url=wrong_answer_or_timeout)
                 await ctx.followup.send(embed=wrong)
 
     @guess.subcommand(description="Guess my number and you can win 20 QP with betting")
@@ -154,11 +152,11 @@ class currencysys(Cog):
         else:
             rolled = randint(1, 6)
             qp = str(self.bot.get_emoji(980772736861343774))
-            if digit == rolled:
+            if int(digit) == rolled:
                 add_qp(ctx.user.id, 20)
                 embed = Embed(color=0x0000FF)
                 embed.add_field(name=f"YAY! You got it!\n20 {qp} has been added",
-                                value=f"Rolled: **{rolled}**\nResult: **{self.values[0]}**!", inline=False)
+                                value=f"Dice rolled: **{rolled}**\You guessed: **{digit}**!", inline=False)
                 await ctx.edit_original_message(embed=embed)
             else:
                 embed = Embed(
@@ -194,7 +192,7 @@ class currencysys(Cog):
                         add_qp(ctx.user.id, int(bet))
                         embed = Embed(color=0x0000FF)
                         embed.add_field(name=f"YAY! You got it!\n20 {qp} has been added",
-                                    value=f"Dice rolled: **{rolled}**\nYou guessed: **{digit}**", inline=False)
+                                value=f"Dice rolled: **{rolled}**\You guessed: **{digit}**!", inline=False)
                         await ctx.followup.send(embed=embed)
 
                     else:
@@ -278,7 +276,7 @@ class currencysys(Cog):
             await ctx.followup.send(embed=ask, view=view)
             await view.wait()
 
-            if view.value == choice(jeannes_pick):
+            if str(view.value) == str(choice(jeannes_pick)):
                 add_qp(ctx.user.id, 20)
 
                 embed = Embed(
@@ -327,7 +325,7 @@ class currencysys(Cog):
                 await ctx.followup.send(embed=ask, view=view)
                 await view.wait()
 
-                if view.value == choice(jeannes_pick):
+                if str(view.value) == str(choice(jeannes_pick)):
                     add_qp(ctx.user.id, int(bet))
 
                     embed = Embed(
