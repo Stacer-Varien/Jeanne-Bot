@@ -2,8 +2,9 @@ from db_functions import *
 from discord import *
 from discord.ext.commands import Cog, Bot, Context, hybrid_command, has_permissions, GroupCog, command, Group, group, hybrid_group
 from humanfriendly import format_timespan, parse_timespan
-from typing import Optional
+from typing import Optional, Literal
 from discord_argparse import ArgumentConverter, OptionalArgument, RequiredArgument
+
 
 
 class Create_Group(GroupCog, name="create"):
@@ -76,6 +77,320 @@ class Create_Group(GroupCog, name="create"):
 
             await ctx.followup.send(embed=embed)
 
+    @app_commands.command(description='Create a stage channel')
+    @has_permissions(manage_channels=True)
+    async def stage_channel(self, ctx: Interaction, name: str, topic: str, category: CategoryChannel):
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            await ctx.guild.create_stage_channel(name=name, topic=topic, category=category)
+            embed = Embed()
+            embed.description = "Stage channel `{}` has been created".format(
+                name)
+            embed.color = Color.green()
+
+            await ctx.followup.send(embed=embed)
+
+    @app_commands.command(description="Create a forum")
+    @has_permissions(manage_channels=True)
+    async def forum(self, ctx: Interaction, name: str, topic: str, category:CategoryChannel):
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            forum = await ctx.guild.create_forum(name=name, topic=topic)
+            embed = Embed()
+            embed.description = "Forum `{}` has been created".format(
+                forum.name)
+            embed.color = Color.green()
+            if category:
+                await forum.edit(category=category)
+                embed.add_field(name="Added into category",
+                                value=category.name, inline=True)
+
+            await ctx.followup.send(embed=embed)
+
+    @app_commands.command(description="Create a role")
+    @has_permissions(manage_roles=True)
+    async def role(self, ctx: Interaction, name:str, color:str, hoisted:Literal["true", "false"]=None, mentionable:Literal["true", "false"]=None)->None:
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            role = await ctx.guild.create_role(name=name)
+            embed = Embed()
+            embed.description = "Role `{}` has been created".format(name)
+            embed.color = Color.green()
+
+            if color:
+                await role.edit(color=int(color, 16))
+                embed.add_field(name="Color", value=color, inline=True)
+
+            if hoisted:
+                if hoisted == "true":
+                    await role.edit(hoist=True)
+                    embed.add_field(name="Hoisted", value="Yes", inline=True)
+                elif hoisted == "false":
+                    pass
+
+            if mentionable:
+                if mentionable == "true":
+                    await role.edit(mentionable=True)
+                    embed.add_field(name="Mentionable",
+                                    value="Yes", inline=True)
+                elif mentionable == "false":
+                    pass
+
+            await ctx.followup.send(embed=embed)
+
+    @app_commands.command(description="Makes a public thread channel")
+    @has_permissions(create_public_threads=True)
+    async def thread(self, ctx: Interaction, name: str, channel:TextChannel, message_id:int, slowmode: Optional[str]=None):
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            channel_:TextChannel=await ctx.guild.get_channel(channel.id)
+            message = await channel_.fetch_message(message_id)
+            thread = await ctx.channel.create_thread(name=name, message=message, type=ChannelType.public_thread)
+
+            embed = Embed()
+            embed.description = "Thread `{}` has been created on [message]({})".format(
+                name, message.jump_url)
+            embed.color = Color.green()
+
+            if slowmode:
+                delay = int(parse_timespan(slowmode))
+                if delay > 21600:
+                    delay = 21600
+                await thread.edit(slowmode_delay=delay)
+                embed.add_field(name="Slowmode",
+                                value=format_timespan(delay), inline=True)
+
+            await ctx.followup.send(embed=embed)
+
+class Delete_Group(GroupCog, name="delete"):
+    def __init__(self, bot: Bot) -> None:
+        self.bot = bot
+        super().__init__()
+
+    @app_commands.command(description="Deletes a channel")
+    @has_permissions(manage_channels=True)
+    async def channel(self, ctx: Interaction, channel: abc.GuildChannel):
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            await channel.delete()
+            embed = Embed(description="{} has been deleted".format(
+                channel.name), color=0x00FF68)
+            await ctx.followup.send(embed=embed)
+
+    @app_commands.command(description="Deletes a role")
+    @has_permissions(manage_channels=True)
+    async def role(self, ctx: Interaction, role: Role):
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            await role.delete()
+            embed = Embed(description="{} has been deleted".format(
+                role.name), color=0x00FF68)
+            await ctx.followup.send(embed=embed)
+
+class Edit_Group(GroupCog, name="edit"):
+    def __init__(self, bot: Bot) -> None:
+        self.bot = bot
+        super().__init__()
+
+    @app_commands.command(description="Edits a text/news channel")
+    @has_permissions(manage_channels=True)
+    async def text_channel(self, ctx: Interaction, channel: TextChannel, name: Optional[str]=None, nsfw_enabled:Literal["true", "false"]=None, slowmode: Optional[str]=None, category: Optional[CategoryChannel]=None)->None:
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            embed = Embed()
+            embed.description = "Channel `{}` has been edited".format(
+                channel.name)
+            embed.color = Color.green()
+
+            if name:
+                await channel.edit(name=name)
+                embed.add_field(name="Name", value=name, inline=True)
+
+            if category:
+                await channel.edit(category=category)
+                embed.add_field(name="Category",
+                                value=category, inline=True)
+
+            if nsfw_enabled:
+                if nsfw_enabled == "True":
+                    await channel.edit(nsfw=True)
+                    embed.add_field(name="NSFW enabled",
+                                    value="Yes", inline=True)
+                elif nsfw_enabled == "False":
+                    await channel.edit(nsfw=False)
+                    embed.add_field(name="NSFW enabled",
+                                    value="No", inline=True)
+
+            if slowmode:
+                delay = int(parse_timespan(slowmode))
+                if delay > 21600:
+                    delay = 21600
+                await channel.edit(slowmode_delay=delay)
+                embed.add_field(name="Slowmode",
+                                value=format_timespan(delay), inline=True)
+
+            await ctx.followup.send(embed=embed)
+
+    @app_commands.command(description="Edits a thread")
+    @has_permissions(manage_channels=True)
+    async def thread(self, ctx: Interaction, thread: Thread, name: Optional[str]=None, slowmode: Optional[str]=None)->None:
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            embed = Embed()
+            embed.description = "Thread `{}` has been edited".format(
+                thread.name)
+            embed.color = Color.green()
+
+            if name:
+                await thread.edit(name=name)
+                embed.add_field(name="Name", value=name, inline=True)
+
+            if slowmode:
+                delay = int(parse_timespan(slowmode))
+                if delay > 21600:
+                    delay = 21600
+                await thread.edit(slowmode_delay=delay)
+                embed.add_field(name="Slowmode",
+                                value=format_timespan(delay), inline=True)
+
+            await ctx.followup.send(embed=embed)
+
+    @app_commands.command(description="Edit a role")
+    @has_permissions(manage_roles=True)
+    async def role(self, ctx: Interaction, role: Role, name: Optional[str]=None, color:Optional[str]=None, hoisted:Literal["true", "false"]=None, mentionable:Literal["true", "false"]=None)->None:
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            embed = Embed()
+            embed.description = "Role `{}` has been edited".format(role.name)
+            embed.color = Color.green()
+
+            if name:
+                await role.edit(name=name)
+                embed.add_field(name="Name", value=name, inline=True)
+
+            if color:
+                await role.edit(color=int(color, 16))
+                embed.add_field(name="Color", value=color, inline=True)
+
+            if hoisted:
+                if hoisted == "true":
+                    await role.edit(hoist=True)
+                    embed.add_field(name="Hoisted", value="Yes", inline=True)
+                elif hoisted == "false":
+                    await role.edit(hoist=False)
+                    embed.add_field(name="Hoisted", value="No", inline=True)
+
+            if mentionable:
+                if mentionable == "true":
+                    await role.edit(mentionable=True)
+                    embed.add_field(name="Mentionable",
+                                    value="Yes", inline=True)
+                elif mentionable == "false":
+                    await role.edit(mentionable=False)
+                    embed.add_field(name="Mentionable",
+                                    value="No", inline=True)
+
+            await ctx.followup.send(embed=embed)
+
+    @app_commands.command(description="Edits the server")
+    @has_permissions(manage_guild=True)
+    async def server(self, ctx: Interaction, name: Optional[str]=None, description: Optional[str]=None, verification_level:Literal['none', 'low', 'medium', 'high', 'highest']=None)->None:
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            embed = Embed()
+            embed.description = "{} has been edited".format(ctx.guild.name)
+            embed.color = Color.green()
+
+            if name:
+                await ctx.guild.edit(name=name)
+                embed.add_field(name="Name", value=name, inline=True)
+
+            if description:
+                if "PUBLIC" in ctx.guild.features:
+                    await ctx.guild.edit(description=description)
+                    embed.add_field(name="Description",
+                                    value=description, inline=True)
+                else:
+                    embed.add_field(name="Description",
+                                    value="Your server is not public to have a description edited", inline=True)
+
+            if verification_level:
+                if verification_level == 'none':
+                    await ctx.guild.edit(verification_level=VerificationLevel.none)
+                    embed.add_field(name="Verification Level", value="{}\nNo verification required".format(
+                        verification_level), inline=True)
+
+                elif verification_level == 'low':
+                    await ctx.guild.edit(verification_level=VerificationLevel.low)
+                    embed.add_field(name="Verification Level", value="{}\nMembers must have a verified email".format(
+                        verification_level), inline=True)
+
+                elif verification_level == 'medium':
+                    await ctx.guild.edit(verification_level=VerificationLevel.medium)
+                    embed.add_field(name="Verification Level", value="{}\nMembers must have a verified email and be registered on Discord for more than 5 minutes".format(
+                        verification_level), inline=True)
+
+                elif verification_level == 'high':
+                    await ctx.guild.edit(verification_level=VerificationLevel.high)
+                    embed.add_field(name="Verification Level", value="{}\nMembers must have a verified email, be registered on Discord for more than 5 minutes and stay in the server for more than 10 minutes".format(
+                        verification_level), inline=True)
+
+                elif verification_level == 'highest':
+                    await ctx.guild.edit(verification_level=VerificationLevel.highest)
+                    embed.add_field(name="Verification Level", value="{}\nMembers must have a verified phone number".format(
+                        verification_level), inline=True)
+
+            await ctx.followup.send(embed=embed)
+
+    @app_commands.command(description="Edits a forum")
+    @has_permissions(manage_channels=True)
+    async def forum(self, ctx: Interaction, forum: Literal[ChannelType.forum], name: Optional[str]=None, topic: Optional[str]=None, category: CategoryChannel=None)->None:
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+
+            embed = Embed()
+            embed.description = "Forum {} has been edited".format(forum.name)
+            embed.color = Color.green()
+
+            if name:
+                await forum.edit(name=name)
+                embed.add_field(name="Name",
+                                value=name, inline=True)
+
+            if topic:
+                await forum.edit(topic=topic)
+                embed.add_field(name="Topic",
+                                value=topic, inline=True)
+
+            if category:
+                await forum.edit(category=category)
+                embed.add_field(name="Category",
+                                value=category, inline=True)
+
+            await ctx.followup.send(embed=embed)
+
 class manage(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
@@ -120,7 +435,6 @@ class manage(Cog):
     @create.command(aliases=['txtch', 'tc', 'textchannel'])
     @has_permissions(manage_channels=True)
     async def text_channel(self, ctx: Context, name: str, *, params: create_channel=create_channel.defaults()):
-        await ctx.defer()
         if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
@@ -156,7 +470,6 @@ class manage(Cog):
     @create.command(description='Create a category', aliases=['cat', 'catch'])
     @has_permissions(manage_channels=True)
     async def category(self, ctx: Context, name: str):
-        await ctx.defer()
         if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
@@ -172,8 +485,7 @@ class manage(Cog):
 
     @create.command(aliases=['stage', 'stagech', 'stagechannel'])
     @has_permissions(manage_channels=True)
-    async def stage_channel(self, ctx: Context, name: str, *, params: create_stage_channel = create_stage_channel.defaults()) -> None:
-        await ctx.defer()
+    async def stage_channel(self, ctx: Context, name: str, params: create_stage_channel = create_stage_channel.defaults()) -> None:
         if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
@@ -221,49 +533,54 @@ class manage(Cog):
 
             await ctx.send(embed=embed)
 
-    create_role = ArgumentConverter(color=OptionalArgument(), hoisted=OptionalArgument(bool, default=False), mentioned=OptionalArgument(bool, default=False))
+    create_role = ArgumentConverter(name=RequiredArgument(str),color=OptionalArgument(str, default=Color.default()), hoisted=OptionalArgument(bool, default=False), mentioned=OptionalArgument(bool, default=False))
 
     @create.command(aliases=['r'])
     @has_permissions(manage_roles=True)
-    async def role(self, ctx: Context, name: str, *, params:create_role=create_role.defaults()) -> None:
-        await ctx.defer()
+    async def role(self, ctx: Context, *,params:create_role=create_role.defaults()) -> None:
         if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
-            role = await ctx.guild.create_role(name=name)
             embed = Embed()
-            embed.description = "Role `{}` has been created".format(name)
-            embed.color = Color.green()
-
             try:
-                color=params['color']
-                await role.edit(color=int(color, 16))
-                embed.add_field(name="Color", value=color, inline=True)
-            except:
-                pass
+                name:str=params['name']
+                role = await ctx.guild.create_role(name=name)
+                embed.description = "Role `{}` has been created".format(name)
+                embed.color = Color.green()
 
-            try:
-                hoisted:bool=params['hoisted']
-                if hoisted == True:
-                    await role.edit(hoist=True)
-                    embed.add_field(name="Hoisted", value="Yes", inline=True)
-                elif hoisted == False:
+                try:
+                    color=params['color']
+                    await role.edit(color=int(color, 16))
+                    embed.add_field(name="Color", value=color, inline=True)
+                except:
                     pass
-            except:
-                pass
-            try:
-                mentionable:bool=params['mentioned']
-                if mentionable == True:
-                    await role.edit(mentionable=True)
-                    embed.add_field(name="Mentionable",
-                                    value="Yes", inline=True)
-                elif mentionable == False:
-                    pass
-            
-            except:
-                pass
 
-            await ctx.send(embed=embed)
+                try:
+                    hoisted:bool=params['hoisted']
+                    if hoisted == True:
+                        await role.edit(hoist=True)
+                        embed.add_field(name="Hoisted", value="Yes", inline=True)
+                    elif hoisted == False:
+                        pass
+                except:
+                    pass
+                try:
+                    mentionable:bool=params['mentioned']
+                    if mentionable == True:
+                        await role.edit(mentionable=True)
+                        embed.add_field(name="Mentionable",
+                                        value="Yes", inline=True)
+                    elif mentionable == False:
+                        pass
+                
+                except:
+                    pass
+
+                await ctx.send(embed=embed)
+            except Exception as e:
+                embed.description=e
+                embed.color=Color.red()
+                await ctx.send(embed=embed)
 
     @create.command(description="Makes a thread channel")
     @has_permissions(create_public_threads=True)
@@ -290,7 +607,7 @@ class manage(Cog):
 
             await ctx.send(embed=embed)
 
-    @hybrid_group(description="Main delete command", aliases=['del'])
+    @group(invoke_without_command=True, aliases=['del'])
     async def delete(self, ctx: Context):
         if check_botbanned_user(ctx.author.id) == True:
             pass
@@ -299,9 +616,9 @@ class manage(Cog):
                           description="```delete channel CHANNEL\ndelete role ROLE```")
             await ctx.send(embed=embed)
 
-    @delete.command(description="Deletes a channel", aliases=['ch'])
+    @delete.command(aliases=['ch'])
     @has_permissions(manage_channels=True)
-    async def channel(self, ctx: Context, channel: GuildChannel):
+    async def channel(self, ctx: Context, channel: abc.GuildChannel):
         if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
@@ -310,7 +627,7 @@ class manage(Cog):
                 channel.name), color=0x00FF68)
             await ctx.send(embed=embed)
 
-    @delete.command(description="Deletes a role", aliases=['r'])
+    @delete.command(aliases=['r'])
     @has_permissions(manage_channels=True)
     async def role(self, ctx: Context, role: Role):
         if check_botbanned_user(ctx.author.id) == True:
@@ -321,7 +638,7 @@ class manage(Cog):
                 role.name), color=0x00FF68)
             await ctx.send(embed=embed)
 
-    @hybrid_group(description="Main edit command")
+    @group(invoke_without_command=True)
     async def edit(self, ctx: Context):
         if check_botbanned_user(ctx.author.id) == True:
             pass
@@ -330,9 +647,9 @@ class manage(Cog):
                           description="```edit text_channel CHANNEL NAME NSFW_ENABLED SLOWMODE CATEGORY\nedit thread THREAD NAME SLOWMODE```")
             await ctx.send(embed=embed)
 
-    @edit.command(description="Edits a text/news channel", aliases=['txtch', 'textchannel', 'tch'])
+    @edit.command(aliases=['txtch', 'textchannel', 'tch'])
     @has_permissions(manage_channels=True)
-    async def text_channel(self, ctx: Context, channel: TextChannel, *, name: Optional[str] =None, nsfw_enabled: Literal["True", "False"]=None, slowmode: Optional[str]=None, category: Optional[CategoryChannel]=None) -> None:
+    async def text_channel(self, ctx: Context, channel: TextChannel, *, name: Optional[str] =None, nsfw_enabled: Literal["true", "false"]=None, slowmode: Optional[str]=None, category: Optional[CategoryChannel]=None) -> None:
         await ctx.defer()
         if check_botbanned_user(ctx.author.id) == True:
             pass
@@ -371,7 +688,7 @@ class manage(Cog):
 
             await ctx.send(embed=embed)
 
-    @edit.command(description="Edits a thread")
+    @edit.command()
     @has_permissions(manage_channels=True)
     async def thread(self, ctx: Context, thread: Thread, *, name: Optional[str] =None, slowmode: Optional[str]=None) -> None:
         await ctx.defer()
@@ -436,7 +753,7 @@ class manage(Cog):
 
             await ctx.send(embed=embed)
 
-    @edit.command(description="Edits the server")
+    @edit.command()
     @has_permissions(manage_guild=True)
     async def server(self, ctx: Context, *, name: Optional[str] = None, description: Optional[str] = None, verification_level: Literal['none', 'low', 'medium', 'high', 'highest']=None) -> None:
         await ctx.defer()
@@ -488,7 +805,7 @@ class manage(Cog):
 
             await ctx.send(embed=embed)
 
-    @edit.command(name="forum", description="Edits a forum")
+    @edit.command(description="Edits a forum")
     @has_permissions(manage_channels=True)
     async def forum_1(self, ctx: Context, forum: ForumChannel, *, name: Optional[str] = None, topic: Optional[str] = None, category: Optional[CategoryChannel] = None) -> None:
         await ctx.defer()
@@ -641,7 +958,7 @@ class manage(Cog):
 
     @hybrid_command(description="Clone a channel", aliases=['copy'])
     @has_permissions(manage_channels=True)
-    async def clone(self, ctx: Context, channel: GuildChannel, name: Optional[str] =None) -> None:
+    async def clone(self, ctx: Context, channel: abc.GuildChannel, name: Optional[str] =None) -> None:
         await ctx.defer()
         if check_botbanned_user(ctx.author.id) == True:
             pass
@@ -659,6 +976,8 @@ class manage(Cog):
 async def setup(bot: Bot):
     await bot.add_cog(manage(bot))
     await bot.add_cog(Create_Group(bot))
+    await bot.add_cog(Edit_Group(bot))
+    await bot.add_cog(Delete_Group(bot))
 
 
 #needs more work
