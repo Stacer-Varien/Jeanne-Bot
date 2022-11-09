@@ -38,7 +38,7 @@ intents.webhooks = False
 intents.voice_states = False
 intents.reactions = False
 
-bot = Jeanne(command_prefix=prefixes, intents=intents,
+bot = Jeanne(command_prefix="たいと", intents=intents,#the prefix is temporary
              allowed_mentions=AllowedMentions.all())
 bot.remove_command('help')
 
