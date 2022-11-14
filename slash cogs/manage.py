@@ -3,7 +3,6 @@ from discord import *
 from discord.ext.commands import Cog, Bot, has_permissions, GroupCog
 from humanfriendly import format_timespan, parse_timespan
 from typing import Optional, Literal
-from discord_argparse import ArgumentConverter, OptionalArgument, RequiredArgument
 
 class Create_Group(GroupCog, name="create"):
     def __init__(self, bot:Bot) -> None:
@@ -359,6 +358,58 @@ class Edit_Group(GroupCog, name="edit"):
 
             await ctx.followup.send(embed=embed)
 
+class Set_Group(GroupCog, name="set"):
+    def __init__(self, bot: Bot) -> None:
+        self.bot = bot
+        super().__init__()
+
+    @app_commands.command(description="Set a welcomer and/or leaver channel")
+    @has_permissions(manage_guild=True)
+    async def welcomer(self, ctx: Interaction, welcoming_channel: Optional[TextChannel] = None, leaving_channel: Optional[TextChannel] = None) -> None:
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            if welcoming_channel and leaving_channel == None:
+                error=Embed(description="Both options are empty. Please set at least a welcomer or leaving channel", color=Color.red())
+                await ctx.followup.send(embed=error)
+            else:
+                setup=Embed(description="Welcomer channels set", color=ctx.user.color)
+                if welcoming_channel:
+                    set_welcomer(ctx.guild.id, welcoming_channel.id)
+                    setup.add_field(name='Channel welcoming users', value=welcoming_channel.mention, inline=True)
+                
+                if leaving_channel:
+                    set_leaver(ctx.guild.id, leaving_channel.id)
+                    setup.add_field(name='Channel showing users that left', value=welcoming_channel.mention, inline=True)
+
+                await ctx.followup.send(embed=setup)
+
+    @app_commands.command(description="Set a modlog channel")
+    @has_permissions(manage_guild=True)
+    async def modlog(self, ctx: Interaction, channel: TextChannel):
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            set_modloger(ctx.guild.id, channel.id)
+            embed=Embed(description='Modlog channel set', color=Color.red())
+            embed.add_field(name="Channel selected", value=channel.mention, inline=True)
+            await ctx.followup.send(embed=embed)
+
+    @app_commands.command(description="Set a report channel")
+    @has_permissions(manage_guild=True)
+    async def report(self, ctx: Interaction, channel: TextChannel):
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            set_reporter(ctx.guild.id, channel.id)
+            embed = Embed(description='Report channel set', color=Color.red())
+            embed.add_field(name="Channel selected",
+                            value=channel.mention, inline=True)
+            await ctx.followup.send(embed=embed)
+
 class manage(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
@@ -389,132 +440,69 @@ class manage(Cog):
                             value=f"`{role}` was removed from `{member}`", inline=False)
             await ctx.followup.send(embed=embed)
 
-    @app_commands.command(description="Removes a welcoming/modlog/report channel that was set from the database")
+    @app_commands.command(description="Removes a welcoming/modlog/report channel. Set all options to true to remove all")
     @has_permissions(manage_guild=True)
-    async def remove(self, ctx: Interaction, type: Literal['welcomer', 'leaver', 'modlog', 'report', 'all']):
+    async def remove(self, ctx: Interaction, welcomer: Optional[bool] = None, leaving: Optional[bool] = None, modlog: Optional[bool] = None, report: Optional[bool] = None)->None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            if type == 'welcomer':
-                wel = remove_welcomer(ctx.guild.id)
+            if welcomer and leaving and modlog and report == None:
+                error=Embed(description="Please select a channel to remove")
+                await ctx.followup.send(embed=error)
+            else:
+                embed=Embed(description="Channels removed")
 
-                if wel == False:
-                    await ctx.followup.send("You don't have a welcomer channel")
-                else:
-                    welcomer = Embed(
-                        description="Welcomer channel removed", color=0x00FF68)
-                    await ctx.followup.send(embed=welcomer)
+                if welcomer == True:
 
-            elif type == 'leaver':
-                leave = remove_leaver(ctx.guild.id)
+                    wel = remove_welcomer(ctx.guild.id)
 
-                if leave == False:
-                    await ctx.followup.send("You don't have a leaver channel")
-                else:
-                    leaver = Embed(
-                        description="Leaver channel removed", color=0x00FF68)
-                    await ctx.followup.send(embed=leaver)
+                    if wel == False:
+                        embed.add_field(
+                            name='Welcomer channel removal status', value='Failed. No welcomer channel set', inline=True)
+                    else:
+                        embed.add_field(name='Welcomer channel removal status',
+                                        value='Successful', inline=True)
 
-            elif type == 'modlog':
-                modloger = remove_modloger(ctx.guild.id)
+                if leaving == True:
 
-                if modloger == False:
-                    await ctx.followup.send("You don't have a modlog channel")
-                else:
-                    modlog = Embed(
-                        description="Modlog channel removed", color=0x00FF68)
-                    await ctx.followup.send(embed=modlog)
+                    leav = remove_leaver(ctx.guild.id)
 
-            elif type == 'report':
-                reporter = remove_reporter(ctx.guild.id)
+                    if leav == False:
+                        embed.add_field(
+                            name='Leaving channel removal status', value='Failed. No leaving channel set', inline=True)
+                    else:
+                        embed.add_field(name='Leaving channel removal status',
+                                        value='Successful', inline=True)
 
-                if reporter == False:
-                    await ctx.followup.send("You don't have a report channel")
-                else:
-                    report = Embed(
-                        description="Report channel removed", color=0x00FF68)
-                    await ctx.followup.send(embed=report)
+                if modlog == True:
 
-            elif type == 'all':
+                    mod = remove_modloger(ctx.guild.id)
 
-                try:
-                    remove_welcomer(ctx.guild.id) is True
-                except:
-                    pass
+                    if mod == False:
+                        embed.add_field(
+                            name='Modlog channel removal status', value='Failed. No modlog channel set', inline=True)
+                    else:
+                        embed.add_field(name='Modlog channel removal status',
+                                        value='Successful', inline=True)
 
-                try:
-                    remove_leaver(ctx.guild.id) is True
-                except:
-                    pass
+                if report == True:
 
-                try:
-                    remove_modloger(ctx.guild.id) is True
-                except:
-                    pass
+                    rep = remove_reporter(ctx.guild.id)
 
-                try:
-                    remove_reporter(ctx.guild.id) is True
-                except:
-                    pass
-
-                all = Embed(
-                    description='All channels that were set for the server have been removed from the database.', color=0x00FF68)
-                await ctx.followup.send(embed=all)
-
-    @hybrid_group(description="Main set command")
-    async def set(self, ctx: Interaction):
-        if check_botbanned_user(ctx.user.id) == True:
-            pass
-        else:
-            embed = Embed(title="This is a group command. However, the available commands for this is:",
-                          description="```set welcomer CHANNEL\nset leaver CHANNEL\nset modlog CHANNEL\nset report_channel CHANNEL```")
-            await ctx.send(embed=embed)
-
-    @set.command(description="Set a welcomer/modlog/report channel")
-    @has_permissions(manage_guild=True)
-    async def log_channel(self, ctx: Interaction, type: Literal['welcomer', 'leaver', 'modlog', 'report_channel'], *,
-                          channel: TextChannel):
-        await ctx.defer()
-        if check_botbanned_user(ctx.user.id) == True:
-            pass
-        else:
-            if type == 'welcomer':
-                set_welcomer(ctx.guild.id, channel.id)
-
-                welcomer = Embed(color=0x00FF68)
-                welcomer.add_field(
-                    name="Welcomer channel set", value=f"{channel.mention} has been selected to welcomer members in the server.")
-                await ctx.send(embed=welcomer)
-
-            elif type == 'leaver':
-                set_leaver(ctx.guild.id, channel.id)
-
-                leaver = Embed(color=0x00FF68)
-                leaver.add_field(
-                    name="Leave channel set", value=f"{channel.mention} has been selected if someone left the server")
-                await ctx.send(embed=leaver)
-
-            elif type == 'modlog':
-                set_modloger(ctx.guild.id, channel.id)
-
-                modlog = Embed(color=0x00FF68)
-                modlog.add_field(
-                    name="Modlog channel set", value=f"{channel.mention} has been selected to have all moderation actions updated in there.")
-                await ctx.send(embed=modlog)
-
-            elif type == 'report_channel':
-                set_reporter(ctx.guild.id, channel.id)
-
-                modlog = Embed(color=0x00FF68)
-                modlog.add_field(
-                    name="Report channel set", value=f"{channel.mention} has been selected to have all reported members in there.")
-                await ctx.send(embed=modlog)
-
-    @app_commands.command(description="Clone a channel", aliases=['copy'])
+                    if rep == False:
+                        embed.add_field(
+                            name='Report channel removal status', value='Failed. No report channel set', inline=True)
+                    else:
+                        embed.add_field(name='Report channel removal status',
+                                        value='Successful', inline=True)
+                
+                await ctx.followup.send(embed=embed)
+                        
+    @app_commands.command(description="Clone a channel")
     @has_permissions(manage_channels=True)
     async def clone(self, ctx: Interaction, channel: abc.GuildChannel, name: Optional[str] =None) -> None:
-        await ctx.defer()
+        await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
@@ -525,15 +513,13 @@ class manage(Cog):
 
             cloned = Embed(description="{} was cloned as {}".format(
                 channel.mention, c.mention))
-            await ctx.send(embed=cloned)
-
+            await ctx.followup.send(embed=cloned)
 
 async def setup(bot: Bot):
     await bot.add_cog(manage(bot))
     await bot.add_cog(Create_Group(bot))
     await bot.add_cog(Edit_Group(bot))
     await bot.add_cog(Delete_Group(bot))
+    await bot.add_cog(Set_Group(bot))
 
 
-#needs more work
-#must not forget about https://github.com/lukeciel/discord-argparse
