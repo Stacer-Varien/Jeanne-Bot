@@ -1,6 +1,6 @@
 import contextlib
 from io import StringIO
-from discord.ext.commands import Cog, Bot, hybrid_group, hybrid_command, is_owner, guild_only, Context, Greedy, command
+from discord.ext.commands import Cog, Bot, group, is_owner, guild_only, Context, Greedy, command
 from discord import *
 from os import execv
 from sys import executable, argv
@@ -8,6 +8,7 @@ from db_functions import add_botbanned_user, check_botbanned_user
 from config import BB_WEBHOOK
 from time import time
 from typing import Literal, Optional
+from discord_argparse import RequiredArgument, ArgumentConverter
 
 def restart_bot():
   execv(executable, ['python'] + argv)
@@ -17,7 +18,7 @@ class slashowner(Cog):
         self.bot = bot
 
 
-    @hybrid_group(aliases=['act', 'pressence'])
+    @group(aliases=['act', 'pressence'])
     async def activity(self, ctx : Context):
         if check_botbanned_user(ctx.author.id) == True:
             pass
@@ -57,7 +58,7 @@ class slashowner(Cog):
             await ctx.send(f"Jeanne's activity has been removed")
 
 
-    @hybrid_command(aliases=['fuser'])
+    @command(aliases=['fuser'])
     @is_owner()
     async def finduser(self, ctx: Context, user_id:int):
         """Finds a user"""
@@ -89,7 +90,7 @@ class slashowner(Cog):
                 e = [fuser, userbanner]
                 await ctx.send(embeds=e)
 
-    @hybrid_command(aliases=['restart', 'refresh'])
+    @command(aliases=['restart', 'refresh'])
     @is_owner()
     async def update(self, ctx:Context):
         """Restart me so I can be updated"""
@@ -100,16 +101,19 @@ class slashowner(Cog):
             await ctx.send(f"YAY! NEW UPDATE!")
             restart_bot()
     
-    @hybrid_command(aliases=['forbid', 'disallow', 'bban', 'bb'])
+    botban_args=ArgumentConverter(user_id=RequiredArgument(int), reason=RequiredArgument(str))
+
+    @command(aliases=['forbid', 'disallow', 'bban', 'bb'])
     @is_owner()
-    async def botban(self, ctx: Context, user_id:int, reason:str):
+    async def botban(self, ctx: Context, params:botban_args):
         """Botban a user from using the bot"""
-        await ctx.defer(ephemeral=True)
         if check_botbanned_user(ctx.author.id) == True:
             pass
-        else:   
+        else:
+            user_id=params['user_id']
             user= await self.bot.fetch_user(user_id)
-            add_botbanned_user(user_id, reason)==True                     
+            reason=params['reason']
+            add_botbanned_user(user_id, reason)                    
 
             botbanned=Embed(title="User has been botbanned!", description="They will no longer use Jeanne,permanently!")
             botbanned.add_field(name="User",
@@ -126,7 +130,7 @@ class slashowner(Cog):
 
             await ctx.send("User botbanned", ephemeral=True)
 
-    @hybrid_command(aliases=['eval', 'execute', 'exe'])
+    @command(aliases=['eval', 'execute', 'exe'])
     @is_owner()
     async def evaluate(self, ctx: Context, raw:Optional[Literal["True", "False"]]):
         """Evaluates a code"""
@@ -135,20 +139,20 @@ class slashowner(Cog):
             pass
         else:
             m = await ctx.send("Insert your code.\nType 'cancel' if you don't want to evaluate")
+
             def check(m:Message):
                 return m.author == ctx.author and m.content
 
-            code = await self.bot.wait_for('message', check=check)
-            eval=str(code.content)
+            code:Message = await self.bot.wait_for('message', check=check)
 
-            if eval.startswith("cancel"):
+            if code.content.startswith("cancel"):
                 await m.edit(content="Evaluation aborted")
-            elif eval.startswith("```") and eval.endswith("```"):
+            elif code.content.startswith("```") and code.content.endswith("```"):
                 str_obj = StringIO()
                 start_time = time()
                 try:
                     with contextlib.redirect_stdout(str_obj):
-                        exec(eval.strip("`python"))
+                        exec(code.content.strip("`python"))
                 except Exception as e:
                     
                     embed = Embed(title="Evaluation failed :negative_squared_cross_mark:\nResults:",
