@@ -1,5 +1,5 @@
 from discord import *
-from discord.ext.commands import Cog, hybrid_command, Context, Bot
+from discord.ext.commands import Cog, Bot
 from db_functions import check_botbanned_user
 
 
@@ -19,21 +19,20 @@ class help_button(ui.View):
                       label="ToS and Privacy Policy", url=tos_and_policy_url))
 
 
-class slashhelp(Cog):
+class help(Cog):
     def __init__(self, bot:Bot):
         self.bot = bot
 
-    @hybrid_command(name='help', aliases=['h'])
-    async def help(self, ctx: Context):
-        """Get help from the wiki or join the support server for further help"""
+    @app_commands.command(description="Get help from the wiki or join the support server for further help")
+    async def help(self, ctx: Interaction):
         if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
             view=help_button()
             help = Embed(
                 description="Click on one of the buttons to open the documentation or get help on the support server")
-            await ctx.send(embed=help, view=view)
+            await ctx.response.send_message(embed=help, view=view)
 
 
 async def setup(bot:Bot):
-    await bot.add_cog(slashhelp(bot))
+    await bot.add_cog(help(bot))

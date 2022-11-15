@@ -1,11 +1,10 @@
-from ast import alias
 from db_functions import check_botbanned_user
 from assets.buttons import ViewRoles
 from config import db
 from time import time
 from datetime import timedelta
 from sys import version_info as py_version
-from discord.ext.commands import Cog, Bot, Context, hybrid_command
+from discord.ext.commands import Cog, Bot
 from discord import *
 from discord import __version__ as discord_version
 from typing import Optional
@@ -16,11 +15,12 @@ start_time = time()
 class slashinfo(Cog):
     def __init__(self, bot:Bot):
         self.bot = bot
-        self.bot_version="3.5 VarPatch"
+        self.bot_version="4.0"
 
-    @hybrid_command(description="See the bot's status from development to now", aliases=['botstats'])
-    async def stats(self, ctx : Context):
-        if check_botbanned_user(ctx.author.id) == True:
+    @app_commands.command(description="See the bot's status from development to now")
+    async def stats(self, ctx : Interaction):
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             botowner = self.bot.get_user(597829930964877369)
@@ -46,20 +46,20 @@ class slashinfo(Cog):
                 name="Uptime", value=f"{uptime} hours", inline=True)
 
             embed.add_field(name="Invites",
-                            value="• [Invite me to your server](https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=1378013736054&scope=bot)\n• [Vote for me](https://top.gg/bot/831993597166747679)\n• [Join the support server](https://discord.gg/VVxGUmqQhF)\n• [Go to my website to learn more about me](https://jeannebot.nicepage.io/)", inline=True)
+                            value="• [Invite me to your server](https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=1428479601718&scope=bot%20applications.commands)\n• [Vote for me](https://top.gg/bot/831993597166747679)\n• [Join the support server](https://discord.gg/jh7jkuk2pp)\n• [Go to my website to learn more about me](https://jeannebot.nicepage.io/)", inline=True)
 
             embed.set_thumbnail(
                 url=self.bot.user.avatar)
-            await ctx.send(embed=embed)
+            await ctx.followup.send(embed=embed)
 
-    @hybrid_command(description="See the information of a member or yourself", aliases=['uinfo'])
-    async def userinfo(self, ctx : Context, member: Optional[Member]= None)->None:
-        await ctx.defer()
-        if check_botbanned_user(ctx.author.id) == True:
+    @app_commands.command(description="See the information of a member or yourself")
+    async def userinfo(self, ctx : Interaction, member: Optional[Member]= None)->None:
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             if member == None:
-                member = ctx.author
+                member = ctx.user
             user = await self.bot.fetch_user(member.id)
             hasroles = [role.name for role in member.roles][1:][:: -1]
             view=ViewRoles()
@@ -89,21 +89,21 @@ class slashinfo(Cog):
             
             if banner == True:
                 userinfo.set_image(url=user.banner)
-                await ctx.send(embed=userinfo, view=view)
+                await ctx.followup.send(embed=userinfo, view=view)
             else:
-                await ctx.send(embed=userinfo, view=view)
+                await ctx.followup.send(embed=userinfo, view=view)
             
             await view.wait()
             
             if view.value=="roles":
                 embed = Embed(title="{}'s roles".format(member), description='\n'.join(
                     hasroles) + '\n`@everyone`', color=member.color)
-                await ctx.send(embed=embed, ephemeral=True)
+                await ctx.followup.send(embed=embed, ephemeral=True)
 
-    @hybrid_command(description="Get information about this server", aliases=['sinfo'])
-    async def serverinfo(self, ctx : Context):
-        await ctx.defer()
-        if check_botbanned_user(ctx.author.id) == True:
+    @app_commands.command(description="Get information about this server")
+    async def serverinfo(self, ctx : Interaction):
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             guild = ctx.guild
@@ -113,7 +113,7 @@ class slashinfo(Cog):
             
 
             date = round(guild.created_at.timestamp())
-            serverinfo = Embed(title="Server's Info", color=ctx.author.color)
+            serverinfo = Embed(title="Server's Info", color=ctx.user.color)
             serverinfo.add_field(name="Name", value=guild.name, inline=True)
             serverinfo.add_field(name="ID", value=guild.id, inline=True)
             serverinfo.add_field(
@@ -143,59 +143,60 @@ class slashinfo(Cog):
                 serverinfo.set_image(url=guild.splash)
 
             if len(emojis) == 0:
-                await ctx.send(embed=serverinfo)
+                await ctx.followup.send(embed=serverinfo)
 
             else:
                 emojie = Embed(title="Emojis", description=''.join(emojis[:40]), color=0x00B0ff)
 
                 e=[serverinfo, emojie]
                 
-                await ctx.send(embeds=e)
+                await ctx.followup.send(embeds=e)
 
 
-    @hybrid_command(description="Check how fast I respond to a command", aliases=['response'])
-    async def ping(self, ctx : Context):
-        if check_botbanned_user(ctx.author.id) == True:
+    @app_commands.command(description="Check how fast I respond to a command")
+    async def ping(self, ctx : Interaction):
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            await ctx.response.defer()
             start_time = time()
-            test = Embed(description="Testing ping", color=ctx.author.color)
-            msg = await ctx.send(embed=test)
+            test = Embed(description="Testing ping", color=ctx.user.color)
+            await ctx.followup.send(embed=test)
 
-            ping = Embed(color=ctx.author.color)
+            ping = Embed(color=ctx.user.color)
             ping.add_field(
                 name="Bot Latency", value=f'{round(self.bot.latency * 1000)}ms', inline=False)
             end_time = time()
             ping.add_field(
                 name="API Latency", value=f'{round((end_time - start_time) * 1000)}ms', inline=False)
-            await msg.edit(embed=ping)
+            await ctx.edit_original_response(embed=ping)
 
-    @hybrid_command(description="See the server's banner", aliases=['gbanner'])
-    async def guildbanner(self, ctx : Context):
+    @app_commands.command(description="See the server's banner")
+    async def guildbanner(self, ctx : Interaction):
         await ctx.response.defer()
-        if check_botbanned_user(ctx.author.id) == True:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             guild = ctx.guild
 
             if guild.premium_subscription_count < 2:
                 nobanner = Embed(description="Server is not boosted at tier 2")
-                await ctx.send(embed=nobanner)
+                await ctx.followup.send(embed=nobanner)
             
+            elif guild.banner==None:
+                embed = Embed(description='Server has no banner')
+                await ctx.followup.send(embed=embed)
             else:
-                try:
-                    embed = Embed(colour=ctx.user.color)
-                    embed.set_footer(text=f"{guild.name}'s banner")
-                    embed.set_image(url=ctx.guild.banner)
-                    await ctx.send(embed=embed)
-                except:
-                    embed=Embed(description='Guild has no banner')
-                    await ctx.send(embed=embed)
+                embed = Embed(colour=ctx.user.color)
+                embed.set_footer(text=f"{guild.name}'s banner")
+                embed.set_image(url=ctx.guild.banner)
+                await ctx.followup.send(embed=embed)
 
-    @hybrid_command(description="See your avatar or another member's avatar")
-    async def avatar(self, ctx: Context, member: Optional[Member]=None)->None:
+
+    @app_commands.command(description="See your avatar or another member's avatar")
+    async def avatar(self, ctx: Interaction, member: Optional[Member]=None)->None:
         await ctx.response.defer()
-        if check_botbanned_user(ctx.author.id) == True:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             if member==None:
@@ -203,15 +204,15 @@ class slashinfo(Cog):
 
             avatar = Embed(title=f"{member}'s Avatar", color=member.color)
             avatar.set_image(url=member.avatar)
-            await ctx.send(embed=avatar)
+            await ctx.followup.send(embed=avatar)
 
-    @hybrid_command(description="See your guild avatar or a member's guild avatar", aliases=['gavatar'])
-    async def guildavatar(self, ctx: Context, member: Optional[Member]=None)->None:
-        if check_botbanned_user(ctx.author.id) == True:
+    @app_commands.command(description="See your guild avatar or a member's guild avatar")
+    async def guildavatar(self, ctx: Interaction, member: Optional[Member]=None)->None:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             if member == None:
-                member = ctx.author
+                member = ctx.user
             
             member_avatar = bool(member.guild_avatar)
 
@@ -219,12 +220,12 @@ class slashinfo(Cog):
 
             if member_avatar == True:
                 guild_avatar.set_image(url=member.guild_avatar)
-                await ctx.send(embed=guild_avatar)
+                await ctx.followup.send(embed=guild_avatar)
             else:
                 guild_avatar.set_image(url=member.display_avatar)
                 guild_avatar.set_footer(
                     text="Member has no server avatar. Passed normal avatar instead")
-                await ctx.send(embed=guild_avatar)
+                await ctx.followup.send(embed=guild_avatar)
 
 
 async def setup(bot:Bot):

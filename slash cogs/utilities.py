@@ -1,6 +1,6 @@
 from discord import *
 from aiohttp import ClientSession
-from discord.ext.commands import Cog, Bot, hybrid_command, hybrid_group, Context, has_permissions
+from discord.ext.commands import Cog, Bot, GroupCog
 from db_functions import check_botbanned_user, get_report_channel
 from assets.buttons import Confirmation
 from assets.modals import Bot_Report_Modal, Say_Modal
@@ -10,14 +10,15 @@ from discord.ui import View
 from asyncio import TimeoutError
 from py_expression_eval import Parser
 from typing import Optional, Literal
+from discord.app_commands import *
 
-bot_invite_url = "https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=2550197270&redirect_uri=https%3A%2F%2Fdiscord.com%2Foauth2%2Fauthorize%3Fclient_id%3D831993597166747679%26scope%3Dbot&scope=bot%20applications.commands"
+bot_invite_url = "https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=1428479601718&scope=bot%20applications.commands"
 
 topgg_invite = "https://top.gg/bot/831993597166747679"
 
 discordbots_url = "https://discord.bots.gg/bots/831993597166747679"
 
-haze_url = "https://discord.gg/VVxGUmqQhF"
+haze_url = "https://discord.gg/jh7jkuk2pp"
 
 
 def send_bot_report(report_type, report, reporter):
@@ -26,7 +27,6 @@ def send_bot_report(report_type, report, reporter):
     report.set_footer(text=f"Reporter: {reporter}")
 
     return report
-
 
 class invite_button(View):
     def __init__(self):
@@ -42,30 +42,21 @@ class invite_button(View):
                       label="HAZE", url=haze_url))
 
 
-class slashutilities(Cog):
-    def __init__(self, bot:Bot):
+class Weather_Group(GroupCog, name="weather"):
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
-        self.parser = Parser()
+        super().__init__()
 
-    @hybrid_group(description="Main weather command")
-    async def weather(self, ctx: Context):
-        if check_botbanned_user(ctx.author.id) == True:
+    @app_commands.command(description="Get weather information on a city")
+    async def city(self, ctx: Interaction, city: str):
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            embed = Embed(title="This is a group command. However, the available commands for this is:",
-                          description="```weather city CITY`\n`weather zip_code ZIP_CODE COUNTRY_CODE```")
-            await ctx.send(embed=embed)
-
-    @weather.command(description="Get weather information on a city")
-    async def city(self, ctx: Context, city:str):
-        await ctx.defer()
-        if check_botbanned_user(ctx.author.id) == True:
-            pass
-        else:
-            min_tempe=self.bot.get_emoji(1009760796017963119)
-            max_tempe=self.bot.get_emoji(1009761541169618964)
-            guste=self.bot.get_emoji(1009766251431743569)
-            globe=self.bot.get_emoji(1009723165305491498)
+            min_tempe = self.bot.get_emoji(1009760796017963119)
+            max_tempe = self.bot.get_emoji(1009761541169618964)
+            guste = self.bot.get_emoji(1009766251431743569)
+            globe = self.bot.get_emoji(1009723165305491498)
 
             urlil = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={WEATHER}&units=metric'
             async with ClientSession() as session:
@@ -73,88 +64,136 @@ class slashutilities(Cog):
                     if r.status == 200:
                         js = await r.json()
                         feels_like = js['main']['feels_like']
-                        min_temp=js['main']['temp_min']
-                        max_temp=js['main']['temp_max']
+                        min_temp = js['main']['temp_min']
+                        max_temp = js['main']['temp_max']
                         desc = js['weather'][0]["description"]
                         count = js['sys']['country']
                         hum = js['main']['humidity']
-                        visibility=js['visibility']
-                        clouds=js['clouds']['all']
+                        visibility = js['visibility']
+                        clouds = js['clouds']['all']
                         windir = js['wind']['deg']
-                        wind_gust=js['wind']['speed']
+                        wind_gust = js['wind']['speed']
 
                         embed = Embed(
-                            title=f'⛅ Weather details of {city} ⛅', description=f'{globe} Country: {count}', colour=ctx.author.color)
-                        embed.add_field(name=":newspaper: Description", value=desc, inline=True)
-                        embed.add_field(name=f"{min_tempe} Minimum Temperature", value=f"{min_temp}°C", inline=True)
-                        embed.add_field(name=f"{max_tempe} Maximum Temperature", value=f"{max_temp}°C", inline=True)
-                        embed.add_field(name=":raised_back_of_hand: Feels Like", value=f"{feels_like}°C", inline=True)
-                        embed.add_field(name=":droplet: Humidity", value=hum, inline=True)
-                        embed.add_field(name=":eye: Visibility", value=f"{visibility}m", inline=True)
-                        embed.add_field(name=":cloud: Clouds", value=f"{clouds}%", inline=True)
-                        embed.add_field(name=":arrow_right: Wind Direction", value=f"{windir}°", inline=True)
-                        embed.add_field(name=f"{guste} Wind Gust", value=f"{wind_gust}m/s", inline=True)
-                        await ctx.send(embed=embed)
+                            title=f'⛅ Weather details of {city} ⛅', description=f'{globe} Country: {count}', colour=ctx.user.color)
+                        embed.add_field(
+                            name=":newspaper: Description", value=desc, inline=True)
+                        embed.add_field(
+                            name=f"{min_tempe} Minimum Temperature", value=f"{min_temp}°C", inline=True)
+                        embed.add_field(
+                            name=f"{max_tempe} Maximum Temperature", value=f"{max_temp}°C", inline=True)
+                        embed.add_field(
+                            name=":raised_back_of_hand: Feels Like", value=f"{feels_like}°C", inline=True)
+                        embed.add_field(name=":droplet: Humidity",
+                                        value=hum, inline=True)
+                        embed.add_field(name=":eye: Visibility",
+                                        value=f"{visibility}m", inline=True)
+                        embed.add_field(name=":cloud: Clouds",
+                                        value=f"{clouds}%", inline=True)
+                        embed.add_field(
+                            name=":arrow_right: Wind Direction", value=f"{windir}°", inline=True)
+                        embed.add_field(
+                            name=f"{guste} Wind Gust", value=f"{wind_gust}m/s", inline=True)
+                        await ctx.followup.send(embed=embed)
 
-    @weather.command(description="Get weather information on a city but with a ZIP code and Country code", aliases=['zp', 'zip'])
-    async def zip_code(self, ctx: Context, zip_code:str, country_code:str):
-        await ctx.defer()
-        if check_botbanned_user(ctx.author.id) == True:
+    @app_commands.command(description="Get weather information on a city but with a ZIP code and Country code")
+    async def zip_code(self, ctx: Interaction, zip_code: str, country_code: str):
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            min_tempe=self.bot.get_emoji(1009760796017963119)
-            max_tempe=self.bot.get_emoji(1009761541169618964)
-            guste=self.bot.get_emoji(1009766251431743569)
+            min_tempe = self.bot.get_emoji(1009760796017963119)
+            max_tempe = self.bot.get_emoji(1009761541169618964)
+            guste = self.bot.get_emoji(1009766251431743569)
             urlil = f'http://api.openweathermap.org/data/2.5/weather?zip={zip_code},{country_code}&appid={WEATHER}&units=metric'
             async with ClientSession() as session:
                 async with session.get(urlil) as r:
                     if r.status == 200:
                         js = await r.json()
                         feels_like = js['main']['feels_like']
-                        min_temp=js['main']['temp_min']
-                        max_temp=js['main']['temp_max']
+                        min_temp = js['main']['temp_min']
+                        max_temp = js['main']['temp_max']
                         desc = js['weather'][0]["description"]
                         count = js['sys']['country']
                         hum = js['main']['humidity']
-                        visibility=js['visibility']
-                        clouds=js['clouds']['all']
+                        visibility = js['visibility']
+                        clouds = js['clouds']['all']
                         pres = js['wind']['pressure']
                         windir = js['wind']['deg']
-                        wind_gust=js['wind']['speed']
+                        wind_gust = js['wind']['speed']
                         embed = Embed(
-                            title=f'⛅ Weather details of {zip_code} ⛅', description=f':earth_africa: Country: {count}', colour=ctx.author.color)
-                        embed.add_field(name=":newspaper: Description", value=desc, inline=True)
-                        embed.add_field(name=f"{min_tempe} Minimum Temperature", value=f"{min_temp}°C", inline=True)
-                        embed.add_field(name=f"{max_tempe} Maximum Temperature", value=f"{max_temp}°C", inline=True)
-                        embed.add_field(name=":raised_back_of_hand: Feels Like", value=f"{feels_like}°C", inline=True)
-                        embed.add_field(name=":droplet: Humidity", value=hum, inline=True)
-                        embed.add_field(name=":eye: Visibility", value=f"{visibility}m", inline=True)
-                        embed.add_field(name=":cloud: Clouds", value=f"{clouds}%", inline=True)
-                        embed.add_field(name=":cloud: Pressure", value=f"{pres}hPa", inline=True)
-                        embed.add_field(name=":arrow_right: Wind Direction", value=f"{windir}°", inline=True)
-                        embed.add_field(name=f"{guste} Wind Gust", value=f"{wind_gust}m/s", inline=True)
-                        await ctx.send(embed=embed)
+                            title=f'⛅ Weather details of {zip_code} ⛅', description=f':earth_africa: Country: {count}', colour=ctx.user.color)
+                        embed.add_field(
+                            name=":newspaper: Description", value=desc, inline=True)
+                        embed.add_field(
+                            name=f"{min_tempe} Minimum Temperature", value=f"{min_temp}°C", inline=True)
+                        embed.add_field(
+                            name=f"{max_tempe} Maximum Temperature", value=f"{max_temp}°C", inline=True)
+                        embed.add_field(
+                            name=":raised_back_of_hand: Feels Like", value=f"{feels_like}°C", inline=True)
+                        embed.add_field(name=":droplet: Humidity",
+                                        value=hum, inline=True)
+                        embed.add_field(name=":eye: Visibility",
+                                        value=f"{visibility}m", inline=True)
+                        embed.add_field(name=":cloud: Clouds",
+                                        value=f"{clouds}%", inline=True)
+                        embed.add_field(name=":cloud: Pressure",
+                                        value=f"{pres}hPa", inline=True)
+                        embed.add_field(
+                            name=":arrow_right: Wind Direction", value=f"{windir}°", inline=True)
+                        embed.add_field(
+                            name=f"{guste} Wind Gust", value=f"{wind_gust}m/s", inline=True)
+                        await ctx.followup.send(embed=embed)
 
-    @hybrid_command(description="Do a calculation")
-    async def calculator(self, ctx: Context, calculate):
-        await ctx.defer()
-        if check_botbanned_user(ctx.author.id) == True:
+
+class Say_Group(GroupCog, name="say"):
+    def __init__(self, bot: Bot) -> None:
+        self.bot = bot
+        super().__init__()
+
+    @app_commands.command(description="Type something and I will say it in plain text")
+    @checks.has_permissions(administrator=True)
+    async def plain(self, ctx: Interaction, channel: Literal[ChannelType.text, ChannelType.news]):
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            await ctx.response.send_modal(Say_Modal('plain', channel))
+
+    @app_commands.command(description="Type something and I will say it in embed")
+    @checks.has_permissions(administrator=True)
+    async def embed(self, ctx: Interaction, channel: Literal[ChannelType.text, ChannelType.news]):
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            await ctx.response.send_modal(Say_Modal('embed', channel))
+
+class slashutilities(Cog):
+    def __init__(self, bot:Bot):
+        self.bot = bot
+        self.parser = Parser()
+
+
+
+    @app_commands.command(description="Do a calculation")
+    async def calculator(self, ctx: Interaction, calculate):
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             try:
                 answer = self.parser.parse(calculate).evaluate({})
                 calculation = Embed(title="Result", color=0x00FFFF)
                 calculation.add_field(name=calculate, value=answer)
-                await ctx.send(embed=calculation)
+                await ctx.followup.send(embed=calculation)
             except Exception as e:
                 failed = Embed(
                     description=f"{e}\nPlease refer to [Python Operators](https://www.geeksforgeeks.org/python-operators/?ref=lbp) if you don't know how to use the command")
-                await ctx.send(embed=failed)
+                await ctx.followup.send(embed=failed)
 
-    @hybrid_command(description="Invite me to your server or join the support server")
-    async def invite(self, ctx: Context):
-        await ctx.defer()
-        if check_botbanned_user(ctx.author.id) == True:
+    @app_commands.command(description="Invite me to your server or join the support server")
+    async def invite(self, ctx: Interaction):
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             invite = Embed(
@@ -162,35 +201,12 @@ class slashutilities(Cog):
                 description="Click on one of these buttons to invite me to you server or join my creator's server",
                 color=0x00bfff)
 
-            await ctx.send(embed=invite, view=invite_button())
+            await ctx.followup.send(embed=invite, view=invite_button())
 
-    @hybrid_group(description="Main say command")
-    async def say(self, ctx: Context):
-        if check_botbanned_user(ctx.author.id) == True:
-            pass
-        else:
-            embed = Embed(title="This is a group command. However, the available commands for this is:",
-                          description="```say plain`\n`say embed```")
-            await ctx.send(embed=embed)
 
-    @say.command(name='plain', description="Type something and I will say it in plain text")
-    @has_permissions(administrator=True)
-    async def say_plain(self, ctx: Interaction, channel: Literal[ChannelType.text, ChannelType.news]):
-        if check_botbanned_user(ctx.user.id) == True:
-            pass
-        else:
-            await ctx.response.send_modal(Say_Modal('plain', channel))
 
-    @say.command(name='embed', description="Type something and I will say it in embed")
-    @has_permissions(administrator=True)
-    async def say_embed(self, ctx: Interaction, channel: Literal[ChannelType.text, ChannelType.news]):
-        if check_botbanned_user(ctx.user.id) == True:
-            pass
-        else:
-            await ctx.response.send_modal(Say_Modal('embed', channel))
-
-    @hybrid_command(name='bot_report')
-    async def bot_report(self, ctx: Interaction, type:Literal['bug', 'fault', 'exploit', 'violator']):
+    @app_commands.command()
+    async def botreport(self, ctx: Interaction, type:Literal['bug', 'fault', 'exploit', 'violator']):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
@@ -206,7 +222,7 @@ class slashutilities(Cog):
             await ctx.response.send_modal(Bot_Report_Modal(report_type))
 
 
-    @hybrid_command(description="Report a member in your server")
+    @app_commands.command(description="Report a member in your server")
     async def report(self, ctx: Interaction, member: Member, anonymous:Literal['True', 'False']):
         await ctx.response.defer(ephemeral=True)
         if check_botbanned_user(ctx.user.id) == True:
@@ -230,7 +246,7 @@ class slashutilities(Cog):
                         elif attachments==True:
                             return m.author == ctx.user and m.attachments
                     try:
-                        msg = await self.bot.wait_for('message', check=check, timeout=600)
+                        msg:Message = await self.bot.wait_for('message', check=check, timeout=600)
                         
 
                         report_channel_id = report_channel[0]
@@ -279,7 +295,7 @@ class slashutilities(Cog):
                     except TimeoutError:
                         await ctx.user.send("Timeout")
 
-
-
 async def setup(bot:Bot):
+    await bot.add_cog(Weather_Group(bot))
+    await bot.add_cog(Say_Group(bot))
     await bot.add_cog(slashutilities(bot))
