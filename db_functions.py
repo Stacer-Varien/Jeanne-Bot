@@ -77,7 +77,6 @@ def get_next_daily(user:int):
 
 
 def add_botbanned_user(user: int, reason: str):
-    try:
         db.execute(
             "INSERT OR IGNORE INTO botbannedData (user_id, reason) VALUES (?,?)", (user, reason,))
 
@@ -117,9 +116,6 @@ def add_botbanned_user(user: int, reason: str):
 
         db.commit()
 
-        return(True)
-    except:
-        return(False)
 
 
 def fetch_wallpapers(qp:Emoji):
