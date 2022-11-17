@@ -9,9 +9,9 @@ class errors(Cog):
         self.bot.tree.on_error = self.on_app_command_error
     
     @Cog.listener()
-    async def on_app_command_error(self, ctx: Interaction, error: AppCommandError):
+    async def on_app_command_error(self, ctx: Interaction, error: AppCommand):
         embed = Embed(description=error, color=Color.red())
-        await ctx.response.send_message(embed=embed)
+        await ctx.followup.send(embed=embed)
     
     @Cog.listener()
     async def on_command_error(self, ctx:Context, error):

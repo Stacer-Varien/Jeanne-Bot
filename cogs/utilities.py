@@ -153,7 +153,7 @@ class Say_Group(GroupCog, name="say"):
 
     @app_commands.command(description="Type something and I will say it in plain text")
     @checks.has_permissions(administrator=True)
-    async def plain(self, ctx: Interaction, channel: Literal[ChannelType.text, ChannelType.news]):
+    async def plain(self, ctx: Interaction, channel: TextChannel):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
@@ -161,7 +161,7 @@ class Say_Group(GroupCog, name="say"):
 
     @app_commands.command(description="Type something and I will say it in embed")
     @checks.has_permissions(administrator=True)
-    async def embed(self, ctx: Interaction, channel: Literal[ChannelType.text, ChannelType.news]):
+    async def embed(self, ctx: Interaction, channel: TextChannel):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
@@ -172,10 +172,8 @@ class slashutilities(Cog):
         self.bot = bot
         self.parser = Parser()
 
-
-
     @app_commands.command(description="Do a calculation")
-    async def calculator(self, ctx: Interaction, calculate):
+    async def calculator(self, ctx: Interaction, calculate:str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass

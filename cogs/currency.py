@@ -127,7 +127,7 @@ class Guess_Group(GroupCog, name="guess"):
     async def bet_error(self, ctx: Interaction, error:AppCommandError):
         if isinstance(error, app_commands.CommandOnCooldown):
             cooldown = Embed(
-                description=f"WOAH! Calm down!\nTry again after `{error.retry_after} seconds`", color=0xff0000)
+                description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`", color=0xff0000)
             await ctx.response.send_message(embed=cooldown)
 
 class Dice_Group(GroupCog, name="dice"):
@@ -205,10 +205,10 @@ class Dice_Group(GroupCog, name="dice"):
             await ctx.response.send_message(embed=cooldown)
 
     @bet.error
-    async def bet_error(self, ctx: Interaction, error:AppCommandError):
+    async def bet_error(self, ctx: Interaction, error: AppCommandError):
         if isinstance(error, app_commands.CommandOnCooldown):
             cooldown = Embed(
-                description=f"WOAH! Calm down!\nTry again after `{error.retry_after} seconds`", color=0xff0000)
+                description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`", color=0xff0000)
             await ctx.response.send_message(embed=cooldown)
 
 class Flip_Group(GroupCog, name="flip"):
@@ -312,7 +312,7 @@ class Flip_Group(GroupCog, name="flip"):
     async def bet_error(self, ctx: Interaction, error: AppCommandError):
         if isinstance(error, app_commands.CommandOnCooldown):
             cooldown = Embed(
-                description=f"WOAH! Calm down!\nTry again after `{error.retry_after} seconds`", color=0xff0000)
+                description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`", color=0xff0000)
             await ctx.response.send_message(embed=cooldown)
 
 class currency(Cog):
@@ -365,7 +365,7 @@ class currency(Cog):
     async def balance_error(self, ctx: Interaction, error:AppCommandError):
         if isinstance(error, app_commands.CommandOnCooldown):
             cooldown = Embed(
-                description=f"WOAH! Calm down! Why keep checking again quickly?\nTry again after `{error.retry_after} seconds`", color=0xff0000)
+                description=f"WOAH! Calm down! Why keep checking again quickly?\nTry again after `{round(error.retry_after, 2)} seconds`", color=0xff0000)
             await ctx.response.send_message(embed=cooldown)
 
 async def setup(bot:Bot):

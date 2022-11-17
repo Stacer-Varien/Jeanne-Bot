@@ -98,6 +98,7 @@ class slashinfo(Cog):
             if view.value=="roles":
                 embed = Embed(title="{}'s roles".format(member), description='\n'.join(
                     hasroles) + '\n`@everyone`', color=member.color)
+                await ctx.edit_original_response(view=None)
                 await ctx.followup.send(embed=embed, ephemeral=True)
 
     @app_commands.command(description="Get information about this server")
@@ -172,7 +173,7 @@ class slashinfo(Cog):
             await ctx.edit_original_response(embed=ping)
 
     @app_commands.command(description="See the server's banner")
-    async def guildbanner(self, ctx : Interaction):
+    async def serverbanner(self, ctx : Interaction):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -207,10 +208,11 @@ class slashinfo(Cog):
             await ctx.followup.send(embed=avatar)
 
     @app_commands.command(description="See your guild avatar or a member's guild avatar")
-    async def guildavatar(self, ctx: Interaction, member: Optional[Member]=None)->None:
+    async def serveravatar(self, ctx: Interaction, member: Optional[Member]=None)->None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            await ctx.response.defer()
             if member == None:
                 member = ctx.user
             

@@ -96,16 +96,16 @@ class Background_Group(GroupCog, name="background"):
                     await view.wait()
 
                     if view.value == None:
-                        await ctx.edit_original_response("Timeout")
+                        await ctx.edit_original_response(content="Timeout", view=None, embed=None)
                     elif view.value is True:
                         if create_user_inventory(ctx.user.id) == False:
                             pass
                         add_user_wallpaper(ctx.user.id, item_id)
                         embed1 = Embed(description=f"Background wallpaper bought and selected",color=Color.blue())
-                        await ctx.edit_original_response(embed=embed1)
+                        await ctx.edit_original_response(embed=embed1, view=None)
 
                     elif view.value is False:
-                        await ctx.edit_original_response("Cancelled")
+                        await ctx.edit_original_response("Cancelled", view=None, embed=None)
 
     @app_commands.command(description='Select a wallpaper')
     async def use(self, ctx: Interaction, name: str):
@@ -126,7 +126,7 @@ class Background_Group(GroupCog, name="background"):
                await ctx.followup.send(embed=embed)
 
     @app_commands.command(description="Buy a custom background pic for your level card")
-    async def buy_custom(self, ctx: Interaction, name: str, link: Optional[str]=None, image:Optional[Attachment]=None) -> None:
+    async def buycustom(self, ctx: Interaction, name: str, link: Optional[str]=None, image:Optional[Attachment]=None) -> None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -142,10 +142,6 @@ class Background_Group(GroupCog, name="background"):
                 notenough = Embed(
                     description='You do not have enough QP.\nPlease get more QP by doing `/daily`, `/guess` and/or `/dice`')
                 await ctx.followup.send(embed=notenough)
-            
-            elif link and image == None:
-                nothing=Embed(description="You didn't put an image URL or image. Please add one")
-                await ctx.followup.send(embed=nothing)
             
             elif link and image:
                 one = Embed(
@@ -172,10 +168,11 @@ If you feel that the image fits the above or not, click one of the buttons to co
                 await ctx.followup.send(embed=confirm, view=view)
                 await view.wait()
                 if view.value == True:
-
+                    loading = self.bot.get_emoji(1012677456811016342)
+                    await ctx.edit_original_response(content="Creating preview... This will take some time {}".format(loading), view=None, embed=None)
                     qp = self.bot.get_emoji(980772736861343774)
                     if requests.get(link).status_code == 200:
-                    
+
                         if image:
                             link=image.url
                         args = {'level_card': link, 'profile_image': str(ctx.user.avatar.with_format('png')), 'server_level': 100, 'server_user_xp': 50, 'server_next_xp': 100, 'global_level': 100, 'global_user_xp': 100, 'global_next_xp': 100, 'user_name': str(ctx.user),}
@@ -187,7 +184,7 @@ If you feel that the image fits the above or not, click one of the buttons to co
 
                         preview = Embed(description="This is the preview of the level card.", color=Color.blue()).add_field(name="Cost", value=f"1000 {qp}").set_footer(text="Is this the background you wanted?").set_footer(text="Please note that if the custom background violates ToS or is NSFW, it will be removed with NO REFUNDS!")
                         view = Confirmation()
-                        await ctx.edit_original_response(content=None, file=file, embed=preview, view=view)
+                        await ctx.edit_original_response(content=None, attachments=[file], embed=preview, view=view)
                         await view.wait()
 
                         if view.value is None:
@@ -200,7 +197,7 @@ If you feel that the image fits the above or not, click one of the buttons to co
                             await ctx.edit_original_response(embed=embed1, view=None)
 
                         elif view.value is False:
-                            await ctx.followup(content="Cancelled", embed=None, view=None)
+                            await ctx.edit_original_response(content="Cancelled", embed=None, view=None)
                 elif view.value == False:
                     check = Embed(
                         description="Please try to sort out the image first and try again", color=Color.blue())
@@ -218,7 +215,7 @@ If you feel that the image fits the above or not, click one of the buttons to co
                 a = fetch_user_inventory(ctx.user.id)
                 inv = Embed(title="List of wallpapers you have",
                             color=Color.blue())
-                inv.description = "\n".join(a)
+                inv.description = a
                 await ctx.followup.send(embed=inv)
             except FileNotFoundError:
                 embed = Embed(

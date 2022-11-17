@@ -1,4 +1,4 @@
-from config import TOKEN, prefixes
+from config import TOKEN
 from discord.ext.commands import Bot
 from discord import *
 from os import listdir
@@ -24,9 +24,9 @@ class Jeanne(Bot):
         self.tree.copy_global_to(guild=MY_GUILD)
         await self.tree.sync(guild=MY_GUILD)
         #slash cogs
-        for filename in listdir('./slash cogs'):
+        for filename in listdir('./cogs'):
           if filename.endswith('.py'):
-            await bot.load_extension(f'slash cogs.{filename[:-3]}')
+            await bot.load_extension(f'cogs.{filename[:-3]}')
             print(f"{filename} loaded")
 
           else:

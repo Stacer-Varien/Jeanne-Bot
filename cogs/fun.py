@@ -101,7 +101,7 @@ class fun(Cog):
             await ctx.followup.send(embed=choose)
 
     @app_commands.command(description="Check how much of a simp you are")
-    async def simp_rate(self, ctx: Interaction, member: Optional[Member] = None):
+    async def simprate(self, ctx: Interaction, member: Optional[Member] = None):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -122,8 +122,8 @@ class fun(Cog):
 
             await ctx.followup.send(embed=simp)
 
-    @app_commands(description="Check how gay you are")
-    async def gay_rate(self, ctx: Interaction, member: Optional[Member] =None):
+    @app_commands.command(description="Check how gay you are")
+    async def gayrate(self, ctx: Interaction, member: Optional[Member] =None):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -143,7 +143,6 @@ class fun(Cog):
                 gay.set_image(url="https://i.imgur.com/tYAbWCl.jpg")
 
             await ctx.followup.send(embed=gay)
-
 
 async def setup(bot: Bot):
     await bot.add_cog(fun(bot))

@@ -2,8 +2,6 @@ from os import getenv
 from dotenv import load_dotenv
 from sqlite3 import connect
 
-prefixes=['j!', 'jeanne ', 'JEANNE ', 'J!', 'Jeanne ']
-
 load_dotenv()
 TOKEN = getenv("token")
 WEATHER = getenv("weather_api")

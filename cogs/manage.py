@@ -1,8 +1,11 @@
-from db_functions import *
+from typing import Literal, Optional
+
 from discord import *
-from discord.ext.commands import Cog, Bot, has_permissions, GroupCog
+from discord.ext.commands import Bot, Cog, GroupCog, has_permissions
 from humanfriendly import format_timespan, parse_timespan
-from typing import Optional, Literal
+
+from db_functions import *
+
 
 class Create_Group(GroupCog, name="create"):
     def __init__(self, bot:Bot) -> None:
@@ -11,12 +14,11 @@ class Create_Group(GroupCog, name="create"):
     
     @app_commands.command(description="Creates a text channel")
     @has_permissions(manage_channels=True)
-    async def text_channel(self, ctx: Interaction, name: str, category: Optional[CategoryChannel] = None, slowmode: str = None) -> None:
-        await ctx.response.defer()
+    async def textchannel(self, ctx: Interaction, name: str, category: Optional[CategoryChannel] = None, slowmode: str = None) -> None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-
+            await ctx.response.defer()
             embed = Embed()
             embed.color = Color.green()
             embed.description = "Text Channel `{}` has been created".format(
@@ -41,11 +43,11 @@ class Create_Group(GroupCog, name="create"):
 
     @app_commands.command(description='Create a voice channel')
     @has_permissions(manage_channels=True)
-    async def voice_channel(self, ctx: Interaction, name: str, category: Optional[CategoryChannel] = None) -> None:
-        await ctx.response.defer()
+    async def voicechannel(self, ctx: Interaction, name: str, category: Optional[CategoryChannel] = None) -> None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            await ctx.response.defer()
             embed = Embed()
             embed.description = "Voice Channel `{}` has been created".format(
                 name)
@@ -63,10 +65,10 @@ class Create_Group(GroupCog, name="create"):
     @app_commands.command(description='Create a category')
     @has_permissions(manage_channels=True)
     async def category(self, ctx: Interaction, name: str):
-        await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            await ctx.response.defer()
             await ctx.guild.create_category(name=name)
             embed = Embed()
             embed.description = "Category `{}` has been created".format(name)
@@ -76,11 +78,11 @@ class Create_Group(GroupCog, name="create"):
 
     @app_commands.command(description='Create a stage channel')
     @has_permissions(manage_channels=True)
-    async def stage_channel(self, ctx: Interaction, name: str, topic: str, category: CategoryChannel):
-        await ctx.response.defer()
+    async def stagechannel(self, ctx: Interaction, name: str, topic: str, category: CategoryChannel):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            await ctx.response.defer()
             await ctx.guild.create_stage_channel(name=name, topic=topic, category=category)
             embed = Embed()
             embed.description = "Stage channel `{}` has been created".format(
@@ -88,14 +90,14 @@ class Create_Group(GroupCog, name="create"):
             embed.color = Color.green()
 
             await ctx.followup.send(embed=embed)
-
+    
     @app_commands.command(description="Create a forum")
     @has_permissions(manage_channels=True)
     async def forum(self, ctx: Interaction, name: str, topic: str, category:CategoryChannel):
-        await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            await ctx.response.defer()
             forum = await ctx.guild.create_forum(name=name, topic=topic)
             embed = Embed()
             embed.description = "Forum `{}` has been created".format(
@@ -110,11 +112,11 @@ class Create_Group(GroupCog, name="create"):
 
     @app_commands.command(description="Create a role")
     @has_permissions(manage_roles=True)
-    async def role(self, ctx: Interaction, name:str, color:str, hoisted:Literal["true", "false"]=None, mentionable:Literal["true", "false"]=None)->None:
-        await ctx.response.defer()
+    async def role(self, ctx: Interaction, name:str, color:Optional[str]=None, hoisted:Literal["true", "false"]=None, mentionable:Literal["true", "false"]=None)->None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            await ctx.response.defer()
             role = await ctx.guild.create_role(name=name)
             embed = Embed()
             embed.description = "Role `{}` has been created".format(name)
@@ -143,13 +145,13 @@ class Create_Group(GroupCog, name="create"):
 
     @app_commands.command(description="Makes a public thread channel")
     @has_permissions(create_public_threads=True)
-    async def thread(self, ctx: Interaction, name: str, channel:TextChannel, message_id:int, slowmode: Optional[str]=None):
-        await ctx.response.defer()
+    async def thread(self, ctx: Interaction, name: str, channel:TextChannel, message_id:str, slowmode: Optional[str]=None):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            message = await channel.fetch_message(message_id)
-            thread = await ctx.channel.create_thread(name=name, message=message, type=ChannelType.public_thread)
+            await ctx.response.defer()
+            message = await channel.fetch_message(int(message_id))
+            thread = await channel.create_thread(name=name, message=message)
 
             embed = Embed()
             embed.description = "Thread `{}` has been created on [message]({})".format(
@@ -174,10 +176,10 @@ class Delete_Group(GroupCog, name="delete"):
     @app_commands.command(description="Deletes a channel")
     @has_permissions(manage_channels=True)
     async def channel(self, ctx: Interaction, channel: abc.GuildChannel):
-        await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            await ctx.response.defer()
             await channel.delete()
             embed = Embed(description="{} has been deleted".format(
                 channel.name), color=0x00FF68)
@@ -186,10 +188,10 @@ class Delete_Group(GroupCog, name="delete"):
     @app_commands.command(description="Deletes a role")
     @has_permissions(manage_channels=True)
     async def role(self, ctx: Interaction, role: Role):
-        await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            await ctx.response.defer()
             await role.delete()
             embed = Embed(description="{} has been deleted".format(
                 role.name), color=0x00FF68)
@@ -202,11 +204,11 @@ class Edit_Group(GroupCog, name="edit"):
 
     @app_commands.command(description="Edits a text/news channel")
     @has_permissions(manage_channels=True)
-    async def text_channel(self, ctx: Interaction, channel: TextChannel, name: Optional[str]=None, nsfw_enabled:Literal["true", "false"]=None, slowmode: Optional[str]=None, category: Optional[CategoryChannel]=None)->None:
-        await ctx.response.defer()
+    async def textchannel(self, ctx: Interaction, channel: TextChannel, name: Optional[str]=None, nsfw_enabled:Literal["true", "false"]=None, slowmode: Optional[str]=None, category: Optional[CategoryChannel]=None)->None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            await ctx.response.defer()
             embed = Embed()
             embed.description = "Channel `{}` has been edited".format(
                 channel.name)
@@ -241,39 +243,13 @@ class Edit_Group(GroupCog, name="edit"):
 
             await ctx.followup.send(embed=embed)
 
-    @app_commands.command(description="Edits a thread")
-    @has_permissions(manage_channels=True)
-    async def thread(self, ctx: Interaction, thread: Thread, name: Optional[str]=None, slowmode: Optional[str]=None)->None:
-        await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
-            pass
-        else:
-            embed = Embed()
-            embed.description = "Thread `{}` has been edited".format(
-                thread.name)
-            embed.color = Color.green()
-
-            if name:
-                await thread.edit(name=name)
-                embed.add_field(name="Name", value=name, inline=True)
-
-            if slowmode:
-                delay = int(parse_timespan(slowmode))
-                if delay > 21600:
-                    delay = 21600
-                await thread.edit(slowmode_delay=delay)
-                embed.add_field(name="Slowmode",
-                                value=format_timespan(delay), inline=True)
-
-            await ctx.followup.send(embed=embed)
-
     @app_commands.command(description="Edit a role")
     @has_permissions(manage_roles=True)
     async def role(self, ctx: Interaction, role: Role, name: Optional[str]=None, color:Optional[str]=None, hoisted:Literal["true", "false"]=None, mentionable:Literal["true", "false"]=None)->None:
-        await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            await ctx.response.defer()
             embed = Embed()
             embed.description = "Role `{}` has been edited".format(role.name)
             embed.color = Color.green()
@@ -309,10 +285,10 @@ class Edit_Group(GroupCog, name="edit"):
     @app_commands.command(description="Edits the server")
     @has_permissions(manage_guild=True)
     async def server(self, ctx: Interaction, name: Optional[str]=None, description: Optional[str]=None, verification_level:Literal['none', 'low', 'medium', 'high', 'highest']=None)->None:
-        await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            await ctx.response.defer()
             embed = Embed()
             embed.description = "{} has been edited".format(ctx.guild.name)
             embed.color = Color.green()
@@ -366,10 +342,10 @@ class Set_Group(GroupCog, name="set"):
     @app_commands.command(description="Set a welcomer and/or leaver channel")
     @has_permissions(manage_guild=True)
     async def welcomer(self, ctx: Interaction, welcoming_channel: Optional[TextChannel] = None, leaving_channel: Optional[TextChannel] = None) -> None:
-        await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            await ctx.response.defer()
             if welcoming_channel and leaving_channel == None:
                 error=Embed(description="Both options are empty. Please set at least a welcomer or leaving channel", color=Color.red())
                 await ctx.followup.send(embed=error)
@@ -388,10 +364,10 @@ class Set_Group(GroupCog, name="set"):
     @app_commands.command(description="Set a modlog channel")
     @has_permissions(manage_guild=True)
     async def modlog(self, ctx: Interaction, channel: TextChannel):
-        await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            await ctx.response.defer()
             set_modloger(ctx.guild.id, channel.id)
             embed=Embed(description='Modlog channel set', color=Color.red())
             embed.add_field(name="Channel selected", value=channel.mention, inline=True)
@@ -400,10 +376,10 @@ class Set_Group(GroupCog, name="set"):
     @app_commands.command(description="Set a report channel")
     @has_permissions(manage_guild=True)
     async def report(self, ctx: Interaction, channel: TextChannel):
-        await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            await ctx.response.defer()
             set_reporter(ctx.guild.id, channel.id)
             embed = Embed(description='Report channel set', color=Color.red())
             embed.add_field(name="Channel selected",
@@ -416,7 +392,7 @@ class manage(Cog):
 
     @app_commands.command(description="Add a role to a member")
     @has_permissions(manage_roles=True)
-    async def add_role(self, ctx: Interaction, member: Member, role: Role):
+    async def addrole(self, ctx: Interaction, member: Member, role: Role):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
@@ -425,15 +401,15 @@ class manage(Cog):
             embed = Embed(color=0x00FF68)
             embed.add_field(name=f"Role given",
                             value=f"`{role}` was given to `{member}`", inline=False)
-            await ctx.response.send_message(embed=embed)
+            await ctx.followup.send(embed=embed)
 
     @app_commands.command(description="Remove a role from a member")
     @has_permissions(manage_roles=True)
-    async def remove_role(self, ctx: Interaction, member: Member, role: Role):
-        await ctx.response.defer()
+    async def removerole(self, ctx: Interaction, member: Member, role: Role):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            await ctx.response.defer()
             await member.remove_roles(role)
             embed = Embed(color=0x00FF68)
             embed.add_field(name=f"Role removed",
@@ -443,10 +419,10 @@ class manage(Cog):
     @app_commands.command(description="Removes a welcoming/modlog/report channel. Set all options to true to remove all")
     @has_permissions(manage_guild=True)
     async def remove(self, ctx: Interaction, welcomer: Optional[bool] = None, leaving: Optional[bool] = None, modlog: Optional[bool] = None, report: Optional[bool] = None)->None:
-        await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            await ctx.response.defer()
             if welcomer and leaving and modlog and report == None:
                 error=Embed(description="Please select a channel to remove")
                 await ctx.followup.send(embed=error)
@@ -502,10 +478,10 @@ class manage(Cog):
     @app_commands.command(description="Clone a channel")
     @has_permissions(manage_channels=True)
     async def clone(self, ctx: Interaction, channel: abc.GuildChannel, name: Optional[str] =None) -> None:
-        await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            await ctx.response.defer()
             if name == None:
                 name = channel.name
 

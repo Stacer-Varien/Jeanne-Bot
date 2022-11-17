@@ -25,7 +25,7 @@ class help(Cog):
 
     @app_commands.command(description="Get help from the wiki or join the support server for further help")
     async def help(self, ctx: Interaction):
-        if check_botbanned_user(ctx.author.id) == True:
+        if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             view=help_button()

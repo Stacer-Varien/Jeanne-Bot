@@ -150,4 +150,4 @@ class nsfw(Cog):
 
 
 async def setup(bot: Bot):
-    bot.add_cog(nsfw(bot))
+    await bot.add_cog(nsfw(bot))

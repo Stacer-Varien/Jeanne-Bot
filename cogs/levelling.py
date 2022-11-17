@@ -9,6 +9,7 @@ from cooldowns import *
 from discord.app_commands import *
 
 
+
 class Rank_Group(GroupCog, name="rank"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
@@ -86,7 +87,7 @@ class levelling(Cog):
                 pass
 
     @app_commands.command(description="See your level or someone else's level")
-    @checks.cooldown(1, 20, key=lambda i: (i.user.id))
+    @checks.cooldown(1, 60, key=lambda i: (i.user.id))
     async def level(self, ctx: Interaction, member: Optional[Member]=None)->None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -113,6 +114,13 @@ class levelling(Cog):
             except:
                 no_exp = Embed(description="Failed to get level stats")
                 await ctx.followup.send(embed=no_exp)
+
+    @level.error
+    async def level_error(self, ctx: Interaction, error: AppCommandError):
+        if isinstance(error, app_commands.CommandOnCooldown):
+            cooldown = Embed(
+                description=f"You have already checked your level?\nTry again after `{round(error.retry_after, 2)} seconds`", color=0xff0000)
+            await ctx.response.send_message(embed=cooldown)
 
 async def setup(bot: Bot):
     await bot.add_cog(levelling(bot))
