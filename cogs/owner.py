@@ -19,6 +19,7 @@ class slashowner(Cog):
 
 
     @group(aliases=['act', 'pressence'])
+    @is_owner()
     async def activity(self, ctx : Context):
         if check_botbanned_user(ctx.author.id) == True:
             pass
