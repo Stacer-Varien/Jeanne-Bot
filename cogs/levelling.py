@@ -73,18 +73,17 @@ class levelling(Cog):
         if check_botbanned_user(message.author.id) == True:
             pass
         else:
-            humans = len(
-                [member for member in message.guild.members if not member.bot])
-            if humans > 5:
-                ratelimit = self.get_ratelimit(message)
-                if ratelimit == None:
-                    if not message.author.bot:
+            if not message.author.bot:
+                try:
+                    ratelimit = self.get_ratelimit(message)
+                    if ratelimit == None:
                         add_xp(message.author.id, message.guild.id)
                         add_level(message.author.id, message.guild.id)
-                    else:
-                        pass
+                except AttributeError:
+                    pass
             else:
                 pass
+            
 
     @app_commands.command(description="See your level or someone else's level")
     @checks.cooldown(1, 60, key=lambda i: (i.user.id))
