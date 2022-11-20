@@ -225,7 +225,7 @@ class Flip_Group(GroupCog, name="flip"):
         else:
             jeannes_pick = ['Heads', 'Tails']
             qp = str(self.bot.get_emoji(980772736861343774))
-            view = Heads_or_Tails()
+            view = Heads_or_Tails(ctx.user)
             ask = Embed(description="Heads or Tails?")
             await ctx.followup.send(embed=ask, view=view)
             await view.wait()
@@ -274,7 +274,7 @@ class Flip_Group(GroupCog, name="flip"):
                 await ctx.followup.send(embed=zerobal)
 
             elif int(bet) <= int(balance):
-                view = Heads_or_Tails()
+                view = Heads_or_Tails(ctx.user)
                 ask = Embed(description="Heads or Tails?")
                 await ctx.followup.send(embed=ask, view=view)
                 await view.wait()
@@ -329,11 +329,17 @@ class currency(Cog):
 
             if give_daily(ctx.user.id) == True:
                 balance=get_balance(ctx.user.id)
+                
 
                 daily = Embed(
                     title="Daily", description=f"**{ctx.user}**, you claimed your daily reward.", color=ctx.user.color)
-                daily.add_field(name="Rewards:",
-                                value=f"You received 100 {qp}")
+                
+                if datetime.today().weekday() > 5:
+                    daily.add_field(name="Rewards (weekend):",
+                                    value=f"You received 200 {qp}")
+                else:
+                    daily.add_field(name="Rewards:",
+                                    value=f"You received 100 {qp}")
                 daily.add_field(
                     name='Balance', value=f"{balance} {qp}")
                 daily.add_field(name="Next Daily:",

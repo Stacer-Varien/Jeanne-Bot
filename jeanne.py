@@ -37,13 +37,12 @@ intents.presences = False
 intents.webhooks = False
 intents.voice_states = False
 intents.reactions = False
+intents.auto_moderation=False
 
-bot = Jeanne(command_prefix="j!", intents=intents,#the prefix is temporary
+
+bot = Jeanne(command_prefix="j!", intents=intents, #the prefix is owner only
              allowed_mentions=AllowedMentions.all())
 bot.remove_command('help')
-
-
-#bot.load_extension('topgg.topgg_')
 
 @bot.event
 async def on_ready():

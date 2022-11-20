@@ -5,6 +5,7 @@ from discord import Embed, Color, Emoji
 from config import db, inv_db
 from os import listdir, makedirs, path
 from requests import get
+from random import randint
 
 current_time = date.today()
 
