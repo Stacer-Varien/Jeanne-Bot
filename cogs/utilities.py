@@ -3,13 +3,11 @@ from aiohttp import ClientSession
 from discord.ext.commands import Cog, Bot, GroupCog
 from db_functions import check_botbanned_user, get_report_channel
 from assets.buttons import Confirmation
-from assets.modals import Bot_Report_Modal, Say_Modal
-from config import WEATHER
-from discord.abc import GuildChannel
+from config import WEATHER, WEBHOOK
 from discord.ui import View
 from asyncio import TimeoutError
 from py_expression_eval import Parser
-from typing import Optional, Literal
+from typing import Literal, Optional
 from discord.app_commands import *
 
 bot_invite_url = "https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=1428479601718&scope=bot%20applications.commands"
@@ -27,6 +25,8 @@ def send_bot_report(report_type, report, reporter):
     report.set_footer(text=f"Reporter: {reporter}")
 
     return report
+
+
 
 class invite_button(View):
     def __init__(self):
@@ -49,10 +49,10 @@ class Weather_Group(GroupCog, name="weather"):
 
     @app_commands.command(description="Get weather information on a city")
     async def city(self, ctx: Interaction, city: str):
-        await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            await ctx.response.defer()
             min_tempe = self.bot.get_emoji(1009760796017963119)
             max_tempe = self.bot.get_emoji(1009761541169618964)
             guste = self.bot.get_emoji(1009766251431743569)
@@ -97,7 +97,7 @@ class Weather_Group(GroupCog, name="weather"):
                         await ctx.followup.send(embed=embed)
 
     @app_commands.command(description="Get weather information on a city but with a ZIP code and Country code")
-    async def zip_code(self, ctx: Interaction, zip_code: str, country_code: str):
+    async def zipcode(self, ctx: Interaction, zip_code: str, country_code: str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -118,7 +118,6 @@ class Weather_Group(GroupCog, name="weather"):
                         hum = js['main']['humidity']
                         visibility = js['visibility']
                         clouds = js['clouds']['all']
-                        pres = js['wind']['pressure']
                         windir = js['wind']['deg']
                         wind_gust = js['wind']['speed']
                         embed = Embed(
@@ -137,8 +136,6 @@ class Weather_Group(GroupCog, name="weather"):
                                         value=f"{visibility}m", inline=True)
                         embed.add_field(name=":cloud: Clouds",
                                         value=f"{clouds}%", inline=True)
-                        embed.add_field(name=":cloud: Pressure",
-                                        value=f"{pres}hPa", inline=True)
                         embed.add_field(
                             name=":arrow_right: Wind Direction", value=f"{windir}°", inline=True)
                         embed.add_field(
@@ -157,7 +154,21 @@ class Say_Group(GroupCog, name="say"):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            await ctx.response.send_modal(Say_Modal('plain', channel))
+            await ctx.followup.send("Type something!", ephemeral=True)
+
+            def check(m:Message):
+                return m.author == ctx.user and m.content
+
+            try:
+                msg:Message = await self.bot.wait_for('message', check=check, timeout=300)
+
+                await ctx.followup.send("Sent", ephemeral=True)
+                await msg.delete()
+                await channel.send(msg.content)
+            except TimeoutError:
+                timeout = Embed(
+                    description=f"Guess you have nothing to say", color=0xFF0000)
+                await ctx.followup.send(embed=timeout, ephemeral=True)
 
     @app_commands.command(description="Type something and I will say it in embed")
     @checks.has_permissions(administrator=True)
@@ -165,7 +176,25 @@ class Say_Group(GroupCog, name="say"):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            await ctx.response.send_modal(Say_Modal('embed', channel))
+            ask = Embed(
+                description="Type something\nMaxinum characters allowed is 4096")
+            await ctx.followup.send(embed=ask)
+
+            def check(m:Message):
+                return m.author == ctx.user and m.content
+
+            try:
+                msg:Message = await self.bot.wait_for('message', check=check, timeout=300)
+
+                await ctx.followup.send("Sent", ephemeral=True)
+                await msg.delete()
+                embed_text = Embed(description=msg.content, color=Color.blue())
+                await channel.send(embed=embed_text)
+
+            except TimeoutError:
+                timeout = Embed(
+                    description=f"Guess you have nothing to say", color=0xFF0000)
+                await ctx.followup.send(embed=timeout, ephemeral=True)
 
 class slashutilities(Cog):
     def __init__(self, bot:Bot):
@@ -181,7 +210,7 @@ class slashutilities(Cog):
             try:
                 answer = self.parser.parse(calculate).evaluate({})
                 calculation = Embed(title="Result", color=0x00FFFF)
-                calculation.add_field(name=calculate, value=answer)
+                calculation.add_field(name=f"`{calculate}`", value=answer)
                 await ctx.followup.send(embed=calculation)
             except Exception as e:
                 failed = Embed(
@@ -203,11 +232,13 @@ class slashutilities(Cog):
 
 
 
-    @app_commands.command()
+    @app_commands.command(description="Submit a bot report if you found something wrong")
+    @checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     async def botreport(self, ctx: Interaction, type:Literal['bug', 'fault', 'exploit', 'violator']):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            await ctx.response.defer()
             if type == 'bug':
                 report_type = "Bug"
             elif type == 'fault':
@@ -217,15 +248,70 @@ class slashutilities(Cog):
             elif type == 'violator':
                 report_type = "Violator"
 
-            await ctx.response.send_modal(Bot_Report_Modal(report_type))
+            try:            
+                if report_type == 'bug' or 'fault' or 'exploit':
+                    m = await ctx.user.send("What have you found?\nPlease include steps on how you were able to find it and include proof if possible")
+                
+                elif report_type == 'violator':
+                    m = await ctx.user.send("Who has violated the rules and ToS of Jeanne? Please include proof if possible")
+
+                await ctx.followup.send("Please go to your [DMs]({}) to report what you have found about Jeanne".format(m.jump_url), ephemeral=True)
+
+                def check(m:Message):
+                    attachments = bool(m.attachments)
+                    content=bool(m.content)
+                    if attachments and content == True:
+                        return m.author == ctx.user and m.content and m.attachments
+                    elif content == True:
+                        return m.author == ctx.user and m.content
+                    elif attachments==True:
+                        return m.author == ctx.user and m.attachments
+                    elif attachments==True and content=='':
+                        return m.author == ctx.user and m.attachments
+                try:
+                    msg:Message = await self.bot.wait_for('message', check=check, timeout=600)
+
+                    view=Confirmation(ctx.user)
+                    embed = Embed(title="Before it gets submitted, did you make sure everything you have told is legit?")
+                    await ctx.user.send(embed=embed, view=view)
+                    await view.wait()
+
+                    if view.value == None:
+                        await ctx.user.send("Timeout")
+
+                    elif view.value == True:
+                        await ctx.user.send("Thank you for submitting your bot report. I will look into it. Unfortunately, you have to wait for the outcome if it was successful or not.")
+                        report = Embed(title=f'{report_type} reported',
+                                            color=Color.brand_red())
+                        report.set_footer(text='Reporter {}| `{}`'.format(ctx.user, ctx.user.id))
+                                
+                        if msg.content!='':
+                            report.description=msg.content
+                        else:
+                            pass
+
+                        try:
+                            image_urls = [x.url for x in msg.attachments]
+                            images = "\n".join(image_urls)
+                            SyncWebhook.from_url(WEBHOOK).send(content=images,embed=report)
+                        except:
+                            SyncWebhook.from_url(WEBHOOK).send(embed=report)
+
+                    elif view.value == False:
+                        await ctx.user.send("Bot Report Cancelled")
+                except TimeoutError:
+                    await ctx.user.send("Timeout")
+            except:
+                await ctx.followup.send("Your DMs are not opened. Please open them for this process", ephemeral=True)
+
 
 
     @app_commands.command(description="Report a member in your server")
     async def report(self, ctx: Interaction, member: Member, anonymous:Literal['True', 'False']):
-        await ctx.response.defer(ephemeral=True)
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            await ctx.response.defer(ephemeral=True)
             report_channel = get_report_channel(ctx.guild.id)
             if report_channel == None:
                 await ctx.followup.send("This server doesn't have a report channel set")
