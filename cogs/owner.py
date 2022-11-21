@@ -8,7 +8,6 @@ from db_functions import add_botbanned_user, check_botbanned_user
 from config import BB_WEBHOOK
 from time import time
 from typing import Literal, Optional
-from discord_argparse import RequiredArgument, ArgumentConverter
 
 def restart_bot():
   execv(executable, ['python'] + argv)
@@ -102,40 +101,38 @@ class slashowner(Cog):
             await ctx.send(f"YAY! NEW UPDATE!")
             restart_bot()
     
-    botban_args=ArgumentConverter(user_id=RequiredArgument(int), reason=RequiredArgument(str))
-
     @command(aliases=['forbid', 'disallow', 'bban', 'bb'])
     @is_owner()
-    async def botban(self, ctx: Context, params:botban_args):
+    async def botban(self, ctx: Context, user_id:int, *, reason:str=None):
         """Botban a user from using the bot"""
         if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
-            user_id=params['user_id']
-            user= await self.bot.fetch_user(user_id)
-            reason=params['reason']
-            add_botbanned_user(user_id, reason)                    
+            if reason == None:
+                await ctx.send("Reason missing for botban", ephemeral=True)
+            else:
+                user=await self.bot.fetch_user(user_id)
+                add_botbanned_user(user_id, reason)                    
 
-            botbanned=Embed(title="User has been botbanned!", description="They will no longer use Jeanne,permanently!")
-            botbanned.add_field(name="User",
-                            value=user)
-            botbanned.add_field(name="ID", value=user.id,
-                            inline=True)
-            botbanned.add_field(name="Reason of ban",
-                                    value=reason,
-                                    inline=False)
-            botbanned.set_footer(text="Due to this user botbanned, all data except warnings are immediatley deletedfrom the database! They will have no chance of appealing their botban and all the commands executed bythem are now rendered USELESS!")
-            botbanned.set_thumbnail(url=user.avatar)
-            webhook = SyncWebhook.from_url(BB_WEBHOOK)
-            webhook.send(embed=botbanned)
+                botbanned=Embed(title="User has been botbanned!", description="They will no longer use Jeanne, permanently!")
+                botbanned.add_field(name="User",
+                                value=user)
+                botbanned.add_field(name="ID", value=user.id,
+                                inline=True)
+                botbanned.add_field(name="Reason of ban",
+                                        value=reason,
+                                        inline=False)
+                botbanned.set_footer(text="Due to this user botbanned, all data except warnings are immediatley deletedfrom the database! They will have no chance of appealing their botban and all the commands executed bythem are now rendered USELESS!")
+                botbanned.set_thumbnail(url=user.avatar)
+                webhook = SyncWebhook.from_url(BB_WEBHOOK)
+                webhook.send(embed=botbanned)
 
-            await ctx.send("User botbanned", ephemeral=True)
+                await ctx.send("User botbanned", ephemeral=True)
 
-    @command(aliases=['eval', 'execute', 'exe'])
+    @command(aliases=['eval', 'execute', 'exe', 'exec'])
     @is_owner()
     async def evaluate(self, ctx: Context, raw:Optional[Literal["True", "False"]]):
         """Evaluates a code"""
-        await ctx.defer()
         if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
@@ -151,6 +148,7 @@ class slashowner(Cog):
             elif code.content.startswith("```") and code.content.endswith("```"):
                 str_obj = StringIO()
                 start_time = time()
+                await ctx.typing()
                 try:
                     with contextlib.redirect_stdout(str_obj):
                         exec(code.content.strip("`python"))
