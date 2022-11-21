@@ -209,6 +209,7 @@ class Mute_Group(GroupCog, name="mute"):
 
     @app_commands.command(description="Create a mute role with default mute permissions")
     @checks.has_permissions(manage_guild=True)
+    @checks.bot_has_permissions(manage_roles=True, manage_channels=True, manage_permissions=True)
     async def createrole(self, ctx: Interaction):
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -648,7 +649,7 @@ class moderation(Cog):
 
     @app_commands.command(description="Ban multiple members at once. You can put only 20 user IDs. leave a space after each ID")
     @checks.has_permissions(administrator=True)
-    @checks.cooldown(1, 300, key=lambda i: (i.guild.id))
+    @checks.cooldown(1, 1800, key=lambda i: (i.guild.id))
     async def massban(self, ctx:Interaction, user_id:str, reason:str):
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -714,7 +715,7 @@ class moderation(Cog):
                 await ctx.edit_original_response(embed=cancelled, view=None)
 
     @app_commands.command(description="Unban multiple members at once. You can put only 20 user IDs. Leave a space after each ID")
-    @checks.cooldown(1, 300, key=lambda i: (i.guild.id))
+    @checks.cooldown(1, 1800, key=lambda i: (i.guild.id))
     @checks.has_permissions(administrator=True)
     async def massunban(self, ctx: Interaction, user_id: str, reason:str):
         await ctx.response.defer()
