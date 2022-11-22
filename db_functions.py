@@ -1,14 +1,13 @@
 from datetime import date, datetime, timedelta
 from shutil import rmtree
-from sqlite3 import connect
 from humanfriendly import parse_timespan
-from nextcord import Embed, Color, Emoji
+from discord import Embed, Color, Emoji
 from config import db, inv_db
 from os import listdir, makedirs, path
 from requests import get
+from random import randint
 
 current_time = date.today()
-
 
 def check_botbanned_user(user: int):
     try:
@@ -29,7 +28,6 @@ def get_balance(user: int):
         return 0
     else:
         return data[0]
-
 
 def add_qp(user: int, amount: int):
     cur = db.execute("INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)",
@@ -52,19 +50,24 @@ def give_daily(user: int):
     next_claim= current_time + timedelta(days=1)
     data = db.execute("SELECT * FROM bankData WHERE user_id = ?", (user,)).fetchone()
 
+    if datetime.today().weekday() > 5:
+        qp=200
+    else:
+        qp=100
+
     if data == None:
         cur = db.execute(
-            "INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)", (user, 100, round(next_claim.timestamp()),))
+            "INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)", (user, qp, round(next_claim.timestamp()),))
 
         if cur.rowcount == 0:
             db.execute(
-                "UPDATE bankData SET claimed_date = ? , amount = amount + 100 WHERE user_id = ?", (round(next_claim.timestamp()), user,))
+                "UPDATE bankData SET claimed_date = ? , amount = amount + ? WHERE user_id = ?", (round(next_claim.timestamp()), qp, user,))
         db.commit()
         return(True)
 
     elif data[2] < round(current_time.timestamp()):
         db.execute(
-            "UPDATE bankData SET claimed_date = ? , amount = amount + 100 WHERE user_id = ?", (round(next_claim.timestamp()), user,))
+            "UPDATE bankData SET claimed_date = ? , amount = amount + ? WHERE user_id = ?", (round(next_claim.timestamp()), qp, user,))
         db.commit()
         return(True)
 
@@ -78,7 +81,6 @@ def get_next_daily(user:int):
 
 
 def add_botbanned_user(user: int, reason: str):
-    try:
         db.execute(
             "INSERT OR IGNORE INTO botbannedData (user_id, reason) VALUES (?,?)", (user, reason,))
 
@@ -118,9 +120,6 @@ def add_botbanned_user(user: int, reason: str):
 
         db.commit()
 
-        return(True)
-    except:
-        return(False)
 
 
 def fetch_wallpapers(qp:Emoji):
@@ -197,9 +196,10 @@ def use_wallpaper(name, user):
         "UPDATE userWallpaperInventory SET wallpaper = ? WHERE user_id = ?", (name, user,))
 
 def fetch_user_inventory(user: int):
-    inventory = listdir("./User_Inventories/{}/wallpapers/".format(user))
-    inventory.sort()
-    return '\n'.join(inventory)
+    wallpapers = [wallpaper.strip('.png') for wallpaper in listdir(
+        "./User_Inventories/{}/wallpapers/".format(user)) if wallpaper.endswith('.png')]
+    wallpapers.sort()
+    return "\n".join(wallpapers)
     
 
 
@@ -246,13 +246,16 @@ def get_user_level(user: int):
 
 
 def add_xp(member: int, server: int):
+    if datetime.today().weekday() > 5:
+        xp=10
+    else:
+        xp=5
     cursor1 = db.execute("INSERT OR IGNORE INTO serverxpData (guild_id, user_id, lvl, exp, cumulative_exp) VALUES (?,?,?,?,?)", (
-        server, member, 0, 5, 5,))
+        server, member, 0, xp, xp,))
 
     cursor2 = db.execute(
-        "INSERT OR IGNORE INTO globalxpData (user_id, lvl, exp, cumulative_exp) VALUES (?,?,?,?)", (member, 0, 5, 5,))
+        "INSERT OR IGNORE INTO globalxpData (user_id, lvl, exp, cumulative_exp) VALUES (?,?,?,?)", (member, 0, xp, xp,))
 
-    xp = 5
     if cursor1.rowcount == 0:
         server_exp = get_member_xp(member, server)
         cumulated_exp = get_member_cumulated_xp(member, server)

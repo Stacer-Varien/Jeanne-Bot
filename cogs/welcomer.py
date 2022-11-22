@@ -1,5 +1,5 @@
-from nextcord import *
-from nextcord.ext.commands import Cog, Bot
+from discord import *
+from discord.ext.commands import Cog, Bot
 from db_functions import *
 
 class welcomer(Cog):
@@ -40,5 +40,5 @@ class welcomer(Cog):
         except:
             pass
 
-def setup(bot:Bot):
-    bot.add_cog(welcomer(bot))
+async def setup(bot:Bot):
+    await bot.add_cog(welcomer(bot))

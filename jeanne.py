@@ -1,11 +1,9 @@
-
+from config import TOKEN
+from discord.ext.commands import Bot
+from discord import *
 from os import listdir
 from assets.handler import handler
-handler()
-from nextcord import *
-from nextcord.ext.commands import Bot as Jeanne
-from config import TOKEN
-#from nextcord.gateway import DiscordWebSocket
+#from discord.gateway import DiscordWebSocket
 
 #class MyDiscordWebSocket(DiscordWebSocket):
 
@@ -18,33 +16,37 @@ from config import TOKEN
 
 #DiscordWebSocket.from_client = MyDiscordWebSocket.from_client
 
+MY_GUILD = Object(id=809862945211285555)
+
+
+class Jeanne(Bot):
+    async def setup_hook(self):
+        self.tree.copy_global_to(guild=MY_GUILD)
+        await self.tree.sync(guild=MY_GUILD)
+        #slash cogs
+        for filename in listdir('./cogs'):
+          if filename.endswith('.py'):
+            await bot.load_extension(f'cogs.{filename[:-3]}')
+            print(f"{filename} loaded")
+
+          else:
+            print(f'Unable to load {filename[:-3]}')
+
 intents = Intents().all()
 intents.presences = False
 intents.webhooks = False
 intents.voice_states = False
 intents.reactions = False
-intents.scheduled_events = False
+intents.auto_moderation=False
 
-bot = Jeanne(intents=intents,
+
+bot = Jeanne(command_prefix="j!", intents=intents, #the prefix is owner only
              allowed_mentions=AllowedMentions.all())
 bot.remove_command('help')
 
-for filename in listdir('./slash cogs'):
-  if filename.endswith('.py'):
-    bot.load_extension(f'slash cogs.{filename[:-3]}')
-    print(f"{filename} loaded")
-
-  else:
-    print(f'Unable to load {filename[:-3]}')
-
-#bot.load_extension('topgg.topgg_')
-
 @bot.event
 async def on_ready():
-  
   print('Connected to bot: {}'.format(bot.user.name))
   print('Bot ID: {}'.format(bot.user.id))
 
-bot.run(TOKEN)
-
-
+bot.run(TOKEN, log_handler=handler())

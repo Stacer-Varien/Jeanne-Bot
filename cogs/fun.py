@@ -1,19 +1,19 @@
 from random import *
-from nextcord import *
-from nextcord import slash_command as jeanne_slash
-from nextcord.ext.commands import Cog, Bot
+from discord import *
+from discord.ext.commands import Cog, Bot
 from db_functions import add_botbanned_user, check_botbanned_user
 from assets.needed import *
-from config import BB_WEBHOOK, ANIMEME
+from config import BB_WEBHOOK
 from assets.imgur import get_animeme_pic
+from typing import Optional
 
 
-class slashfun(Cog):
+class fun(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @jeanne_slash(name='8ball', description="Ask 8 ball anything and you will get your awnser")
-    async def _8ball(self, ctx: Interaction, question=SlashOption(description="What question do you have?")):
+    @app_commands.command(name='8ball', description="Ask 8 ball anything and you will get your awnser")
+    async def _8ball(self, ctx: Interaction, question:str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -25,8 +25,8 @@ class slashfun(Cog):
                 name="Answer:", value=f'{choice(eight_ball_answers)}', inline=False)
             await ctx.followup.send(embed=embed)
 
-    @jeanne_slash(description="Say something and I will say it in reversed text")
-    async def reverse(self, ctx: Interaction, text=SlashOption(description="Type something")):
+    @app_commands.command(description="Say something and I will say it in reversed text")
+    async def reverse(self, ctx: Interaction, text:str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -57,7 +57,7 @@ class slashfun(Cog):
                     text="Author: {} | {}".format(ctx.user, ctx.user.id))
                 await ctx.followup.send(embed=msg)
 
-    @jeanne_slash(description="Get a random animeme")
+    @app_commands.command(description="Get a random animeme")
     async def animeme(self, ctx: Interaction):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -68,8 +68,8 @@ class slashfun(Cog):
             animeme.set_footer(text="Fetched from animeme1936")
             await ctx.followup.send(embed=animeme)
 
-    @jeanne_slash(description="Combine 2 words to get 2 combined words")
-    async def combine(self, ctx: Interaction, first_word=SlashOption(description="Enter first word"), second_word=SlashOption(description="Enter second word")):
+    @app_commands.command(description="Combine 2 words to get 2 combined words")
+    async def combine(self, ctx: Interaction, first_word:str, second_word:str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -89,8 +89,8 @@ class slashfun(Cog):
             combine.set_author(name=f"{first_word} + {second_word}")
             await ctx.followup.send(embed=combine)
 
-    @jeanne_slash(description="Give me a lot of choices and I will pick one for you")
-    async def choose(self, ctx: Interaction, choices: str = SlashOption(description="Add your choices here. Seperate them with ',' to split them")):
+    @app_commands.command(description="Give me a lot of choices and I will pick one for you. Seperate with ','")
+    async def choose(self, ctx: Interaction, choices: str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -100,8 +100,8 @@ class slashfun(Cog):
                 description=f"I chose **{choice(choices)}**", color=0x0000FF)
             await ctx.followup.send(embed=choose)
 
-    @jeanne_slash(description="Check how much of a simp you are")
-    async def simp_rate(self, ctx: Interaction, member: Member = SlashOption(description="Which member you want to check their simp rate?", required=False)):
+    @app_commands.command(description="Check how much of a simp you are")
+    async def simprate(self, ctx: Interaction, member: Optional[Member] = None):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -122,8 +122,8 @@ class slashfun(Cog):
 
             await ctx.followup.send(embed=simp)
 
-    @jeanne_slash(description="Check how gay you are")
-    async def gay_rate(self, ctx: Interaction, member: Member = SlashOption(description="Which member do you want to check their gay rate?", required=False)):
+    @app_commands.command(description="Check how gay you are")
+    async def gayrate(self, ctx: Interaction, member: Optional[Member] =None):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -144,6 +144,5 @@ class slashfun(Cog):
 
             await ctx.followup.send(embed=gay)
 
-
-def setup(bot: Bot):
-    bot.add_cog(slashfun(bot))
+async def setup(bot: Bot):
+    await bot.add_cog(fun(bot))

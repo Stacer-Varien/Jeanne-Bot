@@ -25,7 +25,7 @@ class Level:
         width, height = card.size
         if width == 900 and height == 500:
                 pass
-
+        
         elif width > 900 and height > 500:
                 x1 = 0
                 y1 = 0

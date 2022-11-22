@@ -1,9 +1,9 @@
 from db_functions import check_botbanned_user
-from nextcord import *
-from nextcord import slash_command as jeanne_slash
-from nextcord.ext.commands import Cog, Bot
+from discord import *
+from discord.ext.commands import Cog, Bot
 from requests import get
 from config import *
+from typing import Optional
 
 
 
@@ -11,8 +11,8 @@ class slashreactions(Cog):
     def __init__(self, bot:Bot):
         self.bot = bot
 
-    @jeanne_slash(description="Hug someone or yourself")
-    async def hug(self, ctx: Interaction, member: Member = SlashOption(description="Who do you want to hug?", required=False)):
+    @app_commands.command(description="Hug someone or yourself")
+    async def hug(self, ctx: Interaction, member: Optional[Member]=None)->None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
@@ -28,8 +28,8 @@ class slashreactions(Cog):
             hug.set_image(url=hug_api["url"])
             await ctx.response.send_message(msg, embed=hug)
 
-    @jeanne_slash(description="Slap someone or yourself")
-    async def slap(self, ctx: Interaction, member: Member = SlashOption(description="Who do you want to slap?", required=False)):
+    @app_commands.command(description="Slap someone or yourself")
+    async def slap(self, ctx: Interaction, member: Optional[Member]=None)->None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:        
@@ -46,7 +46,7 @@ class slashreactions(Cog):
                     msg=f"*{ctx.user} slapped {member.mention}*"
             await ctx.response.send_message(msg, embed=slap)
 
-    @jeanne_slash(description="Show a smuggy look")
+    @app_commands.command(description="Show a smuggy look")
     async def smug(self, ctx : Interaction):
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -58,8 +58,8 @@ class slashreactions(Cog):
             smug.set_image(url=smug_api["url"])
             await ctx.response.send_message(f"*{ctx.user} is smugging*", embed=smug) 
 
-    @jeanne_slash(description="Poke someone or yourself")
-    async def poke(self, ctx: Interaction, member: Member = SlashOption(description="Who do you want to poke?", required=False)):
+    @app_commands.command(description="Poke someone or yourself")
+    async def poke(self, ctx: Interaction, member: Optional[Member]=None)->None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
@@ -75,8 +75,8 @@ class slashreactions(Cog):
                     msg=f"*{ctx.user} poked {member.mention}*"
             await ctx.response.send_message(msg, embed=poke)
 
-    @jeanne_slash(description="Pat someone or yourself")
-    async def pat(self, ctx: Interaction, member: Member = SlashOption(description="Who do you want to pat?", required=False)):
+    @app_commands.command(description="Pat someone or yourself")
+    async def pat(self, ctx: Interaction, member: Optional[Member]=None)->None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
@@ -92,8 +92,8 @@ class slashreactions(Cog):
                     msg=f"*{ctx.user} patted {member.mention}*"
             await ctx.response.send_message(msg, embed=pat)
 
-    @jeanne_slash(description="Kiss someone or yourself")
-    async def kiss(self, ctx: Interaction, member: Member = SlashOption(description="Who do you want to kiss?", required=False)):
+    @app_commands.command(description="Kiss someone or yourself")
+    async def kiss(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
@@ -109,8 +109,8 @@ class slashreactions(Cog):
             kiss.set_image(url=kiss_api["image"])
             await ctx.response.send_message(msg, embed=kiss)
 
-    @jeanne_slash(description="Tickle someone or yourself")
-    async def tickle(self, ctx: Interaction, member: Member = SlashOption(description="Who do you want to tickle?", required=False)):
+    @app_commands.command(description="Tickle someone or yourself")
+    async def tickle(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
@@ -126,8 +126,8 @@ class slashreactions(Cog):
             tickle.set_image(url=tickle_api["url"])
             await ctx.response.send_message(msg, embed=tickle)
 
-    @jeanne_slash(description="Call someone or yourself a baka!")
-    async def baka(self, ctx: Interaction, member: Member = SlashOption(description="Who do you calling a baka?", required=False)):
+    @app_commands.command(description="Call someone or yourself a baka!")
+    async def baka(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
@@ -143,8 +143,8 @@ class slashreactions(Cog):
             baka.set_image(url=baka_api['image'])
             await ctx.response.send_message(msg, embed=baka)
 
-    @jeanne_slash(description="Feed someone or yourself")
-    async def feed(self, ctx: Interaction, *, member: Member = SlashOption(description="Who do you want to feed?", required=False)):
+    @app_commands.command(description="Feed someone or yourself")
+    async def feed(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
@@ -161,5 +161,5 @@ class slashreactions(Cog):
             await ctx.response.send_message(msg, embed=feed)
 
 
-def setup(bot:Bot):
-    bot.add_cog(slashreactions(bot))
+async def setup(bot:Bot):
+    await bot.add_cog(slashreactions(bot))
