@@ -13,7 +13,7 @@ class Shop_Group(GroupCog, name="shop"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()
-        
+
     @app_commands.command(description="Check all the wallpapers available")
     async def backgrounds(self, ctx: Interaction):
         await ctx.response.defer()
@@ -23,17 +23,18 @@ class Shop_Group(GroupCog, name="shop"):
             qp = self.bot.get_emoji(980772736861343774)
             await ctx.followup.send(embed=fetch_wallpapers(qp))
 
+
 class Background_Group(GroupCog, name="background"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()
-    
+
     def get_card(self, args):
         image = Level().generate_level(**args)
         return image
-    
+
     @app_commands.command(description="Preview the background image")
-    async def preview(self, ctx: Interaction, item_id:str):
+    async def preview(self, ctx: Interaction, item_id: str):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
@@ -46,19 +47,20 @@ class Background_Group(GroupCog, name="background"):
             embed.add_field(name="Price", value=f"1000 {qp}", inline=True)
             embed.set_image(url=wallpaper[2])
             await ctx.followup.send(embed=embed)
-    
+
     @app_commands.command(description="Buy a background pic for your level card")
-    async def buy(self, ctx:Interaction, item_id:str):
+    async def buy(self, ctx: Interaction, item_id: str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            balance:int = get_balance(ctx.user.id)
-            
+            balance: int = get_balance(ctx.user.id)
+
             if balance == 0:
-                nomoney = Embed(description='You have no QP.\nPlease get QP by doing `/daily`, `/guess` and/or `/dice`')
+                nomoney = Embed(
+                    description='You have no QP.\nPlease get QP by doing `/daily`, `/guess` and/or `/dice`')
                 await ctx.followup.send(embed=nomoney)
-            
+
             elif balance < 1000:
                 notenough = Embed(
                     description='You do not have enough QP.\nPlease get more QP by doing `/daily`, `/guess` and/or `/dice`')
@@ -66,32 +68,33 @@ class Background_Group(GroupCog, name="background"):
 
             else:
                 qp = self.bot.get_emoji(980772736861343774)
-                wallpaper=get_wallpaper(item_id)
-                        
+                wallpaper = get_wallpaper(item_id)
+
                 if wallpaper == None:
-                    nonexist=Embed(description='Invalid item ID passed')
+                    nonexist = Embed(description='Invalid item ID passed')
                     await ctx.followup.send(embed=nonexist)
 
                 else:
                     args = {
                         'level_card': wallpaper[2],
              	    	'profile_image': str(ctx.user.avatar.with_format('png')),
-     			        'server_level': 100,
-     			        'server_user_xp': 50,
-     			        'server_next_xp': 100,
+             			        'server_level': 100,
+             			        'server_user_xp': 50,
+             			        'server_next_xp': 100,
                         'global_level': 100,
-     			        'global_user_xp': 100,
-     			        'global_next_xp': 100,
-     			        'user_name': str(ctx.user),
-                        }
+             			        'global_user_xp': 100,
+             			        'global_next_xp': 100,
+             			        'user_name': str(ctx.user),
+                    }
 
                     func = partial(self.get_card, args)
                     image = await get_event_loop().run_in_executor(None, func)
 
                     file = File(fp=image, filename=f'preview_level_card.png')
 
-                    preview=Embed(description="This is the preview of the level card.", color=Color.blue()).add_field(name="Cost", value=f"{wallpaper[3]} {qp}").set_footer(text="Is this the background you wanted?")
-                    view=Confirmation()
+                    preview = Embed(description="This is the preview of the level card.", color=Color.blue()).add_field(
+                        name="Cost", value=f"{wallpaper[3]} {qp}").set_footer(text="Is this the background you wanted?")
+                    view = Confirmation(ctx.user)
                     await ctx.followup.send(file=file, embed=preview, view=view)
                     await view.wait()
 
@@ -101,7 +104,8 @@ class Background_Group(GroupCog, name="background"):
                         if create_user_inventory(ctx.user.id) == False:
                             pass
                         add_user_wallpaper(ctx.user.id, item_id)
-                        embed1 = Embed(description=f"Background wallpaper bought and selected",color=Color.blue())
+                        embed1 = Embed(
+                            description=f"Background wallpaper bought and selected", color=Color.blue())
                         await ctx.edit_original_response(embed=embed1, view=None)
 
                     elif view.value is False:
@@ -126,7 +130,7 @@ class Background_Group(GroupCog, name="background"):
                await ctx.followup.send(embed=embed)
 
     @app_commands.command(description="Buy a custom background pic for your level card")
-    async def buycustom(self, ctx: Interaction, name: str, link: Optional[str]=None, image:Optional[Attachment]=None) -> None:
+    async def buycustom(self, ctx: Interaction, name: str, link: Optional[str] = None, image: Optional[Attachment] = None) -> None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -142,7 +146,7 @@ class Background_Group(GroupCog, name="background"):
                 notenough = Embed(
                     description='You do not have enough QP.\nPlease get more QP by doing `/daily`, `/guess` and/or `/dice`')
                 await ctx.followup.send(embed=notenough)
-            
+
             elif link and image:
                 one = Embed(
                     description="Please use either an image URL or image")
@@ -163,7 +167,7 @@ Before you buy a custom background picture, did you make sure the image is:
 
 If you feel that the image fits the above or not, click one of the buttons to continue
 """
-                view = Confirmation()
+                view = Confirmation(ctx.user)
                 confirm = Embed(description=alert, color=ctx.user.color)
                 await ctx.followup.send(embed=confirm, view=view)
                 await view.wait()
@@ -171,19 +175,24 @@ If you feel that the image fits the above or not, click one of the buttons to co
                     loading = self.bot.get_emoji(1012677456811016342)
                     await ctx.edit_original_response(content="Creating preview... This will take some time {}".format(loading), view=None, embed=None)
                     qp = self.bot.get_emoji(980772736861343774)
-                    if requests.get(link).status_code == 200:
+                    if image and not link:
+                        link = image.url
 
-                        if image:
-                            link=image.url
-                        args = {'level_card': link, 'profile_image': str(ctx.user.avatar.with_format('png')), 'server_level': 100, 'server_user_xp': 50, 'server_next_xp': 100, 'global_level': 100, 'global_user_xp': 100, 'global_next_xp': 100, 'user_name': str(ctx.user),}
+                    elif link and not image:
+                        link = link
+                    if requests.get(link).status_code == 200:
+                        args = {'level_card': link, 'profile_image': str(ctx.user.avatar.with_format(
+                            'png')), 'server_level': 100, 'server_user_xp': 50, 'server_next_xp': 100, 'global_level': 100, 'global_user_xp': 100, 'global_next_xp': 100, 'user_name': str(ctx.user), }
 
                         func = partial(self.get_card, args)
                         image = await get_event_loop().run_in_executor(None, func)
 
-                        file = File(fp=image, filename='preview_level_card.png')
+                        file = File(
+                            fp=image, filename='preview_level_card.png')
 
-                        preview = Embed(description="This is the preview of the level card.", color=Color.blue()).add_field(name="Cost", value=f"1000 {qp}").set_footer(text="Is this the background you wanted?").set_footer(text="Please note that if the custom background violates ToS or is NSFW, it will be removed with NO REFUNDS!")
-                        view = Confirmation()
+                        preview = Embed(description="This is the preview of the level card.", color=Color.blue()).add_field(name="Cost", value=f"1000 {qp}").set_footer(
+                            text="Is this the background you wanted?").set_footer(text="Please note that if the custom background violates ToS or is NSFW, it will be removed with NO REFUNDS!")
+                        view = Confirmation(ctx.user)
                         await ctx.edit_original_response(content=None, attachments=[file], embed=preview, view=view)
                         await view.wait()
 
@@ -221,7 +230,8 @@ If you feel that the image fits the above or not, click one of the buttons to co
                 embed = Embed(
                     description="Your inventory is empty", color=Color.red())
                 await ctx.followup.send(embed=embed)
-              
-async def setup(bot:Bot):
+
+
+async def setup(bot: Bot):
     await bot.add_cog(Shop_Group(bot))
     await bot.add_cog(Background_Group(bot))
