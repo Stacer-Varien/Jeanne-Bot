@@ -1,20 +1,15 @@
-#To run this bot, the packages are set and ready to install.
+# To run this bot, the packages are set and ready to install.
 
-from os import system as console
-from platform import system
+import os
+import platform
 
-if system() == "Windows":  # If you are using a Windows Operating System
+if platform.platform() == "Windows":  # If you are using a Windows Operating System
     # Upgrades the pip package for fluent installation
-    upgrade_pip = "python -m pip install --upgrade pip"
+    os.system("python.exe -m pip install -U pip")
 
-elif system() == "Linux":  # If you are using a Linux Operating System
+elif platform.platform() == "Linux":  # If you are using a Linux Operating System
     # Upgrades the pip package for fluent installation #You need Python3.10 with an activated venv
-    upgrade_pip = "python3 -m pip install --upgrade pip"
+    os.system("python3 -m pip install -U pip")
 
 # Required packages for the bot to use. Also upgrades it if a new release is found
-essentials = "pip install --upgrade discord requests function-cooldowns python-dotenv humanfriendly datetime pillow py-expression-eval topggpy"
-
-packages = [upgrade_pip, essentials]
-
-for a in packages:
-    console(a)
+os.system("pip install -U discord requests python-dotenv humanfriendly datetime pillow py-expression-eval topggpy")
