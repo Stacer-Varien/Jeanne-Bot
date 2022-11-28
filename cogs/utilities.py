@@ -154,6 +154,7 @@ class Say_Group(GroupCog, name="say"):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            await ctx.response.defer()
             await ctx.followup.send("Type something!", ephemeral=True)
 
             def check(m:Message):
@@ -162,13 +163,13 @@ class Say_Group(GroupCog, name="say"):
             try:
                 msg:Message = await self.bot.wait_for('message', check=check, timeout=300)
 
-                await ctx.followup.send("Sent", ephemeral=True)
+                await ctx.edit_original_response(content="Sent")
                 await msg.delete()
                 await channel.send(msg.content)
             except TimeoutError:
                 timeout = Embed(
                     description=f"Guess you have nothing to say", color=0xFF0000)
-                await ctx.followup.send(embed=timeout, ephemeral=True)
+                await ctx.edit_original_response(content=None, embed=timeout)
 
     @app_commands.command(description="Type something and I will say it in embed")
     @checks.has_permissions(administrator=True)
@@ -176,9 +177,10 @@ class Say_Group(GroupCog, name="say"):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            await ctx.response.defer()
             ask = Embed(
                 description="Type something\nMaxinum characters allowed is 4096")
-            await ctx.followup.send(embed=ask)
+            await ctx.followup.send(embed=ask, ephemeral=True)
 
             def check(m:Message):
                 return m.author == ctx.user and m.content
@@ -186,15 +188,15 @@ class Say_Group(GroupCog, name="say"):
             try:
                 msg:Message = await self.bot.wait_for('message', check=check, timeout=300)
 
-                await ctx.followup.send("Sent", ephemeral=True)
+                await ctx.edit_original_response(content="Sent", embed=None)
                 await msg.delete()
                 embed_text = Embed(description=msg.content, color=Color.blue())
                 await channel.send(embed=embed_text)
 
             except TimeoutError:
                 timeout = Embed(
-                    description=f"Guess you have nothing to say", color=0xFF0000)
-                await ctx.followup.send(embed=timeout, ephemeral=True)
+                    description="Guess you have nothing to say", color=0xFF0000)
+                await ctx.edit_original_response(embed=timeout)
 
 class slashutilities(Cog):
     def __init__(self, bot:Bot):
