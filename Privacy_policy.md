@@ -17,7 +17,7 @@ Data can be accessed but limited to anyone except the bot developer as he has fu
 
 ## Removal of Data
 
-Users are free to request a removal of data via joining the [support server](https://dsc.gg/varien) and contacting the bot developer with valid reasons.
+Users are free to request a removal of data via joining the [support server](https://discord.gg/Vfa796yvNq) and contacting the bot developer with valid reasons.
 
 ## Questions
 

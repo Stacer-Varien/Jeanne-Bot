@@ -16,13 +16,10 @@ from assets.handler import handler
 
 #DiscordWebSocket.from_client = MyDiscordWebSocket.from_client
 
-MY_GUILD = Object(id=809862945211285555)
-
 
 class Jeanne(Bot):
     async def setup_hook(self):
-        self.tree.copy_global_to(guild=MY_GUILD)
-        await self.tree.sync(guild=MY_GUILD)
+        await self.tree.sync()
         #slash cogs
         for filename in listdir('./cogs'):
           if filename.endswith('.py'):
