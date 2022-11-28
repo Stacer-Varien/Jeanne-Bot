@@ -8,7 +8,7 @@ class help_button(ui.View):
         super().__init__()
 
         wiki_url = 'https://jeannebot.nicepage.io/Commands.html'
-        haze_url = 'https://discord.gg/VVxGUmqQhF'
+        haze_url = 'https://discord.gg/jh7jkuk2pp'
         tos_and_policy_url = 'https://jeannebot.nicepage.io/ToS-and-Privacy-Policy.html'
 
         self.add_item(ui.Button(style=ButtonStyle.link,
