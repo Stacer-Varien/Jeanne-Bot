@@ -9,6 +9,7 @@ from asyncio import TimeoutError
 from py_expression_eval import Parser
 from typing import Literal, Optional
 from discord.app_commands import *
+from json import loads
 
 bot_invite_url = "https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=1428479601718&scope=bot%20applications.commands"
 
@@ -150,26 +151,37 @@ class Say_Group(GroupCog, name="say"):
 
     @app_commands.command(description="Type something and I will say it in plain text")
     @checks.has_permissions(administrator=True)
-    async def plain(self, ctx: Interaction, channel: TextChannel):
+    async def plain(self, ctx: Interaction, channel: TextChannel, message:str):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             await ctx.response.defer()
-            await ctx.followup.send("Type something!", ephemeral=True)
-
-            def check(m:Message):
-                return m.author == ctx.user and m.content
-
+            
+            null=None
+            json=loads(message)
+            print(message)
+            
             try:
-                msg:Message = await self.bot.wait_for('message', check=check, timeout=300)
+                content=json["content"]
+            except:
+                pass
+            
+            try:
+                embed_=json["embeds"][0]
+                e = Embed()
+                e.title = embed_['title']
+                e.description = embed_['description']
+                e.color = embed_['color']
+            except:
+                pass
+            
+            await ctx.followup.send(content="Sent")
+            try:
+                await channel.send(content=content, embed=e)
+            except:
+                await channel.send(content=content)
 
-                await ctx.edit_original_response(content="Sent")
-                await msg.delete()
-                await channel.send(msg.content)
-            except TimeoutError:
-                timeout = Embed(
-                    description=f"Guess you have nothing to say", color=0xFF0000)
-                await ctx.edit_original_response(content=None, embed=timeout)
+
 
     @app_commands.command(description="Type something and I will say it in embed")
     @checks.has_permissions(administrator=True)
