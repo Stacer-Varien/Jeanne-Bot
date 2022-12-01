@@ -1,5 +1,3 @@
-## DO NOT FORK AND TEST THIS BRANCH! MOST OF IT IS WRITTEN IN NEXTCORD AND MIGHT BREAK THE BOT ON YOUR SIDE. RATHER USE THE MAIN BRANCH
-
 Jeanne is a multipurpose bot with miscellaneous, moderation, management and some fun commands.
 
 **FEATURES**
