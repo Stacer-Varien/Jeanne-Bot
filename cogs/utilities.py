@@ -10,6 +10,7 @@ from py_expression_eval import Parser
 from typing import Literal, Optional
 from discord.app_commands import *
 from json import loads
+from requests import get
 
 bot_invite_url = "https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=1428479601718&scope=bot%20applications.commands"
 
@@ -148,67 +149,79 @@ class Say_Group(GroupCog, name="say"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()
-
+    
     @app_commands.command(description="Type something and I will say it in plain text")
     @checks.has_permissions(administrator=True)
-    async def plain(self, ctx: Interaction, channel: TextChannel, message:str):
+    async def plain(self, ctx: Interaction, channel: TextChannel):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            await ctx.response.defer()
+            await ctx.response.defer(ephemeral=True)
+            await ctx.followup.send("Type something!", ephemeral=True)
+
+            def check(m: Message):
+                return m.author == ctx.user and m.content
+
+            try:
+                msg: Message = await self.bot.wait_for('message', check=check, timeout=300)
+
+                await ctx.edit_original_response(content="Sent")
+                await msg.delete()
+                await channel.send(msg.content)
+            except TimeoutError:
+                timeout = Embed(
+                    description=f"Guess you have nothing to say", color=0xFF0000)
+                await ctx.edit_original_response(content=None, embed=timeout)
+
+
+    @app_commands.command(description="Generates an embed message")
+    @checks.has_permissions(administrator=True)
+    async def embedgen(self, ctx: Interaction, channel: TextChannel, message:str):
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            await ctx.response.defer(ephemeral=True)
             
-            null=None
             json=loads(message)
-            print(message)
             
             try:
                 content=json["content"]
             except:
                 pass
-            
+
+            await ctx.followup.send(content="Sent", ephemeral=True)
             try:
-                embed_=json["embeds"][0]
-                e = Embed()
-                e.title = embed_['title']
-                e.description = embed_['description']
-                e.color = embed_['color']
-            except:
-                pass
-            
-            await ctx.followup.send(content="Sent")
-            try:
-                await channel.send(content=content, embed=e)
+                embed = Embed.from_dict(json['embeds'][0])
+                await channel.send(content=content, embed=embed)
             except:
                 await channel.send(content=content)
 
 
 
-    @app_commands.command(description="Type something and I will say it in embed")
+    @app_commands.command(description="Generates an embed using a JSON file")
     @checks.has_permissions(administrator=True)
-    async def embed(self, ctx: Interaction, channel: TextChannel):
+    async def embedjson(self, ctx: Interaction, channel: TextChannel, json:Attachment):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            await ctx.response.defer()
-            ask = Embed(
-                description="Type something\nMaxinum characters allowed is 4096")
-            await ctx.followup.send(embed=ask, ephemeral=True)
+            await ctx.response.defer(ephemeral=True)
 
-            def check(m:Message):
-                return m.author == ctx.user and m.content
-
+            json_file=json.url
+            json_request=get(json_file)
+            json_content=json_request.content
+            json=loads(json_content)
+                        
             try:
-                msg:Message = await self.bot.wait_for('message', check=check, timeout=300)
+                content=json["content"]
+            except:
+                pass
 
-                await ctx.edit_original_response(content="Sent", embed=None)
-                await msg.delete()
-                embed_text = Embed(description=msg.content, color=Color.blue())
-                await channel.send(embed=embed_text)
-
-            except TimeoutError:
-                timeout = Embed(
-                    description="Guess you have nothing to say", color=0xFF0000)
-                await ctx.edit_original_response(embed=timeout)
+            await ctx.followup.send(content="Sent", ephemeral=True)
+            try:
+                embed = Embed.from_dict(json['embeds'][0])
+                await channel.send(content=content, embed=embed)
+            except:
+                await channel.send(content=content)
 
 class slashutilities(Cog):
     def __init__(self, bot:Bot):
