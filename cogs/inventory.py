@@ -2,8 +2,8 @@ from typing import Optional
 from assets.buttons import Confirmation
 from db_functions import add_user_custom_wallpaper, add_user_wallpaper, check_botbanned_user, fetch_user_inventory, fetch_wallpapers, get_balance, create_user_inventory, get_wallpaper, use_wallpaper
 from discord import *
-from discord.ext.commands import Cog, Bot, GroupCog
-from assets.generators.level_card import Level
+from discord.ext.commands import Bot, GroupCog
+from assets.generators.level_card import Generator
 from asyncio import get_event_loop
 from functools import partial
 import requests
@@ -30,7 +30,7 @@ class Background_Group(GroupCog, name="background"):
         super().__init__()
 
     def get_card(self, args):
-        image = Level().generate_level(**args)
+        image = Generator().generate_profile(**args)
         return image
 
     @app_commands.command(description="Preview the background image")
@@ -130,7 +130,7 @@ class Background_Group(GroupCog, name="background"):
                await ctx.followup.send(embed=embed)
 
     @app_commands.command(description="Buy a custom background pic for your level card")
-    async def buycustom(self, ctx: Interaction, name: str, link: Optional[str] = None, image: Optional[Attachment] = None) -> None:
+    async def buycustom(self, ctx: Interaction, name: str, link: str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -147,24 +147,16 @@ class Background_Group(GroupCog, name="background"):
                     description='You do not have enough QP.\nPlease get more QP by doing `/daily`, `/guess` and/or `/dice`')
                 await ctx.followup.send(embed=notenough)
 
-            elif link and image:
-                one = Embed(
-                    description="Please use either an image URL or image")
-                await ctx.followup.send(embed=one)
-
             else:
-
                 alert = """
 Before you buy a custom background picture, did you make sure the image is:
-
-    1. A valid image/image URL
+    1. A valid and permanent image URL
     2. Not crossing NSFW borderline
     3. Does not contain any lewded characters and/or lolis
     4. Is not sexualised in some way
     5. Does not violate ToS and/or contains TW slurs
     6. The name you set for it also does not violate ToS and/or contains TW slurs
     7. The image's resolution is at a 9:5 ratio and at least 900x500 for better quality.
-
 If you feel that the image fits the above or not, click one of the buttons to continue
 """
                 view = Confirmation(ctx.user)
@@ -173,16 +165,21 @@ If you feel that the image fits the above or not, click one of the buttons to co
                 await view.wait()
                 if view.value == True:
                     loading = self.bot.get_emoji(1012677456811016342)
-                    await ctx.edit_original_response(content="Creating preview... This will take some time {}".format(loading), view=None, embed=None)
                     qp = self.bot.get_emoji(980772736861343774)
-                    if image and not link:
-                        link = image.url
+                    await ctx.edit_original_response(content="Creating preview... This will take some time {}".format(loading), view=None, embed=None)
 
-                    elif link and not image:
-                        link = link
                     if requests.get(link).status_code == 200:
-                        args = {'level_card': link, 'profile_image': str(ctx.user.avatar.with_format(
-                            'png')), 'server_level': 100, 'server_user_xp': 50, 'server_next_xp': 100, 'global_level': 100, 'global_user_xp': 100, 'global_next_xp': 100, 'user_name': str(ctx.user), }
+                        args = {
+                            'bg_image': link,
+                  	        	'profile_image': str(ctx.user.avatar.with_format('png')),
+                     	    		'server_level': 100,
+                     	    		'server_user_xp': 50,
+                     	    		'server_next_xp': 100,
+                            'global_level': 100,
+                     	    		'global_user_xp': 100,
+                     	    		'global_next_xp': 100,
+                     	    		'user_name': str(ctx.user),
+                        }
 
                         func = partial(self.get_card, args)
                         image = await get_event_loop().run_in_executor(None, func)
@@ -199,10 +196,14 @@ If you feel that the image fits the above or not, click one of the buttons to co
                         if view.value is None:
                             await ctx.edit_original_response(content="Time out", view=None)
                         elif view.value is True:
+                            if create_user_inventory(ctx.user.id) == False:
+                                pass
+                            else:
+                                create_user_inventory(ctx.user.id)
                             add_user_custom_wallpaper(ctx.user.id, name, link)
 
                             embed1 = Embed(
-                                description=f"Background wallpaper bought and selected.", color=Color.blue())
+                                description=f"Background wallpaper bought. Don't forget to use `/use {name}` to set it", color=Color.blue())
                             await ctx.edit_original_response(embed=embed1, view=None)
 
                         elif view.value is False:
