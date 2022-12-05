@@ -16,8 +16,7 @@ class slashowner(Cog):
     def __init__(self, bot:Bot):
         self.bot = bot
 
-
-    @group(aliases=['act', 'pressence'])
+    @group(aliases=['act', 'pressence'], invoke_without_command=True)
     @is_owner()
     async def activity(self, ctx : Context):
         if check_botbanned_user(ctx.author.id) == True:
@@ -29,7 +28,7 @@ class slashowner(Cog):
 
     @activity.command(aliases=['playing'])
     @is_owner()
-    async def play(self, ctx: Context, activity:str):
+    async def play(self, ctx: Context, *, activity:str):
         """Make Jeanne play something as an activity"""
         if check_botbanned_user(ctx.author.id) == True:
             pass
@@ -39,7 +38,7 @@ class slashowner(Cog):
 
     @activity.command(aliases=['listening'])
     @is_owner()
-    async def listen(self, ctx: Context, activity:str):
+    async def listen(self, ctx: Context, *, activity:str):
         """Make Jeanne listen to something as an activity"""
         if check_botbanned_user(ctx.author.id) == True:
             pass

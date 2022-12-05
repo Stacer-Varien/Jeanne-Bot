@@ -4,7 +4,7 @@ from discord.ext.commands import Cog, CooldownMapping, BucketType, Bot, GroupCog
 from discord import *
 from db_functions import add_level, add_xp, check_botbanned_user, get_global_rank, get_member_level, get_member_xp, get_server_rank, selected_wallpaper, get_user_level, get_user_xp
 from typing import Optional
-from assets.generators.level_card import Level
+from assets.generators.level_card import Generator
 from cooldowns import *
 from discord.app_commands import *
 
@@ -65,7 +65,7 @@ class levelling(Cog):
         return bucket.update_rate_limit()
 
     def get_card(self, args):
-        image = Level().generate_level(**args)
+        image = Generator().generate_level(**args)
         return image
 
     @Cog.listener()
