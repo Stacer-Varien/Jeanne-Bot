@@ -31,7 +31,6 @@ class Jeanne(Bot):
 
 intents = Intents().all()
 intents.presences = False
-intents.webhooks = False
 intents.voice_states = False
 intents.reactions = False
 intents.auto_moderation=False
