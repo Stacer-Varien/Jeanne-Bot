@@ -73,7 +73,7 @@ class Ban_Group(GroupCog, name="ban"):
 
     @app_commands.command(description="Ban someone in this server")
     @app_commands.describe(member="Which member are you banning?", reason="What did they do?", time="How long should they be tempbanned? (1m, 1h30m, etc)")
-    @app_commands.default_permissions(ban_members=True)
+    @app_commands.checks.has_permissions(ban_members=True)
     async def member(self, ctx: Interaction, member: Member, reason:Optional[str]=None, time: Optional[str]=None)->None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -131,7 +131,7 @@ class Ban_Group(GroupCog, name="ban"):
 
     @app_commands.command(description="Ban someone outside the server")
     @app_commands.describe(user_id="What is the user ID?", reason="What did they do?")
-    @app_commands.default_permissions(ban_members=True)
+    @app_commands.checks.has_permissions(ban_members=True)
     async def user(self, ctx: Interaction, user_id:str, reason:Optional[str]=None)->None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -210,7 +210,7 @@ class Mute_Group(GroupCog, name="mute"):
         super().__init__()
 
     @app_commands.command(description="Create a mute role with default mute permissions")
-    @app_commands.default_permissions(manage_guild=True)
+    @app_commands.checks.has_permissions(manage_guild=True)
     @app_commands.checks.bot_has_permissions(manage_roles=True, manage_channels=True, manage_permissions=True)
     async def createrole(self, ctx: Interaction):
         if check_botbanned_user(ctx.user.id) == True:
@@ -249,7 +249,7 @@ class Mute_Group(GroupCog, name="mute"):
 
     @app_commands.command(description="Set a mute role that is available in the server")
     @app_commands.describe(role="Which role is gonna be the mute role?")
-    @app_commands.default_permissions(manage_guild=True)
+    @app_commands.checks.has_permissions(manage_guild=True)
     async def setrole(self, ctx: Interaction, role: Role):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -263,7 +263,7 @@ class Mute_Group(GroupCog, name="mute"):
 
     @app_commands.command(description="Mute a member")
     @app_commands.describe(member="Which member are you muting?", reason="What did they do?", time="How long should they be muted? (1m, 1h30m, etc)")
-    @app_commands.default_permissions(kick_members=True)
+    @app_commands.checks.has_permissions(kick_members=True)
     @app_commands.checks.bot_has_permissions(manage_roles=True)
     async def member(self, ctx: Interaction, member: Member, time: Optional[str]=None, reason:Optional[str]=None)->None:
         await ctx.response.defer()
@@ -327,7 +327,7 @@ class moderation(Cog):
     
     @app_commands.command(description="Warn a member")
     @app_commands.describe(member="Which member are you warning?", reason="What did they do?")
-    @app_commands.default_permissions(kick_members=True)
+    @app_commands.checks.has_permissions(kick_members=True)
     async def warn(self, ctx: Interaction, member: Member, reason:Optional[str]=None)->None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -385,7 +385,7 @@ class moderation(Cog):
 
     @app_commands.command(description="Revoke a warn by warn ID")
     @app_commands.describe(warn_id="What is the warn ID you want to remove?")
-    @app_commands.default_permissions(kick_members=True)
+    @app_commands.checks.has_permissions(kick_members=True)
     async def clearwarn(self, ctx: Interaction, warn_id:str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -416,7 +416,7 @@ class moderation(Cog):
 
     @app_commands.command(description="Kick a member out of the server")
     @app_commands.describe(member="Which member are you kicking?", reason="Why are they being kicked?")
-    @app_commands.default_permissions(kick_members=True)
+    @app_commands.checks.has_permissions(kick_members=True)
     async def kick(self, ctx: Interaction, member: Member, reason:Optional[str]=None)->None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -470,7 +470,7 @@ class moderation(Cog):
 
     @app_commands.command(description="Bulk delete messages")
     @app_commands.describe(limit="How many messages? (max is 100)", member="Which member's messages you want to delete?")
-    @app_commands.default_permissions(manage_messages=True)
+    @app_commands.checks.has_permissions(manage_messages=True)
     async def prune(self, ctx: Interaction, limit:Optional[int]=None, member: Optional[Member]=None)->None:
         await ctx.response.defer(thinking=True)
         if check_botbanned_user(ctx.user.id) == True:
@@ -493,7 +493,7 @@ class moderation(Cog):
 
     @app_commands.command(description="Change someone's nickname")
     @app_commands.describe(member="Which member?", nickname="What is their new nickname")
-    @app_commands.default_permissions(manage_nicknames=True)
+    @app_commands.checks.has_permissions(manage_nicknames=True)
     async def changenickname(self, ctx: Interaction, member: Member, nickname:str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -507,7 +507,7 @@ class moderation(Cog):
 
     @app_commands.command(description="Unbans a user")
     @app_commands.describe(user_id="What is the user ID you want to unban?", reason="Why are they being unbanned?")
-    @app_commands.default_permissions(ban_members=True)
+    @app_commands.checks.has_permissions(ban_members=True)
     async def unban(self, ctx: Interaction, user_id:str, reason:Optional[str]=None)->None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -535,7 +535,7 @@ class moderation(Cog):
 
     @app_commands.command(description="Unmutes a member")
     @app_commands.describe(member="Which member you want to unmute?", reason="Why are they being unmuted?")
-    @app_commands.default_permissions(moderate_members=True)
+    @app_commands.checks.has_permissions(moderate_members=True)
     @app_commands.checks.bot_has_permissions(manage_roles=True)
     async def unmute(self, ctx:Interaction, member:Member, reason:Optional[str]=None)->None:
         await ctx.response.defer()
@@ -576,7 +576,7 @@ class moderation(Cog):
 
     @app_commands.command(description="Timeout a member using Discord's timeout feature")
     @app_commands.describe(member="Which member?", time="How long should they be on timeout (1m, 1h30m, etc)", reason="Why are they on timeout?")
-    @app_commands.default_permissions(moderate_members=True)
+    @app_commands.checks.has_permissions(moderate_members=True)
     async def timeout(self, ctx: Interaction, member: Member, time:Optional[str]=None, reason:Optional[str]=None)->None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -623,7 +623,7 @@ class moderation(Cog):
 
     @app_commands.command(description="Untimeouts a member")
     @app_commands.describe(member="Which member?", reason="Why are they untimeouted?")
-    @app_commands.default_permissions(moderate_members=True)
+    @app_commands.checks.has_permissions(moderate_members=True)
     async def untimeout(self, ctx: Interaction, member: Member, reason:Optional[str]=None)->None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -663,7 +663,7 @@ class moderation(Cog):
 
     @app_commands.command(description="Ban multiple members at once")
     @app_commands.describe(user_ids="How many user IDs? Leave a space after each ID (min is 5 and max is 20)", reason="Why are they being banned?")
-    @app_commands.default_permissions(administrator=True)
+    @app_commands.checks.has_permissions(administrator=True)
     @app_commands.checks.cooldown(1, 1800, key=lambda i: (i.guild.id))
     async def massban(self, ctx:Interaction, user_ids:str, reason:str):
         if check_botbanned_user(ctx.user.id) == True:
@@ -737,7 +737,7 @@ class moderation(Cog):
     @app_commands.command(description="Unban multiple members at once")
     @app_commands.describe(user_ids="How many user IDs? Leave a space after each ID (min is 5 and max is 20)", reason="Why are they being unbanned?")
     @app_commands.checks.cooldown(1, 1800, key=lambda i: (i.guild.id))
-    @app_commands.default_permissions(administrator=True)
+    @app_commands.checks.has_permissions(administrator=True)
     async def massunban(self, ctx: Interaction, user_id: str, reason:str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:

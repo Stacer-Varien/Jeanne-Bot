@@ -7,7 +7,7 @@ from config import WEATHER, WEBHOOK
 from discord.ui import View
 from asyncio import TimeoutError
 from py_expression_eval import Parser
-from typing import Literal
+from typing import Literal, Optional
 from discord.app_commands import *
 from json import loads
 from requests import get
@@ -151,7 +151,8 @@ class Say_Group(GroupCog, name="say"):
         super().__init__()
     
     @app_commands.command(description="Type something and I will say it in plain text")
-    @app_commands.default_permissions(administrator=True)
+    @app_commands.describe(channel="Send to which channel?")
+    @app_commands.checks.has_permissions(administrator=True)
     async def plain(self, ctx: Interaction, channel: TextChannel):
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -174,8 +175,9 @@ class Say_Group(GroupCog, name="say"):
                 await ctx.edit_original_response(content=None, embed=timeout)
 
 
-    @app_commands.command(description="Generates an embed message")
-    @checks.has_guild_permissions(administrator=True)
+    @app_commands.command(description="Generates an embed message. This needs the Discohooks.org embed generator")
+    @app_commands.describe(channel="Send to which channel?", message="Add the JSON script")
+    @app_commands.checks.has_permissions(administrator=True)
     async def embedgen(self, ctx: Interaction, channel: TextChannel, message:str):
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -196,10 +198,9 @@ class Say_Group(GroupCog, name="say"):
             except:
                 await channel.send(content=content)
 
-
-
-    @app_commands.command(description="Generates an embed using a JSON file")
-    @checks.has_guild_permissions(administrator=True)
+    @app_commands.command(description="Generates an embed using a JSON file. This needs Discohooks.org embed generator")
+    @app_commands.describe(channel="Send to which channel?", json="Place the JSON file here")
+    @app_commands.checks.has_permissions(administrator=True)
     async def embedjson(self, ctx: Interaction, channel: TextChannel, json:Attachment):
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -262,6 +263,7 @@ class slashutilities(Cog):
 
 
     @app_commands.command(description="Submit a bot report if you found something wrong")
+    @app_commands.describe(type="What is the nature of the report?")
     @checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     async def botreport(self, ctx: Interaction, type:Literal['bug', 'fault', 'exploit', 'violator']):
         if check_botbanned_user(ctx.user.id) == True:
@@ -282,7 +284,7 @@ class slashutilities(Cog):
                     m = await ctx.user.send("What have you found?\nPlease include steps on how you were able to find it and include proof if possible")
                 
                 elif report_type == 'violator':
-                    m = await ctx.user.send("Who has violated the rules and ToS of Jeanne? Please include proof if possible")
+                    m = await ctx.user.send("Who has violated the ToS of Jeanne? Please include proof if possible")
 
                 await ctx.followup.send("Please go to your [DMs]({}) to report what you have found about Jeanne".format(m.jump_url), ephemeral=True)
 
@@ -336,7 +338,8 @@ class slashutilities(Cog):
 
 
     @app_commands.command(description="Report a member in your server")
-    async def report(self, ctx: Interaction, member: Member, anonymous:Literal['True', 'False']):
+    @app_commands.describe(member="Who are you reporting?", anonymous="Do you want your name to be hidden?")
+    async def report(self, ctx: Interaction, member: Member, anonymous:Optional[Literal['True', 'False']]=None)->None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
@@ -391,7 +394,7 @@ class slashutilities(Cog):
                                 report.set_footer(
                                     text="Made by an anonymous member of {}".format(ctx.guild.name))
 
-                            if anonymous == 'False':
+                            elif anonymous == 'False' or None:
                                 report.set_footer(text="Made by {} | {} of {}".format(
                                     ctx.user, ctx.user.id, ctx.guild.name))
 

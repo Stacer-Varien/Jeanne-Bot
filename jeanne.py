@@ -1,5 +1,5 @@
 from config import TOKEN
-from discord.ext.commands import Bot
+from discord.ext.commands import Bot, when_mentioned_or
 from discord import *
 from os import listdir
 from assets.handler import handler
@@ -36,9 +36,10 @@ intents.reactions = False
 intents.auto_moderation=False
 
 
-bot = Jeanne(command_prefix="j!", intents=intents, #the prefix is owner only
-             allowed_mentions=AllowedMentions.all())
+bot = Jeanne(command_prefix=when_mentioned_or('j!'), intents=intents, #the prefix is owner only
+             allowed_mentions=AllowedMentions.all(), max_messages=100)
 bot.remove_command('help')
+bot.cached_messages
 
 @bot.event
 async def on_ready():
