@@ -658,3 +658,35 @@ def remove_softban(member:int, guild:int):
     db.execute("DELETE FROM softbannedMembers WHERE user_id = ? AND guild_id = ?",
                (member, guild,))
     db.commit()
+
+def set_message_logger(server:int, channel:int):
+    cur=db.execute("INSERT OR IGNORE INTO messageLogData (server, channel) VALUES (?,?)", (server, channel,))
+
+    if cur.rowcount==0:
+        db.execute("UPDATE messageLogData SET channel = ? WHERE server = ?", (channel, server,))
+    db.commit()
+
+
+def get_message_logger(server:int)->int:
+    try:
+        channel = db.execute("SELECT channel FROM messageLogData WHERE server = ?", (server,))
+        db.commit()
+        return channel[0]
+    except:
+        return False
+
+def set_member_logger(server:int, channel:int):
+    cur=db.execute("INSERT OR IGNORE INTO memberLogData (server, channel) VALUES (?,?)", (server, channel,))
+
+    if cur.rowcount==0:
+        db.execute("UPDATE memberLogData SET channel = ? WHERE server = ?", (channel, server,))
+    db.commit()
+
+
+def get_member_logger(server:int)->int:
+    try:
+        channel = db.execute("SELECT channel FROM memberLogData WHERE server = ?", (server,))
+        db.commit()
+        return channel[0]
+    except:
+        return False
