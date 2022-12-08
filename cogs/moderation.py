@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 from humanfriendly import format_timespan, parse_timespan
 from db_functions import *
 from assets.buttons import Confirmation
-from discord.app_commands import *
 from discord.ext import tasks
 from typing import Optional
 
@@ -36,6 +35,7 @@ class ListWarns_Group(GroupCog, name="listwarns"):
                 await ctx.followup.send(embed=embed)
 
     @app_commands.command(description="View warnings that a member has")
+    @app_commands.describe(member="Which member are you checking the warns?")
     async def user(self, ctx: Interaction, member: Optional[Member])->None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -72,7 +72,8 @@ class Ban_Group(GroupCog, name="ban"):
         super().__init__()
 
     @app_commands.command(description="Ban someone in this server")
-    @checks.has_permissions(ban_members=True)
+    @app_commands.describe(member="Which member are you banning?", reason="What did they do?", time="How long should they be tempbanned? (1m, 1h30m, etc)")
+    @app_commands.default_permissions(ban_members=True)
     async def member(self, ctx: Interaction, member: Member, reason:Optional[str]=None, time: Optional[str]=None)->None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -129,7 +130,8 @@ class Ban_Group(GroupCog, name="ban"):
                     await modlog.send(embed=ban)
 
     @app_commands.command(description="Ban someone outside the server")
-    @checks.has_permissions(ban_members=True)
+    @app_commands.describe(user_id="What is the user ID?", reason="What did they do?")
+    @app_commands.default_permissions(ban_members=True)
     async def user(self, ctx: Interaction, user_id:str, reason:Optional[str]=None)->None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -208,8 +210,8 @@ class Mute_Group(GroupCog, name="mute"):
         super().__init__()
 
     @app_commands.command(description="Create a mute role with default mute permissions")
-    @checks.has_permissions(manage_guild=True)
-    @checks.bot_has_permissions(manage_roles=True, manage_channels=True, manage_permissions=True)
+    @app_commands.default_permissions(manage_guild=True)
+    @app_commands.checks.bot_has_permissions(manage_roles=True, manage_channels=True, manage_permissions=True)
     async def createrole(self, ctx: Interaction):
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -246,7 +248,8 @@ class Mute_Group(GroupCog, name="mute"):
                 await ctx.followup.send(embed=em)
 
     @app_commands.command(description="Set a mute role that is available in the server")
-    @checks.has_permissions(manage_guild=True)
+    @app_commands.describe(role="Which role is gonna be the mute role?")
+    @app_commands.default_permissions(manage_guild=True)
     async def setrole(self, ctx: Interaction, role: Role):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -259,8 +262,9 @@ class Mute_Group(GroupCog, name="mute"):
             await ctx.followup.send(embed=e)
 
     @app_commands.command(description="Mute a member")
-    @checks.has_permissions(kick_members=True)
-    @checks.bot_has_permissions(manage_roles=True)
+    @app_commands.describe(member="Which member are you muting?", reason="What did they do?", time="How long should they be muted? (1m, 1h30m, etc)")
+    @app_commands.default_permissions(kick_members=True)
+    @app_commands.checks.bot_has_permissions(manage_roles=True)
     async def member(self, ctx: Interaction, member: Member, time: Optional[str]=None, reason:Optional[str]=None)->None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -322,7 +326,8 @@ class moderation(Cog):
         self.check_db.start()
     
     @app_commands.command(description="Warn a member")
-    @checks.has_permissions(kick_members=True)
+    @app_commands.describe(member="Which member are you warning?", reason="What did they do?")
+    @app_commands.default_permissions(kick_members=True)
     async def warn(self, ctx: Interaction, member: Member, reason:Optional[str]=None)->None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -335,53 +340,52 @@ class moderation(Cog):
                 failed = Embed(
                     description="You can't warn the owner of the server...".format(member), color=Color.red())
                 await ctx.followup.send(embed=failed)
+            elif member == ctx.user:
+                    failed = Embed(description="You can't warn yourself")
+                    await ctx.followup.send(embed=failed)
             else:
                 if reason == None:
                     reason = "Unspecified"
 
-                if member == ctx.user:
-                    failed = Embed(description="You can't warn yourself")
-                    await ctx.followup.send(embed=failed)
+                warn_id = f"{randint(0,100000)}"
+                date = round(datetime.now().timestamp())
+                warn_user(ctx.guild.id, member.id,
+                        ctx.user.id, reason, warn_id, date)
 
+                warn = Embed(title="Member warned", color=0xFF0000)
+                warn.add_field(name="Member",
+                            value=member,
+                            inline=True)
+                warn.add_field(name="ID",
+                            value=member.id,
+                            inline=True)
+                warn.add_field(
+                    name="Moderator", value=ctx.user, inline=True)
+                warn.add_field(name="Reason",
+                            value=reason,
+                            inline=False)
+                warn.add_field(name="Warn ID",
+                            value=warn_id,
+                            inline=True)
+                warn.add_field(name="Date",
+                            value="<t:{}:F>".format(date),
+                            inline=True)
+                warn.set_thumbnail(url=member.display_avatar)
+
+                modlog_id = get_modlog_channel(ctx.guild.id)
+
+                if modlog_id == None:
+                    await ctx.followup.send(embed=warn)
                 else:
-                    warn_id = f"{randint(0,100000)}"
-                    date = round(datetime.now().timestamp())
-                    warn_user(ctx.guild.id, member.id,
-                            ctx.user.id, reason, warn_id, date)
-
-                    warn = Embed(title="Member warned", color=0xFF0000)
-                    warn.add_field(name="Member",
-                                value=member,
-                                inline=True)
-                    warn.add_field(name="ID",
-                                value=member.id,
-                                inline=True)
-                    warn.add_field(
-                        name="Moderator", value=ctx.user, inline=True)
-                    warn.add_field(name="Reason",
-                                value=reason,
-                                inline=False)
-                    warn.add_field(name="Warn ID",
-                                value=warn_id,
-                                inline=True)
-                    warn.add_field(name="Date",
-                                value="<t:{}:F>".format(date),
-                                inline=True)
-                    warn.set_thumbnail(url=member.display_avatar)
-
-                    modlog_id = get_modlog_channel(ctx.guild.id)
-
-                    if modlog_id == None:
-                        await ctx.followup.send(embed=warn)
-                    else:
-                        modlog = ctx.guild.get_channel(modlog_id)
-                        warned = Embed(
-                            description=f"{member} has been warned. Check {modlog.mention}", color=0xFF0000)
-                        await ctx.followup.send(embed=warned)
-                        await modlog.send(embed=warn)
+                    modlog = ctx.guild.get_channel(modlog_id)
+                    warned = Embed(
+                        description=f"{member} has been warned. Check {modlog.mention}", color=0xFF0000)
+                    await ctx.followup.send(embed=warned)
+                    await modlog.send(embed=warn)
 
     @app_commands.command(description="Revoke a warn by warn ID")
-    @checks.has_permissions(kick_members=True)
+    @app_commands.describe(warn_id="What is the warn ID you want to remove?")
+    @app_commands.default_permissions(kick_members=True)
     async def clearwarn(self, ctx: Interaction, warn_id:str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -411,7 +415,8 @@ class moderation(Cog):
                     await ctx.followup.send(embed=revoked_warn)
 
     @app_commands.command(description="Kick a member out of the server")
-    @checks.has_permissions(kick_members=True)
+    @app_commands.describe(member="Which member are you kicking?", reason="Why are they being kicked?")
+    @app_commands.default_permissions(kick_members=True)
     async def kick(self, ctx: Interaction, member: Member, reason:Optional[str]=None)->None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -426,6 +431,9 @@ class moderation(Cog):
                 await ctx.followup.send(embed=failed)
             elif member.id == ctx.guild.owner.id:
                 failed = Embed(description="You cannot kick the owner of the server out...", color=Color.red())
+                await ctx.followup.send(embed=failed)
+            elif member == ctx.user:
+                failed = Embed(description="You can't kick yourself out")
                 await ctx.followup.send(embed=failed)
             else:
                 if reason == None:
@@ -461,7 +469,8 @@ class moderation(Cog):
                     await modlog.send(embed=kick)
 
     @app_commands.command(description="Bulk delete messages")
-    @checks.has_permissions(manage_messages=True)
+    @app_commands.describe(limit="How many messages? (max is 100)", member="Which member's messages you want to delete?")
+    @app_commands.default_permissions(manage_messages=True)
     async def prune(self, ctx: Interaction, limit:Optional[int]=None, member: Optional[Member]=None)->None:
         await ctx.response.defer(thinking=True)
         if check_botbanned_user(ctx.user.id) == True:
@@ -483,7 +492,8 @@ class moderation(Cog):
                 await ctx.channel.purge(limit=limit)
 
     @app_commands.command(description="Change someone's nickname")
-    @checks.has_permissions(manage_nicknames=True)
+    @app_commands.describe(member="Which member?", nickname="What is their new nickname")
+    @app_commands.default_permissions(manage_nicknames=True)
     async def changenickname(self, ctx: Interaction, member: Member, nickname:str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -496,7 +506,8 @@ class moderation(Cog):
             await ctx.followup.send(embed=setnick)
 
     @app_commands.command(description="Unbans a user")
-    @checks.has_permissions(ban_members=True)
+    @app_commands.describe(user_id="What is the user ID you want to unban?", reason="Why are they being unbanned?")
+    @app_commands.default_permissions(ban_members=True)
     async def unban(self, ctx: Interaction, user_id:str, reason:Optional[str]=None)->None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -523,8 +534,9 @@ class moderation(Cog):
                 await modlog.send(embed=unban)
 
     @app_commands.command(description="Unmutes a member")
-    @checks.has_permissions(moderate_members=True)
-    @checks.bot_has_permissions(manage_roles=True)
+    @app_commands.describe(member="Which member you want to unmute?", reason="Why are they being unmuted?")
+    @app_commands.default_permissions(moderate_members=True)
+    @app_commands.checks.bot_has_permissions(manage_roles=True)
     async def unmute(self, ctx:Interaction, member:Member, reason:Optional[str]=None)->None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -563,7 +575,8 @@ class moderation(Cog):
 
 
     @app_commands.command(description="Timeout a member using Discord's timeout feature")
-    @checks.has_permissions(moderate_members=True)
+    @app_commands.describe(member="Which member?", time="How long should they be on timeout (1m, 1h30m, etc)", reason="Why are they on timeout?")
+    @app_commands.default_permissions(moderate_members=True)
     async def timeout(self, ctx: Interaction, member: Member, time:Optional[str]=None, reason:Optional[str]=None)->None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -609,7 +622,8 @@ class moderation(Cog):
 
 
     @app_commands.command(description="Untimeouts a member")
-    @checks.has_permissions(moderate_members=True)
+    @app_commands.describe(member="Which member?", reason="Why are they untimeouted?")
+    @app_commands.default_permissions(moderate_members=True)
     async def untimeout(self, ctx: Interaction, member: Member, reason:Optional[str]=None)->None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -647,141 +661,152 @@ class moderation(Cog):
                     await ctx.followup.send(embed=unmuted)
                     await modlog.send(embed=unmute)
 
-    @app_commands.command(description="Ban multiple members at once. You can put only 20 user IDs. leave a space after each ID")
-    @checks.has_permissions(administrator=True)
-    @checks.cooldown(1, 1800, key=lambda i: (i.guild.id))
-    async def massban(self, ctx:Interaction, user_id:str, reason:str):
+    @app_commands.command(description="Ban multiple members at once")
+    @app_commands.describe(user_ids="How many user IDs? Leave a space after each ID (min is 5 and max is 20)", reason="Why are they being banned?")
+    @app_commands.default_permissions(administrator=True)
+    @app_commands.checks.cooldown(1, 1800, key=lambda i: (i.guild.id))
+    async def massban(self, ctx:Interaction, user_ids:str, reason:str):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             await ctx.response.defer()
-            ids=user_id.replace(' ', ',').split(',')
-            if len(ids)>20:
-                ids=ids[:20]
+            ids=user_ids.replace(' ', ',').split(',')
 
-            view=Confirmation(ctx.user)
-            alert=Embed(title="BEWARE", description="This is an experimental command and the developer is **NOT** responsible in any way or form if you messed up, even if it was misused (but report anyone misusung them to the developer so he can botban them).\n\nDo you want to proceed?",color=Color.red())
-            await ctx.followup.send(embed=alert, view=view)
+            if len(ids) < 5:
+                embed=Embed(description="There is very few IDs. Please add more and try again after <t:{}:R>".format(round((datetime.now() + timedelta(minutes=30)).timestamp())))
+                await ctx.followup.send(embed=embed)
+            else:
+                if len(ids)>20:
+                    ids=ids[:20]
 
-            await view.wait()
+                view=Confirmation(ctx.user)
+                alert=Embed(title="BEWARE", description="This is an experimental command and the developer is **NOT** responsible in any way or form if you messed up, even if it was misused (but report anyone misusung them to the developer so he can botban them).\n\nDo you want to proceed?",color=Color.red())
+                await ctx.followup.send(embed=alert, view=view)
 
-            if view.value == True:
-                loading = self.bot.get_emoji(1012677456811016342)
-                em=Embed(description="Banning user IDs now {}".format(loading), color=Color.red())
-                await ctx.edit_original_response(embed=em, view=None)
-                massmb = Embed()
-                massmb.title = "List of users massbanned"
-                massmb.color = Color.red()
-                massmb.description=""
-                for id in ids:
+                await view.wait()
 
-                    if id ==str(ctx.user.id):
-                        pass
+                if view.value == True:
+                    loading = self.bot.get_emoji(1012677456811016342)
+                    em=Embed(description="Banning user IDs now {}".format(loading), color=Color.red())
+                    await ctx.edit_original_response(embed=em, view=None)
+                    massmb = Embed()
+                    massmb.title = "List of users massbanned"
+                    massmb.color = Color.red()
+                    massmb.description=""
+                    for id in ids:
 
-                    if id == str(ctx.guild.owner.id):
-                        pass
-
-                    try:
-                        if ctx.guild.get_member(int(id)).top_role.position > ctx.user.top_role.position:
+                        if id ==str(ctx.user.id):
                             pass
-                    except:
-                        pass
-                    
-                    try:
-                        user = await self.bot.fetch_user(int(id))
-                        await ctx.guild.ban(user, reason=reason)
 
-                        massmb.description += "{} | `{}`\n".format(user, user.id) 
-                    except:
-                        continue
-                massmb.add_field(name="Reason", value=reason, inline=False)
-                modlog_id = get_modlog_channel(ctx.guild.id)
-                if modlog_id == None:
-                    await ctx.edit_original_response(embed=massmb)
-                else:
-                    modlog = await ctx.guild.fetch_channel(modlog_id)
-                    muted = Embed(
-                        description="Tried to ban {} users. Check {}".format(len(ids), modlog.mention), color=0xFF0000)
-                    await ctx.edit_original_response(embed=muted)
-                    await modlog.send(embed=massmb)
-        
-            elif view.value == False:
-                cancelled=Embed(description="Massban cancelled", color=Color.red())
-                await ctx.edit_original_response(embed=cancelled, view=None)
+                        if id == str(ctx.guild.owner.id):
+                            pass
 
-            elif view.value==None:
-                cancelled = Embed(
-                    description="Massban cancelled due to timeout", color=Color.red())
-                await ctx.edit_original_response(embed=cancelled, view=None)
+                        try:
+                            if ctx.guild.get_member(int(id)).top_role.position > ctx.user.top_role.position:
+                                pass
+                        except:
+                            pass
+                        
+                        try:
+                            user = await self.bot.fetch_user(int(id))
+                            await ctx.guild.ban(user, reason=reason)
 
-    @app_commands.command(description="Unban multiple members at once. You can put only 20 user IDs. Leave a space after each ID")
-    @checks.cooldown(1, 1800, key=lambda i: (i.guild.id))
-    @checks.has_permissions(administrator=True)
+                            massmb.description += "{} | `{}`\n".format(user, user.id) 
+                        except:
+                            continue
+                    massmb.add_field(name="Reason", value=reason, inline=False)
+                    modlog_id = get_modlog_channel(ctx.guild.id)
+                    if modlog_id == None:
+                        await ctx.edit_original_response(embed=massmb)
+                    else:
+                        modlog = await ctx.guild.fetch_channel(modlog_id)
+                        muted = Embed(
+                            description="Tried to ban {} users. Check {}".format(len(ids), modlog.mention), color=0xFF0000)
+                        await ctx.edit_original_response(embed=muted)
+                        await modlog.send(embed=massmb)
+            
+                elif view.value == False:
+                    cancelled=Embed(description="Massban cancelled", color=Color.red())
+                    await ctx.edit_original_response(embed=cancelled, view=None)
+
+                elif view.value==None:
+                    cancelled = Embed(
+                        description="Massban cancelled due to timeout", color=Color.red())
+                    await ctx.edit_original_response(embed=cancelled, view=None)
+
+    @app_commands.command(description="Unban multiple members at once")
+    @app_commands.describe(user_ids="How many user IDs? Leave a space after each ID (min is 5 and max is 20)", reason="Why are they being unbanned?")
+    @app_commands.checks.cooldown(1, 1800, key=lambda i: (i.guild.id))
+    @app_commands.default_permissions(administrator=True)
     async def massunban(self, ctx: Interaction, user_id: str, reason:str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             ids = user_id.replace(' ', ',').split(',')
-            if len(ids) > 20:
-                ids = ids[:20]
+            if len(ids) < 5:
+                embed=Embed(description="There is very few IDs. Please add more and try again after <t:{}:R>".format(round((datetime.now() + timedelta(minutes=30)).timestamp())))
+                await ctx.followup.send(embed=embed)
+            else:            
+                if len(ids) > 20:
+                    ids = ids[:20]
 
-            view = Confirmation(ctx.user)
-            alert = Embed(title="BEWARE", description="This is an experimental command and the developer is **NOT** responsible in any way or form if you messed up, even if it was misused (but report anyone misusung them to the developer so he can botban them)", color=Color.red())
-            await ctx.followup.send(embed=alert, view=view)
+                view = Confirmation(ctx.user)
+                alert = Embed(title="BEWARE", description="This is an experimental command and the developer is **NOT** responsible in any way or form if you messed up, even if it was misused (but report anyone misusung them to the developer so he can botban them)", color=Color.red())
+                await ctx.followup.send(embed=alert, view=view)
 
-            await view.wait()
+                await view.wait()
 
-            if view.value == True:
-                loading = self.bot.get_emoji(1012677456811016342)
-                em = Embed(description="Unbanning user IDs now {}".format(
-                    loading), color=Color.red())
-                await ctx.edit_original_response(embed=em, view=None)
-                massmb = Embed()
-                massmb.title = "List of users massunbanned"
-                massmb.color = Color.red()
-                massmb.description = ""
-                for id in ids:
-                    if id == str(ctx.user.id):
-                        pass
-
-                    if id == str(ctx.guild.owner.id):
-                        pass
-
-                    try:
-                        if ctx.guild.get_member(int(id)).top_role.position > ctx.user.top_role.position:
+                if view.value == True:
+                    loading = self.bot.get_emoji(1012677456811016342)
+                    em = Embed(description="Unbanning user IDs now {}".format(
+                        loading), color=Color.red())
+                    await ctx.edit_original_response(embed=em, view=None)
+                    massmb = Embed()
+                    massmb.title = "List of users massunbanned"
+                    massmb.color = Color.red()
+                    massmb.description = ""
+                    for id in ids:
+                        if id == str(ctx.user.id):
                             pass
-                    except:
-                        pass
-                    
-                    try:
-                        user = await self.bot.fetch_user(int(id))
-                        await ctx.guild.unban(user, reason=reason)
 
-                        massmb.description += "{} | `{}`\n".format(
-                            user, user.id)
-                    except:
-                        continue
-                massmb.add_field(name="Reason", value=reason, inline=False)
-                modlog_id = get_modlog_channel(ctx.guild.id)
-                if modlog_id == None:
-                    await ctx.edit_original_response(embed=massmb)
-                else:
-                    modlog = await ctx.guild.fetch_channel(modlog_id)
-                    muted = Embed(
-                        description="Tried to unban {} users. Check {}".format(len(ids), modlog.mention), color=0xFF0000)
-                    await ctx.edit_original_response(embed=muted)
-                    await modlog.send(embed=massmb)
+                        if id == str(ctx.guild.owner.id):
+                            pass
 
-            elif view.value == False:
-                cancelled = Embed(
-                    description="Massunban cancelled", color=Color.red())
-                await ctx.edit_original_response(embed=cancelled, view=None)
+                        try:
+                            if ctx.guild.get_member(int(id)).top_role.position > ctx.user.top_role.position:
+                                pass
+                        except:
+                            pass
+                        
+                        try:
+                            user = await self.bot.fetch_user(int(id))
+                            await ctx.guild.unban(user, reason=reason)
 
-            elif view.value == None:
-                cancelled = Embed(
-                    description="Massunban cancelled due to timeout", color=Color.red())
-                await ctx.edit_original_response(embed=cancelled, view=None)
+                            massmb.description += "{} | `{}`\n".format(
+                                user, user.id)
+                        except:
+                            continue
+                    massmb.add_field(name="Reason", value=reason, inline=False)
+                    modlog_id = get_modlog_channel(ctx.guild.id)
+                    if modlog_id == None:
+                        await ctx.edit_original_response(embed=massmb)
+                    else:
+                        modlog = await ctx.guild.fetch_channel(modlog_id)
+                        muted = Embed(
+                            description="Tried to unban {} users. Check {}".format(len(ids), modlog.mention), color=0xFF0000)
+                        await ctx.edit_original_response(embed=muted)
+                        await modlog.send(embed=massmb)
+
+                elif view.value == False:
+                    cancelled = Embed(
+                        description="Massunban cancelled", color=Color.red())
+                    await ctx.edit_original_response(embed=cancelled, view=None)
+
+                elif view.value == None:
+                    cancelled = Embed(
+                        description="Massunban cancelled due to timeout", color=Color.red())
+                    await ctx.edit_original_response(embed=cancelled, view=None)
 
     @tasks.loop(seconds=5, reconnect=True)
     async def check_db(self):

@@ -12,6 +12,7 @@ class slashreactions(Cog):
         self.bot = bot
 
     @app_commands.command(description="Hug someone or yourself")
+    @app_commands.describe(member="Who are you hugging?")
     async def hug(self, ctx: Interaction, member: Optional[Member]=None)->None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -29,6 +30,7 @@ class slashreactions(Cog):
             await ctx.response.send_message(msg, embed=hug)
 
     @app_commands.command(description="Slap someone or yourself")
+    @app_commands.describe(member="Who are you slapping?")
     async def slap(self, ctx: Interaction, member: Optional[Member]=None)->None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -59,6 +61,7 @@ class slashreactions(Cog):
             await ctx.response.send_message(f"*{ctx.user} is smugging*", embed=smug) 
 
     @app_commands.command(description="Poke someone or yourself")
+    @app_commands.describe(member="Who are you poking?")
     async def poke(self, ctx: Interaction, member: Optional[Member]=None)->None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -76,6 +79,7 @@ class slashreactions(Cog):
             await ctx.response.send_message(msg, embed=poke)
 
     @app_commands.command(description="Pat someone or yourself")
+    @app_commands.describe(member="Who are you patting?")
     async def pat(self, ctx: Interaction, member: Optional[Member]=None)->None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -93,6 +97,7 @@ class slashreactions(Cog):
             await ctx.response.send_message(msg, embed=pat)
 
     @app_commands.command(description="Kiss someone or yourself")
+    @app_commands.describe(member="Who are you kissing?")
     async def kiss(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -110,6 +115,7 @@ class slashreactions(Cog):
             await ctx.response.send_message(msg, embed=kiss)
 
     @app_commands.command(description="Tickle someone or yourself")
+    @app_commands.describe(member="Who are you tickling?")
     async def tickle(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -127,6 +133,7 @@ class slashreactions(Cog):
             await ctx.response.send_message(msg, embed=tickle)
 
     @app_commands.command(description="Call someone or yourself a baka!")
+    @app_commands.describe(member="Who are you calling a baka?")
     async def baka(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -144,6 +151,7 @@ class slashreactions(Cog):
             await ctx.response.send_message(msg, embed=baka)
 
     @app_commands.command(description="Feed someone or yourself")
+    @app_commands.describe(member="Who are you feeding?")
     async def feed(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if check_botbanned_user(ctx.user.id) == True:
             pass

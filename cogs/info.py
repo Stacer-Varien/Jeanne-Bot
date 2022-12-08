@@ -53,6 +53,7 @@ class slashinfo(Cog):
             await ctx.followup.send(embed=embed)
 
     @app_commands.command(description="See the information of a member or yourself")
+    @app_commands.describe(member="Which member?")
     async def userinfo(self, ctx : Interaction, member: Optional[Member]= None)->None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -195,6 +196,7 @@ class slashinfo(Cog):
 
 
     @app_commands.command(description="See your avatar or another member's avatar")
+    @app_commands.describe(member="Which member?")
     async def avatar(self, ctx: Interaction, member: Optional[Member]=None)->None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -208,6 +210,7 @@ class slashinfo(Cog):
             await ctx.followup.send(embed=avatar)
 
     @app_commands.command(description="See your guild avatar or a member's guild avatar")
+    @app_commands.describe(member="Which member?")
     async def serveravatar(self, ctx: Interaction, member: Optional[Member]=None)->None:
         if check_botbanned_user(ctx.user.id) == True:
             pass

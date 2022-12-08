@@ -12,6 +12,7 @@ class nsfw(Cog):
         self.bot = bot
 
     @app_commands.command(description="Get a random hentai from Jeanne", nsfw=True)
+    @app_commands.describe(rating="Do you want questionable or explicit content?")
     async def hentai(self, ctx: Interaction, rating: Optional[Literal["questionable", "explicit"]] = None) -> None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -54,6 +55,7 @@ class nsfw(Cog):
                 await ctx.followup.send(embed=embed)
 
     @app_commands.command(description="Get a random media content from Gelbooru", nsfw=True)
+    @app_commands.describe(rating="Do you want questionable or explicit content?", tag="Add your tag")
     async def gelbooru(self, ctx: Interaction, rating: Optional[Literal["questionable", "explicit"]], tag: Optional[str] = None) -> None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -89,6 +91,7 @@ class nsfw(Cog):
                 await ctx.followup.send(embed=no_tag)
 
     @app_commands.command(description="Get a random hentai from Yande.re", nsfw=True)
+    @app_commands.describe(rating="Do you want questionable or explicit content?", tag="Add your tag")
     async def yandere(self, ctx: Interaction, rating: Optional[Literal["questionable", "explicit"]], tag: Optional[str] = None) -> None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -121,6 +124,7 @@ class nsfw(Cog):
                 await ctx.followup.send(embed=no_tag)
 
     @app_commands.command(description="Get a random hentai from Konachan")
+    @app_commands.describe(rating="Do you want questionable or explicit content?", tag="Add your tag")
     async def konachan(self, ctx: Interaction, rating: Optional[Literal["questionable", "explicit"]], tag: Optional[str] = None) -> None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:

@@ -13,6 +13,7 @@ class fun(Cog):
         self.bot = bot
 
     @app_commands.command(name='8ball', description="Ask 8 ball anything and you will get your awnser")
+    @app_commands.describe(question="Add your question")
     async def _8ball(self, ctx: Interaction, question:str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -26,6 +27,7 @@ class fun(Cog):
             await ctx.followup.send(embed=embed)
 
     @app_commands.command(description="Say something and I will say it in reversed text")
+    @app_commands.describe(text="What are you reversing?")
     async def reverse(self, ctx: Interaction, text:str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -69,6 +71,7 @@ class fun(Cog):
             await ctx.followup.send(embed=animeme)
 
     @app_commands.command(description="Combine 2 words to get 2 combined words")
+    @app_commands.describe(first_word="Add first word", second_word="Add second word")
     async def combine(self, ctx: Interaction, first_word:str, second_word:str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -89,7 +92,8 @@ class fun(Cog):
             combine.set_author(name=f"{first_word} + {second_word}")
             await ctx.followup.send(embed=combine)
 
-    @app_commands.command(description="Give me a lot of choices and I will pick one for you. Seperate with ','")
+    @app_commands.command(description="Give me a lot of choices and I will pick one for you")
+    @app_commands.describe(choices="Add your choices here. Separate them with ','")
     async def choose(self, ctx: Interaction, choices: str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -101,6 +105,7 @@ class fun(Cog):
             await ctx.followup.send(embed=choose)
 
     @app_commands.command(description="Check how much of a simp you are")
+    @app_commands.describe(member="Which member?")
     async def simprate(self, ctx: Interaction, member: Optional[Member] = None):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -123,6 +128,7 @@ class fun(Cog):
             await ctx.followup.send(embed=simp)
 
     @app_commands.command(description="Check how gay you are")
+    @app_commands.describe(member="Which member?")
     async def gayrate(self, ctx: Interaction, member: Optional[Member] =None):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:

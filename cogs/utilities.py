@@ -7,7 +7,7 @@ from config import WEATHER, WEBHOOK
 from discord.ui import View
 from asyncio import TimeoutError
 from py_expression_eval import Parser
-from typing import Literal, Optional
+from typing import Literal
 from discord.app_commands import *
 from json import loads
 from requests import get
@@ -27,8 +27,6 @@ def send_bot_report(report_type, report, reporter):
     report.set_footer(text=f"Reporter: {reporter}")
 
     return report
-
-
 
 class invite_button(View):
     def __init__(self):
@@ -50,6 +48,7 @@ class Weather_Group(GroupCog, name="weather"):
         super().__init__()
 
     @app_commands.command(description="Get weather information on a city")
+    @app_commands.describe(city="Add a city")
     async def city(self, ctx: Interaction, city: str):
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -99,6 +98,7 @@ class Weather_Group(GroupCog, name="weather"):
                         await ctx.followup.send(embed=embed)
 
     @app_commands.command(description="Get weather information on a city but with a ZIP code and Country code")
+    @app_commands.describe(zip_code="Add a ZIP code", country_code="Add a country code")
     async def zipcode(self, ctx: Interaction, zip_code: str, country_code: str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -151,7 +151,7 @@ class Say_Group(GroupCog, name="say"):
         super().__init__()
     
     @app_commands.command(description="Type something and I will say it in plain text")
-    @checks.has_permissions(administrator=True)
+    @app_commands.default_permissions(administrator=True)
     async def plain(self, ctx: Interaction, channel: TextChannel):
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -175,7 +175,7 @@ class Say_Group(GroupCog, name="say"):
 
 
     @app_commands.command(description="Generates an embed message")
-    @checks.has_permissions(administrator=True)
+    @checks.has_guild_permissions(administrator=True)
     async def embedgen(self, ctx: Interaction, channel: TextChannel, message:str):
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -199,7 +199,7 @@ class Say_Group(GroupCog, name="say"):
 
 
     @app_commands.command(description="Generates an embed using a JSON file")
-    @checks.has_permissions(administrator=True)
+    @checks.has_guild_permissions(administrator=True)
     async def embedjson(self, ctx: Interaction, channel: TextChannel, json:Attachment):
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -228,7 +228,9 @@ class slashutilities(Cog):
         self.bot = bot
         self.parser = Parser()
 
+
     @app_commands.command(description="Do a calculation")
+    @app_commands.describe(calculate="Add a calculation")
     async def calculator(self, ctx: Interaction, calculate:str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
