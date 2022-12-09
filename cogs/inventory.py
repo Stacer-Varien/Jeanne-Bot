@@ -31,7 +31,7 @@ class Background_Group(GroupCog, name="background"):
         image = Level().generate_level(**args)
         return image
 
-    @app_commands.command(description="Preview the background image")
+    @app_commands.command(description="Preview the inbuild background image")
     @app_commands.describe(item_id="Which background you are checking?")
     async def preview(self, ctx: Interaction, item_id: str):
         if check_botbanned_user(ctx.user.id) == True:
@@ -40,7 +40,7 @@ class Background_Group(GroupCog, name="background"):
             await ctx.response.defer()
             qp = self.bot.get_emoji(980772736861343774)
             wallpaper = get_wallpaper(item_id)
-            embed = Embed(title="Preview backgorund")
+            embed = Embed(title="Preview background")
             embed.color = ctx.user.color
             embed.add_field(name="Name", value=wallpaper[1], inline=True)
             embed.add_field(name="Price", value=f"1000 {qp}", inline=True)
@@ -75,6 +75,9 @@ class Background_Group(GroupCog, name="background"):
                     await ctx.followup.send(embed=nonexist)
 
                 else:
+                    loading = self.bot.get_emoji(1012677456811016342)
+                    qp = self.bot.get_emoji(980772736861343774)
+                    await ctx.followup.send("Creating preview... This will take some time {}".format(loading))
                     args = {
                         'bg_image': wallpaper[2],
              	    	'profile_image': str(ctx.user.avatar.with_format('png')),
@@ -95,12 +98,12 @@ class Background_Group(GroupCog, name="background"):
                     preview = Embed(description="This is the preview of the level card.", color=Color.blue()).add_field(
                         name="Cost", value=f"{wallpaper[3]} {qp}").set_footer(text="Is this the background you wanted?")
                     view = Confirmation(ctx.user)
-                    await ctx.followup.send(file=file, embed=preview, view=view)
+                    await ctx.edit_original_response(content=None, file=[file], embed=preview, view=view)
                     await view.wait()
 
                     if view.value == None:
                         await ctx.edit_original_response(content="Timeout", view=None, embed=None)
-                    elif view.value is True:
+                    elif view.value == True:
                         if create_user_inventory(ctx.user.id) == False:
                             pass
                         add_user_wallpaper(ctx.user.id, item_id)
@@ -108,11 +111,11 @@ class Background_Group(GroupCog, name="background"):
                             description=f"Background wallpaper bought and selected", color=Color.blue())
                         await ctx.edit_original_response(embed=embed1, view=None)
 
-                    elif view.value is False:
-                        await ctx.edit_original_response("Cancelled", view=None, embed=None)
+                    elif view.value == False:
+                        await ctx.edit_original_response(content="Cancelled", view=None, embed=None)
 
     @app_commands.command(description='Select a wallpaper')
-    @app_commands.describe(item_id="What is the name of the background?")
+    @app_commands.describe(name="What is the name of the background?")
     async def use(self, ctx: Interaction, name: str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -176,7 +179,7 @@ class Background_Group(GroupCog, name="background"):
                     add_user_custom_wallpaper(ctx.user.id, name, link)
 
                     embed1 = Embed(
-                        description=f"Background wallpaper bought and . Don't forget to use `/use {name}` to set it", color=Color.blue())
+                        description="Background wallpaper bought and selected", color=Color.blue())
                     await ctx.edit_original_response(embed=embed1, view=None)
 
                 elif view.value == False:
