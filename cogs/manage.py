@@ -401,6 +401,34 @@ class Set_Group(GroupCog, name="set"):
                             value=channel.mention, inline=True)
             await ctx.followup.send(embed=embed)
 
+    @app_commands.command(description="Set a message logging channel")
+    @app_commands.describe(channel="Which channel should log edited and deleted messages?")
+    @app_commands.checks.has_permissions(manage_guild=True)
+    async def messagelog(self, ctx: Interaction, channel: TextChannel):
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            await ctx.response.defer()
+            set_message_logger(ctx.guild.id, channel.id)
+            embed = Embed(description='Message logging channel set', color=Color.red())
+            embed.add_field(name="Channel selected",
+                            value=channel.mention, inline=True)
+            await ctx.followup.send(embed=embed)
+
+    @app_commands.command(description="Set a member logging channel")
+    @app_commands.describe(channel="Which channel should log changes to member's tag, name, nickname and avatar?")
+    @app_commands.checks.has_permissions(manage_guild=True)
+    async def memberlog(self, ctx: Interaction, channel: TextChannel):
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            await ctx.response.defer()
+            set_member_logger(ctx.guild.id, channel.id)
+            embed = Embed(description='Message logging channel set', color=Color.red())
+            embed.add_field(name="Channel selected",
+                            value=channel.mention, inline=True)
+            await ctx.followup.send(embed=embed)
+
 class manage(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
