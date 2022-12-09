@@ -144,91 +144,58 @@ class Weather_Group(GroupCog, name="weather"):
                             name=f"{guste} Wind Gust", value=f"{wind_gust}m/s", inline=True)
                         await ctx.followup.send(embed=embed)
 
-
-class Say_Group(GroupCog, name="say"):
-    def __init__(self, bot: Bot) -> None:
-        self.bot = bot
-        super().__init__()
-    
-    @app_commands.command(description="Type something and I will say it in plain text")
-    @app_commands.describe(channel="Send to which channel?")
-    @app_commands.checks.has_permissions(administrator=True)
-    async def plain(self, ctx: Interaction, channel: TextChannel):
-        if check_botbanned_user(ctx.user.id) == True:
-            pass
-        else:
-            await ctx.response.defer(ephemeral=True)
-            await ctx.followup.send("Type something!", ephemeral=True)
-
-            def check(m: Message):
-                return m.author == ctx.user and m.content
-
-            try:
-                msg: Message = await self.bot.wait_for('message', check=check, timeout=300)
-
-                await ctx.edit_original_response(content="Sent")
-                await msg.delete()
-                await channel.send(msg.content)
-            except TimeoutError:
-                timeout = Embed(
-                    description=f"Guess you have nothing to say", color=0xFF0000)
-                await ctx.edit_original_response(content=None, embed=timeout)
-
-
-    @app_commands.command(description="Generates an embed message. This needs the Discohooks.org embed generator")
-    @app_commands.describe(channel="Send to which channel?", message="Add the JSON script")
-    @app_commands.checks.has_permissions(administrator=True)
-    async def embedgen(self, ctx: Interaction, channel: TextChannel, message:str):
-        if check_botbanned_user(ctx.user.id) == True:
-            pass
-        else:
-            await ctx.response.defer(ephemeral=True)
-            
-            json=loads(message)
-            
-            try:
-                content=json["content"]
-            except:
-                pass
-
-            await ctx.followup.send(content="Sent", ephemeral=True)
-            try:
-                embed = Embed.from_dict(json['embeds'][0])
-                await channel.send(content=content, embed=embed)
-            except:
-                await channel.send(content=content)
-
-    @app_commands.command(description="Generates an embed using a JSON file. This needs Discohooks.org embed generator")
-    @app_commands.describe(channel="Send to which channel?", json="Place the JSON file here")
-    @app_commands.checks.has_permissions(administrator=True)
-    async def embedjson(self, ctx: Interaction, channel: TextChannel, json:Attachment):
-        if check_botbanned_user(ctx.user.id) == True:
-            pass
-        else:
-            await ctx.response.defer(ephemeral=True)
-
-            json_file=json.url
-            json_request=get(json_file)
-            json_content=json_request.content
-            json=loads(json_content)
-                        
-            try:
-                content=json["content"]
-            except:
-                pass
-
-            await ctx.followup.send(content="Sent", ephemeral=True)
-            try:
-                embed = Embed.from_dict(json['embeds'][0])
-                await channel.send(content=content, embed=embed)
-            except:
-                await channel.send(content=content)
-
 class slashutilities(Cog):
     def __init__(self, bot:Bot):
         self.bot = bot
         self.parser = Parser()
 
+    @app_commands.command(description="Type something and I will say it")
+    @app_commands.describe(channel="Send to which channel?", message="What should I say?")
+    @app_commands.checks.has_permissions(administrator=True)
+    async def say(self, ctx: Interaction, channel: TextChannel, message: str):
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            await ctx.response.defer(ephemeral=True)
+            await ctx.followup.send(content="Sent")
+            await channel.send(message)
+
+    @app_commands.command(description="Generates an embed message. This needs the Discohooks.org embed generator")
+    @app_commands.describe(channel="Send to which channel?", message="Add the JSON script")
+    @app_commands.checks.has_permissions(administrator=True)
+    async def embedgen(self, ctx: Interaction, channel: TextChannel, jsonscript: Optional[str]=None, jsonfile:Optional[Attachment]=None):
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            await ctx.response.defer(ephemeral=True)
+
+            if not jsonscript and not jsonfile:
+                embed=Embed(description="You are missing the JSON script or JSON file\nPlease use [Discohooks](https://discohook.org/)")
+                await ctx.followup.send(embed=embed)
+            elif jsonscript and jsonfile:
+                embed=Embed(description="You are using both the JSON script and JSON file\nPlease use one")
+                await ctx.followup.send(embed=embed)
+            else:
+                if jsonscript and not jsonfile:
+                    json = loads(jsonscript)
+                
+                elif jsonfile and not jsonscript:
+                    json_file = jsonfile.url
+                    json_request = get(json_file)
+                    json_content = json_request.content
+                    json = loads(json_content)
+            
+                try:
+                    content = json["content"]
+                except:
+                    pass
+                
+                try:
+                    embed = Embed.from_dict(json['embeds'][0])
+                    await channel.send(content=content, embed=embed)
+                except:
+                    await channel.send(content=content)
+                await ctx.followup.send(content="Sent", ephemeral=True)
 
     @app_commands.command(description="Do a calculation")
     @app_commands.describe(calculate="Add a calculation")
@@ -413,5 +380,4 @@ class slashutilities(Cog):
 
 async def setup(bot:Bot):
     await bot.add_cog(Weather_Group(bot))
-    await bot.add_cog(Say_Group(bot))
     await bot.add_cog(slashutilities(bot))
