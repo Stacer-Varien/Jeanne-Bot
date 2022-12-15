@@ -3,11 +3,11 @@
 import os
 import platform
 
-if platform.platform() == "Windows":  # If you are using a Windows Operating System
+if platform.system() == "Windows":  # If you are using a Windows Operating System
     # Upgrades the pip package for fluent installation
     os.system("python.exe -m pip install -U pip")
 
-elif platform.platform() == "Linux":  # If you are using a Linux Operating System
+elif platform.system() == "Linux":  # If you are using a Linux Operating System
     # Upgrades the pip package for fluent installation #You need Python3.10 with an activated venv
     os.system("python3 -m pip install -U pip")
 
