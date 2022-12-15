@@ -161,7 +161,7 @@ class slashutilities(Cog):
             await channel.send(message)
 
     @app_commands.command(description="Generates an embed message. This needs the Discohooks.org embed generator")
-    @app_commands.describe(channel="Send to which channel?", message="Add the JSON script")
+    @app_commands.describe(channel="Send to which channel?", jsonscript="Add a JSON script", jsonfile="Add a JSON file")
     @app_commands.checks.has_permissions(administrator=True)
     async def embedgen(self, ctx: Interaction, channel: TextChannel, jsonscript: Optional[str]=None, jsonfile:Optional[Attachment]=None):
         if check_botbanned_user(ctx.user.id) == True:

@@ -10,11 +10,11 @@ dbl_token = TOPGG
 class topgg(Cog):
     def __init__(self, bot:Bot):
         self.bot = bot
-        self.update_stats.start()
         self.topggpy = DBLClient(self.bot, dbl_token)
         self.topgg_webhook = WebhookManager(
             self.bot).dbl_webhook("/dblwebhook", TOPGG_AUTH)
         self.topgg_webhook.run(5000)
+        self.update_stats.start()
 
     @tasks.loop(minutes=30)
     async def update_stats(self):
@@ -29,8 +29,7 @@ class topgg(Cog):
     async def on_dbl_vote(self, data):
         if data["type"] == "upvote":
             voter = await self.bot.fetch_user(data['user'])
-            check = check_botbanned_user(voter.id)
-            if check == voter.id:
+            if check_botbanned_user(voter.id) == True:
                 pass
             else:
                 if await self.topggpy.get_weekend_status() is True:
