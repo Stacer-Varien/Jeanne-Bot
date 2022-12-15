@@ -123,4 +123,5 @@ class levelling(Cog):
 
 
 async def setup(bot: Bot):
+    await bot.add_cog(Rank_Group(bot))
     await bot.add_cog(levelling(bot))
