@@ -126,7 +126,7 @@ class Create_Group(GroupCog, name="create"):
             role = await ctx.guild.create_role(name=name)
             embed = Embed()
             embed.description = "Role `{}` has been created".format(name)
-            embed.color = Color.green()
+            embed.color = color
 
             if color:
                 await role.edit(color=int(color, 16))
@@ -263,7 +263,11 @@ class Edit_Group(GroupCog, name="edit"):
             await ctx.response.defer()
             embed = Embed()
             embed.description = "Role `{}` has been edited".format(role.name)
-            embed.color = Color.green()
+            
+            if color:
+                embed.color=color
+            else:
+                embed.color=Color.green()
 
             if name:
                 await role.edit(name=name)
@@ -462,9 +466,9 @@ class manage(Cog):
             await ctx.followup.send(embed=embed)
 
     @app_commands.command(description="Removes a welcoming/modlog/report channel. Set all options to true to remove all")
-    @app_commands.describe(welcomer="Remove welcomer channel?", leaving="Remove leaving channel?", modlog="Remove modlog channel?", report="Remove report channel?")
+    @app_commands.describe(welcomer="Remove welcomer channel?", leaving="Remove leaving channel?", modlog="Remove modlog channel?", report="Remove report channel?", memberlog="Remove member logging channel?", messagelog="Remove lessage logging channel?")
     @app_commands.checks.has_permissions(manage_guild=True)
-    async def remove(self, ctx: Interaction, welcomer: Optional[bool] = None, leaving: Optional[bool] = None, modlog: Optional[bool] = None, report: Optional[bool] = None)->None:
+    async def remove(self, ctx: Interaction, welcomer: Optional[bool] = None, leaving: Optional[bool] = None, modlog: Optional[bool] = None, report: Optional[bool] = None, memberlog: Optional[bool] = None, messagelog: Optional[bool] = None) -> None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
@@ -518,7 +522,31 @@ class manage(Cog):
                     else:
                         embed.add_field(name='Report channel removal status',
                                         value='Successful', inline=True)
-                
+            
+                if memberlog == True:
+
+                    rep = remove_memberlog(ctx.guild.id)
+
+                    if rep == False:
+                        embed.add_field(
+                            name='Member logging channel removal status', value='Failed. No Member logging channel set', inline=True)
+                    else:
+                        embed.add_field(name='Member logging channel removal status',
+                                        value='Successful', inline=True)
+
+                await ctx.followup.send(embed=embed)
+
+                if messagelog == True:
+
+                    rep = remove_messagelog(ctx.guild.id)
+
+                    if rep == False:
+                        embed.add_field(
+                            name='Message logging channel removal status', value='Failed. No Message logging channel set', inline=True)
+                    else:
+                        embed.add_field(name='Message logging channel removal status',
+                                        value='Successful', inline=True)
+
                 await ctx.followup.send(embed=embed)
                         
     @app_commands.command(description="Clone a channel")
