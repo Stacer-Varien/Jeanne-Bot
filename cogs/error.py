@@ -9,7 +9,7 @@ class errors(Cog):
         self.bot.tree.on_error = self.on_app_command_error
     
     @Cog.listener()
-    async def on_app_command_error(self, ctx: Interaction, error: AppCommand):
+    async def on_app_command_error(self, ctx: Interaction, error: AppCommandError):
         if isinstance(error, CommandInvokeError):
             embed = Embed(description=error, color=Color.red())
             await ctx.followup.send(embed=embed)
@@ -22,6 +22,8 @@ class errors(Cog):
         elif isinstance(error, NoPrivateMessage):
             embed = Embed(description=error, color=Color.red())
             await ctx.followup.send(embed=embed)
+        elif isinstance(error, CommandOnCooldown):
+            pass
 
     @Cog.listener()
     async def on_command_error(self, ctx:Context, error):
