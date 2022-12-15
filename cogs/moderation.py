@@ -6,9 +6,8 @@ from datetime import datetime, timedelta
 from humanfriendly import format_timespan, parse_timespan
 from db_functions import *
 from assets.buttons import Confirmation
-from discord.ext import tasks
 from typing import Optional
-
+from discord.ext import tasks
 
 class ListWarns_Group(GroupCog, name="listwarns"):
     def __init__(self, bot: Bot) -> None:
@@ -329,6 +328,65 @@ class moderation(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.check_db.start()
+
+    @tasks.loop(seconds=5, reconnect=True)
+    async def check_db(self):
+        for mutes in get_muted_data():
+            if int(round(datetime.now().timestamp())) > int(mutes[2]):
+                guild = await self.bot.fetch_guild(mutes[1])
+
+                member = await guild.fetch_member(mutes[0])
+                mute_role = guild.get_role(check_mute_role(mutes[1]))
+
+                await member.remove_roles(mute_role, reason="Mute expired")
+
+                remove_mute(member.id, guild.id)
+
+                mod_channel = get_modlog_channel(guild.id)
+
+                if mod_channel != None:
+                    unmute = Embed(
+                        title="Member Unmuted", color=0xFF0000)
+                    unmute.add_field(name="Member", value=member, inline=True)
+                    unmute.add_field(name="ID", value=member.id, inline=True)
+                    unmute.add_field(
+                        name="Reason", value="Mute expired", inline=True)
+                    unmute.set_thumbnail(url=member.display_avatar)
+
+                    modlog = await guild.fetch_channel(mod_channel)
+
+                    await modlog.send(embed=unmute)
+
+                else:
+                    continue
+
+        for bans in get_softban_data():
+            if int(round(datetime.now().timestamp())) > int(bans[2]):
+                guild = await self.bot.fetch_guild(bans[1])
+
+                member = await self.bot.fetch_user(bans[0])
+
+                await guild.unban(member, reason="Softban expired")
+
+                remove_softban(member.id, guild.id)
+
+                mod_channel = get_modlog_channel(guild.id)
+
+                if mod_channel != None:
+                    unmute = Embed(
+                        title="Member unbanned", color=0xFF0000)
+                    unmute.add_field(name="Member", value=member, inline=True)
+                    unmute.add_field(name="ID", value=member.id, inline=True)
+                    unmute.add_field(
+                        name="Reason", value="Softban expired", inline=True)
+                    unmute.set_thumbnail(url=member.display_avatar)
+
+                    modlog = await guild.fetch_channel(mod_channel)
+
+                    await modlog.send(embed=unmute)
+
+                else:
+                    continue
 
     @app_commands.command(description="Warn a member")
     @app_commands.describe(member="Which member are you warning?", reason="What did they do?")
@@ -743,6 +801,15 @@ class moderation(Cog):
                         description="Massban cancelled due to timeout", color=Color.red())
                     await ctx.edit_original_response(embed=cancelled, view=None)
 
+    @massban.error
+    async def massban_error(self, ctx: Interaction, error:app_commands.AppCommandError):
+        if isinstance(error, app_commands.CommandOnCooldown):
+            reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
+            reset_hour = round(reset_hour_time.timestamp())
+            cooldown = Embed(
+                description=f"A massban command was already used here in this server.\nTry again after <t:{reset_hour}:R>", color=0xff0000)
+            await ctx.followup.send(embed=cooldown)
+
     @app_commands.command(description="Unban multiple members at once")
     @app_commands.describe(user_ids="How many user IDs? Leave a space after each ID (min is 5 and max is 20)", reason="Why are they being unbanned?")
     @app_commands.checks.cooldown(1, 1800, key=lambda i: (i.guild.id))
@@ -818,64 +885,16 @@ class moderation(Cog):
                         description="Massunban cancelled due to timeout", color=Color.red())
                     await ctx.edit_original_response(embed=cancelled, view=None)
 
-    @tasks.loop(seconds=5, reconnect=True)
-    async def check_db(self):
-        for mutes in get_muted_data():
-            if int(round(datetime.now().timestamp())) > int(mutes[2]):
-                guild = await self.bot.fetch_guild(mutes[1])
+    @massunban.error
+    async def massunban_error(self, ctx: Interaction, error: app_commands.AppCommandError):
+        if isinstance(error, app_commands.CommandOnCooldown):
+            reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
+            reset_hour = round(reset_hour_time.timestamp())
+            cooldown = Embed(
+                description=f"A massunban command was already used here in this server.\nTry again after <t:{reset_hour}:R>", color=0xff0000)
+            await ctx.followup.send(embed=cooldown)
 
-                member = await guild.fetch_member(mutes[0])
-                mute_role = guild.get_role(check_mute_role(mutes[1]))
 
-                await member.remove_roles(mute_role, reason="Mute expired")
-
-                remove_mute(member.id, guild.id)
-
-                mod_channel = get_modlog_channel(guild.id)
-
-                if mod_channel != None:
-                    unmute = Embed(
-                        title="Member Unmuted", color=0xFF0000)
-                    unmute.add_field(name="Member", value=member, inline=True)
-                    unmute.add_field(name="ID", value=member.id, inline=True)
-                    unmute.add_field(
-                        name="Reason", value="Mute expired", inline=True)
-                    unmute.set_thumbnail(url=member.display_avatar)
-
-                    modlog = await guild.fetch_channel(mod_channel)
-
-                    await modlog.send(embed=unmute)
-
-                else:
-                    continue
-
-        for bans in get_softban_data():
-            if int(round(datetime.now().timestamp())) > int(bans[2]):
-                guild = await self.bot.fetch_guild(bans[1])
-
-                member = await self.bot.fetch_user(bans[0])
-
-                await guild.unban(member, reason="Softban expired")
-
-                remove_softban(member.id, guild.id)
-
-                mod_channel = get_modlog_channel(guild.id)
-
-                if mod_channel != None:
-                    unmute = Embed(
-                        title="Member unbanned", color=0xFF0000)
-                    unmute.add_field(name="Member", value=member, inline=True)
-                    unmute.add_field(name="ID", value=member.id, inline=True)
-                    unmute.add_field(
-                        name="Reason", value="Softban expired", inline=True)
-                    unmute.set_thumbnail(url=member.display_avatar)
-
-                    modlog = await guild.fetch_channel(mod_channel)
-
-                    await modlog.send(embed=unmute)
-
-                else:
-                    continue
 
 
 async def setup(bot: Bot):
