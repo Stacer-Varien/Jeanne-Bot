@@ -428,7 +428,7 @@ class Set_Group(GroupCog, name="set"):
         else:
             await ctx.response.defer()
             set_member_logger(ctx.guild.id, channel.id)
-            embed = Embed(description='Message logging channel set', color=Color.red())
+            embed = Embed(description='Member logging channel set', color=Color.red())
             embed.add_field(name="Channel selected",
                             value=channel.mention, inline=True)
             await ctx.followup.send(embed=embed)
