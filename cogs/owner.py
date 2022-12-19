@@ -191,6 +191,23 @@ class slashowner(Cog):
 
         await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
 
+    @command(aliases=['load'])
+    @is_owner()
+    async def load_(self, ctx:Context, extension):
+        await self.bot.load_extension("cogs.{}".format(extension))
+        await ctx.send("{} loaded".format(extension), ephemeral=True)
+
+    @command(aliases=['unload'])
+    @is_owner()
+    async def unload_(self, ctx: Context, extension):
+        await self.bot.unload_extension("cogs.{}".format(extension))
+        await ctx.send("{} unloaded".format(extension), ephemeral=True)
+
+    @command(aliases=['reload'])
+    @is_owner()
+    async def reload_(self, ctx: Context, extension):
+        await self.bot.reload_extension("cogs.{}".format(extension))
+        await ctx.send("{} reloaded".format(extension), ephemeral=True)
 
 async def setup(bot:Bot):
     await bot.add_cog(slashowner(bot))
