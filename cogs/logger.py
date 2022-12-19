@@ -96,29 +96,22 @@ class logger(Cog):
 
     @Cog.listener()
     async def on_member_update(self, before: Member, after: Member):
-        if before.id != self.bot.user.id:
+        if not self.bot.user.id:
             logger = get_member_logger(before.guild.id)
             if logger == None:
                 pass
             else:
                 embed = Embed()
-                if before != after:
-                    embed.description = "Name changed"
-                    embed.add_field(name="Old Name",
-                                    value=before, inline=True)
-                    embed.add_field(name="New Name",
-                                    value=after, inline=True)
-
                 if before.nick != after.nick:
                     embed.description = "Nickname changed"
-                    embed.add_field(name="Old nickname",
+                    embed.add_field(name="Old Nickname",
                                     value=before.nick, inline=True)
-                    embed.add_field(name="New nickname",
+                    embed.add_field(name="New Nickname",
                                     value=after.nick, inline=True)
 
-                if before.display_avatar != after.display_avatar:
+                elif before.guild_avatar != after.guild_avatar:
                     embed.description = "Avatar change"
-                    embed.set_thumbnail(url=after.display_avatar)
+                    embed.set_thumbnail(url=after.guild_avatar)
 
                 colors = [Color.red(), Color.blue(),
                           Color.green(), Color.gold()]
@@ -127,6 +120,6 @@ class logger(Cog):
                     text="Member: {} | `{}`".format(before, before.id))
                 channel = await self.bot.fetch_channel(logger)
                 await channel.send(embed=embed)
-
+                        
 async def setup(bot: Bot):
     await bot.add_cog(logger(bot))
