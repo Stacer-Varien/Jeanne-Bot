@@ -1,5 +1,3 @@
-## DO NOT FORK AND TEST THIS BRANCH! MOST OF IT IS WRITTEN IN NEXTCORD AND MIGHT BREAK THE BOT ON YOUR SIDE. RATHER USE THE MAIN BRANCH
-
 Jeanne is a multipurpose bot with miscellaneous, moderation, management and some fun commands.
 
 **FEATURES**
@@ -12,8 +10,9 @@ Jeanne is a multipurpose bot with miscellaneous, moderation, management and some
 * Getting information of a user and server
 * A say command that will make Jeanne say the message the user wants
 * A reaction system such as slap, hug and pat
-* A welcoming, leaving and modlogging system
+* A welcoming, leaving, message, member and modlogging system
 * A partial currency system
+* Advance embed generator
 
 
 NOTE: THIS IS FOR EDUCATIONAL PURPORSES. ALSO I WOULD NOT RECOMMENDEND SELFHOSTING THE BOT AS THERE CAN BE CHANGES TO IT SUCH AS ADDING APIS THAT WILL MAKE YOU RUN ALMOST ALL FEATURES OF THE BOT
