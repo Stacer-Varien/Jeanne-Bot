@@ -40,7 +40,7 @@ class Guess_Group(GroupCog, name="guess"):
                 timeout.set_image(url='https://i.imgur.com/faD48C3.jpg')
                 return await ctx.followup.send(embed=timeout)
 
-            if guess.content == answer:
+            if int(guess.content) == answer:
                 add_qp(ctx.user.id, 20)
 
                 correct = Embed(
@@ -95,7 +95,7 @@ class Guess_Group(GroupCog, name="guess"):
                     timeout.set_image(url='https://i.imgur.com/faD48C3.jpg')
                     return await ctx.followup.send(embed=timeout)
 
-                if guess.content == answer:
+                if int(guess.content) == answer:
                     try:
                         add_qp(ctx.user.id, int(bet))
                         correct = Embed(
