@@ -5,9 +5,7 @@ from discord import *
 from db_functions import add_level, add_xp, check_botbanned_user, get_global_rank, get_member_level, get_member_xp, get_server_rank, selected_wallpaper, get_user_level, get_user_xp
 from typing import Optional
 from assets.generators.level_card import Level
-from cooldowns import *
 from discord.app_commands import *
-
 
 
 class Rank_Group(GroupCog, name="rank"):
@@ -15,7 +13,7 @@ class Rank_Group(GroupCog, name="rank"):
         self.bot = bot
         super().__init__()
 
-    @app_commands.command(name='global',description="Check the users with the most XP globally")
+    @app_commands.command(name='global', description="Check the users with the most XP globally")
     @checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def _global(self, ctx: Interaction):
         await ctx.response.defer()
@@ -55,6 +53,7 @@ class Rank_Group(GroupCog, name="rank"):
 
             await ctx.followup.send(embed=embed)
 
+
 class levelling(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
@@ -83,11 +82,11 @@ class levelling(Cog):
                     pass
             else:
                 pass
-            
 
     @app_commands.command(description="See your level or someone else's level")
+    @app_commands.describe(member="Which member?")
     @checks.cooldown(1, 60, key=lambda i: (i.user.id))
-    async def level(self, ctx: Interaction, member: Optional[Member]=None)->None:
+    async def level(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -103,7 +102,8 @@ class levelling(Cog):
 
                 bg = selected_wallpaper(member.id)
 
-                args = {'level_card': bg, 'profile_image': str(member.avatar.with_format('png')), 'server_level': slvl, 'server_user_xp': sexp, 'server_next_xp': ((slvl * 50) + ((slvl - 1) * 25) + 50), 'global_level': glvl, 'global_user_xp': gexp, 'global_next_xp': ((glvl * 50) + ((glvl - 1) * 25) + 50), 'user_name': str(member),}
+                args = {'bg_image': bg, 'profile_image': str(member.avatar.with_format('png')), 'server_level': slvl, 'server_user_xp': sexp, 'server_next_xp': (
+                    (slvl * 50) + ((slvl - 1) * 25) + 50), 'global_level': glvl, 'global_user_xp': gexp, 'global_next_xp': ((glvl * 50) + ((glvl - 1) * 25) + 50), 'user_name': str(member), }
 
                 func = partial(self.get_card, args)
                 image = await get_event_loop().run_in_executor(None, func)
@@ -121,5 +121,7 @@ class levelling(Cog):
                 description=f"You have already checked your level?\nTry again after `{round(error.retry_after, 2)} seconds`", color=0xff0000)
             await ctx.response.send_message(embed=cooldown)
 
+
 async def setup(bot: Bot):
+    await bot.add_cog(Rank_Group(bot))
     await bot.add_cog(levelling(bot))

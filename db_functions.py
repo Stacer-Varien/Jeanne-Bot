@@ -5,7 +5,6 @@ from discord import Embed, Color, Emoji
 from config import db, inv_db
 from os import listdir, makedirs, path
 from requests import get
-from random import randint
 
 current_time = date.today()
 
@@ -180,7 +179,6 @@ def add_user_custom_wallpaper(user: int, name: str, link: str):
 
     remove_qp(user, 1000)
 
-################################################################################################################
 def selected_wallpaper(user):
     try:
         wallpaper=db.execute("SELECT wallpaper FROM userWallpaperInventory WHERE user_id = ?", (user,)).fetchone()
@@ -371,10 +369,7 @@ def remove_welcomer(server: int):
 
     else:
         cur.execute(
-            "SELECT channel_id FROM welcomerData WHERE guild_id = ?", (server,))
-        result = cur.fetchone()
-        cur.execute(
-            "DELETE FROM welcomerData WHERE channel_id = ?", (result[0],))
+            "DELETE FROM welcomerData WHERE guild_id = ?", (server,))
         db.commit()
         return(True)
 
@@ -390,10 +385,7 @@ def remove_leaver(server: int):
 
     else:
         cur.execute(
-            "SELECT channel_id FROM leaverData WHERE guild_id = ?", (server,))
-        result = cur.fetchone()
-        cur.execute(
-            "DELETE FROM leaverData WHERE channel_id = ?", (result[0],))
+            "DELETE FROM leaverData WHERE guild_id = ?", (server,))
         db.commit()
         return True
 
@@ -409,13 +401,9 @@ def remove_modloger(server: int):
 
     else:
         cur.execute(
-            "SELECT channel_id FROM modlogData WHERE guild_id = ?", (server,))
-        result = cur.fetchone()
-        cur.execute(
-            "DELETE FROM modlogData WHERE channel_id = ?", (result[0],))
+            "DELETE FROM modlogData WHERE guild_id = ?", (server,))
         db.commit()
         return(True)
-
 
 def remove_reporter(server: int):
     cur = db.cursor()
@@ -428,14 +416,10 @@ def remove_reporter(server: int):
 
     else:
         cur.execute(
-            "SELECT channel_id FROM reportData WHERE guild_id = ?", (server,))
-        result = cur.fetchone()
-        cur.execute(
-            "DELETE FROM reportData WHERE channel_id = ?", (result[0],))
+            "DELETE FROM reportData WHERE guild_id = ?", (server,))
 
         db.commit()
         return(True)
-
 
 def warn_user(server: int, member: int, moderator: int, reason: str, warn_id: int, date: int):
 
@@ -537,60 +521,9 @@ def get_leaver(server: int):
         "SELECT channel_id FROM leaverData where guild_id = ?", (server,)).fetchone()
     return data[0]
 
-def get_user_bank(user:int):
-    data=db.execute("SELECT user_id FROM bankData WHERE user_id = ?", (user)).fetchone()
-    return data[0]
-
 def add_wallpaper(id, name, link):
     inv_db.execute("INSERT OR IGNORE INTO wallpapers (id, name, link, price) VALUES (?,?,?,?)", (id, name, link, 1000,))
     db.commit()
-
-def add_voter(user_id:int):
-    if check_botbanned_user(user_id) is True:
-        pass
-    else:
-
-        new_vote=int(round((datetime.now() + timedelta(hours=12)).timestamp()))
-        weekend = datetime.today().weekday()
-
-        voted=db.execute("SELECT voted FROM votersData WHERE user_id = ?", (user_id,)).fetchone()
-
-        if voted==None:
-            ids=db.execute("INSERT OR IGNORE INTO votersData (user_id, voted) VALUES (?,?)", (user_id, new_vote,))
-
-            if ids.rowcount==0:
-                db.execute("UPDATE votersData SET voted = ? WHERE user_id = ?", (new_vote, user_id,))
-
-            db.commit()
-
-            if weekend < 5:
-                add_qp(user_id, 50)
-            elif weekend > 5:
-                add_qp(user_id, 100)
-
-        
-        elif int(round(datetime.now().timestamp())) > new_vote:
-            db.execute("UPDATE votersData SET voted = ? WHERE user_id = ?", (new_vote, user_id,))
-            db.commit()
-
-            if weekend < 5:
-                add_qp(user_id, 50)
-            elif weekend > 5:
-                add_qp(user_id, 100)
-
-            
-        else:
-            pass
-
-def get_voters():
-    voters=db.execute("SELECT user_id FROM votersData").fetchall()
-
-    if voters==None:
-        pass
-    else:
-        for a in voters:
-            return a[0]
-
 
 def check_mute_role(guild_id: int):
     role = db.execute("SELECT role_id FROM muteroleData WHERE guild_id = ?", (guild_id,)).fetchone()
@@ -658,3 +591,77 @@ def remove_softban(member:int, guild:int):
     db.execute("DELETE FROM softbannedMembers WHERE user_id = ? AND guild_id = ?",
                (member, guild,))
     db.commit()
+
+def set_message_logger(server:int, channel:int):
+    cur=db.execute("INSERT OR IGNORE INTO messageLogData (server, channel) VALUES (?,?)", (server, channel,))
+
+    if cur.rowcount==0:
+        db.execute("UPDATE messageLogData SET channel = ? WHERE server = ?", (channel, server,))
+    db.commit()
+
+
+def get_message_logger(server:int)->int:
+    try:
+        channel = db.execute("SELECT channel FROM messageLogData WHERE server = ?", (server,)).fetchone()
+        db.commit()
+        return channel[0]
+    except:
+        return False
+
+def set_member_logger(server:int, channel:int):
+    cur=db.execute("INSERT OR IGNORE INTO memberLogData (server, channel) VALUES (?,?)", (server, channel,))
+
+    if cur.rowcount==0:
+        db.execute("UPDATE memberLogData SET channel = ? WHERE server = ?", (channel, server,))
+    db.commit()
+
+
+def get_member_logger(server:int)->int:
+    try:
+        channel = db.execute("SELECT channel FROM memberLogData WHERE server = ?", (server,)).fetchone()
+        db.commit()
+        return channel[0]
+    except:
+        return False
+
+
+def remove_messagelog(server: int):
+    cur = db.cursor()
+    cur.execute(
+        "SELECT channel FROM messageLogData WHERE server = ?", (server,))
+    result = cur.fetchone()
+
+    if result == None:
+        return (False)
+
+    else:
+        db.execute(
+            "DELETE FROM messageLogData WHERE server = ?", (server,))
+
+        db.commit()
+        return (True)
+
+
+def remove_memberlog(server: int):
+    cur = db.cursor()
+    cur.execute(
+        "SELECT channel FROM memberLogData WHERE server = ?", (server,))
+    result = cur.fetchone()
+
+    if result == None:
+        return (False)
+
+    else:
+        db.execute(
+            "DELETE FROM memberLogData WHERE server = ?", (server,))
+
+        db.commit()
+        return (True)
+
+def get_cached_users():
+    data=db.execute("SELECT * FROM globalxpData").fetchall()
+    return len(data)
+
+def get_true_members():
+    data=db.execute("SELECT * FROM bankData").fetchall()
+    return len(data)

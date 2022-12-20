@@ -1,4 +1,4 @@
-from db_functions import check_botbanned_user
+from db_functions import check_botbanned_user, get_cached_users, get_true_members
 from assets.buttons import ViewRoles
 from config import db
 from time import time
@@ -15,7 +15,7 @@ start_time = time()
 class slashinfo(Cog):
     def __init__(self, bot:Bot):
         self.bot = bot
-        self.bot_version="4.0.2"
+        self.bot_version="4.1 VarPatch"
 
     @app_commands.command(description="See the bot's status from development to now")
     async def stats(self, ctx : Interaction):
@@ -24,6 +24,8 @@ class slashinfo(Cog):
             pass
         else:
             botowner = self.bot.get_user(597829930964877369)
+            all_users=get_cached_users()
+            true_users=get_true_members()
             embed = Embed(title="Bot stats", color=0x236ce1)
             embed.add_field(
                 name="Developer", value=f"• **Name:** {botowner}\n• **ID:** {botowner.id}", inline=True)
@@ -32,10 +34,6 @@ class slashinfo(Cog):
             embed.add_field(
                 name="Version", value=f"• **Python Version:** {py_version.major}.{py_version.minor}.{py_version.micro}\n• **Discord.PY Version:** {discord_version}\n• **Bot:** {self.bot_version}", inline=True)
 
-            cur=db.execute("SELECT * FROM globalxpData").fetchall()
-            all_users=len(cur)
-            cur1=db.execute("SELECT * FROM bankData").fetchall()
-            true_users=len(cur1)
             embed.add_field(name="Count",
                             value=f"• **Server Count:** {len(self.bot.guilds)} servers\n• **User Count:** {len(set(self.bot.get_all_members()))}\n• **Cached Members:** {all_users}\n• **True Members:** {true_users}", inline=True)
 
@@ -53,6 +51,7 @@ class slashinfo(Cog):
             await ctx.followup.send(embed=embed)
 
     @app_commands.command(description="See the information of a member or yourself")
+    @app_commands.describe(member="Which member?")
     async def userinfo(self, ctx : Interaction, member: Optional[Member]= None)->None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -100,6 +99,8 @@ class slashinfo(Cog):
                     hasroles) + '\n`@everyone`', color=member.color)
                 await ctx.edit_original_response(view=None)
                 await ctx.followup.send(embed=embed, ephemeral=True)
+            else:
+                pass
 
     @app_commands.command(description="Get information about this server")
     async def serverinfo(self, ctx : Interaction):
@@ -112,7 +113,6 @@ class slashinfo(Cog):
             humans=len([member for  member in ctx.guild.members if not member.bot])
             bots = len([bot for bot in ctx.guild.members if bot.bot])
             
-
             date = round(guild.created_at.timestamp())
             serverinfo = Embed(title="Server's Info", color=ctx.user.color)
             serverinfo.add_field(name="Name", value=guild.name, inline=True)
@@ -195,6 +195,7 @@ class slashinfo(Cog):
 
 
     @app_commands.command(description="See your avatar or another member's avatar")
+    @app_commands.describe(member="Which member?")
     async def avatar(self, ctx: Interaction, member: Optional[Member]=None)->None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -208,6 +209,7 @@ class slashinfo(Cog):
             await ctx.followup.send(embed=avatar)
 
     @app_commands.command(description="See your guild avatar or a member's guild avatar")
+    @app_commands.describe(member="Which member?")
     async def serveravatar(self, ctx: Interaction, member: Optional[Member]=None)->None:
         if check_botbanned_user(ctx.user.id) == True:
             pass

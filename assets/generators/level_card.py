@@ -13,18 +13,19 @@ class Level:
         self.font2 = os.path.join(os.path.dirname(
             __file__), 'assets', 'font2.ttf')
 
-    def generate_level(self, level_card: str = None, profile_image: str = None, server_level: int = None, server_current_xp: int = 0, server_user_xp: int = None, server_next_xp: int = None, global_level: int = None, global_current_xp: int = 0, global_user_xp: int = None, global_next_xp: int = None, user_name: str = None):
-        try:
-            card = Image.open(level_card).convert("RGBA")
-        except FileNotFoundError:
+    def generate_level(self, bg_image: str = None, profile_image: str = None, server_level: int = None, server_current_xp: int = 0, server_user_xp: int = None, server_next_xp: int = None, global_level: int = None, global_current_xp: int = 0, global_user_xp: int = None, global_next_xp: int = None, user_name: str = None):
+        if not bg_image:
             card = Image.open(self.default_bg).convert("RGBA")
-        except OSError:
-            bg_bytes = BytesIO(requests.get(level_card).content)
-            card = Image.open(bg_bytes).convert("RGBA")
+        else:
+            try:
+                bg_bytes = BytesIO(requests.get(bg_image).content)
+                card = Image.open(bg_bytes).convert("RGBA")
+            except:
+                card = Image.open(bg_image).convert("RGBA")
 
         width, height = card.size
         if width == 900 and height == 500:
-                pass
+            pass
         
         elif width > 900 and height > 500:
                 x1 = 0
@@ -72,7 +73,9 @@ class Level:
         font_small = ImageFont.truetype(self.font1, 30)
 
         # ======== Colors ========================
+
         COLOR = (204, 204, 255)
+                
         STROKE = (151, 151, 151)
 
         def get_str(xp):
@@ -144,4 +147,3 @@ class Level:
         final.save(final_bytes, 'png')
         final_bytes.seek(0)
         return final_bytes
-

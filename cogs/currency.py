@@ -40,7 +40,7 @@ class Guess_Group(GroupCog, name="guess"):
                 timeout.set_image(url='https://i.imgur.com/faD48C3.jpg')
                 return await ctx.followup.send(embed=timeout)
 
-            if guess.content == answer:
+            if int(guess.content) == answer:
                 add_qp(ctx.user.id, 20)
 
                 correct = Embed(
@@ -55,6 +55,7 @@ class Guess_Group(GroupCog, name="guess"):
 
 
     @app_commands.command(description='Guess my number and you can win 20 QP with betting')
+    @app_commands.describe(bet="How much are you betting?")
     @checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def bet(self, ctx: Interaction, bet: int):
         if check_botbanned_user(ctx.user.id) == True:
@@ -94,7 +95,7 @@ class Guess_Group(GroupCog, name="guess"):
                     timeout.set_image(url='https://i.imgur.com/faD48C3.jpg')
                     return await ctx.followup.send(embed=timeout)
 
-                if guess.content == answer:
+                if int(guess.content) == answer:
                     try:
                         add_qp(ctx.user.id, int(bet))
                         correct = Embed(
@@ -136,6 +137,7 @@ class Dice_Group(GroupCog, name="dice"):
         super().__init__()
 
     @app_commands.command(description="Roll a dice for free 20 QP")
+    @app_commands.describe(digit="Guess what will roll")
     @checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     async def free(self, ctx: Interaction, digit:int):
         if check_botbanned_user(ctx.user.id) == True:
@@ -156,6 +158,7 @@ class Dice_Group(GroupCog, name="dice"):
                 await ctx.followup.send(embed=embed)
 
     @app_commands.command(description="Roll a dice with betting")
+    @app_commands.describe(bet="How much are you betting?",digit="Guess what will roll")
     @checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def bet(self, ctx: Interaction, bet:int, digit:int):
         
@@ -250,6 +253,7 @@ class Flip_Group(GroupCog, name="flip"):
                 await ctx.edit_original_response(embed=embed, view=None)
 
     @app_commands.command(name='bet', description='Flip a coin and earn with betting')
+    @app_commands.describe(bet="How much are you betting?")
     @checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def bet(self, ctx: Interaction, bet:int):
         await ctx.response.defer()

@@ -16,8 +16,7 @@ class slashowner(Cog):
     def __init__(self, bot:Bot):
         self.bot = bot
 
-
-    @group(aliases=['act', 'pressence'])
+    @group(aliases=['act', 'pressence'], invoke_without_command=True)
     @is_owner()
     async def activity(self, ctx : Context):
         if check_botbanned_user(ctx.author.id) == True:
@@ -29,7 +28,7 @@ class slashowner(Cog):
 
     @activity.command(aliases=['playing'])
     @is_owner()
-    async def play(self, ctx: Context, activity:str):
+    async def play(self, ctx: Context, *, activity:str):
         """Make Jeanne play something as an activity"""
         if check_botbanned_user(ctx.author.id) == True:
             pass
@@ -39,7 +38,7 @@ class slashowner(Cog):
 
     @activity.command(aliases=['listening'])
     @is_owner()
-    async def listen(self, ctx: Context, activity:str):
+    async def listen(self, ctx: Context, *, activity:str):
         """Make Jeanne listen to something as an activity"""
         if check_botbanned_user(ctx.author.id) == True:
             pass
@@ -103,7 +102,7 @@ class slashowner(Cog):
     
     @command(aliases=['forbid', 'disallow', 'bban', 'bb'])
     @is_owner()
-    async def botban(self, ctx: Context, user_id:int, *, reason:str=None):
+    async def botban(self, ctx: Context, user_id:int, *, reason:str):
         """Botban a user from using the bot"""
         if check_botbanned_user(ctx.author.id) == True:
             pass
@@ -131,27 +130,18 @@ class slashowner(Cog):
 
     @command(aliases=['eval', 'execute', 'exe', 'exec'])
     @is_owner()
-    async def evaluate(self, ctx: Context, raw:Optional[Literal["True", "False"]]):
+    async def evaluate(self, ctx: Context, *, code:str):
         """Evaluates a code"""
         if check_botbanned_user(ctx.author.id) == True:
             pass
         else:
-            m = await ctx.send("Insert your code.\nType 'cancel' if you don't want to evaluate")
-
-            def check(m:Message):
-                return m.author == ctx.author and m.content
-
-            code:Message = await self.bot.wait_for('message', check=check)
-
-            if code.content.startswith("cancel"):
-                await m.edit(content="Evaluation aborted")
-            elif code.content.startswith("```") and code.content.endswith("```"):
+            if code.startswith("```") and code.endswith("```"):
                 str_obj = StringIO()
                 start_time = time()
                 await ctx.typing()
                 try:
                     with contextlib.redirect_stdout(str_obj):
-                        exec(code.content.strip("`python"))
+                        exec(code.strip("`python"))
                 except Exception as e:
                     
                     embed = Embed(title="Evaluation failed :negative_squared_cross_mark:\nResults:",
@@ -160,15 +150,13 @@ class slashowner(Cog):
                     embed.set_footer(
                         text=f"Compiled in {round((end_time - start_time) * 1000)}ms")
                     return await ctx.send(embed=embed)
-                if raw == None:
-                    embed1 = Embed(title="Evaluation suscessful! :white_check_mark: \nResults:",
+
+                embed1 = Embed(title="Evaluation suscessful! :white_check_mark: \nResults:",
                             description=f'```{str_obj.getvalue()}```', color=0x008000)
-                    end_time = time()
-                    embed1.set_footer(
+                end_time = time()
+                embed1.set_footer(
                         text=f"Compiled in {round((end_time - start_time) * 1000)}ms")
-                    await ctx.send(embed=embed1)
-                else:
-                    await ctx.send(str_obj.getvalue())
+                await ctx.send(embed=embed1)
 
     @command()
     @guild_only()
@@ -202,7 +190,6 @@ class slashowner(Cog):
                 ret += 1
 
         await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
-
 
 async def setup(bot:Bot):
     await bot.add_cog(slashowner(bot))

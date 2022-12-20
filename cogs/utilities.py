@@ -9,6 +9,8 @@ from asyncio import TimeoutError
 from py_expression_eval import Parser
 from typing import Literal, Optional
 from discord.app_commands import *
+from json import loads
+from requests import get
 
 bot_invite_url = "https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=1428479601718&scope=bot%20applications.commands"
 
@@ -25,8 +27,6 @@ def send_bot_report(report_type, report, reporter):
     report.set_footer(text=f"Reporter: {reporter}")
 
     return report
-
-
 
 class invite_button(View):
     def __init__(self):
@@ -48,6 +48,7 @@ class Weather_Group(GroupCog, name="weather"):
         super().__init__()
 
     @app_commands.command(description="Get weather information on a city")
+    @app_commands.describe(city="Add a city")
     async def city(self, ctx: Interaction, city: str):
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -97,6 +98,7 @@ class Weather_Group(GroupCog, name="weather"):
                         await ctx.followup.send(embed=embed)
 
     @app_commands.command(description="Get weather information on a city but with a ZIP code and Country code")
+    @app_commands.describe(zip_code="Add a ZIP code", country_code="Add a country code")
     async def zipcode(self, ctx: Interaction, zip_code: str, country_code: str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -142,68 +144,117 @@ class Weather_Group(GroupCog, name="weather"):
                             name=f"{guste} Wind Gust", value=f"{wind_gust}m/s", inline=True)
                         await ctx.followup.send(embed=embed)
 
-
-class Say_Group(GroupCog, name="say"):
+class Embed_Group(GroupCog, name="embed"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()
 
-    @app_commands.command(description="Type something and I will say it in plain text")
-    @checks.has_permissions(administrator=True)
-    async def plain(self, ctx: Interaction, channel: TextChannel):
+    @app_commands.command(description="Generates an embed message. This needs the Discohooks.org embed generator")
+    @app_commands.describe(channel="Send to which channel?", jsonscript="Add a JSON script", jsonfile="Add a JSON file")
+    @app_commands.checks.has_permissions(administrator=True)
+    async def generate(self, ctx: Interaction, channel: TextChannel, jsonscript: Optional[str] = None, jsonfile: Optional[Attachment] = None):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            await ctx.response.defer()
-            await ctx.followup.send("Type something!", ephemeral=True)
+            await ctx.response.defer(ephemeral=True)
 
-            def check(m:Message):
-                return m.author == ctx.user and m.content
+            if not jsonscript and not jsonfile:
+                embed = Embed(
+                    description="You are missing the JSON script or JSON file\nPlease use [Discohooks](https://discohook.org/)")
+                await ctx.followup.send(embed=embed)
+            elif jsonscript and jsonfile:
+                embed = Embed(
+                    description="You are using both the JSON script and JSON file\nPlease use one")
+                await ctx.followup.send(embed=embed)
+            else:
+                if jsonscript and not jsonfile:
+                    json = loads(jsonscript)
 
-            try:
-                msg:Message = await self.bot.wait_for('message', check=check, timeout=300)
+                elif jsonfile and not jsonscript:
+                    json_file = jsonfile.url
+                    json_request = get(json_file)
+                    json_content = json_request.content
+                    json = loads(json_content)
 
-                await ctx.edit_original_response(content="Sent")
-                await msg.delete()
-                await channel.send(msg.content)
-            except TimeoutError:
-                timeout = Embed(
-                    description=f"Guess you have nothing to say", color=0xFF0000)
-                await ctx.edit_original_response(content=None, embed=timeout)
+                try:
+                    content = json["content"]
+                except:
+                    pass
 
-    @app_commands.command(description="Type something and I will say it in embed")
-    @checks.has_permissions(administrator=True)
-    async def embed(self, ctx: Interaction, channel: TextChannel):
+                try:
+                    embed = Embed.from_dict(json['embeds'][0])
+                    await channel.send(content=content, embed=embed)
+                except:
+                    await channel.send(content=content)
+                await ctx.followup.send(content="Sent", ephemeral=True)
+
+    @app_commands.command(description="Edits an embed message. This needs the Discohook.org embed generator")
+    @app_commands.describe(channel="Which channel is the embed message in?", messageid="What is the message ID?", jsonscript="Add a JSON script", jsonfile="Add a JSON file")
+    @app_commands.checks.has_permissions(administrator=True)
+    async def edit(self, ctx: Interaction, channel: TextChannel, messageid:str, jsonscript: Optional[str] = None, jsonfile: Optional[Attachment] = None):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            await ctx.response.defer()
-            ask = Embed(
-                description="Type something\nMaxinum characters allowed is 4096")
-            await ctx.followup.send(embed=ask, ephemeral=True)
-
-            def check(m:Message):
-                return m.author == ctx.user and m.content
+            await ctx.response.defer(ephemeral=True)
 
             try:
-                msg:Message = await self.bot.wait_for('message', check=check, timeout=300)
+                message:Message= await channel.fetch_message(int(messageid))
+            except Exception as e:
+                embed = Embed(description=e)
+                await ctx.followup.send(embed=embed)                
+            else:
+                if not jsonscript and not jsonfile:
+                    embed = Embed(
+                        description="You are missing the JSON script or JSON file\nPlease use [Discohooks](https://discohook.org/)")
+                    await ctx.followup.send(embed=embed)
+                elif jsonscript and jsonfile:
+                    embed = Embed(
+                        description="You are using both the JSON script and JSON file\nPlease use one")
+                    await ctx.followup.send(embed=embed)
+                else:
+                    if jsonscript and not jsonfile:
+                        json = loads(jsonscript)
 
-                await ctx.edit_original_response(content="Sent", embed=None)
-                await msg.delete()
-                embed_text = Embed(description=msg.content, color=Color.blue())
-                await channel.send(embed=embed_text)
+                    elif jsonfile and not jsonscript:
+                        json_file = jsonfile.url
+                        json_request = get(json_file)
+                        json_content = json_request.content
+                        json = loads(json_content)
 
-            except TimeoutError:
-                timeout = Embed(
-                    description="Guess you have nothing to say", color=0xFF0000)
-                await ctx.edit_original_response(embed=timeout)
+                    try:
+                        content = json["content"]
+
+                        if content=='':
+                            content=None
+                    except:
+                        pass
+
+                    try:
+                        embed = Embed.from_dict(json['embeds'][0])
+                        await message.edit(content=content, embed=embed)
+                    except:
+                        await message.edit(content=content)
+                    await ctx.followup.send(content="Message edited", ephemeral=True)
 
 class slashutilities(Cog):
     def __init__(self, bot:Bot):
         self.bot = bot
         self.parser = Parser()
 
+    @app_commands.command(description="Type something and I will say it")
+    @app_commands.describe(channel="Send to which channel?", message="What should I say?")
+    @app_commands.checks.has_permissions(administrator=True)
+    async def say(self, ctx: Interaction, channel: TextChannel, message: str):
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            await ctx.response.defer(ephemeral=True)
+            await ctx.followup.send(content="Sent")
+            await channel.send(message)
+
+
     @app_commands.command(description="Do a calculation")
+    @app_commands.describe(calculate="Add a calculation")
     async def calculator(self, ctx: Interaction, calculate:str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -235,6 +286,7 @@ class slashutilities(Cog):
 
 
     @app_commands.command(description="Submit a bot report if you found something wrong")
+    @app_commands.describe(type="What is the nature of the report?")
     @checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     async def botreport(self, ctx: Interaction, type:Literal['bug', 'fault', 'exploit', 'violator']):
         if check_botbanned_user(ctx.user.id) == True:
@@ -255,7 +307,7 @@ class slashutilities(Cog):
                     m = await ctx.user.send("What have you found?\nPlease include steps on how you were able to find it and include proof if possible")
                 
                 elif report_type == 'violator':
-                    m = await ctx.user.send("Who has violated the rules and ToS of Jeanne? Please include proof if possible")
+                    m = await ctx.user.send("Who has violated the ToS of Jeanne? Please include proof if possible")
 
                 await ctx.followup.send("Please go to your [DMs]({}) to report what you have found about Jeanne".format(m.jump_url), ephemeral=True)
 
@@ -309,7 +361,8 @@ class slashutilities(Cog):
 
 
     @app_commands.command(description="Report a member in your server")
-    async def report(self, ctx: Interaction, member: Member, anonymous:Literal['True', 'False']):
+    @app_commands.describe(member="Who are you reporting?", anonymous="Do you want your name to be hidden?")
+    async def report(self, ctx: Interaction, member: Member, anonymous:Optional[Literal['True', 'False']]=None)->None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
@@ -364,7 +417,7 @@ class slashutilities(Cog):
                                 report.set_footer(
                                     text="Made by an anonymous member of {}".format(ctx.guild.name))
 
-                            if anonymous == 'False':
+                            elif anonymous == 'False' or None:
                                 report.set_footer(text="Made by {} | {} of {}".format(
                                     ctx.user, ctx.user.id, ctx.guild.name))
 
@@ -383,5 +436,5 @@ class slashutilities(Cog):
 
 async def setup(bot:Bot):
     await bot.add_cog(Weather_Group(bot))
-    await bot.add_cog(Say_Group(bot))
+    await bot.add_cog(Embed_Group(bot))
     await bot.add_cog(slashutilities(bot))
