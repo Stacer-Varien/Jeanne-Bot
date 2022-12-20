@@ -144,6 +144,98 @@ class Weather_Group(GroupCog, name="weather"):
                             name=f"{guste} Wind Gust", value=f"{wind_gust}m/s", inline=True)
                         await ctx.followup.send(embed=embed)
 
+class Embed_Group(GroupCog, name="embed"):
+    def __init__(self, bot: Bot) -> None:
+        self.bot = bot
+        super().__init__()
+
+    @app_commands.command(description="Generates an embed message. This needs the Discohooks.org embed generator")
+    @app_commands.describe(channel="Send to which channel?", jsonscript="Add a JSON script", jsonfile="Add a JSON file")
+    @app_commands.checks.has_permissions(administrator=True)
+    async def generate(self, ctx: Interaction, channel: TextChannel, jsonscript: Optional[str] = None, jsonfile: Optional[Attachment] = None):
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            await ctx.response.defer(ephemeral=True)
+
+            if not jsonscript and not jsonfile:
+                embed = Embed(
+                    description="You are missing the JSON script or JSON file\nPlease use [Discohooks](https://discohook.org/)")
+                await ctx.followup.send(embed=embed)
+            elif jsonscript and jsonfile:
+                embed = Embed(
+                    description="You are using both the JSON script and JSON file\nPlease use one")
+                await ctx.followup.send(embed=embed)
+            else:
+                if jsonscript and not jsonfile:
+                    json = loads(jsonscript)
+
+                elif jsonfile and not jsonscript:
+                    json_file = jsonfile.url
+                    json_request = get(json_file)
+                    json_content = json_request.content
+                    json = loads(json_content)
+
+                try:
+                    content = json["content"]
+                except:
+                    pass
+
+                try:
+                    embed = Embed.from_dict(json['embeds'][0])
+                    await channel.send(content=content, embed=embed)
+                except:
+                    await channel.send(content=content)
+                await ctx.followup.send(content="Sent", ephemeral=True)
+
+    @app_commands.command(description="Edits an embed message. This needs the Discohook.org embed generator")
+    @app_commands.describe(channel="Which channel is the embed message in?", messageid="What is the message ID?", jsonscript="Add a JSON script", jsonfile="Add a JSON file")
+    @app_commands.checks.has_permissions(administrator=True)
+    async def edit(self, ctx: Interaction, channel: TextChannel, messageid:str, jsonscript: Optional[str] = None, jsonfile: Optional[Attachment] = None):
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            await ctx.response.defer(ephemeral=True)
+
+            try:
+                message:Message= await channel.fetch_message(int(messageid))
+            except Exception as e:
+                embed = Embed(description=e)
+                await ctx.followup.send(embed=embed)                
+            else:
+                if not jsonscript and not jsonfile:
+                    embed = Embed(
+                        description="You are missing the JSON script or JSON file\nPlease use [Discohooks](https://discohook.org/)")
+                    await ctx.followup.send(embed=embed)
+                elif jsonscript and jsonfile:
+                    embed = Embed(
+                        description="You are using both the JSON script and JSON file\nPlease use one")
+                    await ctx.followup.send(embed=embed)
+                else:
+                    if jsonscript and not jsonfile:
+                        json = loads(jsonscript)
+
+                    elif jsonfile and not jsonscript:
+                        json_file = jsonfile.url
+                        json_request = get(json_file)
+                        json_content = json_request.content
+                        json = loads(json_content)
+
+                    try:
+                        content = json["content"]
+
+                        if content=='':
+                            content=None
+                    except:
+                        pass
+
+                    try:
+                        embed = Embed.from_dict(json['embeds'][0])
+                        await message.edit(content=content, embed=embed)
+                    except:
+                        await message.edit(content=content)
+                    await ctx.followup.send(content="Message edited", ephemeral=True)
+
 class slashutilities(Cog):
     def __init__(self, bot:Bot):
         self.bot = bot
@@ -160,42 +252,6 @@ class slashutilities(Cog):
             await ctx.followup.send(content="Sent")
             await channel.send(message)
 
-    @app_commands.command(description="Generates an embed message. This needs the Discohooks.org embed generator")
-    @app_commands.describe(channel="Send to which channel?", jsonscript="Add a JSON script", jsonfile="Add a JSON file")
-    @app_commands.checks.has_permissions(administrator=True)
-    async def embedgen(self, ctx: Interaction, channel: TextChannel, jsonscript: Optional[str]=None, jsonfile:Optional[Attachment]=None):
-        if check_botbanned_user(ctx.user.id) == True:
-            pass
-        else:
-            await ctx.response.defer(ephemeral=True)
-
-            if not jsonscript and not jsonfile:
-                embed=Embed(description="You are missing the JSON script or JSON file\nPlease use [Discohooks](https://discohook.org/)")
-                await ctx.followup.send(embed=embed)
-            elif jsonscript and jsonfile:
-                embed=Embed(description="You are using both the JSON script and JSON file\nPlease use one")
-                await ctx.followup.send(embed=embed)
-            else:
-                if jsonscript and not jsonfile:
-                    json = loads(jsonscript)
-                
-                elif jsonfile and not jsonscript:
-                    json_file = jsonfile.url
-                    json_request = get(json_file)
-                    json_content = json_request.content
-                    json = loads(json_content)
-            
-                try:
-                    content = json["content"]
-                except:
-                    pass
-                
-                try:
-                    embed = Embed.from_dict(json['embeds'][0])
-                    await channel.send(content=content, embed=embed)
-                except:
-                    await channel.send(content=content)
-                await ctx.followup.send(content="Sent", ephemeral=True)
 
     @app_commands.command(description="Do a calculation")
     @app_commands.describe(calculate="Add a calculation")
@@ -380,4 +436,5 @@ class slashutilities(Cog):
 
 async def setup(bot:Bot):
     await bot.add_cog(Weather_Group(bot))
+    await bot.add_cog(Embed_Group(bot))
     await bot.add_cog(slashutilities(bot))
