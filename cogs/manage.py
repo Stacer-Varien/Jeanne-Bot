@@ -126,11 +126,12 @@ class Create_Group(GroupCog, name="create"):
             role = await ctx.guild.create_role(name=name)
             embed = Embed()
             embed.description = "Role `{}` has been created".format(name)
-            embed.color = color
 
             if color:
                 await role.edit(color=int(color, 16))
                 embed.add_field(name="Color", value=color, inline=True)
+            elif not color:
+                embed.color = Color.green()
 
             if hoisted:
                 if hoisted == "true":
