@@ -7,7 +7,7 @@ class help_button(ui.View):
     def __init__(self):
         super().__init__()
 
-        wiki_url = 'https://jeannebot.nicepage.io/Commands.html'
+        wiki_url = 'https://jeannebot.gitbook.io/jeannebot/help'
         haze_url = 'https://discord.gg/jh7jkuk2pp'
         tos_and_policy_url = 'https://jeannebot.nicepage.io/ToS-and-Privacy-Policy.html'
 
