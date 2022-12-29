@@ -61,9 +61,10 @@ class images(Cog):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            neko_api = get(neko_purrbot).json()
             neko = Embed(color=0xFFC0CB)
-            neko.set_image(url=get_neko_pic())
-            neko.set_footer(text="Fetched from Neko_1936")
+            neko.set_image(url=neko_api['link'])
+            neko.set_footer(text="Fetched from PurrBot.site")
             await ctx.followup.send(embed=neko)
 
     @app_commands.command(description="Get a Medusa (Fate) image")
@@ -77,6 +78,5 @@ class images(Cog):
             medusa.set_footer(text="Fetched from Medusa_1936")
             await ctx.followup.send(embed=medusa)
 
-
-async def setup(bot:Bot):
+async def setup(bot: Bot):
     await bot.add_cog(images(bot))
