@@ -98,7 +98,7 @@ class Background_Group(GroupCog, name="background"):
                     preview = Embed(description="This is the preview of the level card.", color=Color.blue()).add_field(
                         name="Cost", value=f"{wallpaper[3]} {qp}").set_footer(text="Is this the background you wanted?")
                     view = Confirmation(ctx.user)
-                    await ctx.edit_original_response(content=None, file=[file], embed=preview, view=view)
+                    await ctx.edit_original_response(content=None, attachments=[file], embed=preview, view=view)
                     await view.wait()
 
                     if view.value == None:
