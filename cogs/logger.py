@@ -25,6 +25,10 @@ class logger(Cog):
                     old_content = bool(before.content)
                     new_content = bool(after.content)
                     if old_content == True and old_attachments == False:
+                        if len(before.content) > 1024:
+                            before.content = before.content[:1020] + "..."
+                        if len(after.content) > 1024:
+                            after.content = after.content[:1020] + "..."
                         embed.add_field(name="Old message",
                                         value=before.content, inline=False)
                         if new_content == True:
@@ -34,6 +38,10 @@ class logger(Cog):
                             embed.add_field(name="New message",
                                             value="None (no message)", inline=False)
                     elif old_content == True and old_attachments == True:
+                        if len(before.content) > 1024:
+                            before.content = before.content[:1020] + "..."
+                        if len(after.content) > 1024:
+                            after.content = after.content[:1020] + "..."
                         embed.add_field(name="Old message",
                                         value=before.content, inline=False)
                         if new_content == True:
@@ -75,9 +83,13 @@ class logger(Cog):
                     attachments = bool(message.attachments)
                     content = bool(message.content)
                     if content == True and attachments == False:
+                        if len(message.content) > 1024:
+                            message.content = message.content[:1020] + "..."
                         embed.add_field(name="Message",
                                         value=message.content, inline=False)
                     elif content == True and attachments == True:
+                        if len(message.content) > 1024:
+                            message.content = message.content[:1020] + "..."
                         embed.add_field(name="Message",
                                         value=message.content, inline=False)
                         embed.set_image(url=message.attachments[0].url.replace(
