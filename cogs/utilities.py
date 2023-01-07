@@ -160,7 +160,7 @@ class Embed_Group(GroupCog, name="embed"):
 
             if not jsonscript and not jsonfile:
                 embed = Embed(
-                    description="You are missing the JSON script or JSON file\nPlease use [Discohooks](https://discohook.org/)")
+                    description="You are missing the JSON script or JSON file\nPlease use [Discohook](https://discohook.org/)")
                 await ctx.followup.send(embed=embed)
             elif jsonscript and jsonfile:
                 embed = Embed(
