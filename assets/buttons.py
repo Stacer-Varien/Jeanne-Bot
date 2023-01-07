@@ -40,16 +40,6 @@ class Heads_or_Tails(ui.View):
 
     async def interaction_check(self, ctx: Interaction):
         return ctx.user.id == self.author.id
-
-
-class ViewRoles(ui.View):
-    def __init__(self):
-        super().__init__()
-
-    @ui.button(label="Roles", style=ButtonStyle.green)
-    async def roles(self, button: ui.Button, ctx: Interaction):
-        self.value = "roles"
-        self.stop()
            
 class Cancellation(ui.View):
     def __init__(self, author:User):
