@@ -9,6 +9,7 @@ from assets.buttons import Confirmation
 from typing import Optional
 from discord.ext import tasks
 
+
 class ListWarns_Group(GroupCog, name="listwarns"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
@@ -802,7 +803,7 @@ class moderation(Cog):
                     await ctx.edit_original_response(embed=cancelled, view=None)
 
     @massban.error
-    async def massban_error(self, ctx: Interaction, error:app_commands.AppCommandError):
+    async def massban_error(self, ctx: Interaction, error: app_commands.AppCommandError):
         if isinstance(error, app_commands.CommandOnCooldown):
             reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
             reset_hour = round(reset_hour_time.timestamp())
@@ -893,8 +894,6 @@ class moderation(Cog):
             cooldown = Embed(
                 description=f"A massunban command was already used here in this server.\nTry again after <t:{reset_hour}:R>", color=0xff0000)
             await ctx.followup.send(embed=cooldown)
-
-
 
 
 async def setup(bot: Bot):

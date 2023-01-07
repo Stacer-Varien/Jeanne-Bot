@@ -7,8 +7,9 @@ from datetime import *
 
 dbl_token = TOPGG
 
+
 class topgg(Cog):
-    def __init__(self, bot:Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
         self.topggpy = DBLClient(self.bot, dbl_token)
         self.topgg_webhook = WebhookManager(
@@ -40,5 +41,6 @@ class topgg(Cog):
                 add_qp(voter.id, credits)
                 print(f"Received a vote:\n{data}")
 
-async def setup(bot:Bot):
+
+async def setup(bot: Bot):
     await bot.add_cog(topgg(bot))

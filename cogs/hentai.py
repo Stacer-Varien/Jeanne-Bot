@@ -36,7 +36,7 @@ class nsfw(Cog):
 
             h = [gelbooru_image, yandere_image, konachan_image]
 
-            hentai:str = choice(h)
+            hentai: str = choice(h)
 
             if hentai == gelbooru_image:
                 source = 'Gelbooru'

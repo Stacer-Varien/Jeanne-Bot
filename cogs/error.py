@@ -4,10 +4,10 @@ from discord.ext.commands import Bot, Cog, Context, NotOwner
 
 
 class errors(Cog):
-    def __init__(self, bot:Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
         self.bot.tree.on_error = self.on_app_command_error
-    
+
     @Cog.listener()
     async def on_app_command_error(self, ctx: Interaction, error: AppCommandError):
         if isinstance(error, CommandInvokeError):
@@ -26,11 +26,12 @@ class errors(Cog):
             pass
 
     @Cog.listener()
-    async def on_command_error(self, ctx:Context, error):
+    async def on_command_error(self, ctx: Context, error):
         if isinstance(error, CommandNotFound):
             pass
         elif isinstance(error, NotOwner):
             pass
 
-async def setup(bot:Bot):
+
+async def setup(bot: Bot):
     await bot.add_cog(errors(bot))
