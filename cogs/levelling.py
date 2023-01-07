@@ -2,7 +2,7 @@ from asyncio import get_event_loop
 from functools import partial
 from discord.ext.commands import Cog, CooldownMapping, BucketType, Bot, GroupCog
 from discord import *
-from db_functions import add_level, add_xp, check_botbanned_user, get_global_rank, get_member_level, get_member_xp, get_server_rank, selected_wallpaper, get_user_level, get_user_xp
+from db_functions import *
 from typing import Optional
 from assets.generators.level_card import Level
 from discord.app_commands import *
@@ -73,12 +73,15 @@ class levelling(Cog):
             pass
         else:
             if not message.author.bot:
-                try:
-                    ratelimit = self.get_ratelimit(message)
-                    if ratelimit == None:
-                        add_xp(message.author.id, message.guild.id)
-                        add_level(message.author.id, message.guild.id)
-                except AttributeError:
+                if check_xpblacklist_channel(message.guild.id, message.channel.id) == False:
+                    try:
+                        ratelimit = self.get_ratelimit(message)
+                        if ratelimit == None:
+                            add_xp(message.author.id, message.guild.id)
+                            add_level(message.author.id, message.guild.id)
+                    except AttributeError:
+                        pass
+                else:
                     pass
             else:
                 pass
