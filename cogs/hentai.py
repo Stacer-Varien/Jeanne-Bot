@@ -50,7 +50,7 @@ class nsfw(Cog):
             if hentai.endswith('mp4'):
                 await ctx.followup.send(hentai)
             else:
-                embed = Embed(color=0xFFC0CB).set_image(url=hentai).set_footer(
+                embed = Embed(color=Color.purple()).set_image(url=hentai).set_footer(
                     text="Fetched from {}".format(source))
                 await ctx.followup.send(embed=embed)
 
@@ -82,7 +82,7 @@ class nsfw(Cog):
 
                 else:
 
-                    embed = Embed(color=0xFFC0CB).set_image(
+                    embed = Embed(color=Color.purple()).set_image(
                         url=image).set_footer(text="Fetched from Gelbooru")
                     await ctx.followup.send(embed=embed)
             except:
@@ -114,7 +114,7 @@ class nsfw(Cog):
                     yandere_api = choice(get(
                         f"https://yande.re/post.json?limit=100&tags=rating:{rating}+-loli+-shota+-cub+" + formated_tag).json())
 
-                yandere = Embed(color=0xFFC0CB)
+                yandere = Embed(color=Color.purple())
                 yandere.set_image(url=yandere_api['file_url'])
                 yandere.set_footer(text="Fetched from Yande.re")
                 await ctx.followup.send(embed=yandere)
@@ -143,7 +143,7 @@ class nsfw(Cog):
                     konachan_api = choice(get(
                         f"https://konachan.com/post.json?s=post&q=indexlimit=100&tags=rating:{rating}+-loli+-shota+-cub+{formated_tag}").json())
 
-                konachan = Embed(color=0xFFC0CB)
+                konachan = Embed(color=Color.purple())
                 konachan.set_image(url=konachan_api['file_url'])
                 konachan.set_footer(text="Fetched from Konachan")
                 await ctx.followup.send(embed=konachan)

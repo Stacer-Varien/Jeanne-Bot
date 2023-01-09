@@ -16,11 +16,11 @@ class logger(Cog):
                 pass
             else:
                 try:
+                    channel = await self.bot.fetch_channel(logger)
                     embed = Embed()
-                    embed.description = "Message edited"
-                    colors = [Color.red(), Color.blue(),
-                              Color.green(), Color.gold()]
-                    embed.color = random.choice(colors)
+                    embed.description = "Message edited in {}".format(channel.mention)
+
+                    embed.color = Color.random()
                     old_attachments = bool(before.attachments)
                     old_content = bool(before.content)
                     new_content = bool(after.content)
@@ -62,7 +62,6 @@ class logger(Cog):
                     embed.set_thumbnail(url=before.author.display_avatar)
                     embed.set_footer(text="Author: {} | {}".format(
                         before.author, before.author.id))
-                    channel = await self.bot.fetch_channel(logger)
                     await channel.send(embed=embed)
                 except AttributeError:
                     pass
@@ -75,11 +74,10 @@ class logger(Cog):
                 pass
             else:
                 try:
+                    channel = await self.bot.fetch_channel(logger)
                     embed = Embed()
-                    embed.description = "Message deleted"
-                    colors = [Color.red(), Color.blue(),
-                              Color.green(), Color.gold()]
-                    embed.color = random.choice(colors)
+                    embed.description = "Message deleted in {}".format(channel.mention)
+                    embed.color = Color.random()
                     attachments = bool(message.attachments)
                     content = bool(message.content)
                     if content == True and attachments == False:
@@ -101,7 +99,6 @@ class logger(Cog):
                     embed.set_thumbnail(url=message.author.display_avatar)
                     embed.set_footer(text="Author: {} | {}".format(
                         message.author, message.author.id))
-                    channel = await self.bot.fetch_channel(logger)
                     await channel.send(embed=embed)
                 except AttributeError:
                     pass
@@ -124,10 +121,7 @@ class logger(Cog):
                 elif before.guild_avatar != after.guild_avatar:
                     embed.description = "Avatar change"
                     embed.set_thumbnail(url=after.guild_avatar)
-
-                colors = [Color.red(), Color.blue(),
-                          Color.green(), Color.gold()]
-                embed.color = random.choice(colors)
+                embed.color = Color.random()
                 embed.set_footer(
                     text="Member: {} | `{}`".format(before, before.id))
                 channel = await self.bot.fetch_channel(logger)

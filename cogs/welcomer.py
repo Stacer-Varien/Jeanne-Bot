@@ -25,7 +25,7 @@ class welcomer(Cog):
                 channel = self.bot.get_channel(channel_id)
 
                 if get_welcoming_msg(member.guild.id) == None:
-                    welcome = Embed(description=f"Hi {member} and welcome to {member.guild.name}!", color=Color.og_blurple(
+                    welcome = Embed(description=f"Hi {member} and welcome to {member.guild.name}!", color=Color.random(
                     )).set_thumbnail(url=member.display_avatar)
                     await channel.send(embed=welcome)
                 else:
@@ -62,7 +62,7 @@ class welcomer(Cog):
                 channel = self.bot.get_channel(channel_id)
 
                 if get_leaving_msg(member.guild.id) == None:
-                    leave = Embed(description=f"{member} left the server", color=0x00FFFF).set_thumbnail(
+                    leave = Embed(description=f"{member} left the server", color=Color.random()).set_thumbnail(
                         url=member.display_avatar)
                     await channel.send(embed=leave)
                 else:

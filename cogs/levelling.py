@@ -20,7 +20,7 @@ class Rank_Group(GroupCog, name="rank"):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            embed = Embed(color=ctx.user.color)
+            embed = Embed(color=Color.random())
             embed.set_author(name="Global XP Leaderboard")
 
             leaderboard = get_global_rank()
@@ -121,7 +121,7 @@ class levelling(Cog):
     async def level_error(self, ctx: Interaction, error: AppCommandError):
         if isinstance(error, app_commands.CommandOnCooldown):
             cooldown = Embed(
-                description=f"You have already checked your level?\nTry again after `{round(error.retry_after, 2)} seconds`", color=0xff0000)
+                description=f"You have already checked your level?\nTry again after `{round(error.retry_after, 2)} seconds`", color=Color.random())
             await ctx.response.send_message(embed=cooldown)
 
 

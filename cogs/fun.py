@@ -19,7 +19,7 @@ class fun(Cog):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            embed = Embed(color=0x0000FF)
+            embed = Embed(color=Color.random())
             embed.add_field(name="Question:",
                             value=f'{question}', inline=False)
             embed.add_field(
@@ -65,7 +65,7 @@ class fun(Cog):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            animeme = Embed(color=0x0000FF)
+            animeme = Embed(color=Color.random())
             animeme.set_image(url=get_animeme_pic())
             animeme.set_footer(text="Fetched from animeme1936")
             await ctx.followup.send(embed=animeme)
@@ -88,7 +88,7 @@ class fun(Cog):
             combine2 = "".join([option2_name1letters, option2_name2letters])
 
             combine = Embed(
-                description=f"**1st combine word**: {combine1}\n**2nd combined word**:{combine2}", color=0x0000FF)
+                description=f"**1st combine word**: {combine1}\n**2nd combined word**:{combine2}", color=Color.random())
             combine.set_author(name=f"{first_word} + {second_word}")
             await ctx.followup.send(embed=combine)
 
@@ -101,7 +101,7 @@ class fun(Cog):
         else:
             choices = choices.split(sep=",")
             choose = Embed(
-                description=f"I chose **{choice(choices)}**", color=0x0000FF)
+                description=f"I chose **{choice(choices)}**", color=Color.random())
             await ctx.followup.send(embed=choose)
 
     @app_commands.command(description="Check how much of a simp you are")
