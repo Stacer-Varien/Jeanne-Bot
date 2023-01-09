@@ -286,6 +286,13 @@ class slashinfo(Cog):
             try:
                 e=emoji.split(':')[-1].rstrip('>')
                 emote = self.bot.get_emoji(int(e))
+                embed = Embed()
+                embed.color = ctx.user.color
+                embed.add_field(
+                    name="Name", value=emote.name, inline=False)
+                embed.add_field(name="ID", value=emote.id, inline=False)
+                embed.set_image(url=emote.url)
+                await ctx.followup.send(embed=embed)
             except:
                 try:
                     emote=utils.get(ctx.guild.emojis, name=emoji)

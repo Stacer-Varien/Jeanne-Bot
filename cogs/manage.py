@@ -209,10 +209,14 @@ class Create_Group(GroupCog, name="create"):
                 elif emoji_image:
                     emojibytes = requests.get(emoji_image.url).content
 
-                emote = await ctx.guild.create_custom_emoji(name=name, image=emojibytes)
-                embed.description = "{} | {} has been created".format(
-                    emote.name, str(emote))
-                embed.color=ctx.user.color
+                try:
+                    emote = await ctx.guild.create_custom_emoji(name=name, image=emojibytes)
+                    embed.description = "{} | {} has been created".format(
+                        emote.name, str(emote))
+                    embed.color=ctx.user.color
+                except HTTPException:
+                    embed.description = "There was a problem making the emoji. Please check that the emoji you are making is a PNG, JPEG or GIF"
+                    embed.color = Color.red()
 
         await ctx.followup.send(embed=embed)
 
@@ -243,12 +247,16 @@ class Create_Group(GroupCog, name="create"):
                     url=sticker_image.url
                 
                 stickerfile = File(fp=stickerbytes, filename="sticker.png")
-
-                sticker = await ctx.guild.create_sticker(name=name, description=description, emoji=emoji, file=stickerfile)
-                embed.description = "{} has been created".format(
-                    sticker.name)
-                embed.color = ctx.user.color
-                embed.set_image(url=url)
+                
+                try:
+                    sticker = await ctx.guild.create_sticker(name=name, description=description, emoji=emoji, file=stickerfile)
+                    embed.description = "{} has been created".format(
+                        sticker.name)
+                    embed.color = ctx.user.color
+                    embed.set_image(url=url)
+                except HTTPException:
+                    embed.description="There was a problem making the sticker. Please check that the sticker you are making is:\n\n 1. 512kb or less. Use [Ezgif](https://ezgif.com/) to compress it\n 2. The file is a PNG or APNG"
+                    embed.color=Color.red()
 
         await ctx.followup.send(embed=embed)
 
@@ -286,16 +294,33 @@ class Delete_Group(GroupCog, name="delete"):
 
     @app_commands.command(description="Deletes an emoji")
     @app_commands.describe(emoji="Which emoji are you deleting?")
-    @app_commands.checks.has_permissions(manage_channels=True)
+    @app_commands.checks.has_permissions(manage_emojis_and_stickers=True)
     async def emoji(self, ctx: Interaction, emoji: str):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             await ctx.response.defer()
-            e = emoji.split(':')[-1].rstrip('>')
-            emote = self.bot.get_emoji(int(e))
+            try:
+                e = emoji.split(':')[-1].rstrip('>')
+                emote = self.bot.get_emoji(int(e))
+            except:
+                emote = utils.get(ctx.guild.emojis, name=emoji)
             embed = Embed(description="{} has been deleted".format(str(emote)), color=0x00FF68)
             await emote.delete()
+            await ctx.followup.send(embed=embed)
+
+    @app_commands.command(description="Deletes a sticker")
+    @app_commands.describe(sticker="Which sticker are you deleting?")
+    @app_commands.checks.has_permissions(manage_emojis_and_stickers=True)
+    async def sticker(self, ctx: Interaction, sticker: str):
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            await ctx.response.defer()
+            
+            stick = utils.get(ctx.guild.stickers, name=sticker)
+            embed = Embed(description="`{}` has been deleted".format(str(stick.name)), color=0x00FF68)
+            await stick.delete()
             await ctx.followup.send(embed=embed)
             
 
