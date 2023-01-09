@@ -10,10 +10,7 @@ class errors(Cog):
 
     @Cog.listener()
     async def on_app_command_error(self, ctx: Interaction, error: AppCommandError):
-        if isinstance(error, CommandInvokeError):
-            embed = Embed(description=error, color=Color.red())
-            await ctx.followup.send(embed=embed)
-        elif isinstance(error, MissingPermissions):
+        if isinstance(error, MissingPermissions):
             embed = Embed(description=error, color=Color.red())
             await ctx.followup.send(embed=embed)
         elif isinstance(error, BotMissingPermissions):
