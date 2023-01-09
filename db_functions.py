@@ -128,7 +128,7 @@ def add_botbanned_user(user: int, reason: str):
 def fetch_wallpapers(qp: Emoji):
     w = db.execute("SELECT * FROM wallpapers").fetchall()
 
-    backgrounds = Embed(title='Avaliable Background Pictures for Level Cards', color=Color.blue(
+    backgrounds = Embed(title='Avaliable Background Pictures for Level Cards', color=Color.random(
     )).set_footer(text="To view them, click on the hyperlinked names")
 
     for a in w:
@@ -458,17 +458,28 @@ def get_modlog_channel(server: int):
 def fetch_warnings_server(server: int):
     cur = db.cursor()
     warnings = cur.execute(
-        "SELECT * FROM warnDATAv2 WHERE guild_id = ?", (server,))
+        "SELECT * FROM warnDATAv2 WHERE guild_id = ?", (server,)).fetchall()
     db.commit()
-    return warnings
+    if len(warnings) == 0:
+        return None
+    elif warnings == None:
+        return None
+    else:
+        return warnings
 
 
 def fetch_warnings_user(member: int, server: int):
     cur = db.cursor()
     warnings = cur.execute(
-        "SELECT * FROM warnDATA user WHERE user_id = ? AND guild_id = ?", (member, server,))
+        "SELECT * FROM warnDATA user WHERE user_id = ? AND guild_id = ?", (member, server,)).fetchall()
     db.commit()
-    return warnings
+
+    if len(warnings)==0:
+        return None
+    elif warnings == None:
+        return None
+    else:
+        return warnings
 
 
 def check_warn_id(server: int, warn_id: int):
@@ -739,7 +750,7 @@ def get_welcoming_msg(server: int):
     data = db.execute(
         "SELECT welcoming FROM welcomerMsgData WHERE server = ?", (server,)).fetchone()
 
-    if data == None:
+    if data == None or 0:
         return None
     else:
         return data[0]
@@ -749,8 +760,32 @@ def get_leaving_msg(server: int):
     data = db.execute(
         "SELECT leaving FROM welcomerMsgData WHERE server = ?", (server,)).fetchone()
 
-    if data == None:
+    if data == None or 0:
         return None
     else:
         return data[0]
+
+
+def remove_welcomer_msg(server: int):
+    data= db.execute("SELECT welcoming FROM welcomerMsgData WHERE server = ?", (server,)).fetchone()
+    db.commit()
+    if data==None:
+        return None
+    else:
+        db.execute("UPDATE welcomerMsgData SET welcoming = ? WHERE server = ?", (0, server,))
+        db.commit()
+
+    
+
+
+def remove_leaving_msg(server: int):
+    data = db.execute(
+        "SELECT leaving FROM welcomerMsgData WHERE server = ?", (server,)).fetchone()
+    db.commit()
+    if data == None:
+        return None
+    else:
+        db.execute(
+            "UPDATE welcomerMsgData SET leaving = ? WHERE server = ?", (0, server,))
+        db.commit()
 
