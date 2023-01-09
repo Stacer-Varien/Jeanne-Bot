@@ -2,7 +2,7 @@ from typing import Literal, Optional
 from json import loads
 from discord import *
 from discord.ext.commands import Bot, Cog, GroupCog
-from humanfriendly import format_timespan, parse_timespan
+from humanfriendly import format_timespan, parse_timespan, InvalidTimespan
 from collections import OrderedDict
 from db_functions import *
 from assets.buttons import Confirmation
@@ -21,15 +21,15 @@ class Create_Group(GroupCog, name="create"):
         super().__init__()
 
     @app_commands.command(description="Creates a text channel")
-    @app_commands.describe(name="What will you name it?", category="Place in which category?", slowmode="What is the slowmode (1hr, 30m, etc) (Max is 6 hours)")
+    @app_commands.describe(name="What will you name it?", topic="What is the channel topic?",category="Place in which category?", slowmode="What is the slowmode (1hr, 30m, etc) (Max is 6 hours)")
     @app_commands.checks.has_permissions(manage_channels=True)
-    async def textchannel(self, ctx: Interaction, name: str, category: Optional[CategoryChannel] = None, slowmode: str = None) -> None:
+    async def textchannel(self, ctx: Interaction, name: str, topic:Optional[str]=None,category: Optional[CategoryChannel] = None, slowmode: str = None) -> None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             await ctx.response.defer()
             embed = Embed()
-            embed.color = Color.green()
+            embed.color = Color.random()
             embed.description = "Text Channel `{}` has been created".format(
                 name)
 
@@ -39,21 +39,33 @@ class Create_Group(GroupCog, name="create"):
                 await channel.edit(category=category)
                 embed.add_field(name="Added into category",
                                 value=category.name, inline=True)
+            
+            if topic:
+                if len(topic) <= 1024:
+                    await channel.edit(topic=topic)
+                    added_topic=topic
+                else:
+                    added_topic="Too many characters! Please make sure your topic has less than 1024 characters"
+                embed.add_field(name="Topic", value=added_topic, inline=True)
 
             if slowmode:
-                delay = int(parse_timespan(slowmode))
-                if delay > 21600:
-                    delay = 21600
-                await channel.edit(slowmode_delay=delay)
+                try:
+                    delay = int(parse_timespan(slowmode))
+                    if delay > 21600:
+                        delay = 21600
+                    await channel.edit(slowmode_delay=delay)
+                    added_slowmode = format_timespan(delay)
+                except InvalidTimespan as e:
+                    added_slowmode = e
                 embed.add_field(name="Slowmode",
-                                value=format_timespan(delay), inline=True)
+                                value=added_slowmode, inline=True)
 
             await ctx.followup.send(embed=embed)
 
     @app_commands.command(description='Create a voice channel')
     @app_commands.describe(name="What will you name it?", category="Place in which category?")
     @app_commands.checks.has_permissions(manage_channels=True)
-    async def voicechannel(self, ctx: Interaction, name: str, category: Optional[CategoryChannel] = None) -> None:
+    async def voicechannel(self, ctx: Interaction, name: str, category: Optional[CategoryChannel] = None, users:Optional[int]=None) -> None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
@@ -61,7 +73,7 @@ class Create_Group(GroupCog, name="create"):
             embed = Embed()
             embed.description = "Voice Channel `{}` has been created".format(
                 name)
-            embed.color = Color.green()
+            embed.color = Color.random()
 
             channel = await ctx.guild.create_voice_channel(name=name)
 
@@ -69,6 +81,13 @@ class Create_Group(GroupCog, name="create"):
                 await channel.edit(category=category)
                 embed.add_field(name="Added into category",
                                 value=category.name, inline=True)
+            
+            if users:
+                if users > 99:
+                    user_limit=99
+                    
+                await channel.edit(user_limit=user_limit)
+                embed.add_field(name="User Limit", value=user_limit, inline=True)
 
             await ctx.followup.send(embed=embed)
 
@@ -83,7 +102,7 @@ class Create_Group(GroupCog, name="create"):
             await ctx.guild.create_category(name=name)
             embed = Embed()
             embed.description = "Category `{}` has been created".format(name)
-            embed.color = Color.green()
+            embed.color = Color.random()
 
             await ctx.followup.send(embed=embed)
 
@@ -95,13 +114,30 @@ class Create_Group(GroupCog, name="create"):
             pass
         else:
             await ctx.response.defer()
-            await ctx.guild.create_stage_channel(name=name, topic=topic, category=category)
             embed = Embed()
+            channel=await ctx.guild.create_stage_channel(name=name, topic=topic)
             embed.description = "Stage channel `{}` has been created".format(
-                name)
-            embed.color = Color.green()
+                    name)
+            embed.add_field(name="Topic", value=topic, inline=True)
+
+            if category:
+                await channel.edit(category=category)
+                embed.add_field(name="Moved to category", value=category, inline= True)
+
+            embed.color = Color.random()
 
             await ctx.followup.send(embed=embed)
+    
+    @stagechannel.error
+    async def stagechannel_error(self, ctx:Interaction, error:app_commands.AppCommandError):
+        if isinstance(error, app_commands.CommandInvokeError):
+            if HTTPException:
+                embed=Embed()
+                embed.description = "Couldn't make a new stage channel. Please make sure the server is community enabled"
+                embed.color=Color.red()
+                await ctx.followup.send(embed=embed)
+            
+
 
     @app_commands.command(description="Create a forum")
     @app_commands.describe(name="What will you name it?", topic="What is the topic", category="Place in which category?")
@@ -111,11 +147,11 @@ class Create_Group(GroupCog, name="create"):
             pass
         else:
             await ctx.response.defer()
-            forum = await ctx.guild.create_forum(name=name, topic=topic)
             embed = Embed()
+            forum = await ctx.guild.create_forum(name=name, topic=topic)
             embed.description = "Forum `{}` has been created".format(
-                forum.name)
-            embed.color = Color.green()
+                    forum.name)
+            embed.color = Color.random()
             if category:
                 await forum.edit(category=category)
                 embed.add_field(name="Added into category",
@@ -123,10 +159,19 @@ class Create_Group(GroupCog, name="create"):
 
             await ctx.followup.send(embed=embed)
 
+    @forum.error
+    async def forum_error(self, ctx:Interaction, error:app_commands.AppCommandError):
+        if isinstance(error, app_commands.CommandInvokeError):
+            if HTTPException:
+                embed=Embed()
+                embed.description = "Couldn't make a new forum. Please make sure the server is community enabled"
+                embed.color=Color.red()
+                await ctx.followup.send(embed=embed)
+
     @app_commands.command(description="Create a role")
     @app_commands.describe(name="What will you name it?", color="What color will it be? (use HEX codes)", hoisted="Should it be shown in member list?", mentionable="Should it be mentioned?")
     @app_commands.checks.has_permissions(manage_roles=True)
-    async def role(self, ctx: Interaction, name: str, color: Optional[str] = None, hoisted: Literal["true", "false"] = None, mentionable: Literal["true", "false"] = None) -> None:
+    async def role(self, ctx: Interaction, name: str, color: Optional[str] = None, hoisted: Optional[bool] = None, mentionable: Optional[bool] = None) -> None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
@@ -139,7 +184,7 @@ class Create_Group(GroupCog, name="create"):
                 await role.edit(color=int(color, 16))
                 embed.add_field(name="Color", value=color, inline=True)
             elif not color:
-                embed.color = Color.green()
+                embed.color = Color.random()
 
             if hoisted:
                 if hoisted == "true":
@@ -309,6 +354,14 @@ class Delete_Group(GroupCog, name="delete"):
             await emote.delete()
             await ctx.followup.send(embed=embed)
 
+    @emoji.error
+    async def emoji_error(self, ctx: Interaction, error: app_commands.AppCommandError):
+        if isinstance(error, app_commands.CommandInvokeError):
+            if AttributeError:
+                embed = Embed(
+                    description="This emoji doesn't exist in the server", color=Color.red())
+                await ctx.followup.send(embed=embed)
+
     @app_commands.command(description="Deletes a sticker")
     @app_commands.describe(sticker="Which sticker are you deleting?")
     @app_commands.checks.has_permissions(manage_emojis_and_stickers=True)
@@ -322,7 +375,14 @@ class Delete_Group(GroupCog, name="delete"):
             embed = Embed(description="`{}` has been deleted".format(str(stick.name)), color=0x00FF68)
             await stick.delete()
             await ctx.followup.send(embed=embed)
-            
+
+    @sticker.error
+    async def sticker_error(self, ctx: Interaction, error: app_commands.AppCommandError):
+        if isinstance(error, app_commands.CommandInvokeError):
+            if AttributeError:
+                embed = Embed(
+                    description="This sticker doesn't exist in the server", color=Color.red())
+                await ctx.followup.send(embed=embed)
 
 class Edit_Group(GroupCog, name="edit"):
     def __init__(self, bot: Bot) -> None:
@@ -441,17 +501,23 @@ class Edit_Group(GroupCog, name="edit"):
                                     value="Your server is not public to have a description edited", inline=True)
             
             if avatar:
-                avatarbytes=get(avatar.url).content
-                await ctx.guild.edit(icon=avatarbytes)
-                embed.thumbnail(url=avatar.url)
+                try:
+                    avatarbytes=get(avatar.url).content
+                    await ctx.guild.edit(icon=avatarbytes)
+                    embed.thumbnail(url=avatar.url)
+                except:
+                    pass
 
             if banner:
                 if ctx.guild.premium_tier < 1:
                     embed.add_field(name="Banner not added", value="This server is not boosted to Tier 1", inline=True)
                 else:
-                    bannerbytes = get(banner.url).content
-                    await ctx.guild.edit(banner=bannerbytes)
-                    embed.set_image(url=banner.url)
+                    try:
+                        bannerbytes = get(banner.url).content
+                        await ctx.guild.edit(banner=bannerbytes)
+                        embed.set_image(url=banner.url)
+                    except:
+                        pass
 
             if verification_level:
                 if verification_level == 'none':
@@ -489,12 +555,22 @@ class Edit_Group(GroupCog, name="edit"):
             pass
         else:
             await ctx.response.defer()
-            e = emoji.split(':')[-1].rstrip('>')
-            emote = self.bot.get_emoji(int(e))
-            
+            try:
+                e = emoji.split(':')[-1].rstrip('>')
+                emote = self.bot.get_emoji(int(e))
+            except:
+                emote = utils.get(ctx.guild.emojis, name=emoji)
             embed = Embed(description="{} has been renamed to {}".format(str(emote), name), color=0x00FF68)
             await emote.edit(name=name)
             await ctx.followup.send(embed=embed)
+
+    @emoji.error
+    async def emoji_error(self, ctx: Interaction, error: app_commands.AppCommandError):
+        if isinstance(error, app_commands.CommandInvokeError):
+            if AttributeError:
+                embed = Embed(
+                    description="This emoji doesn't exist in the server", color=Color.red())
+                await ctx.followup.send(embed=embed)
             
 
 
@@ -661,7 +737,10 @@ class Set_Group(GroupCog, name="set"):
                     await ctx.followup.send(content=content, embed=confirm, allowed_mentions=AllowedMentions(everyone=False, roles=False, users=False), view=view, ephemeral=True)
                     await view.wait()
 
-                    if view.value == True:
+                    if view.value == None:
+                        embed = Embed(description="Timeout")
+                        await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+                    elif view.value:
                         if message:
                             set_welcomer_msg(ctx.guild.id, message)
                         elif jsonfile:
@@ -673,12 +752,10 @@ class Set_Group(GroupCog, name="set"):
                         embed = Embed(description="Welcoming message set")
                         await ctx.edit_original_response(content=None, embeds=[embed], view=None)
 
-                    elif view.value == False:
+                    else:
                         embed = Embed(description="Action cancelled")
                         await ctx.edit_original_response(content=None, embeds=[embed], view=None)
-                    else:
-                        embed = Embed(description="Timeout")
-                        await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+
 
     @app_commands.command(description="Set a leaving message when someone leaves the server")
     @app_commands.describe(message="What is the new leaving message", jsonfile="Upload JSON file with the welcoming message")
@@ -792,8 +869,8 @@ class XP_Group(GroupCog, name="xp"):
                 await ctx.followup.send(embed=embed)
             else:
                 add_xpblacklist(ctx.guild.id, channel.id)
-                embed = Embed(color=0x00FF68)
-                embed.add_field(name=f"Channel XP blacklisted",
+                embed = Embed(color=Color.random())
+                embed.add_field(name="Channel XP blacklisted",
                                 value=f"`{channel}` has been added to the XP blacklist", inline=False)
                 await ctx.followup.send(embed=embed)
 
@@ -806,14 +883,14 @@ class XP_Group(GroupCog, name="xp"):
         else:
             await ctx.response.defer()
             if check_xpblacklist_channel(ctx.guild.id, channel.id) == False:
-                embed = Embed(color=0x00FF68)
+                embed = Embed(color=Color.red())
                 embed.description = "Channel is not in the XP blacklisted"
                 embed.color = Color.red()
                 await ctx.followup.send(embed=embed)
             else:
                 remove_blacklist(ctx.guild.id, channel.id)
-                embed = Embed(color=0x00FF68)
-                embed.add_field(name=f"Channel XP blacklisted",
+                embed = Embed(color=Color.random())
+                embed.add_field(name="Channel XP blacklisted",
                                 value=f"`{channel}` has been added to the XP blacklist", inline=False)
                 await ctx.followup.send(embed=embed)
 
@@ -831,7 +908,7 @@ class manage(Cog):
         else:
             await ctx.response.defer()
             await member.add_roles(role)
-            embed = Embed(color=0x00FF68)
+            embed = Embed(color=Color.random())
             embed.add_field(name=f"Role given",
                             value=f"`{role}` was given to `{member}`", inline=False)
             await ctx.followup.send(embed=embed)
@@ -845,20 +922,20 @@ class manage(Cog):
         else:
             await ctx.response.defer()
             await member.remove_roles(role)
-            embed = Embed(color=0x00FF68)
+            embed = Embed(color=Color.random())
             embed.add_field(name=f"Role removed",
                             value=f"`{role}` was removed from `{member}`", inline=False)
             await ctx.followup.send(embed=embed)
 
     @app_commands.command(description="Removes a welcoming/modlog/report channel. Set all options to true to remove all")
-    @app_commands.describe(welcomer="Remove welcomer channel?", leaving="Remove leaving channel?", modlog="Remove modlog channel?", report="Remove report channel?", memberlog="Remove member logging channel?", messagelog="Remove lessage logging channel?")
+    @app_commands.describe(welcomer="Remove welcomer channel?", leaving="Remove leaving channel?", modlog="Remove modlog channel?", report="Remove report channel?", memberlog="Remove member logging channel?", messagelog="Remove lessage logging channel?", welcomingmsg="Remove the welcoming message and reset to default", leavingmsg="Remove the leaving message and reset to default")
     @app_commands.checks.has_permissions(manage_guild=True)
-    async def remove(self, ctx: Interaction, welcomer: Optional[bool] = None, leaving: Optional[bool] = None, modlog: Optional[bool] = None, report: Optional[bool] = None, memberlog: Optional[bool] = None, messagelog: Optional[bool] = None) -> None:
+    async def remove(self, ctx: Interaction, welcomer: Optional[bool] = None, leaving: Optional[bool] = None, modlog: Optional[bool] = None, report: Optional[bool] = None, memberlog: Optional[bool] = None, messagelog: Optional[bool] = None, welcomingmsg:Optional[bool]=None, leavingmsg:Optional[bool]=None) -> None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             await ctx.response.defer()
-            if welcomer and leaving and modlog and report == None:
+            if welcomer==None and leaving==None and modlog==None and report == None and welcomingmsg==None and leavingmsg==None:
                 error = Embed(description="Please select a channel to remove")
                 await ctx.followup.send(embed=error)
             else:
@@ -919,8 +996,6 @@ class manage(Cog):
                         embed.add_field(name='Member logging channel removal status',
                                         value='Successful', inline=True)
 
-                await ctx.followup.send(embed=embed)
-
                 if messagelog == True:
 
                     rep = remove_messagelog(ctx.guild.id)
@@ -930,6 +1005,28 @@ class manage(Cog):
                             name='Message logging channel removal status', value='Failed. No Message logging channel set', inline=True)
                     else:
                         embed.add_field(name='Message logging channel removal status',
+                                        value='Successful', inline=True)
+                
+                if welcomingmsg == True:
+                    
+                    msg=remove_welcomer_msg(ctx.guild.id)
+
+                    if msg == 0 or None:
+                        embed.add_field(
+                            name='Welcoming Message removal status', value='Failed. No welcoming message set', inline=True)
+                    else:
+                        embed.add_field(name='Welcoming Message removal status',
+                                        value='Successful', inline=True)
+
+                if leavingmsg == True:
+
+                    leav = remove_welcomer_msg(ctx.guild.id)
+
+                    if leav == 0 or None:
+                        embed.add_field(
+                            name='Leaving Message removal status', value='Failed. No leaving message set', inline=True)
+                    else:
+                        embed.add_field(name='Leaving Message removal status',
                                         value='Successful', inline=True)
 
                 await ctx.followup.send(embed=embed)
@@ -949,6 +1046,7 @@ class manage(Cog):
 
             cloned = Embed(description="{} was cloned as {}".format(
                 channel.mention, c.mention))
+            cloned.color = Color.random()
             await ctx.followup.send(embed=cloned)
 
 

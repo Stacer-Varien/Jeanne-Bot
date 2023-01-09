@@ -25,7 +25,7 @@ class slashinfo(Cog):
             botowner = self.bot.get_user(597829930964877369)
             all_users = get_cached_users()
             true_users = get_true_members()
-            embed = Embed(title="Bot stats", color=ctx.user.color)
+            embed = Embed(title="Bot stats", color=Color.random())
             embed.add_field(
                 name="Developer", value=f"• **Name:** {botowner}\n• **ID:** {botowner.id}", inline=True)
             embed.add_field(name="Bot ID", value=self.bot.user.id, inline=True)
@@ -84,8 +84,8 @@ class slashinfo(Cog):
             userinfo.set_thumbnail(url=member.display_avatar)
             roles = Embed(title="{}'s roles".format(member), description=''.join(
                 hasroles) + '`@everyone`', color=member.color)
-            
-            embeds=[userinfo, roles]
+
+            embeds = [userinfo, roles]
 
             banner = bool(user.banner)
 
@@ -108,7 +108,7 @@ class slashinfo(Cog):
             bots = len([bot for bot in ctx.guild.members if bot.bot])
 
             date = round(guild.created_at.timestamp())
-            serverinfo = Embed(title="Server's Info", color=ctx.user.color)
+            serverinfo = Embed(title="Server's Info", color=Color.random())
             serverinfo.add_field(name="Name", value=guild.name, inline=True)
             serverinfo.add_field(name="ID", value=guild.id, inline=True)
             serverinfo.add_field(
@@ -143,7 +143,7 @@ class slashinfo(Cog):
 
             else:
                 emojie = Embed(title="Emojis", description=''.join(
-                    emojis[:40]), color=0x00B0ff)
+                    emojis[:40]), color=Color.random())
 
                 e = [serverinfo, emojie]
 
@@ -156,10 +156,10 @@ class slashinfo(Cog):
         else:
             await ctx.response.defer()
             start_time = time()
-            test = Embed(description="Testing ping", color=ctx.user.color)
+            test = Embed(description="Testing ping", color=Color.random())
             await ctx.followup.send(embed=test)
 
-            ping = Embed(color=ctx.user.color)
+            ping = Embed(color=Color.random())
             ping.add_field(
                 name="Bot Latency", value=f'{round(self.bot.latency * 1000)}ms', inline=False)
             end_time = time()
@@ -176,14 +176,16 @@ class slashinfo(Cog):
             guild = ctx.guild
 
             if guild.premium_subscription_count < 2:
-                nobanner = Embed(description="Server is not boosted at tier 2", color=Color.red())
+                nobanner = Embed(
+                    description="Server is not boosted at tier 2", color=Color.red())
                 await ctx.followup.send(embed=nobanner)
 
             elif guild.banner == None:
-                embed = Embed(description='Server has no banner', color=Color.red())
+                embed = Embed(description='Server has no banner',
+                              color=Color.red())
                 await ctx.followup.send(embed=embed)
             else:
-                embed = Embed(colour=ctx.user.color)
+                embed = Embed(colour=Color.random())
                 embed.set_footer(text=f"{guild.name}'s banner")
                 embed.set_image(url=ctx.guild.banner)
                 await ctx.followup.send(embed=embed)
@@ -198,7 +200,7 @@ class slashinfo(Cog):
             if member == None:
                 member = ctx.user
 
-            avatar = Embed(title=f"{member}'s Avatar", color=member.color)
+            avatar = Embed(title=f"{member}'s Avatar", color=Color.random())
             avatar.set_image(url=member.avatar)
             await ctx.followup.send(embed=avatar)
 
@@ -228,53 +230,44 @@ class slashinfo(Cog):
 
     @app_commands.command(description="View a sticker")
     @app_commands.describe(sticker="Insert message ID with the sticker or name of the sticker in the server")
-    async def sticker(self, ctx: Interaction, sticker:str):
+    async def sticker(self, ctx: Interaction, sticker: str):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             await ctx.response.defer()
+            
             try:
                 m: Message = await ctx.channel.fetch_message(int(sticker))
-                try:
-                    s: StickerItem = m.stickers[0]
-                    q = await self.bot.fetch_sticker(s.id)
-                    embed = Embed()
-                    embed.colour = ctx.user.color
-                    embed.add_field(name="Sticker Name",
-                                    value=q.name, inline=False)
-                    embed.add_field(name="Sticker ID",
-                                    value=q.id, inline=False)
-                    embed.set_image(url=q.url)
-
-                    if 'apng' in q.format:
-                        embed.add_field(
-                            name="Anitmated Sticker URL", value=q.url, inline=False)
-
-                    await ctx.followup.send(embed=embed)
-                except IndexError:
-                    embed = Embed(
-                        description="No sticker is in that message", color=Color.red())
-                    await ctx.followup.send(embed=embed)
+                s: StickerItem = m.stickers[0]
             except:
-                try:
-                    s:StickerItem=utils.get(ctx.guild.stickers, name=sticker)
-                    q = await self.bot.fetch_sticker(s.id)
-                    embed = Embed()
-                    embed.colour = ctx.user.color
-                    embed.add_field(name="Sticker Name",
-                                    value=q.name, inline=False)
-                    embed.add_field(name="Sticker ID",
-                                    value=q.id, inline=False)
-                    embed.set_image(url=q.url)
+                s: StickerItem = utils.get(ctx.guild.stickers, name=sticker)
 
-                    if 'apng' in q.format:
-                        embed.add_field(
-                            name="Anitmated Sticker URL", value=q.url, inline=False)
-                    await ctx.followup.send(embed=embed)
-                except AttributeError:
-                    embed = Embed(
-                        description="This sticker doesn't exist in the server", color=Color.red())
-                    await ctx.followup.send(embed=embed)
+            q = await self.bot.fetch_sticker(s.id)
+            embed = Embed()
+            embed.colour = Color.random()
+            embed.add_field(name="Sticker Name",
+                            value=q.name, inline=False)
+            embed.add_field(name="Sticker ID",
+                            value=q.id, inline=False)
+            embed.set_image(url=q.url)
+
+            if 'apng' in q.format:
+                embed.add_field(
+                    name="Anitmated Sticker URL", value=q.url, inline=False)
+
+            await ctx.followup.send(embed=embed)
+
+    @sticker.error
+    async def sticker_error(self, ctx: Interaction, error: app_commands.AppCommandError):
+        if isinstance(error, app_commands.CommandInvokeError):
+            if IndexError:
+                embed = Embed(
+                    description="No sticker is in that message or the sticker got deleted from its server", color=Color.red())
+                await ctx.followup.send(embed=embed)
+            elif AttributeError:
+                embed = Embed(
+                    description="This sticker doesn't exist in the server", color=Color.red())
+                await ctx.followup.send(embed=embed)
 
     @app_commands.command(description="View an emoji")
     @app_commands.describe(emoji="What is the name of the emoji?")
@@ -284,28 +277,27 @@ class slashinfo(Cog):
         else:
             await ctx.response.defer()
             try:
-                e=emoji.split(':')[-1].rstrip('>')
+                e = emoji.split(':')[-1].rstrip('>')
                 emote = self.bot.get_emoji(int(e))
-                embed = Embed()
-                embed.color = ctx.user.color
-                embed.add_field(
-                    name="Name", value=emote.name, inline=False)
-                embed.add_field(name="ID", value=emote.id, inline=False)
-                embed.set_image(url=emote.url)
-                await ctx.followup.send(embed=embed)
             except:
-                try:
-                    emote=utils.get(ctx.guild.emojis, name=emoji)
-                    embed=Embed()
-                    embed.color=ctx.user.color
-                    embed.add_field(name="Name", value=emote.name, inline=False)
-                    embed.add_field(name="ID", value=emote.id, inline=False)
-                    embed.set_image(url=emote.url)
-                    await ctx.followup.send(embed=embed)
-                except AttributeError:
-                    embed = Embed(
-                        description="This emoji doesn't exist in the server", color=Color.red())
-                    await ctx.followup.send(embed=embed)
+                emote = utils.get(ctx.guild.emojis, name=emoji)
+
+            embed = Embed()
+            embed.color = Color.random()
+            embed.add_field(
+                name="Name", value=emote.name, inline=False)
+            embed.add_field(name="ID", value=emote.id, inline=False)
+            embed.set_image(url=emote.url)
+            await ctx.followup.send(embed=embed)
+
+    @emoji.error
+    async def emoji_error(self, ctx: Interaction, error: app_commands.AppCommandError):
+        if isinstance(error, app_commands.CommandInvokeError):
+            if AttributeError:
+                embed = Embed(
+                    description="This emoji doesn't exist in the server", color=Color.red())
+                await ctx.followup.send(embed=embed)
+
 
 async def setup(bot: Bot):
     await bot.add_cog(slashinfo(bot))
