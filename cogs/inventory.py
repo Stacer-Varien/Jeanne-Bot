@@ -22,7 +22,6 @@ class Shop_Group(GroupCog, name="shop"):
             qp = self.bot.get_emoji(980772736861343774)
             await ctx.followup.send(embed=fetch_wallpapers(qp))
 
-
 class Background_Group(GroupCog, name="background"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot

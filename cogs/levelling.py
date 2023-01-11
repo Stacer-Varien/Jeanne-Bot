@@ -4,7 +4,7 @@ from discord.ext.commands import Cog, CooldownMapping, BucketType, Bot, GroupCog
 from discord import *
 from db_functions import *
 from typing import Optional
-from assets.generators.level_card import Level
+from assets.generators.level_card import Level, Profile
 from discord.app_commands import *
 
 
@@ -67,6 +67,10 @@ class levelling(Cog):
         image = Level().generate_level(**args)
         return image
 
+    def get_profile(self, args):
+        image = Profile().generate_profile(**args)
+        return image
+
     @Cog.listener()
     async def on_message(self, message: Message):
         if check_botbanned_user(message.author.id) == True:
@@ -104,14 +108,46 @@ class levelling(Cog):
                 gexp = get_user_xp(member.id)
 
                 bg = selected_wallpaper(member.id)
+                font_color=selected_wallpaper(member.id)
 
-                args = {'bg_image': bg, 'profile_image': str(member.avatar.with_format('png')), 'server_level': slvl, 'server_user_xp': sexp, 'server_next_xp': (
+                args = {'bg_image': bg, 'profile_image': str(member.avatar.with_format('png')), 'font_color':font_color,'server_level': slvl, 'server_user_xp': sexp, 'server_next_xp': (
                     (slvl * 50) + ((slvl - 1) * 25) + 50), 'global_level': glvl, 'global_user_xp': gexp, 'global_next_xp': ((glvl * 50) + ((glvl - 1) * 25) + 50), 'user_name': str(member), }
 
                 func = partial(self.get_card, args)
                 image = await get_event_loop().run_in_executor(None, func)
 
                 file = File(fp=image, filename=f'{member.name}_level_card.png')
+                await ctx.followup.send(file=file)
+            except:
+                no_exp = Embed(description="Failed to get level stats")
+                await ctx.followup.send(embed=no_exp)
+
+    @app_commands.command(description="See your level or someone else's level")
+    @app_commands.describe(member="Which member?")
+    @checks.cooldown(1, 60, key=lambda i: (i.user.id))
+    async def profile(self, ctx: Interaction, member: Optional[Member] = None) -> None:
+        await ctx.response.defer()
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            if member is None:
+                member = ctx.user
+            try:
+                slvl = get_member_level(member.id, ctx.guild.id)
+                sexp = get_member_xp(member.id, ctx.guild.id)
+
+                glvl = get_user_level(member.id)
+                gexp = get_user_xp(member.id)
+
+                bg = selected_wallpaper(member.id)
+
+                args = {'bg_image': bg, 'profile_image': str(member.avatar.with_format('png')), 'server_level': slvl, 'server_user_xp': sexp, 'server_next_xp': (
+                    (slvl * 50) + ((slvl - 1) * 25) + 50), 'global_level': glvl, 'global_user_xp': gexp, 'global_next_xp': ((glvl * 50) + ((glvl - 1) * 25) + 50), 'user_name': str(member), }
+
+                func = partial(self.get_profile, args)
+                image = await get_event_loop().run_in_executor(None, func)
+
+                file = File(fp=image, filename=f'{member.name}_profile_card.png')
                 await ctx.followup.send(file=file)
             except:
                 no_exp = Embed(description="Failed to get level stats")
