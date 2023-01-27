@@ -1,5 +1,5 @@
 from assets.buttons import Confirmation
-from db_functions import add_user_custom_wallpaper, add_user_wallpaper, check_botbanned_user, fetch_user_inventory, fetch_wallpapers, get_balance, create_user_inventory, get_wallpaper, use_wallpaper
+from db_functions import add_user_custom_wallpaper, add_user_wallpaper, check_botbanned_user, fetch_user_inventory, fetch_wallpapers, get_balance, get_wallpaper, use_wallpaper
 from discord import *
 from discord.ext.commands import Bot, GroupCog
 from assets.generators.level_card import Level
@@ -104,8 +104,6 @@ class Background_Group(GroupCog, name="background"):
                     if view.value == None:
                         await ctx.edit_original_response(content="Timeout", view=None, embed=None)
                     elif view.value:
-                        if create_user_inventory(ctx.user.id) == False:
-                            pass
                         add_user_wallpaper(ctx.user.id, item_id)
                         embed1 = Embed(
                             description=f"Background wallpaper bought and selected", color=Color.random())
@@ -121,14 +119,12 @@ class Background_Group(GroupCog, name="background"):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            user_inv = fetch_user_inventory(ctx.user.id)
-
-            if f'{name}.png' in user_inv:
+            try:
                 use_wallpaper(name, ctx.user.id)
                 embed = Embed(
                     description=f"{name} has been selected", color=Color.random())
                 await ctx.followup.send(embed=embed)
-            else:
+            except:
                embed = Embed(
                    description="This background image is not in your inventory", color=Color.red())
                await ctx.followup.send(embed=embed)
@@ -175,10 +171,6 @@ class Background_Group(GroupCog, name="background"):
                 if view.value == None:
                     await ctx.edit_original_response(content="Time out", embed=None, view=None)
                 if view.value:
-                    if create_user_inventory(ctx.user.id) == False:
-                        pass
-                    else:
-                        create_user_inventory(ctx.user.id)
                     add_user_custom_wallpaper(ctx.user.id, name, link)
 
                     embed1 = Embed(
@@ -195,18 +187,17 @@ class Background_Group(GroupCog, name="background"):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            try:
+            if fetch_user_inventory(ctx.user.id)==None:
+                embed = Embed(
+                    description="Your inventory is empty", color=Color.red())
+                await ctx.followup.send(embed=embed)
+            else:
                 a = fetch_user_inventory(ctx.user.id)
                 inv = Embed(title="List of wallpapers you have",
                             color=Color.random())
                 inv.description = a
                 await ctx.followup.send(embed=inv)
-            except FileNotFoundError:
-                embed = Embed(
-                    description="Your inventory is empty", color=Color.red())
-                await ctx.followup.send(embed=embed)
-
-
+                
 async def setup(bot: Bot):
     await bot.add_cog(Shop_Group(bot))
     await bot.add_cog(Background_Group(bot))
