@@ -756,7 +756,6 @@ class Set_Group(GroupCog, name="set"):
                         embed = Embed(description="Action cancelled")
                         await ctx.edit_original_response(content=None, embeds=[embed], view=None)
 
-
     @app_commands.command(description="Set a leaving message when someone leaves the server")
     @app_commands.describe(message="What is the new leaving message", jsonfile="Upload JSON file with the welcoming message")
     @app_commands.checks.has_permissions(manage_guild=True)
@@ -849,6 +848,50 @@ class Set_Group(GroupCog, name="set"):
                         embed = Embed(description="Timeout")
                         await ctx.edit_original_response(content=None, embeds=[embed], view=None)
 
+    @app_commands.command(description="Change the brightness of your background")
+    @app_commands.describe(brightness="Set the level of brightness. Default is 100")
+    async def brightness(self, ctx:Interaction, brightness:int):
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            await ctx.response.defer()
+            embed = Embed()
+            if brightness > 150:
+                embed.description="This is too bright!\nPlease make sure it is higher than 10 and lower than 150"
+                embed.color=Color.red()
+                await ctx.followup.send(embed=embed)
+            elif brightness < 10:
+                embed.description = "This is too dark!\nPlease make sure it is higher than 10 and lower than 150"
+                embed.color = Color.red()
+                await ctx.followup.send(embed=embed)
+            else:
+                if set_brightness(ctx.user.id, brightness) == None:
+                    embed.description="You have no background wallpaper"
+                    embed.color=Color.red()
+                    await ctx.followup.send(embed=embed)
+                else:
+                    set_brightness(ctx.user.id, brightness)
+                    embed.description = "Brightness has been changed to {}".format(brightness)
+                    embed.color = Color.random()
+                    await ctx.followup.send(embed=embed)
+
+    @app_commands.command(description="Change your profile bio")
+    @app_commands.describe(bio="Add your bio. Make sure its 60 characters per line")
+    async def bio(self, ctx: Interaction, bio: int):
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            await ctx.response.defer()
+            embed = Embed()
+            if len(bio) > 120:
+                embed.description = "Too many words!\nPlease make sure your bio has 60 words per line and only 2 lines"
+                embed.color = Color.red()
+                await ctx.followup.send(embed=embed)
+            else:
+                set_bio(ctx.user.id, bio)
+                embed.description = "New bio has been added"
+                embed.color = Color.random()
+                await ctx.followup.send(embed=embed)             
 
 class XP_Group(GroupCog, name="xp"):
     def __init__(self, bot: Bot) -> None:
