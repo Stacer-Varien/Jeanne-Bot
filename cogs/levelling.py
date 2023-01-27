@@ -4,8 +4,18 @@ from discord.ext.commands import Cog, CooldownMapping, BucketType, Bot, GroupCog
 from discord import *
 from db_functions import *
 from typing import Optional
-from assets.generators.level_card import Level, Profile
+from assets.generators.level_card import Level
+from assets.generators.profile_card import Profile
 from discord.app_commands import *
+from config import TOPGG
+from topgg import *
+from collections import OrderedDict
+from json import loads
+
+def replace_all(text: str, dic: dict):
+    for i, j in dic.items():
+        text = text.replace(i, j)
+    return text
 
 
 class Rank_Group(GroupCog, name="rank"):
@@ -53,11 +63,11 @@ class Rank_Group(GroupCog, name="rank"):
 
             await ctx.followup.send(embed=embed)
 
-
 class levelling(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self._cd = CooldownMapping.from_cooldown(1, 120, BucketType.member)
+        self.topggpy = DBLClient(self.bot, str(TOPGG))
 
     def get_ratelimit(self, message: Message) -> Optional[int]:
         bucket = self._cd.get_bucket(message)
@@ -82,7 +92,20 @@ class levelling(Cog):
                         ratelimit = self.get_ratelimit(message)
                         if ratelimit == None:
                             add_xp(message.author.id, message.guild.id)
-                            add_level(message.author.id, message.guild.id)
+                            lvl=add_level(message.author.id, message.guild.id)
+                            if lvl == None:
+                                pass
+                            else:
+                                msg=lvl[2]
+                                if msg ==0:
+                                    msg="{} levelled up to {}".format(member.mention, get_member_level(message.author.id, message.guild.id))
+                                else:
+                                    parameters = OrderedDict([("%member%", str(message.author)), ("%pfp%", str(message.author.display_avatar)), ("%server%", str(message.guild.name)), ("%mention%", str(message.author.mention)), ("%name%", str(message.author.name)),])
+                                    json = loads(replace_all(message, parameters))
+                                    msg = json["content"]
+                                    embed = Embed.from_dict(json['embeds'][0])
+                                channel=await self.bot.fetch_channel(lvl[1])
+                                await channel.send(content=msg, embed=embed)
                     except AttributeError:
                         pass
                 else:
@@ -124,7 +147,7 @@ class levelling(Cog):
 
     @app_commands.command(description="See your level or someone else's level")
     @app_commands.describe(member="Which member?")
-    @checks.cooldown(1, 60, key=lambda i: (i.user.id))
+    #@checks.cooldown(1, 60, key=lambda i: (i.user.id))
     async def profile(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
@@ -140,9 +163,14 @@ class levelling(Cog):
                 gexp = get_user_xp(member.id)
 
                 bg = selected_wallpaper(member.id)
+                grank=get_member_global_rank(member)
+                srank=get_member_server_rank(member)
+                rrank=get_richest(member)
+
+                #voted=await self.topggpy.get_user_vote(member.id)
 
                 args = {'bg_image': bg, 'profile_image': str(member.avatar.with_format('png')), 'server_level': slvl, 'server_user_xp': sexp, 'server_next_xp': (
-                    (slvl * 50) + ((slvl - 1) * 25) + 50), 'global_level': glvl, 'global_user_xp': gexp, 'global_next_xp': ((glvl * 50) + ((glvl - 1) * 25) + 50), 'user_name': str(member), }
+                    (slvl * 50) + ((slvl - 1) * 25) + 50), 'global_level': glvl, 'global_user_xp': gexp, 'global_next_xp': ((glvl * 50) + ((glvl - 1) * 25) + 50), 'user_name': str(member), 'grank':grank, 'srank': srank, 'voted':True, 'rrank':rrank, 'creator':member.id, 'partner':member.id, 'balance': get_balance(member.id), 'bio': None, 'brightness':50}
 
                 func = partial(self.get_profile, args)
                 image = await get_event_loop().run_in_executor(None, func)
@@ -150,7 +178,7 @@ class levelling(Cog):
                 file = File(fp=image, filename=f'{member.name}_profile_card.png')
                 await ctx.followup.send(file=file)
             except:
-                no_exp = Embed(description="Failed to get level stats")
+                no_exp = Embed(description="Failed to make profile card")
                 await ctx.followup.send(embed=no_exp)
 
     @level.error
