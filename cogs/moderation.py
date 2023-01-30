@@ -206,6 +206,15 @@ class Ban_Group(GroupCog, name="ban"):
                             description="Ban cancelled", color=Color.red())
                         await ctx.edit_original_response(embed=cancelled, view=None)
 
+    @user.error
+    async def ban_user_error(self, ctx:Interaction, error:app_commands.AppCommandError):
+        if isinstance(error, app_commands.CommandInvokeError):
+            if HTTPException:
+                embed = Embed()
+                embed.description="Invalid user ID given\nPlease try again"
+                embed.color=Color.red()
+                await ctx.followup.send(embed=embed)
+
 
 class Mute_Group(GroupCog, name="mute"):
     def __init__(self, bot: Bot) -> None:
@@ -684,7 +693,7 @@ class moderation(Cog):
                     await modlog.send(embed=mute)
 
     @timeout.error
-    async def timeout_error(self, ctx:Interaction, error:app_commands.CommandInvokeError):
+    async def timeout_error(self, ctx:Interaction, error:app_commands.AppCommandError):
         if isinstance(error, app_commands.CommandInvokeError):
                 embed=Embed()
                 embed.description="Invalid time added. Please try again"
