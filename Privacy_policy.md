@@ -12,7 +12,7 @@ User IDs, server IDs and channel IDs are the main data stored and kept privately
 The user's or server's data is **not registered** in the database if:
 
 1. The user hasn't talked in the server or talking in XP ignored channels and Direct Messages between them and the bot
-2. A certian command required to log/dump data in the has not been used at least once
+2. A certian command required to add/enter data in the database has not been used at least once
 3. If the user has been banned from using the bot
 
 ## Data Accessing
@@ -22,7 +22,7 @@ Data can be accessed but limited to anyone except the bot developer as he has fu
 
 ## Removal of Data
 
-Users are free to request a removal of data via joining the [support server](https://discord.gg/Vfa796yvNq) and contacting the bot developer with valid reasons.
+Users are free to request a removal of data via joining the [support server](https://discord.gg/Vfa796yvNq) or email to zane544yt@protonmail.com contacting the bot developer with valid reasons.
 
 ## Questions
 
