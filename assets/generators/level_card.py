@@ -1,5 +1,5 @@
 from io import BytesIO
-from PIL import Image, ImageDraw, ImageFont, ImageColor
+from PIL import Image, ImageDraw, ImageFont, ImageColor, ImageEnhance
 import requests
 import math
 import os
@@ -13,15 +13,15 @@ class Level:
         self.font2 = os.path.join(os.path.dirname(
             __file__), 'assets', 'font2.ttf')
 
-    def generate_level(self, bg_image: str = None, profile_image: str = None, font_color:str=None, server_level: int = None, server_current_xp: int = 0, server_user_xp: int = None, server_next_xp: int = None, global_level: int = None, global_current_xp: int = 0, global_user_xp: int = None, global_next_xp: int = None, user_name: str = None):
+    def generate_level(self, bg_image: str = None, profile_image: str = None, font_color: str = None, server_level: int = None, server_current_xp: int = 0, server_user_xp: int = None, server_next_xp: int = None, global_level: int = None, global_current_xp: int = 0, global_user_xp: int = None, global_next_xp: int = None, user_name: str = None, brightness: int = None):
         if not bg_image:
             card = Image.open(self.default_bg).convert("RGBA")
         else:
-            try:
-                bg_bytes = BytesIO(requests.get(bg_image).content)
-                card = Image.open(bg_bytes).convert("RGBA")
-            except:
-                card = Image.open(bg_image).convert("RGBA")
+            bg_bytes = BytesIO(requests.get(bg_image).content)
+            card = Image.open(bg_bytes).convert("RGBA")
+
+        
+        card = ImageEnhance.Brightness(card).enhance(float(brightness/100))
 
         width, height = card.size
         if width == 900 and height == 500:
@@ -52,7 +52,7 @@ class Level:
 
                 card = card.crop((x1, y1, x2, y2)).resize(
                     (900, 500), resample=Image.LANCZOS)
-
+        #profile
         profile_bytes = BytesIO(requests.get(profile_image).content)
         profile = Image.open(profile_bytes)
         profile = profile.convert('RGBA').resize(
@@ -76,8 +76,10 @@ class Level:
 
         if not font_color:
             COLOR = (204, 204, 255)
+        elif font_color == None:
+            COLOR = (204, 204, 255)
         else:
-            hex = ImageColor.getcolor(font_color, "RGB")
+            hex = ImageColor.getcolor(('#' + font_color), "RGB")
             COLOR = tuple(hex)
                 
         STROKE = (151, 151, 151)
@@ -160,8 +162,20 @@ class Profile:
             os.path.dirname(__file__), 'assets', 'font.ttf')
         self.font2 = os.path.join(os.path.dirname(
             __file__), 'assets', 'font2.ttf')
+        self.vote_badge = os.path.join(os.path.dirname(
+            __file__), 'assets', 'voted.png')
+        self.first_badge = os.path.join(os.path.dirname(
+            __file__), 'assets', 'first.png')
+        self.second_badge = os.path.join(os.path.dirname(
+            __file__), 'assets', 'second.png')
+        self.third_badge = os.path.join(os.path.dirname(
+            __file__), 'assets', 'third.png')
+        self.creator_badge = os.path.join(os.path.dirname(
+            __file__), 'assets', 'creator.png')
+        self.richest_badge = os.path.join(os.path.dirname(
+            __file__), 'assets', 'richest.png')
 
-    def generate_profile(self, bg_image: str = None, profile_image: str = None, font_color:str=None, server_level: int = None, server_current_xp: int = 0, server_user_xp: int = None, server_next_xp: int = None, global_level: int = None, global_current_xp: int = 0, global_user_xp: int = None, global_next_xp: int = None, user_name: str = None):
+    def generate_profile(self, bg_image: str = None, profile_image: str = None, font_color:str=None, server_level: int = None, server_current_xp: int = 0, server_user_xp: int = None, server_next_xp: int = None, global_level: int = None, global_current_xp: int = 0, global_user_xp: int = None, global_next_xp: int = None, user_name: str = None, voted:bool=None, creator:int=None):
         if not bg_image:
             card = Image.open(self.default_bg).convert("RGBA")
         else:
@@ -200,11 +214,11 @@ class Profile:
 
                 card = card.crop((x1, y1, x2, y2)).resize(
                     (900, 500), resample=Image.LANCZOS)
-
+        #profile
         profile_bytes = BytesIO(requests.get(profile_image).content)
         profile = Image.open(profile_bytes)
         profile = profile.convert('RGBA').resize(
-            (250, 250), resample=Image.LANCZOS)
+            (180, 180), resample=Image.LANCZOS)
 
         profile_pic_holder = Image.new(
             "RGBA", card.size, (255, 255, 255, 0)
@@ -213,7 +227,7 @@ class Profile:
         mask = Image.new("RGBA", card.size, 0)
         mask_draw = ImageDraw.Draw(mask)
         mask_draw.ellipse(
-            (29, 29, 209, 209), fill=(255, 25, 255, 255)
+            (30, 250, 210, 430), fill=(255, 25, 255, 255)
         )
 
         # ======== Fonts to use =============
@@ -239,7 +253,7 @@ class Profile:
                 return str(round(xp / 1000000, 1)) + "M"
 
         draw = ImageDraw.Draw(card)
-        draw.text((20, 240), user_name, COLOR, font=font_normal,
+        draw.text((250, 320), user_name, COLOR, font=ImageFont.truetype(self.font1, 60),
                   stroke_fill=STROKE, stroke_width=1)
         draw.text((20, 310), f"Server Level: {server_level}", COLOR,
                   font=font_small, stroke_width=1, stroke_fill=STROKE)
@@ -262,18 +276,10 @@ class Profile:
         server_length_of_bar = (server_current_percentage * 4.9) + 28
 
         blank_draw.rectangle((28, 378, server_length_of_bar, 382), fill=COLOR)
-        blank_draw.ellipse((29, 29, 209, 209), fill=(
+        blank_draw.ellipse((30, 250, 210, 430), fill=(
             255, 255, 255, 0), outline=COLOR)
 
 ########################################################################################
-
-        draw.text((20, 420), f"Global Level: {global_level}", COLOR,
-                  font=font_small, stroke_width=1, stroke_fill=STROKE)
-        draw.text(
-            (280, 420),
-            f"Global XP: {get_str(global_user_xp)}/{get_str(global_next_xp)}",
-            COLOR,
-            font=font_small, stroke_width=1, stroke_fill=STROKE)
 
         blank_draw.rectangle(
             (25, 470, 520, 480), fill=(255, 255, 255, 0), outline=COLOR
@@ -287,14 +293,24 @@ class Profile:
 
         blank_draw.rectangle((28, 473, global_length_of_bar, 477), fill=COLOR)
 
-        profile_pic_holder.paste(profile, (29, 29, 209, 209))
-
-        pre = Image.composite(profile_pic_holder, card, mask)
-        pre = Image.alpha_composite(pre, blank)
+        profile_pic_holder.paste(profile, (30, 250))
         
-        final1 = Image.alpha_composite(pre, blank)
-        profile_canvas = Image.new("RGB", (900, 900), (128, 128, 128))
-        profile_canvas.paste(final1)
+        pre = Image.composite(profile_pic_holder, card, mask)
+        #pre = Image.alpha_composite(pre)
+        
+        
+        profile_canvas = Image.new("RGB", (900, 900), (32, 32, 32))
+        profile_draw=ImageDraw.Draw(profile_canvas)
+        profile_draw.text((20, 520), f"Global Level: {global_level}", COLOR,
+                  font=font_small, stroke_width=1, stroke_fill=STROKE)
+        profile_draw.text(
+            (280, 520),
+            f"Global XP: {get_str(global_user_xp)}/{get_str(global_next_xp)}",
+            COLOR,
+            font=font_small, stroke_width=1, stroke_fill=STROKE)
+
+        profile_canvas.paste(pre)
+        
         final_bytes = BytesIO()
         profile_canvas.save(final_bytes, 'png')
         final_bytes.seek(0)

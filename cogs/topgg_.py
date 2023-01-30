@@ -5,13 +5,10 @@ from discord.ext import tasks
 from discord.ext.commands import Cog, Bot
 from datetime import *
 
-dbl_token = TOPGG
-
-
 class topgg(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.topggpy = DBLClient(self.bot, dbl_token)
+        self.topggpy = DBLClient(self.bot, TOPGG)
         self.topgg_webhook = WebhookManager(
             self.bot).dbl_webhook("/dblwebhook", TOPGG_AUTH)
         self.topgg_webhook.run(5000)
@@ -33,7 +30,7 @@ class topgg(Cog):
             if check_botbanned_user(voter.id) == True:
                 pass
             else:
-                if await self.topggpy.get_weekend_status() is True:
+                if await self.topggpy.get_weekend_status() == True:
                     credits = 100
                 else:
                     credits = 50

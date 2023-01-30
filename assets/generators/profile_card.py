@@ -38,11 +38,8 @@ class Profile:
         if not bg_image:
             card = Image.open(self.default_bg).convert("RGBA")
         else:
-            try:
-                bg_bytes = BytesIO(requests.get(bg_image).content)
-                card = Image.open(bg_bytes).convert("RGBA")
-            except:
-                card = Image.open(bg_image).convert("RGBA")
+            bg_bytes = BytesIO(requests.get(bg_image).content)
+            card = Image.open(bg_bytes).convert("RGBA")
             
         card = ImageEnhance.Brightness(card).enhance(float(brightness/100))
 
@@ -98,8 +95,10 @@ class Profile:
 
         if not font_color:
             COLOR = (204, 204, 255)
+        elif font_color == None:
+            COLOR = (204, 204, 255)
         else:
-            hex = ImageColor.getcolor(font_color, "RGB")
+            hex = ImageColor.getcolor(('#' + font_color), "RGB")
             COLOR = tuple(hex)
                 
         STROKE = (151, 151, 151)
@@ -242,9 +241,6 @@ class Profile:
 
         profile_draw.rectangle(
             (12, 682, global_length_of_bar, 691), fill=COLOR)
-
-
-
 
         profile_draw.text((20, 710), f"Server Level: {server_level}", COLOR,
                           font=font_small, stroke_width=1, stroke_fill=STROKE)
