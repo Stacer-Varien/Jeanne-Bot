@@ -6,7 +6,7 @@ from humanfriendly import format_timespan, parse_timespan, InvalidTimespan
 from collections import OrderedDict
 from db_functions import *
 from assets.buttons import Confirmation
-import requests
+from requests import get
 from io import BytesIO
 
 def replace_all(text: str, dic: dict):
@@ -136,9 +136,7 @@ class Create_Group(GroupCog, name="create"):
                 embed.description = "Couldn't make a new stage channel. Please make sure the server is community enabled"
                 embed.color=Color.red()
                 await ctx.followup.send(embed=embed)
-            
-
-
+        
     @app_commands.command(description="Create a forum")
     @app_commands.describe(name="What will you name it?", topic="What is the topic", category="Place in which category?")
     @app_commands.checks.has_permissions(manage_channels=True)
@@ -249,10 +247,10 @@ class Create_Group(GroupCog, name="create"):
                 
             else:
                 if emoji_link:
-                    emojibytes=requests.get(emoji_link).content
+                    emojibytes=get(emoji_link).content
                         
                 elif emoji_image:
-                    emojibytes = requests.get(emoji_image.url).content
+                    emojibytes = get(emoji_image.url).content
 
                 try:
                     emote = await ctx.guild.create_custom_emoji(name=name, image=emojibytes)
@@ -284,11 +282,11 @@ class Create_Group(GroupCog, name="create"):
 
             else:
                 if sticker_link:
-                    stickerbytes = BytesIO(requests.get(sticker_link).content)
+                    stickerbytes = BytesIO(get(sticker_link).content)
                     url=sticker_link
                     
                 elif sticker_image:
-                    stickerbytes = BytesIO(requests.get(sticker_image.url).content)
+                    stickerbytes = BytesIO(get(sticker_image.url).content)
                     url=sticker_image.url
                 
                 stickerfile = File(fp=stickerbytes, filename="sticker.png")
@@ -572,8 +570,6 @@ class Edit_Group(GroupCog, name="edit"):
                     description="This emoji doesn't exist in the server", color=Color.red())
                 await ctx.followup.send(embed=embed)
             
-
-
 class Set_Group(GroupCog, name="set"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
@@ -848,8 +844,22 @@ class Set_Group(GroupCog, name="set"):
                         embed = Embed(description="Timeout")
                         await ctx.edit_original_response(content=None, embeds=[embed], view=None)
 
-    @app_commands.command(description="Change the brightness of your background")
-    @app_commands.describe(brightness="Set the level of brightness. Default is 100")
+    @app_commands.command(description="Set a level up notification channel")
+    @app_commands.describe(channel="Which channel will update when a member levels up?", jsonscript="Upload JSON file with the welcoming message")
+    @app_commands.checks.has_permissions(manage_guild=True)
+    async def levelupdate(self, ctx: Interaction, channel: TextChannel, jsonscript: Optional[str] = None) -> None:
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            await ctx.response.defer()
+
+            add_level_channel(ctx.guild.id, channel.id, jsonscript)
+            embed = Embed(description="Level update channel set")
+            await ctx.followup.send(embed=embed)
+
+
+    @app_commands.command(description="Change the brightness of your level and profile card background")
+    @app_commands.describe(brightness="Set the level of brightness between 10 - 150. Default is 100")
     async def brightness(self, ctx:Interaction, brightness:int):
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -865,7 +875,7 @@ class Set_Group(GroupCog, name="set"):
                 embed.color = Color.red()
                 await ctx.followup.send(embed=embed)
             else:
-                if set_brightness(ctx.user.id, brightness) == None:
+                if set_brightness(ctx.user.id, brightness) == False:
                     embed.description="You have no background wallpaper"
                     embed.color=Color.red()
                     await ctx.followup.send(embed=embed)
@@ -877,7 +887,7 @@ class Set_Group(GroupCog, name="set"):
 
     @app_commands.command(description="Change your profile bio")
     @app_commands.describe(bio="Add your bio. Make sure its 60 characters per line")
-    async def bio(self, ctx: Interaction, bio: int):
+    async def bio(self, ctx: Interaction, bio: str):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
@@ -891,7 +901,24 @@ class Set_Group(GroupCog, name="set"):
                 set_bio(ctx.user.id, bio)
                 embed.description = "New bio has been added"
                 embed.color = Color.random()
-                await ctx.followup.send(embed=embed)             
+                await ctx.followup.send(embed=embed)
+
+    @app_commands.command(description="Change your level and profile card font and bar color")
+    @app_commands.describe(color="Add your color. Must be in HEX code")
+    async def color(self, ctx: Interaction, color: str):
+        if check_botbanned_user(ctx.user.id) == True:
+            pass
+        else:
+            await ctx.response.defer()
+            embed = Embed()
+            try:
+                set_color(ctx.user.id, color)
+                embed.description = "Profile and Level card font and bar color changed"
+                embed.color = int(color, 16)
+            except:
+                embed.description = "Invalid HEX code entered"
+                embed.color = Color.red()
+            await ctx.followup.send(embed=embed)  
 
 class XP_Group(GroupCog, name="xp"):
     def __init__(self, bot: Bot) -> None:
@@ -938,6 +965,7 @@ class XP_Group(GroupCog, name="xp"):
                 await ctx.followup.send(embed=embed)
 
 
+
 class manage(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
@@ -971,9 +999,9 @@ class manage(Cog):
             await ctx.followup.send(embed=embed)
 
     @app_commands.command(description="Removes a welcoming/modlog/report channel. Set all options to true to remove all")
-    @app_commands.describe(welcomer="Remove welcomer channel?", leaving="Remove leaving channel?", modlog="Remove modlog channel?", report="Remove report channel?", memberlog="Remove member logging channel?", messagelog="Remove lessage logging channel?", welcomingmsg="Remove the welcoming message and reset to default", leavingmsg="Remove the leaving message and reset to default")
+    @app_commands.describe(welcomer="Remove welcomer channel?", leaving="Remove leaving channel?", modlog="Remove modlog channel?", report="Remove report channel?", memberlog="Remove member logging channel?", messagelog="Remove lessage logging channel?", welcomingmsg="Remove the welcoming message and reset to default", leavingmsg="Remove the leaving message and reset to default",levelupchannel="Remove the level up update channel")
     @app_commands.checks.has_permissions(manage_guild=True)
-    async def remove(self, ctx: Interaction, welcomer: Optional[bool] = None, leaving: Optional[bool] = None, modlog: Optional[bool] = None, report: Optional[bool] = None, memberlog: Optional[bool] = None, messagelog: Optional[bool] = None, welcomingmsg:Optional[bool]=None, leavingmsg:Optional[bool]=None) -> None:
+    async def remove(self, ctx: Interaction, welcomer: Optional[bool] = None, leaving: Optional[bool] = None, modlog: Optional[bool] = None, report: Optional[bool] = None, memberlog: Optional[bool] = None, messagelog: Optional[bool] = None, welcomingmsg:Optional[bool]=None, leavingmsg:Optional[bool]=None,levelupchannel:Optional[bool]=None) -> None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
@@ -1070,6 +1098,16 @@ class manage(Cog):
                             name='Leaving Message removal status', value='Failed. No leaving message set', inline=True)
                     else:
                         embed.add_field(name='Leaving Message removal status',
+                                        value='Successful', inline=True)
+                
+                if levelupchannel == True:
+                    lvlup = remove_levelup(ctx.guild.id)
+
+                    if lvlup == 0 or None:
+                        embed.add_field(
+                            name='Level Up Channel Update removal status', value='Failed. No Level Up Channel Update set', inline=True)
+                    else:
+                        embed.add_field(name='Level Up Channel Update removal status',
                                         value='Successful', inline=True)
 
                 await ctx.followup.send(embed=embed)

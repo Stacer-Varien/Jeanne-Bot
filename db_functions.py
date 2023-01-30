@@ -1,10 +1,10 @@
+from collections import OrderedDict
 from datetime import date, datetime, timedelta
 from shutil import rmtree
 from humanfriendly import parse_timespan
-from discord import Embed, Color, Emoji, Member
+from discord import Embed, Color, Emoji, Guild, Member
 from config import db
-from os import listdir, makedirs, path
-from requests import get
+from json import loads
 
 current_time = date.today()
 
@@ -173,7 +173,7 @@ def use_wallpaper(name, user):
     db.commit()
 
 def fetch_user_inventory(user: int) -> (str | None):
-    wallpapers = db.execute("SELECT * FROM userWallpaperInventory WHERE user = ?" (user,)).fetchall()
+    wallpapers = db.execute("SELECT * FROM userWallpaperInventory WHERE user = ?", (user,)).fetchall()
 
     if wallpapers == None:
         return None
@@ -183,9 +183,7 @@ def fetch_user_inventory(user: int) -> (str | None):
 
 def set_brightness(user:int, brightness:int):
     try:
-        wallpaper=selected_wallpaper(user)
-
-        db.execute("UPDATE userWallpaperData SET brightness = ? WHERE user_id = ? AND wallpaper = ? AND selected = ?", (brightness, user, wallpaper[1], 1,))
+        db.execute("UPDATE userWallpaperInventory SET brightness = ? WHERE user_id = ? AND selected = ?", (brightness, user, 1,))
         db.commit()
     except:
         return False
@@ -197,8 +195,25 @@ def set_bio(user:int, bio:str):
         db.execute("UPDATE userBio SET bio = ? WHERE user_id = ?", (bio, user,))
     db.commit()
 
-def get_bio(user:int)-> (str | None):
+def get_bio(user:int):
     data=db.execute("SELECT bio FROM userBio WHERE user_id = ?", (user,)).fetchone()
+
+    if data == None:
+        return None
+    else:
+        return data[0]
+
+def set_color(user:int, color:str):
+    cur = db.execute("INSERT OR IGNORE INTO userBio (user_id, color) VALUES (?,?)", (user, color,))
+
+    if cur.rowcount == 0:
+        db.execute("UPDATE userBio SET color = ? WHERE user_id = ?", (color, user,))
+    db.commit()
+
+
+def get_color(user: int):
+    data = db.execute(
+        "SELECT color FROM userBio WHERE user_id = ?", (user,)).fetchone()
 
     if data == None:
         return None
@@ -277,27 +292,33 @@ def add_xp(member: int, server: int):
     db.commit()
 
 def add_level_channel(server:int, channel:int, message:str=None):
-
     if not message:
-        message=0
+        message = 0
 
-    cur=db.execute("INSERT OR IGNORE INTO levelNotifierData (server_id, channel, message) VALUES (?,?,?)", (server, channel, message,))
+    cur=db.execute("INSERT OR IGNORE INTO levelNotifierData (server_id, channel_id, message) VALUES (?,?,?)", (server, channel, message,))
 
     if cur.rowcount==0:
         if channel:
-            db.execute("UPDATE levelNotifierData SET channel = ? WHERE server_id =?", (channel, server,))
+            db.execute("UPDATE levelNotifierData SET channel_id = ? WHERE server_id =?", (channel, server,))
         if message:
             db.execute(
                 "UPDATE levelNotifierData SET message = ? WHERE server_id =?", (message, server,))
     db.commit()
 
-def get_level_channel(server:int):
-    data = db.execute("SELECT * FROM levelNotifierData WHERE server_id = ?", (server,))
+def get_level_channel(member:Member, server:Guild):
+    data = db.execute("SELECT * FROM levelNotifierData WHERE server_id = ?", (server.id,)).fetchone()
+    
+    server_cumulated_exp = get_member_cumulated_xp(member.id, server.id)
+    server_level = get_member_level(member.id, server.id)
+    server_next_lvl_exp = ((server_level * 50) +
+                           ((server_level - 1) * 25) + 50)
+    db.commit()
+    if server_cumulated_exp >= server_next_lvl_exp:
+        if data == None:
+            return None
+        else:
+            return data
 
-    if data == None:
-        return None
-    else:
-        return data
 
 def add_level(member: int, server: int):
     server_cumulated_exp = get_member_cumulated_xp(member, server)
@@ -309,11 +330,12 @@ def add_level(member: int, server: int):
         server_updated_exp = server_cumulated_exp - server_next_lvl_exp
         db.execute("UPDATE serverxpData SET lvl = lvl + ?, exp = ? WHERE guild_id = ? AND user_id = ?",
                    (1, server_updated_exp, server, member,))
-
-        if get_level_channel(server) == None:
-            pass
+        
+        data = db.execute("SELECT * FROM levelNotifierData WHERE server_id = ?", (server,)).fetchone()
+        if data == None:
+            return None
         else:
-            return get_level_channel(server)
+            return data
 
     db.commit()
 
@@ -443,6 +465,23 @@ def remove_reporter(server: int):
     else:
         cur.execute(
             "DELETE FROM reportData WHERE guild_id = ?", (server,))
+
+        db.commit()
+        return (True)
+
+
+def remove_levelup(server: int):
+    cur = db.cursor()
+    cur.execute(
+        "SELECT * FROM levelNotifierData WHERE server_id = ?", (server,))
+    result = cur.fetchone()
+
+    if result == None:
+        return (False)
+
+    else:
+        cur.execute(
+            "DELETE FROM levelNotifierData WHERE server_id = ?", (server,))
 
         db.commit()
         return (True)
