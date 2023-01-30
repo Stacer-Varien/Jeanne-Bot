@@ -13,6 +13,9 @@ class errors(Cog):
         if isinstance(error, MissingPermissions):
             embed = Embed(description=error, color=Color.red())
             await ctx.followup.send(embed=embed)
+        elif isinstance(error, CommandInvokeError):
+            with open('cmd-invoke-errors.txt', 'a') as f:
+                f.writelines(f"{ctx.user.id}-{error}\n\n")
         elif isinstance(error, BotMissingPermissions):
             embed = Embed(description=error, color=Color.red())
             await ctx.followup.send(embed=embed)
