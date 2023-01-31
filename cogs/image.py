@@ -18,7 +18,7 @@ class images(Cog):
         else:
             kistune_api = get(kitsune_nekoslife).json()
             kitsune = Embed(color=Color.random())
-            kitsune.set_footer(text="Fetched from nekos.life")
+            kitsune.set_footer(text="Fetched from nekos.life • Credits must go to the artist")
             kitsune.set_image(url=kistune_api["url"])
             await ctx.followup.send(embed=kitsune)
 
@@ -30,7 +30,7 @@ class images(Cog):
         else:
             wallpaper = Embed(color=Color.random())
             wallpaper.set_image(url=get_wallpaper_pic())
-            wallpaper.set_footer(text="Fetched from Wallpaper_1936")
+            wallpaper.set_footer(text="Fetched from Wallpaper_1936 • Credits must go to the artist")
             await ctx.followup.send(embed=wallpaper)
 
     @app_commands.command(description="Get a Jeanne d'Arc image")
@@ -41,7 +41,7 @@ class images(Cog):
         else:
             jeanne = Embed(color=Color.random())
             jeanne.set_image(url=get_jeanne_pic())
-            jeanne.set_footer(text="Fetched from Jeanne_1936")
+            jeanne.set_footer(text="Fetched from Jeanne_1936 • Credits must go to the artist")
             await ctx.followup.send(embed=jeanne)
 
     @app_commands.command(description="Get a Saber image")
@@ -52,7 +52,7 @@ class images(Cog):
         else:
             saber = Embed(color=Color.random())
             saber.set_image(url=get_saber_pic())
-            saber.set_footer(text="Fetched from Saber_1936")
+            saber.set_footer(text="Fetched from Saber_1936 • Credits must go to the artist")
             await ctx.followup.send(embed=saber)
 
     @app_commands.command(description="Get a neko image")
@@ -64,7 +64,7 @@ class images(Cog):
             neko_api = get(neko_purrbot).json()
             neko = Embed(color=Color.random())
             neko.set_image(url=neko_api['link'])
-            neko.set_footer(text="Fetched from PurrBot.site")
+            neko.set_footer(text="Fetched from PurrBot.site • Credits must go to the artist")
             await ctx.followup.send(embed=neko)
 
     @app_commands.command(description="Get a Medusa (Fate) image")
@@ -75,7 +75,7 @@ class images(Cog):
         else:
             medusa = Embed(color=Color.random())
             medusa.set_image(url=get_medusa_pic())
-            medusa.set_footer(text="Fetched from Medusa_1936")
+            medusa.set_footer(text="Fetched from Medusa_1936 • Credits must go to the artist")
             await ctx.followup.send(embed=medusa)
 
 
