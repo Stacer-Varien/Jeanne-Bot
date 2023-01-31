@@ -204,6 +204,7 @@ class Create_Group(GroupCog, name="create"):
     @app_commands.command(description="Makes a public thread channel")
     @app_commands.describe(name="What will you name it?", channel="Which channel is the message in?", message_id="What is the message ID?", slowmode="WHat is the slowmode (1hr, 30m, etc) (Max is 6 hours)")
     @app_commands.checks.has_permissions(create_public_threads=True)
+    @app_commands.checks.bot_has_permissions(create_public_threads=True, manage_threads=True)
     async def thread(self, ctx: Interaction, name: str, channel: TextChannel, message_id: str, slowmode: Optional[str] = None):
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -845,18 +846,50 @@ class Set_Group(GroupCog, name="set"):
                         await ctx.edit_original_response(content=None, embeds=[embed], view=None)
 
     @app_commands.command(description="Set a level up notification channel")
-    @app_commands.describe(channel="Which channel will update when a member levels up?", jsonscript="Upload JSON file with the welcoming message")
+    @app_commands.describe(channel="Which channel will update when a member levels up?", levelmsg="Add your level message here. Use Discohooks to generate the embed")
     @app_commands.checks.has_permissions(manage_guild=True)
-    async def levelupdate(self, ctx: Interaction, channel: TextChannel, jsonscript: Optional[str] = None) -> None:
+    async def levelupdate(self, ctx: Interaction, channel: TextChannel, levelmsg: Optional[str]=None)->None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
             await ctx.response.defer()
 
-            add_level_channel(ctx.guild.id, channel.id, jsonscript)
-            embed = Embed(description="Level update channel set")
-            await ctx.followup.send(embed=embed)
+            if levelmsg == None:
+                embed=Embed()
+                embed.description="{} will post level updates when someone levels up"
+                embed.color=Color.random()
+                await ctx.followup.send(embed=embed)
+            
+            else:
+                parameters = OrderedDict([("%member%", str(ctx.user)), ("%pfp%", str(ctx.user.display_avatar)), ("%server%", str(
+                    ctx.guild.name)), ("%mention%", str(ctx.user.mention)), ("%name%", str(ctx.user.name)), ("%newlevel%", str(get_member_level(ctx.user.id, ctx.guild.id)))])
 
+                json = loads(replace_all(levelmsg, parameters))
+                try:
+                    content = json["content"]
+                except:
+                    pass
+
+                confirm = Embed(
+                        description="This is the preview of the level update message whenever someone levels up in the server and will be sent to {}.\nAre you happy with it?".format(channel.mention))
+
+                embed = Embed.from_dict(json['embeds'][0])
+                view = Confirmation(ctx.user)
+                await ctx.followup.send(content=content, embeds=[embed, confirm], view=view, allowed_mentions=AllowedMentions(everyone=False, roles=False, users=False), ephemeral=True)
+                await view.wait()
+
+                if view.value == True:
+                    add_level_channel(ctx.guild.id, channel.id, levelmsg)
+
+                    embed = Embed(description="Welcoming message set")
+                    await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+
+                elif view.value == False:
+                    embed = Embed(description="Action cancelled")
+                    await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+                else:
+                    embed = Embed(description="Timeout")
+                    await ctx.edit_original_response(content=None, embeds=[embed], view=None)
 
     @app_commands.command(description="Change the brightness of your level and profile card background")
     @app_commands.describe(brightness="Set the level of brightness between 10 - 150. Default is 100")
@@ -874,16 +907,15 @@ class Set_Group(GroupCog, name="set"):
                 embed.description = "This is too dark!\nPlease make sure it is higher than 10 and lower than 150"
                 embed.color = Color.red()
                 await ctx.followup.send(embed=embed)
-            else:
-                if set_brightness(ctx.user.id, brightness) == False:
+            elif set_brightness(ctx.user.id, brightness) == False:
                     embed.description="You have no background wallpaper"
                     embed.color=Color.red()
                     await ctx.followup.send(embed=embed)
-                else:
-                    set_brightness(ctx.user.id, brightness)
-                    embed.description = "Brightness has been changed to {}".format(brightness)
-                    embed.color = Color.random()
-                    await ctx.followup.send(embed=embed)
+            else:
+                set_brightness(ctx.user.id, brightness)
+                embed.description = "Brightness has been changed to {}".format(brightness)
+                embed.color = Color.random()
+                await ctx.followup.send(embed=embed)
 
     @app_commands.command(description="Change your profile bio")
     @app_commands.describe(bio="Add your bio. Make sure its 60 characters per line")
@@ -899,7 +931,7 @@ class Set_Group(GroupCog, name="set"):
                 await ctx.followup.send(embed=embed)
             else:
                 set_bio(ctx.user.id, bio)
-                embed.description = "New bio has been added"
+                embed.description = "New bio has been set to\n{}".format(bio)
                 embed.color = Color.random()
                 await ctx.followup.send(embed=embed)
 
@@ -913,7 +945,7 @@ class Set_Group(GroupCog, name="set"):
             embed = Embed()
             try:
                 set_color(ctx.user.id, color)
-                embed.description = "Profile and Level card font and bar color changed"
+                embed.description = "Profile and Level card font and bar color changed to {} as showing in the embed color".format(color)
                 embed.color = int(color, 16)
             except:
                 embed.description = "Invalid HEX code entered"
@@ -963,8 +995,6 @@ class XP_Group(GroupCog, name="xp"):
                 embed.add_field(name="Channel XP blacklisted",
                                 value=f"`{channel}` has been added to the XP blacklist", inline=False)
                 await ctx.followup.send(embed=embed)
-
-
 
 class manage(Cog):
     def __init__(self, bot: Bot):
