@@ -1,6 +1,5 @@
 from discord import *
 from discord.ext.commands import Cog, Bot
-import random
 from db_functions import *
 
 
@@ -18,7 +17,7 @@ class logger(Cog):
                 try:
                     channel = await self.bot.fetch_channel(logger)
                     embed = Embed()
-                    embed.description = "Message edited in {}".format(channel.mention)
+                    embed.description = "Message edited in {}".format(before.channel.mention)
 
                     embed.color = Color.random()
                     old_attachments = bool(before.attachments)
@@ -76,7 +75,7 @@ class logger(Cog):
                 try:
                     channel = await self.bot.fetch_channel(logger)
                     embed = Embed()
-                    embed.description = "Message deleted in {}".format(channel.mention)
+                    embed.description = "Message deleted in {}".format(message.channel.mention)
                     embed.color = Color.random()
                     attachments = bool(message.attachments)
                     content = bool(message.content)
@@ -105,7 +104,7 @@ class logger(Cog):
 
     @Cog.listener()
     async def on_member_update(self, before: Member, after: Member):
-        if not self.bot.user.id:
+        if not before.bot:
             logger = get_member_logger(before.guild.id)
             if logger == None:
                 pass
