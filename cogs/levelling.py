@@ -199,14 +199,14 @@ class levelling(Cog):
         if isinstance(error, app_commands.CommandOnCooldown):
             cooldown = Embed(
                 description=f"You have already checked your level!\nTry again after `{round(error.retry_after, 2)} seconds`", color=Color.random())
-            await ctx.response.send_message(embed=cooldown)
+            await ctx.followup.send(embed=cooldown)
 
     @profile.error
     async def profile_error(self, ctx: Interaction, error: AppCommandError):
         if isinstance(error, app_commands.CommandOnCooldown):
             cooldown = Embed(
                 description=f"You have already checked your profile!\nTry again after `{round(error.retry_after, 2)} seconds`", color=Color.random())
-            await ctx.response.send_message(embed=cooldown)
+            await ctx.followup.send(embed=cooldown)
 
 
 async def setup(bot: Bot):

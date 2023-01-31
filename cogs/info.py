@@ -44,7 +44,7 @@ class slashinfo(Cog):
                 name="Uptime", value=f"{uptime} hours", inline=True)
 
             embed.add_field(name="Invites",
-                            value="• [Invite me to your server](https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=1428479601718&scope=bot%20applications.commands)\n• [Vote for me](https://top.gg/bot/831993597166747679)\n• [Join the support server](https://discord.gg/jh7jkuk2pp)\n• [Go to my website to learn more about me](https://jeannebot.gitbook.io/jeannebot/)", inline=True)
+                            value="• [Invite me to your server]https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=1429553343542&scope=bot%20applications.commands)\n• [Vote for me](https://top.gg/bot/831993597166747679)\n• [Join the support server](https://discord.gg/jh7jkuk2pp)\n• [Go to my website to learn more about me](https://jeannebot.gitbook.io/jeannebot/)", inline=True)
 
             embed.set_thumbnail(
                 url=self.bot.user.avatar)
