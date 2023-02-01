@@ -9,7 +9,7 @@ class help_button(ui.View):
 
         wiki_url = 'https://jeannebot.gitbook.io/jeannebot/help'
         haze_url = 'https://discord.gg/jh7jkuk2pp'
-        tos_and_policy_url = 'https://jeannebot.nicepage.io/ToS-and-Privacy-Policy.html'
+        tos_and_policy_url = 'https://jeannebot.gitbook.io/jeannebot/tos-and-privacy'
 
         self.add_item(ui.Button(style=ButtonStyle.link,
                       label="Jeanne Webiste", url=wiki_url))
@@ -20,7 +20,7 @@ class help_button(ui.View):
 
 
 class help(Cog):
-    def __init__(self, bot:Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @app_commands.command(description="Get help from the wiki or join the support server for further help")
@@ -28,11 +28,11 @@ class help(Cog):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            view=help_button()
+            view = help_button()
             help = Embed(
                 description="Click on one of the buttons to open the documentation or get help on the support server")
             await ctx.response.send_message(embed=help, view=view)
 
 
-async def setup(bot:Bot):
+async def setup(bot: Bot):
     await bot.add_cog(help(bot))

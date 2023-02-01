@@ -14,12 +14,12 @@ class fun(Cog):
 
     @app_commands.command(name='8ball', description="Ask 8 ball anything and you will get your awnser")
     @app_commands.describe(question="Add your question")
-    async def _8ball(self, ctx: Interaction, question:str):
+    async def _8ball(self, ctx: Interaction, question: str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            embed = Embed(color=0x0000FF)
+            embed = Embed(color=Color.random())
             embed.add_field(name="Question:",
                             value=f'{question}', inline=False)
             embed.add_field(
@@ -28,7 +28,7 @@ class fun(Cog):
 
     @app_commands.command(description="Say something and I will say it in reversed text")
     @app_commands.describe(text="What are you reversing?")
-    async def reverse(self, ctx: Interaction, text:str):
+    async def reverse(self, ctx: Interaction, text: str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -65,14 +65,14 @@ class fun(Cog):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            animeme = Embed(color=0x0000FF)
+            animeme = Embed(color=Color.random())
             animeme.set_image(url=get_animeme_pic())
             animeme.set_footer(text="Fetched from animeme1936")
             await ctx.followup.send(embed=animeme)
 
     @app_commands.command(description="Combine 2 words to get 2 combined words")
     @app_commands.describe(first_word="Add first word", second_word="Add second word")
-    async def combine(self, ctx: Interaction, first_word:str, second_word:str):
+    async def combine(self, ctx: Interaction, first_word: str, second_word: str):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -88,7 +88,7 @@ class fun(Cog):
             combine2 = "".join([option2_name1letters, option2_name2letters])
 
             combine = Embed(
-                description=f"**1st combine word**: {combine1}\n**2nd combined word**:{combine2}", color=0x0000FF)
+                description=f"**1st combine word**: {combine1}\n**2nd combined word**:{combine2}", color=Color.random())
             combine.set_author(name=f"{first_word} + {second_word}")
             await ctx.followup.send(embed=combine)
 
@@ -101,7 +101,7 @@ class fun(Cog):
         else:
             choices = choices.split(sep=",")
             choose = Embed(
-                description=f"I chose **{choice(choices)}**", color=0x0000FF)
+                description=f"I chose **{choice(choices)}**", color=Color.random())
             await ctx.followup.send(embed=choose)
 
     @app_commands.command(description="Check how much of a simp you are")
@@ -129,7 +129,7 @@ class fun(Cog):
 
     @app_commands.command(description="Check how gay you are")
     @app_commands.describe(member="Which member?")
-    async def gayrate(self, ctx: Interaction, member: Optional[Member] =None):
+    async def gayrate(self, ctx: Interaction, member: Optional[Member] = None):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -149,6 +149,7 @@ class fun(Cog):
                 gay.set_image(url="https://i.imgur.com/tYAbWCl.jpg")
 
             await ctx.followup.send(embed=gay)
+
 
 async def setup(bot: Bot):
     await bot.add_cog(fun(bot))

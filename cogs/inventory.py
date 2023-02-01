@@ -1,5 +1,5 @@
 from assets.buttons import Confirmation
-from db_functions import add_user_custom_wallpaper, add_user_wallpaper, check_botbanned_user, fetch_user_inventory, fetch_wallpapers, get_balance, create_user_inventory, get_wallpaper, use_wallpaper
+from db_functions import add_user_custom_wallpaper, add_user_wallpaper, check_botbanned_user, fetch_user_inventory, fetch_wallpapers, get_balance, get_wallpaper, use_wallpaper
 from discord import *
 from discord.ext.commands import Bot, GroupCog
 from assets.generators.level_card import Level
@@ -18,9 +18,9 @@ class Shop_Group(GroupCog, name="shop"):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
+            
             qp = self.bot.get_emoji(980772736861343774)
             await ctx.followup.send(embed=fetch_wallpapers(qp))
-
 
 class Background_Group(GroupCog, name="background"):
     def __init__(self, bot: Bot) -> None:
@@ -41,7 +41,7 @@ class Background_Group(GroupCog, name="background"):
             qp = self.bot.get_emoji(980772736861343774)
             wallpaper = get_wallpaper(item_id)
             embed = Embed(title="Preview background")
-            embed.color = ctx.user.color
+            embed.color = Color.random()
             embed.add_field(name="Name", value=wallpaper[1], inline=True)
             embed.add_field(name="Price", value=f"1000 {qp}", inline=True)
             embed.set_image(url=wallpaper[2])
@@ -95,23 +95,21 @@ class Background_Group(GroupCog, name="background"):
 
                     file = File(fp=image, filename=f'preview_level_card.png')
 
-                    preview = Embed(description="This is the preview of the level card.", color=Color.blue()).add_field(
+                    preview = Embed(description="This is the preview of the level card.", color=Color.random()).add_field(
                         name="Cost", value=f"{wallpaper[3]} {qp}").set_footer(text="Is this the background you wanted?")
                     view = Confirmation(ctx.user)
-                    await ctx.edit_original_response(content=None, file=[file], embed=preview, view=view)
+                    await ctx.edit_original_response(content=None, attachments=[file], embed=preview, view=view)
                     await view.wait()
 
                     if view.value == None:
                         await ctx.edit_original_response(content="Timeout", view=None, embed=None)
-                    elif view.value == True:
-                        if create_user_inventory(ctx.user.id) == False:
-                            pass
+                    elif view.value:
                         add_user_wallpaper(ctx.user.id, item_id)
                         embed1 = Embed(
-                            description=f"Background wallpaper bought and selected", color=Color.blue())
+                            description=f"Background wallpaper bought and selected", color=Color.random())
                         await ctx.edit_original_response(embed=embed1, view=None)
 
-                    elif view.value == False:
+                    else:
                         await ctx.edit_original_response(content="Cancelled", view=None, embed=None)
 
     @app_commands.command(description='Select a wallpaper')
@@ -121,14 +119,12 @@ class Background_Group(GroupCog, name="background"):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            user_inv = fetch_user_inventory(ctx.user.id)
-
-            if f'{name}.png' in user_inv:
+            try:
                 use_wallpaper(name, ctx.user.id)
                 embed = Embed(
-                    description=f"{name} has been selected", color=ctx.user.color)
+                    description=f"{name} has been selected", color=Color.random())
                 await ctx.followup.send(embed=embed)
-            else:
+            except:
                embed = Embed(
                    description="This background image is not in your inventory", color=Color.red())
                await ctx.followup.send(embed=embed)
@@ -171,21 +167,19 @@ class Background_Group(GroupCog, name="background"):
                 view = Confirmation(ctx.user)
                 await ctx.edit_original_response(content=None, embed=preview, attachments=[file], view=view)
                 await view.wait()
-                if view.value == True:
-                    if create_user_inventory(ctx.user.id) == False:
-                        pass
-                    else:
-                        create_user_inventory(ctx.user.id)
+                
+                if view.value == None:
+                    await ctx.edit_original_response(content="Time out", embed=None, view=None)
+                if view.value:
                     add_user_custom_wallpaper(ctx.user.id, name, link)
 
                     embed1 = Embed(
-                        description="Background wallpaper bought and selected", color=Color.blue())
+                        description="Background wallpaper bought and selected", color=Color.random())
                     await ctx.edit_original_response(embed=embed1, view=None)
 
-                elif view.value == False:
+                else:
                     await ctx.edit_original_response(content="Cancelled", embed=None, view=None)
-                elif view.value == None:
-                    await ctx.edit_original_response(content="Time out", embed=None, view=None)
+
 
     @app_commands.command(description='Check which backgrounds you have')
     async def list(self, ctx: Interaction):
@@ -193,18 +187,17 @@ class Background_Group(GroupCog, name="background"):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
-            try:
-                a = fetch_user_inventory(ctx.user.id)
-                inv = Embed(title="List of wallpapers you have",
-                            color=Color.blue())
-                inv.description = a
-                await ctx.followup.send(embed=inv)
-            except FileNotFoundError:
+            if fetch_user_inventory(ctx.user.id)==None:
                 embed = Embed(
                     description="Your inventory is empty", color=Color.red())
                 await ctx.followup.send(embed=embed)
-
-
+            else:
+                a = fetch_user_inventory(ctx.user.id)
+                inv = Embed(title="List of wallpapers you have",
+                            color=Color.random())
+                inv.description = a
+                await ctx.followup.send(embed=inv)
+                
 async def setup(bot: Bot):
     await bot.add_cog(Shop_Group(bot))
     await bot.add_cog(Background_Group(bot))

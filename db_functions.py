@@ -1,34 +1,34 @@
+from collections import OrderedDict
 from datetime import date, datetime, timedelta
 from shutil import rmtree
 from humanfriendly import parse_timespan
-from discord import Embed, Color, Emoji
-from config import db, inv_db
-from os import listdir, makedirs, path
-from requests import get
+from discord import Embed, Color, Emoji, Guild, Member
+from config import db
+from json import loads
 
 current_time = date.today()
 
-def check_botbanned_user(user: int):
-    try:
-        botbanquery = db.execute(
-            "SELECT * FROM botbannedData WHERE user_id = ?", (user,))
-        botbanned_data = botbanquery.fetchone()
-        if user == botbanned_data[0]:
-            return(True)
-    except:
-        return(False)
 
+def check_botbanned_user(user: int) -> bool:
+    botbanned_data = db.execute(
+        "SELECT * FROM botbannedData WHERE user_id = ?", (user,)).fetchone()
+
+    if botbanned_data == None:
+        return False
+    else:
+        if user == botbanned_data[0]:
+            return True
 
 def get_balance(user: int):
-    a = db.execute("SELECT amount FROM bankData WHERE user_id = ?", (user,))
-    data = a.fetchone()
+    data = db.execute(
+        "SELECT amount FROM bankData WHERE user_id = ?", (user,)).fetchone()
 
     if data == None:
         return 0
     else:
         return data[0]
 
-def add_qp(user: int, amount: int):
+def add_qp(user: int, amount: int) -> int:
     cur = db.execute("INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)",
                      (user, amount, (current_time - timedelta(days=1))))
 
@@ -37,22 +37,21 @@ def add_qp(user: int, amount: int):
             "UPDATE bankData SET amount = amount + ? WHERE user_id = ?", (amount, user,))
     db.commit()
 
-
-def remove_qp(user: int, amount: int):
+def remove_qp(user: int, amount: int) -> int:
     db.execute(
         "UPDATE bankData SET amount = amount - ? WHERE user_id = ?", (amount, user,))
     db.commit()
 
-
-def give_daily(user: int):
+def give_daily(user: int) -> bool:
     current_time = datetime.now()
-    next_claim= current_time + timedelta(days=1)
-    data = db.execute("SELECT * FROM bankData WHERE user_id = ?", (user,)).fetchone()
+    next_claim = current_time + timedelta(days=1)
+    data = db.execute(
+        "SELECT * FROM bankData WHERE user_id = ?", (user,)).fetchone()
 
     if datetime.today().weekday() > 5:
-        qp=200
+        qp = 200
     else:
-        qp=100
+        qp = 100
 
     if data == None:
         cur = db.execute(
@@ -62,69 +61,58 @@ def give_daily(user: int):
             db.execute(
                 "UPDATE bankData SET claimed_date = ? , amount = amount + ? WHERE user_id = ?", (round(next_claim.timestamp()), qp, user,))
         db.commit()
-        return(True)
+        return True
 
     elif data[2] < round(current_time.timestamp()):
         db.execute(
             "UPDATE bankData SET claimed_date = ? , amount = amount + ? WHERE user_id = ?", (round(next_claim.timestamp()), qp, user,))
         db.commit()
-        return(True)
+        return True
 
     else:
-        return(False)
+        return False
 
-def get_next_daily(user:int):
-    data = db.execute("SELECT claimed_date FROM bankData WHERE user_id = ?", (user,)).fetchone()
+def get_next_daily(user: int):
+    data = db.execute(
+        "SELECT claimed_date FROM bankData WHERE user_id = ?", (user,)).fetchone()
     db.commit()
     return data[0]
 
-
 def add_botbanned_user(user: int, reason: str):
-        db.execute(
-            "INSERT OR IGNORE INTO botbannedData (user_id, reason) VALUES (?,?)", (user, reason,))
+    db.execute("INSERT OR IGNORE INTO botbannedData (user_id, reason) VALUES (?,?)", (user, reason,))
 
-        cur = db.cursor()
+    server_xp_data=db.execute("SELECT * FROM serverxpData WHERE user_id = ?", (user,)).fetchall()
+    global_xp_data=db.execute("SELECT * FROM globalxpData WHERE user_id = ?", (user,)).fetchone()
+    inventory_data=db.execute("SELECT * FROM userWallpaperData WHERE user_id = ?", (user,)).fetchall()
+    bank_data = db.execute("SELECT * FROM bankData WHERE user_id = ?", (user,)).fetchone()
+    
+    if server_xp_data == None:
+        pass
+    else:
+        db.executemany("DELETE FROM serverxpData WHERE user_id = ?", (user,))
 
-        cur.execute("SELECT * FROM serverxpData WHERE user_id = ?", (user,))
-        server_user_id = cur.fetchall()
+    if global_xp_data == None:
+        pass
+    else:
+        db.execute("SELECT * FROM globalxpData WHERE user_id = ?", (user,))
 
-        if server_user_id == None:
-            pass
+    if inventory_data == None:
+        pass
 
-        else:
-            cur.execute("DELETE FROM serverxpData WHERE user_id = ?", (user,))
+    else:
+        db.executemany("DELETE FROM userWallpaperData WHERE user_id = ?", (user,))
 
-        cur.execute("SELECT * FROM globalxpData WHERE user_id = ?", (user,))
-        global_user_id = cur.fetchone()
+    if bank_data == None:
+        pass
+    else:
+        db.execute("DELETE FROM bankData WHERE user_id = ?", (user,))
+    
+    db.commit()
 
-        if global_user_id == None:
-            pass
-
-        else:
-            cur.execute("DELETE FROM globalxpData WHERE user_id = ?", (user,))
-
-        cur.execute("SELECT * FROM bankData WHERE user_id = ?", (user,))
-        user_bank = cur.fetchone()
-
-        if user_bank == None:
-            pass
-
-        else:
-            cur.execute("DELETE FROM bankData WHERE user_id = ?", (user,))
-
-        try:
-            rmtree("./User_Inventories/{}".format(user))
-        except:
-            pass
-
-        db.commit()
-
-
-
-def fetch_wallpapers(qp:Emoji):
+def fetch_wallpapers(qp: Emoji) ->Embed:
     w = db.execute("SELECT * FROM wallpapers").fetchall()
 
-    backgrounds = Embed(title='Avaliable Background Pictures for Level Cards', color=Color.blue(
+    backgrounds = Embed(title='Avaliable Background Pictures for Level Cards', color=Color.random(
     )).set_footer(text="To view them, click on the hyperlinked names")
 
     for a in w:
@@ -133,94 +121,122 @@ def fetch_wallpapers(qp:Emoji):
     db.commit()
     return backgrounds
 
-
 def get_wallpaper(item_id: str):
     wallpaper = db.execute(
         'SELECT * FROM wallpapers WHERE id = ?', (item_id,)).fetchone()
     db.commit()
     return wallpaper
 
+def deselect_wallpaper(user:int):
+    wallpaper=db.execute("SELECT wallpaper FROM userWallpaperInventory WHERE user_id = ? AND selected = ?", (user, 1,))
+    if wallpaper == None:
+        return None
+    else:
+        db.execute("UPDATE userWallpaperInventory SET selected = ? WHERE user_id = ? AND wallpaper = ?", (0, user, wallpaper[0],))
+    db.commit()
 
-def create_user_inventory(user):
-    try:
-        makedirs('./User_Inventories/{}/wallpapers'.format(str(user)))
-    except:
-        return(False)
-
-
-def add_user_wallpaper(user, item_id):
+def add_user_wallpaper(user:int, item_id:int):
     wallpaper = get_wallpaper(item_id)
 
-    img_data = get(wallpaper[2]).content
+    if deselect_wallpaper(user)==None:
+        pass
 
-    with open(r"./User_Inventories/{}/wallpapers/{}.png".format(str(user), wallpaper[1]), 'wb') as handler:
-        handler.write(img_data)
+    db.execute(
+        "INSERT OR IGNORE INTO userWallpaperInventory (user_id, wallpaper, link, brightness, selected) VALUES (?,?,?,?,?)", (user, wallpaper[1],wallpaper[2],100,1))
+    db.commit()
 
-    data=db.execute("INSERT OR IGNORE INTO userWallpaperInventory (user_id, wallpaper) VALUES (?,?)", (user, wallpaper[1],))
-
-    if data.rowcount==0:
-        db.execute("UPDATE userWallpaperInventory SET wallpaper = ? WHERE user_id = ?", (wallpaper[1], user,))
     remove_qp(user, 1000)
-
 
 def add_user_custom_wallpaper(user: int, name: str, link: str):
+    if deselect_wallpaper(user) == None:
+        pass
 
-    img_data = get(link).content
-
-    with open(r"./User_Inventories/{}/wallpapers/{}.png".format(str(user), name), 'wb') as handler:
-        handler.write(img_data)
-
-    data = db.execute(
-        "INSERT OR IGNORE INTO userWallpaperInventory (user_id, wallpaper) VALUES (?,?)", (user, name,))
-
-    if data.rowcount == 0:
-        db.execute(
-            "UPDATE userWallpaperInventory SET wallpaper = ? WHERE user_id = ?", (name, user,))
+    db.execute(
+        "INSERT OR IGNORE INTO userWallpaperInventory (user_id, wallpaper, link, brightness, selected) VALUES (?,?,?,?,?)", (user, name, link, 100,1,))
 
     remove_qp(user, 1000)
 
-def selected_wallpaper(user):
+def selected_wallpaper(user:int):
     try:
-        wallpaper=db.execute("SELECT wallpaper FROM userWallpaperInventory WHERE user_id = ?", (user,)).fetchone()
+        wallpaper = db.execute(
+            "SELECT * FROM userWallpaperInventory WHERE user_id = ? and selected = ?", (user,1,)).fetchone()
         db.commit()
-        image = path.join(
-            path.dirname(__file__), 'User_Inventories', str(user), 'wallpapers', '{}.png'.format(wallpaper[0]))
-        return image
+        return wallpaper
     except:
         return ''
 
 def use_wallpaper(name, user):
+    if deselect_wallpaper(user) == None:
+        pass
     db.execute(
-        "UPDATE userWallpaperInventory SET wallpaper = ? WHERE user_id = ?", (name, user,))
+        "UPDATE userWallpaperInventory SET selected = ? WHERE wallpaper = ? AND user_id = ?", (1, name, user,))
+    db.commit()
 
-def fetch_user_inventory(user: int):
-    wallpapers = [wallpaper.strip('.png') for wallpaper in listdir(
-        "./User_Inventories/{}/wallpapers/".format(user)) if wallpaper.endswith('.png')]
-    wallpapers.sort()
-    return "\n".join(wallpapers)
-    
+def fetch_user_inventory(user: int) -> (str | None):
+    wallpapers = db.execute("SELECT * FROM userWallpaperInventory WHERE user = ?", (user,)).fetchall()
+
+    if wallpapers == None:
+        return None
+    else:
+        for data in wallpapers:
+            return f"[{data[1]}]({data[2]})\n"
+
+def set_brightness(user:int, brightness:int):
+    try:
+        db.execute("UPDATE userWallpaperInventory SET brightness = ? WHERE user_id = ? AND selected = ?", (brightness, user, 1,))
+        db.commit()
+    except:
+        return False
+
+def set_bio(user:int, bio:str):
+    cur = db.execute("INSERT OR IGNORE INTO userBio (user_id, bio) VALUES (?,?)", (user, bio,))
+
+    if cur.rowcount == 0:
+        db.execute("UPDATE userBio SET bio = ? WHERE user_id = ?", (bio, user,))
+    db.commit()
+
+def get_bio(user:int):
+    data=db.execute("SELECT bio FROM userBio WHERE user_id = ?", (user,)).fetchone()
+
+    if data == None:
+        return None
+    else:
+        return data[0]
+
+def set_color(user:int, color:str):
+    cur = db.execute("INSERT OR IGNORE INTO userBio (user_id, color) VALUES (?,?)", (user, color,))
+
+    if cur.rowcount == 0:
+        db.execute("UPDATE userBio SET color = ? WHERE user_id = ?", (color, user,))
+    db.commit()
 
 
-def get_member_xp(member: int, server: int):
+def get_color(user: int):
+    data = db.execute(
+        "SELECT color FROM userBio WHERE user_id = ?", (user,)).fetchone()
+
+    if data == None:
+        return None
+    else:
+        return data[0]
+
+def get_member_xp(member: int, server: int)->int:
     xp = db.execute("SELECT exp FROM serverxpData WHERE user_id = ? AND guild_id = ?",
                     (member, server,)).fetchone()
     db.commit()
     return xp[0]
 
-
-def get_user_xp(user: int):
+def get_user_xp(user: int) ->int:
     xp = db.execute(
         "SELECT exp FROM globalxpData WHERE user_id = ?", (user,)).fetchone()
     db.commit()
     return xp[0]
 
-
-def get_member_cumulated_xp(member: int, server: int):
+def get_member_cumulated_xp(member: int, server: int)->int:
     cumulated_exp = db.execute(
         "SELECT cumulative_exp FROM serverxpData WHERE user_id = ? AND guild_id = ?", (member, server,)).fetchone()
     db.commit()
     return cumulated_exp[0]
-
 
 def get_user_cumulated_xp(user: int):
     cumulated_exp = db.execute(
@@ -228,13 +244,11 @@ def get_user_cumulated_xp(user: int):
     db.commit()
     return cumulated_exp[0]
 
-
 def get_member_level(member: int, server: int):
     level = db.execute(
         "SELECT lvl FROM serverxpData WHERE user_id = ? AND guild_id = ?", (member, server,)).fetchone()
     db.commit()
     return level[0]
-
 
 def get_user_level(user: int):
     level = db.execute(
@@ -242,12 +256,11 @@ def get_user_level(user: int):
     db.commit()
     return level[0]
 
-
 def add_xp(member: int, server: int):
     if datetime.today().weekday() > 5:
-        xp=10
+        xp = 10
     else:
-        xp=5
+        xp = 5
     cursor1 = db.execute("INSERT OR IGNORE INTO serverxpData (guild_id, user_id, lvl, exp, cumulative_exp) VALUES (?,?,?,?,?)", (
         server, member, 0, xp, xp,))
 
@@ -263,7 +276,7 @@ def add_xp(member: int, server: int):
 
         db.execute("UPDATE serverxpData SET exp = ?, cumulative_exp = ? WHERE guild_id = ? AND user_id = ?",
                    (server_updated_exp, server_updated_cumulative_exp, server, member,))
-
+        
     db.commit()
 
     if cursor2.rowcount == 0:
@@ -278,6 +291,34 @@ def add_xp(member: int, server: int):
 
     db.commit()
 
+def add_level_channel(server:int, channel:int, message:str=None):
+    if not message:
+        message = 0
+
+    cur=db.execute("INSERT OR IGNORE INTO levelNotifierData (server_id, channel_id, message) VALUES (?,?,?)", (server, channel, message,))
+
+    if cur.rowcount==0:
+        if channel:
+            db.execute("UPDATE levelNotifierData SET channel_id = ? WHERE server_id =?", (channel, server,))
+        if message:
+            db.execute(
+                "UPDATE levelNotifierData SET message = ? WHERE server_id =?", (message, server,))
+    db.commit()
+
+def get_level_channel(member:Member, server:Guild):
+    data = db.execute("SELECT * FROM levelNotifierData WHERE server_id = ?", (server.id,)).fetchone()
+    
+    server_cumulated_exp = get_member_cumulated_xp(member.id, server.id)
+    server_level = get_member_level(member.id, server.id)
+    server_next_lvl_exp = ((server_level * 50) +
+                           ((server_level - 1) * 25) + 50)
+    db.commit()
+    if server_cumulated_exp >= server_next_lvl_exp:
+        if data == None:
+            return None
+        else:
+            return data
+
 
 def add_level(member: int, server: int):
     server_cumulated_exp = get_member_cumulated_xp(member, server)
@@ -289,6 +330,12 @@ def add_level(member: int, server: int):
         server_updated_exp = server_cumulated_exp - server_next_lvl_exp
         db.execute("UPDATE serverxpData SET lvl = lvl + ?, exp = ? WHERE guild_id = ? AND user_id = ?",
                    (1, server_updated_exp, server, member,))
+        
+        data = db.execute("SELECT * FROM levelNotifierData WHERE server_id = ?", (server,)).fetchone()
+        if data == None:
+            return None
+        else:
+            return data
 
     db.commit()
 
@@ -365,13 +412,13 @@ def remove_welcomer(server: int):
     result = cur.fetchone()
 
     if result == None:
-        return(False)
+        return (False)
 
     else:
         cur.execute(
             "DELETE FROM welcomerData WHERE guild_id = ?", (server,))
         db.commit()
-        return(True)
+        return (True)
 
 
 def remove_leaver(server: int):
@@ -381,7 +428,7 @@ def remove_leaver(server: int):
     result = cur.fetchone()
 
     if result == None:
-        return(False)
+        return (False)
 
     else:
         cur.execute(
@@ -397,13 +444,14 @@ def remove_modloger(server: int):
     result = cur.fetchone()
 
     if result == None:
-        return(False)
+        return (False)
 
     else:
         cur.execute(
             "DELETE FROM modlogData WHERE guild_id = ?", (server,))
         db.commit()
-        return(True)
+        return (True)
+
 
 def remove_reporter(server: int):
     cur = db.cursor()
@@ -412,14 +460,32 @@ def remove_reporter(server: int):
     result = cur.fetchone()
 
     if result == None:
-        return(False)
+        return (False)
 
     else:
         cur.execute(
             "DELETE FROM reportData WHERE guild_id = ?", (server,))
 
         db.commit()
-        return(True)
+        return (True)
+
+
+def remove_levelup(server: int):
+    cur = db.cursor()
+    cur.execute(
+        "SELECT * FROM levelNotifierData WHERE server_id = ?", (server,))
+    result = cur.fetchone()
+
+    if result == None:
+        return (False)
+
+    else:
+        cur.execute(
+            "DELETE FROM levelNotifierData WHERE server_id = ?", (server,))
+
+        db.commit()
+        return (True)
+
 
 def warn_user(server: int, member: int, moderator: int, reason: str, warn_id: int, date: int):
 
@@ -448,17 +514,28 @@ def get_modlog_channel(server: int):
 def fetch_warnings_server(server: int):
     cur = db.cursor()
     warnings = cur.execute(
-        "SELECT * FROM warnDATAv2 WHERE guild_id = ?", (server,))
+        "SELECT * FROM warnDATAv2 WHERE guild_id = ?", (server,)).fetchall()
     db.commit()
-    return warnings
+    if len(warnings) == 0:
+        return None
+    elif warnings == None:
+        return None
+    else:
+        return warnings
 
 
 def fetch_warnings_user(member: int, server: int):
     cur = db.cursor()
     warnings = cur.execute(
-        "SELECT * FROM warnDATA user WHERE user_id = ? AND guild_id = ?", (member, server,))
+        "SELECT * FROM warnDATA user WHERE user_id = ? AND guild_id = ?", (member, server,)).fetchall()
     db.commit()
-    return warnings
+
+    if len(warnings)==0:
+        return None
+    elif warnings == None:
+        return None
+    else:
+        return warnings
 
 
 def check_warn_id(server: int, warn_id: int):
@@ -479,7 +556,8 @@ def revoke_warn(member: int, server: int, warn_id: int):
     cur = db.cursor()
     cur.execute("DELETE FROM warnData WHERE warn_id = ?", (warn_id,))
 
-    cur.execute("UPDATE warnDatav2 SET warn_points = warn_points - ? WHERE user_id = ? AND guild_id = ?", (1, member, server))
+    cur.execute(
+        "UPDATE warnDatav2 SET warn_points = warn_points - ? WHERE user_id = ? AND guild_id = ?", (1, member, server))
 
     wp_query = cur.execute(
         f"SELECT warn_points FROM warnDatav2 WHERE user_id = ? AND guild_id = ?", (member, server))
@@ -521,49 +599,52 @@ def get_leaver(server: int):
         "SELECT channel_id FROM leaverData where guild_id = ?", (server,)).fetchone()
     return data[0]
 
-def add_wallpaper(id, name, link):
-    inv_db.execute("INSERT OR IGNORE INTO wallpapers (id, name, link, price) VALUES (?,?,?,?)", (id, name, link, 1000,))
-    db.commit()
-
 def check_mute_role(guild_id: int):
-    role = db.execute("SELECT role_id FROM muteroleData WHERE guild_id = ?", (guild_id,)).fetchone()
+    role = db.execute(
+        "SELECT role_id FROM muteroleData WHERE guild_id = ?", (guild_id,)).fetchone()
     db.commit()
-    if role ==None:
-        return(False)
+    if role == None:
+        return (False)
     else:
         return role[0]
-    
 
-def add_mute_role(guild:int, role_id:int):
-    role=db.execute("INSERT OR IGNORE INTO muteroleData (guild_id, role_id) VALUES (?,?)", (guild, role_id,))
 
-    if role.rowcount==0:
-        db.execute("UPDATE muteroleData SET role_id = ? WHERE guild_id = ?", (role_id, guild,))
+def add_mute_role(guild: int, role_id: int):
+    role = db.execute(
+        "INSERT OR IGNORE INTO muteroleData (guild_id, role_id) VALUES (?,?)", (guild, role_id,))
+
+    if role.rowcount == 0:
+        db.execute(
+            "UPDATE muteroleData SET role_id = ? WHERE guild_id = ?", (role_id, guild,))
 
     db.commit()
 
-def mute_member(member:int, guild:int, ends:str=None):
-    
-    if ends ==None:
-        ends=99999999999 #infinite value for now
+
+def mute_member(member: int, guild: int, ends: str =None):
+
+    if ends == None:
+        ends = 99999999999  # infinite value for now
     else:
         seconds = parse_timespan(ends)
         ends = round((datetime.now() + timedelta(seconds=seconds)).timestamp())
-        
-    
-    data=db.execute("INSERT OR IGNORE INTO mutedMembers (user_id, guild_id, ends) VALUES (?,?,?)", (member, guild, ends,))
-    
-    if data.rowcount==0:
-        db.execute("UPDATE mutedMembers SET ends = ? WHERE user_id = ? AND guild_id = ?", (ends, member, guild,))
+
+    data = db.execute(
+        "INSERT OR IGNORE INTO mutedMembers (user_id, guild_id, ends) VALUES (?,?,?)", (member, guild, ends,))
+
+    if data.rowcount == 0:
+        db.execute(
+            "UPDATE mutedMembers SET ends = ? WHERE user_id = ? AND guild_id = ?", (ends, member, guild,))
 
     db.commit()
+
 
 def get_muted_data():
     data = db.execute("SELECT * FROM mutedMembers").fetchall()
     db.commit()
     return data
 
-def remove_mute(member:int, guild:int):
+
+def remove_mute(member: int, guild: int):
     db.execute("DELETE FROM mutedMembers WHERE user_id = ? AND guild_id = ?",
                (member, guild,))
     db.commit()
@@ -573,6 +654,7 @@ def get_softban_data():
     data = db.execute("SELECT * FROM softbannedMembers").fetchall()
     db.commit()
     return data
+
 
 def softban_member(member: int, guild: int, ends: str = None):
 
@@ -587,38 +669,47 @@ def softban_member(member: int, guild: int, ends: str = None):
 
     db.commit()
 
-def remove_softban(member:int, guild:int):
+
+def remove_softban(member: int, guild: int):
     db.execute("DELETE FROM softbannedMembers WHERE user_id = ? AND guild_id = ?",
                (member, guild,))
     db.commit()
 
-def set_message_logger(server:int, channel:int):
-    cur=db.execute("INSERT OR IGNORE INTO messageLogData (server, channel) VALUES (?,?)", (server, channel,))
 
-    if cur.rowcount==0:
-        db.execute("UPDATE messageLogData SET channel = ? WHERE server = ?", (channel, server,))
+def set_message_logger(server: int, channel: int):
+    cur = db.execute(
+        "INSERT OR IGNORE INTO messageLogData (server, channel) VALUES (?,?)", (server, channel,))
+
+    if cur.rowcount == 0:
+        db.execute(
+            "UPDATE messageLogData SET channel = ? WHERE server = ?", (channel, server,))
     db.commit()
 
 
-def get_message_logger(server:int)->int:
+def get_message_logger(server: int) -> int:
     try:
-        channel = db.execute("SELECT channel FROM messageLogData WHERE server = ?", (server,)).fetchone()
+        channel = db.execute(
+            "SELECT channel FROM messageLogData WHERE server = ?", (server,)).fetchone()
         db.commit()
         return channel[0]
     except:
         return False
 
-def set_member_logger(server:int, channel:int):
-    cur=db.execute("INSERT OR IGNORE INTO memberLogData (server, channel) VALUES (?,?)", (server, channel,))
 
-    if cur.rowcount==0:
-        db.execute("UPDATE memberLogData SET channel = ? WHERE server = ?", (channel, server,))
+def set_member_logger(server: int, channel: int):
+    cur = db.execute(
+        "INSERT OR IGNORE INTO memberLogData (server, channel) VALUES (?,?)", (server, channel,))
+
+    if cur.rowcount == 0:
+        db.execute(
+            "UPDATE memberLogData SET channel = ? WHERE server = ?", (channel, server,))
     db.commit()
 
 
-def get_member_logger(server:int)->int:
+def get_member_logger(server: int) -> int:
     try:
-        channel = db.execute("SELECT channel FROM memberLogData WHERE server = ?", (server,)).fetchone()
+        channel = db.execute(
+            "SELECT channel FROM memberLogData WHERE server = ?", (server,)).fetchone()
         db.commit()
         return channel[0]
     except:
@@ -658,10 +749,124 @@ def remove_memberlog(server: int):
         db.commit()
         return (True)
 
+
 def get_cached_users():
-    data=db.execute("SELECT * FROM globalxpData").fetchall()
+    data = db.execute("SELECT * FROM globalxpData").fetchall()
     return len(data)
 
+
 def get_true_members():
-    data=db.execute("SELECT * FROM bankData").fetchall()
+    data = db.execute("SELECT * FROM bankData").fetchall()
     return len(data)
+
+
+def check_xpblacklist_channel(server: int, channel: int):
+    data = db.execute(
+        "SELECT * FROM xpChannelData WHERE server = ? AND channel = ?", (server, channel,)).fetchone()
+    db.commit()
+    if data == None:
+        return False
+    else:
+        return True
+
+
+def add_xpblacklist(server: int, channel: int):
+    db.execute(
+        "INSERT OR IGNORE INTO xpChannelData (server, channel) VALUES (?,?)", (server, channel,))
+    db.commit()
+
+
+def remove_blacklist(server: int, channel: int):
+    db.execute(
+        "DELETE FROM xpChannelData WHERE server = ? AND channel = ?", (server, channel,))
+    db.commit()
+
+
+def set_welcomer_msg(server: int, json_script: str):
+    cur = db.execute(
+        "INSERT OR IGNORE INTO welcomerMsgData (server, welcoming, leaving) VALUES (?,?,?)", (server, json_script, 0,))
+
+    if cur.rowcount == 0:
+        db.execute(
+            "UPDATE welcomerMsgData SET welcoming = ? WHERE server = ?", (json_script, server,))
+    db.commit()
+
+
+def set_leaving_msg(server: int, json_script: str):
+    cur = db.execute(
+        "INSERT OR IGNORE INTO welcomerMsgData (server, welcoming, leaving) VALUES (?,?,?)", (server, 0, json_script,))
+
+    if cur.rowcount == 0:
+        db.execute(
+            "UPDATE welcomerMsgData SET leaving = ? WHERE server = ?", (json_script, server,))
+    db.commit()
+
+
+def get_welcoming_msg(server: int):
+    data = db.execute(
+        "SELECT welcoming FROM welcomerMsgData WHERE server = ?", (server,)).fetchone()
+
+    if data == None or 0:
+        return None
+    else:
+        return data[0]
+
+
+def get_leaving_msg(server: int):
+    data = db.execute(
+        "SELECT leaving FROM welcomerMsgData WHERE server = ?", (server,)).fetchone()
+
+    if data == None or 0:
+        return None
+    else:
+        return data[0]
+
+
+def remove_welcomer_msg(server: int):
+    data= db.execute("SELECT welcoming FROM welcomerMsgData WHERE server = ?", (server,)).fetchone()
+    db.commit()
+    if data==None:
+        return None
+    else:
+        db.execute("UPDATE welcomerMsgData SET welcoming = ? WHERE server = ?", (0, server,))
+        db.commit()
+
+def remove_leaving_msg(server: int):
+    data = db.execute(
+        "SELECT leaving FROM welcomerMsgData WHERE server = ?", (server,)).fetchone()
+    db.commit()
+    if data == None:
+        return None
+    else:
+        db.execute(
+            "UPDATE welcomerMsgData SET leaving = ? WHERE server = ?", (0, server,))
+        db.commit()
+
+def get_member_server_rank(member:Member):
+    result = db.execute('SELECT user_id FROM serverxpData WHERE guild_id = ? ORDER BY cumulative_exp DESC', (member.guild.id,)).fetchall()
+    all_ids = [m_id[0] for m_id in result]
+    try:
+        rank = all_ids.index(member.id) + 1
+        return rank
+    except ValueError:
+            return None
+
+def get_member_global_rank(member:Member):
+    result = db.execute('SELECT user_id FROM globalxpData ORDER BY cumulative_exp DESC').fetchall()
+    all_ids = [m_id[0] for m_id in result]
+    
+    try:
+        rank = all_ids.index(member.id) + 1
+        return rank
+    except ValueError:
+            return None
+
+def get_richest(member:Member):
+    result = db.execute('SELECT user_id FROM bankData ORDER BY amount DESC').fetchall()
+    all_ids = [m_id[0] for m_id in result]
+        
+    try:
+        rank = all_ids.index(member.id) + 1
+        return rank
+    except:
+        return 20   

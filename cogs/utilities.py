@@ -39,7 +39,7 @@ class invite_button(View):
         self.add_item(ui.Button(style=ButtonStyle.url,
                       label="DiscordBots", url=discordbots_url))
         self.add_item(ui.Button(style=ButtonStyle.url,
-                      label="HAZE", url=haze_url))
+                      label="Orleans", url=haze_url))
 
 
 class Weather_Group(GroupCog, name="weather"):
@@ -76,7 +76,7 @@ class Weather_Group(GroupCog, name="weather"):
                         wind_gust = js['wind']['speed']
 
                         embed = Embed(
-                            title=f'⛅ Weather details of {city} ⛅', description=f'{globe} Country: {count}', colour=ctx.user.color)
+                            title=f'⛅ Weather details of {city} ⛅', description=f'{globe} Country: {count}', colour=Color.random())
                         embed.add_field(
                             name=":newspaper: Description", value=desc, inline=True)
                         embed.add_field(
@@ -123,7 +123,7 @@ class Weather_Group(GroupCog, name="weather"):
                         windir = js['wind']['deg']
                         wind_gust = js['wind']['speed']
                         embed = Embed(
-                            title=f'⛅ Weather details of {zip_code} ⛅', description=f':earth_africa: Country: {count}', colour=ctx.user.color)
+                            title=f'⛅ Weather details of {zip_code} ⛅', description=f':earth_africa: Country: {count}', colour=Color.random())
                         embed.add_field(
                             name=":newspaper: Description", value=desc, inline=True)
                         embed.add_field(
@@ -160,7 +160,7 @@ class Embed_Group(GroupCog, name="embed"):
 
             if not jsonscript and not jsonfile:
                 embed = Embed(
-                    description="You are missing the JSON script or JSON file\nPlease use [Discohooks](https://discohook.org/)")
+                    description="You are missing the JSON script or JSON file\nPlease use [Discohook](https://discohook.org/)")
                 await ctx.followup.send(embed=embed)
             elif jsonscript and jsonfile:
                 embed = Embed(
@@ -262,7 +262,7 @@ class slashutilities(Cog):
         else:
             try:
                 answer = self.parser.parse(calculate).evaluate({})
-                calculation = Embed(title="Result", color=0x00FFFF)
+                calculation = Embed(title="Result", color=Color.random())
                 calculation.add_field(name=f"`{calculate}`", value=answer)
                 await ctx.followup.send(embed=calculation)
             except Exception as e:
@@ -279,7 +279,7 @@ class slashutilities(Cog):
             invite = Embed(
                 title="Invite me!",
                 description="Click on one of these buttons to invite me to you server or join my creator's server",
-                color=0x00bfff)
+                color=Color.random())
 
             await ctx.followup.send(embed=invite, view=invite_button())
 

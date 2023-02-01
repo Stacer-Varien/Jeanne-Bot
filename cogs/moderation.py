@@ -3,11 +3,12 @@ from discord import *
 from discord.ext.commands import Cog, Bot, GroupCog
 from discord.utils import utcnow
 from datetime import datetime, timedelta
-from humanfriendly import format_timespan, parse_timespan
+from humanfriendly import format_timespan, parse_timespan, InvalidTimespan
 from db_functions import *
 from assets.buttons import Confirmation
 from typing import Optional
 from discord.ext import tasks
+
 
 class ListWarns_Group(GroupCog, name="listwarns"):
     def __init__(self, bot: Bot) -> None:
@@ -20,12 +21,12 @@ class ListWarns_Group(GroupCog, name="listwarns"):
             pass
         else:
             await ctx.response.defer()
-            record = fetch_warnings_server(ctx.guild.id).fetchall()
-            if len(record) == 0:
-                await ctx.followup.send(f"No warnings up to date")
+            record = fetch_warnings_server(ctx.guild.id)
+            if record == None:
+                await ctx.followup.send("No warnings up to date")
             else:
                 embed = Embed(
-                    title=f"Currently warned members", colour=0xFF0000)
+                    title=f"Currently warned members", colour=Color.red())
                 embed.description = ""
                 for i in record:
                     warned_member = await self.bot.fetch_user(i[0])
@@ -44,8 +45,8 @@ class ListWarns_Group(GroupCog, name="listwarns"):
             if member == None:
                 member = ctx.user
 
-            record = fetch_warnings_user(member.id, ctx.guild.id).fetchall()
-            if len(record) == 0:
+            record = fetch_warnings_user(member.id, ctx.guild.id)
+            if record == None:
                 await ctx.followup.send(f"{member} has no warn IDs")
 
             else:
@@ -102,9 +103,6 @@ class Ban_Group(GroupCog, name="ban"):
                 if reason == None:
                     reason = 'Unspecified'
 
-                else:
-                    reason = reason
-
                 await member.ban(reason="{} | {}".format(reason, ctx.user))
 
                 ban = Embed(title="Member Banned", color=0xFF0000)
@@ -113,9 +111,12 @@ class Ban_Group(GroupCog, name="ban"):
                 ban.add_field(name="Moderator", value=ctx.user, inline=True)
                 ban.add_field(name="Reason", value=reason, inline=False)
                 if time:
-                    a = parse_timespan(time)
-                    softban_member(member.id, ctx.guild.id, time)
-                    time = format_timespan(a)
+                    try:
+                        a = parse_timespan(time)
+                        softban_member(member.id, ctx.guild.id, time)
+                        time = format_timespan(a)
+                    except:
+                        time="Invalid time added. User is banned permanently!"
                     ban.add_field(name="Duration", value=time, inline=True)
                 ban.set_thumbnail(url=member.display_avatar)
 
@@ -139,7 +140,6 @@ class Ban_Group(GroupCog, name="ban"):
         else:
             await ctx.response.defer()
             user = await self.bot.fetch_user(int(user_id))
-            guild = ctx.guild
             if reason == None:
                 reason = "Unspecified"
             else:
@@ -205,6 +205,15 @@ class Ban_Group(GroupCog, name="ban"):
                         cancelled = Embed(
                             description="Ban cancelled", color=Color.red())
                         await ctx.edit_original_response(embed=cancelled, view=None)
+
+    @user.error
+    async def ban_user_error(self, ctx:Interaction, error:app_commands.AppCommandError):
+        if isinstance(error, app_commands.CommandInvokeError):
+            if HTTPException:
+                embed = Embed()
+                embed.description="Invalid user ID given\nPlease try again"
+                embed.color=Color.red()
+                await ctx.followup.send(embed=embed)
 
 
 class Mute_Group(GroupCog, name="mute"):
@@ -293,9 +302,12 @@ class Mute_Group(GroupCog, name="mute"):
                     time = "Indefinitely"
                     mute_member(member.id, ctx.guild.id)
                 else:
-                    a = parse_timespan(time)
-                    mute_member(member.id, ctx.guild.id, time)
-                    time = format_timespan(a)
+                    try:
+                        a = parse_timespan(time)
+                        mute_member(member.id, ctx.guild.id, time)
+                        time = format_timespan(a)
+                    except:
+                        time = "Invalid time added. User is muted indefinitely!"
 
                 mute_role = ctx.guild.get_role(check_mute_role(ctx.guild.id))
                 await member.add_roles(mute_role, reason=reason)
@@ -402,7 +414,7 @@ class moderation(Cog):
                 await ctx.followup.send(embed=failed)
             elif member.id == ctx.guild.owner.id:
                 failed = Embed(
-                    description="You can't warn the owner of the server...".format(member), color=Color.red())
+                    description="You can't warn the owner of the server...", color=Color.red())
                 await ctx.followup.send(embed=failed)
             elif member == ctx.user:
                 failed = Embed(description="You can't warn yourself")
@@ -503,8 +515,6 @@ class moderation(Cog):
             else:
                 if reason == None:
                     reason = 'Unspecified'
-                else:
-                    reason = reason
 
                 try:
                     kickmsg = Embed(
@@ -656,8 +666,6 @@ class moderation(Cog):
 
                 if reason == None:
                     reason = "Unspecified"
-                else:
-                    reason = reason
 
                 timed = parse_timespan(time)
                 await member.edit(timed_out_until=utcnow()+timedelta(seconds=timed), reason="{} | {}".format(reason, ctx.user))
@@ -683,6 +691,14 @@ class moderation(Cog):
                         description=f"{member} has been muted. Check {modlog.mention}", color=0xFF0000)
                     await ctx.followup.send(embed=muted)
                     await modlog.send(embed=mute)
+
+    @timeout.error
+    async def timeout_error(self, ctx:Interaction, error:app_commands.AppCommandError):
+        if isinstance(error, app_commands.CommandInvokeError):
+                embed=Embed()
+                embed.description="Invalid time added. Please try again"
+                embed.color=Color.red()
+                await ctx.followup.send(embed=embed)
 
     @app_commands.command(description="Untimeouts a member")
     @app_commands.describe(member="Which member?", reason="Why are they untimeouted?")
@@ -774,10 +790,18 @@ class moderation(Cog):
 
                         try:
                             user = await self.bot.fetch_user(int(id))
-                            await ctx.guild.ban(user, reason=reason)
+                            try:
+                                banned = await ctx.guild.fetch_ban(user)
+                            except NotFound:
+                                banned = False
 
-                            massmb.description += "{} | `{}`\n".format(
-                                user, user.id)
+                            if banned:
+                                pass
+                            else:
+                                await ctx.guild.ban(user, reason=reason)
+
+                                massmb.description += "{} | `{}`\n".format(
+                                    user, user.id)
                         except:
                             continue
                     massmb.add_field(name="Reason", value=reason, inline=False)
@@ -802,8 +826,8 @@ class moderation(Cog):
                     await ctx.edit_original_response(embed=cancelled, view=None)
 
     @massban.error
-    async def massban_error(self, ctx: Interaction, error:app_commands.AppCommandError):
-        if isinstance(error, app_commands.CommandOnCooldown):
+    async def massban_error(self, ctx: Interaction, error: app_commands.AppCommandError):
+        if isinstance(error, app_commands.errors.CommandOnCooldown):
             reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
             reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
@@ -892,9 +916,7 @@ class moderation(Cog):
             reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
                 description=f"A massunban command was already used here in this server.\nTry again after <t:{reset_hour}:R>", color=0xff0000)
-            await ctx.followup.send(embed=cooldown)
-
-
+            await ctx.response.send_message(embed=cooldown)
 
 
 async def setup(bot: Bot):

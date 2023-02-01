@@ -10,11 +10,12 @@ from db_functions import add_qp, check_botbanned_user, get_balance, get_next_dai
 
 current_time = date.today()
 
+
 class Guess_Group(GroupCog, name="guess"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()
-    
+
     @app_commands.command(description="Guess my number and you can win 20 QP")
     @checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     async def free(self, ctx: Interaction):
@@ -24,7 +25,7 @@ class Guess_Group(GroupCog, name="guess"):
             await ctx.response.defer()
             qp = str(self.bot.get_emoji(980772736861343774))
             guessit = Embed(
-                description="I'm thinking of a number between 1 to 10.\nYou have 5 seconds to guess it!", color=0x00FFFF)
+                description="I'm thinking of a number between 1 to 10.\nYou have 5 seconds to guess it!", color=Color.random())
             await ctx.followup.send(embed=guessit)
 
             def is_correct(m: Message):
@@ -33,10 +34,10 @@ class Guess_Group(GroupCog, name="guess"):
             answer = randint(1, 10)
 
             try:
-                guess:Message = await self.bot.wait_for("message", check=is_correct, timeout=5.0)
+                guess: Message = await self.bot.wait_for("message", check=is_correct, timeout=5.0)
             except TimeoutError:
                 timeout = Embed(
-                    description=f"Sorry but you took too long. It was {answer}", color=0xFF0000)
+                    description=f"Sorry but you took too long. It was {answer}", color=Color.red())
                 timeout.set_image(url='https://i.imgur.com/faD48C3.jpg')
                 return await ctx.followup.send(embed=timeout)
 
@@ -44,15 +45,14 @@ class Guess_Group(GroupCog, name="guess"):
                 add_qp(ctx.user.id, 20)
 
                 correct = Embed(
-                    description=f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given 20 {qp}!", color=0x008000)
+                    description=f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given 20 {qp}!", color=Color.random())
                 correct.set_image(url='https://i.imgur.com/ICndRZg.gifv')
                 await ctx.followup.send(embed=correct)
             else:
                 wrong = Embed(
-                    description=f"Wrong answer. It was {answer}", color=0xFF0000)
+                    description=f"Wrong answer. It was {answer}", color=Color.red())
                 wrong.set_image(url='https://i.imgur.com/faD48C3.jpg')
                 await ctx.followup.send(embed=wrong)
-
 
     @app_commands.command(description='Guess my number and you can win 20 QP with betting')
     @app_commands.describe(bet="How much are you betting?")
@@ -79,7 +79,7 @@ class Guess_Group(GroupCog, name="guess"):
                 await ctx.followup.send(embed=zerobal)
             else:
                 guessit = Embed(
-                    description="I'm thinking of a number between 1 to 10.\nYou have 5 seconds to guess it!", color=0x00FFFF)
+                    description="I'm thinking of a number between 1 to 10.\nYou have 5 seconds to guess it!", color=Color.random())
                 await ctx.followup.send(embed=guessit)
 
                 def is_correct(m: Message):
@@ -88,10 +88,10 @@ class Guess_Group(GroupCog, name="guess"):
                 answer = randint(1, 10)
 
                 try:
-                    guess:Message = await self.bot.wait_for("message", check=is_correct, timeout=5.0)
+                    guess: Message = await self.bot.wait_for("message", check=is_correct, timeout=5.0)
                 except TimeoutError:
                     timeout = Embed(
-                        description=f"Sorry but you took too long. It was {answer}", color=0xFF0000)
+                        description=f"Sorry but you took too long. It was {answer}", color=Color.red())
                     timeout.set_image(url='https://i.imgur.com/faD48C3.jpg')
                     return await ctx.followup.send(embed=timeout)
 
@@ -99,37 +99,38 @@ class Guess_Group(GroupCog, name="guess"):
                     try:
                         add_qp(ctx.user.id, int(bet))
                         correct = Embed(
-                            description=f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given {int(bet)} {qp}!", color=0x008000)
+                            description=f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given {int(bet)} {qp}!", color=Color.random())
                         correct.set_image(
                             url='https://i.imgur.com/ICndRZg.gifv')
                     except:
                         correct = Embed(
-                            description="YES!", color=0x008000)
+                            description="YES!", color=Color.random())
                         correct.set_image(
                             url='https://i.imgur.com/ICndRZg.gifv')
                     await ctx.followup.send(embed=correct)
                 else:
                     remove_qp(ctx.user.id, int(bet))
                     wrong = Embed(
-                        description=f"Wrong answer. It was {answer}\nAfraid I have to take {int(bet)} {qp} from you...", color=0xFF0000)
+                        description=f"Wrong answer. It was {answer}\nAfraid I have to take {int(bet)} {qp} from you...", color=Color.red())
                     wrong.set_image(url='https://i.imgur.com/faD48C3.jpg')
                     await ctx.followup.send(embed=wrong)
 
     @free.error
-    async def free_error(self, ctx: Interaction, error:AppCommandError):
+    async def free_error(self, ctx: Interaction, error: AppCommandError):
         if isinstance(error, app_commands.CommandOnCooldown):
             reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
             reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
-                description=f"You have already used your free chance\nTry again after <t:{reset_hour}:R>", color=0xff0000)
+                description=f"You have already used your free chance\nTry again after <t:{reset_hour}:R>", color=Color.red())
             await ctx.response.send_message(embed=cooldown)
 
     @bet.error
-    async def bet_error(self, ctx: Interaction, error:AppCommandError):
+    async def bet_error(self, ctx: Interaction, error: AppCommandError):
         if isinstance(error, app_commands.CommandOnCooldown):
             cooldown = Embed(
-                description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`", color=0xff0000)
+                description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`", color=Color.red())
             await ctx.response.send_message(embed=cooldown)
+
 
 class Dice_Group(GroupCog, name="dice"):
     def __init__(self, bot: Bot) -> None:
@@ -139,7 +140,7 @@ class Dice_Group(GroupCog, name="dice"):
     @app_commands.command(description="Roll a dice for free 20 QP")
     @app_commands.describe(digit="Guess what will roll")
     @checks.cooldown(1, 3600, key=lambda i: (i.user.id))
-    async def free(self, ctx: Interaction, digit:int):
+    async def free(self, ctx: Interaction, digit: int):
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
@@ -148,7 +149,7 @@ class Dice_Group(GroupCog, name="dice"):
             qp = str(self.bot.get_emoji(980772736861343774))
             if int(digit) == rolled:
                 add_qp(ctx.user.id, 20)
-                embed = Embed(color=0x0000FF)
+                embed = Embed(color=Color.random())
                 embed.add_field(name=f"YAY! You got it!\n20 {qp} has been added",
                                 value=f"Dice rolled: **{rolled}**\You guessed: **{digit}**!", inline=False)
                 await ctx.followup.send(embed=embed)
@@ -158,10 +159,10 @@ class Dice_Group(GroupCog, name="dice"):
                 await ctx.followup.send(embed=embed)
 
     @app_commands.command(description="Roll a dice with betting")
-    @app_commands.describe(bet="How much are you betting?",digit="Guess what will roll")
+    @app_commands.describe(bet="How much are you betting?", digit="Guess what will roll")
     @checks.cooldown(1, 20, key=lambda i: (i.user.id))
-    async def bet(self, ctx: Interaction, bet:int, digit:int):
-        
+    async def bet(self, ctx: Interaction, bet: int, digit: int):
+
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
@@ -186,9 +187,9 @@ class Dice_Group(GroupCog, name="dice"):
             else:
                 if rolled == int(digit):
                     add_qp(ctx.user.id, int(bet))
-                    embed = Embed(color=0x0000FF)
+                    embed = Embed(color=Color.random())
                     embed.add_field(name=f"YAY! You got it!\n20 {qp} has been added",
-                            value=f"Dice rolled: **{rolled}**\You guessed: **{digit}**!", inline=False)
+                                    value=f"Dice rolled: **{rolled}**\You guessed: **{digit}**!", inline=False)
                     await ctx.followup.send(embed=embed)
 
                 else:
@@ -196,23 +197,24 @@ class Dice_Group(GroupCog, name="dice"):
                     embed = Embed(color=Color.red())
                     embed = Embed(
                         description=f"Oh no. It rolled a **{rolled}**", color=Color.red())
-                    await ctx.followup.send(embed=embed)  
+                    await ctx.followup.send(embed=embed)
 
     @free.error
-    async def free_error(self, ctx: Interaction, error:AppCommandError):
+    async def free_error(self, ctx: Interaction, error: AppCommandError):
         if isinstance(error, app_commands.CommandOnCooldown):
             reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
             reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
-                description=f"You have already used your free chance\nTry again after <t:{reset_hour}:R>", color=0xff0000)
+                description=f"You have already used your free chance\nTry again after <t:{reset_hour}:R>", color=Color.red())
             await ctx.response.send_message(embed=cooldown)
 
     @bet.error
     async def bet_error(self, ctx: Interaction, error: AppCommandError):
         if isinstance(error, app_commands.CommandOnCooldown):
             cooldown = Embed(
-                description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`", color=0xff0000)
+                description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`", color=Color.red())
             await ctx.response.send_message(embed=cooldown)
+
 
 class Flip_Group(GroupCog, name="flip"):
     def __init__(self, bot: Bot) -> None:
@@ -243,7 +245,7 @@ class Flip_Group(GroupCog, name="flip"):
 
             elif view.value == None:
                 timeout = Embed(
-                    description=f"Sorry but you took too long. It was {choice(jeannes_pick)}", color=0xFF0000)
+                    description=f"Sorry but you took too long. It was {choice(jeannes_pick)}", color=Color.red())
                 await ctx.edit_original_response(embed=timeout, view=None)
 
             else:
@@ -255,7 +257,7 @@ class Flip_Group(GroupCog, name="flip"):
     @app_commands.command(name='bet', description='Flip a coin and earn with betting')
     @app_commands.describe(bet="How much are you betting?")
     @checks.cooldown(1, 20, key=lambda i: (i.user.id))
-    async def bet(self, ctx: Interaction, bet:int):
+    async def bet(self, ctx: Interaction, bet: int):
         await ctx.response.defer()
         if check_botbanned_user(ctx.user.id) == True:
             pass
@@ -293,7 +295,7 @@ class Flip_Group(GroupCog, name="flip"):
 
                 elif view.value == None:
                     timeout = Embed(
-                        description=f"Sorry but you took too long. It was {choice(jeannes_pick)}", color=0xFF0000)
+                        description=f"Sorry but you took too long. It was {choice(jeannes_pick)}", color=Color.red())
                     await ctx.edit_original_response(embed=timeout, view=None)
 
                 else:
@@ -309,18 +311,19 @@ class Flip_Group(GroupCog, name="flip"):
             reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
             reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
-                description=f"You have already used your free chance\nTry again after <t:{reset_hour}:R>", color=0xff0000)
+                description=f"You have already used your free chance\nTry again after <t:{reset_hour}:R>", color=Color.red())
             await ctx.response.send_message(embed=cooldown)
 
     @bet.error
     async def bet_error(self, ctx: Interaction, error: AppCommandError):
         if isinstance(error, app_commands.CommandOnCooldown):
             cooldown = Embed(
-                description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`", color=0xff0000)
+                description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`", color=Color.red())
             await ctx.response.send_message(embed=cooldown)
 
+
 class currency(Cog):
-    def __init__(self, bot:Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @app_commands.command(description="Claim your daily")
@@ -332,12 +335,11 @@ class currency(Cog):
             tomorrow = round((datetime.now() + timedelta(days=1)).timestamp())
 
             if give_daily(ctx.user.id) == True:
-                balance=get_balance(ctx.user.id)
-                
+                balance = get_balance(ctx.user.id)
 
                 daily = Embed(
                     title="Daily", description=f"**{ctx.user}**, you claimed your daily reward.", color=ctx.user.color)
-                
+
                 if datetime.today().weekday() > 5:
                     daily.add_field(name="Rewards (weekend):",
                                     value=f"You received 200 {qp}")
@@ -363,24 +365,24 @@ class currency(Cog):
         else:
             await ctx.response.defer()
             qp = str(self.bot.get_emoji(980772736861343774))
-            bal=get_balance(ctx.user.id)
+            bal = get_balance(ctx.user.id)
 
             balance = Embed(
-                    description=f"You have {bal} {qp}", color=Color.blue())
+                description=f"You have {bal} {qp}", color=Color.blue())
             balance.add_field(
                 name=f"If you want more {qp}:", value="[Vote for me in TopGG](https://top.gg/bot/831993597166747679/vote)", inline=True)
             await ctx.followup.send(embed=balance)
 
     @balance.error
-    async def balance_error(self, ctx: Interaction, error:AppCommandError):
+    async def balance_error(self, ctx: Interaction, error: AppCommandError):
         if isinstance(error, app_commands.CommandOnCooldown):
             cooldown = Embed(
-                description=f"WOAH! Calm down! Why keep checking again quickly?\nTry again after `{round(error.retry_after, 2)} seconds`", color=0xff0000)
+                description=f"WOAH! Calm down! Why keep checking again quickly?\nTry again after `{round(error.retry_after, 2)} seconds`", color=Color.red())
             await ctx.response.send_message(embed=cooldown)
 
-async def setup(bot:Bot):
+
+async def setup(bot: Bot):
     await bot.add_cog(Guess_Group(bot))
     await bot.add_cog(Dice_Group(bot))
     await bot.add_cog(Flip_Group(bot))
     await bot.add_cog(currency(bot))
-    

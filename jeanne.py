@@ -35,7 +35,7 @@ intents.reactions = False
 intents.auto_moderation=False
 
 bot = Jeanne(command_prefix=when_mentioned_or('j!', 'J!', 'jeanne ', 'Jeanne'), intents=intents, #the prefix is owner only
-             allowed_mentions=AllowedMentions.all(), max_messages=1000)
+             allowed_mentions=AllowedMentions.all(), max_messages=10000)
 bot.remove_command('help')
 
 @bot.event

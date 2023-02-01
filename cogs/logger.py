@@ -1,6 +1,5 @@
 from discord import *
 from discord.ext.commands import Cog, Bot
-import random
 from db_functions import *
 
 
@@ -16,15 +15,19 @@ class logger(Cog):
                 pass
             else:
                 try:
+                    channel = await self.bot.fetch_channel(logger)
                     embed = Embed()
-                    embed.description = "Message edited"
-                    colors = [Color.red(), Color.blue(),
-                              Color.green(), Color.gold()]
-                    embed.color = random.choice(colors)
+                    embed.description = "Message edited in {}".format(before.channel.mention)
+
+                    embed.color = Color.random()
                     old_attachments = bool(before.attachments)
                     old_content = bool(before.content)
                     new_content = bool(after.content)
                     if old_content == True and old_attachments == False:
+                        if len(before.content) > 1024:
+                            before.content = before.content[:1020] + "..."
+                        if len(after.content) > 1024:
+                            after.content = after.content[:1020] + "..."
                         embed.add_field(name="Old message",
                                         value=before.content, inline=False)
                         if new_content == True:
@@ -34,6 +37,10 @@ class logger(Cog):
                             embed.add_field(name="New message",
                                             value="None (no message)", inline=False)
                     elif old_content == True and old_attachments == True:
+                        if len(before.content) > 1024:
+                            before.content = before.content[:1020] + "..."
+                        if len(after.content) > 1024:
+                            after.content = after.content[:1020] + "..."
                         embed.add_field(name="Old message",
                                         value=before.content, inline=False)
                         if new_content == True:
@@ -54,7 +61,6 @@ class logger(Cog):
                     embed.set_thumbnail(url=before.author.display_avatar)
                     embed.set_footer(text="Author: {} | {}".format(
                         before.author, before.author.id))
-                    channel = await self.bot.fetch_channel(logger)
                     await channel.send(embed=embed)
                 except AttributeError:
                     pass
@@ -67,17 +73,20 @@ class logger(Cog):
                 pass
             else:
                 try:
+                    channel = await self.bot.fetch_channel(logger)
                     embed = Embed()
-                    embed.description = "Message deleted"
-                    colors = [Color.red(), Color.blue(),
-                              Color.green(), Color.gold()]
-                    embed.color = random.choice(colors)
+                    embed.description = "Message deleted in {}".format(message.channel.mention)
+                    embed.color = Color.random()
                     attachments = bool(message.attachments)
                     content = bool(message.content)
                     if content == True and attachments == False:
+                        if len(message.content) > 1024:
+                            message.content = message.content[:1020] + "..."
                         embed.add_field(name="Message",
                                         value=message.content, inline=False)
                     elif content == True and attachments == True:
+                        if len(message.content) > 1024:
+                            message.content = message.content[:1020] + "..."
                         embed.add_field(name="Message",
                                         value=message.content, inline=False)
                         embed.set_image(url=message.attachments[0].url.replace(
@@ -89,14 +98,13 @@ class logger(Cog):
                     embed.set_thumbnail(url=message.author.display_avatar)
                     embed.set_footer(text="Author: {} | {}".format(
                         message.author, message.author.id))
-                    channel = await self.bot.fetch_channel(logger)
                     await channel.send(embed=embed)
                 except AttributeError:
                     pass
 
     @Cog.listener()
     async def on_member_update(self, before: Member, after: Member):
-        if not self.bot.user.id:
+        if not before.bot:
             logger = get_member_logger(before.guild.id)
             if logger == None:
                 pass
@@ -112,10 +120,7 @@ class logger(Cog):
                 elif before.guild_avatar != after.guild_avatar:
                     embed.description = "Avatar change"
                     embed.set_thumbnail(url=after.guild_avatar)
-
-                colors = [Color.red(), Color.blue(),
-                          Color.green(), Color.gold()]
-                embed.color = random.choice(colors)
+                embed.color = Color.random()
                 embed.set_footer(
                     text="Member: {} | `{}`".format(before, before.id))
                 channel = await self.bot.fetch_channel(logger)
