@@ -101,30 +101,6 @@ class logger(Cog):
                     await channel.send(embed=embed)
                 except AttributeError:
                     pass
-
-    @Cog.listener()
-    async def on_member_update(self, before: Member, after: Member):
-        if not before.bot:
-            logger = get_member_logger(before.guild.id)
-            if logger == None:
-                pass
-            else:
-                embed = Embed()
-                if before.nick != after.nick:
-                    embed.description = "Nickname changed"
-                    embed.add_field(name="Old Nickname",
-                                    value=before.nick, inline=True)
-                    embed.add_field(name="New Nickname",
-                                    value=after.nick, inline=True)
-
-                elif before.guild_avatar != after.guild_avatar:
-                    embed.description = "Avatar change"
-                    embed.set_thumbnail(url=after.guild_avatar)
-                embed.color = Color.random()
-                embed.set_footer(
-                    text="Member: {} | `{}`".format(before, before.id))
-                channel = await self.bot.fetch_channel(logger)
-                await channel.send(embed=embed)
                         
 async def setup(bot: Bot):
     await bot.add_cog(logger(bot))

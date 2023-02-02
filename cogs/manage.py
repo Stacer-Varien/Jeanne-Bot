@@ -646,21 +646,6 @@ class Set_Group(GroupCog, name="set"):
                             value=channel.mention, inline=True)
             await ctx.followup.send(embed=embed)
 
-    @app_commands.command(description="Set a member logging channel")
-    @app_commands.describe(channel="Which channel should log changes to member's tag, name, nickname and avatar?")
-    @app_commands.checks.has_permissions(manage_guild=True)
-    async def memberlog(self, ctx: Interaction, channel: TextChannel):
-        if check_botbanned_user(ctx.user.id) == True:
-            pass
-        else:
-            await ctx.response.defer()
-            set_member_logger(ctx.guild.id, channel.id)
-            embed = Embed(
-                description='Member logging channel set', color=Color.red())
-            embed.add_field(name="Channel selected",
-                            value=channel.mention, inline=True)
-            await ctx.followup.send(embed=embed)
-
     @app_commands.command(description="Set a welcoming message when someone joins the server")
     @app_commands.describe(message="What is the new welcoming message", jsonfile="Upload JSON file with the welcoming message")
     @app_commands.checks.has_permissions(manage_guild=True)
@@ -1029,9 +1014,9 @@ class manage(Cog):
             await ctx.followup.send(embed=embed)
 
     @app_commands.command(description="Removes a welcoming/modlog/report channel. Set all options to true to remove all")
-    @app_commands.describe(welcomer="Remove welcomer channel?", leaving="Remove leaving channel?", modlog="Remove modlog channel?", report="Remove report channel?", memberlog="Remove member logging channel?", messagelog="Remove lessage logging channel?", welcomingmsg="Remove the welcoming message and reset to default", leavingmsg="Remove the leaving message and reset to default",levelupchannel="Remove the level up update channel")
+    @app_commands.describe(welcomer="Remove welcomer channel?", leaving="Remove leaving channel?", modlog="Remove modlog channel?", report="Remove report channel?", messagelog="Remove lessage logging channel?", welcomingmsg="Remove the welcoming message and reset to default", leavingmsg="Remove the leaving message and reset to default",levelupchannel="Remove the level up update channel")
     @app_commands.checks.has_permissions(manage_guild=True)
-    async def remove(self, ctx: Interaction, welcomer: Optional[bool] = None, leaving: Optional[bool] = None, modlog: Optional[bool] = None, report: Optional[bool] = None, memberlog: Optional[bool] = None, messagelog: Optional[bool] = None, welcomingmsg:Optional[bool]=None, leavingmsg:Optional[bool]=None,levelupchannel:Optional[bool]=None) -> None:
+    async def remove(self, ctx: Interaction, welcomer: Optional[bool] = None, leaving: Optional[bool] = None, modlog: Optional[bool] = None, report: Optional[bool] = None, messagelog: Optional[bool] = None, welcomingmsg:Optional[bool]=None, leavingmsg:Optional[bool]=None,levelupchannel:Optional[bool]=None) -> None:
         if check_botbanned_user(ctx.user.id) == True:
             pass
         else:
@@ -1084,17 +1069,6 @@ class manage(Cog):
                             name='Report channel removal status', value='Failed. No report channel set', inline=True)
                     else:
                         embed.add_field(name='Report channel removal status',
-                                        value='Successful', inline=True)
-
-                if memberlog == True:
-
-                    rep = remove_memberlog(ctx.guild.id)
-
-                    if rep == False:
-                        embed.add_field(
-                            name='Member logging channel removal status', value='Failed. No Member logging channel set', inline=True)
-                    else:
-                        embed.add_field(name='Member logging channel removal status',
                                         value='Successful', inline=True)
 
                 if messagelog == True:

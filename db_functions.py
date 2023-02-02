@@ -128,11 +128,11 @@ def get_wallpaper(item_id: str):
     return wallpaper
 
 def deselect_wallpaper(user:int):
-    wallpaper=db.execute("SELECT wallpaper FROM userWallpaperInventory WHERE user_id = ? AND selected = ?", (user, 1,))
+    wallpaper=db.execute("SELECT wallpaper FROM userWallpaperInventory WHERE user_id = ? AND selected = ?", (user, 1,)).fetchone()[0]
     if wallpaper == None:
         return None
     else:
-        db.execute("UPDATE userWallpaperInventory SET selected = ? WHERE user_id = ? AND wallpaper = ?", (0, user, wallpaper[0],))
+        db.execute("UPDATE userWallpaperInventory SET selected = ? WHERE user_id = ? AND wallpaper = ?", (0, user, wallpaper,))
     db.commit()
 
 def add_user_wallpaper(user:int, item_id:int):
@@ -731,24 +731,6 @@ def remove_messagelog(server: int):
 
         db.commit()
         return (True)
-
-
-def remove_memberlog(server: int):
-    cur = db.cursor()
-    cur.execute(
-        "SELECT channel FROM memberLogData WHERE server = ?", (server,))
-    result = cur.fetchone()
-
-    if result == None:
-        return (False)
-
-    else:
-        db.execute(
-            "DELETE FROM memberLogData WHERE server = ?", (server,))
-
-        db.commit()
-        return (True)
-
 
 def get_cached_users():
     data = db.execute("SELECT * FROM globalxpData").fetchall()

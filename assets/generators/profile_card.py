@@ -51,7 +51,7 @@ class Profile:
                 x1 = 0
                 y1 = 0
                 x2 = width
-                nh = math.ceil(width * 0.2528888)
+                nh = math.ceil(width * 0.528888)
                 y2 = 0
 
                 if nh < height:
@@ -64,7 +64,7 @@ class Profile:
                 x1 = 0
                 y1 = 0
                 x2 = width
-                nh = math.ceil(width * 0.2528888)
+                nh = math.ceil(width * 0.528888)
                 y2 = 0
 
                 if nh < height:

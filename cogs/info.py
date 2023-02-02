@@ -60,7 +60,7 @@ class slashinfo(Cog):
             if member == None:
                 member = ctx.user
             user = await self.bot.fetch_user(member.id)
-            hasroles = [role.name for role in member.roles][1:][:: -1]
+            hasroles = [role.mention for role in member.roles][1:][:: -1]
 
             if member.bot == True:
                 botr = "Yes"
@@ -82,8 +82,8 @@ class slashinfo(Cog):
                                value=len(member.roles), inline=True)
 
             userinfo.set_thumbnail(url=member.display_avatar)
-            roles = Embed(title="{}'s roles".format(member), description=''.join(
-                hasroles) + '`@everyone`', color=member.color)
+            roles = Embed(title="{}'s roles".format(member), description=' '.join(
+                hasroles) + ' `@everyone`', color=member.color)
 
             embeds = [userinfo, roles]
 
@@ -93,7 +93,7 @@ class slashinfo(Cog):
                 userinfo.set_image(url=user.banner)
                 await ctx.followup.send(embed=embeds)
             else:
-                await ctx.followup.send(embed=embeds)
+                await ctx.followup.send(embeds=embeds)
 
     @app_commands.command(description="Get information about this server")
     async def serverinfo(self, ctx: Interaction):

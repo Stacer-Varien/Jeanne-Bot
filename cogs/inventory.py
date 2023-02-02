@@ -47,6 +47,15 @@ class Background_Group(GroupCog, name="background"):
             embed.set_image(url=wallpaper[2])
             await ctx.followup.send(embed=embed)
 
+    @preview.error
+    async def preview_error(self, ctx: Interaction, error: app_commands.AppCommandError):
+        if isinstance(error, app_commands.CommandInvokeError):
+            if TypeError:
+                embed = Embed()
+                embed.description = "Invalid item ID given"
+                embed.color = Color.red()
+                await ctx.followup.send(embed=embed)
+
     @app_commands.command(description="Buy a background pic for your level card")
     @app_commands.describe(item_id="Which background you are buying?")
     async def buy(self, ctx: Interaction, item_id: str):
