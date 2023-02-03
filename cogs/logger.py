@@ -9,12 +9,12 @@ class logger(Cog):
 
     @Cog.listener()
     async def on_message_edit(self, before: Message, after: Message):
-        if not after.author.bot:
+        if not before.author.bot:
             logger = get_message_logger(after.guild.id)
             if logger == False:
                 pass
             else:
-                try:
+                try: 
                     channel = await self.bot.fetch_channel(logger)
                     embed = Embed()
                     embed.description = "Message edited in {}".format(before.channel.mention)

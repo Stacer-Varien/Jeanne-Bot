@@ -143,8 +143,18 @@ class levelling(Cog):
                 bg = selected_wallpaper(member.id)
                 font_color=get_color(member.id)
 
-                args = {'bg_image': bg[2], 'profile_image': str(member.avatar.with_format('png')), 'font_color':font_color,'server_level': slvl, 'server_user_xp': sexp, 'server_next_xp': (
-                    (slvl * 50) + ((slvl - 1) * 25) + 50), 'global_level': glvl, 'global_user_xp': gexp, 'global_next_xp': ((glvl * 50) + ((glvl - 1) * 25) + 50), 'user_name': str(member), 'brightness': bg[3]}
+                try:
+                    brightness=bg[3]
+                except:
+                    brightness=100
+
+                try:
+                    bg_image=bg[2]
+                except:
+                    bg_image=''
+
+                args = {'bg_image': bg_image, 'profile_image': str(member.avatar.with_format('png')), 'font_color':font_color,'server_level': slvl, 'server_user_xp': sexp, 'server_next_xp': (
+                    (slvl * 50) + ((slvl - 1) * 25) + 50), 'global_level': glvl, 'global_user_xp': gexp, 'global_next_xp': ((glvl * 50) + ((glvl - 1) * 25) + 50), 'user_name': str(member), 'brightness': brightness}
 
                 func = partial(self.get_card, args)
                 image = await get_event_loop().run_in_executor(None, func)
@@ -180,10 +190,20 @@ class levelling(Cog):
                 bio=get_bio(member.id)
                 font_color = get_color(member.id)
 
-                voted=await self.topggpy.get_user_vote(member.id)
+                #voted=await self.topggpy.get_user_vote(member.id)
 
-                args = {'bg_image': bg[2], 'profile_image': str(member.avatar.with_format('png')), 'font_color': font_color, 'server_level': slvl, 'server_user_xp': sexp, 'server_next_xp': (
-                    (slvl * 50) + ((slvl - 1) * 25) + 50), 'global_level': glvl, 'global_user_xp': gexp, 'global_next_xp': ((glvl * 50) + ((glvl - 1) * 25) + 50), 'user_name': str(member), 'grank':grank, 'srank': srank, 'voted':voted, 'rrank':rrank, 'creator':member.id, 'partner':member.id, 'balance': get_balance(member.id), 'bio': str(bio), 'brightness':bg[3]}
+                try:
+                    brightness=bg[3]
+                except:
+                    brightness=100
+
+                try:
+                    bg_image=bg[2]
+                except:
+                    bg_image=''
+
+                args = {'bg_image': bg_image, 'profile_image': str(member.avatar.with_format('png')), 'font_color': font_color, 'server_level': slvl, 'server_user_xp': sexp, 'server_next_xp': (
+                    (slvl * 50) + ((slvl - 1) * 25) + 50), 'global_level': glvl, 'global_user_xp': gexp, 'global_next_xp': ((glvl * 50) + ((glvl - 1) * 25) + 50), 'user_name': str(member), 'grank':grank, 'srank': srank, 'voted':False, 'rrank':rrank, 'creator':member.id, 'partner':member.id, 'balance': get_balance(member.id), 'bio': str(bio), 'brightness':brightness}
 
                 func = partial(self.get_profile, args)
                 image = await get_event_loop().run_in_executor(None, func)
