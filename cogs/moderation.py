@@ -1,9 +1,10 @@
 from random import randint
 from discord import *
+from discord.app_commands import *
 from discord.ext.commands import Cog, Bot, GroupCog
 from discord.utils import utcnow
 from datetime import datetime, timedelta
-from humanfriendly import format_timespan, parse_timespan, InvalidTimespan
+from humanfriendly import format_timespan, parse_timespan
 from db_functions import *
 from assets.buttons import Confirmation
 from typing import Optional
@@ -157,16 +158,12 @@ class Ban_Group(GroupCog, name="ban"):
 
             else:
                 try:
-                    banned = await guild.fetch_ban(user)
+                    banned = await ctx.guild.fetch_ban(user)
+                    if banned:
+                        already_banned = Embed(
+                            description=f"{user} is already banned here", color=Color.red())
+                        await ctx.followup.send(embed=already_banned)
                 except NotFound:
-                    banned = False
-
-                if banned:
-                    already_banned = Embed(
-                        description=f"{user} is already banned here")
-                    await ctx.followup.send(embed=already_banned)
-
-                else:
                     view = Confirmation(ctx.user)
                     confirm = Embed(description="Is {} the one you want to ban from your server?".format(
                         user), color=Color.dark_red()).set_thumbnail(url=user.display_avatar)
@@ -179,7 +176,7 @@ class Ban_Group(GroupCog, name="ban"):
                         await ctx.edit_original_response(embed=cancelled, view=None)
 
                     elif view.value == True:
-                        await guild.ban(user, reason="{} | {}".format(reason, ctx.user))
+                        await ctx.guild.ban(user, reason="{} | {}".format(reason, ctx.user))
 
                         ban = Embed(title="User Banned", color=0xFF0000)
                         ban.add_field(name="Name", value=user, inline=True)
@@ -209,7 +206,7 @@ class Ban_Group(GroupCog, name="ban"):
     @user.error
     async def ban_user_error(self, ctx:Interaction, error:app_commands.AppCommandError):
         if isinstance(error, app_commands.CommandInvokeError):
-            if HTTPException:
+            if HTTPException or ValueError:
                 embed = Embed()
                 embed.description="Invalid user ID given\nPlease try again"
                 embed.color=Color.red()
@@ -741,7 +738,7 @@ class moderation(Cog):
                     await modlog.send(embed=unmute)
 
     @app_commands.command(description="Ban multiple members at once")
-    @app_commands.describe(user_ids="How many user IDs? Leave a space after each ID (min is 5 and max is 20)", reason="Why are they being banned?")
+    @app_commands.describe(user_ids="How many user IDs? Leave a space after each ID (min is 5 and max is 25)", reason="Why are they being banned?")
     @app_commands.checks.has_permissions(administrator=True)
     @app_commands.checks.cooldown(1, 1800, key=lambda i: (i.guild.id))
     async def massban(self, ctx: Interaction, user_ids: str, reason: str):
@@ -756,11 +753,11 @@ class moderation(Cog):
                     round((datetime.now() + timedelta(minutes=30)).timestamp())))
                 await ctx.followup.send(embed=embed)
             else:
-                if len(ids) > 20:
-                    ids = ids[:20]
+                if len(ids) > 25:
+                    ids = ids[:25]
 
                 view = Confirmation(ctx.user)
-                alert = Embed(title="BEWARE", description="This is an experimental command and the developer is **NOT** responsible in any way or form if you messed up, even if it was misused (but report anyone misusung them to the developer so he can botban them).\n\nDo you want to proceed?", color=Color.red())
+                alert = Embed(title="BEWARE", description="The developer is **NOT** responsible in any way or form if you messed up, even if it was misused (but report anyone misusung them to the developer so he can botban them).\n\nDo you want to proceed?", color=Color.red())
                 await ctx.followup.send(embed=alert, view=view)
 
                 await view.wait()
@@ -827,12 +824,12 @@ class moderation(Cog):
 
     @massban.error
     async def massban_error(self, ctx: Interaction, error: app_commands.AppCommandError):
-        if isinstance(error, app_commands.errors.CommandOnCooldown):
+        if isinstance(error, app_commands.CommandOnCooldown):
             reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
             reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
                 description=f"A massban command was already used here in this server.\nTry again after <t:{reset_hour}:R>", color=0xff0000)
-            await ctx.followup.send(embed=cooldown)
+            await ctx.response.send_message(embed=cooldown)
 
     @app_commands.command(description="Unban multiple members at once")
     @app_commands.describe(user_ids="How many user IDs? Leave a space after each ID (min is 5 and max is 20)", reason="Why are they being unbanned?")
@@ -910,8 +907,8 @@ class moderation(Cog):
                     await ctx.edit_original_response(embed=cancelled, view=None)
 
     @massunban.error
-    async def massunban_error(self, ctx: Interaction, error: app_commands.AppCommandError):
-        if isinstance(error, app_commands.CommandOnCooldown):
+    async def massunban_error(self, ctx: Interaction, error: AppCommandError):
+        if isinstance(error, CommandOnCooldown):
             reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
             reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
