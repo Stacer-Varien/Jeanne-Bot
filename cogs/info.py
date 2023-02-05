@@ -253,7 +253,7 @@ class slashinfo(Cog):
 
             if 'apng' in q.format:
                 embed.add_field(
-                    name="Anitmated Sticker URL", value=q.url, inline=False)
+                    name="Animated Sticker URL", value=q.url, inline=False)
 
             await ctx.followup.send(embed=embed)
 
