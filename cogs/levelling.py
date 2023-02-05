@@ -165,7 +165,7 @@ class levelling(Cog):
                 no_exp = Embed(description="Failed to get level stats")
                 await ctx.followup.send(embed=no_exp)
 
-    @app_commands.command(description="See your level or someone else's level")
+    @app_commands.command(description="See your profile or someone else's profile")
     @app_commands.describe(member="Which member?")
     @checks.cooldown(1, 60, key=lambda i: (i.user.id))
     async def profile(self, ctx: Interaction, member: Optional[Member] = None) -> None:
@@ -190,7 +190,7 @@ class levelling(Cog):
                 bio=get_bio(member.id)
                 font_color = get_color(member.id)
 
-                #voted=await self.topggpy.get_user_vote(member.id)
+                voted=await self.topggpy.get_user_vote(member.id)
 
                 try:
                     brightness=bg[3]
@@ -203,7 +203,7 @@ class levelling(Cog):
                     bg_image=''
 
                 args = {'bg_image': bg_image, 'profile_image': str(member.avatar.with_format('png')), 'font_color': font_color, 'server_level': slvl, 'server_user_xp': sexp, 'server_next_xp': (
-                    (slvl * 50) + ((slvl - 1) * 25) + 50), 'global_level': glvl, 'global_user_xp': gexp, 'global_next_xp': ((glvl * 50) + ((glvl - 1) * 25) + 50), 'user_name': str(member), 'grank':grank, 'srank': srank, 'voted':False, 'rrank':rrank, 'creator':member.id, 'partner':member.id, 'balance': get_balance(member.id), 'bio': str(bio), 'brightness':brightness}
+                    (slvl * 50) + ((slvl - 1) * 25) + 50), 'global_level': glvl, 'global_user_xp': gexp, 'global_next_xp': ((glvl * 50) + ((glvl - 1) * 25) + 50), 'user_name': str(member), 'grank':grank, 'srank': srank, 'voted':voted, 'rrank':rrank, 'creator':member.id, 'partner':member.id, 'balance': get_balance(member.id), 'bio': str(bio), 'brightness':brightness}
 
                 func = partial(self.get_profile, args)
                 image = await get_event_loop().run_in_executor(None, func)
