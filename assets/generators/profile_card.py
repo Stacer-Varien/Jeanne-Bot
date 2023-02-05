@@ -120,8 +120,7 @@ class Profile:
                 return str(round(balance / 1000000, 1)) + "M"
 
         draw = ImageDraw.Draw(card)
-        draw.text((250, 320), user_name, COLOR, font=ImageFont.truetype(self.font1, 60),
-            stroke_fill=STROKE, stroke_width=1)
+        draw.text((215, 320), user_name, COLOR, font=ImageFont.truetype(self.font1, 45), stroke_width=1)
         
         draw.ellipse((30, 250, 210, 430), fill=(
             255, 255, 255, 0), outline=COLOR)
@@ -194,44 +193,36 @@ class Profile:
         profile_canvas = Image.new("RGB", (900, 900), (32, 32, 32))
         profile_draw=ImageDraw.Draw(profile_canvas)
 
-        profile_draw.text((30, 510), text="Global Rank", color=COLOR, font=ImageFont.truetype(self.font1, 35),
-                          stroke_fill=STROKE, stroke_width=1)
-        profile_draw.text((330, 510), text="Server Rank", color=COLOR, font=ImageFont.truetype(self.font1, 35),
-                          stroke_fill=STROKE, stroke_width=1)
-        profile_draw.text((630, 510), text="QP Balance", color=COLOR, font=ImageFont.truetype(self.font1, 35),
-                          stroke_fill=STROKE, stroke_width=1)
+        profile_draw.text((30, 510), text="Global Rank", fill=COLOR, font=ImageFont.truetype(self.font1, 35), stroke_width=1)
+        profile_draw.text((330, 510), text="Server Rank", fill=COLOR, font=ImageFont.truetype(self.font1, 35), stroke_width=1)
+        profile_draw.text((630, 510), text="QP Balance", fill=COLOR, font=ImageFont.truetype(self.font1, 35), stroke_width=1)
 
         if grank == None:
             profile_draw.text(
-                (70, 570), "N/A", COLOR, font=ImageFont.truetype(self.font1, 45),
-                stroke_fill=STROKE, stroke_width=1)
+                (70, 570), "N/A", COLOR, font=ImageFont.truetype(self.font1, 45), stroke_width=1)
         else:
             profile_draw.text(
-                (70, 570), f"#{grank}", COLOR, font=ImageFont.truetype(self.font1, 45),
-                stroke_fill=STROKE, stroke_width=1)
+                (70, 570), f"#{grank}", COLOR, font=ImageFont.truetype(self.font1, 45), stroke_width=1)
         
         if srank == None:
             profile_draw.text(
-                (370, 570), "N/A", COLOR, font=ImageFont.truetype(self.font1, 45),
-                stroke_fill=STROKE, stroke_width=1)
+                (370, 570), "N/A", COLOR, font=ImageFont.truetype(self.font1, 45), stroke_width=1)
         else:
-            profile_draw.text((370, 570), f"#{srank}", COLOR, font=ImageFont.truetype(self.font1, 45),
-                              stroke_fill=STROKE, stroke_width=1)
+            profile_draw.text((370, 570), f"#{srank}", COLOR, font=ImageFont.truetype(self.font1, 45), stroke_width=1)
         
-        profile_draw.text((640, 570), f"{get_str_qp(balance)}", COLOR, font=ImageFont.truetype(self.font1, 45),
-                          stroke_fill=STROKE, stroke_width=1)
+        profile_draw.text((640, 570), f"{get_str_qp(balance)}", COLOR, font=ImageFont.truetype(self.font1, 45), stroke_width=1)
         profile_canvas.paste(qp, (760,570), qp)
 
 
         profile_draw.rectangle((10, 680, 890, 693), outline=COLOR, width=2)
 
         profile_draw.text((20, 640), f"Global Level: {global_level}", COLOR,
-                          font=font_small, stroke_width=1, stroke_fill=STROKE)
+                          font=font_small, stroke_width=1)
         profile_draw.text(
             (520, 640),
             f"Global XP: {get_str(global_user_xp)}/{get_str(global_next_xp)}",
             COLOR,
-            font=font_small, stroke_width=1, stroke_fill=STROKE)
+            font=font_small, stroke_width=1)
 
         global_xpneed = global_next_xp - global_current_xp
         global_xphave = global_user_xp - global_current_xp
@@ -243,12 +234,12 @@ class Profile:
             (12, 682, global_length_of_bar, 691), fill=COLOR)
 
         profile_draw.text((20, 710), f"Server Level: {server_level}", COLOR,
-                          font=font_small, stroke_width=1, stroke_fill=STROKE)
+                          font=font_small, stroke_width=1)
         profile_draw.text(
             (520, 710),
             f"Server XP: {get_str(server_user_xp)}/{get_str(server_next_xp)}",
             COLOR,
-            font=font_small, stroke_width=1, stroke_fill=STROKE)
+            font=font_small, stroke_width=1)
 
         profile_draw.rectangle((10, 750, 890, 763), outline=COLOR, width=2)
 
@@ -267,7 +258,7 @@ class Profile:
         
         profile_draw.rounded_rectangle((10,780,890,890), radius=7, width=2, outline=COLOR, fill=(59,59,59))
         profile_draw.text((20, 790), f'{bio}', COLOR,
-                          font=ImageFont.truetype(self.font1, 25), stroke_width=1, stroke_fill=STROKE)
+                          font=ImageFont.truetype(self.font1, 25), stroke_width=1)
 
 
         profile_canvas.paste(pre)
