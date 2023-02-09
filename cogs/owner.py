@@ -125,42 +125,12 @@ class slashowner(Cog):
                                     value=reason,
                                     inline=False)
                 botbanned.set_footer(
-                    text="Due to this user botbanned, all data except warnings are immediatley deletedfrom the database! They will have no chance of appealing their botban and all the commands executed bythem are now rendered USELESS!")
+                    text="Due to this user botbanned, all data except warnings are immediatley deleted from the database! They will have no chance of appealing their botban and all the commands executed by them are now rendered USELESS!")
                 botbanned.set_thumbnail(url=user.avatar)
                 webhook = SyncWebhook.from_url(BB_WEBHOOK)
                 webhook.send(embed=botbanned)
 
                 await ctx.send("User botbanned", ephemeral=True)
-
-    @command(aliases=['eval', 'execute', 'exe', 'exec'])
-    @is_owner()
-    async def evaluate(self, ctx: Context, *, code: str):
-        """Evaluates a code"""
-        if check_botbanned_user(ctx.author.id) == True:
-            pass
-        else:
-            if code.startswith("```") and code.endswith("```"):
-                str_obj = StringIO()
-                start_time = time()
-                await ctx.typing()
-                try:
-                    with contextlib.redirect_stdout(str_obj):
-                        exec(code.strip("`python"))
-                except Exception as e:
-
-                    embed = Embed(title="Evaluation failed :negative_squared_cross_mark:\nResults:",
-                                  description=f"```{e.__class__.__name__}: {e}```", color=0xFF0000)
-                    end_time = time()
-                    embed.set_footer(
-                        text=f"Compiled in {round((end_time - start_time) * 1000)}ms")
-                    return await ctx.send(embed=embed)
-
-                embed1 = Embed(title="Evaluation suscessful! :white_check_mark: \nResults:",
-                               description=f'```{str_obj.getvalue()}```', color=0x008000)
-                end_time = time()
-                embed1.set_footer(
-                    text=f"Compiled in {round((end_time - start_time) * 1000)}ms")
-                await ctx.send(embed=embed1)
 
     @command()
     @guild_only()
