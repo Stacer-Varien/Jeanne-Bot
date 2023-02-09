@@ -27,6 +27,7 @@ class Jeanne(Bot):
 
           else:
             print(f'Unable to load {filename[:-3]}')
+        await bot.load_extension('jishaku')
 
 intents = Intents().all()
 intents.presences = False
