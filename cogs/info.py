@@ -14,7 +14,7 @@ start_time = time()
 class slashinfo(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.bot_version = "4.2.1"
+        self.bot_version = "4.2.2"
 
     @app_commands.command(description="See the bot's status from development to now")
     async def stats(self, ctx: Interaction):

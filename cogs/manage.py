@@ -930,7 +930,7 @@ class Set_Group(GroupCog, name="set"):
             embed = Embed()
             try:
                 set_color(ctx.user.id, color)
-                embed.description = "Profile and Level card font and bar color changed to {} as showing in the embed color".format(color)
+                embed.description = "Profile and Level card font and bar color changed to `{}` as showing in the embed color".format(color)
                 embed.color = int(color, 16)
             except:
                 embed.description = "Invalid HEX code entered"
