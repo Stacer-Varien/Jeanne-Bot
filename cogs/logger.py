@@ -17,47 +17,34 @@ class logger(Cog):
                 try: 
                     channel = await self.bot.fetch_channel(logger)
                     embed = Embed()
-                    embed.description = "Message edited in {}".format(before.channel.mention)
+                    embed.description = "[Message]({}) edited in {}".format(before.jump_url, before.channel.mention)
 
                     embed.color = Color.random()
-                    old_attachments = bool(before.attachments)
-                    old_content = bool(before.content)
-                    new_content = bool(after.content)
-                    if old_content == True and old_attachments == False:
-                        if len(before.content) > 1024:
-                            before.content = before.content[:1020] + "..."
-                        if len(after.content) > 1024:
-                            after.content = after.content[:1020] + "..."
-                        embed.add_field(name="Old message",
+                    new_attachments = bool(after.attachments)
+
+                    if len(before.content) > 1024:
+                        before.content = before.content[:1020] + "..."
+                    if len(after.content) > 1024:
+                        after.content = after.content[:1020] + "..."
+                    embed.add_field(name="Old message",
                                         value=before.content, inline=False)
-                        if new_content == True:
-                            embed.add_field(name="New message",
-                                            value=after.content, inline=False)
-                        else:
-                            embed.add_field(name="New message",
-                                            value="None (no message)", inline=False)
-                    elif old_content == True and old_attachments == True:
-                        if len(before.content) > 1024:
-                            before.content = before.content[:1020] + "..."
-                        if len(after.content) > 1024:
-                            after.content = after.content[:1020] + "..."
-                        embed.add_field(name="Old message",
-                                        value=before.content, inline=False)
-                        if new_content == True:
-                            embed.add_field(name="New message",
-                                            value=after.content, inline=False)
-                        else:
-                            embed.add_field(name="New message",
-                                            value="None (no message)", inline=False)
-                    elif old_attachments == True and old_content == False:
-                        embed.add_field(name="Old message",
-                                        value=before.content, inline=False)
-                        if new_content == True:
-                            embed.add_field(name="New message",
-                                            value=after.content, inline=False)
-                        else:
-                            embed.add_field(name="New message",
-                                            value="None (no message)", inline=False)
+                    embed.add_field(name="New message", value=after.content, inline=False)
+
+                    if new_attachments == True:
+                        old_image_urls = [x.url for x in before.attachments]
+                        old_images = "\n".join(old_image_urls)
+                        new_image_urls = [x.url for x in after.attachments]
+                        new_images = "\n".join(new_image_urls)
+
+                        if old_images != new_images:
+
+                            if len(old_images) > 1024:
+                                old_images = old_images[:1020] + "..."
+                            if len(new_images) > 1024:
+                                new_images = new_images[:1020] + "..."
+
+                            embed.add_field(name="Old Media", value=old_images, inline=False)
+                            embed.add_field(name="New Media",value=new_images, inline=False)
                     embed.set_thumbnail(url=before.author.display_avatar)
                     embed.set_footer(text="Author: {} | {}".format(
                         before.author, before.author.id))
