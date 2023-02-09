@@ -173,13 +173,12 @@ def use_wallpaper(name, user):
     db.commit()
 
 def fetch_user_inventory(user: int) -> (str | None):
-    wallpapers = db.execute("SELECT * FROM userWallpaperInventory WHERE user = ?", (user,)).fetchall()
+    wallpapers = db.execute("SELECT * FROM userWallpaperInventory WHERE user_id = ?", (user,)).fetchall()
 
     if wallpapers == None:
         return None
     else:
-        for data in wallpapers:
-            return f"[{data[1]}]({data[2]})\n"
+        return wallpapers
 
 def set_brightness(user:int, brightness:int):
     try:

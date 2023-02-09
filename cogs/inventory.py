@@ -204,7 +204,12 @@ class Background_Group(GroupCog, name="background"):
                 a = fetch_user_inventory(ctx.user.id)
                 inv = Embed(title="List of wallpapers you have",
                             color=Color.random())
-                inv.description = a
+                inv.description =""
+
+                for b in a:
+                    name=b[1]
+                    link=b[2]
+                    inv.description+= "[{}]({})\n".format(name, link)
                 await ctx.followup.send(embed=inv)
                 
 async def setup(bot: Bot):
