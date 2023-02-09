@@ -12,6 +12,7 @@ from topgg import *
 from collections import OrderedDict
 from json import loads
 
+
 def replace_all(text: str, dic: dict):
     for i, j in dic.items():
         text = text.replace(i, j)
@@ -63,6 +64,7 @@ class Rank_Group(GroupCog, name="rank"):
 
             await ctx.followup.send(embed=embed)
 
+
 class levelling(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
@@ -92,16 +94,18 @@ class levelling(Cog):
                         ratelimit = self.get_ratelimit(message)
                         if ratelimit == None:
                             add_xp(message.author.id, message.guild.id)
-                            lvl=add_level(message.author.id, message.guild.id)
+                            lvl = add_level(message.author.id,
+                                            message.guild.id)
 
                             if lvl == None:
                                 pass
                             else:
                                 if lvl[2] == '0':
-                                    msg = "{} has leveled up to `level {}`".format(message.author, get_member_level(message.author.id, message.guild.id))
+                                    msg = "{} has leveled up to `level {}`".format(
+                                        message.author, get_member_level(message.author.id, message.guild.id))
                                     lvlup = await self.bot.fetch_channel(lvl[1])
                                     await lvlup.send(msg)
-                                    
+
                                 else:
                                     msg: str = lvl[2]
 
@@ -116,6 +120,8 @@ class levelling(Cog):
                                     embed = Embed.from_dict(json['embeds'][0])
                                     lvlup = await self.bot.fetch_channel(lvl[1])
                                     await lvlup.send(content=msg, embed=embed)
+                        else:
+                            pass
                     except AttributeError:
                         pass
                 else:
@@ -141,19 +147,19 @@ class levelling(Cog):
                 gexp = get_user_xp(member.id)
 
                 bg = selected_wallpaper(member.id)
-                font_color=get_color(member.id)
+                font_color = get_color(member.id)
 
                 try:
-                    brightness=bg[3]
+                    brightness = bg[3]
                 except:
-                    brightness=100
+                    brightness = 100
 
                 try:
-                    bg_image=bg[2]
+                    bg_image = bg[2]
                 except:
-                    bg_image=''
+                    bg_image = ''
 
-                args = {'bg_image': bg_image, 'profile_image': str(member.avatar.with_format('png')), 'font_color':font_color,'server_level': slvl, 'server_user_xp': sexp, 'server_next_xp': (
+                args = {'bg_image': bg_image, 'profile_image': str(member.avatar.with_format('png')), 'font_color': font_color, 'server_level': slvl, 'server_user_xp': sexp, 'server_next_xp': (
                     (slvl * 50) + ((slvl - 1) * 25) + 50), 'global_level': glvl, 'global_user_xp': gexp, 'global_next_xp': ((glvl * 50) + ((glvl - 1) * 25) + 50), 'user_name': str(member), 'brightness': brightness}
 
                 func = partial(self.get_card, args)
@@ -183,32 +189,33 @@ class levelling(Cog):
                 gexp = get_user_xp(member.id)
 
                 bg = selected_wallpaper(member.id)
-                grank=get_member_global_rank(member)
-                srank=get_member_server_rank(member)
-                rrank=get_richest(member)
+                grank = get_member_global_rank(member)
+                srank = get_member_server_rank(member)
+                rrank = get_richest(member)
 
-                bio=get_bio(member.id)
+                bio = get_bio(member.id)
                 font_color = get_color(member.id)
 
-                voted=await self.topggpy.get_user_vote(member.id)
+                voted = await self.topggpy.get_user_vote(member.id)
 
                 try:
-                    brightness=bg[3]
+                    brightness = bg[3]
                 except:
-                    brightness=100
+                    brightness = 100
 
                 try:
-                    bg_image=bg[2]
+                    bg_image = bg[2]
                 except:
-                    bg_image=''
+                    bg_image = ''
 
                 args = {'bg_image': bg_image, 'profile_image': str(member.avatar.with_format('png')), 'font_color': font_color, 'server_level': slvl, 'server_user_xp': sexp, 'server_next_xp': (
-                    (slvl * 50) + ((slvl - 1) * 25) + 50), 'global_level': glvl, 'global_user_xp': gexp, 'global_next_xp': ((glvl * 50) + ((glvl - 1) * 25) + 50), 'user_name': str(member), 'grank':grank, 'srank': srank, 'voted':voted, 'rrank':rrank, 'creator':member.id, 'partner':member.id, 'balance': get_balance(member.id), 'bio': str(bio), 'brightness':brightness}
+                    (slvl * 50) + ((slvl - 1) * 25) + 50), 'global_level': glvl, 'global_user_xp': gexp, 'global_next_xp': ((glvl * 50) + ((glvl - 1) * 25) + 50), 'user_name': str(member), 'grank': grank, 'srank': srank, 'voted': voted, 'rrank': rrank, 'creator': member.id, 'partner': member.id, 'balance': get_balance(member.id), 'bio': str(bio), 'brightness': brightness}
 
                 func = partial(self.get_profile, args)
                 image = await get_event_loop().run_in_executor(None, func)
 
-                file = File(fp=image, filename=f'{member.name}_profile_card.png')
+                file = File(
+                    fp=image, filename=f'{member.name}_profile_card.png')
                 await ctx.followup.send(file=file)
             except:
                 no_exp = Embed(description="Failed to make profile card")
