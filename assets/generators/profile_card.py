@@ -101,7 +101,7 @@ class Profile:
             hex = ImageColor.getcolor(('#' + font_color), "RGB")
             COLOR = tuple(hex)
                 
-        STROKE = (151, 151, 151)
+
 
         def get_str(xp):
             if xp < 1000:
@@ -120,7 +120,8 @@ class Profile:
                 return str(round(balance / 1000000, 1)) + "M"
 
         draw = ImageDraw.Draw(card)
-        draw.text((215, 320), user_name, COLOR, font=ImageFont.truetype(self.font1, 45), stroke_width=1)
+        draw.text((215, 320), user_name, COLOR,
+                  font=ImageFont.truetype(self.font1, 45), stroke_width=1)
         
         draw.ellipse((30, 250, 210, 430), fill=(
             255, 255, 255, 0), outline=COLOR)
@@ -178,9 +179,10 @@ class Profile:
         else:
             pass
 
-        partner_ids = [533792698331824138, 597829930964877369, 336891933911678977, 995330806056755321]
+        with open('assets/partnerlist.txt', 'r') as f:
+            partner_ids=f.read()
 
-        if partner in partner_ids:
+        if str(partner) in partner_ids:
             partner_badge = ImageEnhance.Brightness(partner_badge).enhance(1.1)
             card.paste(partner_badge, (600, 430), partner_badge)
         else:
@@ -193,9 +195,9 @@ class Profile:
         profile_canvas = Image.new("RGB", (900, 900), (32, 32, 32))
         profile_draw=ImageDraw.Draw(profile_canvas)
 
-        profile_draw.text((30, 510), text="Global Rank", fill=COLOR, font=ImageFont.truetype(self.font1, 35), stroke_width=1)
-        profile_draw.text((330, 510), text="Server Rank", fill=COLOR, font=ImageFont.truetype(self.font1, 35), stroke_width=1)
-        profile_draw.text((630, 510), text="QP Balance", fill=COLOR, font=ImageFont.truetype(self.font1, 35), stroke_width=1)
+        profile_draw.text((30, 510), "Global Rank", COLOR, font=ImageFont.truetype(self.font1, 35), stroke_width=1)
+        profile_draw.text((330, 510), "Server Rank", COLOR, font=ImageFont.truetype(self.font1, 35), stroke_width=1)
+        profile_draw.text((630, 510), "QP Balance", COLOR, font=ImageFont.truetype(self.font1, 35), stroke_width=1)
 
         if grank == None:
             profile_draw.text(
@@ -210,7 +212,7 @@ class Profile:
         else:
             profile_draw.text((370, 570), f"#{srank}", COLOR, font=ImageFont.truetype(self.font1, 45), stroke_width=1)
         
-        profile_draw.text((640, 570), f"{get_str_qp(balance)}", COLOR, font=ImageFont.truetype(self.font1, 45), stroke_width=1)
+        profile_draw.text((640, 570), f"{get_str_qp(balance)}", COLOR, font=ImageFont.truetype(self.font1, 45), troke_width=1)
         profile_canvas.paste(qp, (760,570), qp)
 
 
@@ -253,12 +255,12 @@ class Profile:
             (12, 752, server_length_of_bar, 761), fill=COLOR)
         
         if bio ==None:
-            bio='No bio available'
+            bio=None
 
         
         profile_draw.rounded_rectangle((10,780,890,890), radius=7, width=2, outline=COLOR, fill=(59,59,59))
         profile_draw.text((20, 790), f'{bio}', COLOR,
-                          font=ImageFont.truetype(self.font1, 25), stroke_width=1)
+                          font=ImageFont.truetype(self.font1, 25))
 
 
         profile_canvas.paste(pre)
