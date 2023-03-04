@@ -1,14 +1,14 @@
 from discord import *
 from aiohttp import ClientSession
 from discord.ext.commands import Cog, Bot, GroupCog
-from db_functions import check_botbanned_user, get_report_channel
+from db_functions import
 from assets.buttons import Confirmation
 from config import WEATHER, WEBHOOK
 from discord.ui import View
 from asyncio import TimeoutError
 from py_expression_eval import Parser
 from typing import Literal, Optional
-from discord.app_commands import *
+from discord.app_commands import 
 from json import loads
 from requests import get
 

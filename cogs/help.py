@@ -1,7 +1,6 @@
-from discord import *
+from discord import ButtonStyle, Embed, Interaction, ui, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
-from db_functions import check_botbanned_user
-
+from db_functions import Botban
 
 class help_button(ui.View):
     def __init__(self):
@@ -23,9 +22,9 @@ class help(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @app_commands.command(description="Get help from the wiki or join the support server for further help")
+    @Jeanne.command(description="Get help from the wiki or join the support server for further help")
     async def help(self, ctx: Interaction):
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             view = help_button()

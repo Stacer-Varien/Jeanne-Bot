@@ -1,9 +1,9 @@
-from db_functions import check_botbanned_user, get_cached_users, get_true_members
+from db_functions import Botban, get_cached_users, get_true_members
 from time import time
 from datetime import timedelta
 from sys import version_info as py_version
 from discord.ext.commands import Cog, Bot
-from discord import *
+from discord import Color, Embed, Interaction, Member, Message, StickerItem, app_commands as Jeanne, utils
 from discord import __version__ as discord_version
 from typing import Optional
 
@@ -14,12 +14,12 @@ start_time = time()
 class slashinfo(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.bot_version = "4.2.1"
+        self.bot_version = "4.2a"
 
-    @app_commands.command(description="See the bot's status from development to now")
+    @Jeanne.command(description="See the bot's status from development to now")
     async def stats(self, ctx: Interaction):
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             botowner = self.bot.get_user(597829930964877369)
@@ -50,11 +50,11 @@ class slashinfo(Cog):
                 url=self.bot.user.avatar)
             await ctx.followup.send(embed=embed)
 
-    @app_commands.command(description="See the information of a member or yourself")
-    @app_commands.describe(member="Which member?")
+    @Jeanne.command(description="See the information of a member or yourself")
+    @Jeanne.describe(member="Which member?")
     async def userinfo(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             if member == None:
@@ -95,10 +95,10 @@ class slashinfo(Cog):
             else:
                 await ctx.followup.send(embeds=embeds)
 
-    @app_commands.command(description="Get information about this server")
+    @Jeanne.command(description="Get information about this server")
     async def serverinfo(self, ctx: Interaction):
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             guild = ctx.guild
@@ -149,9 +149,9 @@ class slashinfo(Cog):
 
                 await ctx.followup.send(embeds=e)
 
-    @app_commands.command(description="Check how fast I respond to a command")
+    @Jeanne.command(description="Check how fast I respond to a command")
     async def ping(self, ctx: Interaction):
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             await ctx.response.defer()
@@ -167,10 +167,10 @@ class slashinfo(Cog):
                 name="API Latency", value=f'{round((end_time - start_time) * 1000)}ms', inline=False)
             await ctx.edit_original_response(embed=ping)
 
-    @app_commands.command(description="See the server's banner")
+    @Jeanne.command(description="See the server's banner")
     async def serverbanner(self, ctx: Interaction):
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             guild = ctx.guild
@@ -190,11 +190,11 @@ class slashinfo(Cog):
                 embed.set_image(url=ctx.guild.banner)
                 await ctx.followup.send(embed=embed)
 
-    @app_commands.command(description="See your avatar or another member's avatar")
-    @app_commands.describe(member="Which member?")
+    @Jeanne.command(description="See your avatar or another member's avatar")
+    @Jeanne.describe(member="Which member?")
     async def avatar(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             if member == None:
@@ -204,10 +204,10 @@ class slashinfo(Cog):
             avatar.set_image(url=member.avatar)
             await ctx.followup.send(embed=avatar)
 
-    @app_commands.command(description="See your server avatar or a member's server avatar")
-    @app_commands.describe(member="Which member?")
+    @Jeanne.command(description="See your server avatar or a member's server avatar")
+    @Jeanne.describe(member="Which member?")
     async def serveravatar(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             await ctx.response.defer()
@@ -228,10 +228,10 @@ class slashinfo(Cog):
                     text="Member has no server avatar. Passed normal avatar instead")
                 await ctx.followup.send(embed=guild_avatar)
 
-    @app_commands.command(description="View a sticker")
-    @app_commands.describe(sticker="Insert message ID with the sticker or name of the sticker in the server")
+    @Jeanne.command(description="View a sticker")
+    @Jeanne.describe(sticker="Insert message ID with the sticker or name of the sticker in the server")
     async def sticker(self, ctx: Interaction, sticker: str):
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             await ctx.response.defer()
@@ -258,8 +258,8 @@ class slashinfo(Cog):
             await ctx.followup.send(embed=embed)
 
     @sticker.error
-    async def sticker_error(self, ctx: Interaction, error: app_commands.AppCommandError):
-        if isinstance(error, app_commands.CommandInvokeError):
+    async def sticker_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandInvokeError):
             if IndexError:
                 embed = Embed(
                     description="No sticker is in that message or the sticker got deleted from its server", color=Color.red())
@@ -269,10 +269,10 @@ class slashinfo(Cog):
                     description="This sticker doesn't exist in the server", color=Color.red())
                 await ctx.followup.send(embed=embed)
 
-    @app_commands.command(description="View an emoji")
-    @app_commands.describe(emoji="What is the name of the emoji?")
+    @Jeanne.command(description="View an emoji")
+    @Jeanne.describe(emoji="What is the name of the emoji?")
     async def emoji(self, ctx: Interaction, emoji: str):
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             await ctx.response.defer()
@@ -291,8 +291,8 @@ class slashinfo(Cog):
             await ctx.followup.send(embed=embed)
 
     @emoji.error
-    async def emoji_error(self, ctx: Interaction, error: app_commands.AppCommandError):
-        if isinstance(error, app_commands.CommandInvokeError):
+    async def emoji_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandInvokeError):
             if AttributeError:
                 embed = Embed(
                     description="This emoji doesn't exist in the server", color=Color.red())

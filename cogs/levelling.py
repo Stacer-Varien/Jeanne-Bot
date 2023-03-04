@@ -1,8 +1,8 @@
 from asyncio import get_event_loop
 from functools import partial
 from discord.ext.commands import Cog, CooldownMapping, BucketType, Bot, GroupCog
-from discord import *
-from db_functions import *
+from discord import Color, Embed, Interaction, app_commands as Jeanne
+from db_functions import Botban, Levelling
 from typing import Optional
 from assets.generators.level_card import Level
 from assets.generators.profile_card import Profile
@@ -23,17 +23,17 @@ class Rank_Group(GroupCog, name="rank"):
         self.bot = bot
         super().__init__()
 
-    @app_commands.command(name='global', description="Check the users with the most XP globally")
+    @Jeanne.command(name='global', description="Check the users with the most XP globally")
     @checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def _global(self, ctx: Interaction):
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             embed = Embed(color=Color.random())
             embed.set_author(name="Global XP Leaderboard")
 
-            leaderboard = get_global_rank()
+            leaderboard = Levelling().get_global_rank()
 
             r = 1
             for i in leaderboard:
@@ -43,11 +43,11 @@ class Rank_Group(GroupCog, name="rank"):
 
             await ctx.followup.send(embed=embed)
 
-    @app_commands.command(description="Check the users with the most XP in the server")
+    @Jeanne.command(description="Check the users with the most XP in the server")
     @checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def server(self, ctx: Interaction):
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             embed = Embed(color=0xFFD700)
@@ -123,12 +123,12 @@ class levelling(Cog):
             else:
                 pass
 
-    @app_commands.command(description="See your level or someone else's level")
-    @app_commands.describe(member="Which member?")
+    @Jeanne.command(description="See your level or someone else's level")
+    @Jeanne.describe(member="Which member?")
     @checks.cooldown(1, 60, key=lambda i: (i.user.id))
     async def level(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             if member is None:
@@ -165,12 +165,12 @@ class levelling(Cog):
                 no_exp = Embed(description="Failed to get level stats")
                 await ctx.followup.send(embed=no_exp)
 
-    @app_commands.command(description="See your profile or someone else's profile")
-    @app_commands.describe(member="Which member?")
+    @Jeanne.command(description="See your profile or someone else's profile")
+    @Jeanne.describe(member="Which member?")
     @checks.cooldown(1, 60, key=lambda i: (i.user.id))
     async def profile(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             if member is None:
@@ -216,14 +216,14 @@ class levelling(Cog):
 
     @level.error
     async def level_error(self, ctx: Interaction, error: AppCommandError):
-        if isinstance(error, app_commands.CommandOnCooldown):
+        if isinstance(error, Jeanne.CommandOnCooldown):
             cooldown = Embed(
                 description=f"You have already checked your level!\nTry again after `{round(error.retry_after, 2)} seconds`", color=Color.random())
             await ctx.followup.send(embed=cooldown)
 
     @profile.error
     async def profile_error(self, ctx: Interaction, error: AppCommandError):
-        if isinstance(error, app_commands.CommandOnCooldown):
+        if isinstance(error, Jeanne.CommandOnCooldown):
             cooldown = Embed(
                 description=f"You have already checked your profile!\nTry again after `{round(error.retry_after, 2)} seconds`", color=Color.random())
             await ctx.followup.send(embed=cooldown)

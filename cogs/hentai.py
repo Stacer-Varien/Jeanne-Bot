@@ -1,9 +1,9 @@
 from json import loads
 from random import choice
-from discord import *
+from discord import Color, Embed, Interaction, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
 from requests import get
-from db_functions import check_botbanned_user
+from db_functions import Botban
 from typing import Literal, Optional
 
 
@@ -11,11 +11,11 @@ class nsfw(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @app_commands.command(description="Get a random hentai from Jeanne", nsfw=True)
-    @app_commands.describe(rating="Do you want questionable or explicit content?")
+    @Jeanne.command(description="Get a random hentai from Jeanne", nsfw=True)
+    @Jeanne.describe(rating="Do you want questionable or explicit content?")
     async def hentai(self, ctx: Interaction, rating: Optional[Literal["questionable", "explicit"]] = None) -> None:
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             if rating == None:
@@ -53,11 +53,11 @@ class nsfw(Cog):
                     text="Fetched from {} • Credits must go to the artist".format(source))
                 await ctx.followup.send(embed=embed)
 
-    @app_commands.command(description="Get a random media content from Gelbooru", nsfw=True)
-    @app_commands.describe(rating="Do you want questionable or explicit content?", tag="Add your tag")
+    @Jeanne.command(description="Get a random media content from Gelbooru", nsfw=True)
+    @Jeanne.describe(rating="Do you want questionable or explicit content?", tag="Add your tag")
     async def gelbooru(self, ctx: Interaction, rating: Optional[Literal["questionable", "explicit"]], tag: Optional[str] = None) -> None:
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             if rating == None:
@@ -84,18 +84,18 @@ class nsfw(Cog):
 
 
     @gelbooru.error
-    async def gelbooru_error(self, ctx:Interaction, error:app_commands.AppCommandError):
-        if isinstance(error, app_commands.CommandInvokeError):
+    async def gelbooru_error(self, ctx:Interaction, error:Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandInvokeError):
             if IndexError or KeyError:
                 no_tag = Embed(
                     description="The tag could not be found", color=Color.red())
                 await ctx.followup.send(embed=no_tag)
 
-    @app_commands.command(description="Get a random hentai from Yande.re", nsfw=True)
-    @app_commands.describe(rating="Do you want questionable or explicit content?", tag="Add your tag")
+    @Jeanne.command(description="Get a random hentai from Yande.re", nsfw=True)
+    @Jeanne.describe(rating="Do you want questionable or explicit content?", tag="Add your tag")
     async def yandere(self, ctx: Interaction, rating: Optional[Literal["questionable", "explicit"]], tag: Optional[str] = None) -> None:
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
                 if rating == None:
@@ -120,18 +120,18 @@ class nsfw(Cog):
                 await ctx.followup.send(embed=yandere)
 
     @yandere.error
-    async def yandere_error(self, ctx: Interaction, error: app_commands.AppCommandError):
-        if isinstance(error, app_commands.CommandInvokeError):
+    async def yandere_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandInvokeError):
             if IndexError or KeyError:
                 no_tag = Embed(
                     description="The tag could not be found", color=Color.red())
                 await ctx.followup.send(embed=no_tag)
 
-    @app_commands.command(description="Get a random hentai from Konachan")
-    @app_commands.describe(rating="Do you want questionable or explicit content?", tag="Add your tag")
+    @Jeanne.command(description="Get a random hentai from Konachan")
+    @Jeanne.describe(rating="Do you want questionable or explicit content?", tag="Add your tag")
     async def konachan(self, ctx: Interaction, rating: Optional[Literal["questionable", "explicit"]], tag: Optional[str] = None) -> None:
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
                 if rating == None:
@@ -152,8 +152,8 @@ class nsfw(Cog):
                 await ctx.followup.send(embed=konachan)
 
     @konachan.error
-    async def konachan_error(self, ctx: Interaction, error: app_commands.AppCommandError):
-        if isinstance(error, app_commands.CommandInvokeError):
+    async def konachan_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandInvokeError):
             if IndexError or KeyError:
                 no_tag = Embed(
                     description="The tag could not be found", color=Color.red())

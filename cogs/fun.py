@@ -1,8 +1,8 @@
-from random import *
-from discord import *
+from random import choice, randint
+from discord import Color, Embed, Interaction, Member, SyncWebhook, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
-from db_functions import add_botbanned_user, check_botbanned_user
-from assets.needed import *
+from db_functions import Botban
+from assets.needed import eight_ball_answers, filtered_words
 from config import BB_WEBHOOK
 from assets.imgur import get_animeme_pic
 from typing import Optional
@@ -12,11 +12,11 @@ class fun(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @app_commands.command(name='8ball', description="Ask 8 ball anything and you will get your awnser")
-    @app_commands.describe(question="Add your question")
+    @Jeanne.command(name='8ball', description="Ask 8 ball anything and you will get your awnser")
+    @Jeanne.describe(question="Add your question")
     async def _8ball(self, ctx: Interaction, question: str):
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             embed = Embed(color=Color.random())
@@ -26,11 +26,11 @@ class fun(Cog):
                 name="Answer:", value=f'{choice(eight_ball_answers)}', inline=False)
             await ctx.followup.send(embed=embed)
 
-    @app_commands.command(description="Say something and I will say it in reversed text")
-    @app_commands.describe(text="What are you reversing?")
+    @Jeanne.command(description="Say something and I will say it in reversed text")
+    @Jeanne.describe(text="What are you reversing?")
     async def reverse(self, ctx: Interaction, text: str):
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             if any(word in text for word in filtered_words):
@@ -38,8 +38,7 @@ class fun(Cog):
                              color=Color.red())
                 await ctx.followup.send(embed=nope)
             elif "raffik" in text:
-                add_botbanned_user(
-                    ctx.user.id, "Using the reversed version of the 'k-word'")
+                Botban(ctx.user).add_botbanned_user("Using the reversed version of the 'k-word'")
                 botbanned = Embed(title="User has been botbanned!",
                                   description="They will no longer use Jeanne,permanently!")
                 botbanned.add_field(name="User",
@@ -50,7 +49,7 @@ class fun(Cog):
                                     value="Using the reversed version of the 'k-word'",
                                     inline=False)
                 botbanned.set_footer(
-                    text="Due to this user botbanned, all data except warnings are immediatley deleted from the database! They will have no chance of appealing their botban and all the commands executed bythem are now rendered USELESS!")
+                    text="Due to this user botbanned, all data except warnings are immediatley deleted from the database! They will have no chance of appealing their botban and all the commands executed by them are now rendered USELESS!")
                 botbanned.set_thumbnail(url=ctx.user.avatar)
                 webhook = SyncWebhook.from_url(BB_WEBHOOK)
                 webhook.send(embed=botbanned)
@@ -59,10 +58,10 @@ class fun(Cog):
                     text="Author: {} | {}".format(ctx.user, ctx.user.id))
                 await ctx.followup.send(embed=msg)
 
-    @app_commands.command(description="Get a random animeme")
+    @Jeanne.command(description="Get a random animeme")
     async def animeme(self, ctx: Interaction):
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             animeme = Embed(color=Color.random())
@@ -70,11 +69,11 @@ class fun(Cog):
             animeme.set_footer(text="Fetched from animeme1936")
             await ctx.followup.send(embed=animeme)
 
-    @app_commands.command(description="Combine 2 words to get 2 combined words")
-    @app_commands.describe(first_word="Add first word", second_word="Add second word")
+    @Jeanne.command(description="Combine 2 words to get 2 combined words")
+    @Jeanne.describe(first_word="Add first word", second_word="Add second word")
     async def combine(self, ctx: Interaction, first_word: str, second_word: str):
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
 
@@ -92,11 +91,11 @@ class fun(Cog):
             combine.set_author(name=f"{first_word} + {second_word}")
             await ctx.followup.send(embed=combine)
 
-    @app_commands.command(description="Give me a lot of choices and I will pick one for you")
-    @app_commands.describe(choices="Add your choices here. Separate them with ','")
+    @Jeanne.command(description="Give me a lot of choices and I will pick one for you")
+    @Jeanne.describe(choices="Add your choices here. Separate them with ','")
     async def choose(self, ctx: Interaction, choices: str):
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             choices = choices.split(sep=",")
@@ -104,11 +103,11 @@ class fun(Cog):
                 description=f"I chose **{choice(choices)}**", color=Color.random())
             await ctx.followup.send(embed=choose)
 
-    @app_commands.command(description="Check how much of a simp you are")
-    @app_commands.describe(member="Which member?")
+    @Jeanne.command(description="Check how much of a simp you are")
+    @Jeanne.describe(member="Which member?")
     async def simprate(self, ctx: Interaction, member: Optional[Member] = None):
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             perc = randint(0, 100)
@@ -127,11 +126,11 @@ class fun(Cog):
 
             await ctx.followup.send(embed=simp)
 
-    @app_commands.command(description="Check how gay you are")
-    @app_commands.describe(member="Which member?")
+    @Jeanne.command(description="Check how gay you are")
+    @Jeanne.describe(member="Which member?")
     async def gayrate(self, ctx: Interaction, member: Optional[Member] = None):
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             perc = randint(0, 100)

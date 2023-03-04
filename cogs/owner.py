@@ -1,10 +1,10 @@
 import contextlib
 from io import StringIO
 from discord.ext.commands import Cog, Bot, group, is_owner, guild_only, Context, Greedy, command
-from discord import *
+from discord import 
 from os import execv
 from sys import executable, argv
-from db_functions import add_botbanned_user, check_botbanned_user
+from db_functions import
 from config import BB_WEBHOOK
 from time import time
 from typing import Literal, Optional

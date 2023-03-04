@@ -1,6 +1,6 @@
-from discord import *
+from discord import 
 from discord.ext.commands import Cog, Bot
-from db_functions import *
+from db_functions import 
 
 
 class logger(Cog):

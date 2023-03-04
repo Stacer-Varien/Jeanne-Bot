@@ -1,6 +1,6 @@
-from discord import *
-from discord.app_commands import *
-from discord.ext.commands import Bot, Cog, Context, NotOwner
+from discord import Color, Embed, Interaction
+from discord.app_commands import AppCommandError, MissingPermissions, CommandInvokeError, BotMissingPermissions, NoPrivateMessage, CommandOnCooldown
+from discord.ext.commands import Bot, Cog, Context, NotOwner, CommandNotFound
 
 
 class errors(Cog):

@@ -1,19 +1,19 @@
-from db_functions import check_botbanned_user
-from discord import *
+from db_functions import Botban
+from discord import Color, Embed, Interaction, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
-from config import kitsune_nekoslife
+from config import kitsune_nekoslife, neko_purrbot
 from requests import get
-from assets.imgur import *
+from assets.imgur import get_jeanne_pic, get_medusa_pic, get_saber_pic, get_wallpaper_pic
 
 
 class images(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(description="Get a kitsune image")
+    @Jeanne.command(description="Get a kitsune image")
     async def kitsune(self, ctx: Interaction):
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             kistune_api = get(kitsune_nekoslife).json()
@@ -22,10 +22,10 @@ class images(Cog):
             kitsune.set_image(url=kistune_api["url"])
             await ctx.followup.send(embed=kitsune)
 
-    @app_commands.command(description="Need a wallpaper for your PC or phone?")
+    @Jeanne.command(description="Need a wallpaper for your PC or phone?")
     async def wallpaper(self, ctx: Interaction):
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             wallpaper = Embed(color=Color.random())
@@ -33,10 +33,10 @@ class images(Cog):
             wallpaper.set_footer(text="Fetched from Wallpaper_1936 • Credits must go to the artist")
             await ctx.followup.send(embed=wallpaper)
 
-    @app_commands.command(description="Get a Jeanne d'Arc image")
+    @Jeanne.command(description="Get a Jeanne d'Arc image")
     async def jeanne(self, ctx: Interaction):
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             jeanne = Embed(color=Color.random())
@@ -44,10 +44,10 @@ class images(Cog):
             jeanne.set_footer(text="Fetched from Jeanne_1936 • Credits must go to the artist")
             await ctx.followup.send(embed=jeanne)
 
-    @app_commands.command(description="Get a Saber image")
+    @Jeanne.command(description="Get a Saber image")
     async def saber(self, ctx: Interaction):
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             saber = Embed(color=Color.random())
@@ -55,10 +55,10 @@ class images(Cog):
             saber.set_footer(text="Fetched from Saber_1936 • Credits must go to the artist")
             await ctx.followup.send(embed=saber)
 
-    @app_commands.command(description="Get a neko image")
+    @Jeanne.command(description="Get a neko image")
     async def neko(self, ctx: Interaction):
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             neko_api = get(neko_purrbot).json()
@@ -67,10 +67,10 @@ class images(Cog):
             neko.set_footer(text="Fetched from PurrBot.site • Credits must go to the artist")
             await ctx.followup.send(embed=neko)
 
-    @app_commands.command(description="Get a Medusa (Fate) image")
+    @Jeanne.command(description="Get a Medusa (Fate) image")
     async def medusa(self, ctx: Interaction):
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             medusa = Embed(color=Color.random())

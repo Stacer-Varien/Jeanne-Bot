@@ -1,10 +1,10 @@
 from typing import Literal, Optional
 from json import loads
-from discord import *
+from discord import 
 from discord.ext.commands import Bot, Cog, GroupCog
 from humanfriendly import format_timespan, parse_timespan, InvalidTimespan
 from collections import OrderedDict
-from db_functions import *
+from db_functions import 
 from assets.buttons import Confirmation
 from requests import get
 from io import BytesIO

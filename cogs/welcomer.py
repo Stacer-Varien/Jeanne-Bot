@@ -1,6 +1,6 @@
-from discord import *
+from discord import Member
 from discord.ext.commands import Cog, Bot
-from db_functions import *
+from db_functions import Logger
 from collections import OrderedDict
 from json import loads
 
@@ -18,8 +18,8 @@ class welcomer(Cog):
     @Cog.listener()
     async def on_member_join(self, member: Member):
         try:
-            channel_id = get_welcomer(member.guild.id)
-            server_id = fetch_welcomer(channel_id)
+            channel_id = Logger(server=member.guild.id).get_welcomer()
+            server_id = Logger(member.guild.id, channel=await self.bot.fetch_channel(channel_id)).fetch_welcomer()
 
             if member.guild.id == server_id:
                 channel = self.bot.get_channel(channel_id)

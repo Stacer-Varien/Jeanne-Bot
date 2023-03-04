@@ -1,6 +1,6 @@
-from db_functions import add_qp, check_botbanned_user
+from db_functions import
 from config import TOPGG, TOPGG_AUTH
-from topgg import *
+from topgg import 
 from discord.ext import tasks
 from discord.ext.commands import Cog, Bot
 from datetime import *
