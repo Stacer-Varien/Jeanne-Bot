@@ -234,12 +234,12 @@ class Inventory():
 
         Currency(self.user).remove_qp(1000)
 
-    def selected_wallpaper(self, user: User):
+    def selected_wallpaper(self):
         try:
             wallpaper = db.execute(
                 "SELECT * FROM userWallpaperInventory WHERE user_id = ? and selected = ?",
                 (
-                    user.id,
+                    self.user.id,
                     1,
                 )).fetchone()
             db.commit()

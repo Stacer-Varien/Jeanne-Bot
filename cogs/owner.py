@@ -1,10 +1,10 @@
 import contextlib
 from io import StringIO
 from discord.ext.commands import Cog, Bot, group, is_owner, guild_only, Context, Greedy, command
-from discord import 
+from discord import ActivityType, Embed, Game, Activity, Object, SyncWebhook, HTTPException
 from os import execv
 from sys import executable, argv
-from db_functions import
+from db_functions import Botban
 from config import BB_WEBHOOK
 from time import time
 from typing import Literal, Optional
@@ -21,7 +21,7 @@ class slashowner(Cog):
     @group(aliases=['act', 'pressence'], invoke_without_command=True)
     @is_owner()
     async def activity(self, ctx: Context):
-        if check_botbanned_user(ctx.author.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             embed = Embed(title="This is a group command. However, the available commands for this is:",
@@ -32,7 +32,7 @@ class slashowner(Cog):
     @is_owner()
     async def play(self, ctx: Context, *, activity: str):
         """Make Jeanne play something as an activity"""
-        if check_botbanned_user(ctx.author.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             await self.bot.change_presence(activity=Game(name=activity))
@@ -42,7 +42,7 @@ class slashowner(Cog):
     @is_owner()
     async def listen(self, ctx: Context, *, activity: str):
         """Make Jeanne listen to something as an activity"""
-        if check_botbanned_user(ctx.author.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             await self.bot.change_presence(activity=Activity(type=ActivityType.listening, name=activity))
@@ -52,7 +52,7 @@ class slashowner(Cog):
     @is_owner()
     async def clear(self, ctx: Context):
         """Clears the bot's activity"""
-        if check_botbanned_user(ctx.author.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             await self.bot.change_presence(activity=None)
@@ -63,7 +63,7 @@ class slashowner(Cog):
     async def finduser(self, ctx: Context, user_id: int):
         """Finds a user"""
         await ctx.defer()
-        if check_botbanned_user(ctx.author.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             user = await self.bot.fetch_user(user_id)
@@ -96,7 +96,7 @@ class slashowner(Cog):
     async def update(self, ctx: Context):
         """Restart me so I can be updated"""
         await ctx.defer()
-        if check_botbanned_user(ctx.author.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             await ctx.send(f"YAY! NEW UPDATE!")
@@ -106,14 +106,14 @@ class slashowner(Cog):
     @is_owner()
     async def botban(self, ctx: Context, user_id: int, *, reason: str):
         """Botban a user from using the bot"""
-        if check_botbanned_user(ctx.author.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             if reason == None:
                 await ctx.send("Reason missing for botban", ephemeral=True)
             else:
                 user = await self.bot.fetch_user(user_id)
-                add_botbanned_user(user_id, reason)
+                Botban(user).add_botbanned_user(reason)
 
                 botbanned = Embed(title="User has been botbanned!",
                                   description="They will no longer use Jeanne, permanently!")
@@ -136,7 +136,7 @@ class slashowner(Cog):
     @is_owner()
     async def evaluate(self, ctx: Context, *, code: str):
         """Evaluates a code"""
-        if check_botbanned_user(ctx.author.id) == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
             pass
         else:
             if code.startswith("```") and code.endswith("```"):

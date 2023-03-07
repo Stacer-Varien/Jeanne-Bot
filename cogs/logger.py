@@ -1,6 +1,6 @@
-from discord import 
+from discord import Color, Embed, Message  
 from discord.ext.commands import Cog, Bot
-from db_functions import 
+from db_functions import Logger
 
 
 class logger(Cog):
@@ -10,7 +10,7 @@ class logger(Cog):
     @Cog.listener()
     async def on_message_edit(self, before: Message, after: Message):
         if not before.author.bot:
-            logger = get_message_logger(after.guild.id)
+            logger = Logger(before.guild).get_message_logger()
             if logger == False:
                 pass
             else:
@@ -68,7 +68,7 @@ class logger(Cog):
     @Cog.listener()
     async def on_message_delete(self, message: Message):
         if not message.author.bot:
-            logger = get_message_logger(message.guild.id)
+            logger = Logger(message.guild).get_message_logger()
             if logger == False:
                 pass
             else:
