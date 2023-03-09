@@ -385,7 +385,7 @@ class Levelling():
         return level[0]
 
     def add_xp(self):
-        if datetime.today().weekday() > 5:
+        if datetime.today().weekday() >= 5:
             xp = 10
         else:
             xp = 5
@@ -423,7 +423,7 @@ class Levelling():
                     self.server.id,
                     self.member.id,
                 ))
-
+        
         db.commit()
 
         if cursor2.rowcount == 0:
@@ -440,7 +440,7 @@ class Levelling():
                     global_updated_cumulated_exp,
                     self.member.id,
                 ))
-
+        
         db.commit()
 
         server_cumulated_exp = self.get_member_cumulated_xp()
@@ -462,6 +462,7 @@ class Levelling():
             data = db.execute(
                 "SELECT * FROM levelNotifierData WHERE server_id = ?",
                 (self.server.id, )).fetchone()
+            db.commit()
             if data == None:
                 return None
             else:
@@ -513,22 +514,6 @@ class Levelling():
                         self.server.id,
                     ))
         db.commit()
-
-    def get_level_channel(self):
-        data = db.execute(
-            "SELECT * FROM levelNotifierData WHERE server_id = ?",
-            (self.server.id, )).fetchone()
-
-        server_cumulated_exp = self.get_member_cumulated_xp()
-        server_level = self.get_member_level()
-        server_next_lvl_exp = ((server_level * 50) +
-                               ((server_level - 1) * 25) + 50)
-        db.commit()
-        if server_cumulated_exp >= server_next_lvl_exp:
-            if data == None:
-                return None
-            else:
-                return data
 
     def get_server_rank(self):
         leaders_query = db.execute(
@@ -597,6 +582,15 @@ class Levelling():
             return rank
         except ValueError:
             return None
+        
+    def get_blacklisted_channels(self):
+        data=db.execute("SELECT channel FROM xpChannelData WHERE server = ?", (self.server.id)).fetchall()
+        db.commit()
+
+        if data == None:
+            return None
+        else:
+            return data
 
 class Manage():
 
@@ -636,19 +630,19 @@ class Manage():
                 ))
         db.commit()
 
-    def set_modloger(server: int, channel: int):
+    def set_modloger(self, channel: TextChannel):
         cursor = db.execute(
             "INSERT OR IGNORE INTO modlogData (guild_id, channel_id) VALUES (?,?)",
             (
-                server,
-                channel,
+                self.server.id,
+                channel.id,
             ))
 
         if cursor.rowcount == 0:
             db.execute(
                 f"UPDATE modlogData SET channel_id = ? WHERE guild_id = ?", (
-                    channel,
-                    server,
+                    channel.id,
+                    self.server.id,
                 ))
         db.commit()
 
@@ -738,7 +732,7 @@ class Manage():
             db.commit()
 
 class Moderation():
-    def __init__(self, server:Guild, member:Optional[Member]=None) -> None:
+    def __init__(self, server:Optional[Guild]=None, member:Optional[Member]=None) -> None:
         self.server=server
         self.member=member
 
@@ -832,77 +826,6 @@ class Moderation():
 
         db.commit()
 
-
-    def check_mute_role(self):
-        role = db.execute("SELECT role_id FROM muteroleData WHERE guild_id = ?",
-                        (self.server.id, )).fetchone()
-        db.commit()
-        if role == None:
-            return False
-        else:
-            return role[0]
-
-
-    def add_mute_role(self, role_id: Role):
-        role = db.execute(
-            "INSERT OR IGNORE INTO muteroleData (guild_id, role_id) VALUES (?,?)",
-            (
-                self.server.id,
-                role_id.id,
-            ))
-
-        if role.rowcount == 0:
-            db.execute("UPDATE muteroleData SET role_id = ? WHERE guild_id = ?", (
-                role_id.id,
-                self.server.id,
-            ))
-
-        db.commit()
-
-
-    def mute_member(self, ends: str = None):
-
-        if ends == None:
-            ends = 99999999999  # infinite value for now
-        else:
-            seconds = parse_timespan(ends)
-            ends = round((datetime.now() + timedelta(seconds=seconds)).timestamp())
-
-        data = db.execute(
-            "INSERT OR IGNORE INTO mutedMembers (user_id, guild_id, ends) VALUES (?,?,?)",
-            (
-                self.member.id,
-                self.server.id,
-                ends,
-            ))
-
-        if data.rowcount == 0:
-            db.execute(
-                "UPDATE mutedMembers SET ends = ? WHERE user_id = ? AND guild_id = ?",
-                (
-                    ends,
-                    self.member.id,
-                    self.server.id,
-                ))
-
-        db.commit()
-
-
-    def get_muted_data(self):
-        data = db.execute("SELECT * FROM mutedMembers").fetchall()
-        db.commit()
-        return data
-
-
-    def remove_mute(self):
-        db.execute(
-            "DELETE FROM mutedMembers WHERE user_id = ? AND guild_id = ?", (
-                self.member.id,
-                self.server.id,
-            ))
-        db.commit()
-
-
     def get_softban_data(self):
         data = db.execute("SELECT * FROM softbannedMembers").fetchall()
         db.commit()
@@ -980,17 +903,17 @@ class Logger():
                         (self.server.id, )).fetchone()
         return data[0]
 
-    def set_message_logger(self, channel:int):
+    def set_message_logger(self, channel:TextChannel):
         cur = db.execute(
             "INSERT OR IGNORE INTO messageLogData (server, channel) VALUES (?,?)",
             (
                 self.server.id,
-                channel,
+                channel.id,
             ))
 
         if cur.rowcount == 0:
             db.execute("UPDATE messageLogData SET channel = ? WHERE server = ?", (
-                channel,
+                channel.id,
                 self.server.id,
             ))
         db.commit()

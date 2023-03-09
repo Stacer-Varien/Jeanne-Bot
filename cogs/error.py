@@ -5,17 +5,20 @@ import traceback
 
 
 class errors(Cog):
+
     def __init__(self, bot: Bot):
         self.bot = bot
         self.bot.tree.on_error = self.on_app_command_error
 
     @Cog.listener()
-    async def on_app_command_error(self, ctx: Interaction, error: AppCommandError):
+    async def on_app_command_error(self, ctx: Interaction,
+                                   error: AppCommandError):
         if isinstance(error, MissingPermissions):
             embed = Embed(description=error, color=Color.red())
             await ctx.followup.send(embed=embed)
         elif isinstance(error, CommandInvokeError):
-            traceback_error=traceback.format_exception(error, error, error.__traceback__)
+            traceback_error = traceback.format_exception(
+                error, error, error.__traceback__)
             with open('cmd-invoke-errors.txt', 'a') as f:
                 f.writelines(f"{ctx.user.id}-{traceback_error}\n\n")
         elif isinstance(error, BotMissingPermissions):
