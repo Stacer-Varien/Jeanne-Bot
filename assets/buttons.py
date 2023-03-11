@@ -1,6 +1,5 @@
 from discord import ui, ButtonStyle, Interaction, User
 
-
 class Confirmation(ui.View):
     def __init__(self, author:User):
         super().__init__(timeout=600)
@@ -40,7 +39,7 @@ class Heads_or_Tails(ui.View):
 
     async def interaction_check(self, ctx: Interaction):
         return ctx.user.id == self.author.id
-           
+
 class Cancellation(ui.View):
     def __init__(self, author:User):
         super().__init__()
@@ -52,6 +51,6 @@ class Cancellation(ui.View):
         self.value = 'cancel'
         button.disabled = True
         self.stop()
-    
+
     async def interaction_check(self, ctx: Interaction):
         return ctx.user.id == self.author.id

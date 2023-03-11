@@ -36,7 +36,7 @@ class help(Cog):
         "Get help from the wiki or join the support server for further help")
     async def help(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             view = help_button()
             help = Embed(

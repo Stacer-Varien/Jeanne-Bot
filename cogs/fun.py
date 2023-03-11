@@ -20,7 +20,7 @@ class fun(Cog):
     async def _8ball(self, ctx: Interaction, question: str):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             embed = Embed(color=Color.random())
             embed.add_field(name="Question:",
@@ -37,7 +37,7 @@ class fun(Cog):
     async def reverse(self, ctx: Interaction, text: str):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             if any(word in text for word in filtered_words):
                 nope = Embed(description="I am not reversing that",
@@ -72,7 +72,7 @@ class fun(Cog):
     async def animeme(self, ctx: Interaction):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             animeme = Embed(color=Color.random())
             animeme.set_image(url=get_animeme_pic())
@@ -86,7 +86,7 @@ class fun(Cog):
                       second_word: str):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
 
             option_name1letters = first_word[:round(len(first_word) / 2)]
@@ -111,7 +111,7 @@ class fun(Cog):
     async def choose(self, ctx: Interaction, choices: str):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             choices = choices.split(sep=",")
             choose = Embed(description=f"I chose **{choice(choices)}**",
@@ -125,7 +125,7 @@ class fun(Cog):
                        member: Optional[Member] = None):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             perc = randint(0, 100)
 
@@ -149,7 +149,7 @@ class fun(Cog):
     async def gayrate(self, ctx: Interaction, member: Optional[Member] = None):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             perc = randint(0, 100)
 

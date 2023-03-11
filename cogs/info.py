@@ -20,7 +20,7 @@ class slashinfo(Cog):
     async def stats(self, ctx: Interaction):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             botowner = self.bot.get_user(597829930964877369)
             all_users = get_cached_users()
@@ -70,7 +70,7 @@ class slashinfo(Cog):
                        member: Optional[Member] = None) -> None:
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             if member == None:
                 member = ctx.user
@@ -118,7 +118,7 @@ class slashinfo(Cog):
     async def serverinfo(self, ctx: Interaction):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             guild = ctx.guild
             emojis = [str(x) for x in guild.emojis]
@@ -184,7 +184,7 @@ class slashinfo(Cog):
     @Jeanne.command(description="Check how fast I respond to a command")
     async def ping(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             await ctx.response.defer()
             start_time = time()
@@ -205,7 +205,7 @@ class slashinfo(Cog):
     async def serverbanner(self, ctx: Interaction):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             guild = ctx.guild
 
@@ -231,14 +231,28 @@ class slashinfo(Cog):
                      member: Optional[Member] = None) -> None:
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             if member == None:
                 member = ctx.user
+        color=Color.random()
+        normav = Embed(description=f"**{member}'s Avatar**",url="https://cdn.discordapp.com", color=color)
+        guildav = Embed(url="https://cdn.discordapp.com", color=color)
 
-            avatar = Embed(title=f"{member}'s Avatar", color=Color.random())
-            avatar.set_image(url=member.avatar)
-            await ctx.followup.send(embed=avatar)
+        if member.guild_avatar != None and member.avatar ==None:
+            guildav.set_image(url=member.avatar)
+            await ctx.followup.send(embed=guildav)
+        elif member.guild_avatar == None and member.display_avatar ==None:
+            normav.set_image(url=member.default_avatar)
+            await ctx.followup.send(embed=normav)
+        elif member.guild_avatar == None and member.display_avatar != None:
+            normav.set_image(url=member.display_avatar)
+            await ctx.followup.send(embed=normav)
+        else:
+            normav.set_image(url=member.display_avatar)
+            guildav.set_image(url=member.guild_avatar)
+            await ctx.followup.send(embeds=[normav, guildav])
+
 
     @Jeanne.command(
         description="See your server avatar or a member's server avatar")
@@ -247,7 +261,7 @@ class slashinfo(Cog):
                            ctx: Interaction,
                            member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             await ctx.response.defer()
             if member == None:
@@ -276,7 +290,7 @@ class slashinfo(Cog):
     )
     async def sticker(self, ctx: Interaction, sticker: str):
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             await ctx.response.defer()
 
@@ -320,7 +334,7 @@ class slashinfo(Cog):
     @Jeanne.describe(emoji="What is the name of the emoji?")
     async def emoji(self, ctx: Interaction, emoji: str):
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             await ctx.response.defer()
             try:

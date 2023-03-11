@@ -21,7 +21,7 @@ class nsfw(Cog):
                                      "explicit"]] = None) -> None:
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             if rating == None:
                 rating = ["questionable", "explicit"]
@@ -72,7 +72,7 @@ class nsfw(Cog):
                        tag: Optional[str] = None) -> None:
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             if rating == None:
                 rating = ["questionable", "explicit"]
@@ -116,7 +116,7 @@ class nsfw(Cog):
                       tag: Optional[str] = None) -> None:
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             if rating == None:
                 rating = ["questionable", "explicit"]
@@ -162,7 +162,7 @@ class nsfw(Cog):
                        tag: Optional[str] = None) -> None:
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             if rating == None:
                 rating = ["questionable", "explicit"]

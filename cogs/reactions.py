@@ -17,7 +17,7 @@ class slashreactions(Cog):
                   ctx: Interaction,
                   member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             hug_api = get(hug_nekoslife).json()
             if member == None:
@@ -37,7 +37,7 @@ class slashreactions(Cog):
                    ctx: Interaction,
                    member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             slap_api = get(slap_nekoslife).json()
 
@@ -55,7 +55,7 @@ class slashreactions(Cog):
     @Jeanne.command(description="Show a smuggy look")
     async def smug(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             smug_api = get(smug_nekoslife).json()
 
@@ -71,7 +71,7 @@ class slashreactions(Cog):
                    ctx: Interaction,
                    member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             poke_api = get(poke_nekosfun).json()
             poke = Embed(color=Color.random())
@@ -91,7 +91,7 @@ class slashreactions(Cog):
                   ctx: Interaction,
                   member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             pat_api = get(pat_nekoslife).json()
             pat = Embed(color=Color.random())
@@ -111,7 +111,7 @@ class slashreactions(Cog):
                    ctx: Interaction,
                    member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             kiss_api = get(kiss_nekosfun).json()
             if member == None:
@@ -131,7 +131,7 @@ class slashreactions(Cog):
                      ctx: Interaction,
                      member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             tickle_api = get(tickle_nekoslife).json()
             if member == None:
@@ -151,7 +151,7 @@ class slashreactions(Cog):
                    ctx: Interaction,
                    member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             baka_api = get(baka_nekosfun).json()
             if member == None:
@@ -171,7 +171,7 @@ class slashreactions(Cog):
                    ctx: Interaction,
                    member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             feed_api = get(feed_nekoslife).json()
             if member == None:
@@ -188,7 +188,7 @@ class slashreactions(Cog):
     @Jeanne.command(description="Make yourself cry")
     async def cry(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             cry_api = get(cry_purrbot).json()
 
@@ -204,7 +204,7 @@ class slashreactions(Cog):
                    ctx: Interaction,
                    member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             bite_api = get(bite_purrbot).json()
             if member == None:
@@ -221,7 +221,7 @@ class slashreactions(Cog):
     @Jeanne.command(description="Make yourself blush")
     async def blush(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             blush_api = get(blush_purrbot).json()
 
@@ -237,7 +237,7 @@ class slashreactions(Cog):
                      ctx: Interaction,
                      member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             cuddle_api = get(cuddle_purrbot).json()
             if member == None:
@@ -257,7 +257,7 @@ class slashreactions(Cog):
                     ctx: Interaction,
                     member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             dance_api = get(dance_purrbot).json()
             if member == None:

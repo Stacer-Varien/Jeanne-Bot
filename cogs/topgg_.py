@@ -19,7 +19,7 @@ class topgg(Cog):
     @tasks.loop(minutes=30)
     async def update_stats(self):
         try:
-            await self.topggpy.post_guild_count()
+            
             print(
                 f"Posted server count ({self.topggpy.guild_count}) at {datetime.now().strftime('%H:%M')}"
             )

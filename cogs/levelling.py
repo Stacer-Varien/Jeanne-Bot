@@ -30,7 +30,7 @@ class Rank_Group(GroupCog, name="rank"):
     async def _global(self, ctx: Interaction):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             embed = Embed(color=Color.random())
             embed.set_author(name="Global XP Leaderboard")
@@ -51,7 +51,7 @@ class Rank_Group(GroupCog, name="rank"):
     async def server(self, ctx: Interaction):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             embed = Embed(color=0xFFD700)
             embed.set_author(name="XP Leaderboard")
@@ -89,28 +89,23 @@ class levelling(Cog):
     @Cog.listener()
     async def on_message(self, message: Message):
         if Botban(message.author).check_botbanned_user() == True:
-            pass
-        else:
-            if not message.author.bot:
-                if Levelling(server=message.guild).check_xpblacklist_channel(
-                        message.channel) == False:
-                    try:
-                        ratelimit = self.get_ratelimit(message)
-                        if ratelimit == None:
-                            lvl = Levelling(message.member,
-                                            message.guild).add_xp()
+            return
+        
+        if not message.author.bot:
+            if Levelling(server=message.guild).check_xpblacklist_channel(message.channel) == False:
+                try:
+                    ratelimit = self.get_ratelimit(message)
+                    if ratelimit == None:
+                        lvl=Levelling(message.author, message.guild).add_xp()
 
-                            if lvl == None:
+                        if lvl == None:
                                 pass
-                            else:
+                        else:
                                 if lvl[2] == '0':
                                     msg = "{} has leveled up to `level {}`".format(
                                         message.author,
-                                        Levelling(
-                                            message.author,
-                                            message.guild).get_member_level())
-                                    lvlup = await self.bot.fetch_channel(lvl[1]
-                                                                         )
+                                        Levelling(message.author, message.guild).get_member_level())
+                                    lvlup = await self.bot.fetch_channel(lvl[1])
                                     await lvlup.send(msg)
 
                                 else:
@@ -131,9 +126,7 @@ class levelling(Cog):
                                         ("%name%", str(message.author.name)),
                                         ("%newlevel%",
                                          str(
-                                             Levelling(message.author,
-                                                       message.guild).
-                                             get_member_level()))
+                                             Levelling(message.author, message.guild).get_member_level()))
                                     ])
                                     json = loads(replace_all(msg, parameters))
                                     msg = json['content']
@@ -141,12 +134,11 @@ class levelling(Cog):
                                     lvlup = await self.bot.fetch_channel(lvl[1]
                                                                          )
                                     await lvlup.send(content=msg, embed=embed)
-                    except AttributeError:
-                        pass
-                else:
-                    pass
+                except AttributeError:
+                    return
             else:
-                pass
+                return
+
 
     @Jeanne.command(description="See your level or someone else's level")
     @Jeanne.describe(member="Which member?")
@@ -156,7 +148,7 @@ class levelling(Cog):
                     member: Optional[Member] = None) -> None:
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             if member is None:
                 member = ctx.user
@@ -212,7 +204,7 @@ class levelling(Cog):
                       member: Optional[Member] = None) -> None:
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             if member is None:
                 member = ctx.user

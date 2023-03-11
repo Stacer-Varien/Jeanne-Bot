@@ -1,10 +1,7 @@
-from collections import OrderedDict
 from datetime import date, datetime, timedelta
-from shutil import rmtree
 from humanfriendly import parse_timespan
-from discord import Embed, Color, Emoji, Guild, Member, Role, TextChannel, User
+from discord import Embed, Color, Emoji, Guild, Member, TextChannel, User
 from config import db
-from json import loads
 from typing import Optional
 
 current_time = date.today()
@@ -335,23 +332,25 @@ class Levelling():
         self.member = member
         self.server = server
 
-    def get_member_xp(self) -> int:
+
+    def get_member_xp(self):
         xp = db.execute(
-            "SELECT exp FROM serverxpData WHERE user_id = ? AND guild_id = ?",
-            (
+            "SELECT exp FROM serverxpData WHERE user_id = ? AND guild_id = ?", (
                 self.member.id,
                 self.server.id,
             )).fetchone()
         db.commit()
         return xp[0]
 
-    def get_user_xp(self) -> int:
+
+    def get_user_xp(self):
         xp = db.execute("SELECT exp FROM globalxpData WHERE user_id = ?",
                         (self.member.id, )).fetchone()
         db.commit()
         return xp[0]
 
-    def get_member_cumulated_xp(self) -> int:
+
+    def get_member_cumulated_xp(self):
         cumulated_exp = db.execute(
             "SELECT cumulative_exp FROM serverxpData WHERE user_id = ? AND guild_id = ?",
             (
@@ -361,31 +360,34 @@ class Levelling():
         db.commit()
         return cumulated_exp[0]
 
-    def get_user_cumulated_xp(self) -> int:
+
+    def get_user_cumulated_xp(self):
         cumulated_exp = db.execute(
             "SELECT cumulative_exp FROM globalxpData WHERE user_id = ?",
             (self.member.id, )).fetchone()
         db.commit()
         return cumulated_exp[0]
 
-    def get_member_level(self) -> int:
+
+    def get_member_level(self):
         level = db.execute(
-            "SELECT lvl FROM serverxpData WHERE user_id = ? AND guild_id = ?",
-            (
+            "SELECT lvl FROM serverxpData WHERE user_id = ? AND guild_id = ?", (
                 self.member.id,
                 self.server.id,
             )).fetchone()
         db.commit()
         return level[0]
 
-    def get_user_level(self) -> int:
+
+    def get_user_level(self):
         level = db.execute("SELECT lvl FROM globalxpData WHERE user_id = ?",
-                           (self.member.id, )).fetchone()
+                        (self.member.id, )).fetchone()
         db.commit()
         return level[0]
 
+
     def add_xp(self):
-        if datetime.today().weekday() >= 5:
+        if datetime.today().weekday() > 5:
             xp = 10
         else:
             xp = 5
@@ -423,7 +425,7 @@ class Levelling():
                     self.server.id,
                     self.member.id,
                 ))
-        
+
         db.commit()
 
         if cursor2.rowcount == 0:
@@ -440,7 +442,23 @@ class Levelling():
                     global_updated_cumulated_exp,
                     self.member.id,
                 ))
-        
+
+        db.commit()
+
+        global_cumulated_exp = self.get_user_cumulated_xp()
+        global_level = self.get_user_level()
+        global_next_lvl_exp = ((global_level * 50) +
+                               ((global_level - 1) * 25) + 50)
+
+        if global_cumulated_exp >= global_next_lvl_exp:
+            global_updated_exp = global_cumulated_exp - global_next_lvl_exp
+            db.execute(
+                "UPDATE globalxpData SET lvl = lvl + ?, exp = ? WHERE user_id = ?",
+                (
+                    1,
+                    global_updated_exp,
+                    self.member.id,
+                ))
         db.commit()
 
         server_cumulated_exp = self.get_member_cumulated_xp()
@@ -458,43 +476,19 @@ class Levelling():
                     self.server.id,
                     self.member.id,
                 ))
-
-            data = db.execute(
-                "SELECT * FROM levelNotifierData WHERE server_id = ?",
-                (self.server.id, )).fetchone()
             db.commit()
-            if data == None:
-                return None
-            else:
-                return data
 
-        db.commit()
+            return self.get_level_channel()
 
-        global_cumulated_exp = self.get_user_cumulated_xp()
-        global_level = self.get_user_level()
-        global_next_lvl_exp = ((global_level * 50) +
-                               ((global_level - 1) * 25) + 50)
-
-        if global_cumulated_exp >= global_next_lvl_exp:
-            global_updated_exp = global_cumulated_exp - server_next_lvl_exp
-            db.execute(
-                "UPDATE globalxpData SET lvl = lvl + ?, exp = ? WHERE user_id = ?",
-                (
-                    1,
-                    global_updated_exp,
-                    self.member.id,
-                ))
-        db.commit()
-
-    def add_level_channel(self, channel: int, message: str = None):
-        if not message:
+    def add_level_channel(self, channel: TextChannel, message: Optional[str] = None)->None:
+        if message==None:
             message = 0
 
         cur = db.execute(
             "INSERT OR IGNORE INTO levelNotifierData (server_id, channel_id, message) VALUES (?,?,?)",
             (
                 self.server.id,
-                channel,
+                channel.id,
                 message,
             ))
 
@@ -503,7 +497,7 @@ class Levelling():
                 db.execute(
                     "UPDATE levelNotifierData SET channel_id = ? WHERE server_id =?",
                     (
-                        channel,
+                        channel.id,
                         self.server.id,
                     ))
             if message:
@@ -514,6 +508,19 @@ class Levelling():
                         self.server.id,
                     ))
         db.commit()
+
+
+    def get_level_channel(self):
+        data = db.execute("SELECT * FROM levelNotifierData WHERE server_id = ?",
+                        (self.server.id, )).fetchone()
+        db.commit()
+
+        if data == None:
+            return None
+        else:
+            return data
+
+
 
     def get_server_rank(self):
         leaders_query = db.execute(
@@ -582,7 +589,7 @@ class Levelling():
             return rank
         except ValueError:
             return None
-        
+
     def get_blacklisted_channels(self):
         data=db.execute("SELECT channel FROM xpChannelData WHERE server = ?", (self.server.id)).fetchall()
         db.commit()

@@ -15,7 +15,7 @@ class images(Cog):
     async def kitsune(self, ctx: Interaction):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             kistune_api = get(kitsune_nekoslife).json()
             kitsune = Embed(color=Color.random())
@@ -28,7 +28,7 @@ class images(Cog):
     async def wallpaper(self, ctx: Interaction):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             wallpaper = Embed(color=Color.random())
             wallpaper.set_image(url=get_wallpaper_pic())
@@ -41,7 +41,7 @@ class images(Cog):
     async def jeanne(self, ctx: Interaction):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             jeanne = Embed(color=Color.random())
             jeanne.set_image(url=get_jeanne_pic())
@@ -54,7 +54,7 @@ class images(Cog):
     async def saber(self, ctx: Interaction):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             saber = Embed(color=Color.random())
             saber.set_image(url=get_saber_pic())
@@ -66,7 +66,7 @@ class images(Cog):
     async def neko(self, ctx: Interaction):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             neko_api = get(neko_purrbot).json()
             neko = Embed(color=Color.random())
@@ -80,7 +80,7 @@ class images(Cog):
     async def medusa(self, ctx: Interaction):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             medusa = Embed(color=Color.random())
             medusa.set_image(url=get_medusa_pic())

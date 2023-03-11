@@ -19,7 +19,7 @@ class Guess_Group(GroupCog, name="guess"):
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     async def free(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             await ctx.response.defer()
             qp = str(self.bot.get_emoji(980772736861343774))
@@ -66,7 +66,7 @@ class Guess_Group(GroupCog, name="guess"):
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def bet(self, ctx: Interaction, bet: str):
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             await ctx.response.defer()
             qp = str(self.bot.get_emoji(980772736861343774))
@@ -170,7 +170,7 @@ class Dice_Group(GroupCog, name="dice"):
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     async def free(self, ctx: Interaction, digit: str):
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             await ctx.response.defer()
             rolled = randint(1, 6)
@@ -196,7 +196,7 @@ class Dice_Group(GroupCog, name="dice"):
     async def bet(self, ctx: Interaction, bet: str, digit: str):
 
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             await ctx.response.defer()
             qp = str(self.bot.get_emoji(980772736861343774))
@@ -273,7 +273,7 @@ class Flip_Group(GroupCog, name="flip"):
     async def free(self, ctx: Interaction):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             jeannes_pick = ['Heads', 'Tails']
             qp = str(self.bot.get_emoji(980772736861343774))
@@ -312,7 +312,7 @@ class Flip_Group(GroupCog, name="flip"):
     async def bet(self, ctx: Interaction, bet: str):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             qp = str(self.bot.get_emoji(980772736861343774))
             jeannes_pick = ['Heads', 'Tails']
@@ -398,7 +398,7 @@ class currency(Cog):
     @Jeanne.command(description="Claim your daily")
     async def daily(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             qp = self.bot.get_emoji(980772736861343774)
             tomorrow = round((datetime.now() + timedelta(days=1)).timestamp())
@@ -433,7 +433,7 @@ class currency(Cog):
     @Jeanne.checks.cooldown(1, 30, key=lambda i: (i.user.id))
     async def balance(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             await ctx.response.defer()
             qp = str(self.bot.get_emoji(980772736861343774))
@@ -461,7 +461,7 @@ class currency(Cog):
     @Jeanne.command()
     async def vote(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         await ctx.response.send_message(
             embed=Embed(
                 color=Color.random(),

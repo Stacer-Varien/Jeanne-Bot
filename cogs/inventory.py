@@ -17,7 +17,7 @@ class Shop_Group(GroupCog, name="shop"):
     async def backgrounds(self, ctx: Interaction):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
 
             qp = self.bot.get_emoji(980772736861343774)
@@ -38,7 +38,7 @@ class Background_Group(GroupCog, name="background"):
     @Jeanne.describe(item_id="Which background you are checking?")
     async def preview(self, ctx: Interaction, item_id: str):
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             await ctx.response.defer()
             qp = self.bot.get_emoji(980772736861343774)
@@ -65,7 +65,7 @@ class Background_Group(GroupCog, name="background"):
     async def buy(self, ctx: Interaction, item_id: str):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             balance: int = Currency(ctx.user).get_balance()
 
@@ -151,7 +151,7 @@ class Background_Group(GroupCog, name="background"):
     async def use(self, ctx: Interaction, name: str):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             try:
                 Inventory(ctx.user).use_wallpaper(name)
@@ -170,7 +170,7 @@ class Background_Group(GroupCog, name="background"):
     async def buycustom(self, ctx: Interaction, name: str, link: str):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             balance = Currency(ctx.user).get_balance()
 
@@ -249,7 +249,7 @@ class Background_Group(GroupCog, name="background"):
     async def list(self, ctx: Interaction):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
-            pass
+            return
         else:
             if Inventory(ctx.user).fetch_user_inventory() == None:
                 embed = Embed(description="Your inventory is empty",
