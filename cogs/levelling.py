@@ -253,7 +253,7 @@ class levelling(Cog):
                     'rrank': rrank,
                     'creator': member.id,
                     'partner': member.id,
-                    'balance': Currency(member).get_balance(member.id),
+                    'balance': Currency(member).get_balance(),
                     'bio': str(bio),
                     'brightness': brightness
                 }
