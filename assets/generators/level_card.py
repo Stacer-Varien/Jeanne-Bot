@@ -20,6 +20,8 @@ class Level:
             bg_bytes = BytesIO(requests.get(bg_image).content)
             card = Image.open(bg_bytes).convert("RGBA")
 
+        if brightness==None:
+            brightness=100
         
         card = ImageEnhance.Brightness(card).enhance(float(brightness/100))
 
