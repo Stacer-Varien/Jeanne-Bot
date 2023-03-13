@@ -17,35 +17,17 @@ class Guess_Group(GroupCog, name="guess"):
 
     @Jeanne.command(description="Guess my number and you can win 20 QP")
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
-    async def free(self, ctx: Interaction):
+    @Jeanne.describe(number="Guess her number (between 1 and 10)")
+    async def free(self, ctx: Interaction, number:int):
         if Botban(ctx.user).check_botbanned_user() == True:
             return
         else:
             await ctx.response.defer()
             qp = str(self.bot.get_emoji(980772736861343774))
-            guessit = Embed(
-                description=
-                "I'm thinking of a number between 1 to 10.\nYou have 5 seconds to guess it!",
-                color=Color.random())
-            await ctx.followup.send(embed=guessit)
-
-            def is_correct(m: Message):
-                return m.author == ctx.user and m.content.isdigit()
 
             answer = randint(1, 10)
 
-            try:
-                guess: Message = await self.bot.wait_for("message",
-                                                         check=is_correct,
-                                                         timeout=5.0)
-            except TimeoutError:
-                timeout = Embed(
-                    description=f"Sorry but you took too long. It was {answer}",
-                    color=Color.red())
-                timeout.set_image(url='https://i.imgur.com/faD48C3.jpg')
-                return await ctx.followup.send(embed=timeout)
-
-            if int(guess.content) == answer:
+            if int(number) == answer:
                 Currency(ctx.user).add_qp(20)
 
                 correct = Embed(
@@ -62,9 +44,10 @@ class Guess_Group(GroupCog, name="guess"):
 
     @Jeanne.command(
         description='Guess my number and you can win 20 QP with betting')
-    @Jeanne.describe(bet="How much are you betting?")
+    @Jeanne.describe(bet="How much are you betting?",
+                     number="Guess her number (between 1 and 10)")
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
-    async def bet(self, ctx: Interaction, bet: str):
+    async def bet(self, ctx: Interaction, bet: str, number:int):
         if Botban(ctx.user).check_botbanned_user() == True:
             return
         else:
@@ -89,44 +72,18 @@ class Guess_Group(GroupCog, name="guess"):
                 )
                 await ctx.followup.send(embed=zerobal)
             else:
-                guessit = Embed(
-                    description=
-                    "I'm thinking of a number between 1 to 10.\nYou have 5 seconds to guess it!",
-                    color=Color.random())
-                await ctx.followup.send(embed=guessit)
-
-                def is_correct(m: Message):
-                    return m.author == ctx.user and m.content.isdigit()
 
                 answer = randint(1, 10)
 
-                try:
-                    guess: Message = await self.bot.wait_for("message",
-                                                             check=is_correct,
-                                                             timeout=5.0)
-                except TimeoutError:
-                    timeout = Embed(
-                        description=
-                        f"Sorry but you took too long. It was {answer}",
-                        color=Color.red())
-                    timeout.set_image(url='https://i.imgur.com/faD48C3.jpg')
-                    return await ctx.followup.send(embed=timeout)
+                if int(number) == answer:
 
-                if int(guess.content) == answer:
-                    try:
-                        Currency(ctx.user).add_qp(int(bet))
-                        correct = Embed(
-                            description=
+                    Currency(ctx.user).add_qp(int(bet))
+                    correct = Embed(
+                        description=
                             f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given {int(bet)} {qp}!",
-                            color=Color.random())
-                        correct.set_image(
-                            url='https://i.imgur.com/ICndRZg.gifv')
-                    except:
-                        correct = Embed(description="YES!",
-                                        color=Color.random())
-                        correct.set_image(
-                            url='https://i.imgur.com/ICndRZg.gifv')
-                    await ctx.followup.send(embed=correct)
+                        color=Color.random())
+                    correct.set_image(
+                        url='https://i.imgur.com/ICndRZg.gifv')
                 else:
                     Currency(ctx.user).remove_qp(int(bet))
                     wrong = Embed(
@@ -278,7 +235,7 @@ class Flip_Group(GroupCog, name="flip"):
             jeannes_pick = ['Heads', 'Tails']
             qp = str(self.bot.get_emoji(980772736861343774))
             view = Heads_or_Tails(ctx.user)
-            ask = Embed(description="Heads or Tails?")
+            ask = Embed(description="Heads or Tails?", color=Color.random())
             await ctx.followup.send(embed=ask, view=view)
             await view.wait()
 
@@ -410,7 +367,7 @@ class currency(Cog):
                     title="Daily",
                     description=
                     f"**{ctx.user}**, you claimed your daily reward.",
-                    color=ctx.user.color)
+                    color=Color.random())
 
                 if datetime.today().weekday() > 5:
                     daily.add_field(name="Rewards (weekend):",
@@ -458,7 +415,7 @@ class currency(Cog):
                 color=Color.red())
             await ctx.response.send_message(embed=cooldown)
 
-    @Jeanne.command()
+    @Jeanne.command(description="Vote for me in TopGG to get more QP!")
     async def vote(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user() == True:
             return
