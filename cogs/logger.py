@@ -16,7 +16,7 @@ class logger(Cog):
         if before.author.bot:
             return
 
-        if not (logger_id := Logger(after.guild.id).get_message_logger()):
+        if not (logger_id := Logger(before.guild).get_message_logger()):
             return
 
         channel = await self.bot.fetch_channel(logger_id)
@@ -54,9 +54,9 @@ class logger(Cog):
         if not message.author.bot:
             logger = Logger(message.guild).get_message_logger()
             if logger == False:
-                pass
-            else:
-                try:
+                return
+
+            try:
                     channel = await self.bot.fetch_channel(logger)
                     embed = Embed()
                     embed.description = "Message deleted in {}".format(
@@ -90,8 +90,8 @@ class logger(Cog):
                     embed.set_footer(text="Author: {} | {}".format(
                         message.author, message.author.id))
                     await channel.send(embed=embed)
-                except AttributeError:
-                    pass
+            except AttributeError:
+                    return
 
 
 async def setup(bot: Bot):
