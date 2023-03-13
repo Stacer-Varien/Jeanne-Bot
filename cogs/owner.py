@@ -131,13 +131,22 @@ class slashowner(Cog):
                                     inline=False)
                 botbanned.set_footer(
                     text=
-                    "Due to this user botbanned, all data except warnings are immediatley deletedfrom the database! They will have no chance of appealing their botban and all the commands executed bythem are now rendered USELESS!"
+                    "Due to this user botbanned, all data except warnings and softbans are immediatley deleted from the database and banned in the developer's servers! They will have no chance of appealing their botban including their ban and all the commands executed by them are now rendered USELESS!"
                 )
                 botbanned.set_thumbnail(url=user.avatar)
                 webhook = SyncWebhook.from_url(BB_WEBHOOK)
                 webhook.send(embed=botbanned)
 
                 await ctx.send("User botbanned", ephemeral=True)
+
+                orleans = await self.bot.fetch_guild(740584420645535775)
+                ha = await self.bot.fetch_guild(925790259160166460)
+                vhf = await self.bot.fetch_guild(974028573893595146)
+
+                for server in [orleans, ha, vhf]:
+                    await server.ban(user, reason=f"Botbanned - {reason}")
+
+
 
     @command()
     @guild_only()
