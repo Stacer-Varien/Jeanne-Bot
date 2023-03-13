@@ -82,6 +82,7 @@ class Level:
             hex = ImageColor.getcolor(('#' + font_color), "RGB")
             COLOR = tuple(hex)
                 
+        STROKE = (151, 151, 151)
 
         def get_str(xp):
             if xp < 1000:
@@ -92,14 +93,15 @@ class Level:
                 return str(round(xp / 1000000, 1)) + "M"
 
         draw = ImageDraw.Draw(card)
-        draw.text((20, 240), user_name, COLOR, font=font_normal, stroke_width=1)
+        draw.text((20, 240), user_name, COLOR, font=font_normal,
+                  stroke_fill=STROKE, stroke_width=1)
         draw.text((20, 310), f"Server Level: {server_level}", COLOR,
-                  font=font_small, stroke_width=1)
+                  font=font_small, stroke_width=1, stroke_fill=STROKE)
         draw.text(
             (280, 310),
             f"Server XP: {get_str(server_user_xp)}/{get_str(server_next_xp)}",
             COLOR,
-            font=font_small, stroke_width=1)
+            font=font_small, stroke_width=1, stroke_fill=STROKE)
 
         blank = Image.new("RGBA", card.size, (255, 255, 255, 0))
         blank_draw = ImageDraw.Draw(blank)
@@ -120,12 +122,12 @@ class Level:
 ########################################################################################
 
         draw.text((20, 420), f"Global Level: {global_level}", COLOR,
-                  font=font_small, stroke_width=1)
+                  font=font_small, stroke_width=1, stroke_fill=STROKE)
         draw.text(
             (280, 420),
             f"Global XP: {get_str(global_user_xp)}/{get_str(global_next_xp)}",
             COLOR,
-            font=font_small, stroke_width=1)
+            font=font_small, stroke_width=1, stroke_fill=STROKE)
 
         blank_draw.rectangle(
             (25, 470, 520, 480), fill=(255, 255, 255, 0), outline=COLOR
@@ -151,4 +153,3 @@ class Level:
         final.save(final_bytes, 'png')
         final_bytes.seek(0)
         return final_bytes
-
