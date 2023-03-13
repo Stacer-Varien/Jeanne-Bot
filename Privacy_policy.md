@@ -11,13 +11,13 @@ User IDs, server IDs and channel IDs are the main data stored and kept privately
 
 The user's or server's data is **not registered** in the database if:
 
-1. The user hasn't talked in the server or talking in XP ignored channels and Direct Messages between them and the bot
+1. The user hasn't talked in the server or talking in XP ignored channels and Direct Messages between them and the bot or in a channel were the bot cannot view
 2. A certian command required to add/enter data in the database has not been used at least once
 3. If the user has been banned from using the bot
 
 ## Data Accessing
 
-Data can be accessed but limited to anyone except the bot developer as he has full access to all kinds of data. Level and rank data can be accessed freely but data such as inventory can only be accessed by the main user. Sensitive data such as reports made on users violating rules of the server are private or public depending on how authorised personnel see fit to it and will only be logged to their own servers.
+Data can be accessed but limited to anyone except the bot developer as he has full access to all kinds of data. Level and rank data can be accessed freely but data such as inventory can only be accessed by the main user. Sensitive data such as message logs are private or public depending on how authorised personnel see fit to it and will only be logged to their own servers.
 
 
 ## Removal of Data
