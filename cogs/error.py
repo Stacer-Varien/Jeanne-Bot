@@ -1,3 +1,4 @@
+from datetime import datetime
 from discord import Color, Embed, Interaction
 from discord.app_commands import AppCommandError, MissingPermissions, CommandInvokeError, BotMissingPermissions, NoPrivateMessage, CommandOnCooldown
 from discord.ext.commands import Bot, Cog, Context, NotOwner, CommandNotFound
@@ -19,8 +20,8 @@ class errors(Cog):
         elif isinstance(error, CommandInvokeError):
             traceback_error = traceback.format_exception(
                 error, error, error.__traceback__)
-            with open('cmd-invoke-errors.txt', 'a') as f:
-                f.writelines(f"{ctx.user.id}-{traceback_error}\n\n")
+            with open('cmd-invoke-errors.log', 'a') as f:
+                f.writelines(f"{datetime.now()} - {ctx.user.id}-{traceback_error}\n\n")
         elif isinstance(error, BotMissingPermissions):
             embed = Embed(description=error, color=Color.red())
             await ctx.followup.send(embed=embed)
