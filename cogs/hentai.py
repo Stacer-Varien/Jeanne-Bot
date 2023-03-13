@@ -19,10 +19,10 @@ class nsfw(Cog):
             ctx: Interaction,
             rating: Optional[Literal["questionable",
                                      "explicit"]] = None) -> None:
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             if rating == None:
                 rating = ["questionable", "explicit"]
                 rating = choice(rating)
@@ -70,10 +70,10 @@ class nsfw(Cog):
                        ctx: Interaction,
                        rating: Optional[Literal["questionable", "explicit"]],
                        tag: Optional[str] = None) -> None:
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             if rating == None:
                 rating = ["questionable", "explicit"]
                 rating = choice(rating)
@@ -114,10 +114,10 @@ class nsfw(Cog):
                       ctx: Interaction,
                       rating: Optional[Literal["questionable", "explicit"]],
                       tag: Optional[str] = None) -> None:
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+
             if rating == None:
                 rating = ["questionable", "explicit"]
                 rating = choice(rating)
@@ -160,10 +160,10 @@ class nsfw(Cog):
                        ctx: Interaction,
                        rating: Optional[Literal["questionable", "explicit"]],
                        tag: Optional[str] = None) -> None:
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+            
             if rating == None:
                 rating = ["questionable", "explicit"]
                 rating = choice(rating)

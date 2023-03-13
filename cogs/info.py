@@ -101,7 +101,7 @@ class slashinfo(Cog):
 
             userinfo.set_thumbnail(url=member.display_avatar)
             roles = Embed(title="{}'s roles".format(member),
-                          description=' '.join(hasroles) + ' `@everyone`',
+                          description=' '.join(hasroles) + ' @everyone',
                           color=member.color)
 
             embeds = [userinfo, roles]
@@ -297,7 +297,7 @@ class slashinfo(Cog):
             try:
                 m: Message = await ctx.channel.fetch_message(int(sticker))
                 s: StickerItem = m.stickers[0]
-            except:
+            except ValueError:
                 s: StickerItem = utils.get(ctx.guild.stickers, name=sticker)
 
             q = await self.bot.fetch_sticker(s.id)

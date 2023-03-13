@@ -1,4 +1,4 @@
-from discord import ButtonStyle, Embed, Interaction, ui, app_commands as Jeanne
+from discord import ButtonStyle, Color, Embed, Interaction, ui, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
 from db_functions import Botban
 
@@ -42,7 +42,7 @@ class help(Cog):
             help = Embed(
                 description=
                 "Click on one of the buttons to open the documentation or get help on the support server"
-            )
+            , color=Color.random())
             await ctx.response.send_message(embed=help, view=view)
 
 

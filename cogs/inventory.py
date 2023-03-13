@@ -18,10 +18,8 @@ class Shop_Group(GroupCog, name="shop"):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
             return
-        else:
-
-            qp = self.bot.get_emoji(980772736861343774)
-            await ctx.followup.send(embed=Inventory().fetch_wallpapers(qp))
+        qp = self.bot.get_emoji(980772736861343774)
+        await ctx.followup.send(embed=Inventory().fetch_wallpapers(qp))
 
 
 class Background_Group(GroupCog, name="background"):
@@ -39,16 +37,16 @@ class Background_Group(GroupCog, name="background"):
     async def preview(self, ctx: Interaction, item_id: str):
         if Botban(ctx.user).check_botbanned_user() == True:
             return
-        else:
-            await ctx.response.defer()
-            qp = self.bot.get_emoji(980772736861343774)
-            wallpaper = Inventory().get_wallpaper(item_id)
-            embed = Embed(title="Preview background")
-            embed.color = Color.random()
-            embed.add_field(name="Name", value=wallpaper[1], inline=True)
-            embed.add_field(name="Price", value=f"1000 {qp}", inline=True)
-            embed.set_image(url=wallpaper[2])
-            await ctx.followup.send(embed=embed)
+
+        await ctx.response.defer()
+        qp = self.bot.get_emoji(980772736861343774)
+        wallpaper = Inventory().get_wallpaper(item_id)
+        embed = Embed(title="Preview background")
+        embed.color = Color.random()
+        embed.add_field(name="Name", value=wallpaper[1], inline=True)
+        embed.add_field(name="Price", value=f"1000 {qp}", inline=True)
+        embed.set_image(url=wallpaper[2])
+        await ctx.followup.send(embed=embed)
 
     @preview.error
     async def preview_error(self, ctx: Interaction,
@@ -66,85 +64,85 @@ class Background_Group(GroupCog, name="background"):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
             return
+
+        balance: int = Currency(ctx.user).get_balance()
+
+        if balance == 0:
+            nomoney = Embed(
+                description=
+                'You have no QP.\nPlease get QP by doing `/daily`, `/guess` and/or `/dice`'
+            )
+            await ctx.followup.send(embed=nomoney)
+
+        elif balance < 1000:
+            notenough = Embed(
+                description=
+                'You do not have enough QP.\nPlease get more QP by doing `/daily`, `/guess` and/or `/dice`'
+            )
+            await ctx.followup.send(embed=notenough)
+
         else:
-            balance: int = Currency(ctx.user).get_balance()
+            qp = self.bot.get_emoji(980772736861343774)
+            wallpaper = Inventory().get_wallpaper(item_id)
 
-            if balance == 0:
-                nomoney = Embed(
-                    description=
-                    'You have no QP.\nPlease get QP by doing `/daily`, `/guess` and/or `/dice`'
-                )
-                await ctx.followup.send(embed=nomoney)
-
-            elif balance < 1000:
-                notenough = Embed(
-                    description=
-                    'You do not have enough QP.\nPlease get more QP by doing `/daily`, `/guess` and/or `/dice`'
-                )
-                await ctx.followup.send(embed=notenough)
+            if wallpaper == None:
+                nonexist = Embed(description='Invalid item ID passed')
+                await ctx.followup.send(embed=nonexist)
 
             else:
+                loading = self.bot.get_emoji(1012677456811016342)
                 qp = self.bot.get_emoji(980772736861343774)
-                wallpaper = Inventory().get_wallpaper(item_id)
+                await ctx.followup.send(
+                    "Creating preview... This will take some time {}".
+                    format(loading))
+                args = {
+                    'bg_image': wallpaper[2],
+                    'profile_image':
+                    str(ctx.user.avatar.with_format('png')),
+                    'server_level': 100,
+                    'server_user_xp': 50,
+                    'server_next_xp': 100,
+                    'global_level': 100,
+                    'global_user_xp': 100,
+                    'global_next_xp': 100,
+                    'user_name': str(ctx.user),
+                }
 
-                if wallpaper == None:
-                    nonexist = Embed(description='Invalid item ID passed')
-                    await ctx.followup.send(embed=nonexist)
+                func = partial(self.get_card, args)
+                image = await get_event_loop().run_in_executor(None, func)
+
+                file = File(fp=image, filename=f'preview_level_card.png')
+
+                preview = Embed(
+                    description="This is the preview of the level card.",
+                    color=Color.random()).add_field(
+                        name="Cost",
+                        value=f"{wallpaper[3]} {qp}").set_footer(
+                            text="Is this the background you wanted?")
+                view = Confirmation(ctx.user)
+                await ctx.edit_original_response(content=None,
+                                                 attachments=[file],
+                                                 embed=preview,
+                                                 view=view)
+                await view.wait()
+
+                if view.value == None:
+                    await ctx.edit_original_response(content="Timeout",
+                                                     view=None,
+                                                     embed=None)
+                elif view.value==True:
+                    Inventory(ctx.user).add_user_wallpaper(item_id)
+                    embed1 = Embed(
+                        description=
+                        f"Background wallpaper bought and selected",
+                        color=Color.random())
+                    await ctx.edit_original_response(embed=embed1,
+                                                     view=None)
 
                 else:
-                    loading = self.bot.get_emoji(1012677456811016342)
-                    qp = self.bot.get_emoji(980772736861343774)
-                    await ctx.followup.send(
-                        "Creating preview... This will take some time {}".
-                        format(loading))
-                    args = {
-                        'bg_image': wallpaper[2],
-                        'profile_image':
-                        str(ctx.user.avatar.with_format('png')),
-                        'server_level': 100,
-                        'server_user_xp': 50,
-                        'server_next_xp': 100,
-                        'global_level': 100,
-                        'global_user_xp': 100,
-                        'global_next_xp': 100,
-                        'user_name': str(ctx.user),
-                    }
-
-                    func = partial(self.get_card, args)
-                    image = await get_event_loop().run_in_executor(None, func)
-
-                    file = File(fp=image, filename=f'preview_level_card.png')
-
-                    preview = Embed(
-                        description="This is the preview of the level card.",
-                        color=Color.random()).add_field(
-                            name="Cost",
-                            value=f"{wallpaper[3]} {qp}").set_footer(
-                                text="Is this the background you wanted?")
-                    view = Confirmation(ctx.user)
-                    await ctx.edit_original_response(content=None,
-                                                     attachments=[file],
-                                                     embed=preview,
-                                                     view=view)
-                    await view.wait()
-
-                    if view.value == None:
-                        await ctx.edit_original_response(content="Timeout",
-                                                         view=None,
-                                                         embed=None)
-                    elif view.value:
-                        Inventory(ctx.user).add_user_wallpaper(item_id)
-                        embed1 = Embed(
-                            description=
-                            f"Background wallpaper bought and selected",
-                            color=Color.random())
-                        await ctx.edit_original_response(embed=embed1,
-                                                         view=None)
-
-                    else:
-                        await ctx.edit_original_response(content="Cancelled",
-                                                         view=None,
-                                                         embed=None)
+                    await ctx.edit_original_response(content="Cancelled",
+                                                     view=None,
+                                                     embed=None)
 
     @Jeanne.command(description='Select a wallpaper')
     @Jeanne.describe(name="What is the name of the background?")
@@ -232,7 +230,7 @@ class Background_Group(GroupCog, name="background"):
                     await ctx.edit_original_response(content="Time out",
                                                      embed=None,
                                                      view=None)
-                if view.value:
+                elif view.value==True:
                     Inventory(ctx.user).add_user_custom_wallpaper(name, link)
 
                     embed1 = Embed(
@@ -250,17 +248,19 @@ class Background_Group(GroupCog, name="background"):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
             return
+
+        if Inventory(ctx.user).fetch_user_inventory() == None:
+            embed = Embed(description="Your inventory is empty",
+                          color=Color.red())
+            await ctx.followup.send(embed=embed)
         else:
-            if Inventory(ctx.user).fetch_user_inventory() == None:
-                embed = Embed(description="Your inventory is empty",
-                              color=Color.red())
-                await ctx.followup.send(embed=embed)
-            else:
-                a = Inventory(ctx.user).fetch_user_inventory()
-                inv = Embed(title="List of wallpapers you have",
-                            color=Color.random())
-                inv.description = a
-                await ctx.followup.send(embed=inv)
+            a = Inventory(ctx.user).fetch_user_inventory()
+            inv = Embed(title="List of wallpapers you have",
+                        color=Color.random())
+            inv.description=""
+            for data in a:
+                inv.description += f"[{data[1]}]({data[2]})\n"
+            await ctx.followup.send(embed=inv)
 
 
 async def setup(bot: Bot):
