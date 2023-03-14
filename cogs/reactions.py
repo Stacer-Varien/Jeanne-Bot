@@ -16,9 +16,9 @@ class slashreactions(Cog):
     async def hug(self,
                   ctx: Interaction,
                   member: Optional[Member] = None) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+
             hug_api = get(hug_nekoslife).json()
             if member == None:
                 msg = f"*Hugging {ctx.user}*"
@@ -36,9 +36,8 @@ class slashreactions(Cog):
     async def slap(self,
                    ctx: Interaction,
                    member: Optional[Member] = None) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
             slap_api = get(slap_nekoslife).json()
 
             slap = Embed(color=Color.random())
@@ -54,9 +53,9 @@ class slashreactions(Cog):
 
     @Jeanne.command(description="Show a smuggy look")
     async def smug(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             smug_api = get(smug_nekoslife).json()
 
             smug = Embed(color=Color.random())
@@ -70,9 +69,9 @@ class slashreactions(Cog):
     async def poke(self,
                    ctx: Interaction,
                    member: Optional[Member] = None) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             poke_api = get(poke_nekosfun).json()
             poke = Embed(color=Color.random())
             poke.set_footer(text="Fetched from nekos.fun")
@@ -90,9 +89,9 @@ class slashreactions(Cog):
     async def pat(self,
                   ctx: Interaction,
                   member: Optional[Member] = None) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             pat_api = get(pat_nekoslife).json()
             pat = Embed(color=Color.random())
             pat.set_footer(text="Fetched from nekos.life")
@@ -110,9 +109,9 @@ class slashreactions(Cog):
     async def kiss(self,
                    ctx: Interaction,
                    member: Optional[Member] = None) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             kiss_api = get(kiss_nekosfun).json()
             if member == None:
                 msg = f"*Kissing {ctx.user}*"
@@ -130,9 +129,9 @@ class slashreactions(Cog):
     async def tickle(self,
                      ctx: Interaction,
                      member: Optional[Member] = None) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             tickle_api = get(tickle_nekoslife).json()
             if member == None:
                 msg = f"*Tickling {ctx.user}*"
@@ -150,9 +149,9 @@ class slashreactions(Cog):
     async def baka(self,
                    ctx: Interaction,
                    member: Optional[Member] = None) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             baka_api = get(baka_nekosfun).json()
             if member == None:
                 msg = f"*{ctx.user}, you are a baka!*"
@@ -170,9 +169,9 @@ class slashreactions(Cog):
     async def feed(self,
                    ctx: Interaction,
                    member: Optional[Member] = None) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             feed_api = get(feed_nekoslife).json()
             if member == None:
                 msg = f"*Feeding {ctx.user}*"
@@ -187,9 +186,9 @@ class slashreactions(Cog):
 
     @Jeanne.command(description="Make yourself cry")
     async def cry(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             cry_api = get(cry_purrbot).json()
 
             cry = Embed(color=Color.random())
@@ -203,9 +202,9 @@ class slashreactions(Cog):
     async def bite(self,
                    ctx: Interaction,
                    member: Optional[Member] = None) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             bite_api = get(bite_purrbot).json()
             if member == None:
                 msg = f"*Biting {ctx.user}*"
@@ -220,9 +219,9 @@ class slashreactions(Cog):
 
     @Jeanne.command(description="Make yourself blush")
     async def blush(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             blush_api = get(blush_purrbot).json()
 
             blush = Embed(color=Color.random())
@@ -236,9 +235,9 @@ class slashreactions(Cog):
     async def cuddle(self,
                      ctx: Interaction,
                      member: Optional[Member] = None) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             cuddle_api = get(cuddle_purrbot).json()
             if member == None:
                 msg = f"*Cuddling with {ctx.user}*"
@@ -256,9 +255,9 @@ class slashreactions(Cog):
     async def dance(self,
                     ctx: Interaction,
                     member: Optional[Member] = None) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             dance_api = get(dance_purrbot).json()
             if member == None:
                 msg = f"*{ctx.user} is dancing*"

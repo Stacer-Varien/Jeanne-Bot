@@ -18,9 +18,9 @@ class ListWarns_Group(GroupCog, name="listwarns"):
 
     @Jeanne.command(description="View warnings in the server or a member")
     async def server(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+
             await ctx.response.defer()
             record = Moderation(ctx.guild).fetch_warnings_server()
             if record == None:
@@ -39,9 +39,9 @@ class ListWarns_Group(GroupCog, name="listwarns"):
     @Jeanne.command(description="View warnings that a member has")
     @Jeanne.describe(member="Which member are you checking the warns?")
     async def user(self, ctx: Interaction, member: Optional[Member]) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+
             await ctx.response.defer()
             if member == None:
                 member = ctx.user
@@ -61,7 +61,7 @@ class ListWarns_Group(GroupCog, name="listwarns"):
                     date = i[5]
 
                     if date == None:
-                        date = "Unspecified due to new update"
+                        date = "None due to new update"
 
                     embed.add_field(
                         name=f"`{warn_id}`",
@@ -88,9 +88,9 @@ class Ban_Group(GroupCog, name="ban"):
                      member: Member,
                      reason: Optional[str] = None,
                      time: Optional[str] = None) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             await ctx.response.defer()
             if member == ctx.user:
                 failed = Embed(description="You can't ban yourself")
@@ -114,10 +114,10 @@ class Ban_Group(GroupCog, name="ban"):
                     )
                     await member.send(embed=banmsg)
                 except:
-                    pass
+                    return
 
                 if reason == None:
-                    reason = 'Unspecified'
+                    reason = 'None'
 
                 await member.ban(reason="{} | {}".format(reason, ctx.user))
 
@@ -157,15 +157,15 @@ class Ban_Group(GroupCog, name="ban"):
                    ctx: Interaction,
                    user_id: str,
                    reason: Optional[str] = None) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             await ctx.response.defer()
             user = await self.bot.fetch_user(int(user_id))
             if reason == None:
-                reason = "Unspecified"
-            else:
-                reason = reason
+                reason = "None"
+
+
 
             if int(user_id) == ctx.guild.owner.id:
                 failed = Embed(
@@ -295,10 +295,10 @@ class moderation(Cog):
                    ctx: Interaction,
                    member: Member,
                    reason: Optional[str] = None) -> None:
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             if ctx.user.top_role.position < member.top_role.position:
                 failed = Embed(
                     description="{}'s position is higher than you...".format(
@@ -315,7 +315,7 @@ class moderation(Cog):
                 await ctx.followup.send(embed=failed)
             else:
                 if reason == None:
-                    reason = "Unspecified"
+                    reason = "None"
 
                 warn_id = f"{randint(0,100000)}"
                 date = round(datetime.now().timestamp())
@@ -351,10 +351,10 @@ class moderation(Cog):
     @Jeanne.describe(warn_id="What is the warn ID you want to remove?")
     @Jeanne.checks.has_permissions(kick_members=True)
     async def clearwarn(self, ctx: Interaction, warn_id: str):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+
             mod = Moderation(ctx.guild)
             result = mod.check_warn_id(warn_id)
 
@@ -389,10 +389,10 @@ class moderation(Cog):
                    ctx: Interaction,
                    member: Member,
                    reason: Optional[str] = None) -> None:
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             if member.id == ctx.user.id:
                 failed = Embed(description="You can't kick yourself out")
                 await ctx.followup.send(embed=failed)
@@ -413,7 +413,7 @@ class moderation(Cog):
                 await ctx.followup.send(embed=failed)
             else:
                 if reason == None:
-                    reason = 'Unspecified'
+                    reason = 'None'
 
                 try:
                     kickmsg = Embed(
@@ -422,7 +422,7 @@ class moderation(Cog):
                     )
                     await member.send(embed=kickmsg)
                 except:
-                    pass
+                    return
 
                 await member.kick(reason="{} | {}".format(reason, ctx.user))
                 kick = Embed(title="Member Kicked", color=0xFF0000)
@@ -455,10 +455,10 @@ class moderation(Cog):
                     ctx: Interaction,
                     limit: Optional[int] = None,
                     member: Optional[Member] = None) -> None:
-        await ctx.response.defer(thinking=True)
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer(thinking=True)
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+
             if limit == None:
                 limit = 100
 
@@ -481,10 +481,10 @@ class moderation(Cog):
     @Jeanne.checks.has_permissions(manage_nicknames=True)
     async def changenickname(self, ctx: Interaction, member: Member,
                              nickname: str):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+
             await member.edit(nick=nickname)
             setnick = Embed(color=0x00FF68)
             setnick.add_field(name="Nickname changed",
@@ -500,10 +500,13 @@ class moderation(Cog):
                     ctx: Interaction,
                     user_id: str,
                     reason: Optional[str] = None) -> None:
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+            
+            if reason==None:
+                reason="None"
+
             user = await self.bot.fetch_user(int(user_id))
             await ctx.guild.unban(user,
                                   reason="{} | {}".format(reason, ctx.user))
@@ -539,20 +542,21 @@ class moderation(Cog):
                       member: Member,
                       time: Optional[str] = None,
                       reason: Optional[str] = None) -> None:
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+
             if member == ctx.user:
                 failed = Embed(description="You can't mute yourself")
                 await ctx.followup.send(embed=failed)
 
             else:
+                
+                if reason==None:
+                    reason="None"
+
                 if time == None:
                     time = '28d'
-
-                if reason == None:
-                    reason = "Unspecified"
 
                 timed = parse_timespan(time)
                 await member.edit(timed_out_until=utcnow() +
@@ -596,14 +600,13 @@ class moderation(Cog):
                         ctx: Interaction,
                         member: Member,
                         reason: Optional[str] = None) -> None:
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+
             if reason == None:
-                reason = "Unspecified"
-            else:
-                reason = reason
+                reason = "None"
+
 
             if member == ctx.user:
                 failed = Embed(description="You can't unmute yourself")
@@ -640,9 +643,9 @@ class moderation(Cog):
     @Jeanne.checks.has_permissions(administrator=True)
     @Jeanne.checks.cooldown(1, 1800, key=lambda i: (i.guild.id))
     async def massban(self, ctx: Interaction, user_ids: str, reason: str):
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             await ctx.response.defer()
             ids = user_ids.replace(' ', ',').split(',')
 
@@ -662,7 +665,7 @@ class moderation(Cog):
                 alert = Embed(
                     title="BEWARE",
                     description=
-                    "The developer is **NOT** responsible in any way or form if you messed up, even if it was misused (but report anyone misusung them to the developer so he can botban them).\n\nDo you want to proceed?",
+                    "The developer is **NOT** responsible in any way or form if you messed up, even if it was misused (but report anyone misusing them to the developer so he can botban them).\n\nDo you want to proceed?",
                     color=Color.red())
                 await ctx.followup.send(embed=alert, view=view)
 
@@ -681,18 +684,18 @@ class moderation(Cog):
                     for id in ids:
 
                         if id == str(ctx.user.id):
-                            pass
+                            return
 
                         if id == str(ctx.guild.owner.id):
-                            pass
+                            return
 
                         try:
                             if ctx.guild.get_member(
                                     int(id)
                             ).top_role.position > ctx.user.top_role.position:
-                                pass
+                                return
                         except:
-                            pass
+                            return
 
                         try:
                             user = await self.bot.fetch_user(int(id))
@@ -702,7 +705,7 @@ class moderation(Cog):
                                 banned = False
 
                             if banned:
-                                pass
+                                return
                             else:
                                 await ctx.guild.ban(user, reason=reason)
 
@@ -752,15 +755,15 @@ class moderation(Cog):
     @Jeanne.command(description="Unban multiple members at once")
     @Jeanne.describe(
         user_ids=
-        "How many user IDs? Leave a space after each ID (min is 5 and max is 20)",
+        "How many user IDs? Leave a space after each ID (min is 5 and max is 25)",
         reason="Why are they being unbanned?")
     @Jeanne.checks.cooldown(1, 1800, key=lambda i: (i.guild.id))
     @Jeanne.checks.has_permissions(administrator=True)
     async def massunban(self, ctx: Interaction, user_ids: str, reason: str):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+
             ids = user_ids.replace(' ', ',').split(',')
             if len(ids) < 5:
                 embed = Embed(
@@ -771,14 +774,14 @@ class moderation(Cog):
                                timedelta(minutes=30)).timestamp())))
                 await ctx.followup.send(embed=embed)
             else:
-                if len(ids) > 20:
-                    ids = ids[:20]
+                if len(ids) > 25:
+                    ids = ids[:25]
 
                 view = Confirmation(ctx.user)
                 alert = Embed(
                     title="BEWARE",
                     description=
-                    "This is an experimental command and the developer is **NOT** responsible in any way or form if you messed up, even if it was misused (but report anyone misusung them to the developer so he can botban them)",
+                    "The developer is **NOT** responsible in any way or form if you messed up, even if it was misused (but report anyone misusing them to the developer so he can botban them)",
                     color=Color.red())
                 await ctx.followup.send(embed=alert, view=view)
 
@@ -796,18 +799,18 @@ class moderation(Cog):
                     massmb.description = ""
                     for id in ids:
                         if id == str(ctx.user.id):
-                            pass
+                            return
 
                         if id == str(ctx.guild.owner.id):
-                            pass
+                            return
 
                         try:
                             if ctx.guild.get_member(
                                     int(id)
                             ).top_role.position > ctx.user.top_role.position:
-                                pass
+                                return
                         except:
-                            pass
+                            return
 
                         try:
                             user = await self.bot.fetch_user(int(id))

@@ -89,9 +89,9 @@ class Weather_Group(GroupCog, name="weather"):
     @Jeanne.command(description="Get weather information on a city")
     @Jeanne.describe(city="Add a city")
     async def city(self, ctx: Interaction, city: str):
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             await ctx.response.defer()
             min_tempe = self.bot.get_emoji(1009760796017963119)
             max_tempe = self.bot.get_emoji(1009761541169618964)
@@ -157,10 +157,10 @@ class Weather_Group(GroupCog, name="weather"):
                      country_code="Add a country code")
     async def zipcode(self, ctx: Interaction, zip_code: str,
                       country_code: str):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+            
             min_tempe = self.bot.get_emoji(1009760796017963119)
             max_tempe = self.bot.get_emoji(1009761541169618964)
             guste = self.bot.get_emoji(1009766251431743569)
@@ -235,9 +235,9 @@ class Embed_Group(GroupCog, name="embed"):
                        channel: TextChannel,
                        jsonscript: Optional[str] = None,
                        jsonfile: Optional[Attachment] = None):
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+            
             await ctx.response.defer(ephemeral=True)
 
             if not jsonscript and not jsonfile:

@@ -8,7 +8,7 @@ from db_functions import Botban, Inventory, Levelling, Logger, Manage, Welcomer
 from assets.buttons import Confirmation
 from requests import get
 from io import BytesIO
-from assets.modals import Welcomingmsg
+from assets.modals import Levelmsg, Welcomingmsg, Leavingmsg
 
 
 def replace_all(text: str, dic: dict):
@@ -830,8 +830,7 @@ class Set_Group(GroupCog, name="set"):
 
     @Jeanne.command(
         description="Set a welcoming message when someone joins the server")
-    @Jeanne.describe(message="What is the new welcoming message",
-                     jsonfile="Upload JSON file with the welcoming message")
+    @Jeanne.describe(jsonfile="Upload JSON file with the welcoming message")
     @Jeanne.checks.has_permissions(manage_guild=True)
     async def welcomingmsg(self,
                            ctx: Interaction,
@@ -868,18 +867,19 @@ class Set_Group(GroupCog, name="set"):
 
             try:
                 content = json["content"]
+                embed = Embed.from_dict(json['embeds'][0])
             except:
-                pass
+                content=json_content
 
             confirm = Embed(
                 description=
                 "This is the preview of the welcoming message.\nAre you happy with it?"
             )
 
-            try:
-                embed = Embed.from_dict(json['embeds'][0])
-                view = Confirmation(ctx.user)
-                await ctx.followup.send(content=content,
+
+            embed = Embed.from_dict(json['embeds'][0])
+            view = Confirmation(ctx.user)
+            await ctx.followup.send(content=content,
                                         embeds=[embed, confirm],
                                         view=view,
                                         allowed_mentions=AllowedMentions(
@@ -887,198 +887,102 @@ class Set_Group(GroupCog, name="set"):
                                             roles=False,
                                             users=False),
                                         ephemeral=True)
-                await view.wait()
+            await view.wait()
 
-                if view.value == True:
-                    json_request = get(json_file)
-                    json_content = json_request.content
-                    jsondict = loads(json_content)
-                    Welcomer(ctx.guild).set_welcomer_msg(jsondict)
+            if view.value == True:
+                Welcomer(ctx.guild).set_welcomer_msg(str(json_request.content))
 
-                    embed = Embed(description="Welcoming message set")
-                    await ctx.edit_original_response(content=None,
-                                                     embeds=[embed],
-                                                     view=None)
+                embed = Embed(description="Welcoming message set")
+                await ctx.edit_original_response(content=None,
+                                                 embeds=[embed],
+                                                 view=None)
 
-                elif view.value == False:
-                    embed = Embed(description="Action cancelled")
-                    await ctx.edit_original_response(content=None,
-                                                     embeds=[embed],
-                                                     view=None)
-                else:
-                    embed = Embed(description="Timeout")
-                    await ctx.edit_original_response(content=None,
-                                                     embeds=[embed],
-                                                     view=None)
+            elif view.value == False:
+                embed = Embed(description="Action cancelled")
+                await ctx.edit_original_response(content=None,
+                                                 embeds=[embed],
+                                                 view=None)
+            else:
+                embed = Embed(description="Timeout")
+                await ctx.edit_original_response(content=None,
+                                                 embeds=[embed],
+                                                 view=None)
 
-            except:
-                view = Confirmation(ctx.user)
-                await ctx.followup.send(content=content,
-                                        embed=confirm,
-                                        allowed_mentions=AllowedMentions(
-                                            everyone=False,
-                                            roles=False,
-                                            users=False),
-                                        view=view,
-                                        ephemeral=True)
-                await view.wait()
-
-                if view.value == None:
-                    embed = Embed(description="Timeout")
-                    await ctx.edit_original_response(content=None,
-                                                     embeds=[embed],
-                                                     view=None)
-                elif view.value:
-                    json_request = get(json_file)
-                    json_content = json_request.content
-                    jsondict = loads(json_content)
-                    Welcomer(ctx.guild).set_welcomer_msg(jsondict)
-
-                    embed = Embed(description="Welcoming message set")
-                    await ctx.edit_original_response(content=None,
-                                                     embeds=[embed],
-                                                     view=None)
-
-                else:
-                    embed = Embed(description="Action cancelled")
-                    await ctx.edit_original_response(content=None,
-                                                     embeds=[embed],
-                                                     view=None)
 
     @Jeanne.command(
         description="Set a leaving message when someone leaves the server")
-    @Jeanne.describe(message="What is the new leaving message",
-                     jsonfile="Upload JSON file with the welcoming message")
+    @Jeanne.describe(jsonfile="Upload JSON file with the welcoming message")
     @Jeanne.checks.has_permissions(manage_guild=True)
     async def leavingmsg(self,
                          ctx: Interaction,
-                         message: Optional[str] = None,
                          jsonfile: Optional[Attachment] = None) -> None:
         if Botban(ctx.user).check_botbanned_user() == True:
             return
-        else:
+
+        if jsonfile == None:
+            await ctx.response.send_modal(Leavingmsg())
+
+        elif jsonfile != None:
             await ctx.response.defer()
-            if message == None and jsonfile == None:
-                embed = Embed()
-                embed.color = Color.red()
-                embed.description = "Please use a JSON script or upload a JSON file\nPlease use [Discohook](https://discohook.org/)"
-                await ctx.followup.send(embed=embed)
+            humans = str(
+                len([member for member in ctx.guild.members
+                     if not member.bot]))
+            parameters = OrderedDict([("%member%", str(ctx.user)),
+                                      ("%pfp%", str(ctx.user.display_avatar)),
+                                      ("%server%", str(ctx.guild.name)),
+                                      ("%mention%", str(ctx.user.mention)),
+                                      ("%name%", str(ctx.user.name)),
+                                      ("%members%",
+                                       str(ctx.guild.member_count)),
+                                      ("%humans%", str(humans)),
+                                      ("%icon%", str(ctx.guild.icon))])
 
-            elif message and jsonfile:
-                embed = Embed()
-                embed.color = Color.red()
-                embed.description = "Please use either a JSON script or upload a JSON file\nPlease use [Discohook](https://discohook.org/)"
-                await ctx.followup.send(embed=embed)
+            json_file = jsonfile.url
+            json_request = get(json_file)
+            json_content = replace_all(json_request.content, parameters)
+            json = loads(json_content)
 
+            try:
+                content = json["content"]
+                embed = Embed.from_dict(json['embeds'][0])
+            except:
+                content = json_content
+
+            confirm = Embed(
+                description=
+                "This is the preview of the leaving message.\nAre you happy with it?"
+            )
+
+            embed = Embed.from_dict(json['embeds'][0])
+            view = Confirmation(ctx.user)
+            await ctx.followup.send(content=content,
+                                    embeds=[embed, confirm],
+                                    view=view,
+                                    allowed_mentions=AllowedMentions(
+                                        everyone=False,
+                                        roles=False,
+                                        users=False),
+                                    ephemeral=True)
+            await view.wait()
+
+            if view.value == True:
+                Welcomer(ctx.guild).set_leaving_msg(str(json_request.content))
+
+                embed = Embed(description="Leaving message set")
+                await ctx.edit_original_response(content=None,
+                                                 embeds=[embed],
+                                                 view=None)
+
+            elif view.value == False:
+                embed = Embed(description="Action cancelled")
+                await ctx.edit_original_response(content=None,
+                                                 embeds=[embed],
+                                                 view=None)
             else:
-                humans = str(
-                    len([
-                        member for member in ctx.guild.members
-                        if not member.bot
-                    ]))
-                parameters = OrderedDict([
-                    ("%member%", str(ctx.user)),
-                    ("%pfp%", str(ctx.user.display_avatar)),
-                    ("%server%", str(ctx.guild.name)),
-                    ("%mention%", str(ctx.user.mention)),
-                    ("%name%", str(ctx.user.name)),
-                    ("%members%", str(ctx.guild.member_count)),
-                    ("%humans%", str(humans)), ("%icon%", str(ctx.guild.icon))
-                ])
-                if message and not jsonfile:
-                    json = loads(replace_all(message, parameters))
-
-                elif jsonfile and not message:
-                    json_file = jsonfile.url
-                    json_request = get(json_file)
-                    json_content = replace_all(json_request.content,
-                                               parameters)
-                    json = loads(json_content)
-
-                try:
-                    content = json["content"]
-                except:
-                    pass
-
-                confirm = Embed(
-                    description=
-                    "This is the preview of the leaving message.\nAre you happy with it?"
-                )
-
-                try:
-                    embed = Embed.from_dict(json['embeds'][0])
-                    view = Confirmation(ctx.user)
-                    await ctx.followup.send(content=content,
-                                            embeds=[embed, confirm],
-                                            view=view,
-                                            allowed_mentions=AllowedMentions(
-                                                everyone=False,
-                                                roles=False,
-                                                users=False),
-                                            ephemeral=True)
-                    await view.wait()
-
-                    if view.value == True:
-                        if message:
-                            Welcomer(ctx.guild).set_leaving_msg(message)
-                        elif jsonfile:
-                            json_request = get(json_file)
-                            json_content = json_request.content
-                            jsondict = loads(json_content)
-                            Welcomer(ctx.guild).set_leaving_msg(jsondict)
-
-                        embed = Embed(description="Leaving message set")
-                        await ctx.edit_original_response(content=None,
-                                                         embeds=[embed],
-                                                         view=None)
-
-                    elif view.value == False:
-                        embed = Embed(description="Action cancelled")
-                        await ctx.edit_original_response(content=None,
-                                                         embeds=[embed],
-                                                         view=None)
-                    else:
-                        embed = Embed(description="Timeout")
-                        await ctx.edit_original_response(content=None,
-                                                         embeds=[embed],
-                                                         view=None)
-
-                except:
-                    view = Confirmation(ctx.user)
-                    await ctx.followup.send(content=content,
-                                            embed=confirm,
-                                            allowed_mentions=AllowedMentions(
-                                                everyone=False,
-                                                roles=False,
-                                                users=False),
-                                            view=view,
-                                            ephemeral=True)
-                    await view.wait()
-
-                    if view.value == True:
-                        if message:
-                            Welcomer(ctx.guild).set_leaving_msg(message)
-                        elif jsonfile:
-                            json_request = get(json_file)
-                            json_content = json_request.content
-                            jsondict = loads(json_content)
-                            Welcomer(ctx.guild).set_leaving_msg(jsondict)
-
-                        embed = Embed(description="Leaving message set")
-                        await ctx.edit_original_response(content=None,
-                                                         embeds=[embed],
-                                                         view=None)
-
-                    elif view.value == False:
-                        embed = Embed(description="Action cancelled")
-                        await ctx.edit_original_response(content=None,
-                                                         embeds=[embed],
-                                                         view=None)
-                    else:
-                        embed = Embed(description="Timeout")
-                        await ctx.edit_original_response(content=None,
-                                                         embeds=[embed],
-                                                         view=None)
+                embed = Embed(description="Timeout")
+                await ctx.edit_original_response(content=None,
+                                                 embeds=[embed],
+                                                 view=None)
 
     @Jeanne.command(description="Set a level up notification channel")
     @Jeanne.describe(
@@ -1089,73 +993,21 @@ class Set_Group(GroupCog, name="set"):
     async def levelupdate(self,
                           ctx: Interaction,
                           channel: TextChannel,
-                          levelmsg: Optional[str] = None) -> None:
+                          levelmsg: Optional[bool] = None) -> None:
         if Botban(ctx.user).check_botbanned_user() == True:
             return
-        else:
+
+        if levelmsg == None or False:
             await ctx.response.defer()
+            Levelling(server=ctx.guild).add_level_channel(channel)
+            embed = Embed()
+            embed.description = "{} will post level updates when someone levels up".format(channel.mention)
+            embed.color = Color.random()
+            await ctx.followup.send(embed=embed)
 
-            if levelmsg == None:
-                Levelling(server=ctx.guild).add_level_channel(
-                    channel)
-                embed = Embed()
-                embed.description = "{} will post level updates when someone levels up".format(channel.mention)
-                embed.color = Color.random()
-                await ctx.followup.send(embed=embed)
+        elif levelmsg ==True:
+            await ctx.response.send_modal(Levelmsg(channel))
 
-            else:
-                parameters = OrderedDict([
-                    ("%member%", str(ctx.user)),
-                    ("%pfp%", str(ctx.user.display_avatar)),
-                    ("%server%", str(ctx.guild.name)),
-                    ("%mention%", str(ctx.user.mention)),
-                    ("%name%", str(ctx.user.name)),
-                    ("%newlevel%",
-                     str(Levelling(ctx.user, ctx.guild).get_member_level()))
-                ])
-
-                json = loads(replace_all(levelmsg, parameters))
-                try:
-                    content = json["content"]
-                except:
-                    pass
-
-                confirm = Embed(
-                    description=
-                    "This is the preview of the level update message whenever someone levels up in the server and will be sent to {}.\nAre you happy with it?"
-                    .format(channel.mention))
-
-                embed = Embed.from_dict(json['embeds'][0])
-                view = Confirmation(ctx.user)
-                await ctx.followup.send(content=content,
-                                        embeds=[embed, confirm],
-                                        view=view,
-                                        allowed_mentions=AllowedMentions(
-                                            everyone=False,
-                                            roles=False,
-                                            users=False),
-                                        ephemeral=True)
-                await view.wait()
-
-                if view.value == True:
-                    Levelling(server=ctx.guild).add_level_channel(
-                        channel, levelmsg)
-
-                    embed = Embed(description="Welcoming message set")
-                    await ctx.edit_original_response(content=None,
-                                                     embeds=[embed],
-                                                     view=None)
-
-                elif view.value == False:
-                    embed = Embed(description="Action cancelled")
-                    await ctx.edit_original_response(content=None,
-                                                     embeds=[embed],
-                                                     view=None)
-                else:
-                    embed = Embed(description="Timeout")
-                    await ctx.edit_original_response(content=None,
-                                                     embeds=[embed],
-                                                     view=None)
 
     @Jeanne.command(
         description=
@@ -1164,9 +1016,9 @@ class Set_Group(GroupCog, name="set"):
         brightness="Set the level of brightness between 10 - 150. Default is 100"
     )
     async def brightness(self, ctx: Interaction, brightness: int):
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             await ctx.response.defer()
             embed = Embed()
             if brightness > 150:
@@ -1191,13 +1043,13 @@ class Set_Group(GroupCog, name="set"):
     @Jeanne.command(description="Change your profile bio")
     @Jeanne.describe(bio="Add your bio. Make sure its 60 characters per line")
     async def bio(self, ctx: Interaction, bio: str):
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             await ctx.response.defer()
             embed = Embed()
             if len(bio) > 120:
-                embed.description = "Too many words!\nPlease make sure your bio has 60 words per line and only 2 lines"
+                embed.description = "Too many words!\nPlease make sure your bio has 60 words."
                 embed.color = Color.red()
                 await ctx.followup.send(embed=embed)
             else:
@@ -1210,9 +1062,9 @@ class Set_Group(GroupCog, name="set"):
         description="Change your level and profile card font and bar color")
     @Jeanne.describe(color="Add your color. Must be in HEX code")
     async def color(self, ctx: Interaction, color: str):
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             await ctx.response.defer()
             embed = Embed()
             try:
@@ -1236,9 +1088,9 @@ class XP_Group(GroupCog, name="xp"):
     @Jeanne.describe(channel="Which channel?")
     @Jeanne.checks.has_permissions(manage_guild=True)
     async def blacklist(self, ctx: Interaction, channel: TextChannel) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+
             await ctx.response.defer()
             if Levelling(server=ctx.guild).check_xpblacklist_channel(
                     channel) == True:
@@ -1259,9 +1111,9 @@ class XP_Group(GroupCog, name="xp"):
     @Jeanne.checks.has_permissions(manage_guild=True)
     async def unblacklist(self, ctx: Interaction,
                           channel: TextChannel) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+
             await ctx.response.defer()
             if Levelling(server=ctx.guild).check_xpblacklist_channel(
                     channel) == False:
@@ -1280,9 +1132,9 @@ class XP_Group(GroupCog, name="xp"):
 
     @Jeanne.command(description="List all XP blacklisted channels")
     async def blacklistedchannels(self, ctx: Interaction) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+
             await ctx.response.defer()
             embed = Embed()
             channels = Levelling(server=ctx.guild).get_blacklisted_channels()
@@ -1309,9 +1161,9 @@ class manage(Cog):
     @Jeanne.describe(member="Which member?", role="Which role are you adding?")
     @Jeanne.checks.has_permissions(manage_roles=True)
     async def addrole(self, ctx: Interaction, member: Member, role: Role):
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             await ctx.response.defer()
             await member.add_roles(role)
             embed = Embed(color=Color.random())
@@ -1325,9 +1177,9 @@ class manage(Cog):
                      role="Which role are you removing?")
     @Jeanne.checks.has_permissions(manage_roles=True)
     async def removerole(self, ctx: Interaction, member: Member, role: Role):
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             await ctx.response.defer()
             await member.remove_roles(role)
             embed = Embed(color=Color.random())
@@ -1344,7 +1196,6 @@ class manage(Cog):
         welcomer="Remove welcomer channel?",
         leaving="Remove leaving channel?",
         modlog="Remove modlog channel?",
-        report="Remove report channel?",
         messagelog="Remove lessage logging channel?",
         welcomingmsg="Remove the welcoming message and reset to default",
         leavingmsg="Remove the leaving message and reset to default",
@@ -1355,16 +1206,15 @@ class manage(Cog):
                      welcomer: Optional[bool] = None,
                      leaving: Optional[bool] = None,
                      modlog: Optional[bool] = None,
-                     report: Optional[bool] = None,
                      messagelog: Optional[bool] = None,
                      welcomingmsg: Optional[bool] = None,
                      leavingmsg: Optional[bool] = None,
                      levelupchannel: Optional[bool] = None) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+
             await ctx.response.defer()
-            if welcomer == None and leaving == None and modlog == None and report == None and welcomingmsg == None and leavingmsg == None:
+            if welcomer == None and leaving == None and modlog == None and welcomingmsg == None and leavingmsg == None:
                 error = Embed(description="Please select a channel to remove")
                 await ctx.followup.send(embed=error)
             else:
@@ -1407,19 +1257,6 @@ class manage(Cog):
                                         inline=True)
                     else:
                         embed.add_field(name='Modlog channel removal status',
-                                        value='Successful',
-                                        inline=True)
-
-                if report == True:
-
-                    rep = Manage(ctx.guild).remove_reporter()
-
-                    if rep == False:
-                        embed.add_field(name='Report channel removal status',
-                                        value='Failed. No report channel set',
-                                        inline=True)
-                    else:
-                        embed.add_field(name='Report channel removal status',
                                         value='Successful',
                                         inline=True)
 
@@ -1490,9 +1327,9 @@ class manage(Cog):
                     ctx: Interaction,
                     channel: abc.GuildChannel,
                     name: Optional[str] = None) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+
             await ctx.response.defer()
             if name == None:
                 name = channel.name

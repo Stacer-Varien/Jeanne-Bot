@@ -22,9 +22,9 @@ class slashowner(Cog):
     @group(aliases=['act', 'pressence'], invoke_without_command=True)
     @is_owner()
     async def activity(self, ctx: Context):
-        if Botban(ctx.author).check_botbanned_user() == True:
-            pass
-        else:
+            if Botban(ctx.author).check_botbanned_user() == True:
+                return
+        
             embed = Embed(
                 title=
                 "This is a group command. However, the available commands for this is:",
@@ -36,20 +36,20 @@ class slashowner(Cog):
     @activity.command(aliases=['playing'])
     @is_owner()
     async def play(self, ctx: Context, *, activity: str):
-        """Make Jeanne play something as an activity"""
-        if Botban(ctx.author).check_botbanned_user() == True:
-            pass
-        else:
+            """Make Jeanne play something as an activity"""
+            if Botban(ctx.author).check_botbanned_user() == True:
+                return
+        
             await self.bot.change_presence(activity=Game(name=activity))
             await ctx.send(f"Jeanne is now playing `{activity}`")
 
     @activity.command(aliases=['listening'])
     @is_owner()
     async def listen(self, ctx: Context, *, activity: str):
-        """Make Jeanne listen to something as an activity"""
-        if Botban(ctx.author).check_botbanned_user() == True:
-            pass
-        else:
+            """Make Jeanne listen to something as an activity"""
+            if Botban(ctx.author).check_botbanned_user() == True:
+                return
+        
             await self.bot.change_presence(
                 activity=Activity(type=ActivityType.listening, name=activity))
             await ctx.send(f"Jeanne is now listening to `{activity}`")
@@ -57,21 +57,21 @@ class slashowner(Cog):
     @activity.command(aliases=['remove', 'clean', 'stop'])
     @is_owner()
     async def clear(self, ctx: Context):
-        """Clears the bot's activity"""
-        if Botban(ctx.author).check_botbanned_user() == True:
-            pass
-        else:
+            """Clears the bot's activity"""
+            if Botban(ctx.author).check_botbanned_user() == True:
+                return
+        
             await self.bot.change_presence(activity=None)
             await ctx.send(f"Jeanne's activity has been removed")
 
     @command(aliases=['fuser'])
     @is_owner()
     async def finduser(self, ctx: Context, user_id: int):
-        """Finds a user"""
-        await ctx.defer()
-        if Botban(ctx.author).check_botbanned_user() == True:
-            pass
-        else:
+            """Finds a user"""
+            await ctx.defer()
+            if Botban(ctx.author).check_botbanned_user() == True:
+                return
+        
             user = await self.bot.fetch_user(user_id)
             if user.bot == True:
                 botr = ":o:"
@@ -100,21 +100,20 @@ class slashowner(Cog):
     @command(aliases=['restart', 'refresh'])
     @is_owner()
     async def update(self, ctx: Context):
-        """Restart me so I can be updated"""
-        await ctx.defer()
-        if Botban(ctx.author).check_botbanned_user() == True:
-            pass
-        else:
+            """Restart me so I can be updated"""
+            await ctx.defer()
+            if Botban(ctx.author).check_botbanned_user() == True:
+                return
+
             await ctx.send(f"YAY! NEW UPDATE!")
             restart_bot()
 
     @command(aliases=['forbid', 'disallow', 'bban', 'bb'])
     @is_owner()
     async def botban(self, ctx: Context, user_id: int, *, reason: str):
-        """Botban a user from using the bot"""
-        if Botban(ctx.author).check_botbanned_user() == True:
-            pass
-        else:
+            """Botban a user from using the bot"""
+            if Botban(ctx.author).check_botbanned_user() == True:
+                return
             if reason == None:
                 await ctx.send("Reason missing for botban", ephemeral=True)
             else:
