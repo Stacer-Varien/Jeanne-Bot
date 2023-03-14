@@ -2,7 +2,7 @@ from discord import ui, ButtonStyle, Interaction, User
 
 class Confirmation(ui.View):
     def __init__(self, author:User):
-        super().__init__(timeout=600)
+        super().__init__(timeout=60)
         self.author=author
         self.value = None
 
