@@ -70,9 +70,9 @@ class welcomer(Cog):
                     except:
                         await channel.send(content=content)
             else:
-                pass
+                return
         except Exception:
-            pass
+            return
 
     @Cog.listener()
     async def on_member_remove(self, member: Member):
@@ -112,7 +112,7 @@ class welcomer(Cog):
                     try:
                         content = json["content"]
                     except:
-                        pass
+                        return
 
                     try:
                         embed = Embed.from_dict(json['embeds'][0])
@@ -123,9 +123,9 @@ class welcomer(Cog):
                     except:
                         await channel.send(content=content)
             else:
-                pass
+                return
         except Exception:
-            pass
+            return
 
 
 async def setup(bot: Bot):

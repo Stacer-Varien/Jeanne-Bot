@@ -18,57 +18,57 @@ class ListWarns_Group(GroupCog, name="listwarns"):
 
     @Jeanne.command(description="View warnings in the server or a member")
     async def server(self, ctx: Interaction):
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
-            await ctx.response.defer()
-            record = Moderation(ctx.guild).fetch_warnings_server()
-            if record == None:
-                await ctx.followup.send("No warnings up to date")
-            else:
-                embed = Embed(title=f"Currently warned members",
-                              colour=Color.red())
-                embed.description = ""
-                for i in record:
-                    warned_member = await self.bot.fetch_user(i[0])
-                    warn_points = i[2]
+        await ctx.response.defer()
+        record = Moderation(ctx.guild).fetch_warnings_server()
+        if record == None:
+            await ctx.followup.send("No warnings up to date")
+        else:
+            embed = Embed(title=f"Currently warned members",
+                          colour=Color.red())
+            embed.description = ""
+            for i in record:
+                warned_member = await self.bot.fetch_user(i[0])
+                warn_points = i[2]
 
-                    embed.description += f"**{warned_member}**\n**Warn points**: {warn_points}\n\n"
-                await ctx.followup.send(embed=embed)
+                embed.description += f"**{warned_member}**\n**Warn points**: {warn_points}\n\n"
+            await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="View warnings that a member has")
     @Jeanne.describe(member="Which member are you checking the warns?")
     async def user(self, ctx: Interaction, member: Optional[Member]) -> None:
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
-            await ctx.response.defer()
-            if member == None:
-                member = ctx.user
+        await ctx.response.defer()
+        if member == None:
+            member = ctx.user
 
-            record = Moderation(ctx.guild, member).fetch_warnings_user()
-            if record == None:
-                await ctx.followup.send(f"{member} has no warn IDs")
+        record = Moderation(ctx.guild, member).fetch_warnings_user()
+        if record == None:
+            await ctx.followup.send(f"{member} has no warn IDs")
 
-            else:
-                embed = Embed(title=f"{member}'s warnings", colour=0xFF0000)
-                embed.description = ""
-                embed.set_thumbnail(url=member.display_avatar)
-                for i in record:
-                    moderator = await self.bot.fetch_user(i[2])
-                    reason = i[3]
-                    warn_id = i[4]
-                    date = i[5]
+        else:
+            embed = Embed(title=f"{member}'s warnings", colour=0xFF0000)
+            embed.description = ""
+            embed.set_thumbnail(url=member.display_avatar)
+            for i in record:
+                moderator = await self.bot.fetch_user(i[2])
+                reason = i[3]
+                warn_id = i[4]
+                date = i[5]
 
-                    if date == None:
-                        date = "None due to new update"
+                if date == None:
+                    date = "None due to new update"
 
-                    embed.add_field(
-                        name=f"`{warn_id}`",
-                        value=
-                        f"**Moderator:** {moderator}\n**Reason:** {reason}\n**Date:** <t:{date}:F>",
-                        inline=False)
-                await ctx.followup.send(embed=embed)
+                embed.add_field(
+                    name=f"`{warn_id}`",
+                    value=
+                    f"**Moderator:** {moderator}\n**Reason:** {reason}\n**Date:** <t:{date}:F>",
+                    inline=False)
+            await ctx.followup.send(embed=embed)
 
 
 class Ban_Group(GroupCog, name="ban"):
@@ -88,66 +88,66 @@ class Ban_Group(GroupCog, name="ban"):
                      member: Member,
                      reason: Optional[str] = None,
                      time: Optional[str] = None) -> None:
-            if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
+
+        await ctx.response.defer()
+        if member == ctx.user:
+            failed = Embed(description="You can't ban yourself")
+            await ctx.followup.send(embed=failed)
+        elif member.id == ctx.guild.owner.id:
+            failed = Embed(
+                description="You can't ban the owner of the server...",
+                color=Color.red())
+            await ctx.followup.send(embed=failed)
+        elif ctx.user.top_role.position < member.top_role.position:
+            failed = Embed(
+                description="{}'s position is higher than you...".format(
+                    member),
+                color=Color.red())
+            await ctx.followup.send(embed=failed)
+        else:
+            try:
+                banmsg = Embed(
+                    description=
+                    f"You are banned from **{ctx.guild.name}** for **{reason}**"
+                )
+                await member.send(embed=banmsg)
+            except:
                 return
-        
-            await ctx.response.defer()
-            if member == ctx.user:
-                failed = Embed(description="You can't ban yourself")
-                await ctx.followup.send(embed=failed)
-            elif member.id == ctx.guild.owner.id:
-                failed = Embed(
-                    description="You can't ban the owner of the server...",
-                    color=Color.red())
-                await ctx.followup.send(embed=failed)
-            elif ctx.user.top_role.position < member.top_role.position:
-                failed = Embed(
-                    description="{}'s position is higher than you...".format(
-                        member),
-                    color=Color.red())
-                await ctx.followup.send(embed=failed)
-            else:
+
+            if reason == None:
+                reason = 'None'
+
+            await member.ban(reason="{} | {}".format(reason, ctx.user))
+
+            ban = Embed(title="Member Banned", color=0xFF0000)
+            ban.add_field(name="Name", value=member, inline=True)
+            ban.add_field(name="ID", value=member.id, inline=True)
+            ban.add_field(name="Moderator", value=ctx.user, inline=True)
+            ban.add_field(name="Reason", value=reason, inline=False)
+            if time:
                 try:
-                    banmsg = Embed(
-                        description=
-                        f"You are banned from **{ctx.guild.name}** for **{reason}**"
-                    )
-                    await member.send(embed=banmsg)
+                    a = parse_timespan(time)
+                    Moderation(ctx.guild, member).softban_member(time)
+                    time = format_timespan(a)
                 except:
-                    return
+                    time = "Invalid time added. User is banned permanently!"
+                ban.add_field(name="Duration", value=time, inline=True)
+            ban.set_thumbnail(url=member.display_avatar)
 
-                if reason == None:
-                    reason = 'None'
+            modlog_id = Logger(ctx.guild).get_modlog_channel()
 
-                await member.ban(reason="{} | {}".format(reason, ctx.user))
-
-                ban = Embed(title="Member Banned", color=0xFF0000)
-                ban.add_field(name="Name", value=member, inline=True)
-                ban.add_field(name="ID", value=member.id, inline=True)
-                ban.add_field(name="Moderator", value=ctx.user, inline=True)
-                ban.add_field(name="Reason", value=reason, inline=False)
-                if time:
-                    try:
-                        a = parse_timespan(time)
-                        Moderation(ctx.guild, member).softban_member(time)
-                        time = format_timespan(a)
-                    except:
-                        time = "Invalid time added. User is banned permanently!"
-                    ban.add_field(name="Duration", value=time, inline=True)
-                ban.set_thumbnail(url=member.display_avatar)
-
-                modlog_id = Logger(ctx.guild).get_modlog_channel()
-
-                if modlog_id == None:
-                    await ctx.followup.send(embed=ban)
-                else:
-                    modlog = ctx.guild.get_channel(modlog_id)
-                    banned = Embed(
-                        description=
-                        f"{member} has been banned. Check {modlog.mention}",
-                        color=0xFF0000)
-                    await ctx.followup.send(embed=banned)
-                    await modlog.send(embed=ban)
+            if modlog_id == None:
+                await ctx.followup.send(embed=ban)
+            else:
+                modlog = ctx.guild.get_channel(modlog_id)
+                banned = Embed(
+                    description=
+                    f"{member} has been banned. Check {modlog.mention}",
+                    color=0xFF0000)
+                await ctx.followup.send(embed=banned)
+                await modlog.send(embed=ban)
 
     @Jeanne.command(description="Ban someone outside the server")
     @Jeanne.describe(user_id="What is the user ID?",
@@ -157,88 +157,86 @@ class Ban_Group(GroupCog, name="ban"):
                    ctx: Interaction,
                    user_id: str,
                    reason: Optional[str] = None) -> None:
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
-        
-            await ctx.response.defer()
-            user = await self.bot.fetch_user(int(user_id))
-            if reason == None:
-                reason = "None"
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
+        await ctx.response.defer()
+        user = await self.bot.fetch_user(int(user_id))
+        if reason == None:
+            reason = "None"
 
+        if int(user_id) == ctx.guild.owner.id:
+            failed = Embed(
+                description="You can't ban the owner of the server...",
+                color=Color.red())
+            await ctx.followup.send(embed=failed)
 
-            if int(user_id) == ctx.guild.owner.id:
-                failed = Embed(
-                    description="You can't ban the owner of the server...",
-                    color=Color.red())
-                await ctx.followup.send(embed=failed)
+        elif int(user_id) == ctx.user.id:
+            failed = Embed(description="You cannot ban yourself...",
+                           color=Color.red())
+            await ctx.followup.send(embed=failed)
 
-            elif int(user_id) == ctx.user.id:
-                failed = Embed(description="You cannot ban yourself...",
-                               color=Color.red())
-                await ctx.followup.send(embed=failed)
+        else:
+            try:
+                banned = await ctx.guild.fetch_ban(user)
+                if banned:
+                    already_banned = Embed(
+                        description=f"{user} is already banned here",
+                        color=Color.red())
+                    await ctx.followup.send(embed=already_banned)
+            except NotFound:
+                view = Confirmation(ctx.user)
+                confirm = Embed(
+                    description=
+                    "Is {} the one you want to ban from your server?".
+                    format(user),
+                    color=Color.dark_red()).set_thumbnail(
+                        url=user.display_avatar)
+                await ctx.followup.send(embed=confirm, view=view)
+                await view.wait()
 
-            else:
-                try:
-                    banned = await ctx.guild.fetch_ban(user)
-                    if banned:
-                        already_banned = Embed(
-                            description=f"{user} is already banned here",
-                            color=Color.red())
-                        await ctx.followup.send(embed=already_banned)
-                except NotFound:
-                    view = Confirmation(ctx.user)
-                    confirm = Embed(
-                        description=
-                        "Is {} the one you want to ban from your server?".
-                        format(user),
-                        color=Color.dark_red()).set_thumbnail(
-                            url=user.display_avatar)
-                    await ctx.followup.send(embed=confirm, view=view)
-                    await view.wait()
+                if view.value == None:
+                    cancelled = Embed(description="Ban cancelled",
+                                      color=Color.red())
+                    await ctx.edit_original_response(embed=cancelled,
+                                                     view=None)
 
-                    if view.value == None:
-                        cancelled = Embed(description="Ban cancelled",
-                                          color=Color.red())
-                        await ctx.edit_original_response(embed=cancelled,
+                elif view.value == True:
+                    await ctx.guild.ban(user,
+                                        reason="{} | {}".format(
+                                            reason, ctx.user))
+
+                    ban = Embed(title="User Banned", color=0xFF0000)
+                    ban.add_field(name="Name", value=user, inline=True)
+                    ban.add_field(name="ID", value=user.id, inline=True)
+                    ban.add_field(name="Moderator",
+                                  value=ctx.user,
+                                  inline=True)
+                    ban.add_field(name="Reason",
+                                  value=reason,
+                                  inline=False)
+                    ban.set_thumbnail(url=user.display_avatar)
+
+                    modlog_id = Logger(ctx.guild).get_modlog_channel()
+
+                    if modlog_id == None:
+                        await ctx.edit_original_response(embed=ban,
                                                          view=None)
-
-                    elif view.value == True:
-                        await ctx.guild.ban(user,
-                                            reason="{} | {}".format(
-                                                reason, ctx.user))
-
-                        ban = Embed(title="User Banned", color=0xFF0000)
-                        ban.add_field(name="Name", value=user, inline=True)
-                        ban.add_field(name="ID", value=user.id, inline=True)
-                        ban.add_field(name="Moderator",
-                                      value=ctx.user,
-                                      inline=True)
-                        ban.add_field(name="Reason",
-                                      value=reason,
-                                      inline=False)
-                        ban.set_thumbnail(url=user.display_avatar)
-
-                        modlog_id = Logger(ctx.guild).get_modlog_channel()
-
-                        if modlog_id == None:
-                            await ctx.edit_original_response(embed=ban,
-                                                             view=None)
-                        else:
-                            modlog = ctx.guild.get_channel(modlog_id)
-                            banned = Embed(
-                                description=
-                                f"{user} has been banned. Check {modlog.mention}",
-                                color=0xFF0000)
-                            await ctx.edit_original_response(embed=banned,
-                                                             view=None)
-                            await modlog.send(embed=ban)
-
-                    elif view.value == False:
-                        cancelled = Embed(description="Ban cancelled",
-                                          color=Color.red())
-                        await ctx.edit_original_response(embed=cancelled,
+                    else:
+                        modlog = ctx.guild.get_channel(modlog_id)
+                        banned = Embed(
+                            description=
+                            f"{user} has been banned. Check {modlog.mention}",
+                            color=0xFF0000)
+                        await ctx.edit_original_response(embed=banned,
                                                          view=None)
+                        await modlog.send(embed=ban)
+
+                elif view.value == False:
+                    cancelled = Embed(description="Ban cancelled",
+                                      color=Color.red())
+                    await ctx.edit_original_response(embed=cancelled,
+                                                     view=None)
 
     @user.error
     async def ban_user_error(self, ctx: Interaction,
@@ -295,91 +293,91 @@ class moderation(Cog):
                    ctx: Interaction,
                    member: Member,
                    reason: Optional[str] = None) -> None:
-            await ctx.response.defer()
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
-        
-            if ctx.user.top_role.position < member.top_role.position:
-                failed = Embed(
-                    description="{}'s position is higher than you...".format(
-                        member),
-                    color=Color.red())
-                await ctx.followup.send(embed=failed)
-            elif member.id == ctx.guild.owner.id:
-                failed = Embed(
-                    description="You can't warn the owner of the server...",
-                    color=Color.red())
-                await ctx.followup.send(embed=failed)
-            elif member == ctx.user:
-                failed = Embed(description="You can't warn yourself")
-                await ctx.followup.send(embed=failed)
+        await ctx.response.defer()
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
+
+        if ctx.user.top_role.position < member.top_role.position:
+            failed = Embed(
+                description="{}'s position is higher than you...".format(
+                    member),
+                color=Color.red())
+            await ctx.followup.send(embed=failed)
+        elif member.id == ctx.guild.owner.id:
+            failed = Embed(
+                description="You can't warn the owner of the server...",
+                color=Color.red())
+            await ctx.followup.send(embed=failed)
+        elif member == ctx.user:
+            failed = Embed(description="You can't warn yourself")
+            await ctx.followup.send(embed=failed)
+        else:
+            if reason == None:
+                reason = "None"
+
+            warn_id = f"{randint(0,100000)}"
+            date = round(datetime.now().timestamp())
+            Moderation(ctx.guild,
+                       member).warn_user(ctx.user.id, reason, warn_id,
+                                         date)
+
+            warn = Embed(title="Member warned", color=0xFF0000)
+            warn.add_field(name="Member", value=member, inline=True)
+            warn.add_field(name="ID", value=member.id, inline=True)
+            warn.add_field(name="Moderator", value=ctx.user, inline=True)
+            warn.add_field(name="Reason", value=reason, inline=False)
+            warn.add_field(name="Warn ID", value=warn_id, inline=True)
+            warn.add_field(name="Date",
+                           value="<t:{}:F>".format(date),
+                           inline=True)
+            warn.set_thumbnail(url=member.display_avatar)
+
+            modlog_id = Logger(ctx.guild).get_modlog_channel()
+
+            if modlog_id == None:
+                await ctx.followup.send(embed=warn)
             else:
-                if reason == None:
-                    reason = "None"
-
-                warn_id = f"{randint(0,100000)}"
-                date = round(datetime.now().timestamp())
-                Moderation(ctx.guild,
-                           member).warn_user(ctx.user.id, reason, warn_id,
-                                             date)
-
-                warn = Embed(title="Member warned", color=0xFF0000)
-                warn.add_field(name="Member", value=member, inline=True)
-                warn.add_field(name="ID", value=member.id, inline=True)
-                warn.add_field(name="Moderator", value=ctx.user, inline=True)
-                warn.add_field(name="Reason", value=reason, inline=False)
-                warn.add_field(name="Warn ID", value=warn_id, inline=True)
-                warn.add_field(name="Date",
-                               value="<t:{}:F>".format(date),
-                               inline=True)
-                warn.set_thumbnail(url=member.display_avatar)
-
-                modlog_id = Logger(ctx.guild).get_modlog_channel()
-
-                if modlog_id == None:
-                    await ctx.followup.send(embed=warn)
-                else:
-                    modlog = ctx.guild.get_channel(modlog_id)
-                    warned = Embed(
-                        description=
-                        f"{member} has been warned. Check {modlog.mention}",
-                        color=0xFF0000)
-                    await ctx.followup.send(embed=warned)
-                    await modlog.send(embed=warn)
+                modlog = ctx.guild.get_channel(modlog_id)
+                warned = Embed(
+                    description=
+                    f"{member} has been warned. Check {modlog.mention}",
+                    color=0xFF0000)
+                await ctx.followup.send(embed=warned)
+                await modlog.send(embed=warn)
 
     @Jeanne.command(description="Revoke a warn by warn ID")
     @Jeanne.describe(warn_id="What is the warn ID you want to remove?")
     @Jeanne.checks.has_permissions(kick_members=True)
     async def clearwarn(self, ctx: Interaction, warn_id: str):
-            await ctx.response.defer()
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
+        await ctx.response.defer()
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
-            mod = Moderation(ctx.guild)
-            result = mod.check_warn_id(warn_id)
+        mod = Moderation(ctx.guild)
+        result = mod.check_warn_id(warn_id)
 
-            if result == None:
-                await ctx.followup.send("Invalid warn ID")
+        if result == None:
+            await ctx.followup.send("Invalid warn ID")
 
+        else:
+            member = await ctx.guild.fetch_member(result[0])
+            Moderation(ctx.guild, member).revoke_warn(warn_id)
+
+            revoked_warn = Embed(
+                title="Warn removed!",
+                description=f"{ctx.user} has revoked warn ID ({warn_id})")
+
+            modlog_id = Logger(ctx.guild).get_modlog_channel()
+
+            if modlog_id == None:
+                await ctx.followup.send(embed=revoked_warn)
             else:
-                member = await ctx.guild.fetch_member(result[0])
-                Moderation(ctx.guild, member).revoke_warn(warn_id)
-
-                revoked_warn = Embed(
-                    title="Warn removed!",
-                    description=f"{ctx.user} has revoked warn ID ({warn_id})")
-
-                modlog_id = Logger(ctx.guild).get_modlog_channel()
-
-                if modlog_id == None:
-                    await ctx.followup.send(embed=revoked_warn)
-                else:
-                    modlog = ctx.guild.get_channel(modlog_id)
-                    revoke = Embed(
-                        description=f"Warn revoked. Check {modlog.mention}",
-                        color=0xFF0000)
-                    await modlog.send(embed=revoke)
-                    await ctx.followup.send(embed=revoked_warn)
+                modlog = ctx.guild.get_channel(modlog_id)
+                revoke = Embed(
+                    description=f"Warn revoked. Check {modlog.mention}",
+                    color=0xFF0000)
+                await modlog.send(embed=revoke)
+                await ctx.followup.send(embed=revoked_warn)
 
     @Jeanne.command(description="Kick a member out of the server")
     @Jeanne.describe(member="Which member are you kicking?",
@@ -389,63 +387,63 @@ class moderation(Cog):
                    ctx: Interaction,
                    member: Member,
                    reason: Optional[str] = None) -> None:
-            await ctx.response.defer()
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
-        
-            if member.id == ctx.user.id:
-                failed = Embed(description="You can't kick yourself out")
-                await ctx.followup.send(embed=failed)
-            elif ctx.user.top_role.position < member.top_role.position:
-                failed = Embed(
-                    description="{}'s position is higher than you...".format(
-                        member),
-                    color=Color.red())
-                await ctx.followup.send(embed=failed)
-            elif member.id == ctx.guild.owner.id:
-                failed = Embed(
+        await ctx.response.defer()
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
+
+        if member.id == ctx.user.id:
+            failed = Embed(description="You can't kick yourself out")
+            await ctx.followup.send(embed=failed)
+        elif ctx.user.top_role.position < member.top_role.position:
+            failed = Embed(
+                description="{}'s position is higher than you...".format(
+                    member),
+                color=Color.red())
+            await ctx.followup.send(embed=failed)
+        elif member.id == ctx.guild.owner.id:
+            failed = Embed(
+                description=
+                "You cannot kick the owner of the server out...",
+                color=Color.red())
+            await ctx.followup.send(embed=failed)
+        elif member == ctx.user:
+            failed = Embed(description="You can't kick yourself out")
+            await ctx.followup.send(embed=failed)
+        else:
+            if reason == None:
+                reason = 'None'
+
+            try:
+                kickmsg = Embed(
                     description=
-                    "You cannot kick the owner of the server out...",
-                    color=Color.red())
-                await ctx.followup.send(embed=failed)
-            elif member == ctx.user:
-                failed = Embed(description="You can't kick yourself out")
-                await ctx.followup.send(embed=failed)
+                    f"You are kicked from **{ctx.guild.name}** for **{reason}**"
+                )
+                await member.send(embed=kickmsg)
+            except:
+                return
+
+            await member.kick(reason="{} | {}".format(reason, ctx.user))
+            kick = Embed(title="Member Kicked", color=0xFF0000)
+            kick.add_field(name='Member', value=member, inline=True)
+            kick.add_field(name='ID', value=member.id, inline=True)
+            kick.add_field(name='Resposible Moderator',
+                           value=ctx.user,
+                           inline=True)
+            kick.add_field(name='Reason', value=reason, inline=True)
+            kick.set_thumbnail(url=member.display_avatar)
+
+            modlog_id = Logger(ctx.guild).get_modlog_channel()
+
+            if modlog_id == None:
+                await ctx.followup.send(embed=kick)
             else:
-                if reason == None:
-                    reason = 'None'
-
-                try:
-                    kickmsg = Embed(
-                        description=
-                        f"You are kicked from **{ctx.guild.name}** for **{reason}**"
-                    )
-                    await member.send(embed=kickmsg)
-                except:
-                    return
-
-                await member.kick(reason="{} | {}".format(reason, ctx.user))
-                kick = Embed(title="Member Kicked", color=0xFF0000)
-                kick.add_field(name='Member', value=member, inline=True)
-                kick.add_field(name='ID', value=member.id, inline=True)
-                kick.add_field(name='Resposible Moderator',
-                               value=ctx.user,
-                               inline=True)
-                kick.add_field(name='Reason', value=reason, inline=True)
-                kick.set_thumbnail(url=member.display_avatar)
-
-                modlog_id = Logger(ctx.guild).get_modlog_channel()
-
-                if modlog_id == None:
-                    await ctx.followup.send(embed=kick)
-                else:
-                    modlog = ctx.guild.get_channel(modlog_id)
-                    kicked = Embed(
-                        description=
-                        f"{member} has been kicked. Check {modlog.mention}",
-                        color=0xFF0000)
-                    await ctx.followup.send(embed=kicked)
-                    await modlog.send(embed=kick)
+                modlog = ctx.guild.get_channel(modlog_id)
+                kicked = Embed(
+                    description=
+                    f"{member} has been kicked. Check {modlog.mention}",
+                    color=0xFF0000)
+                await ctx.followup.send(embed=kicked)
+                await modlog.send(embed=kick)
 
     @Jeanne.command(description="Bulk delete messages")
     @Jeanne.describe(limit="How many messages? (max is 100)",
@@ -455,25 +453,25 @@ class moderation(Cog):
                     ctx: Interaction,
                     limit: Optional[int] = None,
                     member: Optional[Member] = None) -> None:
-            await ctx.response.defer(thinking=True)
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
+        await ctx.response.defer(thinking=True)
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
-            if limit == None:
-                limit = 100
+        if limit == None:
+            limit = 100
 
-            elif limit > 100:
-                limit = 100
+        elif limit > 100:
+            limit = 100
 
-            if member:
+        if member:
 
-                def is_member(m: Message):
-                    return m.author == member
+            def is_member(m: Message):
+                return m.author == member
 
-                await ctx.channel.purge(limit=limit, check=is_member)
+            await ctx.channel.purge(limit=limit, check=is_member)
 
-            elif not member:
-                await ctx.channel.purge(limit=limit)
+        elif not member:
+            await ctx.channel.purge(limit=limit)
 
     @Jeanne.command(description="Change someone's nickname")
     @Jeanne.describe(member="Which member?",
@@ -481,16 +479,16 @@ class moderation(Cog):
     @Jeanne.checks.has_permissions(manage_nicknames=True)
     async def changenickname(self, ctx: Interaction, member: Member,
                              nickname: str):
-            await ctx.response.defer()
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
+        await ctx.response.defer()
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
-            await member.edit(nick=nickname)
-            setnick = Embed(color=0x00FF68)
-            setnick.add_field(name="Nickname changed",
-                              value=f"{member}'s nickname is now `{nickname}`",
-                              inline=False)
-            await ctx.followup.send(embed=setnick)
+        await member.edit(nick=nickname)
+        setnick = Embed(color=0x00FF68)
+        setnick.add_field(name="Nickname changed",
+                          value=f"{member}'s nickname is now `{nickname}`",
+                          inline=False)
+        await ctx.followup.send(embed=setnick)
 
     @Jeanne.command(description="Unbans a user")
     @Jeanne.describe(user_id="What is the user ID you want to unban?",
@@ -500,35 +498,35 @@ class moderation(Cog):
                     ctx: Interaction,
                     user_id: str,
                     reason: Optional[str] = None) -> None:
-            await ctx.response.defer()
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
-            
-            if reason==None:
-                reason="None"
+        await ctx.response.defer()
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
-            user = await self.bot.fetch_user(int(user_id))
-            await ctx.guild.unban(user,
-                                  reason="{} | {}".format(reason, ctx.user))
-            unban = Embed(title="User Unbanned", color=0xFF0000)
-            unban.add_field(name="Name", value=user, inline=True)
-            unban.add_field(name="ID", value=user.id, inline=True)
-            unban.add_field(name="Moderator", value=ctx.user, inline=True)
-            unban.add_field(name="Reason", value=reason, inline=False)
-            unban.set_thumbnail(url=user.display_avatar)
+        if reason==None:
+            reason="None"
 
-            modlog_id = Logger(ctx.guild).get_modlog_channel()
+        user = await self.bot.fetch_user(int(user_id))
+        await ctx.guild.unban(user,
+                              reason="{} | {}".format(reason, ctx.user))
+        unban = Embed(title="User Unbanned", color=0xFF0000)
+        unban.add_field(name="Name", value=user, inline=True)
+        unban.add_field(name="ID", value=user.id, inline=True)
+        unban.add_field(name="Moderator", value=ctx.user, inline=True)
+        unban.add_field(name="Reason", value=reason, inline=False)
+        unban.set_thumbnail(url=user.display_avatar)
 
-            if modlog_id == None:
-                await ctx.followup.send(embed=unban)
-            else:
-                modlog = ctx.guild.get_channel(modlog_id)
-                unbanned = Embed(
-                    description=
-                    f"{user} has been unbanned. Check {modlog.mention}",
-                    color=0xFF0000)
-                await ctx.followup.send(embed=unbanned)
-                await modlog.send(embed=unban)
+        modlog_id = Logger(ctx.guild).get_modlog_channel()
+
+        if modlog_id == None:
+            await ctx.followup.send(embed=unban)
+        else:
+            modlog = ctx.guild.get_channel(modlog_id)
+            unbanned = Embed(
+                description=
+                f"{user} has been unbanned. Check {modlog.mention}",
+                color=0xFF0000)
+            await ctx.followup.send(embed=unbanned)
+            await modlog.send(embed=unban)
 
     @Jeanne.command(
         description="Timeout a member using Discord's timeout feature")
@@ -542,46 +540,48 @@ class moderation(Cog):
                       member: Member,
                       time: Optional[str] = None,
                       reason: Optional[str] = None) -> None:
-            await ctx.response.defer()
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
+        await ctx.response.defer()
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
-            if member == ctx.user:
-                failed = Embed(description="You can't mute yourself")
-                await ctx.followup.send(embed=failed)
+        if member == ctx.user:
+            failed = Embed(description="You can't mute yourself")
+            await ctx.followup.send(embed=failed)
 
+        else:
+
+            if reason==None:
+                reason="None"
+
+            if time == None:
+                time = '28d'
+            elif parse_timespan(time) > 2505600.0:
+                time = '28d'
+
+            timed = parse_timespan(time)
+            await member.edit(timed_out_until=utcnow() +
+                              timedelta(seconds=timed),
+                              reason="{} | {}".format(reason, ctx.user))
+            mute = Embed(title="Member Timeout", color=0xFF0000)
+            mute.add_field(name="Member", value=member, inline=True)
+            mute.add_field(name="ID", value=member.id, inline=True)
+            mute.add_field(name="Moderator", value=ctx.user, inline=True)
+            mute.add_field(name="Duration", value=time, inline=True)
+            mute.add_field(name="Reason", value=reason, inline=False)
+            mute.set_thumbnail(url=member.display_avatar)
+
+            modlog_id = Logger(ctx.guild).get_modlog_channel()
+
+            if modlog_id == None:
+                await ctx.followup.send(embed=mute)
             else:
-                
-                if reason==None:
-                    reason="None"
-
-                if time == None:
-                    time = '28d'
-
-                timed = parse_timespan(time)
-                await member.edit(timed_out_until=utcnow() +
-                                  timedelta(seconds=timed),
-                                  reason="{} | {}".format(reason, ctx.user))
-                mute = Embed(title="Member Timeout", color=0xFF0000)
-                mute.add_field(name="Member", value=member, inline=True)
-                mute.add_field(name="ID", value=member.id, inline=True)
-                mute.add_field(name="Moderator", value=ctx.user, inline=True)
-                mute.add_field(name="Duration", value=time, inline=True)
-                mute.add_field(name="Reason", value=reason, inline=False)
-                mute.set_thumbnail(url=member.display_avatar)
-
-                modlog_id = Logger(ctx.guild).get_modlog_channel()
-
-                if modlog_id == None:
-                    await ctx.followup.send(embed=mute)
-                else:
-                    modlog = ctx.guild.get_channel(modlog_id)
-                    muted = Embed(
-                        description=
-                        f"{member} has been muted. Check {modlog.mention}",
-                        color=0xFF0000)
-                    await ctx.followup.send(embed=muted)
-                    await modlog.send(embed=mute)
+                modlog = ctx.guild.get_channel(modlog_id)
+                muted = Embed(
+                    description=
+                    f"{member} has been muted. Check {modlog.mention}",
+                    color=0xFF0000)
+                await ctx.followup.send(embed=muted)
+                await modlog.send(embed=mute)
 
     @timeout.error
     async def timeout_error(self, ctx: Interaction,
@@ -600,40 +600,40 @@ class moderation(Cog):
                         ctx: Interaction,
                         member: Member,
                         reason: Optional[str] = None) -> None:
-            await ctx.response.defer()
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
+        await ctx.response.defer()
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
-            if reason == None:
-                reason = "None"
+        if reason == None:
+            reason = "None"
 
 
-            if member == ctx.user:
-                failed = Embed(description="You can't unmute yourself")
-                await ctx.followup.send(embed=failed)
+        if member == ctx.user:
+            failed = Embed(description="You can't unmute yourself")
+            await ctx.followup.send(embed=failed)
 
+        else:
+            await member.edit(timed_out_until=None,
+                              reason="{} | {}".format(reason, ctx.user))
+            unmute = Embed(title="Member Untimeout", color=0xFF0000)
+            unmute.add_field(name="Member", value=member, inline=True)
+            unmute.add_field(name="ID", value=member.id, inline=True)
+            unmute.add_field(name="Moderator", value=ctx.user, inline=True)
+            unmute.add_field(name="Reason", value=reason, inline=False)
+            unmute.set_thumbnail(url=member.display_avatar)
+
+            modlog_id = Logger(ctx.guild).get_modlog_channel()
+
+            if modlog_id == None:
+                await ctx.followup.send(embed=unmute)
             else:
-                await member.edit(timed_out_until=None,
-                                  reason="{} | {}".format(reason, ctx.user))
-                unmute = Embed(title="Member Untimeout", color=0xFF0000)
-                unmute.add_field(name="Member", value=member, inline=True)
-                unmute.add_field(name="ID", value=member.id, inline=True)
-                unmute.add_field(name="Moderator", value=ctx.user, inline=True)
-                unmute.add_field(name="Reason", value=reason, inline=False)
-                unmute.set_thumbnail(url=member.display_avatar)
-
-                modlog_id = Logger(ctx.guild).get_modlog_channel()
-
-                if modlog_id == None:
-                    await ctx.followup.send(embed=unmute)
-                else:
-                    modlog = ctx.guild.get_channel(modlog_id)
-                    unmuted = Embed(
-                        description=
-                        f"{member} has been untimeouted. Check {modlog.mention}",
-                        color=0xFF0000)
-                    await ctx.followup.send(embed=unmuted)
-                    await modlog.send(embed=unmute)
+                modlog = ctx.guild.get_channel(modlog_id)
+                unmuted = Embed(
+                    description=
+                    f"{member} has been untimeouted. Check {modlog.mention}",
+                    color=0xFF0000)
+                await ctx.followup.send(embed=unmuted)
+                await modlog.send(embed=unmute)
 
     @Jeanne.command(description="Ban multiple members at once")
     @Jeanne.describe(
@@ -643,101 +643,101 @@ class moderation(Cog):
     @Jeanne.checks.has_permissions(administrator=True)
     @Jeanne.checks.cooldown(1, 1800, key=lambda i: (i.guild.id))
     async def massban(self, ctx: Interaction, user_ids: str, reason: str):
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
-        
-            await ctx.response.defer()
-            ids = user_ids.replace(' ', ',').split(',')
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
-            if len(ids) < 5:
-                embed = Embed(
-                    description=
-                    "There is very few IDs. Please add more and try again after <t:{}:R>"
-                    .format(
-                        round((datetime.now() +
-                               timedelta(minutes=30)).timestamp())))
-                await ctx.followup.send(embed=embed)
-            else:
-                if len(ids) > 25:
-                    ids = ids[:25]
+        await ctx.response.defer()
+        ids = user_ids.replace(' ', ',').split(',')
 
-                view = Confirmation(ctx.user)
-                alert = Embed(
-                    title="BEWARE",
-                    description=
-                    "The developer is **NOT** responsible in any way or form if you messed up, even if it was misused (but report anyone misusing them to the developer so he can botban them).\n\nDo you want to proceed?",
+        if len(ids) < 5:
+            embed = Embed(
+                description=
+                "There is very few IDs. Please add more and try again after <t:{}:R>"
+                .format(
+                    round((datetime.now() +
+                           timedelta(minutes=30)).timestamp())))
+            await ctx.followup.send(embed=embed)
+        else:
+            if len(ids) > 25:
+                ids = ids[:25]
+
+            view = Confirmation(ctx.user)
+            alert = Embed(
+                title="BEWARE",
+                description=
+                "The developer is **NOT** responsible in any way or form if you messed up, even if it was misused (but report anyone misusing them to the developer so he can botban them).\n\nDo you want to proceed?",
+                color=Color.red())
+            await ctx.followup.send(embed=alert, view=view)
+
+            await view.wait()
+
+            if view.value == True:
+                loading = self.bot.get_emoji(1012677456811016342)
+                em = Embed(
+                    description="Banning user IDs now {}".format(loading),
                     color=Color.red())
-                await ctx.followup.send(embed=alert, view=view)
+                await ctx.edit_original_response(embed=em, view=None)
+                massmb = Embed()
+                massmb.title = "List of users massbanned"
+                massmb.color = Color.red()
+                massmb.description = ""
+                for id in ids:
 
-                await view.wait()
+                    if id == str(ctx.user.id):
+                        return
 
-                if view.value == True:
-                    loading = self.bot.get_emoji(1012677456811016342)
-                    em = Embed(
-                        description="Banning user IDs now {}".format(loading),
-                        color=Color.red())
-                    await ctx.edit_original_response(embed=em, view=None)
-                    massmb = Embed()
-                    massmb.title = "List of users massbanned"
-                    massmb.color = Color.red()
-                    massmb.description = ""
-                    for id in ids:
+                    if id == str(ctx.guild.owner.id):
+                        return
 
-                        if id == str(ctx.user.id):
+                    try:
+                        if ctx.guild.get_member(
+                                int(id)
+                        ).top_role.position > ctx.user.top_role.position:
                             return
+                    except:
+                        return
 
-                        if id == str(ctx.guild.owner.id):
-                            return
-
+                    try:
+                        user = await self.bot.fetch_user(int(id))
                         try:
-                            if ctx.guild.get_member(
-                                    int(id)
-                            ).top_role.position > ctx.user.top_role.position:
-                                return
-                        except:
+                            banned = await ctx.guild.fetch_ban(user)
+                        except NotFound:
+                            banned = False
+
+                        if banned:
                             return
+                        else:
+                            await ctx.guild.ban(user, reason=reason)
 
-                        try:
-                            user = await self.bot.fetch_user(int(id))
-                            try:
-                                banned = await ctx.guild.fetch_ban(user)
-                            except NotFound:
-                                banned = False
+                            massmb.description += "{} | `{}`\n".format(
+                                user, user.id)
+                    except:
+                        continue
+                massmb.add_field(name="Reason", value=reason, inline=False)
+                modlog_id = Logger(ctx.guild).get_modlog_channel()
+                if modlog_id == None:
+                    await ctx.edit_original_response(embed=massmb)
+                else:
+                    modlog = await ctx.guild.fetch_channel(modlog_id)
+                    muted = Embed(
+                        description="Tried to ban {} users. Check {}".
+                        format(len(ids), modlog.mention),
+                        color=0xFF0000)
+                    await ctx.edit_original_response(embed=muted)
+                    await modlog.send(embed=massmb)
 
-                            if banned:
-                                return
-                            else:
-                                await ctx.guild.ban(user, reason=reason)
+            elif view.value == False:
+                cancelled = Embed(description="Massban cancelled",
+                                  color=Color.red())
+                await ctx.edit_original_response(embed=cancelled,
+                                                 view=None)
 
-                                massmb.description += "{} | `{}`\n".format(
-                                    user, user.id)
-                        except:
-                            continue
-                    massmb.add_field(name="Reason", value=reason, inline=False)
-                    modlog_id = Logger(ctx.guild).get_modlog_channel()
-                    if modlog_id == None:
-                        await ctx.edit_original_response(embed=massmb)
-                    else:
-                        modlog = await ctx.guild.fetch_channel(modlog_id)
-                        muted = Embed(
-                            description="Tried to ban {} users. Check {}".
-                            format(len(ids), modlog.mention),
-                            color=0xFF0000)
-                        await ctx.edit_original_response(embed=muted)
-                        await modlog.send(embed=massmb)
-
-                elif view.value == False:
-                    cancelled = Embed(description="Massban cancelled",
-                                      color=Color.red())
-                    await ctx.edit_original_response(embed=cancelled,
-                                                     view=None)
-
-                elif view.value == None:
-                    cancelled = Embed(
-                        description="Massban cancelled due to timeout",
-                        color=Color.red())
-                    await ctx.edit_original_response(embed=cancelled,
-                                                     view=None)
+            elif view.value == None:
+                cancelled = Embed(
+                    description="Massban cancelled due to timeout",
+                    color=Color.red())
+                await ctx.edit_original_response(embed=cancelled,
+                                                 view=None)
 
     @massban.error
     async def massban_error(self, ctx: Interaction,
@@ -760,91 +760,91 @@ class moderation(Cog):
     @Jeanne.checks.cooldown(1, 1800, key=lambda i: (i.guild.id))
     @Jeanne.checks.has_permissions(administrator=True)
     async def massunban(self, ctx: Interaction, user_ids: str, reason: str):
-            await ctx.response.defer()
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
+        await ctx.response.defer()
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
-            ids = user_ids.replace(' ', ',').split(',')
-            if len(ids) < 5:
-                embed = Embed(
-                    description=
-                    "There is very few IDs. Please add more and try again after <t:{}:R>"
-                    .format(
-                        round((datetime.now() +
-                               timedelta(minutes=30)).timestamp())))
-                await ctx.followup.send(embed=embed)
-            else:
-                if len(ids) > 25:
-                    ids = ids[:25]
+        ids = user_ids.replace(' ', ',').split(',')
+        if len(ids) < 5:
+            embed = Embed(
+                description=
+                "There is very few IDs. Please add more and try again after <t:{}:R>"
+                .format(
+                    round((datetime.now() +
+                           timedelta(minutes=30)).timestamp())))
+            await ctx.followup.send(embed=embed)
+        else:
+            if len(ids) > 25:
+                ids = ids[:25]
 
-                view = Confirmation(ctx.user)
-                alert = Embed(
-                    title="BEWARE",
-                    description=
-                    "The developer is **NOT** responsible in any way or form if you messed up, even if it was misused (but report anyone misusing them to the developer so he can botban them)",
+            view = Confirmation(ctx.user)
+            alert = Embed(
+                title="BEWARE",
+                description=
+                "The developer is **NOT** responsible in any way or form if you messed up, even if it was misused (but report anyone misusing them to the developer so he can botban them)",
+                color=Color.red())
+            await ctx.followup.send(embed=alert, view=view)
+
+            await view.wait()
+
+            if view.value == True:
+                loading = self.bot.get_emoji(1012677456811016342)
+                em = Embed(description="Unbanning user IDs now {}".format(
+                    loading),
+                           color=Color.red())
+                await ctx.edit_original_response(embed=em, view=None)
+                massmb = Embed()
+                massmb.title = "List of users massunbanned"
+                massmb.color = Color.red()
+                massmb.description = ""
+                for id in ids:
+                    if id == str(ctx.user.id):
+                        return
+
+                    if id == str(ctx.guild.owner.id):
+                        return
+
+                    try:
+                        if ctx.guild.get_member(
+                                int(id)
+                        ).top_role.position > ctx.user.top_role.position:
+                            return
+                    except:
+                        return
+
+                    try:
+                        user = await self.bot.fetch_user(int(id))
+                        await ctx.guild.unban(user, reason=reason)
+
+                        massmb.description += "{} | `{}`\n".format(
+                            user, user.id)
+                    except:
+                        continue
+                massmb.add_field(name="Reason", value=reason, inline=False)
+                modlog_id = Logger(ctx.guild).get_modlog_channel()
+                if modlog_id == None:
+                    await ctx.edit_original_response(embed=massmb)
+                else:
+                    modlog = await ctx.guild.fetch_channel(modlog_id)
+                    muted = Embed(
+                        description="Tried to unban {} users. Check {}".
+                        format(len(ids), modlog.mention),
+                        color=0xFF0000)
+                    await ctx.edit_original_response(embed=muted)
+                    await modlog.send(embed=massmb)
+
+            elif view.value == False:
+                cancelled = Embed(description="Massunban cancelled",
+                                  color=Color.red())
+                await ctx.edit_original_response(embed=cancelled,
+                                                 view=None)
+
+            elif view.value == None:
+                cancelled = Embed(
+                    description="Massunban cancelled due to timeout",
                     color=Color.red())
-                await ctx.followup.send(embed=alert, view=view)
-
-                await view.wait()
-
-                if view.value == True:
-                    loading = self.bot.get_emoji(1012677456811016342)
-                    em = Embed(description="Unbanning user IDs now {}".format(
-                        loading),
-                               color=Color.red())
-                    await ctx.edit_original_response(embed=em, view=None)
-                    massmb = Embed()
-                    massmb.title = "List of users massunbanned"
-                    massmb.color = Color.red()
-                    massmb.description = ""
-                    for id in ids:
-                        if id == str(ctx.user.id):
-                            return
-
-                        if id == str(ctx.guild.owner.id):
-                            return
-
-                        try:
-                            if ctx.guild.get_member(
-                                    int(id)
-                            ).top_role.position > ctx.user.top_role.position:
-                                return
-                        except:
-                            return
-
-                        try:
-                            user = await self.bot.fetch_user(int(id))
-                            await ctx.guild.unban(user, reason=reason)
-
-                            massmb.description += "{} | `{}`\n".format(
-                                user, user.id)
-                        except:
-                            continue
-                    massmb.add_field(name="Reason", value=reason, inline=False)
-                    modlog_id = Logger(ctx.guild).get_modlog_channel()
-                    if modlog_id == None:
-                        await ctx.edit_original_response(embed=massmb)
-                    else:
-                        modlog = await ctx.guild.fetch_channel(modlog_id)
-                        muted = Embed(
-                            description="Tried to unban {} users. Check {}".
-                            format(len(ids), modlog.mention),
-                            color=0xFF0000)
-                        await ctx.edit_original_response(embed=muted)
-                        await modlog.send(embed=massmb)
-
-                elif view.value == False:
-                    cancelled = Embed(description="Massunban cancelled",
-                                      color=Color.red())
-                    await ctx.edit_original_response(embed=cancelled,
-                                                     view=None)
-
-                elif view.value == None:
-                    cancelled = Embed(
-                        description="Massunban cancelled due to timeout",
-                        color=Color.red())
-                    await ctx.edit_original_response(embed=cancelled,
-                                                     view=None)
+                await ctx.edit_original_response(embed=cancelled,
+                                                 view=None)
 
     @massunban.error
     async def massunban_error(self, ctx: Interaction,

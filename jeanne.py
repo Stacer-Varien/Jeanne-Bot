@@ -40,11 +40,11 @@ intents.voice_states = False
 intents.reactions = False
 intents.auto_moderation = False
 
-bot = Jeanne(
-    command_prefix=when_mentioned_or('j!', 'J!', 'jeanne ', 'Jeanne'), #the prefix is owner only
-    intents=intents,  
-    allowed_mentions=AllowedMentions.all(),
-    max_messages=10000)
+bot = Jeanne(command_prefix=when_mentioned_or('j!', 'J!', 'jeanne', 'Jeanne'),
+             intents=intents,
+             allowed_mentions=AllowedMentions.all(),
+             cached_messages=10000,
+             strip_after_prefix=True)  #the prefix is owner only)
 bot.remove_command('help')
 
 

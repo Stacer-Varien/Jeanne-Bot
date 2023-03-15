@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from json import loads
-from discord import AllowedMentions, Embed, Interaction, TextChannel, ui, TextInput, TextStyle
+from discord import AllowedMentions, Embed, Interaction, TextChannel, ui, TextStyle
 from assets.buttons import Confirmation
 from db_functions import Levelling, Welcomer
 
@@ -16,7 +16,7 @@ class Welcomingmsg(ui.Modal, title="Welcoming Message"):
         super().__init__()
 
 
-    jsonscript = TextInput(
+    jsonscript = ui.TextInput(
         label="JSON",
         style=TextStyle.paragraph,
         placeholder=
@@ -51,14 +51,18 @@ class Welcomingmsg(ui.Modal, title="Welcoming Message"):
             )
 
         view = Confirmation(ctx.user)
+        try:
+            embeds = [embed, confirm]
+        except:
+            embeds = [confirm]
         await ctx.response.send_message(content=content,
-                                    embeds=[embed, confirm],
-                                    view=view,
-                                    allowed_mentions=AllowedMentions(
-                                        everyone=False,
-                                        roles=False,
-                                        users=False),
-                                    ephemeral=True)
+                                        embeds=embeds,
+                                        view=view,
+                                        allowed_mentions=AllowedMentions(
+                                            everyone=False,
+                                            roles=False,
+                                            users=False),
+                                        ephemeral=True)
         await view.wait()
 
         if view.value == True:
@@ -86,7 +90,7 @@ class Leavingmsg(ui.Modal, title="Leaving Message"):
     def __init__(self) -> None:
         super().__init__()
 
-    jsonscript = TextInput(
+    jsonscript = ui.TextInput(
         label="JSON",
         style=TextStyle.paragraph,
         placeholder=
@@ -121,13 +125,17 @@ class Leavingmsg(ui.Modal, title="Leaving Message"):
         )
 
         view = Confirmation(ctx.user)
+        try:
+            embeds = [embed, confirm]
+        except:
+            embeds = [confirm]
         await ctx.response.send_message(content=content,
-                                        embeds=[embed, confirm],
+                                        embeds=embeds,
                                         view=view,
                                         allowed_mentions=AllowedMentions(
-                                        everyone=False,
-                                        roles=False,
-                                        users=False),
+                                            everyone=False,
+                                            roles=False,
+                                            users=False),
                                         ephemeral=True)
         await view.wait()
 
@@ -157,7 +165,7 @@ class Levelmsg(ui.Modal, title="Level Update Message"):
         super().__init__()
         self.channel=channel
 
-    jsonscript = TextInput(
+    jsonscript = ui.TextInput(
         label="JSON",
         style=TextStyle.paragraph,
         placeholder=
@@ -193,8 +201,12 @@ class Levelmsg(ui.Modal, title="Level Update Message"):
 
 
         view = Confirmation(ctx.user)
-        await ctx.followup.send(content=content,
-                                embeds=[embed, confirm],
+        try:
+            embeds=[embed, confirm]
+        except:
+            embeds=[confirm]
+        await ctx.response.send_message(content=content,
+                                embeds=embeds,
                                 view=view,
                                 allowed_mentions=AllowedMentions(
                                     everyone=False, roles=False, users=False),

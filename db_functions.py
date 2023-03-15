@@ -259,7 +259,7 @@ class Inventory():
 
     def use_wallpaper(self, name: str):
         if self.deselect_wallpaper() == None:
-            pass
+            return
         db.execute(
             "UPDATE userWallpaperInventory SET selected = ? WHERE wallpaper = ? AND user_id = ?",
             (

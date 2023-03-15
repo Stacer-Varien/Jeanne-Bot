@@ -20,7 +20,7 @@ class errors(Cog):
         elif isinstance(error, CommandInvokeError):
             traceback_error = traceback.format_exception(
                 error, error, error.__traceback__)
-            with open('cmd-invoke-errors.log', 'a') as f:
+            with open('cmd-invoke-errors.txt', 'a') as f:
                 f.writelines(f"{datetime.now()} - {ctx.user.id}-{traceback_error}\n\n")
         elif isinstance(error, BotMissingPermissions):
             embed = Embed(description=error, color=Color.red())

@@ -349,9 +349,9 @@ class slashutilities(Cog):
                      message="What should I say?")
     @Jeanne.checks.has_permissions(administrator=True)
     async def say(self, ctx: Interaction, channel: TextChannel, message: str):
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             await ctx.response.defer(ephemeral=True)
             await ctx.followup.send(content="Sent")
             await channel.send(message)
@@ -359,10 +359,10 @@ class slashutilities(Cog):
     @Jeanne.command(description="Do a calculation")
     @Jeanne.describe(calculate="Add a calculation")
     async def calculator(self, ctx: Interaction, calculate: str):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             try:
                 answer = self.parser.parse(calculate).evaluate({})
                 calculation = Embed(title="Result", color=Color.random())
@@ -378,10 +378,10 @@ class slashutilities(Cog):
     @Jeanne.command(
         description="Invite me to your server or join the support server")
     async def invite(self, ctx: Interaction):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             invite = Embed(
                 title="Invite me!",
                 description=
@@ -394,9 +394,9 @@ class slashutilities(Cog):
         description="Submit a bot report if you found something wrong")
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     async def botreport(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             await ctx.response.send_modal(ReportModal())
 
 
