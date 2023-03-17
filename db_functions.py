@@ -52,7 +52,7 @@ class Botban():
             pass
         else:
         
-            db.execute("SELECT * FROM globalxpData WHERE user_id = ?",
+            db.execute("DELETE * FROM globalxpData WHERE user_id = ?",
                        (self.user.id, ))
 
         if inventory_data == None:
