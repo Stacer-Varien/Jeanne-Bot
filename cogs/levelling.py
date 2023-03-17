@@ -92,7 +92,7 @@ class levelling(Cog):
             return
         
         if not message.author.bot:
-            if Levelling(server=message.guild).check_xpblacklist_channel(message.channel) == False:
+            if Levelling(message.author, message.guild).check_xpblacklist_channel(message.channel) == False:
                 try:
                     ratelimit = self.get_ratelimit(message)
                     if ratelimit == None:

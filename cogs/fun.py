@@ -2,7 +2,7 @@ from random import choice, randint
 from discord import Color, Embed, Interaction, Member, SyncWebhook, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
 from db_functions import Botban
-from assets.needed import eight_ball_answers, filtered_words
+from assets.needed import eight_ball_answers
 from config import BB_WEBHOOK
 from assets.imgur import get_animeme_pic
 from typing import Optional
@@ -21,15 +21,28 @@ class fun(Cog):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
             return
-        else:
-            embed = Embed(color=Color.random())
-            embed.add_field(name="Question:",
-                            value=f'{question}',
-                            inline=False)
-            embed.add_field(name="Answer:",
-                            value=f'{choice(eight_ball_answers)}',
-                            inline=False)
-            await ctx.followup.send(embed=embed)
+
+        eight_ball_answers = [
+            "It is certain.", "It is decidedly so.", "Without a doubt.",
+            "Yes – definitely.", "You may rely on it.", "As I see it, yes.",
+            "Most likely.", "Outlook good.", "Yes.", "Signs point to yes.",
+            "Reply hazy, try again.", "Ask again later.",
+            "Better not tell you now.", "Cannot predict now.",
+            "Concentrate and ask again.", "Don't count on it.",
+            "My reply is no.", "My sources say no.", "Outlook not so good.",
+            "Very doubtful.", "Why ask me? Just do it!",
+            "Why ask me? Just don't do it!", "Yeah... no", "Yeah... whatever",
+            "Yeah... I don't know", "Yes? No? I don't know!"
+        ]
+
+        embed = Embed(color=Color.random())
+        embed.add_field(name="Question:",
+                        value=f'{question}',
+                        inline=False)
+        embed.add_field(name="Answer:",
+                        value=f'{choice(eight_ball_answers)}',
+                        inline=False)
+        await ctx.followup.send(embed=embed)
 
     @Jeanne.command(
         description="Say something and I will say it in reversed text")
@@ -38,42 +51,39 @@ class fun(Cog):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
             return
+
+        filtered_words = ['riffak', 'reggin', 'aggin']
+        if any(word in text for word in filtered_words):
+            Botban(ctx.user).add_botbanned_user(
+                "Using the reversed version of a common racial slur")
+            botbanned = Embed(
+                title="User has been botbanned!",
+                description="They will no longer use Jeanne,permanently!")
+            botbanned.add_field(name="User", value=ctx.user)
+            botbanned.add_field(name="ID", value=ctx.user.id, inline=True)
+            botbanned.add_field(
+                name="Reason of ban",
+                value="Using the reversed version of the 'k-word'",
+                inline=False)
+            botbanned.set_footer(
+                text=
+                "Due to this user botbanned, all data except warnings are immediatley deleted from the database! They will have no chance of appealing their botban and all the commands executed by them are now rendered USELESS!"
+            )
+            botbanned.set_thumbnail(url=ctx.user.avatar)
+            webhook = SyncWebhook.from_url(BB_WEBHOOK)
+            webhook.send(embed=botbanned)
         else:
-            if any(word in text for word in filtered_words):
-                nope = Embed(description="I am not reversing that",
-                             color=Color.red())
-                await ctx.followup.send(embed=nope)
-            elif "raffik" in text:
-                Botban(ctx.user).add_botbanned_user(
-                    "Using the reversed version of the 'k-word'")
-                botbanned = Embed(
-                    title="User has been botbanned!",
-                    description="They will no longer use Jeanne,permanently!")
-                botbanned.add_field(name="User", value=ctx.user)
-                botbanned.add_field(name="ID", value=ctx.user.id, inline=True)
-                botbanned.add_field(
-                    name="Reason of ban",
-                    value="Using the reversed version of the 'k-word'",
-                    inline=False)
-                botbanned.set_footer(
-                    text=
-                    "Due to this user botbanned, all data except warnings are immediatley deleted from the database! They will have no chance of appealing their botban and all the commands executed by them are now rendered USELESS!"
-                )
-                botbanned.set_thumbnail(url=ctx.user.avatar)
-                webhook = SyncWebhook.from_url(BB_WEBHOOK)
-                webhook.send(embed=botbanned)
-            else:
-                msg = Embed(
-                    description=text[::-1], color=Color.random()).set_footer(
-                        text="Author: {} | {}".format(ctx.user, ctx.user.id))
-                await ctx.followup.send(embed=msg)
+            msg = Embed(
+                description=text[::-1], color=Color.random()).set_footer(
+                    text="Author: {} | {}".format(ctx.user, ctx.user.id))
+            await ctx.followup.send(embed=msg)
 
     @Jeanne.command(description="Get a random animeme")
     async def animeme(self, ctx: Interaction):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             animeme = Embed(color=Color.random())
             animeme.set_image(url=get_animeme_pic())
             animeme.set_footer(text="Fetched from animeme1936")
@@ -123,10 +133,10 @@ class fun(Cog):
     async def simprate(self,
                        ctx: Interaction,
                        member: Optional[Member] = None):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             perc = randint(0, 100)
 
             if member == None:
@@ -147,10 +157,10 @@ class fun(Cog):
     @Jeanne.command(description="Check how gay you are")
     @Jeanne.describe(member="Which member?")
     async def gayrate(self, ctx: Interaction, member: Optional[Member] = None):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             perc = randint(0, 100)
 
             if member == None:

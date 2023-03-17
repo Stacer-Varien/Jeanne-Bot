@@ -1,8 +1,10 @@
-from discord import Attachment, ButtonStyle, Color, Embed, Interaction, Message, SyncWebhook, TextChannel, TextStyle, app_commands as Jeanne, ui
+from discord import Attachment, ButtonStyle, Color, Embed, Interaction, Message, TextChannel, app_commands as Jeanne, ui
 from aiohttp import ClientSession
 from discord.ext.commands import Cog, Bot, GroupCog
+from assets.modals import ReportModal
 from db_functions import Botban
-from config import WEATHER, WEBHOOK
+from config import WEATHER
+
 from discord.ui import View
 from py_expression_eval import Parser
 from typing import Optional
@@ -18,47 +20,7 @@ discordbots_url = "https://discord.bots.gg/bots/831993597166747679"
 haze_url = "https://discord.gg/jh7jkuk2pp"
 
 
-class ReportModal(ui.Modal, title="Bot Report"):
 
-    def __init__(self):
-        super().__init__()
-
-    report_type = ui.TextInput(label="Type of report",
-                               placeholder="Example: bug, fault, violator",
-                               required=True,
-                               min_length=10,
-                               max_length=30,
-                               style=TextStyle.short)
-    report = ui.TextInput(label="Problem",
-                          placeholder="Type the problem here",
-                          required=True,
-                          min_length=10,
-                          max_length=2000,
-                          style=TextStyle.paragraph)
-
-    steps = ui.TextInput(
-        label="Steps of how you got this problem",
-        placeholder="Type the steps here",
-        required=False,
-        min_length=10,
-        max_length=1024,
-        style=TextStyle.paragraph)
-
-    async def on_submit(self, ctx: Interaction) -> None:
-        report = Embed(title=self.report_type.value, color=Color.brand_red())
-        report.description = self.report.value
-        if self.steps.value !=None or '':
-            report.add_field(name="Steps",
-                             value=self.steps.value,
-                             inline=False)
-        report.set_footer(
-            text='Reporter {}| `{}`'.format(ctx.user, ctx.user.id))
-        SyncWebhook.from_url(WEBHOOK).send(embed=report)
-        embed = Embed(
-            description=
-            "Thank you for submitting your bot report. The dev will look into it but the will not tell you the results.\n\nPlease know that your user ID has been logged if you are trolling around."
-        )
-        await ctx.response.send_message(embed=embed)
 
 
 class invite_button(View):
