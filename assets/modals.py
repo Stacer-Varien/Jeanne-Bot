@@ -1,7 +1,8 @@
 from collections import OrderedDict
 from json import loads
-from discord import AllowedMentions, Embed, Interaction, TextChannel, ui, TextStyle
+from discord import AllowedMentions, Color, Embed, Interaction, SyncWebhook, TextChannel, ui, TextStyle
 from assets.buttons import Confirmation
+from config import WEBHOOK
 from db_functions import Levelling, Welcomer
 
 
@@ -231,3 +232,45 @@ class Levelmsg(ui.Modal, title="Level Update Message"):
             await ctx.edit_original_response(content=None,
                                              embeds=[embed],
                                              view=None)
+
+
+class ReportModal(ui.Modal, title="Bot Report"):
+
+    def __init__(self):
+        super().__init__()
+
+    report_type = ui.TextInput(label="Type of report",
+                               placeholder="Example: bug, fault, violator",
+                               required=True,
+                               min_length=10,
+                               max_length=30,
+                               style=TextStyle.short)
+    report = ui.TextInput(label="Problem",
+                          placeholder="Type the problem here",
+                          required=True,
+                          min_length=10,
+                          max_length=2000,
+                          style=TextStyle.paragraph)
+
+    steps = ui.TextInput(label="Steps of how you got this problem",
+                         placeholder="Type the steps here",
+                         required=False,
+                         min_length=10,
+                         max_length=1024,
+                         style=TextStyle.paragraph)
+
+    async def on_submit(self, ctx: Interaction) -> None:
+        report = Embed(title=self.report_type.value, color=Color.brand_red())
+        report.description = self.report.value
+        if self.steps.value != None or '':
+            report.add_field(name="Steps",
+                             value=self.steps.value,
+                             inline=False)
+        report.set_footer(
+            text='Reporter {}| `{}`'.format(ctx.user, ctx.user.id))
+        SyncWebhook.from_url(WEBHOOK).send(embed=report)
+        embed = Embed(
+            description=
+            "Thank you for submitting your bot report. The dev will look into it but the will not tell you the results.\n\nPlease know that your user ID has been logged if you are trolling around."
+        )
+        await ctx.response.send_message(embed=embed)
