@@ -93,10 +93,10 @@ class fun(Cog):
                      second_word="Add second word")
     async def combine(self, ctx: Interaction, first_word: str,
                       second_word: str):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
 
             option_name1letters = first_word[:round(len(first_word) / 2)]
             option_name2letters = second_word[round(len(second_word) / 2):]
@@ -118,10 +118,10 @@ class fun(Cog):
         description="Give me a lot of choices and I will pick one for you")
     @Jeanne.describe(choices="Add your choices here. Separate them with ','")
     async def choose(self, ctx: Interaction, choices: str):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             choices = choices.split(sep=",")
             choose = Embed(description=f"I chose **{choice(choices)}**",
                            color=Color.random())

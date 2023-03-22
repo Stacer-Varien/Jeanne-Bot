@@ -147,10 +147,10 @@ class Background_Group(GroupCog, name="background"):
     @Jeanne.command(description='Select a wallpaper')
     @Jeanne.describe(name="What is the name of the background?")
     async def use(self, ctx: Interaction, name: str):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             try:
                 Inventory(ctx.user).use_wallpaper(name)
                 embed = Embed(description=f"{name} has been selected",
@@ -162,14 +162,16 @@ class Background_Group(GroupCog, name="background"):
                               color=Color.red())
                 await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(
+    buycustom=Jeanne.Group(name='buy', description='...')
+
+    @buycustom.command(
         description="Buy a custom background pic for your level card")
     @Jeanne.describe(name="What will you name it?", link="Add an image link")
-    async def buycustom(self, ctx: Interaction, name: str, link: str):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+    async def custom(self, ctx: Interaction, name: str, link: str):
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             balance = Currency(ctx.user).get_balance()
 
             if balance == None:

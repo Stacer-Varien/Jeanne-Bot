@@ -28,10 +28,10 @@ class Rank_Group(GroupCog, name="rank"):
                     description="Check the users with the most XP globally")
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def _global(self, ctx: Interaction):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+        
             embed = Embed(color=Color.random())
             embed.set_author(name="Global XP Leaderboard")
 
@@ -49,10 +49,10 @@ class Rank_Group(GroupCog, name="rank"):
         description="Check the users with the most XP in the server")
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def server(self, ctx: Interaction):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+
             embed = Embed(color=0xFFD700)
             embed.set_author(name="XP Leaderboard")
 
@@ -146,10 +146,10 @@ class levelling(Cog):
     async def level(self,
                     ctx: Interaction,
                     member: Optional[Member] = None) -> None:
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+
             if member is None:
                 member = ctx.user
             try:
@@ -202,10 +202,10 @@ class levelling(Cog):
     async def profile(self,
                       ctx: Interaction,
                       member: Optional[Member] = None) -> None:
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-        else:
+            await ctx.response.defer()
+            if Botban(ctx.user).check_botbanned_user() == True:
+                return
+
             if member is None:
                 member = ctx.user
             try:
