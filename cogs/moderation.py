@@ -1,6 +1,6 @@
 from random import randint
 from discord import Color, Embed, HTTPException, Interaction, Member, Message, NotFound, app_commands as Jeanne
-from discord.ext.commands import Cog, Bot, GroupCog
+from discord.ext.commands import Cog, Bot
 from discord.utils import utcnow
 from datetime import datetime, timedelta
 from humanfriendly import format_timespan, parse_timespan
@@ -9,73 +9,44 @@ from assets.buttons import Confirmation
 from typing import Optional
 from discord.ext import tasks
 
+class moderation(Cog):
 
-class ListWarns_Group(GroupCog, name="listwarns"):
-
-    def __init__(self, bot: Bot) -> None:
+    def __init__(self, bot: Bot):
         self.bot = bot
-        super().__init__()
+        self.check_db.start()
 
-    @Jeanne.command(description="View warnings in the server or a member")
-    async def server(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
+    @tasks.loop(seconds=30, reconnect=True)
+    async def check_db(self):
+        for bans in Moderation().get_softban_data():
+            if int(round(datetime.now().timestamp())) > int(bans[2]):
+                guild = await self.bot.fetch_guild(bans[1])
 
-        await ctx.response.defer()
-        record = Moderation(ctx.guild).fetch_warnings_server()
-        if record == None:
-            await ctx.followup.send("No warnings up to date")
-        else:
-            embed = Embed(title=f"Currently warned members",
-                          colour=Color.red())
-            embed.description = ""
-            for i in record:
-                warned_member = await self.bot.fetch_user(i[0])
-                warn_points = i[2]
+                member = await self.bot.fetch_user(bans[0])
 
-                embed.description += f"**{warned_member}**\n**Warn points**: {warn_points}\n\n"
-            await ctx.followup.send(embed=embed)
+                await guild.unban(member, reason="Softban expired")
 
-    @Jeanne.command(description="View warnings that a member has")
-    @Jeanne.describe(member="Which member are you checking the warns?")
-    async def user(self, ctx: Interaction, member: Optional[Member]) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
+                Moderation(guild, member).remove_softban()
 
-        await ctx.response.defer()
-        if member == None:
-            member = ctx.user
+                mod_channel = Logger(guild).get_modlog_channel()
 
-        record = Moderation(ctx.guild, member).fetch_warnings_user()
-        if record == None:
-            await ctx.followup.send(f"{member} has no warn IDs")
+                if mod_channel != None:
+                    unmute = Embed(title="Member unbanned", color=0xFF0000)
+                    unmute.add_field(name="Member", value=member, inline=True)
+                    unmute.add_field(name="ID", value=member.id, inline=True)
+                    unmute.add_field(name="Reason",
+                                     value="Softban expired",
+                                     inline=True)
+                    unmute.set_thumbnail(url=member.display_avatar)
 
-        else:
-            embed = Embed(title=f"{member}'s warnings", colour=0xFF0000)
-            embed.description = ""
-            embed.set_thumbnail(url=member.display_avatar)
-            for i in record:
-                moderator = await self.bot.fetch_user(i[2])
-                reason = i[3]
-                warn_id = i[4]
-                date = i[5]
+                    modlog = await guild.fetch_channel(mod_channel)
 
-                if date == None:
-                    date = "None due to new update"
+                    await modlog.send(embed=unmute)
 
-                embed.add_field(
-                    name=f"`{warn_id}`",
-                    value=
-                    f"**Moderator:** {moderator}\n**Reason:** {reason}\n**Date:** <t:{date}:F>",
-                    inline=False)
-            await ctx.followup.send(embed=embed)
+                else:
+                    continue
 
-
-class Ban_Group(GroupCog, name="ban"):
-
-    def __init__(self, bot: Bot) -> None:
-        self.bot = bot
-        super().__init__()
+    bangroup=Jeanne.Group(name='ban', description="...")
+    listwarnsgroup=Jeanne.Group(name='listwarns', description="...")
 
     @Jeanne.command(description="Ban someone in this server")
     @Jeanne.describe(
@@ -83,7 +54,7 @@ class Ban_Group(GroupCog, name="ban"):
         reason="What did they do?",
         time="How long should they be tempbanned? (1m, 1h30m, etc)")
     @Jeanne.checks.has_permissions(ban_members=True)
-    async def member(self,
+    async def ban(self,
                      ctx: Interaction,
                      member: Member,
                      reason: Optional[str] = None,
@@ -149,7 +120,7 @@ class Ban_Group(GroupCog, name="ban"):
                 await ctx.followup.send(embed=banned)
                 await modlog.send(embed=ban)
 
-    @Jeanne.command(description="Ban someone outside the server")
+    @bangroup.command(description="Ban someone outside the server")
     @Jeanne.describe(user_id="What is the user ID?",
                      reason="What did they do?")
     @Jeanne.checks.has_permissions(ban_members=True)
@@ -248,42 +219,60 @@ class Ban_Group(GroupCog, name="ban"):
                 embed.color = Color.red()
                 await ctx.followup.send(embed=embed)
 
+    @Jeanne.command(description="View warnings in the server or a member")
+    async def listwarns(self, ctx: Interaction):
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
-class moderation(Cog):
+        await ctx.response.defer()
+        record = Moderation(ctx.guild).fetch_warnings_server()
+        if record == None:
+            await ctx.followup.send("No warnings up to date")
+        else:
+            embed = Embed(title=f"Currently warned members",
+                          colour=Color.red())
+            embed.description = ""
+            for i in record:
+                warned_member = await self.bot.fetch_user(i[0])
+                warn_points = i[2]
 
-    def __init__(self, bot: Bot):
-        self.bot = bot
-        self.check_db.start()
+                embed.description += f"**{warned_member}**\n**Warn points**: {warn_points}\n\n"
+            await ctx.followup.send(embed=embed)
 
-    @tasks.loop(seconds=5, reconnect=True)
-    async def check_db(self):
-        for bans in Moderation().get_softban_data():
-            if int(round(datetime.now().timestamp())) > int(bans[2]):
-                guild = await self.bot.fetch_guild(bans[1])
+    @listwarnsgroup.command(description="View warnings that a member has")
+    @Jeanne.describe(member="Which member are you checking the warns?")
+    async def user(self, ctx: Interaction, member: Optional[Member]) -> None:
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
-                member = await self.bot.fetch_user(bans[0])
+        await ctx.response.defer()
+        if member == None:
+            member = ctx.user
 
-                await guild.unban(member, reason="Softban expired")
+        record = Moderation(ctx.guild, member).fetch_warnings_user()
+        if record == None:
+            await ctx.followup.send(f"{member} has no warn IDs")
 
-                Moderation(guild, member).remove_softban()
+        else:
+            embed = Embed(title=f"{member}'s warnings", colour=0xFF0000)
+            embed.description = ""
+            embed.set_thumbnail(url=member.display_avatar)
+            for i in record:
+                moderator = await self.bot.fetch_user(i[2])
+                reason = i[3]
+                warn_id = i[4]
+                date = i[5]
 
-                mod_channel = Logger(guild).get_modlog_channel()
+                if date == None:
+                    date = "None due to new update"
 
-                if mod_channel != None:
-                    unmute = Embed(title="Member unbanned", color=0xFF0000)
-                    unmute.add_field(name="Member", value=member, inline=True)
-                    unmute.add_field(name="ID", value=member.id, inline=True)
-                    unmute.add_field(name="Reason",
-                                     value="Softban expired",
-                                     inline=True)
-                    unmute.set_thumbnail(url=member.display_avatar)
+                embed.add_field(
+                    name=f"`{warn_id}`",
+                    value=
+                    f"**Moderator:** {moderator}\n**Reason:** {reason}\n**Date:** <t:{date}:F>",
+                    inline=False)
+            await ctx.followup.send(embed=embed)
 
-                    modlog = await guild.fetch_channel(mod_channel)
-
-                    await modlog.send(embed=unmute)
-
-                else:
-                    continue
 
     @Jeanne.command(description="Warn a member")
     @Jeanne.describe(member="Which member are you warning?",
@@ -861,6 +850,4 @@ class moderation(Cog):
 
 
 async def setup(bot: Bot):
-    await bot.add_cog(ListWarns_Group(bot))
-    await bot.add_cog(Ban_Group(bot))
     await bot.add_cog(moderation(bot))
