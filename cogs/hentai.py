@@ -3,7 +3,7 @@ from random import choice
 from discord import Color, Embed, Interaction, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
 from requests import get
-from db_functions import Botban
+from functions import Botban, Hentai
 from typing import Literal, Optional
 
 
@@ -19,75 +19,86 @@ class nsfw(Cog):
             ctx: Interaction,
             rating: Optional[Literal["questionable",
                                      "explicit"]] = None) -> None:
-            await ctx.response.defer()
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
-        
-            if rating == None:
-                rating = ["questionable", "explicit"]
-                rating = choice(rating)
+        await ctx.response.defer()
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
-            gelbooru_api = f"https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=rating:{rating}+-loli+-shota+-cub"
-            response = get(gelbooru_api)
-            ret = loads(response.text)
-            gelbooru_image = choice(ret['post'])["file_url"]
+        if rating == None:
+            rating = ["questionable", "explicit"]
+            rating = choice(rating)
 
-            yandere_image = choice(
-                get(f"https://yande.re/post.json?limit=100&tags=rating:{rating}+-loli+-shota+-cub"
-                    ).json())['file_url']
+        gelbooru_api = f"https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=rating:{rating}+-loli+-shota+-cub"
+        response = get(gelbooru_api)
+        ret = loads(response.text)
+        gelbooru_image = choice(ret['post'])["file_url"]
 
-            konachan_image = choice(
-                get(f"https://konachan.com/post.json?s=post&q=index&limit=100&tags=rating:{rating}+-loli+-shota+-cub"
-                    ).json())['file_url']
+        yandere_image = choice(
+            get(f"https://yande.re/post.json?limit=100&tags=rating:{rating}+-loli+-shota+-cub"
+                ).json())['file_url']
 
-            h = [gelbooru_image, yandere_image, konachan_image]
+        konachan_image = choice(
+            get(f"https://konachan.com/post.json?s=post&q=index&limit=100&tags=rating:{rating}+-loli+-shota+-cub"
+                ).json())['file_url']
 
-            hentai: str = choice(h)
+        h = [gelbooru_image, yandere_image, konachan_image]
 
-            if hentai == gelbooru_image:
-                source = 'Gelbooru'
+        hentai: str = choice(h)
 
-            elif hentai == yandere_image:
-                source = 'Yande.re'
+        if hentai == gelbooru_image:
+            source = 'Gelbooru'
 
-            elif hentai == konachan_image:
-                source = 'Konachan'
+        elif hentai == yandere_image:
+            source = 'Yande.re'
 
-            if hentai.endswith('mp4'):
-                await ctx.followup.send(hentai)
-            else:
-                embed = Embed(color=Color.purple()).set_image(
-                    url=hentai).set_footer(
-                        text="Fetched from {} • Credits must go to the artist".
-                        format(source))
-                await ctx.followup.send(embed=embed)
+        elif hentai == konachan_image:
+            source = 'Konachan'
+
+        if hentai.endswith('mp4'):
+            await ctx.followup.send(hentai)
+        else:
+            embed = Embed(color=Color.purple()).set_image(
+                url=hentai).set_footer(
+                    text="Fetched from {} • Credits must go to the artist".
+                    format(source))
+            await ctx.followup.send(embed=embed)
+
 
     @Jeanne.command(description="Get a random media content from Gelbooru",
                     nsfw=True)
     @Jeanne.describe(rating="Do you want questionable or explicit content?",
-                     tag="Add your tag")
+                     tag="Add your tag", plus="Need more content? (up to 4)")
     async def gelbooru(self,
                        ctx: Interaction,
                        rating: Optional[Literal["questionable", "explicit"]],
-                       tag: Optional[str] = None) -> None:
-            await ctx.response.defer()
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
-        
-            if rating == None:
-                rating = ["questionable", "explicit"]
-                rating = choice(rating)
+                       tag: Optional[str] = None, plus:Optional[bool]=None) -> None:
+        await ctx.response.defer()
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
-            if tag == None:
-                gelbooru_api = f"https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=rating:{rating}+-loli+-shota+-cub"
+        image = Hentai(plus).gelbooru(rating, tag)
+
+        if plus==True:
+            if 'mp4' in str(image):
+                media=[image['file_url'] for image in image]
+                await ctx.followup.send("\n".join(media))
             else:
-                formated_tag = tag.replace(" ", "_")
-                gelbooru_api = f"https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=rating:{rating}+-loli+-shota+-cub+" + formated_tag
-
-            response = get(gelbooru_api)
-            ret = loads(response.text)
-            image = str(choice(ret['post'])["file_url"])
-
+                color = Color.random()
+                embed1 = Embed(
+                    color=color, url='https://gelbooru.com'
+                ).set_image(url=image[0]['file_url']).set_footer(
+                    text="Fetched from Gelbooru • Credits must go to the artist")
+                embed2 = Embed(
+                    color=color,
+                    url='https://gelbooru.com').set_image(url=image[1]['file_url'])
+                embed3 = Embed(
+                    color=color,
+                    url='https://gelbooru.com').set_image(url=image[2]['file_url'])
+                embed4 = Embed(
+                    color=color,
+                    url='https://gelbooru.com').set_image(url=image[3]['file_url'])
+                embeds = [embed1, embed2, embed3, embed4]
+                await ctx.followup.send(embeds=embeds)
+        else:
             if image.endswith('mp4'):
                 await ctx.followup.send(image)
 
@@ -114,35 +125,35 @@ class nsfw(Cog):
                       ctx: Interaction,
                       rating: Optional[Literal["questionable", "explicit"]],
                       tag: Optional[str] = None) -> None:
-            await ctx.response.defer()
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
+        await ctx.response.defer()
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
-            if rating == None:
-                rating = ["questionable", "explicit"]
-                rating = choice(rating)
+        if rating == None:
+            rating = ["questionable", "explicit"]
+            rating = choice(rating)
 
-            if tag == None:
-                yandere_api = choice(
-                    get(f"https://yande.re/post.json?limit=100&tags=rating:{rating}+-loli+-shota+-cub"
-                        ).json())
+        if tag == None:
+            yandere_api = choice(
+                get(f"https://yande.re/post.json?limit=100&tags=rating:{rating}+-loli+-shota+-cub"
+                    ).json())
 
-            elif tag == "02":
-                await ctx.followup.send(
-                    "Tag has been blacklisted due to it returning extreme content and guro"
-                )
+        elif tag == "02":
+            await ctx.followup.send(
+                "Tag has been blacklisted due to it returning extreme content and guro"
+            )
 
-            else:
-                formated_tag = tag.replace(" ", "_")
-                yandere_api = choice(
-                    get(f"https://yande.re/post.json?limit=100&tags=rating:{rating}+-loli+-shota+-cub+"
-                        + formated_tag).json())
+        else:
+            formated_tag = tag.replace(" ", "_")
+            yandere_api = choice(
+                get(f"https://yande.re/post.json?limit=100&tags=rating:{rating}+-loli+-shota+-cub+"
+                    + formated_tag).json())
 
-            yandere = Embed(color=Color.purple())
-            yandere.set_image(url=yandere_api['file_url'])
-            yandere.set_footer(
-                text="Fetched from Yande.re • Credits must go to the artist")
-            await ctx.followup.send(embed=yandere)
+        yandere = Embed(color=Color.purple())
+        yandere.set_image(url=yandere_api['file_url'])
+        yandere.set_footer(
+            text="Fetched from Yande.re • Credits must go to the artist")
+        await ctx.followup.send(embed=yandere)
 
     @yandere.error
     async def yandere_error(self, ctx: Interaction,
@@ -160,29 +171,29 @@ class nsfw(Cog):
                        ctx: Interaction,
                        rating: Optional[Literal["questionable", "explicit"]],
                        tag: Optional[str] = None) -> None:
-            await ctx.response.defer()
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
-            
-            if rating == None:
-                rating = ["questionable", "explicit"]
-                rating = choice(rating)
-            if tag == None:
-                konachan_api = choice(
-                    get(f"https://konachan.com/post.json?s=post&q=indexlimit=100&tags=rating:{rating}+-loli+-shota+-cub"
-                        ).json())
+        await ctx.response.defer()
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
-            else:
-                formated_tag = tag.replace(" ", "_")
-                konachan_api = choice(
-                    get(f"https://konachan.com/post.json?s=post&q=indexlimit=100&tags=rating:{rating}+-loli+-shota+-cub+{formated_tag}"
-                        ).json())
+        if rating == None:
+            rating = ["questionable", "explicit"]
+            rating = choice(rating)
+        if tag == None:
+            konachan_api = choice(
+                get(f"https://konachan.com/post.json?s=post&q=indexlimit=100&tags=rating:{rating}+-loli+-shota+-cub"
+                    ).json())
 
-            konachan = Embed(color=Color.purple())
-            konachan.set_image(url=konachan_api['file_url'])
-            konachan.set_footer(
-                text="Fetched from Konachan • Credits must go to the artist")
-            await ctx.followup.send(embed=konachan)
+        else:
+            formated_tag = tag.replace(" ", "_")
+            konachan_api = choice(
+                get(f"https://konachan.com/post.json?s=post&q=indexlimit=100&tags=rating:{rating}+-loli+-shota+-cub+{formated_tag}"
+                    ).json())
+
+        konachan = Embed(color=Color.purple())
+        konachan.set_image(url=konachan_api['file_url'])
+        konachan.set_footer(
+            text="Fetched from Konachan • Credits must go to the artist")
+        await ctx.followup.send(embed=konachan)
 
     @konachan.error
     async def konachan_error(self, ctx: Interaction,
