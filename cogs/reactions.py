@@ -1,4 +1,4 @@
-from db_functions import Botban
+from functions import Botban
 from discord import Color, Embed, Interaction, Member, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
 from requests import get

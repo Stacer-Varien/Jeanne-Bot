@@ -1,4 +1,4 @@
-from db_functions import Botban, get_cached_users, get_true_members
+from functions import Botban, get_cached_users, get_true_members
 from time import time
 from datetime import timedelta
 from sys import version_info as py_version

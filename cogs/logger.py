@@ -1,6 +1,6 @@
 from discord import Color, Embed, Message
 from discord.ext.commands import Cog, Bot
-from db_functions import Logger
+from functions import Logger
 
 
 class logger(Cog):

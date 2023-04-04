@@ -1,7 +1,7 @@
 from random import choice, randint
 from discord import Color, Embed, Interaction, Member, SyncWebhook, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
-from db_functions import Botban
+from functions import Botban
 from config import BB_WEBHOOK
 from assets.imgur import get_animeme_pic
 from typing import Optional

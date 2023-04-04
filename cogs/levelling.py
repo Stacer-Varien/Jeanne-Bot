@@ -2,7 +2,7 @@ from asyncio import get_event_loop
 from functools import partial
 from discord.ext.commands import Cog, CooldownMapping, BucketType, Bot, GroupCog
 from discord import Color, Embed, File, Interaction, Member, app_commands as Jeanne, Message
-from db_functions import Botban, Currency, Inventory, Levelling, get_richest
+from functions import Botban, Currency, Inventory, Levelling, get_richest
 from typing import Optional
 from assets.generators.level_card import Level
 from assets.generators.profile_card import Profile

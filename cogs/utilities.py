@@ -2,7 +2,7 @@ from discord import Attachment, ButtonStyle, Color, Embed, Interaction, Message,
 from aiohttp import ClientSession
 from discord.ext.commands import Cog, Bot, GroupCog
 from assets.modals import ReportModal
-from db_functions import Botban
+from functions import Botban
 from config import WEATHER
 
 from discord.ui import View

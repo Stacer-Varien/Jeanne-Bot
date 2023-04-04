@@ -4,7 +4,7 @@ from discord import ButtonStyle, Color, Embed, Message, app_commands as Jeanne, 
 from datetime import date, datetime, timedelta
 from discord.ext.commands import Cog, Bot, GroupCog
 from assets.buttons import Heads_or_Tails
-from db_functions import Botban, Currency
+from functions import Botban, Currency
 
 current_time = date.today()
 

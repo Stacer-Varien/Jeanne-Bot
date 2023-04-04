@@ -1,6 +1,6 @@
 from discord import AllowedMentions, Color, Embed, Member
 from discord.ext.commands import Cog, Bot
-from db_functions import Logger, Welcomer
+from functions import Logger, Welcomer
 from collections import OrderedDict
 from json import loads
 

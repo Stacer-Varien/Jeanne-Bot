@@ -1,5 +1,5 @@
 from json import dumps, loads
-from db_functions import Botban, Currency
+from functions import Botban, Currency
 from config import TOPGG, TOPGG_AUTH
 from topgg import DBLClient, WebhookManager
 from discord.ext import tasks

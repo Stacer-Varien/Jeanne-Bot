@@ -3,7 +3,7 @@ from json import loads
 from discord import AllowedMentions, Color, Embed, Interaction, SyncWebhook, TextChannel, ui, TextStyle
 from assets.buttons import Confirmation
 from config import WEBHOOK
-from db_functions import Levelling, Welcomer
+from functions import Levelling, Welcomer
 
 
 def replace_all(text: str, dic: dict):

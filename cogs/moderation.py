@@ -4,7 +4,7 @@ from discord.ext.commands import Cog, Bot
 from discord.utils import utcnow
 from datetime import datetime, timedelta
 from humanfriendly import format_timespan, parse_timespan
-from db_functions import Botban, Logger, Moderation
+from functions import Botban, Logger, Moderation
 from assets.buttons import Confirmation
 from typing import Optional
 from discord.ext import tasks
@@ -850,4 +850,4 @@ class moderation(Cog):
 
 
 async def setup(bot: Bot):
-    await bot.add_cog(moderation(bot))
+    await bot.add_cog(moderation(bot), override=True)

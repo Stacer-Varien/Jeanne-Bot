@@ -4,7 +4,7 @@ from discord.ext.commands import Cog, Bot, group, is_owner, guild_only, Context,
 from discord import ActivityType, Embed, Game, Activity, Object, SyncWebhook, HTTPException
 from os import execv
 from sys import executable, argv
-from db_functions import Botban
+from functions import Botban
 from config import BB_WEBHOOK
 from time import time
 from typing import Literal, Optional
