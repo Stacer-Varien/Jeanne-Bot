@@ -1,16 +1,21 @@
+from random import choice
 from typing import Optional
-import lxml.etree as LET
+import lxml.etree as ET
 import requests
 from functions import Botban
 from discord import Color, Embed, Interaction, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
 from config import kitsune_nekoslife, neko_purrbot
 from requests import get
-from assets.imgur import get_jeanne_pic, get_medusa_pic, get_saber_pic, get_wallpaper_pic
+from assets.imgur import (
+    get_jeanne_pic,
+    get_medusa_pic,
+    get_saber_pic,
+    get_wallpaper_pic,
+)
 
 
 class images(Cog):
-
     def __init__(self, bot):
         self.bot = bot
 
@@ -23,7 +28,8 @@ class images(Cog):
         kistune_api = get(kitsune_nekoslife).json()
         kitsune = Embed(color=Color.random())
         kitsune.set_footer(
-            text="Fetched from nekos.life • Credits must go to the artist")
+            text="Fetched from nekos.life • Credits must go to the artist"
+        )
         kitsune.set_image(url=kistune_api["url"])
         await ctx.followup.send(embed=kitsune)
 
@@ -36,8 +42,8 @@ class images(Cog):
         wallpaper = Embed(color=Color.random())
         wallpaper.set_image(url=get_wallpaper_pic())
         wallpaper.set_footer(
-            text=
-            "Fetched from Wallpaper_1936 • Credits must go to the artist")
+            text="Fetched from Wallpaper_1936 • Credits must go to the artist"
+        )
         await ctx.followup.send(embed=wallpaper)
 
     @Jeanne.command(description="Get a Jeanne d'Arc image")
@@ -61,8 +67,7 @@ class images(Cog):
 
         saber = Embed(color=Color.random())
         saber.set_image(url=get_saber_pic())
-        saber.set_footer(
-            text="Fetched from Saber_1936 • Credits must go to the artist")
+        saber.set_footer(text="Fetched from Saber_1936 • Credits must go to the artist")
         await ctx.followup.send(embed=saber)
 
     @Jeanne.command(description="Get a neko image")
@@ -73,7 +78,7 @@ class images(Cog):
 
         neko_api = get(neko_purrbot).json()
         neko = Embed(color=Color.random())
-        neko.set_image(url=neko_api['link'])
+        neko.set_image(url=neko_api["link"])
         neko.set_footer(
             text="Fetched from PurrBot.site • Credits must go to the artist"
         )
@@ -93,13 +98,19 @@ class images(Cog):
         await ctx.followup.send(embed=medusa)
 
     @Jeanne.command(description="Get an image from Safebooru")
-    async def safebooru(self, ctx:Interaction, tag:Optional[str]=None):
-        response=requests.get('https://safebooru.org/index.php?page=dapi&s=post&q=index&limit=100&tags=rating:general').text
-        parser = LET.XMLParser(recover=True)
-        tree = LET.ElementTree(LET.fromstring(response, parser=parser))
+    async def safebooru(self, ctx: Interaction):
+        await ctx.response.defer()
+        response = requests.get(
+            "https://safebooru.org/index.php?page=dapi&s=post&q=index&limit=100&tags=-rating:questionable+-animated+score:>=10"
+        ).text.encode("utf-8")
+        parser = ET.XMLParser(recover=True)
+        tree = ET.ElementTree(ET.fromstring(response, parser=parser))
         root = tree.getroot()
-        embed=Embed()
-
+        embed = Embed(color=Color.random())
+        embed.set_image(url=choice(root).attrib["file_url"])
+        embed.set_footer(
+            text="Fetched from Safebooru • Credits must go to the artist")
+        await ctx.followup.send(embed=embed)
 
 
 async def setup(bot: Bot):
