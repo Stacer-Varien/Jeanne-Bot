@@ -49,7 +49,7 @@ class Botban():
             pass
         else:
             db.execute("DELETE FROM serverxpData WHERE user_id = ?",
-                           (self.user.id, ))
+                       (self.user.id, ))
 
         if global_xp_data == None:
             pass
@@ -63,7 +63,7 @@ class Botban():
         else:
 
             db.execute("DELETE FROM userWallpaperInventory WHERE user_id = ?",
-                           (self.user.id, ))
+                       (self.user.id, ))
 
         if bank_data == None:
             pass
@@ -360,7 +360,7 @@ class Levelling():
                 self.server.id,
             )).fetchone()
         db.commit()
-        if xp==None:
+        if xp == None:
             return 0
         else:
             return xp[0]
@@ -369,7 +369,7 @@ class Levelling():
         xp = db.execute("SELECT exp FROM globalxpData WHERE user_id = ?",
                         (self.member.id, )).fetchone()
         db.commit()
-        if xp==None:
+        if xp == None:
             return 0
         else:
             return xp[0]
@@ -382,7 +382,7 @@ class Levelling():
                 self.server.id,
             )).fetchone()
         db.commit()
-        if cumulated_exp==None:
+        if cumulated_exp == None:
             return 0
         else:
             return cumulated_exp[0]
@@ -622,7 +622,7 @@ class Levelling():
 
     def get_blacklisted_channels(self):
         data = db.execute("SELECT channel FROM xpChannelData WHERE server = ?",
-                          (self.server.id,)).fetchall()
+                          (self.server.id, )).fetchall()
         db.commit()
 
         if data == None:
@@ -1141,20 +1141,24 @@ def get_richest(member: Member):
     except:
         return 20
 
-class Hentai():
-    def __init__(self, plus:Optional[bool]=None) -> None:
-        self.plus=plus
 
-    def gelbooru(self, rating:Optional[str]=None,tag: Optional[str] = None):
+class Hentai():
+
+    def __init__(self, plus: Optional[bool] = None) -> None:
+        self.plus = plus
+
+    def gelbooru(self,
+                 rating: Optional[str] = None,
+                 tag: Optional[str] = None):
 
         if rating == None:
             rating = ["questionable", "explicit"]
             rating = choice(rating)
 
-        if self.plus==True:
-            limit=4
-        elif self.plus==False:
-            limit=100
+        if self.plus == True:
+            limit = 4
+        elif self.plus == False or None:
+            limit = 100
         if tag == None:
             gelbooru_api = f"https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit={str(limit)}&tags=rating:{rating}+-loli+-shota+-cub"
         else:
@@ -1163,8 +1167,63 @@ class Hentai():
 
         response = get(gelbooru_api)
         ret = loads(response.text)
-        if self.plus==True:
+        if self.plus == True:
             return ret['post']
-        elif self.plus==False:
+        elif self.plus == False or None:
             return str(choice(ret['post'])["file_url"])
-        
+
+    def yandere(self, rating: Optional[str] = None, tag: Optional[str] = None):
+
+        if rating == None:
+            rating = ["questionable", "explicit"]
+            rating = choice(rating)
+
+        if self.plus == True:
+            limit = 4
+        elif self.plus == False or None:
+            limit = 100
+
+        if tag == None:
+            yandere_api = get(
+                f"https://yande.re/post.json?limit={limit}&tags=rating:{rating}+-loli+-shota+-cub"
+            ).json()
+
+        else:
+            formated_tag = tag.replace(" ", "_")
+            yandere_api = get(
+                f"https://yande.re/post.json?limit={limit}&tags=rating:{rating}+-loli+-shota+-cub+"
+                + formated_tag).json()
+
+        if self.plus == True:
+            return yandere_api
+        elif self.plus == False or None:
+            return str(choice(yandere_api)["file_url"])
+
+    def konachan(self,
+                 rating: Optional[str] = None,
+                 tag: Optional[str] = None):
+
+        if rating == None:
+            rating = ["questionable", "explicit"]
+            rating = choice(rating)
+
+        if self.plus == True:
+            limit = 4
+        elif self.plus == False or None:
+            limit = 100
+
+        if tag == None:
+            konachan_api = get(
+                f"https://konachan.com/post.json?limit={limit}&tags=rating:{rating}+-loli+-shota+-cub"
+            ).json()
+
+        else:
+            formated_tag = tag.replace(" ", "_")
+            konachan_api = get(
+                f"https://konachan.com/post.json?limit={limit}&tags=rating:{rating}+-loli+-shota+-cub+"
+                + formated_tag).json()
+
+        if self.plus == True:
+            return konachan_api
+        elif self.plus == False or None:
+            return str(choice(konachan_api)["file_url"])

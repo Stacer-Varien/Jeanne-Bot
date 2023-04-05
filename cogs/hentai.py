@@ -120,40 +120,48 @@ class nsfw(Cog):
 
     @Jeanne.command(description="Get a random hentai from Yande.re", nsfw=True)
     @Jeanne.describe(rating="Do you want questionable or explicit content?",
-                     tag="Add your tag")
+                     tag="Add your tag",
+                     plus="Need more content? (up to 4)")
     async def yandere(self,
                       ctx: Interaction,
                       rating: Optional[Literal["questionable", "explicit"]],
-                      tag: Optional[str] = None) -> None:
+                      tag: Optional[str] = None, plus:Optional[bool]=None) -> None:
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
             return
 
-        if rating == None:
-            rating = ["questionable", "explicit"]
-            rating = choice(rating)
-
-        if tag == None:
-            yandere_api = choice(
-                get(f"https://yande.re/post.json?limit=100&tags=rating:{rating}+-loli+-shota+-cub"
-                    ).json())
-
-        elif tag == "02":
+        if tag == "02":
             await ctx.followup.send(
                 "Tag has been blacklisted due to it returning extreme content and guro"
             )
 
         else:
-            formated_tag = tag.replace(" ", "_")
-            yandere_api = choice(
-                get(f"https://yande.re/post.json?limit=100&tags=rating:{rating}+-loli+-shota+-cub+"
-                    + formated_tag).json())
+            image = Hentai(plus).yandere(rating, tag)
 
-        yandere = Embed(color=Color.purple())
-        yandere.set_image(url=yandere_api['file_url'])
-        yandere.set_footer(
-            text="Fetched from Yande.re • Credits must go to the artist")
-        await ctx.followup.send(embed=yandere)
+            if plus == True:
+                color = Color.random()
+                embed1 = Embed(
+                    color=color, url='https://yande.re'
+                ).set_image(url=image[0]['file_url']).set_footer(
+                    text="Fetched from Yande.re • Credits must go to the artist"
+                )
+                embed2 = Embed(color=color,
+                               url='https://yande.re').set_image(
+                                   url=image[1]['file_url'])
+                embed3 = Embed(color=color,
+                               url='https://yande.re').set_image(
+                                   url=image[2]['file_url'])
+                embed4 = Embed(color=color,
+                               url='https://yande.re').set_image(
+                                   url=image[3]['file_url'])
+                embeds = [embed1, embed2, embed3, embed4]
+                await ctx.followup.send(embeds=embeds)
+            else:
+                yandere = Embed(color=Color.random())
+                yandere.set_image(url=image['file_url'])
+                yandere.set_footer(
+                    text="Fetched from Yande.re • Credits must go to the artist")
+                await ctx.followup.send(embed=yandere)
 
     @yandere.error
     async def yandere_error(self, ctx: Interaction,
@@ -166,34 +174,42 @@ class nsfw(Cog):
 
     @Jeanne.command(description="Get a random hentai from Konachan")
     @Jeanne.describe(rating="Do you want questionable or explicit content?",
-                     tag="Add your tag")
+                     tag="Add your tag", plus="Need more content (up to 4)")
     async def konachan(self,
                        ctx: Interaction,
                        rating: Optional[Literal["questionable", "explicit"]],
-                       tag: Optional[str] = None) -> None:
+                       tag: Optional[str] = None, plus:Optional[bool]=None) -> None:
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
             return
 
-        if rating == None:
-            rating = ["questionable", "explicit"]
-            rating = choice(rating)
-        if tag == None:
-            konachan_api = choice(
-                get(f"https://konachan.com/post.json?s=post&q=indexlimit=100&tags=rating:{rating}+-loli+-shota+-cub"
-                    ).json())
+        image = Hentai(plus).konachan(rating, tag)
 
+        if plus == True:
+                color = Color.random()
+                embed1 = Embed(
+                    color=color, url='https://konachan.com'
+                ).set_image(url=image[0]['file_url']).set_footer(
+                    text="Fetched from Yande.re • Credits must go to the artist"
+                )
+                embed2 = Embed(
+                    color=color,
+                    url='https://konachan.com').set_image(url=image[1]['file_url'])
+                embed3 = Embed(
+                    color=color,
+                    url='https://konachan.com').set_image(url=image[2]['file_url'])
+                embed4 = Embed(
+                    color=color,
+                    url='https://konachan.com').set_image(url=image[3]['file_url'])
+                embeds = [embed1, embed2, embed3, embed4]
+                await ctx.followup.send(embeds=embeds)
         else:
-            formated_tag = tag.replace(" ", "_")
-            konachan_api = choice(
-                get(f"https://konachan.com/post.json?s=post&q=indexlimit=100&tags=rating:{rating}+-loli+-shota+-cub+{formated_tag}"
-                    ).json())
-
-        konachan = Embed(color=Color.purple())
-        konachan.set_image(url=konachan_api['file_url'])
-        konachan.set_footer(
-            text="Fetched from Konachan • Credits must go to the artist")
-        await ctx.followup.send(embed=konachan)
+                konachan = Embed(color=Color.random())
+                konachan.set_image(url=image['file_url'])
+                konachan.set_footer(
+                    text="Fetched from Konachan • Credits must go to the artist"
+                )
+                await ctx.followup.send(embed=konachan)
 
     @konachan.error
     async def konachan_error(self, ctx: Interaction,
