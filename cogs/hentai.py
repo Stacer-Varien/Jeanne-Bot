@@ -1,6 +1,6 @@
 from json import loads
 from random import choice
-from discord import Color, Embed, Interaction, app_commands as Jeanne
+from discord import ButtonStyle, Color, Embed, Interaction, app_commands as Jeanne, ui
 from discord.ext.commands import Cog, Bot
 from requests import get
 from functions import Botban, Hentai
@@ -55,6 +55,7 @@ class nsfw(Cog):
 
         if hentai.endswith('mp4'):
             await ctx.followup.send(hentai)
+
         else:
             embed = Embed(color=Color.purple()).set_image(
                 url=hentai).set_footer(
@@ -186,30 +187,30 @@ class nsfw(Cog):
         image = Hentai(plus).konachan(rating, tag)
 
         if plus == True:
-                color = Color.random()
-                embed1 = Embed(
-                    color=color, url='https://konachan.com'
-                ).set_image(url=image[0]['file_url']).set_footer(
-                    text="Fetched from Yande.re • Credits must go to the artist"
-                )
-                embed2 = Embed(
-                    color=color,
-                    url='https://konachan.com').set_image(url=image[1]['file_url'])
-                embed3 = Embed(
-                    color=color,
-                    url='https://konachan.com').set_image(url=image[2]['file_url'])
-                embed4 = Embed(
-                    color=color,
-                    url='https://konachan.com').set_image(url=image[3]['file_url'])
-                embeds = [embed1, embed2, embed3, embed4]
-                await ctx.followup.send(embeds=embeds)
+            color = Color.random()
+            embed1 = Embed(
+                color=color, url='https://konachan.com'
+            ).set_image(url=image[0]['file_url']).set_footer(
+                text="Fetched from Yande.re • Credits must go to the artist"
+            )
+            embed2 = Embed(
+                color=color,
+                url='https://konachan.com').set_image(url=image[1]['file_url'])
+            embed3 = Embed(
+                color=color,
+                url='https://konachan.com').set_image(url=image[2]['file_url'])
+            embed4 = Embed(
+                color=color,
+                url='https://konachan.com').set_image(url=image[3]['file_url'])
+            embeds = [embed1, embed2, embed3, embed4]
+            await ctx.followup.send(embeds=embeds)
         else:
-                konachan = Embed(color=Color.random())
-                konachan.set_image(url=image['file_url'])
-                konachan.set_footer(
-                    text="Fetched from Konachan • Credits must go to the artist"
-                )
-                await ctx.followup.send(embed=konachan)
+            konachan = Embed(color=Color.random())
+            konachan.set_image(url=image['file_url'])
+            konachan.set_footer(
+                text="Fetched from Konachan • Credits must go to the artist"
+            )
+            await ctx.followup.send(embed=konachan)
 
     @konachan.error
     async def konachan_error(self, ctx: Interaction,
