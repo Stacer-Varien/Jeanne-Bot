@@ -4,7 +4,6 @@ from functions import Logger
 
 
 class logger(Cog):
-
     def __init__(self, bot: Bot):
         self.bot = bot
 
@@ -28,10 +27,14 @@ class logger(Cog):
         has_old_content = before.content != ""
         has_new_content = after.content != ""
 
-        old_content = (before.content if len(before.content) < 1024 else
-                       before.content[:1020] + "...")
-        new_content = (after.content if len(after.content) < 1024 else
-                       after.content[:1020] + "...")
+        old_content = (
+            before.content
+            if len(before.content) < 1024
+            else before.content[:1020] + "..."
+        )
+        new_content = (
+            after.content if len(after.content) < 1024 else after.content[:1020] + "..."
+        )
 
         embed.add_field(
             name="Old message",
@@ -57,41 +60,45 @@ class logger(Cog):
                 return
 
             try:
-                    channel = await self.bot.fetch_channel(logger)
-                    embed = Embed()
-                    embed.description = "Message deleted in {}".format(
-                        message.channel.mention)
-                    embed.color = Color.random()
-                    attachments = bool(message.attachments)
-                    content = bool(message.content)
-                    if content == True and attachments == False:
-                        if len(message.content) > 1024:
-                            message.content = message.content[:1020] + "..."
-                        embed.add_field(name="Message",
-                                        value=message.content,
-                                        inline=False)
-                    elif content == True and attachments == True:
-                        if len(message.content) > 1024:
-                            message.content = message.content[:1020] + "..."
-                        embed.add_field(name="Message",
-                                        value=message.content,
-                                        inline=False)
-                        embed.set_image(url=message.attachments[0].url.replace(
-                            'cdn.discordapp.com', 'media.discordapp.net'))
-                    elif attachments == True and content == False:
-                        embed.add_field(
-                            name="Image",
-                            value=
-                            "No messages, only media. If you can't see anything, it was a video file",
-                            inline=False)
-                        embed.set_image(url=message.attachments[0].url.replace(
-                            'cdn.discordapp.com', 'media.discordapp.net'))
-                    embed.set_thumbnail(url=message.author.display_avatar)
-                    embed.set_footer(text="Author: {} | {}".format(
-                        message.author, message.author.id))
-                    await channel.send(embed=embed)
+                channel = await self.bot.fetch_channel(logger)
+                embed = Embed()
+                embed.description = "Message deleted in {}".format(
+                    message.channel.mention
+                )
+                embed.color = Color.random()
+                attachments = bool(message.attachments)
+                content = bool(message.content)
+                if content == True and attachments == False:
+                    if len(message.content) > 1024:
+                        message.content = message.content[:1020] + "..."
+                    embed.add_field(name="Message", value=message.content, inline=False)
+                elif content == True and attachments == True:
+                    if len(message.content) > 1024:
+                        message.content = message.content[:1020] + "..."
+                    embed.add_field(name="Message", value=message.content, inline=False)
+                    embed.set_image(
+                        url=message.attachments[0].url.replace(
+                            "cdn.discordapp.com", "media.discordapp.net"
+                        )
+                    )
+                elif attachments == True and content == False:
+                    embed.add_field(
+                        name="Image",
+                        value="No messages, only media. If you can't see anything, it was a video file",
+                        inline=False,
+                    )
+                    embed.set_image(
+                        url=message.attachments[0].url.replace(
+                            "cdn.discordapp.com", "media.discordapp.net"
+                        )
+                    )
+                embed.set_thumbnail(url=message.author.display_avatar)
+                embed.set_footer(
+                    text="Author: {} | {}".format(message.author, message.author.id)
+                )
+                await channel.send(embed=embed)
             except AttributeError:
-                    return
+                return
 
 
 async def setup(bot: Bot):

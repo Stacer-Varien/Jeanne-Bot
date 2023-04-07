@@ -1,14 +1,29 @@
 from typing import Literal, Optional
 from json import loads
-from discord import AllowedMentions, Attachment, CategoryChannel, Color, Embed, File, HTTPException, Interaction, Member, Role, TextChannel, VerificationLevel, app_commands as Jeanne, abc, utils
+from discord import (
+    AllowedMentions,
+    Attachment,
+    CategoryChannel,
+    Color,
+    Embed,
+    File,
+    HTTPException,
+    Interaction,
+    Member,
+    Role,
+    TextChannel,
+    VerificationLevel,
+    app_commands as Jeanne,
+    abc,
+    utils,
+)
 from discord.ext.commands import Bot, Cog, GroupCog
 from humanfriendly import format_timespan, parse_timespan, InvalidTimespan
 from collections import OrderedDict
 from functions import Botban, Inventory, Levelling, Logger, Manage, Welcomer
-from assets.buttons import Confirmation
+from assets.components import Confirmation, Levelmsg, Welcomingmsg, Leavingmsg
 from requests import get
 from io import BytesIO
-from assets.modals import Levelmsg, Welcomingmsg, Leavingmsg
 
 
 def replace_all(text: str, dic: dict):
@@ -18,7 +33,6 @@ def replace_all(text: str, dic: dict):
 
 
 class Create_Group(GroupCog, name="create"):
-
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()
@@ -29,31 +43,33 @@ class Create_Group(GroupCog, name="create"):
         topic="What is the channel topic?",
         category="Place in which category?",
         slowmode="What is the slowmode (1hr, 30m, etc) (Max is 6 hours)",
-        nsfw_enabled="Should it be an NSFW channel?")
+        nsfw_enabled="Should it be an NSFW channel?",
+    )
     @Jeanne.checks.has_permissions(manage_channels=True)
-    async def textchannel(self,
-                          ctx: Interaction,
-                          name: str,
-                          topic: Optional[str] = None,
-                          category: Optional[CategoryChannel] = None,
-                          slowmode: str = None,
-                          nsfw_enabled: Optional[bool] = None) -> None:
+    async def textchannel(
+        self,
+        ctx: Interaction,
+        name: str,
+        topic: Optional[str] = None,
+        category: Optional[CategoryChannel] = None,
+        slowmode: str = None,
+        nsfw_enabled: Optional[bool] = None,
+    ) -> None:
         if Botban(ctx.user).check_botbanned_user() == True:
             return
 
         await ctx.response.defer()
         embed = Embed()
         embed.color = Color.random()
-        embed.description = "Text Channel `{}` has been created".format(
-            name)
+        embed.description = "Text Channel `{}` has been created".format(name)
 
         channel = await ctx.guild.create_text_channel(name=name)
 
         if category:
             await channel.edit(category=category)
-            embed.add_field(name="Added into category",
-                            value=category.name,
-                            inline=True)
+            embed.add_field(
+                name="Added into category", value=category.name, inline=True
+            )
 
         if topic:
             if len(topic) <= 1024:
@@ -72,9 +88,7 @@ class Create_Group(GroupCog, name="create"):
                 added_slowmode = format_timespan(delay)
             except InvalidTimespan as e:
                 added_slowmode = e
-            embed.add_field(name="Slowmode",
-                            value=added_slowmode,
-                            inline=True)
+            embed.add_field(name="Slowmode", value=added_slowmode, inline=True)
 
         if nsfw_enabled:
             if nsfw_enabled == True:
@@ -86,44 +100,46 @@ class Create_Group(GroupCog, name="create"):
 
         await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(description='Create a voice channel')
-    @Jeanne.describe(name="What will you name it?",
-                     category="Place in which category?", users="How many users are allowed in the channel")
+    @Jeanne.command(description="Create a voice channel")
+    @Jeanne.describe(
+        name="What will you name it?",
+        category="Place in which category?",
+        users="How many users are allowed in the channel",
+    )
     @Jeanne.checks.has_permissions(manage_channels=True)
-    async def voicechannel(self,
-                           ctx: Interaction,
-                           name: str,
-                           category: Optional[CategoryChannel] = None,
-                           users: Optional[int] = None) -> None:
+    async def voicechannel(
+        self,
+        ctx: Interaction,
+        name: str,
+        category: Optional[CategoryChannel] = None,
+        users: Optional[int] = None,
+    ) -> None:
         if Botban(ctx.user).check_botbanned_user() == True:
             return
 
         await ctx.response.defer()
         embed = Embed()
-        embed.description = "Voice Channel `{}` has been created".format(
-            name)
+        embed.description = "Voice Channel `{}` has been created".format(name)
         embed.color = Color.random()
 
         channel = await ctx.guild.create_voice_channel(name=name)
 
         if category:
             await channel.edit(category=category)
-            embed.add_field(name="Added into category",
-                            value=category.name,
-                            inline=True)
+            embed.add_field(
+                name="Added into category", value=category.name, inline=True
+            )
 
         if users:
             if users > 99:
                 users = 99
 
             await channel.edit(user_limit=users)
-            embed.add_field(name="User Limit",
-                            value=users,
-                            inline=True)
+            embed.add_field(name="User Limit", value=users, inline=True)
 
         await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(description='Create a category')
+    @Jeanne.command(description="Create a category")
     @Jeanne.describe(name="What will you name it?")
     @Jeanne.checks.has_permissions(manage_channels=True)
     async def category(self, ctx: Interaction, name: str):
@@ -138,37 +154,35 @@ class Create_Group(GroupCog, name="create"):
 
         await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(description='Create a stage channel')
-    @Jeanne.describe(name="What will you name it?",
-                     topic="What is the topic?",
-                     category="Place in which category?")
+    @Jeanne.command(description="Create a stage channel")
+    @Jeanne.describe(
+        name="What will you name it?",
+        topic="What is the topic?",
+        category="Place in which category?",
+    )
     @Jeanne.checks.has_permissions(manage_channels=True)
-    async def stagechannel(self, ctx: Interaction, name: str, topic: str,
-                           category: CategoryChannel):
+    async def stagechannel(
+        self, ctx: Interaction, name: str, topic: str, category: CategoryChannel
+    ):
         if Botban(ctx.user).check_botbanned_user() == True:
             return
 
         await ctx.response.defer()
         embed = Embed()
-        channel = await ctx.guild.create_stage_channel(name=name,
-                                                       topic=topic)
-        embed.description = "Stage channel `{}` has been created".format(
-            name)
+        channel = await ctx.guild.create_stage_channel(name=name, topic=topic)
+        embed.description = "Stage channel `{}` has been created".format(name)
         embed.add_field(name="Topic", value=topic, inline=True)
 
         if category:
             await channel.edit(category=category)
-            embed.add_field(name="Moved to category",
-                            value=category,
-                            inline=True)
+            embed.add_field(name="Moved to category", value=category, inline=True)
 
         embed.color = Color.random()
 
         await ctx.followup.send(embed=embed)
 
     @stagechannel.error
-    async def stagechannel_error(self, ctx: Interaction,
-                                 error: Jeanne.AppCommandError):
+    async def stagechannel_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandInvokeError):
             if HTTPException:
                 embed = Embed()
@@ -177,32 +191,33 @@ class Create_Group(GroupCog, name="create"):
                 await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Create a forum")
-    @Jeanne.describe(name="What will you name it?",
-                     topic="What is the topic",
-                     category="Place in which category?")
+    @Jeanne.describe(
+        name="What will you name it?",
+        topic="What is the topic",
+        category="Place in which category?",
+    )
     @Jeanne.checks.has_permissions(manage_channels=True)
-    async def forum(self, ctx: Interaction, name: str, topic: str,
-                    category: CategoryChannel):
+    async def forum(
+        self, ctx: Interaction, name: str, topic: str, category: CategoryChannel
+    ):
         if Botban(ctx.user).check_botbanned_user() == True:
             return
 
         await ctx.response.defer()
         embed = Embed()
         forum = await ctx.guild.create_forum(name=name, topic=topic)
-        embed.description = "Forum `{}` has been created".format(
-            forum.name)
+        embed.description = "Forum `{}` has been created".format(forum.name)
         embed.color = Color.random()
         if category:
             await forum.edit(category=category)
-            embed.add_field(name="Added into category",
-                            value=category.name,
-                            inline=True)
+            embed.add_field(
+                name="Added into category", value=category.name, inline=True
+            )
 
         await ctx.followup.send(embed=embed)
 
     @forum.error
-    async def forum_error(self, ctx: Interaction,
-                          error: Jeanne.AppCommandError):
+    async def forum_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandInvokeError):
             if HTTPException:
                 embed = Embed()
@@ -211,17 +226,21 @@ class Create_Group(GroupCog, name="create"):
                 await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Create a role")
-    @Jeanne.describe(name="What will you name it?",
-                     color="What color will it be? (use HEX codes)",
-                     hoisted="Should it be shown in member list?",
-                     mentionable="Should it be mentioned?")
+    @Jeanne.describe(
+        name="What will you name it?",
+        color="What color will it be? (use HEX codes)",
+        hoisted="Should it be shown in member list?",
+        mentionable="Should it be mentioned?",
+    )
     @Jeanne.checks.has_permissions(manage_roles=True)
-    async def role(self,
-                   ctx: Interaction,
-                   name: str,
-                   color: Optional[str] = None,
-                   hoisted: Optional[bool] = None,
-                   mentionable: Optional[bool] = None) -> None:
+    async def role(
+        self,
+        ctx: Interaction,
+        name: str,
+        color: Optional[str] = None,
+        hoisted: Optional[bool] = None,
+        mentionable: Optional[bool] = None,
+    ) -> None:
         if Botban(ctx.user).check_botbanned_user() == True:
             return
 
@@ -246,9 +265,7 @@ class Create_Group(GroupCog, name="create"):
         if mentionable:
             if mentionable == True:
                 await role.edit(mentionable=True)
-                embed.add_field(name="Mentionable",
-                                value="Yes",
-                                inline=True)
+                embed.add_field(name="Mentionable", value="Yes", inline=True)
             elif mentionable == False:
                 embed.add_field(name="Mentionable", value="No", inline=True)
 
@@ -259,16 +276,18 @@ class Create_Group(GroupCog, name="create"):
         name="What will you name it?",
         channel="Which channel is the message in?",
         message_id="What is the message ID?",
-        slowmode="What is the slowmode (1hr, 30m, etc) (Max is 6 hours)")
+        slowmode="What is the slowmode (1hr, 30m, etc) (Max is 6 hours)",
+    )
     @Jeanne.checks.has_permissions(create_public_threads=True)
-    @Jeanne.checks.bot_has_permissions(create_public_threads=True,
-                                       manage_threads=True)
-    async def thread(self,
-                     ctx: Interaction,
-                     name: str,
-                     channel: TextChannel,
-                     message_id: str,
-                     slowmode: Optional[str] = None):
+    @Jeanne.checks.bot_has_permissions(create_public_threads=True, manage_threads=True)
+    async def thread(
+        self,
+        ctx: Interaction,
+        name: str,
+        channel: TextChannel,
+        message_id: str,
+        slowmode: Optional[str] = None,
+    ):
         if Botban(ctx.user).check_botbanned_user() == True:
             return
         await ctx.response.defer()
@@ -277,7 +296,8 @@ class Create_Group(GroupCog, name="create"):
 
         embed = Embed()
         embed.description = "Thread `{}` has been created on [message]({})".format(
-            name, message.jump_url)
+            name, message.jump_url
+        )
         embed.color = Color.green()
 
         if slowmode:
@@ -289,22 +309,24 @@ class Create_Group(GroupCog, name="create"):
                 added_slowmode = format_timespan(delay)
             except InvalidTimespan as e:
                 added_slowmode = e
-            embed.add_field(name="Slowmode",
-                            value=added_slowmode,
-                            inline=True)
+            embed.add_field(name="Slowmode", value=added_slowmode, inline=True)
 
         await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Make a new emoji")
-    @Jeanne.describe(name="What will you name it?",
-                     emoji_link="Insert emoji URL here",
-                     emoji_image="Insert emoji image here")
+    @Jeanne.describe(
+        name="What will you name it?",
+        emoji_link="Insert emoji URL here",
+        emoji_image="Insert emoji image here",
+    )
     @Jeanne.checks.has_permissions(manage_emojis_and_stickers=True)
-    async def emoji(self,
-                    ctx: Interaction,
-                    name: str,
-                    emoji_link: Optional[str] = None,
-                    emoji_image: Optional[Attachment] = None):
+    async def emoji(
+        self,
+        ctx: Interaction,
+        name: str,
+        emoji_link: Optional[str] = None,
+        emoji_image: Optional[Attachment] = None,
+    ):
         if Botban(ctx.user).check_botbanned_user() == True:
             return
 
@@ -327,10 +349,10 @@ class Create_Group(GroupCog, name="create"):
                 emojibytes = get(emoji_image.url).content
 
             try:
-                emote = await ctx.guild.create_custom_emoji(
-                    name=name, image=emojibytes)
+                emote = await ctx.guild.create_custom_emoji(name=name, image=emojibytes)
                 embed.description = "{} | {} has been created".format(
-                    emote.name, str(emote))
+                    emote.name, str(emote)
+                )
                 embed.color = Color.random()
             except HTTPException:
                 embed.description = "There was a problem making the emoji. Please check that the emoji you are making is a PNG, JPEG or GIF"
@@ -339,19 +361,23 @@ class Create_Group(GroupCog, name="create"):
         await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Make a new sticker")
-    @Jeanne.describe(name="What will you name it?",
-                     description="What does your sticker mean?",
-                     emoji="Emoji that will repesent the sticker",
-                     sticker_link="Insert sticker URL here",
-                     sticker_image="Insert sticker image here")
+    @Jeanne.describe(
+        name="What will you name it?",
+        description="What does your sticker mean?",
+        emoji="Emoji that will repesent the sticker",
+        sticker_link="Insert sticker URL here",
+        sticker_image="Insert sticker image here",
+    )
     @Jeanne.checks.has_permissions(manage_emojis_and_stickers=True)
-    async def sticker(self,
-                      ctx: Interaction,
-                      name: str,
-                      description: str,
-                      emoji: str,
-                      sticker_link: Optional[str] = None,
-                      sticker_image: Optional[Attachment] = None):
+    async def sticker(
+        self,
+        ctx: Interaction,
+        name: str,
+        description: str,
+        emoji: str,
+        sticker_link: Optional[str] = None,
+        sticker_image: Optional[Attachment] = None,
+    ):
         if Botban(ctx.user).check_botbanned_user() == True:
             return
 
@@ -378,12 +404,9 @@ class Create_Group(GroupCog, name="create"):
 
             try:
                 sticker = await ctx.guild.create_sticker(
-                    name=name,
-                    description=description,
-                    emoji=emoji,
-                    file=stickerfile)
-                embed.description = "{} has been created".format(
-                    sticker.name)
+                    name=name, description=description, emoji=emoji, file=stickerfile
+                )
+                embed.description = "{} has been created".format(sticker.name)
                 embed.color = Color.random()
                 embed.set_image(url=url)
             except HTTPException:
@@ -394,7 +417,6 @@ class Create_Group(GroupCog, name="create"):
 
 
 class Delete_Group(GroupCog, name="delete"):
-
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()
@@ -408,9 +430,9 @@ class Delete_Group(GroupCog, name="delete"):
 
         await ctx.response.defer()
         await channel.delete()
-        embed = Embed(description="{} has been deleted".format(
-            channel.name),
-                      color=Color.random())
+        embed = Embed(
+            description="{} has been deleted".format(channel.name), color=Color.random()
+        )
         await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Deletes a role")
@@ -422,8 +444,9 @@ class Delete_Group(GroupCog, name="delete"):
 
         await ctx.response.defer()
         await role.delete()
-        embed = Embed(description="{} has been deleted".format(role.name),
-                      color=Color.random())
+        embed = Embed(
+            description="{} has been deleted".format(role.name), color=Color.random()
+        )
         await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Deletes an emoji")
@@ -435,23 +458,24 @@ class Delete_Group(GroupCog, name="delete"):
 
         await ctx.response.defer()
         try:
-            e = emoji.split(':')[-1].rstrip('>')
+            e = emoji.split(":")[-1].rstrip(">")
             emote = self.bot.get_emoji(int(e))
         except:
             emote = utils.get(ctx.guild.emojis, name=emoji)
-        embed = Embed(description="{} has been deleted".format(str(emote)),
-                      color=0x00FF68)
+        embed = Embed(
+            description="{} has been deleted".format(str(emote)), color=0x00FF68
+        )
         await emote.delete()
         await ctx.followup.send(embed=embed)
 
     @emoji.error
-    async def emoji_error(self, ctx: Interaction,
-                          error: Jeanne.AppCommandError):
+    async def emoji_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandInvokeError):
             if AttributeError:
                 embed = Embed(
                     description="This emoji doesn't exist in the server",
-                    color=Color.red())
+                    color=Color.red(),
+                )
                 await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Deletes a sticker")
@@ -464,25 +488,24 @@ class Delete_Group(GroupCog, name="delete"):
         await ctx.response.defer()
 
         stick = utils.get(ctx.guild.stickers, name=sticker)
-        embed = Embed(description="`{}` has been deleted".format(
-            str(stick.name)),
-                      color=0x00FF68)
+        embed = Embed(
+            description="`{}` has been deleted".format(str(stick.name)), color=0x00FF68
+        )
         await stick.delete()
         await ctx.followup.send(embed=embed)
 
     @sticker.error
-    async def sticker_error(self, ctx: Interaction,
-                            error: Jeanne.AppCommandError):
+    async def sticker_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandInvokeError):
             if AttributeError:
                 embed = Embed(
                     description="This sticker doesn't exist in the server",
-                    color=Color.red())
+                    color=Color.red(),
+                )
                 await ctx.followup.send(embed=embed)
 
 
 class Edit_Group(GroupCog, name="edit"):
-
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()
@@ -493,22 +516,26 @@ class Edit_Group(GroupCog, name="edit"):
         name="What will be the new name?",
         topic="What should be the new topic?",
         slowmode="What is the slowmode (1hr, 30m, etc) (Max is 6 hours)",
-        category="Place in which category?", nsfw_enabled="Should it be an NSFW channel?")
+        category="Place in which category?",
+        nsfw_enabled="Should it be an NSFW channel?",
+    )
     @Jeanne.checks.has_permissions(manage_channels=True)
-    async def textchannel(self,
-                          ctx: Interaction,
-                          channel: TextChannel,
-                          name: Optional[str] = None,
-                         topic:Optional[str]=None,
-                          slowmode: Optional[str] = None,
-                          category: Optional[CategoryChannel] = None,  nsfw_enabled: Optional[bool] = None) -> None:
+    async def textchannel(
+        self,
+        ctx: Interaction,
+        channel: TextChannel,
+        name: Optional[str] = None,
+        topic: Optional[str] = None,
+        slowmode: Optional[str] = None,
+        category: Optional[CategoryChannel] = None,
+        nsfw_enabled: Optional[bool] = None,
+    ) -> None:
         if Botban(ctx.user).check_botbanned_user() == True:
             return
 
         await ctx.response.defer()
         embed = Embed()
-        embed.description = "Channel `{}` has been edited".format(
-            channel.name)
+        embed.description = "Channel `{}` has been edited".format(channel.name)
         embed.color = Color.green()
 
         if name:
@@ -526,7 +553,6 @@ class Edit_Group(GroupCog, name="edit"):
             else:
                 added_topic = "Too many characters! Please make sure your topic has less than 1024 characters"
             embed.add_field(name="Topic", value=added_topic, inline=True)
-
 
         if slowmode:
             try:
@@ -550,19 +576,23 @@ class Edit_Group(GroupCog, name="edit"):
         await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Edit a role")
-    @Jeanne.describe(role="Which role are you editing?",
-                     name="What is the new name?",
-                     color="What is the new color? (use HEX codes)",
-                     hoisted="Should it be shown in member list?",
-                     mentionable="Should it be mentioned?")
+    @Jeanne.describe(
+        role="Which role are you editing?",
+        name="What is the new name?",
+        color="What is the new color? (use HEX codes)",
+        hoisted="Should it be shown in member list?",
+        mentionable="Should it be mentioned?",
+    )
     @Jeanne.checks.has_permissions(manage_roles=True)
-    async def role(self,
-                   ctx: Interaction,
-                   role: Role,
-                   name: Optional[str] = None,
-                   color: Optional[str] = None,
-                   hoisted: Optional[bool] = None,
-                   mentionable: Optional[bool] = None) -> None:
+    async def role(
+        self,
+        ctx: Interaction,
+        role: Role,
+        name: Optional[str] = None,
+        color: Optional[str] = None,
+        hoisted: Optional[bool] = None,
+        mentionable: Optional[bool] = None,
+    ) -> None:
         if Botban(ctx.user).check_botbanned_user() == True:
             return
 
@@ -594,14 +624,10 @@ class Edit_Group(GroupCog, name="edit"):
         if mentionable:
             if mentionable == True:
                 await role.edit(mentionable=True)
-                embed.add_field(name="Mentionable",
-                                value="Yes",
-                                inline=True)
+                embed.add_field(name="Mentionable", value="Yes", inline=True)
             elif mentionable == False:
                 await role.edit(mentionable=False)
-                embed.add_field(name="Mentionable",
-                                value="No",
-                                inline=True)
+                embed.add_field(name="Mentionable", value="No", inline=True)
 
         await ctx.followup.send(embed=embed)
 
@@ -611,7 +637,8 @@ class Edit_Group(GroupCog, name="edit"):
         description="What is the new description (only for public servers)",
         avatar="What is the new server avatar?",
         banner="What will be the new banner?",
-        verification_level="How high should the verification level be?")
+        verification_level="How high should the verification level be?",
+    )
     @Jeanne.checks.has_permissions(manage_guild=True)
     async def server(
         self,
@@ -620,8 +647,7 @@ class Edit_Group(GroupCog, name="edit"):
         description: Optional[str] = None,
         avatar: Optional[Attachment] = None,
         banner: Optional[Attachment] = None,
-        verification_level: Literal['none', 'low', 'medium', 'high',
-                                    'highest'] = None
+        verification_level: Literal["none", "low", "medium", "high", "highest"] = None,
     ) -> None:
         if Botban(ctx.user).check_botbanned_user() == True:
             return
@@ -638,15 +664,13 @@ class Edit_Group(GroupCog, name="edit"):
         if description:
             if "PUBLIC" in ctx.guild.features:
                 await ctx.guild.edit(description=description)
-                embed.add_field(name="Description",
-                                value=description,
-                                inline=True)
+                embed.add_field(name="Description", value=description, inline=True)
             else:
                 embed.add_field(
                     name="Description",
-                    value=
-                    "Your server is not public to have a description edited",
-                    inline=True)
+                    value="Your server is not public to have a description edited",
+                    inline=True,
+                )
 
         if avatar:
             try:
@@ -661,7 +685,8 @@ class Edit_Group(GroupCog, name="edit"):
                 embed.add_field(
                     name="Banner not added",
                     value="This server is not boosted to Tier 1",
-                    inline=True)
+                    inline=True,
+                )
             else:
                 try:
                     bannerbytes = get(banner.url).content
@@ -671,58 +696,58 @@ class Edit_Group(GroupCog, name="edit"):
                     return
 
         if verification_level:
-            if verification_level == 'none':
-                await ctx.guild.edit(
-                    verification_level=VerificationLevel.none)
+            if verification_level == "none":
+                await ctx.guild.edit(verification_level=VerificationLevel.none)
                 embed.add_field(
                     name="Verification Level",
-                    value="{}\nNo verification required".format(
-                        verification_level),
-                    inline=True)
+                    value="{}\nNo verification required".format(verification_level),
+                    inline=True,
+                )
 
-            elif verification_level == 'low':
-                await ctx.guild.edit(
-                    verification_level=VerificationLevel.low)
+            elif verification_level == "low":
+                await ctx.guild.edit(verification_level=VerificationLevel.low)
                 embed.add_field(
                     name="Verification Level",
                     value="{}\nMembers must have a verified email".format(
-                        verification_level),
-                    inline=True)
+                        verification_level
+                    ),
+                    inline=True,
+                )
 
-            elif verification_level == 'medium':
-                await ctx.guild.edit(
-                    verification_level=VerificationLevel.medium)
+            elif verification_level == "medium":
+                await ctx.guild.edit(verification_level=VerificationLevel.medium)
                 embed.add_field(
                     name="Verification Level",
-                    value=
-                    "{}\nMembers must have a verified email and be registered on Discord for more than 5 minutes"
-                    .format(verification_level),
-                    inline=True)
+                    value="{}\nMembers must have a verified email and be registered on Discord for more than 5 minutes".format(
+                        verification_level
+                    ),
+                    inline=True,
+                )
 
-            elif verification_level == 'high':
-                await ctx.guild.edit(
-                    verification_level=VerificationLevel.high)
+            elif verification_level == "high":
+                await ctx.guild.edit(verification_level=VerificationLevel.high)
                 embed.add_field(
                     name="Verification Level",
-                    value=
-                    "{}\nMembers must have a verified email, be registered on Discord for more than 5 minutes and stay in the server for more than 10 minutes"
-                    .format(verification_level),
-                    inline=True)
+                    value="{}\nMembers must have a verified email, be registered on Discord for more than 5 minutes and stay in the server for more than 10 minutes".format(
+                        verification_level
+                    ),
+                    inline=True,
+                )
 
-            elif verification_level == 'highest':
-                await ctx.guild.edit(
-                    verification_level=VerificationLevel.highest)
+            elif verification_level == "highest":
+                await ctx.guild.edit(verification_level=VerificationLevel.highest)
                 embed.add_field(
                     name="Verification Level",
-                    value="{}\nMembers must have a verified phone number".
-                    format(verification_level),
-                    inline=True)
+                    value="{}\nMembers must have a verified phone number".format(
+                        verification_level
+                    ),
+                    inline=True,
+                )
 
         await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Renames an emoji")
-    @Jeanne.describe(emoji="What emoji are you renaming?",
-                     name="What is the new name?")
+    @Jeanne.describe(emoji="What emoji are you renaming?", name="What is the new name?")
     @Jeanne.checks.has_permissions(manage_emojis_and_stickers=True)
     async def emoji(self, ctx: Interaction, emoji: str, name: str):
         if Botban(ctx.user).check_botbanned_user() == True:
@@ -730,74 +755,79 @@ class Edit_Group(GroupCog, name="edit"):
 
         await ctx.response.defer()
         try:
-            e = emoji.split(':')[-1].rstrip('>')
+            e = emoji.split(":")[-1].rstrip(">")
             emote = self.bot.get_emoji(int(e))
         except:
             emote = utils.get(ctx.guild.emojis, name=emoji)
-        embed = Embed(description="{} has been renamed to {}".format(
-            str(emote), name),
-                      color=0x00FF68)
+        embed = Embed(
+            description="{} has been renamed to {}".format(str(emote), name),
+            color=0x00FF68,
+        )
         await emote.edit(name=name)
         await ctx.followup.send(embed=embed)
 
     @emoji.error
-    async def emoji_error(self, ctx: Interaction,
-                          error: Jeanne.AppCommandError):
+    async def emoji_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandInvokeError):
             if AttributeError:
                 embed = Embed(
                     description="This emoji doesn't exist in the server",
-                    color=Color.red())
+                    color=Color.red(),
+                )
                 await ctx.followup.send(embed=embed)
 
 
 class Set_Group(GroupCog, name="set"):
-
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()
 
     @Jeanne.command(description="Set a welcomer and/or leaver channel")
     @Jeanne.describe(
-        welcoming_channel=
-        "Which channel should alert members when someone join",
-        leaving_channel="Which channel should members when someone leaves?")
+        welcoming_channel="Which channel should alert members when someone join",
+        leaving_channel="Which channel should members when someone leaves?",
+    )
     @Jeanne.checks.has_permissions(manage_guild=True)
-    async def welcomer(self,
-                       ctx: Interaction,
-                       welcoming_channel: Optional[TextChannel] = None,
-                       leaving_channel: Optional[TextChannel] = None) -> None:
+    async def welcomer(
+        self,
+        ctx: Interaction,
+        welcoming_channel: Optional[TextChannel] = None,
+        leaving_channel: Optional[TextChannel] = None,
+    ) -> None:
         if Botban(ctx.user).check_botbanned_user() == True:
             return
 
         await ctx.response.defer()
         if welcoming_channel == None and leaving_channel == None:
             error = Embed(
-                description=
-                "Both options are empty. Please set at least a welcomer or leaving channel",
-                color=Color.red())
+                description="Both options are empty. Please set at least a welcomer or leaving channel",
+                color=Color.red(),
+            )
             await ctx.followup.send(embed=error)
         else:
-            setup = Embed(description="Welcomer channels set",
-                          color=Color.random())
+            setup = Embed(description="Welcomer channels set", color=Color.random())
             if welcoming_channel:
                 Manage(ctx.guild, welcoming_channel).set_welcomer()
-                setup.add_field(name='Channel welcoming users',
-                                value=welcoming_channel.mention,
-                                inline=True)
+                setup.add_field(
+                    name="Channel welcoming users",
+                    value=welcoming_channel.mention,
+                    inline=True,
+                )
 
             if leaving_channel:
                 Manage(ctx.guild, leaving_channel).set_leaver()
-                setup.add_field(name='Channel showing users that left',
-                                value=leaving_channel.mention,
-                                inline=True)
+                setup.add_field(
+                    name="Channel showing users that left",
+                    value=leaving_channel.mention,
+                    inline=True,
+                )
 
             await ctx.followup.send(embed=setup)
 
     @Jeanne.command(description="Set a modlog channel")
     @Jeanne.describe(
-        channel=
-        "Which channel should log warns, mutes, timeouts, kicks and bans?")
+        channel="Which channel should log warns, mutes, timeouts, kicks and bans?"
+    )
     @Jeanne.checks.has_permissions(manage_guild=True)
     async def modlog(self, ctx: Interaction, channel: TextChannel):
         if Botban(ctx.user).check_botbanned_user() == True:
@@ -805,15 +835,12 @@ class Set_Group(GroupCog, name="set"):
 
         await ctx.response.defer()
         Manage(ctx.guild).set_modloger(channel)
-        embed = Embed(description='Modlog channel set', color=Color.red())
-        embed.add_field(name="Channel selected",
-                        value=channel.mention,
-                        inline=True)
+        embed = Embed(description="Modlog channel set", color=Color.red())
+        embed.add_field(name="Channel selected", value=channel.mention, inline=True)
         await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Set a message logging channel")
-    @Jeanne.describe(
-        channel="Which channel should log edited and deleted messages?")
+    @Jeanne.describe(channel="Which channel should log edited and deleted messages?")
     @Jeanne.checks.has_permissions(manage_guild=True)
     async def messagelog(self, ctx: Interaction, channel: TextChannel):
         if Botban(ctx.user).check_botbanned_user() == True:
@@ -821,101 +848,93 @@ class Set_Group(GroupCog, name="set"):
 
         await ctx.response.defer()
         Logger(ctx.guild).set_message_logger(channel)
-        embed = Embed(description='Message logging channel set',
-                      color=Color.red())
-        embed.add_field(name="Channel selected",
-                        value=channel.mention,
-                        inline=True)
+        embed = Embed(description="Message logging channel set", color=Color.red())
+        embed.add_field(name="Channel selected", value=channel.mention, inline=True)
         await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(
-        description="Set a welcoming message when someone joins the server")
+    @Jeanne.command(description="Set a welcoming message when someone joins the server")
     @Jeanne.describe(jsonfile="Upload JSON file with the welcoming message")
     @Jeanne.checks.has_permissions(manage_guild=True)
-    async def welcomingmsg(self,
-                           ctx: Interaction,
-                           jsonfile: Optional[Attachment] = None) -> None:
+    async def welcomingmsg(
+        self, ctx: Interaction, jsonfile: Optional[Attachment] = None
+    ) -> None:
         if Botban(ctx.user).check_botbanned_user() == True:
             return
 
         if jsonfile == None:
             await ctx.response.send_modal(Welcomingmsg())
 
-        elif jsonfile !=None:
+        elif jsonfile != None:
             await ctx.response.defer()
             humans = str(
-                len([
-                    member for member in ctx.guild.members
-                    if not member.bot
-                ]))
-            parameters = OrderedDict([
-                ("%member%", str(ctx.user)),
-                ("%pfp%", str(ctx.user.display_avatar)),
-                ("%server%", str(ctx.guild.name)),
-                ("%mention%", str(ctx.user.mention)),
-                ("%name%", str(ctx.user.name)),
-                ("%members%", str(ctx.guild.member_count)),
-                ("%humans%", str(humans)), ("%icon%", str(ctx.guild.icon))
-            ])
-
+                len([member for member in ctx.guild.members if not member.bot])
+            )
+            parameters = OrderedDict(
+                [
+                    ("%member%", str(ctx.user)),
+                    ("%pfp%", str(ctx.user.display_avatar)),
+                    ("%server%", str(ctx.guild.name)),
+                    ("%mention%", str(ctx.user.mention)),
+                    ("%name%", str(ctx.user.name)),
+                    ("%members%", str(ctx.guild.member_count)),
+                    ("%humans%", str(humans)),
+                    ("%icon%", str(ctx.guild.icon)),
+                ]
+            )
 
             json_file = jsonfile.url
             json_request = get(json_file)
-            json_content = replace_all(json_request.content,
-                                           parameters)
+            json_content = replace_all(json_request.content, parameters)
             json = loads(json_content)
 
             try:
                 content = json["content"]
-                embed = Embed.from_dict(json['embeds'][0])
+                embed = Embed.from_dict(json["embeds"][0])
             except:
-                content=json_content
+                content = json_content
 
             confirm = Embed(
-                description=
-                "This is the preview of the welcoming message.\nAre you happy with it?"
+                description="This is the preview of the welcoming message.\nAre you happy with it?"
             )
 
-
-            embed = Embed.from_dict(json['embeds'][0])
+            embed = Embed.from_dict(json["embeds"][0])
             view = Confirmation(ctx.user)
-            await ctx.followup.send(content=content,
-                                        embeds=[embed, confirm],
-                                        view=view,
-                                        allowed_mentions=AllowedMentions(
-                                            everyone=False,
-                                            roles=False,
-                                            users=False),
-                                        ephemeral=True)
+            await ctx.followup.send(
+                content=content,
+                embeds=[embed, confirm],
+                view=view,
+                allowed_mentions=AllowedMentions(
+                    everyone=False, roles=False, users=False
+                ),
+                ephemeral=True,
+            )
             await view.wait()
 
             if view.value == True:
                 Welcomer(ctx.guild).set_welcomer_msg(str(json_request.content))
 
                 embed = Embed(description="Welcoming message set")
-                await ctx.edit_original_response(content=None,
-                                                 embeds=[embed],
-                                                 view=None)
+                await ctx.edit_original_response(
+                    content=None, embeds=[embed], view=None
+                )
 
             elif view.value == False:
                 embed = Embed(description="Action cancelled")
-                await ctx.edit_original_response(content=None,
-                                                 embeds=[embed],
-                                                 view=None)
+                await ctx.edit_original_response(
+                    content=None, embeds=[embed], view=None
+                )
             else:
                 embed = Embed(description="Timeout")
-                await ctx.edit_original_response(content=None,
-                                                 embeds=[embed],
-                                                 view=None)
+                await ctx.edit_original_response(
+                    content=None, embeds=[embed], view=None
+                )
 
-
-    @Jeanne.command(
-        description="Set a leaving message when someone leaves the server")
+    @Jeanne.command(description="Set a leaving message when someone leaves the server")
     @Jeanne.describe(jsonfile="Upload JSON file with the welcoming message")
     @Jeanne.checks.has_permissions(manage_guild=True)
-    async def leavingmsg(self,
-                         ctx: Interaction,
-                         jsonfile: Optional[Attachment] = None) -> None:
+    async def leavingmsg(
+        self, ctx: Interaction, jsonfile: Optional[Attachment] = None
+    ) -> None:
         if Botban(ctx.user).check_botbanned_user() == True:
             return
 
@@ -925,17 +944,20 @@ class Set_Group(GroupCog, name="set"):
         elif jsonfile != None:
             await ctx.response.defer()
             humans = str(
-                len([member for member in ctx.guild.members
-                     if not member.bot]))
-            parameters = OrderedDict([("%member%", str(ctx.user)),
-                                      ("%pfp%", str(ctx.user.display_avatar)),
-                                      ("%server%", str(ctx.guild.name)),
-                                      ("%mention%", str(ctx.user.mention)),
-                                      ("%name%", str(ctx.user.name)),
-                                      ("%members%",
-                                       str(ctx.guild.member_count)),
-                                      ("%humans%", str(humans)),
-                                      ("%icon%", str(ctx.guild.icon))])
+                len([member for member in ctx.guild.members if not member.bot])
+            )
+            parameters = OrderedDict(
+                [
+                    ("%member%", str(ctx.user)),
+                    ("%pfp%", str(ctx.user.display_avatar)),
+                    ("%server%", str(ctx.guild.name)),
+                    ("%mention%", str(ctx.user.mention)),
+                    ("%name%", str(ctx.user.name)),
+                    ("%members%", str(ctx.guild.member_count)),
+                    ("%humans%", str(humans)),
+                    ("%icon%", str(ctx.guild.icon)),
+                ]
+            )
 
             json_file = jsonfile.url
             json_request = get(json_file)
@@ -944,56 +966,55 @@ class Set_Group(GroupCog, name="set"):
 
             try:
                 content = json["content"]
-                embed = Embed.from_dict(json['embeds'][0])
+                embed = Embed.from_dict(json["embeds"][0])
             except:
                 content = json_content
 
             confirm = Embed(
-                description=
-                "This is the preview of the leaving message.\nAre you happy with it?"
+                description="This is the preview of the leaving message.\nAre you happy with it?"
             )
 
-            embed = Embed.from_dict(json['embeds'][0])
+            embed = Embed.from_dict(json["embeds"][0])
             view = Confirmation(ctx.user)
-            await ctx.followup.send(content=content,
-                                    embeds=[embed, confirm],
-                                    view=view,
-                                    allowed_mentions=AllowedMentions(
-                                        everyone=False,
-                                        roles=False,
-                                        users=False),
-                                    ephemeral=True)
+            await ctx.followup.send(
+                content=content,
+                embeds=[embed, confirm],
+                view=view,
+                allowed_mentions=AllowedMentions(
+                    everyone=False, roles=False, users=False
+                ),
+                ephemeral=True,
+            )
             await view.wait()
 
             if view.value == True:
                 Welcomer(ctx.guild).set_leaving_msg(str(json_request.content))
 
                 embed = Embed(description="Leaving message set")
-                await ctx.edit_original_response(content=None,
-                                                 embeds=[embed],
-                                                 view=None)
+                await ctx.edit_original_response(
+                    content=None, embeds=[embed], view=None
+                )
 
             elif view.value == False:
                 embed = Embed(description="Action cancelled")
-                await ctx.edit_original_response(content=None,
-                                                 embeds=[embed],
-                                                 view=None)
+                await ctx.edit_original_response(
+                    content=None, embeds=[embed], view=None
+                )
             else:
                 embed = Embed(description="Timeout")
-                await ctx.edit_original_response(content=None,
-                                                 embeds=[embed],
-                                                 view=None)
+                await ctx.edit_original_response(
+                    content=None, embeds=[embed], view=None
+                )
 
     @Jeanne.command(description="Set a level up notification channel")
     @Jeanne.describe(
         channel="Which channel will update when a member levels up?",
-        levelmsg=
-        "Add your level message here. Use Discohooks to generate the embed")
+        levelmsg="Add your level message here. Use Discohooks to generate the embed",
+    )
     @Jeanne.checks.has_permissions(manage_guild=True)
-    async def levelupdate(self,
-                          ctx: Interaction,
-                          channel: TextChannel,
-                          levelmsg: Optional[bool] = None) -> None:
+    async def levelupdate(
+        self, ctx: Interaction, channel: TextChannel, levelmsg: Optional[bool] = None
+    ) -> None:
         if Botban(ctx.user).check_botbanned_user() == True:
             return
 
@@ -1001,85 +1022,88 @@ class Set_Group(GroupCog, name="set"):
             await ctx.response.defer()
             Levelling(server=ctx.guild).add_level_channel(channel)
             embed = Embed()
-            embed.description = "{} will post level updates when someone levels up".format(channel.mention)
+            embed.description = (
+                "{} will post level updates when someone levels up".format(
+                    channel.mention
+                )
+            )
             embed.color = Color.random()
             await ctx.followup.send(embed=embed)
 
-        elif levelmsg ==True:
+        elif levelmsg == True:
             await ctx.response.send_modal(Levelmsg(channel))
 
-
     @Jeanne.command(
-        description=
-        "Change the brightness of your level and profile card background")
+        description="Change the brightness of your level and profile card background"
+    )
     @Jeanne.describe(
         brightness="Set the level of brightness between 10 - 150. Default is 100"
     )
     async def brightness(self, ctx: Interaction, brightness: int):
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
-        
-            await ctx.response.defer()
-            embed = Embed()
-            if brightness > 150:
-                embed.description = "This is too bright!\nPlease make sure it is higher than 10 and lower than 150"
-                embed.color = Color.red()
-                await ctx.followup.send(embed=embed)
-            elif brightness < 10:
-                embed.description = "This is too dark!\nPlease make sure it is higher than 10 and lower than 150"
-                embed.color = Color.red()
-                await ctx.followup.send(embed=embed)
-            elif Inventory(ctx.user).set_brightness(brightness) == False:
-                embed.description = "You have no background wallpaper"
-                embed.color = Color.red()
-                await ctx.followup.send(embed=embed)
-            else:
-                Inventory(ctx.user).set_brightness(brightness)
-                embed.description = "Brightness has been changed to {}".format(
-                    brightness)
-                embed.color = Color.random()
-                await ctx.followup.send(embed=embed)
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
+
+        await ctx.response.defer()
+        embed = Embed()
+        if brightness > 150:
+            embed.description = "This is too bright!\nPlease make sure it is higher than 10 and lower than 150"
+            embed.color = Color.red()
+            await ctx.followup.send(embed=embed)
+        elif brightness < 10:
+            embed.description = "This is too dark!\nPlease make sure it is higher than 10 and lower than 150"
+            embed.color = Color.red()
+            await ctx.followup.send(embed=embed)
+        elif Inventory(ctx.user).set_brightness(brightness) == False:
+            embed.description = "You have no background wallpaper"
+            embed.color = Color.red()
+            await ctx.followup.send(embed=embed)
+        else:
+            Inventory(ctx.user).set_brightness(brightness)
+            embed.description = "Brightness has been changed to {}".format(brightness)
+            embed.color = Color.random()
+            await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Change your profile bio")
     @Jeanne.describe(bio="Add your bio. Make sure its 60 characters per line")
     async def bio(self, ctx: Interaction, bio: str):
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
-        
-            await ctx.response.defer()
-            embed = Embed()
-            if len(bio) > 120:
-                embed.description = "Too many words!\nPlease make sure your bio has 60 words."
-                embed.color = Color.red()
-                await ctx.followup.send(embed=embed)
-            else:
-                Inventory(ctx.user).set_bio(bio)
-                embed.description = "New bio has been set to\n{}".format(bio)
-                embed.color = Color.random()
-                await ctx.followup.send(embed=embed)
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
-    @Jeanne.command(
-        description="Change your level and profile card font and bar color")
+        await ctx.response.defer()
+        embed = Embed()
+        if len(bio) > 120:
+            embed.description = (
+                "Too many words!\nPlease make sure your bio has 60 words."
+            )
+            embed.color = Color.red()
+            await ctx.followup.send(embed=embed)
+        else:
+            Inventory(ctx.user).set_bio(bio)
+            embed.description = "New bio has been set to\n{}".format(bio)
+            embed.color = Color.random()
+            await ctx.followup.send(embed=embed)
+
+    @Jeanne.command(description="Change your level and profile card font and bar color")
     @Jeanne.describe(color="Add your color. Must be in HEX code")
     async def color(self, ctx: Interaction, color: str):
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
-        
-            await ctx.response.defer()
-            embed = Embed()
-            try:
-                Inventory(ctx.user).set_color(color)
-                embed.description = "Profile and Level card font and bar color changed to {} as showing in the embed color".format(
-                    color)
-                embed.color = int(color, 16)
-            except:
-                embed.description = "Invalid HEX code entered"
-                embed.color = Color.red()
-            await ctx.followup.send(embed=embed)
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
+
+        await ctx.response.defer()
+        embed = Embed()
+        try:
+            Inventory(ctx.user).set_color(color)
+            embed.description = "Profile and Level card font and bar color changed to {} as showing in the embed color".format(
+                color
+            )
+            embed.color = int(color, 16)
+        except:
+            embed.description = "Invalid HEX code entered"
+            embed.color = Color.red()
+        await ctx.followup.send(embed=embed)
 
 
 class XP_Group(GroupCog, name="xp"):
-
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()
@@ -1088,72 +1112,69 @@ class XP_Group(GroupCog, name="xp"):
     @Jeanne.describe(channel="Which channel?")
     @Jeanne.checks.has_permissions(manage_guild=True)
     async def blacklist(self, ctx: Interaction, channel: TextChannel) -> None:
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
-            await ctx.response.defer()
-            if Levelling(server=ctx.guild).check_xpblacklist_channel(
-                    channel) == True:
-                embed = Embed(color=Color.red())
-                embed.description = "Channel is already XP blacklisted"
-                await ctx.followup.send(embed=embed)
-            else:
-                Levelling(server=ctx.guild).add_xpblacklist(channel)
-                embed = Embed(color=Color.random())
-                embed.add_field(
-                    name="Channel XP blacklisted",
-                    value=f"`{channel}` has been added to the XP blacklist",
-                    inline=False)
-                await ctx.followup.send(embed=embed)
+        await ctx.response.defer()
+        if Levelling(server=ctx.guild).check_xpblacklist_channel(channel) == True:
+            embed = Embed(color=Color.red())
+            embed.description = "Channel is already XP blacklisted"
+            await ctx.followup.send(embed=embed)
+        else:
+            Levelling(server=ctx.guild).add_xpblacklist(channel)
+            embed = Embed(color=Color.random())
+            embed.add_field(
+                name="Channel XP blacklisted",
+                value=f"`{channel}` has been added to the XP blacklist",
+                inline=False,
+            )
+            await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Unblacklists a channel for gaining XP")
     @Jeanne.describe(channel="Which channel?")
     @Jeanne.checks.has_permissions(manage_guild=True)
-    async def unblacklist(self, ctx: Interaction,
-                          channel: TextChannel) -> None:
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
+    async def unblacklist(self, ctx: Interaction, channel: TextChannel) -> None:
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
-            await ctx.response.defer()
-            if Levelling(server=ctx.guild).check_xpblacklist_channel(
-                    channel) == False:
-                embed = Embed(color=Color.red())
-                embed.description = "Channel is not in the XP blacklisted"
-                embed.color = Color.red()
-                await ctx.followup.send(embed=embed)
-            else:
-                Levelling(server=ctx.guild).remove_blacklist(channel)
-                embed = Embed(color=Color.random())
-                embed.add_field(
-                    name="Channel XP blacklisted",
-                    value=f"`{channel}` has been added to the XP blacklist",
-                    inline=False)
-                await ctx.followup.send(embed=embed)
+        await ctx.response.defer()
+        if Levelling(server=ctx.guild).check_xpblacklist_channel(channel) == False:
+            embed = Embed(color=Color.red())
+            embed.description = "Channel is not in the XP blacklisted"
+            embed.color = Color.red()
+            await ctx.followup.send(embed=embed)
+        else:
+            Levelling(server=ctx.guild).remove_blacklist(channel)
+            embed = Embed(color=Color.random())
+            embed.add_field(
+                name="Channel XP blacklisted",
+                value=f"`{channel}` has been added to the XP blacklist",
+                inline=False,
+            )
+            await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="List all XP blacklisted channels")
     async def blacklistedchannels(self, ctx: Interaction) -> None:
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
-            await ctx.response.defer()
-            embed = Embed()
-            channels = Levelling(server=ctx.guild).get_blacklisted_channels()
+        await ctx.response.defer()
+        embed = Embed()
+        channels = Levelling(server=ctx.guild).get_blacklisted_channels()
 
-            if channels == None:
-                embed.description = "There are no XP blacklisted channels"
-                embed.color = Color.red()
-            else:
-                embed.color = Color.random()
-                embed.title = "List of XP blacklisted channels"
-                embed.description = ""
-                for channel in channels:
-                    embed.description += ctx.guild.get_channel(
-                        int(channel)).mention
-                await ctx.followup.send(embed=embed)
+        if channels == None:
+            embed.description = "There are no XP blacklisted channels"
+            embed.color = Color.red()
+        else:
+            embed.color = Color.random()
+            embed.title = "List of XP blacklisted channels"
+            embed.description = ""
+            for channel in channels:
+                embed.description += ctx.guild.get_channel(int(channel)).mention
+            await ctx.followup.send(embed=embed)
 
 
 class manage(Cog):
-
     def __init__(self, bot: Bot):
         self.bot = bot
 
@@ -1161,36 +1182,36 @@ class manage(Cog):
     @Jeanne.describe(member="Which member?", role="Which role are you adding?")
     @Jeanne.checks.has_permissions(manage_roles=True)
     async def addrole(self, ctx: Interaction, member: Member, role: Role):
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
-        
-            await ctx.response.defer()
-            await member.add_roles(role)
-            embed = Embed(color=Color.random())
-            embed.add_field(name=f"Role given",
-                            value=f"`{role}` was given to `{member}`",
-                            inline=False)
-            await ctx.followup.send(embed=embed)
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
+
+        await ctx.response.defer()
+        await member.add_roles(role)
+        embed = Embed(color=Color.random())
+        embed.add_field(
+            name=f"Role given", value=f"`{role}` was given to `{member}`", inline=False
+        )
+        await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Remove a role from a member")
-    @Jeanne.describe(member="Which member?",
-                     role="Which role are you removing?")
+    @Jeanne.describe(member="Which member?", role="Which role are you removing?")
     @Jeanne.checks.has_permissions(manage_roles=True)
     async def removerole(self, ctx: Interaction, member: Member, role: Role):
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
-        
-            await ctx.response.defer()
-            await member.remove_roles(role)
-            embed = Embed(color=Color.random())
-            embed.add_field(name=f"Role removed",
-                            value=f"`{role}` was removed from `{member}`",
-                            inline=False)
-            await ctx.followup.send(embed=embed)
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
+
+        await ctx.response.defer()
+        await member.remove_roles(role)
+        embed = Embed(color=Color.random())
+        embed.add_field(
+            name=f"Role removed",
+            value=f"`{role}` was removed from `{member}`",
+            inline=False,
+        )
+        await ctx.followup.send(embed=embed)
 
     @Jeanne.command(
-        description=
-        "Removes a welcoming/modlog/report channel. Set all options to true to remove all"
+        description="Removes a welcoming/modlog/report channel. Set all options to true to remove all"
     )
     @Jeanne.describe(
         welcomer="Remove welcomer channel?",
@@ -1199,147 +1220,178 @@ class manage(Cog):
         messagelog="Remove lessage logging channel?",
         welcomingmsg="Remove the welcoming message and reset to default",
         leavingmsg="Remove the leaving message and reset to default",
-        levelupchannel="Remove the level up update channel")
+        levelupchannel="Remove the level up update channel",
+    )
     @Jeanne.checks.has_permissions(manage_guild=True)
-    async def remove(self,
-                     ctx: Interaction,
-                     welcomer: Optional[bool] = None,
-                     leaving: Optional[bool] = None,
-                     modlog: Optional[bool] = None,
-                     messagelog: Optional[bool] = None,
-                     welcomingmsg: Optional[bool] = None,
-                     leavingmsg: Optional[bool] = None,
-                     levelupchannel: Optional[bool] = None) -> None:
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
+    async def remove(
+        self,
+        ctx: Interaction,
+        welcomer: Optional[bool] = None,
+        leaving: Optional[bool] = None,
+        modlog: Optional[bool] = None,
+        messagelog: Optional[bool] = None,
+        welcomingmsg: Optional[bool] = None,
+        leavingmsg: Optional[bool] = None,
+        levelupchannel: Optional[bool] = None,
+    ) -> None:
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
-            await ctx.response.defer()
-            if welcomer == None and leaving == None and modlog == None and welcomingmsg == None and leavingmsg == None:
-                error = Embed(description="Please select a channel to remove")
-                await ctx.followup.send(embed=error)
-            else:
-                embed = Embed(description="Channels removed")
+        await ctx.response.defer()
+        if (
+            welcomer == None
+            and leaving == None
+            and modlog == None
+            and welcomingmsg == None
+            and leavingmsg == None
+        ):
+            error = Embed(description="Please select a channel to remove")
+            await ctx.followup.send(embed=error)
+        else:
+            embed = Embed(description="Channels removed")
 
-                if welcomer == True:
+            if welcomer == True:
 
-                    wel = Manage(ctx.guild).remove_welcomer()
+                wel = Manage(ctx.guild).remove_welcomer()
 
-                    if wel == False:
-                        embed.add_field(
-                            name='Welcomer channel removal status',
-                            value='Failed. No welcomer channel set',
-                            inline=True)
-                    else:
-                        embed.add_field(name='Welcomer channel removal status',
-                                        value='Successful',
-                                        inline=True)
+                if wel == False:
+                    embed.add_field(
+                        name="Welcomer channel removal status",
+                        value="Failed. No welcomer channel set",
+                        inline=True,
+                    )
+                else:
+                    embed.add_field(
+                        name="Welcomer channel removal status",
+                        value="Successful",
+                        inline=True,
+                    )
 
-                if leaving == True:
+            if leaving == True:
 
-                    leav = Manage(ctx.guild).remove_leaver()
+                leav = Manage(ctx.guild).remove_leaver()
 
-                    if leav == False:
-                        embed.add_field(name='Leaving channel removal status',
-                                        value='Failed. No leaving channel set',
-                                        inline=True)
-                    else:
-                        embed.add_field(name='Leaving channel removal status',
-                                        value='Successful',
-                                        inline=True)
+                if leav == False:
+                    embed.add_field(
+                        name="Leaving channel removal status",
+                        value="Failed. No leaving channel set",
+                        inline=True,
+                    )
+                else:
+                    embed.add_field(
+                        name="Leaving channel removal status",
+                        value="Successful",
+                        inline=True,
+                    )
 
-                if modlog == True:
+            if modlog == True:
 
-                    mod = Manage(ctx.guild).remove_modloger()
+                mod = Manage(ctx.guild).remove_modloger()
 
-                    if mod == False:
-                        embed.add_field(name='Modlog channel removal status',
-                                        value='Failed. No modlog channel set',
-                                        inline=True)
-                    else:
-                        embed.add_field(name='Modlog channel removal status',
-                                        value='Successful',
-                                        inline=True)
+                if mod == False:
+                    embed.add_field(
+                        name="Modlog channel removal status",
+                        value="Failed. No modlog channel set",
+                        inline=True,
+                    )
+                else:
+                    embed.add_field(
+                        name="Modlog channel removal status",
+                        value="Successful",
+                        inline=True,
+                    )
 
-                if messagelog == True:
+            if messagelog == True:
 
-                    rep = Logger(ctx.guild).remove_messagelog()
+                rep = Logger(ctx.guild).remove_messagelog()
 
-                    if rep == False:
-                        embed.add_field(
-                            name='Message logging channel removal status',
-                            value='Failed. No Message logging channel set',
-                            inline=True)
-                    else:
-                        embed.add_field(
-                            name='Message logging channel removal status',
-                            value='Successful',
-                            inline=True)
+                if rep == False:
+                    embed.add_field(
+                        name="Message logging channel removal status",
+                        value="Failed. No Message logging channel set",
+                        inline=True,
+                    )
+                else:
+                    embed.add_field(
+                        name="Message logging channel removal status",
+                        value="Successful",
+                        inline=True,
+                    )
 
-                if welcomingmsg == True:
+            if welcomingmsg == True:
 
-                    msg = Welcomer(ctx.guild).remove_welcomer_msg()
+                msg = Welcomer(ctx.guild).remove_welcomer_msg()
 
-                    if msg == 0 or None:
-                        embed.add_field(
-                            name='Welcoming Message removal status',
-                            value='Failed. No welcoming message set',
-                            inline=True)
-                    else:
-                        embed.add_field(
-                            name='Welcoming Message removal status',
-                            value='Successful',
-                            inline=True)
+                if msg == 0 or None:
+                    embed.add_field(
+                        name="Welcoming Message removal status",
+                        value="Failed. No welcoming message set",
+                        inline=True,
+                    )
+                else:
+                    embed.add_field(
+                        name="Welcoming Message removal status",
+                        value="Successful",
+                        inline=True,
+                    )
 
-                if leavingmsg == True:
+            if leavingmsg == True:
 
-                    leav = Welcomer(ctx.guild).remove_welcomer_msg()
+                leav = Welcomer(ctx.guild).remove_welcomer_msg()
 
-                    if leav == 0 or None:
-                        embed.add_field(name='Leaving Message removal status',
-                                        value='Failed. No leaving message set',
-                                        inline=True)
-                    else:
-                        embed.add_field(name='Leaving Message removal status',
-                                        value='Successful',
-                                        inline=True)
+                if leav == 0 or None:
+                    embed.add_field(
+                        name="Leaving Message removal status",
+                        value="Failed. No leaving message set",
+                        inline=True,
+                    )
+                else:
+                    embed.add_field(
+                        name="Leaving Message removal status",
+                        value="Successful",
+                        inline=True,
+                    )
 
-                if levelupchannel == True:
-                    lvlup = Manage(ctx.guild).remove_levelup()
+            if levelupchannel == True:
+                lvlup = Manage(ctx.guild).remove_levelup()
 
-                    if lvlup == 0 or None:
-                        embed.add_field(
-                            name='Level Up Channel Update removal status',
-                            value='Failed. No Level Up Channel Update set',
-                            inline=True)
-                    else:
-                        embed.add_field(
-                            name='Level Up Channel Update removal status',
-                            value='Successful',
-                            inline=True)
+                if lvlup == 0 or None:
+                    embed.add_field(
+                        name="Level Up Channel Update removal status",
+                        value="Failed. No Level Up Channel Update set",
+                        inline=True,
+                    )
+                else:
+                    embed.add_field(
+                        name="Level Up Channel Update removal status",
+                        value="Successful",
+                        inline=True,
+                    )
 
-                await ctx.followup.send(embed=embed)
+            await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Clone a channel")
-    @Jeanne.describe(channel="Which channel are you cloning?",
-                     name="What is the new name?")
+    @Jeanne.describe(
+        channel="Which channel are you cloning?", name="What is the new name?"
+    )
     @Jeanne.checks.has_permissions(manage_channels=True)
-    async def clone(self,
-                    ctx: Interaction,
-                    channel: abc.GuildChannel,
-                    name: Optional[str] = None) -> None:
-            if Botban(ctx.user).check_botbanned_user() == True:
-                return
+    async def clone(
+        self, ctx: Interaction, channel: abc.GuildChannel, name: Optional[str] = None
+    ) -> None:
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
-            await ctx.response.defer()
-            if name == None:
-                name = channel.name
+        await ctx.response.defer()
+        if name == None:
+            name = channel.name
 
-            c = await channel.clone(name=name)
+        c = await channel.clone(name=name)
 
-            cloned = Embed(description="{} was cloned as {}".format(
-                channel.mention, c.mention))
-            cloned.color = Color.random()
-            await ctx.followup.send(embed=cloned)
+        cloned = Embed(
+            description="{} was cloned as {}".format(channel.mention, c.mention)
+        )
+        cloned.color = Color.random()
+        await ctx.followup.send(embed=cloned)
 
 
 async def setup(bot: Bot):

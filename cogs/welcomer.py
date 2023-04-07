@@ -12,7 +12,6 @@ def replace_all(text: str, dic: dict):
 
 
 class welcomer(Cog):
-
     def __init__(self, bot: Bot):
         self.bot = bot
 
@@ -21,40 +20,40 @@ class welcomer(Cog):
         try:
             channel_id = Logger(server=member.guild.id).get_welcomer()
             server_id = Logger(
-                member.guild.id,
-                channel=await
-                self.bot.fetch_channel(channel_id)).fetch_welcomer()
+                member.guild.id, channel=await self.bot.fetch_channel(channel_id)
+            ).fetch_welcomer()
 
             if member.guild.id == server_id:
                 channel = self.bot.get_channel(channel_id)
 
                 if Welcomer(member.guild).get_welcoming_msg() == None:
                     welcome = Embed(
-                        description=
-                        f"Hi {member} and welcome to {member.guild.name}!",
-                        color=Color.random()).set_thumbnail(
-                            url=member.display_avatar)
+                        description=f"Hi {member} and welcome to {member.guild.name}!",
+                        color=Color.random(),
+                    ).set_thumbnail(url=member.display_avatar)
                     await channel.send(embed=welcome)
                 else:
-                    humans = len([
-                        member for member in member.guild.members
-                        if not member.bot
-                    ])
-                    parameters = OrderedDict([
-                        ("%member%", str(member)),
-                        ("%pfp%", str(member.display_avatar)),
-                        ("%server%", str(member.guild.name)),
-                        ("%mention%", str(member.mention)),
-                        ("%name%", str(member.name)),
-                        ("%members%", str(member.guild.member_count)),
-                        ("%humans%", str(humans)),
-                        ("%icon%", str(member.guild.icon))
-                    ])
+                    humans = len(
+                        [member for member in member.guild.members if not member.bot]
+                    )
+                    parameters = OrderedDict(
+                        [
+                            ("%member%", str(member)),
+                            ("%pfp%", str(member.display_avatar)),
+                            ("%server%", str(member.guild.name)),
+                            ("%mention%", str(member.mention)),
+                            ("%name%", str(member.name)),
+                            ("%members%", str(member.guild.member_count)),
+                            ("%humans%", str(humans)),
+                            ("%icon%", str(member.guild.icon)),
+                        ]
+                    )
 
                     json = loads(
                         replace_all(
-                            Welcomer(
-                                member.guild).get_welcoming_msg(parameters)))
+                            Welcomer(member.guild).get_welcoming_msg(parameters)
+                        )
+                    )
 
                     try:
                         content = json["content"]
@@ -62,11 +61,14 @@ class welcomer(Cog):
                         pass
 
                     try:
-                        embed = Embed.from_dict(json['embeds'][0])
-                        await channel.send(content=content,
-                                           embed=embed,
-                                           allowed_mentions=AllowedMentions(
-                                               everyone=False, users=True))
+                        embed = Embed.from_dict(json["embeds"][0])
+                        await channel.send(
+                            content=content,
+                            embed=embed,
+                            allowed_mentions=AllowedMentions(
+                                everyone=False, users=True
+                            ),
+                        )
                     except:
                         await channel.send(content=content)
             else:
@@ -84,30 +86,32 @@ class welcomer(Cog):
                 channel = self.bot.get_channel(channel_id)
 
                 if Welcomer(member.guild).get_leaving_msg() == None:
-                    leave = Embed(description=f"{member} left the server",
-                                  color=Color.random()).set_thumbnail(
-                                      url=member.display_avatar)
+                    leave = Embed(
+                        description=f"{member} left the server", color=Color.random()
+                    ).set_thumbnail(url=member.display_avatar)
                     await channel.send(embed=leave)
                 else:
-                    humans = len([
-                        member for member in member.guild.members
-                        if not member.bot
-                    ])
-                    parameters = OrderedDict([
-                        ("%member%", str(member)),
-                        ("%pfp%", str(member.display_avatar)),
-                        ("%server%", str(member.guild.name)),
-                        ("%mention%", str(member.mention)),
-                        ("%name%", str(member.name)),
-                        ("%members%", str(member.guild.member_count)),
-                        ("%humans%", str(humans)),
-                        ("%icon%", str(member.guild.icon))
-                    ])
+                    humans = len(
+                        [member for member in member.guild.members if not member.bot]
+                    )
+                    parameters = OrderedDict(
+                        [
+                            ("%member%", str(member)),
+                            ("%pfp%", str(member.display_avatar)),
+                            ("%server%", str(member.guild.name)),
+                            ("%mention%", str(member.mention)),
+                            ("%name%", str(member.name)),
+                            ("%members%", str(member.guild.member_count)),
+                            ("%humans%", str(humans)),
+                            ("%icon%", str(member.guild.icon)),
+                        ]
+                    )
 
                     json = loads(
                         replace_all(
-                            Welcomer(member.guild).get_leaving_msg(),
-                            parameters))
+                            Welcomer(member.guild).get_leaving_msg(), parameters
+                        )
+                    )
 
                     try:
                         content = json["content"]
@@ -115,11 +119,14 @@ class welcomer(Cog):
                         return
 
                     try:
-                        embed = Embed.from_dict(json['embeds'][0])
-                        await channel.send(content=content,
-                                           embed=embed,
-                                           allowed_mentions=AllowedMentions(
-                                               everyone=False, users=True))
+                        embed = Embed.from_dict(json["embeds"][0])
+                        await channel.send(
+                            content=content,
+                            embed=embed,
+                            allowed_mentions=AllowedMentions(
+                                everyone=False, users=True
+                            ),
+                        )
                     except:
                         await channel.send(content=content)
             else:
