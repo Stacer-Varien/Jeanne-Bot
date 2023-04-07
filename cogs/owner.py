@@ -145,7 +145,10 @@ class slashowner(Cog):
                 for server in [orleans, ha, vhf]:
                     await server.ban(user, reason=f"Botbanned - {reason}")
 
-
+    @command(aliases=['hb', 'slice'])
+    @is_owner()
+    async def hentaiblacklist(self, ctx:Context, link:str):
+         ...
 
     @command()
     @guild_only()
