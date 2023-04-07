@@ -5,7 +5,7 @@ from humanfriendly import parse_timespan
 from discord import Embed, Color, Emoji, Guild, Member, TextChannel, User
 from requests import get
 from config import db
-from typing import Literal, Optional
+from typing import Optional
 
 current_time = date.today()
 
