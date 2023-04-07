@@ -11,11 +11,11 @@ def replace_all(text: str, dic: dict):
         text = text.replace(i, j)
     return text
 
+
 class Welcomingmsg(ui.Modal, title="Welcoming Message"):
 
     def __init__(self) -> None:
         super().__init__()
-
 
     jsonscript = ui.TextInput(
         label="JSON",
@@ -47,9 +47,9 @@ class Welcomingmsg(ui.Modal, title="Welcoming Message"):
             content = replace_all(self.jsonscript.value, parameters)
 
         confirm = Embed(
-                description=
-                "This is the preview of the welcoming message.\nAre you happy with it?"
-            )
+            description=
+            "This is the preview of the welcoming message.\nAre you happy with it?"
+        )
 
         view = Confirmation(ctx.user)
         try:
@@ -71,8 +71,8 @@ class Welcomingmsg(ui.Modal, title="Welcoming Message"):
 
             embed = Embed(description="Welcoming message set")
             await ctx.edit_original_response(content=None,
-                                                 embeds=[embed],
-                                                 view=None)
+                                             embeds=[embed],
+                                             view=None)
 
         elif view.value == False:
             embed = Embed(description="Action cancelled")
@@ -162,9 +162,9 @@ class Leavingmsg(ui.Modal, title="Leaving Message"):
 
 class Levelmsg(ui.Modal, title="Level Update Message"):
 
-    def __init__(self, channel:TextChannel) -> None:
+    def __init__(self, channel: TextChannel) -> None:
         super().__init__()
-        self.channel=channel
+        self.channel = channel
 
     jsonscript = ui.TextInput(
         label="JSON",
@@ -187,7 +187,6 @@ class Levelmsg(ui.Modal, title="Level Update Message"):
              str(Levelling(ctx.user, ctx.guild).get_member_level()))
         ])
 
-
         try:
             json = loads(replace_all(self.jsonscript.value, parameters))
             content = json["content"]
@@ -200,22 +199,24 @@ class Levelmsg(ui.Modal, title="Level Update Message"):
             "This is the preview of the level update message whenever someone levels up in the server and will be sent to {}.\nAre you happy with it?"
             .format(self.channel.mention))
 
-
         view = Confirmation(ctx.user)
         try:
-            embeds=[embed, confirm]
+            embeds = [embed, confirm]
         except:
-            embeds=[confirm]
+            embeds = [confirm]
         await ctx.response.send_message(content=content,
-                                embeds=embeds,
-                                view=view,
-                                allowed_mentions=AllowedMentions(
-                                    everyone=False, roles=False, users=False),
-                                ephemeral=True)
+                                        embeds=embeds,
+                                        view=view,
+                                        allowed_mentions=AllowedMentions(
+                                            everyone=False,
+                                            roles=False,
+                                            users=False),
+                                        ephemeral=True)
         await view.wait()
 
         if view.value == True:
-            Levelling(server=ctx.guild).add_level_channel(self.channel, self.jsonscript.value)
+            Levelling(server=ctx.guild).add_level_channel(
+                self.channel, self.jsonscript.value)
 
             embed = Embed(description="Level update message set")
             await ctx.edit_original_response(content=None,
@@ -274,3 +275,33 @@ class ReportModal(ui.Modal, title="Bot Report"):
             "Thank you for submitting your bot report. The dev will look into it but the will not tell you the results.\n\nPlease know that your user ID has been logged if you are trolling around."
         )
         await ctx.response.send_message(embed=embed)
+
+
+class ReportContentModal(ui.Modal, title="Illicit Content Report"):
+
+    def __init__(self, link: str):
+        self.link = link
+        super().__init__()
+
+    report = ui.TextInput(
+        label="Reason",
+        style=TextStyle.short,
+        placeholder=
+        "Why are you reporting this link? (eg. loli hentai, too much blood)",
+        required=True,
+        min_length=4,
+        max_length=256)
+
+    async def on_submit(self, ctx: Interaction) -> None:
+        report = Embed(title="Illicit Content Reported",
+                       color=Color.brand_red())
+        report.add_field(name="Link", value=self.link, inline=False)
+        report.add_field(name="Reason", value=self.report.value, inline=False)
+        report.set_footer(
+            text='Reporter {}| `{}`'.format(ctx.user, ctx.user.id))
+        SyncWebhook.from_url(WEBHOOK).send(embed=report)
+        embed = Embed(
+            description=
+            "Than you for submitting the report.\n\nPlease know that your user ID has been logged if you are trolling around."
+        )
+        await ctx.response.send_message(embed=embed, ephemeral=True)

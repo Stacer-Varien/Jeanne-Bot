@@ -1,5 +1,5 @@
-from typing import Optional
-from discord import SelectOption, ui, ButtonStyle, Interaction, User
+from discord import  ui, ButtonStyle, Interaction, User
+from assets.modals import ReportContentModal
 
 
 class Confirmation(ui.View):
@@ -65,35 +65,15 @@ class Cancellation(ui.View):
 
 class ReportContent(ui.View):
 
-    def __init__(self,
-                 link1: str,
-                 link2: Optional[str] = None,
-                 link3: Optional[str] = None,
-                 link4: Optional[str] = None,
-                 plus: Optional[bool] = None):
+    def __init__(self, link: str):
         super().__init__()
-        self.link1 = link1
-        self.link2 = link2
-        self.link3 = link3
-        self.link4 = link4
-        self.plus = plus
+        self.link = link
 
-        self.add_item(ui.Button(style=ButtonStyle.gray,
-                                label="Report Image 1"))
-        self.add_item(ui.Button(style=ButtonStyle.gray,
-                                label="Report Image 1"))
-
-        self.add_item(ui.Button(style=ButtonStyle.gray,
-                                label="Report Image 1"))
-
-        self.add_item(ui.Button(style=ButtonStyle.gray,
-                                label="Report Image 1"))
-
-    @ui.button(label="Report Image 1", style=ButtonStyle.grey)
+    @ui.button(label="Report Content", style=ButtonStyle.grey)
     async def report1(self, ctx: Interaction, button: ui.Button):
-        self.value = 'report1'
-        button.disabled = True
-        self.stop()
+        self.value = 'report'
+        await ctx.response.send_modal(ReportContentModal(self.link))
+        
 
 
 

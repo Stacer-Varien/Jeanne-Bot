@@ -1,10 +1,12 @@
 from json import loads
 from random import choice
-from discord import ButtonStyle, Color, Embed, Interaction, app_commands as Jeanne, ui
+from discord import Color, Embed, Interaction, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
 from requests import get
 from functions import Botban, Hentai
 from typing import Literal, Optional
+from assets.buttons import ReportContent
+from assets.menus import ReportSelect
 
 
 class nsfw(Cog):
@@ -19,7 +21,7 @@ class nsfw(Cog):
             ctx: Interaction,
             rating: Optional[Literal["questionable",
                                      "explicit"]] = None) -> None:
-        await ctx.response.defer()
+        await ctx.channel.typing()
         if Botban(ctx.user).check_botbanned_user() == True:
             return
 
@@ -54,14 +56,14 @@ class nsfw(Cog):
             source = 'Konachan'
 
         if hentai.endswith('mp4'):
-            await ctx.followup.send(hentai)
+            await ctx.channel.send(hentai)
 
         else:
             embed = Embed(color=Color.purple()).set_image(
                 url=hentai).set_footer(
                     text="Fetched from {} • Credits must go to the artist".
                     format(source))
-            await ctx.followup.send(embed=embed)
+            await ctx.channel.send(embed=embed)
 
 
     @Jeanne.command(description="Get a random media content from Gelbooru",
@@ -72,16 +74,17 @@ class nsfw(Cog):
                        ctx: Interaction,
                        rating: Optional[Literal["questionable", "explicit"]],
                        tag: Optional[str] = None, plus:Optional[bool]=None) -> None:
-        await ctx.response.defer()
+        await ctx.channel.typing()
         if Botban(ctx.user).check_botbanned_user() == True:
             return
 
         image = Hentai(plus).gelbooru(rating, tag)
 
         if plus==True:
+            view = ReportSelect(image[0]['file_url'], image[1]['file_url'], image[2]['file_url'], image[3]['file_url'])
             if 'mp4' in str(image):
                 media=[image['file_url'] for image in image]
-                await ctx.followup.send("\n".join(media))
+                await ctx.channel.send("\n".join(media), view=view)
             else:
                 color = Color.random()
                 embed1 = Embed(
@@ -98,17 +101,19 @@ class nsfw(Cog):
                     color=color,
                     url='https://gelbooru.com').set_image(url=image[3]['file_url'])
                 embeds = [embed1, embed2, embed3, embed4]
-                await ctx.followup.send(embeds=embeds)
+                await ctx.channel.send(embeds=embeds, view=view)
         else:
+            view=ReportContent(image)
             if image.endswith('mp4'):
-                await ctx.followup.send(image)
+                await ctx.channel.send(image, view=view)
 
             else:
                 embed = Embed(color=Color.purple(
                 )).set_image(url=image).set_footer(
                     text="Fetched from Gelbooru • Credits must go to the artist"
                 )
-                await ctx.followup.send(embed=embed)
+                view = ReportContent(image)
+                await ctx.channel.send(embed=embed, view=view)
 
     @gelbooru.error
     async def gelbooru_error(self, ctx: Interaction,
