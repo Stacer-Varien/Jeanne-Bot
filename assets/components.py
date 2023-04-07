@@ -1,7 +1,7 @@
+from discord import ui, ButtonStyle, Interaction, User, SelectOption, AllowedMentions, Color, Embed,  SyncWebhook, TextChannel,  TextStyle
+from typing import Optional
 from collections import OrderedDict
 from json import loads
-from discord import AllowedMentions, Color, Embed, Interaction, SyncWebhook, TextChannel, ui, TextStyle
-from assets.buttons import Confirmation
 from config import WEBHOOK
 from functions import Levelling, Welcomer
 
@@ -10,6 +10,66 @@ def replace_all(text: str, dic: dict):
     for i, j in dic.items():
         text = text.replace(i, j)
     return text
+
+class Confirmation(ui.View):
+
+    def __init__(self, author: User):
+        super().__init__(timeout=60)
+        self.author = author
+        self.value = None
+
+    @ui.button(label="Confirm", style=ButtonStyle.green)
+    async def confirm(self, ctx: Interaction, button: ui.Button):
+        self.value = True
+        button.disabled = True
+        self.stop()
+
+    @ui.button(label="Cancel", style=ButtonStyle.red)
+    async def cancel(self, ctx: Interaction, button: ui.Button):
+        self.value = False
+        button.disabled = True
+        self.stop()
+
+    async def interaction_check(self, ctx: Interaction):
+        return ctx.user.id == self.author.id
+
+
+class Heads_or_Tails(ui.View):
+
+    def __init__(self, author: User):
+        self.author = author
+        super().__init__(timeout=30)
+        self.value = None
+
+    @ui.button(label="Heads", style=ButtonStyle.green)
+    async def confirm(self, button: ui.Button, ctx: Interaction):
+        self.value = "Heads"
+        self.stop()
+
+    @ui.button(label="Tails", style=ButtonStyle.green)
+    async def cancel(self, button: ui.Button, ctx: Interaction):
+        self.value = 'Tails'
+        self.stop()
+
+    async def interaction_check(self, ctx: Interaction):
+        return ctx.user.id == self.author.id
+
+
+class Cancellation(ui.View):
+
+    def __init__(self, author: User):
+        super().__init__()
+        self.author = author
+        self.value = None
+
+    @ui.button(label="Cancel", style=ButtonStyle.red)
+    async def cancel(self, ctx: Interaction, button: ui.Button):
+        self.value = 'cancel'
+        button.disabled = True
+        self.stop()
+
+    async def interaction_check(self, ctx: Interaction):
+        return ctx.user.id == self.author.id
 
 
 class Welcomingmsg(ui.Modal, title="Welcoming Message"):
@@ -277,13 +337,13 @@ class ReportModal(ui.Modal, title="Bot Report"):
         await ctx.response.send_message(embed=embed)
 
 
-class ReportContentModal(ui.Modal, title="Illicit Content Report"):
+class ReportContentM(ui.Modal, title="Illicit Content Report"):
 
     def __init__(self, link: str):
         self.link = link
         super().__init__()
 
-    report = ui.TextInput(
+    illegalcontent = ui.TextInput(
         label="Reason",
         style=TextStyle.short,
         placeholder=
@@ -296,7 +356,9 @@ class ReportContentModal(ui.Modal, title="Illicit Content Report"):
         report = Embed(title="Illicit Content Reported",
                        color=Color.brand_red())
         report.add_field(name="Link", value=self.link, inline=False)
-        report.add_field(name="Reason", value=self.report.value, inline=False)
+        report.add_field(name="Reason",
+                         value=self.illegalcontent.value,
+                         inline=False)
         report.set_footer(
             text='Reporter {}| `{}`'.format(ctx.user, ctx.user.id))
         SyncWebhook.from_url(WEBHOOK).send(embed=report)
@@ -305,3 +367,55 @@ class ReportContentModal(ui.Modal, title="Illicit Content Report"):
             "Than you for submitting the report.\n\nPlease know that your user ID has been logged if you are trolling around."
         )
         await ctx.response.send_message(embed=embed, ephemeral=True)
+
+class ReportContentPlus(ui.Select):
+
+    def __init__(self,
+                 link1: Optional[str] = None,
+                 link2: Optional[str] = None,
+                 link3: Optional[str] = None,
+                 link4: Optional[str] = None):
+        self.link1 = link1
+        self.link2 = link2
+        self.link3 = link3
+        self.link4 = link4
+        options = [
+            SelectOption(label="Report 1st Media", value=self.link1),
+            SelectOption(label="Report 2nd Media", value=self.link2),
+            SelectOption(label="Report 3rd Media", value=self.link3),
+            SelectOption(label="Report 4th Media", value=self.link4)
+        ]
+        super().__init__(placeholder="Saw something illegal? Report it here",
+                         max_values=1,
+                         min_values=1,
+                         options=options)
+
+    async def callback(self, ctx: Interaction):
+        await ctx.response.send_modal(ReportContentM(self.values[0]))
+
+
+class ReportSelect(ui.View):
+
+    def __init__(self,
+                 link1: Optional[str] = None,
+                 link2: Optional[str] = None,
+                 link3: Optional[str] = None,
+                 link4: Optional[str] = None):
+        self.link1 = link1
+        self.link2 = link2
+        self.link3 = link3
+        self.link4 = link4
+        super().__init__()
+        self.add_item(
+            ReportContentPlus(self.link1, self.link2, self.link3, self.link4))
+
+class ReportContent(ui.View):
+
+    def __init__(self, link: str):
+        super().__init__()
+        self.link = link
+
+    @ui.button(label="Report Content", style=ButtonStyle.grey)
+    async def report1(self, ctx: Interaction, button: ui.Button):
+        self.value = 'report'
+        await ctx.response.send_modal(ReportContentM(self.link))
