@@ -1,5 +1,3 @@
-import contextlib
-from io import StringIO
 from discord.ext.commands import (
     Cog,
     Bot,
@@ -21,7 +19,7 @@ from discord import (
 )
 from os import execv
 from sys import executable, argv
-from functions import Botban
+from functions import Botban, Hentai
 from config import BB_WEBHOOK
 from time import time
 from typing import Literal, Optional
@@ -160,7 +158,8 @@ class slashowner(Cog):
     @command(aliases=["hb", "slice"])
     @is_owner()
     async def hentaiblacklist(self, ctx: Context, link: str):
-        ...
+        Hentai().add_blacklisted_link(link)
+        await ctx.send("Link blacklisted", ephemeral=True)
 
     @command()
     @guild_only()

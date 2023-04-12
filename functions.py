@@ -1225,6 +1225,26 @@ class Hentai:
     def __init__(self, plus: Optional[bool] = None) -> None:
         self.plus = plus
 
+    def add_blacklisted_link(self, link:str):
+        db.execute("INSERT OR IGNORE INTO hentaiBlacklist (links) VALUES (?)", (link,))
+        db.execute()
+
+    def slice_blacklisted_links(self, source:str, links:str):
+        data=db.execute("SELECT links FROM hentaiBlacklist").fetchall()
+        db.commit()
+
+        if data == None:
+            return
+        else:
+            for i in data:
+                for idx, obj in enumerate(links):
+                    if source == 'g':
+                        if obj["post"]["file_url"] == i[0]:
+                            links.pop(idx)
+                    else:
+                        if obj["file_url"] == i[0]:
+                            links.pop(idx)
+
     def gelbooru(self, rating: Optional[str] = None, tag: Optional[str] = None):
 
         if rating == None:
@@ -1242,7 +1262,7 @@ class Hentai:
             )
 
         response = get(gelbooru_api)
-        ret = loads(response.text)
+        ret = self.slice_blacklisted_links('g', (loads(response.text)))
         if self.plus == True:
             return ret["post"]
         else:
@@ -1255,16 +1275,16 @@ class Hentai:
             rating = choice(rating)
 
         if tag == None:
-            yandere_api = get(
+            yandere_api = self.slice_blacklisted_links('yandere', get(
                 f"https://yande.re/post.json?limit=100&tags=rating:{rating}+-loli+-shota+-cub"
-            ).json()
+            ).json())
 
         else:
             formated_tag = tag.replace(" ", "_")
-            yandere_api = get(
+            yandere_api = self.slice_blacklisted_links('yandere',get(
                 f"https://yande.re/post.json?limit=100&tags=rating:{rating}+-loli+-shota+-cub+"
                 + formated_tag
-            ).json()
+            ).json())
 
         if self.plus == True:
             return yandere_api
@@ -1278,16 +1298,16 @@ class Hentai:
             rating = choice(rating)
 
         if tag == None:
-            konachan_api = get(
+            konachan_api = self.slice_blacklisted_links('konachan',get(
                 f"https://konachan.com/post.json?limit=100&tags=rating:{rating}+-loli+-shota+-cub"
-            ).json()
+            ).json())
 
         else:
             formated_tag = tag.replace(" ", "_")
-            konachan_api = get(
+            konachan_api = self.slice_blacklisted_links('konachan',get(
                 f"https://konachan.com/post.json?limit=100&tags=rating:{rating}+-loli+-shota+-cub+"
                 + formated_tag
-            ).json()
+            ).json())
 
         if self.plus == True:
             return konachan_api
@@ -1301,19 +1321,19 @@ class Hentai:
 
         gelbooru_api = f"https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=rating:{rating}+-loli+-shota+-cub"
         response = get(gelbooru_api)
-        ret = loads(response.text)
+        ret = self.slice_blacklisted_links('gelbooru',loads(response.text))
         gelbooru_image = choice(ret["post"])["file_url"]
 
         yandere_image = choice(
-            get(
+            self.slice_blacklisted_links('konachan',get(
                 f"https://yande.re/post.json?limit=100&tags=rating:{rating}+-loli+-shota+-cub"
-            ).json()
+            ).json())
         )["file_url"]
 
         konachan_image = choice(
-            get(
+            self.slice_blacklisted_links('konachan',get(
                 f"https://konachan.com/post.json?s=post&q=index&limit=100&tags=rating:{rating}+-loli+-shota+-cub"
-            ).json()
+            ).json())
         )["file_url"]
 
         h = [gelbooru_image, yandere_image, konachan_image]
@@ -1330,16 +1350,4 @@ class Hentai:
             source = "Konachan"
         return hentai,source
 
-    def add_blacklisted_link(self, link:str):
-        db.execute("INSERT OR IGNORE INTO hentaiBlacklist (links) VALUES (?)", (link,))
-        db.execute()
 
-    def slice_blacklisted_links(self, links:str):
-        data=db.execute("SELECT links FROM hentaiBlacklist").fetchall()
-        db.commit()
-
-        for i in data:
-            for element in links:     
-                if i[0] in element:     
-                    del element  
-                

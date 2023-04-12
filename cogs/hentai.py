@@ -201,7 +201,7 @@ class nsfw(Cog):
         await ctx.response.defer(thinking=False)
         if Botban(ctx.user).check_botbanned_user() == True:
             return
-
+    
         image = Hentai(plus).konachan(rating, tag)
 
         if plus == True:
