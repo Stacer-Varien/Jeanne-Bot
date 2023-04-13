@@ -1,6 +1,6 @@
 from datetime import date, datetime, timedelta
 from json import loads
-from random import choice
+from random import choice, randint
 from humanfriendly import parse_timespan
 from discord import Embed, Color, Emoji, Guild, Member, TextChannel, User
 from requests import get
@@ -1229,24 +1229,18 @@ class Hentai:
         db.execute("INSERT OR IGNORE INTO hentaiBlacklist (links) VALUES (?)", (link,))
         db.execute()
 
-    def slice_blacklisted_links(self, source:str, links:str):
-        data=db.execute("SELECT links FROM hentaiBlacklist").fetchall()
-        db.commit()
+    def get_blacklisted_links(self):
+        data = db.execute("SELECT links FROM hentaiBlacklist").fetchall()
 
         if data == None:
-            return
+            return None
         else:
             for i in data:
-                for idx, obj in enumerate(links):
-                    if source == 'g':
-                        if obj["post"]["file_url"] == i[0]:
-                            links.pop(idx)
-                    else:
-                        if obj["file_url"] == i[0]:
-                            links.pop(idx)
+                return i
+
 
     def gelbooru(self, rating: Optional[str] = None, tag: Optional[str] = None):
-
+        bl=self.get_blacklisted_links()
         if rating == None:
             rating = ["questionable", "explicit"]
             rating = choice(rating)
@@ -1262,79 +1256,83 @@ class Hentai:
             )
 
         response = get(gelbooru_api)
-        ret = self.slice_blacklisted_links('g', (loads(response.text)))
+        ret = loads(response.text)
+
+        filtered_ret=[]
+        for dictionary in ret["post"]:
+            if dictionary['file_url'] !=bl[0]:
+                filtered_ret.append(dictionary)
+
         if self.plus == True:
-            return ret["post"]
+            return filtered_ret
         else:
-            return str(choice(ret["post"])["file_url"])
+            return str(filtered_ret[randint(1, 100) - 1]["file_url"])
 
     def yandere(self, rating: Optional[str] = None, tag: Optional[str] = None):
 
+        bl=self.get_blacklisted_links()
         if rating == None:
             rating = ["questionable", "explicit"]
             rating = choice(rating)
 
         if tag == None:
-            yandere_api = self.slice_blacklisted_links('yandere', get(
+            yandere_api = get(
                 f"https://yande.re/post.json?limit=100&tags=rating:{rating}+-loli+-shota+-cub"
-            ).json())
+            ).json()
 
         else:
             formated_tag = tag.replace(" ", "_")
-            yandere_api = self.slice_blacklisted_links('yandere',get(
+            yandere_api = get(
                 f"https://yande.re/post.json?limit=100&tags=rating:{rating}+-loli+-shota+-cub+"
                 + formated_tag
-            ).json())
+            ).json()
+
+        filtered_ret = []
+        for dictionary in yandere_api:
+            if dictionary['file_url'] != bl[0]:
+                filtered_ret.append(dictionary)
 
         if self.plus == True:
-            return yandere_api
+            return filtered_ret
         else:
-            return str(choice(yandere_api)["file_url"])
+            return str(filtered_ret[randint(1, 100) - 1]["file_url"])
 
     def konachan(self, rating: Optional[str] = None, tag: Optional[str] = None):
-
+        bl=self.get_blacklisted_links()
         if rating == None:
             rating = ["questionable", "explicit"]
             rating = choice(rating)
 
         if tag == None:
-            konachan_api = self.slice_blacklisted_links('konachan',get(
+            konachan_api = get(
                 f"https://konachan.com/post.json?limit=100&tags=rating:{rating}+-loli+-shota+-cub"
-            ).json())
+            ).json()
 
         else:
             formated_tag = tag.replace(" ", "_")
-            konachan_api = self.slice_blacklisted_links('konachan',get(
+            konachan_api = get(
                 f"https://konachan.com/post.json?limit=100&tags=rating:{rating}+-loli+-shota+-cub+"
                 + formated_tag
-            ).json())
-
+            ).json()
+        filtered_ret = []
+        for dictionary in konachan_api:
+            if dictionary['file_url'] != bl[0]:
+                filtered_ret.append(dictionary)
         if self.plus == True:
             return konachan_api
         else:
-            return str(choice(konachan_api)["file_url"])
+            return str(konachan_api[randint(1, 100) - 1]["file_url"])
 
     def hentai(self, rating:Optional[str]=None):
         if rating == None:
             rating = ["questionable", "explicit"]
             rating = choice(rating)
 
-        gelbooru_api = f"https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=rating:{rating}+-loli+-shota+-cub"
-        response = get(gelbooru_api)
-        ret = self.slice_blacklisted_links('gelbooru',loads(response.text))
-        gelbooru_image = choice(ret["post"])["file_url"]
+        gelbooru_image = self.gelbooru(rating)
 
-        yandere_image = choice(
-            self.slice_blacklisted_links('konachan',get(
-                f"https://yande.re/post.json?limit=100&tags=rating:{rating}+-loli+-shota+-cub"
-            ).json())
-        )["file_url"]
+        yandere_image = self.yandere(rating)
 
-        konachan_image = choice(
-            self.slice_blacklisted_links('konachan',get(
-                f"https://konachan.com/post.json?s=post&q=index&limit=100&tags=rating:{rating}+-loli+-shota+-cub"
-            ).json())
-        )["file_url"]
+        konachan_image = self.konachan(rating)
 
         h = [gelbooru_image, yandere_image, konachan_image]
 
@@ -1349,5 +1347,3 @@ class Hentai:
         elif hentai == konachan_image:
             source = "Konachan"
         return hentai,source
-
-
