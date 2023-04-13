@@ -1,5 +1,5 @@
 from json import loads
-from random import choice
+from random import choice, randint
 from discord import Color, Embed, Interaction, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
 from requests import get
@@ -62,32 +62,37 @@ class nsfw(Cog):
         image = Hentai(plus).gelbooru(rating, tag)
 
         if plus == True:
+            image1=image[randint(1,100)-1]
+            image2=image[randint(1,100)-1]
+            image3=image[randint(1,100)-1]
+            image4 = image[randint(1, 100) - 1]
             view = ReportSelect(
-                image[0]["file_url"],
-                image[1]["file_url"],
-                image[2]["file_url"],
-                image[3]["file_url"],
-            )
-            if "mp4" in str(image)[:4]:
-                media = [image["file_url"] for image in image][:4]
+                image1["file_url"],
+                image2["file_url"],
+                image3["file_url"],
+                image4["file_url"],
+                )
+            images=[image1, image2, image3, image4]
+            if "mp4" in str(image):
+                media = [image["file_url"] for image in images]
                 await ctx.followup.send("\n".join(media), view=view)
             else:
                 color = Color.random()
                 embed1 = (
                     Embed(color=color, url="https://gelbooru.com")
-                    .set_image(url=image[0]["file_url"])
+                    .set_image(url=image1["file_url"])
                     .set_footer(
                         text="Fetched from Gelbooru • Credits must go to the artist"
                     )
                 )
                 embed2 = Embed(color=color, url="https://gelbooru.com").set_image(
-                    url=image[1]["file_url"]
+                    url=image2["file_url"]
                 )
                 embed3 = Embed(color=color, url="https://gelbooru.com").set_image(
-                    url=image[2]["file_url"]
+                    url=image3["file_url"]
                 )
                 embed4 = Embed(color=color, url="https://gelbooru.com").set_image(
-                    url=image[3]["file_url"]
+                    url=image4["file_url"]
                 )
                 embeds = [embed1, embed2, embed3, embed4]
                 await ctx.followup.send(embeds=embeds, view=view)
@@ -142,34 +147,38 @@ class nsfw(Cog):
             image = Hentai(plus).yandere(rating, tag)
 
             if plus == True:
+                image1=image[randint(1,100)-1]
+                image2=image[randint(1,100)-1]
+                image3=image[randint(1,100)-1]
+                image4 = image[randint(1, 100) - 1]
                 view = ReportSelect(
-                image[0]["file_url"],
-                image[1]["file_url"],
-                image[2]["file_url"],
-                image[3]["file_url"],
+                image1["id"],
+                image2["id"],
+                image3["id"],
+                image4["id"],
                 )
                 color = Color.random()
                 embed1 = (
                     Embed(color=color, url="https://yande.re")
-                    .set_image(url=image[0]["file_url"])
+                    .set_image(url=image1["file_url"])
                     .set_footer(
                         text="Fetched from Yande.re • Credits must go to the artist"
                     )
                 )
                 embed2 = Embed(color=color, url="https://yande.re").set_image(
-                    url=image[1]["file_url"]
+                    url=image2["file_url"]
                 )
                 embed3 = Embed(color=color, url="https://yande.re").set_image(
-                    url=image[2]["file_url"]
+                    url=image3["file_url"]
                 )
                 embed4 = Embed(color=color, url="https://yande.re").set_image(
-                    url=image[3]["file_url"]
+                    url=image4["file_url"]
                 )
                 embeds = [embed1, embed2, embed3, embed4]
                 await ctx.followup.send(embeds=embeds, view=view)
             else:
                 yandere = Embed(color=Color.random())
-                yandere.set_image(url=image["file_url"])
+                yandere.set_image(url=image)
                 yandere.set_footer(
                     text="Fetched from Yande.re • Credits must go to the artist"
                 )
@@ -201,38 +210,42 @@ class nsfw(Cog):
         await ctx.response.defer(thinking=False)
         if Botban(ctx.user).check_botbanned_user() == True:
             return
-    
+
         image = Hentai(plus).konachan(rating, tag)
 
         if plus == True:
+            image1=image[randint(1,100)-1]
+            image2=image[randint(1,100)-1]
+            image3=image[randint(1,100)-1]
+            image4 = image[randint(1, 100) - 1]
             view = ReportSelect(
-                image[0]["file_url"],
-                image[1]["file_url"],
-                image[2]["file_url"],
-                image[3]["file_url"],
-                )            
+                image1["id"],
+                image2["id"],
+                image3["id"],
+                image4["id"],
+                )
             color = Color.random()
             embed1 = (
                 Embed(color=color, url="https://konachan.com")
-                .set_image(url=image[0]["file_url"])
+                .set_image(url=image1["file_url"])
                 .set_footer(
                     text="Fetched from Yande.re • Credits must go to the artist"
                 )
             )
             embed2 = Embed(color=color, url="https://konachan.com").set_image(
-                url=image[1]["file_url"]
+                url=image2["file_url"]
             )
             embed3 = Embed(color=color, url="https://konachan.com").set_image(
-                url=image[2]["file_url"]
+                url=image3["file_url"]
             )
             embed4 = Embed(color=color, url="https://konachan.com").set_image(
-                url=image[3]["file_url"]
+                url=image4["file_url"]
             )
             embeds = [embed1, embed2, embed3, embed4]
             await ctx.followup.send(embeds=embeds, view=view)
         else:
             konachan = Embed(color=Color.random())
-            konachan.set_image(url=image["file_url"])
+            konachan.set_image(url=image)
             konachan.set_footer(
                 text="Fetched from Konachan • Credits must go to the artist"
             )

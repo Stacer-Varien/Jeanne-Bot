@@ -1277,13 +1277,13 @@ class Hentai:
 
         if tag == None:
             yandere_api = get(
-                f"https://yande.re/post.json?limit=100&tags=rating:{rating}+-loli+-shota+-cub"
+                f"https://yande.re/post.json?limit=100&shown:true&tags=rating:{rating}+-loli+-shota+-cub"
             ).json()
 
         else:
             formated_tag = tag.replace(" ", "_")
             yandere_api = get(
-                f"https://yande.re/post.json?limit=100&tags=rating:{rating}+-loli+-shota+-cub+"
+                f"https://yande.re/post.json?limit=100&shown:true&tags=rating:{rating}+-loli+-shota+-cub+"
                 + formated_tag
             ).json()
 
@@ -1295,7 +1295,7 @@ class Hentai:
         if self.plus == True:
             return filtered_ret
         else:
-            return str(filtered_ret[randint(1, 100) - 1]["file_url"])
+            return str(choice(filtered_ret)["file_url"])
 
     def konachan(self, rating: Optional[str] = None, tag: Optional[str] = None):
         bl=self.get_blacklisted_links()
