@@ -20,13 +20,13 @@ from typing import Optional
 from json import loads
 from requests import get
 
-bot_invite_url = "https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=1428479601718&scope=bot%20applications.commands"
+bot_invite_url = "https://discord.com/oauth2/authorize?client_id=831993597166747679&scope=bot%20applications.commands&permissions=467480734774"
 
 topgg_invite = "https://top.gg/bot/831993597166747679"
 
 discordbots_url = "https://discord.bots.gg/bots/831993597166747679"
 
-haze_url = "https://discord.gg/jh7jkuk2pp"
+orleans = "https://discord.gg/jh7jkuk2pp"
 
 
 class invite_button(View):
@@ -42,7 +42,7 @@ class invite_button(View):
         self.add_item(
             ui.Button(style=ButtonStyle.url, label="DiscordBots", url=discordbots_url)
         )
-        self.add_item(ui.Button(style=ButtonStyle.url, label="Orleans", url=haze_url))
+        self.add_item(ui.Button(style=ButtonStyle.url, label="Orleans", url=orleans))
 
 
 class Weather_Group(GroupCog, name="weather"):
@@ -242,7 +242,7 @@ class Embed_Group(GroupCog, name="embed"):
                 await channel.send(content=content, embed=embed)
             except:
                 await channel.send(content=content)
-            await ctx.followup.send(content="Sent", ephemeral=True)
+            await ctx.followup.send(content="Embed sent in {}".format(channel.mention), ephemeral=True)
 
     @Jeanne.command(
         description="Edits an embed message. This needs the Discohook.org embed generator"
@@ -306,7 +306,7 @@ class Embed_Group(GroupCog, name="embed"):
                         await message.edit(content=content, embed=embed)
                     except:
                         await message.edit(content=content)
-                    await ctx.followup.send(content="Message edited", ephemeral=True)
+                    await ctx.followup.send(content="[Message]({}) edited".format(message.jump_url), ephemeral=True)
 
 
 class slashutilities(Cog):
@@ -322,7 +322,7 @@ class slashutilities(Cog):
             return
 
         await ctx.response.defer(ephemeral=True)
-        await ctx.followup.send(content="Sent")
+        await ctx.followup.send(content="Message sent to {}".format(channel.mention))
         await channel.send(message)
 
     @Jeanne.command(description="Do a calculation")

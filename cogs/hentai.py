@@ -62,17 +62,17 @@ class nsfw(Cog):
         image = Hentai(plus).gelbooru(rating, tag)
 
         if plus == True:
-            image1=image[randint(1,100)-1]
-            image2=image[randint(1,100)-1]
-            image3=image[randint(1,100)-1]
+            image1 = image[randint(1, 100) - 1]
+            image2 = image[randint(1, 100) - 1]
+            image3 = image[randint(1, 100) - 1]
             image4 = image[randint(1, 100) - 1]
             view = ReportSelect(
                 image1["file_url"],
                 image2["file_url"],
                 image3["file_url"],
                 image4["file_url"],
-                )
-            images=[image1, image2, image3, image4]
+            )
+            images = [image1, image2, image3, image4]
             if "mp4" in str(image):
                 media = [image["file_url"] for image in images]
                 await ctx.followup.send("\n".join(media), view=view)
@@ -147,15 +147,15 @@ class nsfw(Cog):
             image = Hentai(plus).yandere(rating, tag)
 
             if plus == True:
-                image1=image[randint(1,100)-1]
-                image2=image[randint(1,100)-1]
-                image3=image[randint(1,100)-1]
+                image1 = image[randint(1, 100) - 1]
+                image2 = image[randint(1, 100) - 1]
+                image3 = image[randint(1, 100) - 1]
                 image4 = image[randint(1, 100) - 1]
                 view = ReportSelect(
-                image1["id"],
-                image2["id"],
-                image3["id"],
-                image4["id"],
+                    image1["id"],
+                    image2["id"],
+                    image3["id"],
+                    image4["id"],
                 )
                 color = Color.random()
                 embed1 = (
@@ -214,16 +214,16 @@ class nsfw(Cog):
         image = Hentai(plus).konachan(rating, tag)
 
         if plus == True:
-            image1=image[randint(1,100)-1]
-            image2=image[randint(1,100)-1]
-            image3=image[randint(1,100)-1]
+            image1 = image[randint(1, 100) - 1]
+            image2 = image[randint(1, 100) - 1]
+            image3 = image[randint(1, 100) - 1]
             image4 = image[randint(1, 100) - 1]
             view = ReportSelect(
                 image1["id"],
                 image2["id"],
                 image3["id"],
                 image4["id"],
-                )
+            )
             color = Color.random()
             embed1 = (
                 Embed(color=color, url="https://konachan.com")

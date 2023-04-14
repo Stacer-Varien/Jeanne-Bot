@@ -1,16 +1,14 @@
-from random import choice
-import lxml.etree as ET
-import requests
 from functions import Botban
 from discord import Color, Embed, Interaction, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
 from config import kitsune_nekoslife, neko_purrbot
 from requests import get
-from assets.imgur import (
+from assets.images import (
     get_jeanne_pic,
     get_medusa_pic,
     get_saber_pic,
     get_wallpaper_pic,
+    safebooru_pic,
 )
 
 
@@ -99,16 +97,9 @@ class images(Cog):
     @Jeanne.command(description="Get an image from Safebooru")
     async def safebooru(self, ctx: Interaction):
         await ctx.response.defer()
-        response = requests.get(
-            "https://safebooru.org/index.php?page=dapi&s=post&q=index&limit=100&tags=-rating:questionable+-animated+score:>=10"
-        ).text.encode("utf-8")
-        parser = ET.XMLParser(recover=True)
-        tree = ET.ElementTree(ET.fromstring(response, parser=parser))
-        root = tree.getroot()
         embed = Embed(color=Color.random())
-        embed.set_image(url=choice(root).attrib["file_url"])
-        embed.set_footer(
-            text="Fetched from Safebooru • Credits must go to the artist")
+        embed.set_image(url=safebooru_pic())
+        embed.set_footer(text="Fetched from Safebooru • Credits must go to the artist")
         await ctx.followup.send(embed=embed)
 
 

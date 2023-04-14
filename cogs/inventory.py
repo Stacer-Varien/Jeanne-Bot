@@ -156,11 +156,10 @@ class Background_Group(GroupCog, name="background"):
             )
             await ctx.followup.send(embed=embed)
 
-    buycustom = Jeanne.Group(name="buy", description="...")
 
-    @buycustom.command(description="Buy a custom background pic for your level card")
+    @Jeanne.command(description="Buy a custom background pic for your level card")
     @Jeanne.describe(name="What will you name it?", link="Add an image link")
-    async def custom(self, ctx: Interaction, name: str, link: str):
+    async def buycustom(self, ctx: Interaction, name: str, link: str):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
             return

@@ -22,7 +22,7 @@ start_time = time()
 class slashinfo(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.bot_version = "4.2a"
+        self.bot_version = "4.2.4"
 
     @Jeanne.command(description="See the bot's status from development to now")
     async def stats(self, ctx: Interaction):
@@ -247,10 +247,10 @@ class slashinfo(Cog):
         color = Color.random()
         normav = Embed(
             description=f"**{member}'s Avatar**",
-            url="https://cdn.discordapp.com",
+            url="https://discordapp.com",
             color=color,
         )
-        guildav = Embed(url="https://cdn.discordapp.com", color=color)
+        guildav = Embed(url="https://discordapp.com", color=color)
 
         if member.guild_avatar != None and member.avatar == None:
             guildav.set_image(url=member.avatar)
@@ -266,31 +266,6 @@ class slashinfo(Cog):
             guildav.set_image(url=member.guild_avatar)
             await ctx.followup.send(embeds=[normav, guildav])
 
-    @Jeanne.command(description="See your server avatar or a member's server avatar")
-    @Jeanne.describe(member="Which member?")
-    async def serveravatar(
-        self, ctx: Interaction, member: Optional[Member] = None
-    ) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
-            return
-
-        await ctx.response.defer()
-        if member == None:
-            member = ctx.user
-
-        member_avatar = bool(member.guild_avatar)
-
-        guild_avatar = Embed(title=f"{member}'s Avatar", color=member.color)
-
-        if member_avatar == True:
-            guild_avatar.set_image(url=member.guild_avatar)
-            await ctx.followup.send(embed=guild_avatar)
-        else:
-            guild_avatar.set_image(url=member.display_avatar)
-            guild_avatar.set_footer(
-                text="Member has no server avatar. Passed normal avatar instead"
-            )
-            await ctx.followup.send(embed=guild_avatar)
 
     @Jeanne.command(description="View a sticker")
     @Jeanne.describe(
@@ -305,7 +280,7 @@ class slashinfo(Cog):
         try:
             m: Message = await ctx.channel.fetch_message(int(sticker))
             s: StickerItem = m.stickers[0]
-        except ValueError:
+        except:
             s: StickerItem = utils.get(ctx.guild.stickers, name=sticker)
 
         q = await self.bot.fetch_sticker(s.id)

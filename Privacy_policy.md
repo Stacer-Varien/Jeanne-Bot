@@ -11,7 +11,7 @@ User IDs, server IDs and channel IDs are the main data stored and kept privately
 
 The user's or server's data is **not registered** in the database if:
 
-1. The user hasn't talked in the server or talking in XP ignored channels and Direct Messages between them and the bot or in a channel were the bot cannot view
+1. The user has not send a message in the server or sending messages in ignored channels and direct messages between them and the bot or in a channel were the bot cannot view
 2. A certian command required to add/enter data in the database has not been used at least once
 3. If the user has been banned from using the bot
 

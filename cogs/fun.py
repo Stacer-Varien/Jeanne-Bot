@@ -10,7 +10,7 @@ from discord import (
 from discord.ext.commands import Cog, Bot
 from functions import Botban
 from config import BB_WEBHOOK
-from assets.imgur import get_animeme_pic
+from assets.images import get_animeme_pic
 from typing import Optional
 
 

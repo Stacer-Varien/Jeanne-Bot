@@ -542,7 +542,6 @@ class moderation(Cog):
             await ctx.followup.send(embed=failed)
 
         else:
-
             if reason == None:
                 reason = "None"
 
@@ -673,7 +672,6 @@ class moderation(Cog):
                 massmb.color = Color.red()
                 massmb.description = ""
                 for id in ids:
-
                     if id == str(ctx.user.id):
                         return
 

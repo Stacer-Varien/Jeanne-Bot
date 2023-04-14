@@ -76,11 +76,9 @@ class Guess_Group(GroupCog, name="guess"):
             )
             await ctx.followup.send(embed=zerobal)
         else:
-
             answer = randint(1, 10)
 
             if int(number) == answer:
-
                 Currency(ctx.user).add_qp(int(bet))
                 correct = Embed(
                     description=f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given {int(bet)} {qp}!",
@@ -151,7 +149,6 @@ class Dice_Group(GroupCog, name="dice"):
     @Jeanne.describe(bet="How much are you betting?", digit="Guess what will roll")
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def bet(self, ctx: Interaction, bet: str, digit: str):
-
         if Botban(ctx.user).check_botbanned_user() == True:
             return
 
