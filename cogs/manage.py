@@ -7,6 +7,7 @@ from discord import (
     Color,
     Embed,
     File,
+    GuildSticker,
     HTTPException,
     Interaction,
     Member,
@@ -1251,7 +1252,6 @@ class manage(Cog):
             embed = Embed(description="Channels removed")
 
             if welcomer == True:
-
                 wel = Manage(ctx.guild).remove_welcomer()
 
                 if wel == False:
@@ -1268,7 +1268,6 @@ class manage(Cog):
                     )
 
             if leaving == True:
-
                 leav = Manage(ctx.guild).remove_leaver()
 
                 if leav == False:
@@ -1285,7 +1284,6 @@ class manage(Cog):
                     )
 
             if modlog == True:
-
                 mod = Manage(ctx.guild).remove_modloger()
 
                 if mod == False:
@@ -1302,7 +1300,6 @@ class manage(Cog):
                     )
 
             if messagelog == True:
-
                 rep = Logger(ctx.guild).remove_messagelog()
 
                 if rep == False:
@@ -1319,7 +1316,6 @@ class manage(Cog):
                     )
 
             if welcomingmsg == True:
-
                 msg = Welcomer(ctx.guild).remove_welcomer_msg()
 
                 if msg == 0 or None:
@@ -1336,7 +1332,6 @@ class manage(Cog):
                     )
 
             if leavingmsg == True:
-
                 leav = Welcomer(ctx.guild).remove_welcomer_msg()
 
                 if leav == 0 or None:
@@ -1394,6 +1389,85 @@ class manage(Cog):
         await ctx.followup.send(embed=cloned)
 
 
+class Rename_Group(GroupCog, name="rename"):
+    def __init__(self, bot: Bot) -> None:
+        self.bot = bot
+        super().__init__()
+
+    @Jeanne.command(description="Renames an emoji")
+    @Jeanne.describe(emoji="What emoji are you renaming?", name="What is the new name?")
+    @Jeanne.checks.has_permissions(manage_emojis_and_stickers=True)
+    async def emoji(self, ctx: Interaction, emoji: str, name: str):
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
+
+        await ctx.response.defer()
+        try:
+            e = emoji.split(":")[-1].rstrip(">")
+            emote = self.bot.get_emoji(int(e))
+        except:
+            emote = utils.get(ctx.guild.emojis, name=emoji)
+        embed = Embed(
+            description="{} has been renamed to {}".format(str(emote), name),
+            color=0x00FF68,
+        )
+        await emote.edit(name=name)
+        await ctx.followup.send(embed=embed)
+
+    @emoji.error
+    async def emoji_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandInvokeError):
+            if AttributeError:
+                embed = Embed(
+                    description="This emoji doesn't exist in the server",
+                    color=Color.red(),
+                )
+                await ctx.followup.send(embed=embed)
+
+    @Jeanne.command(description="Renames a category")
+    @Jeanne.describe(
+        category="Which category are you renaming?", name="What is the new name?"
+    )
+    @Jeanne.checks.has_permissions(manage_channels=True)
+    async def category(self, ctx: Interaction, category: CategoryChannel, name: str):
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
+
+        await ctx.response.defer()
+        embed = Embed(colour=Color.random())
+        embed.description = f"`{category.name}` has been renamed as `{name}`"
+        await category.edit(name=name)
+        await ctx.followup.send(embed=embed)
+
+    @Jeanne.command(description="Renames a sticker")
+    @Jeanne.describe(
+        sticker="What sticker are you renaming?", name="What is the new name?"
+    )
+    @Jeanne.checks.has_permissions(manage_emojis_and_stickers=True)
+    async def sticker(self, ctx: Interaction, sticker: str, name: str):
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
+
+        await ctx.response.defer()
+        sticker: GuildSticker = utils.get(ctx.guild.stickers, name=sticker)
+        embed = Embed(
+            description="`{}` has been renamed to `{}`".format(str(sticker.name), name),
+            color=Color.random(),
+        )
+        await sticker.edit(name=name)
+        await ctx.followup.send(embed=embed)
+
+    @sticker.error
+    async def sticker_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandInvokeError):
+            if AttributeError:
+                embed = Embed(
+                    description="This sticker doesn't exist in the server",
+                    color=Color.red(),
+                )
+                await ctx.followup.send(embed=embed)
+
+
 async def setup(bot: Bot):
     await bot.add_cog(manage(bot))
     await bot.add_cog(Create_Group(bot))
@@ -1401,3 +1475,4 @@ async def setup(bot: Bot):
     await bot.add_cog(Delete_Group(bot))
     await bot.add_cog(Set_Group(bot))
     await bot.add_cog(XP_Group(bot))
+    await bot.add_cog(Rename_Group(bot))
