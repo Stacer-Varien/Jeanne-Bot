@@ -262,7 +262,7 @@ class slashinfo(Cog):
             normav.set_image(url=member.display_avatar)
             await ctx.followup.send(embed=normav)
         else:
-            normav.set_image(url=member.display_avatar)
+            normav.set_image(url=member.avatar)
             guildav.set_image(url=member.guild_avatar)
             await ctx.followup.send(embeds=[normav, guildav])
 

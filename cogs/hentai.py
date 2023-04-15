@@ -229,7 +229,7 @@ class nsfw(Cog):
                 Embed(color=color, url="https://konachan.com")
                 .set_image(url=image1["file_url"])
                 .set_footer(
-                    text="Fetched from Yande.re • Credits must go to the artist"
+                    text="Fetched from Konachan • Credits must go to the artist"
                 )
             )
             embed2 = Embed(color=color, url="https://konachan.com").set_image(
