@@ -8,18 +8,18 @@ TOKEN = getenv("token")
 WEATHER = getenv("weather_api")
 TOPGG = getenv("topgg")
 TOPGG_AUTH = getenv("topgg_auth")
-WEBHOOK=getenv("report_webhook")
+WEBHOOK = getenv("report_webhook")
 BB_WEBHOOK = getenv("botban_webhook")
-IMGUR_ID=getenv("imgur_client_id")
+IMGUR_ID = getenv("imgur_client_id")
 IMGUR_SECRET = getenv("imgur_client_secret")
-JEANNE=getenv("jeanne_album")
+JEANNE = getenv("jeanne_album")
 SABER = getenv("saber_album")
 WALLPAPER = getenv("wallpaper_album")
 NEKO = getenv("neko_album")
 MEDUSA = getenv("medusa_album")
-ANIMEME=getenv("animeme_album")
+ANIMEME = getenv("animeme_album")
 
-db=connect('database.db')
+db = connect("database.db")
 
 kitsune_nekoslife = "https://nekos.life/api/v2/img/fox_girl"
 hug_nekoslife = "https://nekos.life/api/v2/img/hug"
@@ -36,5 +36,4 @@ bite_purrbot = "https://purrbot.site/api/img/sfw/bite/gif"
 blush_purrbot = "https://purrbot.site/api/img/sfw/blush/gif"
 cuddle_purrbot = "https://purrbot.site/api/img/sfw/cuddle/gif"
 dance_purrbot = "https://purrbot.site/api/img/sfw/dance/gif"
-neko_purrbot = "https://purrbot.site/api/img/sfw/neko/" + choice(['img', 'gif'])
-
+neko_purrbot = "https://purrbot.site/api/img/sfw/neko/" + choice(["img", "gif"])
