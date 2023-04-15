@@ -4,7 +4,7 @@ Jeanne is a multipurpose bot with miscellaneous, moderation, management and some
 
 * Available slash commands
 * Levelling system
-* Moderation such as purge, warn, mute, kick, ban and unban
+* Moderation such as purge, warn, timeout, kick, ban and unban
 * Create, delete and rename categories, roles and text and voice channels
 * Fun commands you can play with
 * Getting information of a user and server

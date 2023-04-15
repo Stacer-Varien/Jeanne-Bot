@@ -135,3 +135,5 @@ logging.db
 #files
 /assets/media.py
 *.db
+cmd-invoke-errors.txt
+voter_data.json

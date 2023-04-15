@@ -1,14 +1,21 @@
 from asyncio import get_event_loop
 from functools import partial
 from discord.ext.commands import Cog, CooldownMapping, BucketType, Bot, GroupCog
-from discord import *
-from db_functions import *
+from discord import (
+    Color,
+    Embed,
+    File,
+    Interaction,
+    Member,
+    app_commands as Jeanne,
+    Message,
+)
+from functions import Botban, Currency, Inventory, Levelling, get_richest
 from typing import Optional
 from assets.generators.level_card import Level
 from assets.generators.profile_card import Profile
-from discord.app_commands import *
 from config import TOPGG
-from topgg import *
+from topgg import DBLClient
 from collections import OrderedDict
 from json import loads
 
@@ -24,45 +31,47 @@ class Rank_Group(GroupCog, name="rank"):
         self.bot = bot
         super().__init__()
 
-    @app_commands.command(name='global', description="Check the users with the most XP globally")
-    @checks.cooldown(1, 20, key=lambda i: (i.user.id))
+    @Jeanne.command(
+        name="global", description="Check the users with the most XP globally"
+    )
+    @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def _global(self, ctx: Interaction):
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
-            pass
-        else:
-            embed = Embed(color=Color.random())
-            embed.set_author(name="Global XP Leaderboard")
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
-            leaderboard = get_global_rank()
+        embed = Embed(color=Color.random())
+        embed.set_author(name="Global XP Leaderboard")
 
-            r = 1
-            for i in leaderboard:
-                p = await self.bot.fetch_user(i[0])
-                embed.add_field(name="_ _", value=f"**{r}**. {p}")
-                r += 1
+        leaderboard = Levelling().get_global_rank()
 
-            await ctx.followup.send(embed=embed)
+        r = 1
+        for i in leaderboard:
+            p = await self.bot.fetch_user(i[0])
+            embed.add_field(name="_ _", value=f"**{r}**. {p}")
+            r += 1
 
-    @app_commands.command(description="Check the users with the most XP in the server")
-    @checks.cooldown(1, 20, key=lambda i: (i.user.id))
+        await ctx.followup.send(embed=embed)
+
+    @Jeanne.command(description="Check the users with the most XP in the server")
+    @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def server(self, ctx: Interaction):
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
-            pass
-        else:
-            embed = Embed(color=0xFFD700)
-            embed.set_author(name="XP Leaderboard")
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
-            leaderboard = get_server_rank(ctx.guild.id)
+        embed = Embed(color=0xFFD700)
+        embed.set_author(name="XP Leaderboard")
 
-            r = 1
-            for i in leaderboard:
-                p = await self.bot.fetch_user(i[0])
-                embed.add_field(name="_ _", value=f"**{r}**. {p}")
-                r += 1
+        leaderboard = Levelling(server=ctx.guild).get_server_rank()
 
-            await ctx.followup.send(embed=embed)
+        r = 1
+        for i in leaderboard:
+            p = await self.bot.fetch_user(i[0])
+            embed.add_field(name="_ _", value=f"**{r}**. {p}")
+            r += 1
+
+        await ctx.followup.send(embed=embed)
 
 
 class levelling(Cog):
@@ -85,154 +94,208 @@ class levelling(Cog):
 
     @Cog.listener()
     async def on_message(self, message: Message):
-        if check_botbanned_user(message.author.id) == True:
-            pass
-        else:
-            if not message.author.bot:
-                if check_xpblacklist_channel(message.guild.id, message.channel.id) == False:
-                    try:
-                        ratelimit = self.get_ratelimit(message)
-                        if ratelimit == None:
-                            add_xp(message.author.id, message.guild.id)
-                            lvl = add_level(message.author.id,
-                                            message.guild.id)
+        if Botban(message.author).check_botbanned_user() == True:
+            return
 
-                            if lvl == None:
-                                pass
-                            else:
-                                if lvl[2] == '0':
-                                    msg = "{} has leveled up to `level {}`".format(
-                                        message.author, get_member_level(message.author.id, message.guild.id))
-                                    lvlup = await self.bot.fetch_channel(lvl[1])
-                                    await lvlup.send(msg)
+        if not message.author.bot:
+            if (
+                Levelling(message.author, message.guild).check_xpblacklist_channel(
+                    message.channel
+                )
+                == False
+            ):
+                try:
+                    ratelimit = self.get_ratelimit(message)
+                    if ratelimit == None:
+                        lvl = Levelling(message.author, message.guild).add_xp()
 
-                                else:
-                                    msg: str = lvl[2]
-
-                                    def replace_all(text: str, dic: dict):
-                                        for i, j in dic.items():
-                                            text = text.replace(i, j)
-                                        return text
-                                    parameters = OrderedDict([("%member%", str(message.author)), ("%pfp%", str(message.author.display_avatar)), ("%server%", str(
-                                        message.guild.name)), ("%mention%", str(message.author.mention)), ("%name%", str(message.author.name)), ("%newlevel%", str(get_member_level(message.author.id, message.guild.id)))])
-                                    json = loads(replace_all(msg, parameters))
-                                    msg = json['content']
-                                    embed = Embed.from_dict(json['embeds'][0])
-                                    lvlup = await self.bot.fetch_channel(lvl[1])
-                                    await lvlup.send(content=msg, embed=embed)
-                        else:
+                        if lvl == None:
                             pass
-                    except AttributeError:
-                        pass
-                else:
-                    pass
-            else:
-                pass
+                        else:
+                            if lvl[2] == "0":
+                                msg = "{} has leveled up to `level {}`".format(
+                                    message.author,
+                                    Levelling(
+                                        message.author, message.guild
+                                    ).get_member_level(),
+                                )
+                                lvlup = await self.bot.fetch_channel(lvl[1])
+                                await lvlup.send(msg)
 
-    @app_commands.command(description="See your level or someone else's level")
-    @app_commands.describe(member="Which member?")
-    @checks.cooldown(1, 60, key=lambda i: (i.user.id))
+                            else:
+                                msg: str = lvl[2]
+
+                                def replace_all(text: str, dic: dict):
+                                    for i, j in dic.items():
+                                        text = text.replace(i, j)
+                                    return text
+
+                                parameters = OrderedDict(
+                                    [
+                                        ("%member%", str(message.author)),
+                                        ("%pfp%", str(message.author.display_avatar)),
+                                        ("%server%", str(message.guild.name)),
+                                        ("%mention%", str(message.author.mention)),
+                                        ("%name%", str(message.author.name)),
+                                        (
+                                            "%newlevel%",
+                                            str(
+                                                Levelling(
+                                                    message.author, message.guild
+                                                ).get_member_level()
+                                            ),
+                                        ),
+                                    ]
+                                )
+                                json = loads(replace_all(msg, parameters))
+                                msg = json["content"]
+                                embed = Embed.from_dict(json["embeds"][0])
+                                lvlup = await self.bot.fetch_channel(lvl[1])
+                                await lvlup.send(content=msg, embed=embed)
+                except AttributeError:
+                    return
+            else:
+                return
+
+    @Jeanne.command(description="See your level or someone else's level")
+    @Jeanne.describe(member="Which member?")
+    @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     async def level(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
-            pass
-        else:
-            if member is None:
-                member = ctx.user
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
+
+        if member is None:
+            member = ctx.user
+        try:
+            memdata = Levelling(member, ctx.guild)
+            slvl = memdata.get_member_level()
+            sexp = memdata.get_member_xp()
+
+            glvl = memdata.get_user_level()
+            gexp = memdata.get_user_xp()
+
+            bg = Inventory(member).selected_wallpaper()
+            font_color = Inventory(member).get_color()
+
             try:
-                slvl = get_member_level(member.id, ctx.guild.id)
-                sexp = get_member_xp(member.id, ctx.guild.id)
-
-                glvl = get_user_level(member.id)
-                gexp = get_user_xp(member.id)
-
-                bg = selected_wallpaper(member.id)
-                font_color = get_color(member.id)
-
-                try:
-                    brightness = bg[3]
-                except:
-                    brightness = 100
-
-                try:
-                    bg_image = bg[2]
-                except:
-                    bg_image = ''
-
-                args = {'bg_image': bg_image, 'profile_image': str(member.avatar.with_format('png')), 'font_color': font_color, 'server_level': slvl, 'server_user_xp': sexp, 'server_next_xp': (
-                    (slvl * 50) + ((slvl - 1) * 25) + 50), 'global_level': glvl, 'global_user_xp': gexp, 'global_next_xp': ((glvl * 50) + ((glvl - 1) * 25) + 50), 'user_name': str(member), 'brightness': brightness}
-
-                func = partial(self.get_card, args)
-                image = await get_event_loop().run_in_executor(None, func)
-
-                file = File(fp=image, filename=f'{member.name}_level_card.png')
-                await ctx.followup.send(file=file)
+                brightness = bg[3]
             except:
-                no_exp = Embed(description="Failed to get level stats")
-                await ctx.followup.send(embed=no_exp)
+                brightness = 100
 
-    @app_commands.command(description="See your profile or someone else's profile")
-    @app_commands.describe(member="Which member?")
-    @checks.cooldown(1, 60, key=lambda i: (i.user.id))
+            try:
+                bg_image = bg[2]
+            except:
+                bg_image = ""
+
+            args = {
+                "bg_image": bg_image,
+                "profile_image": str(member.avatar.with_format("png")),
+                "font_color": font_color,
+                "server_level": slvl,
+                "server_user_xp": sexp,
+                "server_next_xp": ((slvl * 50) + ((slvl - 1) * 25) + 50),
+                "global_level": glvl,
+                "global_user_xp": gexp,
+                "global_next_xp": ((glvl * 50) + ((glvl - 1) * 25) + 50),
+                "user_name": str(member),
+                "brightness": brightness,
+            }
+
+            func = partial(self.get_card, args)
+            image = await get_event_loop().run_in_executor(None, func)
+
+            file = File(fp=image, filename=f"{member.name}_level_card.png")
+            await ctx.followup.send(file=file)
+        except:
+            no_exp = Embed(description="Failed to get level stats")
+            await ctx.followup.send(embed=no_exp)
+
+    @Jeanne.command(description="See your profile or someone else's profile")
+    @Jeanne.describe(member="Which member?")
+    @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     async def profile(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await ctx.response.defer()
-        if check_botbanned_user(ctx.user.id) == True:
-            pass
-        else:
-            if member is None:
-                member = ctx.user
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
+
+        if member is None:
+            member = ctx.user
+        try:
+            memdata = Levelling(member, ctx.guild)
+            slvl = memdata.get_member_level()
+            sexp = memdata.get_member_xp()
+
+            glvl = memdata.get_user_level()
+            gexp = memdata.get_user_xp()
+
+            bg = Inventory(member).selected_wallpaper()
+            grank = memdata.get_member_global_rank()
+            srank = memdata.get_member_server_rank()
+            rrank = get_richest(member)
+
+            bio = Inventory(member).get_bio()
+            font_color = Inventory(member).get_color()
+
+            voted = await self.topggpy.get_user_vote(member.id)
+
             try:
-                slvl = get_member_level(member.id, ctx.guild.id)
-                sexp = get_member_xp(member.id, ctx.guild.id)
-
-                glvl = get_user_level(member.id)
-                gexp = get_user_xp(member.id)
-
-                bg = selected_wallpaper(member.id)
-                grank = get_member_global_rank(member)
-                srank = get_member_server_rank(member)
-                rrank = get_richest(member)
-
-                bio = get_bio(member.id)
-                font_color = get_color(member.id)
-
-                voted = await self.topggpy.get_user_vote(member.id)
-
-                try:
-                    brightness = bg[3]
-                except:
-                    brightness = 100
-
-                try:
-                    bg_image = bg[2]
-                except:
-                    bg_image = ''
-
-                args = {'bg_image': bg_image, 'profile_image': str(member.avatar.with_format('png')), 'font_color': font_color, 'server_level': slvl, 'server_user_xp': sexp, 'server_next_xp': (
-                    (slvl * 50) + ((slvl - 1) * 25) + 50), 'global_level': glvl, 'global_user_xp': gexp, 'global_next_xp': ((glvl * 50) + ((glvl - 1) * 25) + 50), 'user_name': str(member), 'grank': grank, 'srank': srank, 'voted': voted, 'rrank': rrank, 'creator': member.id, 'partner': member.id, 'balance': get_balance(member.id), 'bio': str(bio), 'brightness': brightness}
-
-                func = partial(self.get_profile, args)
-                image = await get_event_loop().run_in_executor(None, func)
-
-                file = File(
-                    fp=image, filename=f'{member.name}_profile_card.png')
-                await ctx.followup.send(file=file)
+                brightness = bg[3]
             except:
-                no_exp = Embed(description="Failed to make profile card")
-                await ctx.followup.send(embed=no_exp)
+                brightness = 100
+
+            try:
+                bg_image = bg[2]
+            except:
+                bg_image = ""
+
+            args = {
+                "bg_image": bg_image,
+                "profile_image": str(member.avatar.with_format("png")),
+                "font_color": font_color,
+                "server_level": slvl,
+                "server_user_xp": sexp,
+                "server_next_xp": ((slvl * 50) + ((slvl - 1) * 25) + 50),
+                "global_level": glvl,
+                "global_user_xp": gexp,
+                "global_next_xp": ((glvl * 50) + ((glvl - 1) * 25) + 50),
+                "user_name": str(member),
+                "grank": grank,
+                "srank": srank,
+                "voted": voted,
+                "rrank": rrank,
+                "creator": member.id,
+                "partner": member.id,
+                "balance": Currency(member).get_balance(),
+                "bio": str(bio),
+                "brightness": brightness,
+            }
+
+            func = partial(self.get_profile, args)
+            image = await get_event_loop().run_in_executor(None, func)
+
+            file = File(fp=image, filename=f"{member.name}_profile_card.png")
+            await ctx.followup.send(file=file)
+        except:
+            no_exp = Embed(description="Failed to make profile card")
+            await ctx.followup.send(embed=no_exp)
 
     @level.error
-    async def level_error(self, ctx: Interaction, error: AppCommandError):
-        if isinstance(error, app_commands.CommandOnCooldown):
+    async def level_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandOnCooldown):
             cooldown = Embed(
-                description=f"You have already checked your level!\nTry again after `{round(error.retry_after, 2)} seconds`", color=Color.random())
+                description=f"You have already checked your level!\nTry again after `{round(error.retry_after, 2)} seconds`",
+                color=Color.random(),
+            )
             await ctx.followup.send(embed=cooldown)
 
     @profile.error
-    async def profile_error(self, ctx: Interaction, error: AppCommandError):
-        if isinstance(error, app_commands.CommandOnCooldown):
+    async def profile_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandOnCooldown):
             cooldown = Embed(
-                description=f"You have already checked your profile!\nTry again after `{round(error.retry_after, 2)} seconds`", color=Color.random())
+                description=f"You have already checked your profile!\nTry again after `{round(error.retry_after, 2)} seconds`",
+                color=Color.random(),
+            )
             await ctx.followup.send(embed=cooldown)
 
 

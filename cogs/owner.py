@@ -1,141 +1,175 @@
-import contextlib
-from io import StringIO
-from discord.ext.commands import Cog, Bot, group, is_owner, guild_only, Context, Greedy, command
-from discord import *
+from discord.ext.commands import (
+    Cog,
+    Bot,
+    group,
+    is_owner,
+    guild_only,
+    Context,
+    Greedy,
+    command,
+)
+from discord import (
+    ActivityType,
+    Embed,
+    Game,
+    Activity,
+    Object,
+    SyncWebhook,
+    HTTPException,
+)
 from os import execv
 from sys import executable, argv
-from db_functions import add_botbanned_user, check_botbanned_user
+from functions import Botban, Hentai
 from config import BB_WEBHOOK
 from time import time
 from typing import Literal, Optional
 
 
 def restart_bot():
-  execv(executable, ['python'] + argv)
+    execv(executable, ["python"] + argv)
 
 
 class slashowner(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @group(aliases=['act', 'pressence'], invoke_without_command=True)
+    @group(aliases=["act", "pressence"], invoke_without_command=True)
     @is_owner()
     async def activity(self, ctx: Context):
-        if check_botbanned_user(ctx.author.id) == True:
-            pass
-        else:
-            embed = Embed(title="This is a group command. However, the available commands for this is:",
-                          description="`activity play ACTIVITY`\n`activity listen ACTIVITY`\n`activity clear`")
-            await ctx.send(embed=embed)
+        if Botban(ctx.author).check_botbanned_user() == True:
+            return
 
-    @activity.command(aliases=['playing'])
+        embed = Embed(
+            title="This is a group command. However, the available commands for this is:",
+            description="`activity play ACTIVITY`\n`activity listen ACTIVITY`\n`activity clear`",
+        )
+        await ctx.send(embed=embed)
+
+    @activity.command(aliases=["playing"])
     @is_owner()
     async def play(self, ctx: Context, *, activity: str):
         """Make Jeanne play something as an activity"""
-        if check_botbanned_user(ctx.author.id) == True:
-            pass
-        else:
-            await self.bot.change_presence(activity=Game(name=activity))
-            await ctx.send(f"Jeanne is now playing `{activity}`")
+        if Botban(ctx.author).check_botbanned_user() == True:
+            return
 
-    @activity.command(aliases=['listening'])
+        await self.bot.change_presence(activity=Game(name=activity))
+        await ctx.send(f"Jeanne is now playing `{activity}`")
+
+    @activity.command(aliases=["listening"])
     @is_owner()
     async def listen(self, ctx: Context, *, activity: str):
         """Make Jeanne listen to something as an activity"""
-        if check_botbanned_user(ctx.author.id) == True:
-            pass
-        else:
-            await self.bot.change_presence(activity=Activity(type=ActivityType.listening, name=activity))
-            await ctx.send(f"Jeanne is now listening to `{activity}`")
+        if Botban(ctx.author).check_botbanned_user() == True:
+            return
 
-    @activity.command(aliases=['remove', 'clean', 'stop'])
+        await self.bot.change_presence(
+            activity=Activity(type=ActivityType.listening, name=activity)
+        )
+        await ctx.send(f"Jeanne is now listening to `{activity}`")
+
+    @activity.command(aliases=["remove", "clean", "stop"])
     @is_owner()
     async def clear(self, ctx: Context):
         """Clears the bot's activity"""
-        if check_botbanned_user(ctx.author.id) == True:
-            pass
-        else:
-            await self.bot.change_presence(activity=None)
-            await ctx.send(f"Jeanne's activity has been removed")
+        if Botban(ctx.author).check_botbanned_user() == True:
+            return
 
-    @command(aliases=['fuser'])
+        await self.bot.change_presence(activity=None)
+        await ctx.send(f"Jeanne's activity has been removed")
+
+    @command(aliases=["fuser"])
     @is_owner()
     async def finduser(self, ctx: Context, user_id: int):
         """Finds a user"""
         await ctx.defer()
-        if check_botbanned_user(ctx.author.id) == True:
-            pass
+        if Botban(ctx.author).check_botbanned_user() == True:
+            return
+
+        user = await self.bot.fetch_user(user_id)
+        if user.bot == True:
+            botr = ":o:"
         else:
-            user = await self.bot.fetch_user(user_id)
-            if user.bot == True:
-                botr = ":o:"
-            else:
-                botr = ":x:"
-            fuser = Embed(title="User Found", color=0xccff33)
-            fuser.add_field(name="Name",
-                            value=user,
-                            inline=True)
-            fuser.add_field(name="Creation Date", value="<t:{}:F>".format(
-                round(user.created_at.timestamp())), inline=True)
-            fuser.add_field(
-                name="Mutuals", value=len(user.mutual_guilds), inline=True)
-            fuser.add_field(
-                name="Bot?", value=botr, inline=True)
-            fuser.set_image(url=user.display_avatar)
-            if user.banner == None:
-                await ctx.send(embed=fuser)
-            else:
-                userbanner = Embed(title="User Banner", color=0xccff33)
-                userbanner.set_image(url=user.banner)
+            botr = ":x:"
+        fuser = Embed(title="User Found", color=0xCCFF33)
+        fuser.add_field(name="Name", value=user, inline=True)
+        fuser.add_field(
+            name="Creation Date",
+            value="<t:{}:F>".format(round(user.created_at.timestamp())),
+            inline=True,
+        )
+        fuser.add_field(name="Mutuals", value=len(user.mutual_guilds), inline=True)
+        fuser.add_field(name="Bot?", value=botr, inline=True)
+        fuser.set_image(url=user.display_avatar)
+        if user.banner == None:
+            await ctx.send(embed=fuser)
+        else:
+            userbanner = Embed(title="User Banner", color=0xCCFF33)
+            userbanner.set_image(url=user.banner)
 
-                e = [fuser, userbanner]
-                await ctx.send(embeds=e)
+            e = [fuser, userbanner]
+            await ctx.send(embeds=e)
 
-    @command(aliases=['restart', 'refresh'])
+    @command(aliases=["restart", "refresh"])
     @is_owner()
     async def update(self, ctx: Context):
         """Restart me so I can be updated"""
         await ctx.defer()
-        if check_botbanned_user(ctx.author.id) == True:
-            pass
-        else:
-            await ctx.send(f"YAY! NEW UPDATE!")
-            restart_bot()
+        if Botban(ctx.author).check_botbanned_user() == True:
+            return
 
-    @command(aliases=['forbid', 'disallow', 'bban', 'bb'])
+        await ctx.send(f"YAY! NEW UPDATE!")
+        restart_bot()
+
+    @command(aliases=["forbid", "disallow", "bban", "bb"])
     @is_owner()
     async def botban(self, ctx: Context, user_id: int, *, reason: str):
         """Botban a user from using the bot"""
-        if check_botbanned_user(ctx.author.id) == True:
-            pass
+        if Botban(ctx.author).check_botbanned_user() == True:
+            return
+        if reason == None:
+            await ctx.send("Reason missing for botban", ephemeral=True)
         else:
-            if reason == None:
-                await ctx.send("Reason missing for botban", ephemeral=True)
-            else:
-                user = await self.bot.fetch_user(user_id)
-                add_botbanned_user(user_id, reason)
+            user = await self.bot.fetch_user(user_id)
+            Botban(user).add_botbanned_user(reason)
 
-                botbanned = Embed(title="User has been botbanned!",
-                                  description="They will no longer use Jeanne, permanently!")
-                botbanned.add_field(name="User",
-                                    value=user)
-                botbanned.add_field(name="ID", value=user.id,
-                                    inline=True)
-                botbanned.add_field(name="Reason of ban",
-                                    value=reason,
-                                    inline=False)
-                botbanned.set_footer(
-                    text="Due to this user botbanned, all data except warnings are immediatley deleted from the database! They will have no chance of appealing their botban and all the commands executed by them are now rendered USELESS!")
-                botbanned.set_thumbnail(url=user.avatar)
-                webhook = SyncWebhook.from_url(BB_WEBHOOK)
-                webhook.send(embed=botbanned)
+            botbanned = Embed(
+                title="User has been botbanned!",
+                description="They will no longer use Jeanne, permanently!",
+            )
+            botbanned.add_field(name="User", value=user)
+            botbanned.add_field(name="ID", value=user.id, inline=True)
+            botbanned.add_field(name="Reason of ban", value=reason, inline=False)
+            botbanned.set_footer(
+                text="Due to this user botbanned, all data except warnings and softbans are immediatley deleted from the database and banned in the developer's servers! They will have no chance of appealing their botban including their ban and all the commands executed by them are now rendered USELESS!"
+            )
+            botbanned.set_thumbnail(url=user.avatar)
+            webhook = SyncWebhook.from_url(BB_WEBHOOK)
+            webhook.send(embed=botbanned)
 
-                await ctx.send("User botbanned", ephemeral=True)
+            await ctx.send("User botbanned", ephemeral=True)
+
+            orleans = await self.bot.fetch_guild(740584420645535775)
+            ha = await self.bot.fetch_guild(925790259160166460)
+            vhf = await self.bot.fetch_guild(974028573893595146)
+
+            for server in [orleans, ha, vhf]:
+                await server.ban(user, reason=f"Botbanned - {reason}")
+
+    @command(aliases=["hb", "slice"])
+    @is_owner()
+    async def hentaiblacklist(self, ctx: Context, link: str):
+        Hentai().add_blacklisted_link(link)
+        await ctx.send("Link blacklisted", ephemeral=True)
 
     @command()
     @guild_only()
     @is_owner()
-    async def sync(self, ctx: Context, guilds: Greedy[Object], spec: Optional[Literal["~", "*", "^"]] = None) -> None:
+    async def sync(
+        self,
+        ctx: Context,
+        guilds: Greedy[Object],
+        spec: Optional[Literal["~", "*", "^"]] = None,
+    ) -> None:
         if not guilds:
             if spec == "~":
                 synced = await self.bot.tree.sync(guild=ctx.guild)
