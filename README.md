@@ -11,7 +11,6 @@ Jeanne is a multipurpose bot with miscellaneous, moderation, management and some
 * A say command that will make Jeanne say the message the user wants
 * A reaction system such as slap, hug and pat
 * A welcoming, leaving, message, member and modlogging system
-* A partial currency system
 * Advance embed generator
 
 
