@@ -15,7 +15,7 @@ class logger(Cog):
         if before.author.bot:
             return
 
-        if not (logger_id := Logger(before.guild).get_message_logger()):
+        if not (logger_id := Logger(after.guild).get_message_logger()):
             return
 
         channel = await self.bot.fetch_channel(logger_id)

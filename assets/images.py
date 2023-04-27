@@ -4,6 +4,7 @@ from config import ANIMEME, JEANNE, MEDUSA, SABER, IMGUR_ID, WALLPAPER
 from json import loads
 import lxml.etree as ET
 
+
 def get_saber_pic():
     url = f"https://api.imgur.com/3/album/{SABER}/images"
     payload = {}
@@ -58,6 +59,7 @@ def get_animeme_pic():
     pick_link = choice(json["data"])["link"]
     return pick_link
 
+
 def safebooru_pic():
     response = requests.get(
         "https://safebooru.org/index.php?page=dapi&s=post&q=index&limit=100&tags=-rating:questionable+-animated+score:>=10"
@@ -65,5 +67,5 @@ def safebooru_pic():
     parser = ET.XMLParser(recover=True)
     tree = ET.ElementTree(ET.fromstring(response, parser=parser))
     root = tree.getroot()
-    image= choice(root).attrib["file_url"]
+    image = choice(root).attrib["file_url"]
     return image

@@ -409,3 +409,4 @@ class ReportContent(ui.View):
     async def report1(self, ctx: Interaction, button: ui.Button):
         self.value = "report"
         await ctx.response.send_modal(ReportContentM(self.link))
+

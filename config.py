@@ -15,7 +15,6 @@ IMGUR_SECRET = getenv("imgur_client_secret")
 JEANNE = getenv("jeanne_album")
 SABER = getenv("saber_album")
 WALLPAPER = getenv("wallpaper_album")
-NEKO = getenv("neko_album")
 MEDUSA = getenv("medusa_album")
 ANIMEME = getenv("animeme_album")
 

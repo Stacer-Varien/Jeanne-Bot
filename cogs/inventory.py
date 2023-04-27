@@ -156,7 +156,6 @@ class Background_Group(GroupCog, name="background"):
             )
             await ctx.followup.send(embed=embed)
 
-
     @Jeanne.command(description="Buy a custom background pic for your level card")
     @Jeanne.describe(name="What will you name it?", link="Add an image link")
     async def buycustom(self, ctx: Interaction, name: str, link: str):

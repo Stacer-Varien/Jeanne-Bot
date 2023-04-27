@@ -18,6 +18,7 @@ from config import TOPGG
 from topgg import DBLClient
 from collections import OrderedDict
 from json import loads
+from tabulate import tabulate
 
 
 def replace_all(text: str, dic: dict):
@@ -44,13 +45,19 @@ class Rank_Group(GroupCog, name="rank"):
         embed.set_author(name="Global XP Leaderboard")
 
         leaderboard = Levelling().get_global_rank()
-
-        r = 1
+        
+        r = 0
+        data=[]
         for i in leaderboard:
             p = await self.bot.fetch_user(i[0])
-            embed.add_field(name="_ _", value=f"**{r}**. {p}")
             r += 1
+            data.append([str(r), str(p)])
+        
 
+        headers=["Place", "User"]
+        
+        embed.description=tabulate(data, headers, tablefmt="pretty", colalign=("right",))
+    
         await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Check the users with the most XP in the server")

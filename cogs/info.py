@@ -266,7 +266,6 @@ class slashinfo(Cog):
             guildav.set_image(url=member.guild_avatar)
             await ctx.followup.send(embeds=[normav, guildav])
 
-
     @Jeanne.command(description="View a sticker")
     @Jeanne.describe(
         sticker="Insert message ID with the sticker or name of the sticker in the server"
