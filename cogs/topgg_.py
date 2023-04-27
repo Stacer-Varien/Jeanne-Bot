@@ -10,9 +10,9 @@ from datetime import datetime
 class topgg(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.topggpy = DBLClient(self.bot, TOPGG)
+        self.topggpy = DBLClient(bot=self.bot, token=TOPGG, autopost=True)
         self.topgg_webhook = WebhookManager(self.bot).dbl_webhook(
-            "/dblwebhook", TOPGG_AUTH
+            route="/dblwebhook", auth_key=TOPGG_AUTH
         )
         self.topgg_webhook.run(5000)
         self.update_stats.start()
