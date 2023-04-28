@@ -19,6 +19,7 @@ from py_expression_eval import Parser
 from typing import Optional
 from json import loads
 from requests import get
+from enum import Enum
 
 bot_invite_url = "https://discord.com/oauth2/authorize?client_id=831993597166747679&scope=bot%20applications.commands&permissions=467480734774"
 
@@ -28,6 +29,11 @@ discordbots_url = "https://discord.bots.gg/bots/831993597166747679"
 
 orleans = "https://discord.gg/jh7jkuk2pp"
 
+class Languages(Enum):
+    English='en'
+    Spanish='es'
+    French='fr'
+    Japanese='jp'
 
 class invite_button(View):
     def __init__(self):
@@ -242,7 +248,9 @@ class Embed_Group(GroupCog, name="embed"):
                 await channel.send(content=content, embed=embed)
             except:
                 await channel.send(content=content)
-            await ctx.followup.send(content="Embed sent in {}".format(channel.mention), ephemeral=True)
+            await ctx.followup.send(
+                content="Embed sent in {}".format(channel.mention), ephemeral=True
+            )
 
     @Jeanne.command(
         description="Edits an embed message. This needs the Discohook.org embed generator"
@@ -306,7 +314,10 @@ class Embed_Group(GroupCog, name="embed"):
                         await message.edit(content=content, embed=embed)
                     except:
                         await message.edit(content=content)
-                    await ctx.followup.send(content="[Message]({}) edited".format(message.jump_url), ephemeral=True)
+                    await ctx.followup.send(
+                        content="[Message]({}) edited".format(message.jump_url),
+                        ephemeral=True,
+                    )
 
 
 class slashutilities(Cog):
@@ -365,6 +376,12 @@ class slashutilities(Cog):
 
         await ctx.response.send_modal(ReportModal())
 
+    @Jeanne.command(description="Check the meaning of a word with this command")
+    @Jeanne.describe()
+    async def dictionary(self, ctx: Interaction, word:str, language:Optional[Languages]):
+        await ctx.response.defer()
+        if Botban(ctx.user).check_botbanned_user() == True:
+            return
 
 async def setup(bot: Bot):
     await bot.add_cog(Weather_Group(bot))
