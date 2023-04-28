@@ -17,14 +17,13 @@ class welcomer(Cog):
 
     @Cog.listener()
     async def on_member_join(self, member: Member):
-        try:
-            channel_id = Logger(server=member.guild.id).get_welcomer()
-            server_id = Logger(
-                member.guild.id, channel=await self.bot.fetch_channel(channel_id)
-            ).fetch_welcomer()
+            welcomer=Logger(member.guild.id).get_welcomer()
 
-            if member.guild.id == server_id:
-                channel = self.bot.get_channel(channel_id)
+            if welcomer == None:
+                return
+
+            if member.guild.id == welcomer[0]:
+                channel=await member.guild.fetch_channel(int(welcomer[1]))
 
                 if Welcomer(member.guild).get_welcoming_msg() == None:
                     welcome = Embed(
@@ -71,19 +70,17 @@ class welcomer(Cog):
                         )
                     except:
                         await channel.send(content=content)
-            else:
-                return
-        except Exception:
-            return
+
 
     @Cog.listener()
     async def on_member_remove(self, member: Member):
-        try:
-            channel_id = Logger(member.guild).get_leaver(member.guild)
-            server_id = Logger().fetch_leaver(channel_id)
+            leaver=Logger(member.guild.id).get_leaver()
 
-            if member.guild.id == server_id:
-                channel = self.bot.get_channel(channel_id)
+            if leaver == None:
+                return
+
+            if member.guild.id == leaver[0]:
+                channel=await member.guild.fetch_channel(int(leaver[1]))
 
                 if Welcomer(member.guild).get_leaving_msg() == None:
                     leave = Embed(
@@ -129,10 +126,6 @@ class welcomer(Cog):
                         )
                     except:
                         await channel.send(content=content)
-            else:
-                return
-        except Exception:
-            return
 
 
 async def setup(bot: Bot):

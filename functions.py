@@ -998,29 +998,19 @@ class Logger:
         ).fetchone()
         return data
 
-    def fetch_welcomer(self, channel: int):
-        data = db.execute(
-            "SELECT guild_id FROM welcomerData where channel_id = ?", (channel,)
-        ).fetchone()
-        return data[0]
 
     def get_welcomer(self):
         data = db.execute(
-            "SELECT channel_id FROM welcomerData where guild_id = ?", (self.server.id,)
+            "SELECT * FROM welcomerData where guild_id = ?", (self.server.id,)
         ).fetchone()
-        return data[0]
+        return data
 
-    def fetch_leaver(self, channel: int):
-        data = db.execute(
-            "SELECT guild_id FROM leaverData where channel_id = ?", (channel,)
-        ).fetchone()
-        return data[0]
 
     def get_leaver(self):
         data = db.execute(
-            "SELECT channel_id FROM leaverData where guild_id = ?", (self.server.id,)
+            "SELECT * FROM leaverData where guild_id = ?", (self.server.id,)
         ).fetchone()
-        return data[0]
+        return data
 
     def set_message_logger(self, channel: TextChannel):
         cur = db.execute(
@@ -1051,12 +1041,12 @@ class Logger:
         except:
             return False
 
-    def set_member_logger(self, channel: int):
+    def set_member_logger(self, channel: TextChannel):
         cur = db.execute(
             "INSERT OR IGNORE INTO memberLogData (server, channel) VALUES (?,?)",
             (
                 self.server.id,
-                channel,
+                channel.id,
             ),
         )
 
@@ -1064,21 +1054,12 @@ class Logger:
             db.execute(
                 "UPDATE memberLogData SET channel = ? WHERE server = ?",
                 (
-                    channel,
+                    channel.id,
                     self.server.id,
                 ),
             )
         db.commit()
 
-    def get_member_logger(self):
-        try:
-            channel = db.execute(
-                "SELECT channel FROM memberLogData WHERE server = ?", (self.server.id,)
-            ).fetchone()
-            db.commit()
-            return channel[0]
-        except:
-            return False
 
     def remove_messagelog(self):
         cur = db.cursor()

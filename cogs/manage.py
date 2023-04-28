@@ -679,7 +679,7 @@ class Edit_Group(GroupCog, name="edit"):
                 await ctx.guild.edit(icon=avatarbytes)
                 embed.thumbnail(url=avatar.url)
             except:
-                return
+                pass
 
         if banner:
             if ctx.guild.premium_tier < 1:
@@ -694,7 +694,7 @@ class Edit_Group(GroupCog, name="edit"):
                     await ctx.guild.edit(banner=bannerbytes)
                     embed.set_image(url=banner.url)
                 except:
-                    return
+                    pass
 
         if verification_level:
             if verification_level == "none":
@@ -1171,7 +1171,7 @@ class XP_Group(GroupCog, name="xp"):
             embed.title = "List of XP blacklisted channels"
             embed.description = ""
             for channel in channels:
-                embed.description += ctx.guild.get_channel(int(channel)).mention
+                embed.description += ctx.guild.get_channel(int(channel)).mention + "\n"
             await ctx.followup.send(embed=embed)
 
 

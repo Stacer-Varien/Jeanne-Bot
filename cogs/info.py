@@ -249,8 +249,9 @@ class slashinfo(Cog):
             description=f"**{member}'s Avatar**",
             url="https://discordapp.com",
             color=color,
+            type='image'
         )
-        guildav = Embed(url="https://discordapp.com", color=color)
+        guildav = Embed(url="https://discordapp.com", color=color, type='image')
 
         if member.guild_avatar != None and member.avatar == None:
             guildav.set_image(url=member.avatar)
