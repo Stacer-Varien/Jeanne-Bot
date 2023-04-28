@@ -53,12 +53,12 @@ class Heads_or_Tails(ui.View):
         self.value = None
 
     @ui.button(label="Heads", style=ButtonStyle.green)
-    async def confirm(self, button: ui.Button, ctx: Interaction):
+    async def confirm(self, ctx: Interaction, button: ui.Button):
         self.value = "Heads"
         self.stop()
 
     @ui.button(label="Tails", style=ButtonStyle.green)
-    async def cancel(self, button: ui.Button, ctx: Interaction):
+    async def cancel(self, ctx:Interaction, button: ui.Button):
         self.value = "Tails"
         self.stop()
 

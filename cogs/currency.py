@@ -223,14 +223,15 @@ class Flip_Group(GroupCog, name="flip"):
         if Botban(ctx.user).check_botbanned_user() == True:
             return
 
-        jeannes_pick = ["Heads", "Tails"]
+        picks = ["Heads", "Tails"]
+        jeannes_pick = choice(picks)
         qp = str(self.bot.get_emoji(980772736861343774))
         view = Heads_or_Tails(ctx.user)
         ask = Embed(description="Heads or Tails?", color=Color.random())
         await ctx.followup.send(embed=ask, view=view)
         await view.wait()
 
-        if str(view.value) == str(choice(jeannes_pick)):
+        if view.value is jeannes_pick:
             Currency(ctx.user).add_qp(20)
 
             embed = Embed(
@@ -241,7 +242,7 @@ class Flip_Group(GroupCog, name="flip"):
 
         elif view.value == None:
             timeout = Embed(
-                description=f"Sorry but you took too long. It was {choice(jeannes_pick)}",
+                description=f"Sorry but you took too long. It was {jeannes_pick}",
                 color=Color.red(),
             )
             await ctx.edit_original_response(embed=timeout, view=None)
@@ -249,7 +250,7 @@ class Flip_Group(GroupCog, name="flip"):
         else:
             embed = Embed(color=Color.red())
             embed = Embed(
-                description="Oh no, it was {}".format(choice(jeannes_pick)),
+                description="Oh no, it was {}".format(jeannes_pick),
                 color=Color.red(),
             )
             await ctx.edit_original_response(embed=embed, view=None)
@@ -263,7 +264,8 @@ class Flip_Group(GroupCog, name="flip"):
             return
 
         qp = str(self.bot.get_emoji(980772736861343774))
-        jeannes_pick = ["Heads", "Tails"]
+        picks = ["Heads", "Tails"]
+        jeannes_pick = choice(picks)
         balance = Currency(ctx.user).get_balance()
         if 5 > int(bet):
             bethigher = Embed(description=f"Please bet an amount higher than 5 {qp}")
@@ -286,7 +288,7 @@ class Flip_Group(GroupCog, name="flip"):
             await ctx.followup.send(embed=ask, view=view)
             await view.wait()
 
-            if str(view.value) == str(choice(jeannes_pick)):
+            if view.value is jeannes_pick:
                 Currency(ctx.user).add_qp(int(bet))
 
                 embed = Embed(
@@ -299,7 +301,7 @@ class Flip_Group(GroupCog, name="flip"):
 
             elif view.value == None:
                 timeout = Embed(
-                    description=f"Sorry but you took too long. It was {choice(jeannes_pick)}",
+                    description=f"Sorry but you took too long. It was {jeannes_pick}",
                     color=Color.red(),
                 )
                 await ctx.edit_original_response(embed=timeout, view=None)
@@ -309,7 +311,7 @@ class Flip_Group(GroupCog, name="flip"):
                 embed = Embed(color=Color.red())
                 embed = Embed(
                     description="Oh no, it was {}\nI'm afraid that I have to take {}{} from you".format(
-                        choice(jeannes_pick), int(bet), qp
+                        jeannes_pick, int(bet), qp
                     ),
                     color=Color.red(),
                 )
