@@ -1,13 +1,13 @@
-from discord import Color, Embed
+from discord import Color, Embed, Interaction
 import requests
 from typing import Optional
 
-def dictionary(word:str, language:Optional[str]):
+async def dictionary(ctx:Interaction, word:str, language:Optional[str]):
     if language == None:
         language='en'
     
     embed=Embed()
-    response=requests.get("https://api.dictionaryapi.dev/api/v2/entries/{}/{}".format(language, word))
+    response=requests.get(f"https://api.dictionaryapi.dev/api/v2/entries/{language}/{word}")
     data=response.json()
 
     if response.status_code == 404:
@@ -29,10 +29,40 @@ def dictionary(word:str, language:Optional[str]):
     else:
         embed.color=Color.random()
         embed.title=data[0]['word']
-        for i in data[0]['meanings']:
-            ...
 
-        embed.description=""
-        embed.add_field(name="Phonetic", value=data[0]['phonetic'])
+        part_of_speech = []
+        definitions = []
+        examples = []
 
+        for i in data[0]["meanings"]:
+            part_of_speech.append(i["partOfSpeech"])
+            for j in i["definitions"]:
+                definitions.append(j["definition"])
+                examples.append(j.get("example", None))
 
+        items_per_page = 2
+        total_pages = (len(part_of_speech) + items_per_page - 1) // items_per_page
+
+        for page_num in range(1, total_pages + 1):
+            start_index = (page_num - 1) * items_per_page
+            end_index = start_index + items_per_page
+
+            page_part_of_speech = part_of_speech[start_index:end_index]
+            page_definitions = definitions[start_index:end_index]
+            page_examples = examples[start_index:end_index]
+
+            embed = Embed(
+                title=f"Page {page_num}/{total_pages}",
+                color=Color.blurple()
+            )
+
+            for part, definition, example in zip(page_part_of_speech, page_definitions, page_examples):
+                embed.add_field(name="Part of Speech", value=part, inline=False)
+                embed.add_field(name="Definition", value=definition, inline=False)
+                if example:
+                    embed.add_field(name="Example", value=example, inline=False)
+
+            embed.set_footer(text="Fetched from dictionaryapi.dev")
+            await ctx.edit_original_response(content=None, embed=embed)
+
+        # Remove the return statement from the loop

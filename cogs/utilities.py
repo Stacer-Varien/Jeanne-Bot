@@ -12,6 +12,7 @@ from discord import (
 from aiohttp import ClientSession
 from discord.ext.commands import Cog, Bot, GroupCog
 from assets.components import ReportModal
+from assets.dictionary import dictionary
 from functions import Botban
 from config import WEATHER
 from discord.ui import View
@@ -57,6 +58,7 @@ class Weather_Group(GroupCog, name="weather"):
         super().__init__()
 
     @Jeanne.command(description="Get weather information on a city")
+    @Jeanne.checks.cooldown(1, 25, key=lambda i: (i.user.id))
     @Jeanne.describe(city="Add a city")
     async def city(self, ctx: Interaction, city: str):
         if Botban(ctx.user).check_botbanned_user() == True:
@@ -128,6 +130,7 @@ class Weather_Group(GroupCog, name="weather"):
         description="Get weather information on a city but with a ZIP code and Country code"
     )
     @Jeanne.describe(zip_code="Add a ZIP code", country_code="Add a country code")
+    @Jeanne.checks.cooldown(1, 25, key=lambda i: (i.user.id))
     async def zipcode(self, ctx: Interaction, zip_code: str, country_code: str):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
@@ -191,6 +194,19 @@ class Weather_Group(GroupCog, name="weather"):
                     )
                     await ctx.followup.send(embed=embed)
 
+    @city.error
+    async def city_error(self,ctx:Interaction, error:Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandOnCooldown):
+            embed=Embed(color=Color.red())
+            embed.description="Woah, slow down! Give the command a rest.\n\nYou can try again after `{} seconds`".format(round(error.retry_after))
+            await ctx.followup.send(embed=embed)
+
+    @zipcode.error
+    async def city_error(self,ctx:Interaction, error:Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandOnCooldown):
+            embed=Embed(color=Color.red())
+            embed.description="Woah, slow down! Give the command a rest.\n\nYou can try again after `{} seconds`".format(round(error.retry_after))
+            await ctx.followup.send(embed=embed)
 
 class Embed_Group(GroupCog, name="embed"):
     def __init__(self, bot: Bot) -> None:
@@ -382,6 +398,9 @@ class slashutilities(Cog):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
             return
+        if language==None:
+            language=None
+        await dictionary(ctx, word, language)
 
 async def setup(bot: Bot):
     await bot.add_cog(Weather_Group(bot))
