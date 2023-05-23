@@ -13,5 +13,5 @@ elif platform.system() == "Linux":  # If you are using a Linux Operating System
 
 # Required packages for the bot to use. Also upgrades it if a new release is found
 os.system(
-    "pip install -U discord requests python-dotenv humanfriendly datetime pillow py-expression-eval topggpy lxml git+https://github.com/Gorialis/jishaku@master "
+    "pip install -U discord requests python-dotenv humanfriendly datetime pillow py-expression-eval topggpy lxml reactionmenu git+https://github.com/Gorialis/jishaku@master"
 )
