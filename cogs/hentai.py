@@ -1,5 +1,4 @@
-from json import loads
-from random import choice, randint
+from random import randint
 from discord import Color, Embed, Interaction, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
 from requests import get

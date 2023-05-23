@@ -14,8 +14,6 @@ from assets.components import Heads_or_Tails
 from functions import Botban, Currency
 
 current_time = date.today()
-
-
 class Guess_Group(GroupCog, name="guess"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
