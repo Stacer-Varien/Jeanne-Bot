@@ -18,7 +18,7 @@ class logger(Cog):
         if not (logger_id := Logger(after.guild).get_message_logger()):
             return
 
-        channel = await self.bot.fetch_channel(logger_id)
+        channel = await self.bot.fetch_channel(int(logger_id))
 
         embed = Embed()
         embed.description = f"Message edited in {before.channel.mention}"
@@ -60,7 +60,7 @@ class logger(Cog):
                 return
 
             try:
-                channel = await self.bot.fetch_channel(logger)
+                channel = await self.bot.fetch_channel(int(logger))
                 embed = Embed()
                 embed.description = "Message deleted in {}".format(
                     message.channel.mention
