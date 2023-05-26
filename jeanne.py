@@ -1,6 +1,6 @@
 from config import TOKEN
 from discord.ext.commands import Bot, when_mentioned_or
-from discord import *
+from discord import Intents, AllowedMentions
 from os import listdir
 from assets.handler import handler
 
