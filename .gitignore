@@ -137,3 +137,4 @@ logging.db
 *.db
 cmd-invoke-errors.txt
 voter_data.json
+env

@@ -22,7 +22,7 @@ class welcomer(Cog):
             if welcomer == None:
                 return
 
-            if member.guild.id == welcomer[0]:
+            if member.guild.id == int(welcomer[0]):
                 channel=await member.guild.fetch_channel(int(welcomer[1]))
 
                 if Welcomer(member.guild).get_welcoming_msg() == None:
@@ -79,7 +79,7 @@ class welcomer(Cog):
             if leaver == None:
                 return
 
-            if member.guild.id == leaver[0]:
+            if member.guild.id == int(leaver[0]):
                 channel=await member.guild.fetch_channel(int(leaver[1]))
 
                 if Welcomer(member.guild).get_leaving_msg() == None:
@@ -113,7 +113,7 @@ class welcomer(Cog):
                     try:
                         content = json["content"]
                     except:
-                        return
+                        pass
 
                     try:
                         embed = Embed.from_dict(json["embeds"][0])
@@ -126,7 +126,6 @@ class welcomer(Cog):
                         )
                     except:
                         await channel.send(content=content)
-
 
 async def setup(bot: Bot):
     await bot.add_cog(welcomer(bot))
