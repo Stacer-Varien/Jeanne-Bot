@@ -357,7 +357,7 @@ class currency(Cog):
                 color=Color.random(),
             )
 
-            if datetime.today().weekday() > 5:
+            if datetime.today().weekday() >= 5:
                 daily.add_field(
                     name="Rewards (weekend):", value=f"You received 200 {qp}"
                 )
