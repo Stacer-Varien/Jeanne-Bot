@@ -1,7 +1,6 @@
 from random import randint
 from discord import Color, Embed, Interaction, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
-from requests import get
 from functions import Botban, Hentai
 from typing import Literal, Optional
 from assets.components import ReportContent, ReportSelect

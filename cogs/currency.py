@@ -3,7 +3,6 @@ from discord import (
     ButtonStyle,
     Color,
     Embed,
-    Message,
     app_commands as Jeanne,
     Interaction,
     ui,
