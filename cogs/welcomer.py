@@ -11,121 +11,111 @@ def replace_all(text: str, dic: dict):
     return text
 
 
-class welcomer(Cog):
+class WelcomerCog(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
     @Cog.listener()
     async def on_member_join(self, member: Member):
-            welcomer=Logger(member.guild.id).get_welcomer()
+        welcomer = Logger(member.guild.id).get_welcomer()
 
-            if welcomer == None:
-                return
+        if welcomer is None:
+            return
 
-            if member.guild.id == int(welcomer[0]):
-                channel=await member.guild.fetch_channel(int(welcomer[1]))
+        if member.guild.id == int(welcomer[0]):
+            channel = self.bot.get_channel(int(welcomer[1]))
 
-                if Welcomer(member.guild).get_welcoming_msg() == None:
-                    welcome = Embed(
-                        description=f"Hi {member} and welcome to {member.guild.name}!",
-                        color=Color.random(),
-                    ).set_thumbnail(url=member.display_avatar)
-                    await channel.send(embed=welcome)
-                else:
-                    humans = len(
-                        [member for member in member.guild.members if not member.bot]
+            if Welcomer(member.guild).get_welcoming_msg() is None:
+                welcome = Embed(
+                    description=f"Hi {member} and welcome to {member.guild.name}!",
+                    color=Color.random(),
+                ).set_thumbnail(url=member.display_avatar.url)
+                await channel.send(embed=welcome)
+            else:
+                humans = len(
+                    [member for member in member.guild.members if not member.bot]
+                )
+                parameters = OrderedDict(
+                    [
+                        ("%member%", str(member)),
+                        ("%pfp%", str(member.display_avatar.url)),
+                        ("%server%", str(member.guild.name)),
+                        ("%mention%", str(member.mention)),
+                        ("%name%", str(member.name)),
+                        ("%members%", str(member.guild.member_count)),
+                        ("%humans%", str(humans)),
+                        ("%icon%", str(member.guild.icon.url)),
+                    ]
+                )
+
+                json_data = loads(
+                    replace_all(
+                        Welcomer(member.guild).get_welcoming_msg(), parameters
                     )
-                    parameters = OrderedDict(
-                        [
-                            ("%member%", str(member)),
-                            ("%pfp%", str(member.display_avatar)),
-                            ("%server%", str(member.guild.name)),
-                            ("%mention%", str(member.mention)),
-                            ("%name%", str(member.name)),
-                            ("%members%", str(member.guild.member_count)),
-                            ("%humans%", str(humans)),
-                            ("%icon%", str(member.guild.icon)),
-                        ]
+                )
+
+                content = json_data.get("content")
+
+                try:
+                    embed = Embed.from_dict(json_data["embeds"][0])
+                    await channel.send(
+                        content=content,
+                        embed=embed,
+                        allowed_mentions=AllowedMentions(everyone=False, users=True),
                     )
-
-                    json = loads(
-                        replace_all(
-                            Welcomer(member.guild).get_welcoming_msg(parameters)
-                        )
-                    )
-
-                    try:
-                        content = json["content"]
-                    except:
-                        pass
-
-                    try:
-                        embed = Embed.from_dict(json["embeds"][0])
-                        await channel.send(
-                            content=content,
-                            embed=embed,
-                            allowed_mentions=AllowedMentions(
-                                everyone=False, users=True
-                            ),
-                        )
-                    except:
-                        await channel.send(content=content)
-
+                except:
+                    await channel.send(content=content)
 
     @Cog.listener()
     async def on_member_remove(self, member: Member):
-            leaver=Logger(member.guild.id).get_leaver()
+        leaver = Logger(member.guild.id).get_leaver()
 
-            if leaver == None:
-                return
+        if leaver is None:
+            return
 
-            if member.guild.id == int(leaver[0]):
-                channel=await member.guild.fetch_channel(int(leaver[1]))
+        if member.guild.id == int(leaver[0]):
+            channel = self.bot.get_channel(int(leaver[1]))
 
-                if Welcomer(member.guild).get_leaving_msg() == None:
-                    leave = Embed(
-                        description=f"{member} left the server", color=Color.random()
-                    ).set_thumbnail(url=member.display_avatar)
-                    await channel.send(embed=leave)
-                else:
-                    humans = len(
-                        [member for member in member.guild.members if not member.bot]
+            if Welcomer(member.guild).get_leaving_msg() is None:
+                leave = Embed(
+                    description=f"{member} left the server", color=Color.random()
+                ).set_thumbnail(url=member.display_avatar.url)
+                await channel.send(embed=leave)
+            else:
+                humans = len(
+                    [member for member in member.guild.members if not member.bot]
+                )
+                parameters = OrderedDict(
+                    [
+                        ("%member%", str(member)),
+                        ("%pfp%", str(member.display_avatar.url)),
+                        ("%server%", str(member.guild.name)),
+                        ("%mention%", str(member.mention)),
+                        ("%name%", str(member.name)),
+                        ("%members%", str(member.guild.member_count)),
+                        ("%humans%", str(humans)),
+                        ("%icon%", str(member.guild.icon.url)),
+                    ]
+                )
+
+                json_data = loads(
+                    replace_all(
+                        Welcomer(member.guild).get_leaving_msg(), parameters
                     )
-                    parameters = OrderedDict(
-                        [
-                            ("%member%", str(member)),
-                            ("%pfp%", str(member.display_avatar)),
-                            ("%server%", str(member.guild.name)),
-                            ("%mention%", str(member.mention)),
-                            ("%name%", str(member.name)),
-                            ("%members%", str(member.guild.member_count)),
-                            ("%humans%", str(humans)),
-                            ("%icon%", str(member.guild.icon)),
-                        ]
+                )
+
+                content = json_data.get("content")
+
+                try:
+                    embed = Embed.from_dict(json_data["embeds"][0])
+                    await channel.send(
+                        content=content,
+                        embed=embed,
+                        allowed_mentions=AllowedMentions(everyone=False, users=True),
                     )
+                except:
+                    await channel.send(content=content)
 
-                    json = loads(
-                        replace_all(
-                            Welcomer(member.guild).get_leaving_msg(), parameters
-                        )
-                    )
-
-                    try:
-                        content = json["content"]
-                    except:
-                        pass
-
-                    try:
-                        embed = Embed.from_dict(json["embeds"][0])
-                        await channel.send(
-                            content=content,
-                            embed=embed,
-                            allowed_mentions=AllowedMentions(
-                                everyone=False, users=True
-                            ),
-                        )
-                    except:
-                        await channel.send(content=content)
 
 async def setup(bot: Bot):
-    await bot.add_cog(welcomer(bot))
+    await bot.add_cog(WelcomerCog(bot))
