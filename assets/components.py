@@ -17,7 +17,6 @@ from json import loads
 from config import WEBHOOK
 from functions import Levelling, Welcomer
 
-
 def replace_all(text: str, dic: dict):
     for i, j in dic.items():
         text = text.replace(i, j)
@@ -402,7 +401,7 @@ class ReportSelect(ui.View):
 
 class ReportContent(ui.View):
     def __init__(self, link: str):
-        super().__init__()
+        super().__init__(timeout=180)
         self.link = link
 
     @ui.button(label="Report Content", style=ButtonStyle.grey)
