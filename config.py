@@ -1,3 +1,5 @@
+"""Everything such as APIs and tokens for the bot, commands and functions to run on"""
+
 from os import getenv
 from dotenv import load_dotenv
 from sqlite3 import connect
