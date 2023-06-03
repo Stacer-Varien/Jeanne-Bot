@@ -3,8 +3,8 @@ from json import loads
 from random import choice, randint
 from humanfriendly import parse_timespan
 from discord import Embed, Color, Emoji, Guild, Member, TextChannel, User
-from requests import get
-from config import db
+from requests import get, post
+from config import db, TINYURL
 from typing import Optional
 
 current_time = date.today()
@@ -54,13 +54,11 @@ class Botban:
         if global_xp_data == None:
             pass
         else:
-
             db.execute("DELETE * FROM globalxpData WHERE user_id = ?", (self.user.id,))
 
         if inventory_data == None:
             pass
         else:
-
             db.execute(
                 "DELETE FROM userWallpaperInventory WHERE user_id = ?", (self.user.id,)
             )
@@ -68,7 +66,6 @@ class Botban:
         if bank_data == None:
             pass
         else:
-
             db.execute("DELETE FROM bankData WHERE user_id = ?", (self.user.id,))
 
         db.commit()
@@ -221,7 +218,6 @@ class Inventory:
             db.commit()
 
     def add_user_wallpaper(self, item_id: int):
-
         self.deselect_wallpaper()
 
         wallpaper = self.get_wallpaper(item_id)
@@ -241,7 +237,6 @@ class Inventory:
         Currency(self.user).remove_qp(1000)
 
     def add_user_custom_wallpaper(self, name: str, link: str):
-
         self.deselect_wallpaper()
 
         db.execute(
@@ -836,7 +831,6 @@ class Moderation:
         self.member = member
 
     def warn_user(self, moderator: int, reason: str, warn_id: int, date: int):
-
         db.execute(
             "INSERT OR IGNORE INTO warnData (guild_id, user_id, moderator_id, reason, warn_id, date) VALUES (?,?,?,?,?,?)",
             (
@@ -949,7 +943,6 @@ class Moderation:
         return data
 
     def softban_member(self, ends: str = None):
-
         if ends == None:
             ends = 99999999999  # infinite value for now
         else:
@@ -998,13 +991,11 @@ class Logger:
         ).fetchone()
         return data
 
-
     def get_welcomer(self):
         data = db.execute(
             "SELECT * FROM welcomerData where guild_id = ?", (self.server.id,)
         ).fetchone()
         return data
-
 
     def get_leaver(self):
         data = db.execute(
@@ -1059,7 +1050,6 @@ class Logger:
                 ),
             )
         db.commit()
-
 
     def remove_messagelog(self):
         cur = db.cursor()
@@ -1206,7 +1196,7 @@ class Hentai:
     def __init__(self, plus: Optional[bool] = None) -> None:
         self.plus = plus
 
-    def add_blacklisted_link(self, link:str):
+    def add_blacklisted_link(self, link: str):
         db.execute("INSERT OR IGNORE INTO hentaiBlacklist (links) VALUES (?)", (link,))
         db.execute()
 
@@ -1219,13 +1209,11 @@ class Hentai:
             for i in data:
                 return i
 
-
     def gelbooru(self, rating: Optional[str] = None, tag: Optional[str] = None):
-        bl=self.get_blacklisted_links()
+        bl = self.get_blacklisted_links()
         if rating == None:
             rating = ["questionable", "explicit"]
             rating = choice(rating)
-
 
         if tag == None:
             gelbooru_api = f"https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=rating:{rating}+-loli+-shota+-cub"
@@ -1239,9 +1227,9 @@ class Hentai:
         response = get(gelbooru_api)
         ret = loads(response.text)
 
-        filtered_ret=[]
+        filtered_ret = []
         for dictionary in ret["post"]:
-            if dictionary['file_url'] !=bl[0]:
+            if dictionary["file_url"] != bl[0]:
                 filtered_ret.append(dictionary)
 
         if self.plus == True:
@@ -1250,36 +1238,30 @@ class Hentai:
             return str(filtered_ret[randint(1, 100) - 1]["file_url"])
 
     def yandere(self, rating: Optional[str] = None, tag: Optional[str] = None):
+        blacklisted_links = self.get_blacklisted_links()
 
-        bl=self.get_blacklisted_links()
-        if rating == None:
-            rating = ["questionable", "explicit"]
-            rating = choice(rating)
+        if rating is None:
+            rating = choice(["questionable", "explicit"])
 
-        if tag == None:
-            yandere_api = get(
-                f"https://yande.re/post.json?limit=100&shown:true&tags=rating:{rating}+-loli+-shota+-cub"
-            ).json()
+        tag_query = f"rating:{rating}+-loli+-shota+-cub"
+        if tag:
+            tag_query += f"+{tag.replace(' ', '_')}"
 
-        else:
-            formated_tag = tag.replace(" ", "_")
-            yandere_api = get(
-                f"https://yande.re/post.json?limit=100&shown:true&tags=rating:{rating}+-loli+-shota+-cub+"
-                + formated_tag
-            ).json()
+        yandere_api = get(
+            f"https://yande.re/post.json?limit=100&shown:true&tags={tag_query}"
+        ).json()
 
-        filtered_ret = []
-        for dictionary in yandere_api:
-            if dictionary['file_url'] != bl[0]:
-                filtered_ret.append(dictionary)
+        filtered_ret = [
+            post for post in yandere_api if post["file_url"] not in blacklisted_links
+        ]
 
-        if self.plus == True:
+        if self.plus:
             return filtered_ret
         else:
             return str(choice(filtered_ret)["file_url"])
 
     def konachan(self, rating: Optional[str] = None, tag: Optional[str] = None):
-        bl=self.get_blacklisted_links()
+        bl = self.get_blacklisted_links()
         if rating == None:
             rating = ["questionable", "explicit"]
             rating = choice(rating)
@@ -1297,14 +1279,14 @@ class Hentai:
             ).json()
         filtered_ret = []
         for dictionary in konachan_api:
-            if dictionary['file_url'] != bl[0]:
+            if dictionary["file_url"] != bl[0]:
                 filtered_ret.append(dictionary)
         if self.plus == True:
             return konachan_api
         else:
             return str(konachan_api[randint(1, 100) - 1]["file_url"])
 
-    def hentai(self, rating:Optional[str]=None):
+    def hentai(self, rating: Optional[str] = None):
         if rating == None:
             rating = ["questionable", "explicit"]
             rating = choice(rating)
@@ -1327,4 +1309,17 @@ class Hentai:
 
         elif hentai == konachan_image:
             source = "Konachan"
-        return hentai,source
+        return hentai, source
+
+
+def shorten_url(url: str):
+    api_url = "http://tinyurl.com/api-create.php"
+
+    params = {"url": url}
+
+    response = get(api_url, params=params)
+    if response.status_code == 200:
+        short_url = response.text
+        return short_url
+    else:
+        return None
