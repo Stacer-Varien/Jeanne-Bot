@@ -1,10 +1,11 @@
 from datetime import date, datetime, timedelta
 from json import loads
 from random import choice, randint
+import time
 from humanfriendly import parse_timespan
 from discord import Embed, Color, Emoji, Guild, Member, TextChannel, User
-from requests import get, post
-from config import db, TINYURL
+from requests import get
+from config import db
 from typing import Optional
 
 current_time = date.today()
@@ -1320,6 +1321,7 @@ def shorten_url(url: str):
     response = get(api_url, params=params)
     if response.status_code == 200:
         short_url = response.text
+        time.sleep(1)
         return short_url
     else:
         return None
