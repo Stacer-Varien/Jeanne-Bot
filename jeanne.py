@@ -1,14 +1,15 @@
 from discord.ext.commands import Bot, when_mentioned_or
 from discord import Intents, AllowedMentions
 from os import listdir
-from assets.handler import handler
 from config import TOKEN
+from assets.handler import handler
+
 
 class Jeanne(Bot):
     async def setup_hook(self):
         for filename in listdir("./cogs"):
             if filename.endswith(".py"):
-                self.load_extension(f"cogs.{filename[:-3]}")
+                await self.load_extension(f"cogs.{filename[:-3]}")
                 print(f"{filename} loaded")
             else:
                 print(f"Unable to load {filename[:-3]}")
@@ -38,4 +39,4 @@ async def on_ready():
     print("Bot ID: {}".format(bot.user.id))
 
 
-bot.run(TOKEN, log_handler=handler)
+bot.run(TOKEN, log_handler=handler())
