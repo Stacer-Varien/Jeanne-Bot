@@ -27,9 +27,9 @@ class TopGG(Cog):
             print(f"Failed to post server count\n{e.__class__.__name__}: {e}")
 
     @Cog.listener()
-    async def on_dbl_vote(self, data):
-        if data["type"] == "upvote":
-            voter = await self.bot.fetch_user(data["user"])
+    async def on_dbl_vote(self, data:dict):
+        if str(data["type"]) == "upvote":
+            voter = await self.bot.fetch_user(int(data["user"]))
             if Botban(voter).check_botbanned_user():
                 return
 
@@ -40,11 +40,6 @@ class TopGG(Cog):
 
             Currency().add_qp(credits)
             print(f"Received a vote:\n{data}")
-            with open("voter_data.json", "r") as f:
-                json_dict = "".join(f.readlines())
-            data.update(loads(json_dict))
-            dumps(data)
-
 
 async def setup(bot: Bot):
     await bot.add_cog(TopGG(bot))
