@@ -63,40 +63,54 @@ class nsfw(Cog):
             images = [image[randint(1, 100) - 1] for _ in range(4)]
             view = ReportSelect(*[img["file_url"] for img in images])
 
-            if "mp4" in image:
-                media = [img["file_url"] for img in images]
+            vids = [i for i in images if "mp4" in i["file_url"]]
+            media = [j["file_url"] for j in vids]
+
+            if media:
                 await ctx.followup.send("\n".join(media), view=view)
             else:
                 color = Color.random()
                 embeds = [
                     Embed(color=color, url="https://gelbooru.com").set_image(
                         url=img["file_url"]
-                    )
+                    ).set_footer(text="Fetched from Gelbooru • Credits must go to the artist")
                     for img in images
                 ]
                 await ctx.followup.send(embeds=embeds, view=view)
         else:
-            view = ReportContent(image)
-            if image.endswith("mp4"):
-                await ctx.followup.send(image, view=view)
-            else:
-                embed = (
-                    Embed(color=Color.purple())
-                    .set_image(url=image)
-                    .set_footer(
-                        text="Fetched from Gelbooru • Credits must go to the artist"
+            try:
+                view = ReportContent(image)
+                if image.endswith("mp4"):
+                    await ctx.followup.send(image, view=view)
+                else:
+                    embed = (
+                        Embed(color=Color.purple())
+                        .set_image(url=image)
+                        .set_footer(
+                            text="Fetched from Gelbooru • Credits must go to the artist"
+                        )
                     )
-                )
-                await ctx.followup.send(embed=embed, view=view)
+                    await ctx.followup.send(embed=embed, view=view)
+            except Exception:
+                if image.endswith("mp4"):
+                    await ctx.followup.send(image)
+                else:
+                    embed = (
+                        Embed(color=Color.purple())
+                        .set_image(url=image)
+                        .set_footer(
+                            text="Fetched from Gelbooru • Credits must go to the artist\nIf you see an illegal content, please use /botreport and attach the link when reporting"
+                        )
+                    )
+                    await ctx.followup.send(embed=embed)
 
     @gelbooru.error
     async def gelbooru_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-        if isinstance(error, Jeanne.CommandInvokeError):
-            if IndexError or KeyError:
-                no_tag = Embed(
-                    description="The tag could not be found", color=Color.red()
-                )
-                await ctx.channel.send(embed=no_tag)
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, (IndexError, KeyError)
+        ):
+            no_tag = Embed(description="The tag could not be found", color=Color.red())
+            await ctx.followup.send(embed=no_tag)
 
     @Jeanne.command(description="Get a random hentai from Yande.re", nsfw=True)
     @Jeanne.describe(
@@ -112,83 +126,56 @@ class nsfw(Cog):
         plus: Optional[bool] = None,
     ) -> None:
         await ctx.response.defer(thinking=False)
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         if tag == "02":
             await ctx.followup.send(
                 "Tag has been blacklisted due to it returning extreme content and guro"
             )
+            return
 
-        else:
-            image = Hentai(plus).yandere(rating, tag)
+        image = Hentai(plus).yandere(rating, tag)
 
-            if plus == True:
-                image1 = image[randint(1, 100) - 1]
-                image2 = image[randint(1, 100) - 1]
-                image3 = image[randint(1, 100) - 1]
-                image4 = image[randint(1, 100) - 1]
-                view = ReportSelect(
-                    shorten_url(str(image1["file_url"])),
-                    shorten_url(str(image2["file_url"])),
-                    shorten_url(str(image3["file_url"])),
-                    shorten_url(str(image4["file_url"])),
-                )
-                color = Color.random()
-                embed1 = (
-                    Embed(color=color, url="https://yande.re")
-                    .set_image(url=image1["file_url"])
-                    .set_footer(
-                        text="Fetched from Yande.re • Credits must go to the artist"
-                    )
-                )
-                embed2 = Embed(color=color, url="https://yande.re").set_image(
-                    url=image2["file_url"]
-                )
-                embed3 = Embed(color=color, url="https://yande.re").set_image(
-                    url=image3["file_url"]
-                )
-                embed4 = Embed(color=color, url="https://yande.re").set_image(
-                    url=image4["file_url"]
-                )
-                embeds = [embed1, embed2, embed3, embed4]
-                try:
-                    embed1.set_footer(
-                        text="Fetched from Yande.re • Credits must go to the artist"
-                    )
-                    await ctx.followup.send(embeds=embeds, view=view)
-                except:
-                    embed1.set_footer(
-                        text="Fetched from Yande.re • Credits must go to the artist\nIfyou see an illegal content, please use /botreport and attach the link when reporting"
-                    )
-                    await ctx.followup.send(embeds=embeds)
-            else:
-                yandere = Embed(color=Color.random())
-                yandere.set_image(url=image)
-                yandere.set_footer(
+        if plus:
+            images = [image[randint(1, 100) - 1] for _ in range(4)]
+            color = Color.random()
+            embeds = [
+                Embed(color=color, url="https://yande.re")
+                .set_image(url=shorten_url(str(img["file_url"])))
+                .set_footer(
                     text="Fetched from Yande.re • Credits must go to the artist"
                 )
-                try:
-                    yandere.set_footer(
-                        text="Fetched from Yande.re • Credits must go to the artist"
-                    )
-                    view = ReportContent(shorten_url(str(image)))
-                    await ctx.followup.send(embed=yandere, view=view)
-                except:
-                    yandere.set_footer(
-                        text="Fetched from Yande.re • Credits must go to the artist\nIfyou see an illegal content, please use /botreport and attach the link when reporting"
-                    )
-
-                    await ctx.followup.send(embed=yandere)
+                for img in images
+            ]
+            footer_text = "Fetched from Yande.re • Credits must go to the artist"
+            try:
+                await ctx.followup.send(embeds=embeds, view=ReportSelect(*embeds))
+            except:
+                footer_text += "\nIf you see an illegal content, please use /botreport and attach the link when reporting"
+                for embed in embeds:
+                    embed.set_footer(text=footer_text)
+                await ctx.followup.send(embeds=embeds)
+        else:
+            color = Color.random()
+            embed = Embed(color=color, url="https://yande.re")
+            embed.set_image(url=shorten_url(str(image)))
+            footer_text = "Fetched from Yande.re • Credits must go to the artist"
+            try:
+                embed.set_footer(text=footer_text)
+                await ctx.followup.send(embed=embed, view=ReportContent(embed))
+            except:
+                footer_text += "\nIf you see an illegal content, please use /botreport and attach the link when reporting"
+                embed.set_footer(text=footer_text)
+                await ctx.followup.send(embed=embed)
 
     @yandere.error
     async def yandere_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-        if isinstance(error, Jeanne.CommandInvokeError):
-            if IndexError or KeyError:
-                no_tag = Embed(
-                    description="The tag could not be found", color=Color.red()
-                )
-                await ctx.followup.send(embed=no_tag)
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, (IndexError, KeyError)
+        ):
+            no_tag = Embed(description="The tag could not be found", color=Color.red())
+            await ctx.followup.send(embed=no_tag)
 
     @Jeanne.command(description="Get a random hentai from Konachan")
     @Jeanne.describe(
@@ -204,74 +191,56 @@ class nsfw(Cog):
         plus: Optional[bool] = None,
     ) -> None:
         await ctx.response.defer(thinking=False)
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
+            return
+
+        if tag == "02":
+            await ctx.followup.send(
+                "Tag has been blacklisted due to it returning extreme content and guro"
+            )
             return
 
         image = Hentai(plus).konachan(rating, tag)
 
-        if plus == True:
-            image1 = image[randint(1, 100) - 1]
-            image2 = image[randint(1, 100) - 1]
-            image3 = image[randint(1, 100) - 1]
-            image4 = image[randint(1, 100) - 1]
-            view = ReportSelect(
-                shorten_url(str(image1["file_url"])),
-                shorten_url(str(image2["file_url"])),
-                shorten_url(str(image3["file_url"])),
-                shorten_url(str(image4["file_url"])),
-            )
+        if plus:
+            images = [image[randint(1, 100) - 1] for _ in range(4)]
             color = Color.random()
-            embed1 = (
+            embeds = [
                 Embed(color=color, url="https://konachan.com")
-                .set_image(url=image1["file_url"])
+                .set_image(url=shorten_url(str(img["file_url"])))
                 .set_footer(
                     text="Fetched from Konachan • Credits must go to the artist"
                 )
-            )
-            embed2 = Embed(color=color, url="https://konachan.com").set_image(
-                url=image2["file_url"]
-            )
-            embed3 = Embed(color=color, url="https://konachan.com").set_image(
-                url=image3["file_url"]
-            )
-            embed4 = Embed(color=color, url="https://konachan.com").set_image(
-                url=image4["file_url"]
-            )
-            embeds = [embed1, embed2, embed3, embed4]
+                for img in images
+            ]
+            footer_text = "Fetched from Konachan • Credits must go to the artist"
             try:
-                embed1.set_footer(
-                    text="Fetched from Konachan • Credits must go to the artist"
-                )
-                await ctx.followup.send(embeds=embeds, view=view)
+                await ctx.followup.send(embeds=embeds, view=ReportSelect(*embeds))
             except:
-                embed1.set_footer(
-                    text="Fetched from Konachan • Credits must go to the artist\nIfyou see an illegal content, please use /botreport and attach the link when reporting"
-                )
+                footer_text += "\nIf you see an illegal content, please use /botreport and attach the link when reporting"
+                for embed in embeds:
+                    embed.set_footer(text=footer_text)
                 await ctx.followup.send(embeds=embeds)
         else:
-            konachan = Embed(color=Color.random())
-            konachan.set_image(url=image)
-
+            color = Color.random()
+            embed = Embed(color=color, url="https://konachan.com")
+            embed.set_image(url=shorten_url(str(image)))
+            footer_text = "Fetched from Konachan • Credits must go to the artist"
             try:
-                konachan.set_footer(
-                    text="Fetched from Konachan • Credits must go to the artist"
-                )
-                view = ReportContent(shorten_url(str(image)))
+                embed.set_footer(text=footer_text)
+                await ctx.followup.send(embed=embed, view=ReportContent(embed))
             except:
-                konachan.set_footer(
-                    text="Fetched from Konachan • Credits must go to the artist\nIfyou see an illegal content, please use /botreport and attach the link when reporting"
-                )
-                view = None
-            await ctx.followup.send(embed=konachan, view=view)
+                footer_text += "\nIf you see an illegal content, please use /botreport and attach the link when reporting"
+                embed.set_footer(text=footer_text)
+                await ctx.followup.send(embed=embed)
 
     @konachan.error
     async def konachan_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-        if isinstance(error, Jeanne.CommandInvokeError):
-            if IndexError or KeyError:
-                no_tag = Embed(
-                    description="The tag could not be found", color=Color.red()
-                )
-                await ctx.followup.send(embed=no_tag)
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, (IndexError, KeyError)
+        ):
+            no_tag = Embed(description="The tag could not be found", color=Color.red())
+            await ctx.followup.send(embed=no_tag)
 
 
 async def setup(bot: Bot):
