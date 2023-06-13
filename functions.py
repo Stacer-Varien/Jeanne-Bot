@@ -994,7 +994,7 @@ class Logger:
 
     def get_welcomer(self):
         data = db.execute(
-            "SELECT * FROM welcomerData where guild_id = ?", (self.server.id,)
+            "SELECT channel_id FROM welcomerData where guild_id = ?", (self.server.id,)
         ).fetchone()
         return data
 
