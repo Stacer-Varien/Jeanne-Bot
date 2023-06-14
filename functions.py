@@ -980,28 +980,25 @@ class Logger:
         modlog_channel_query = db.execute(
             "SELECT channel_id FROM modlogData WHERE guild_id = ?", (self.server.id,)
         ).fetchone()
+        db.commit()
 
         if modlog_channel_query == None:
             return None
         else:
             return modlog_channel_query[0]
 
-    def get_report_channel(self):
-        data = db.execute(
-            "SELECT channel_id FROM reportData WHERE guild_id = ?", (self.server.id,)
-        ).fetchone()
-        return data
-
     def get_welcomer(self):
         data = db.execute(
-            "SELECT channel_id FROM welcomerData where guild_id = ?", (self.server.id,)
+            "SELECT * FROM welcomerData where guild_id = ?", (self.server.id,)
         ).fetchone()
+        db.commit()
         return data
 
     def get_leaver(self):
         data = db.execute(
             "SELECT * FROM leaverData where guild_id = ?", (self.server.id,)
         ).fetchone()
+        db.commit()
         return data
 
     def set_message_logger(self, channel: TextChannel):
@@ -1058,6 +1055,7 @@ class Logger:
             "SELECT channel FROM messageLogData WHERE server = ?", (self.server.id,)
         )
         result = cur.fetchone()
+        db.commit()
 
         if result == None:
             return False
@@ -1076,21 +1074,15 @@ class Welcomer:
         data = db.execute(
             "SELECT welcoming FROM welcomerMsgData WHERE server = ?", (self.server.id,)
         ).fetchone()
-
-        if data == None or 0:
-            return None
-        else:
-            return data[0]
+        db.commit()
+        return data[0] if data else None
 
     def get_leaving_msg(self):
         data = db.execute(
             "SELECT leaving FROM welcomerMsgData WHERE server = ?", (self.server.id,)
         ).fetchone()
-
-        if data == None or 0:
-            return None
-        else:
-            return data[0]
+        db.commit()
+        return data[0] if data else None
 
     def remove_welcomer_msg(self):
         data = db.execute(
@@ -1199,7 +1191,7 @@ class Hentai:
 
     def add_blacklisted_link(self, link: str):
         db.execute("INSERT OR IGNORE INTO hentaiBlacklist (links) VALUES (?)", (link,))
-        db.execute()
+        db.commit()
 
     def get_blacklisted_links(self):
         data = db.execute("SELECT links FROM hentaiBlacklist").fetchall()
