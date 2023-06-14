@@ -24,8 +24,8 @@ class nsfw(Cog):
         hentai, source = Hentai().hentai(rating)
 
         if hentai.endswith("mp4"):
-            view = ReportContent(hentai)
-            await ctx.followup.send(hentai)
+            view = ReportContent(shorten_url(hentai))
+            await ctx.followup.send(hentai, view=view)
 
         else:
             embed = (
@@ -37,7 +37,7 @@ class nsfw(Cog):
                     )
                 )
             )
-            view = ReportContent(hentai)
+            view = ReportContent(shorten_url(hentai))
             await ctx.followup.send(embed=embed, view=view)
 
     @Jeanne.command(description="Get a random media content from Gelbooru", nsfw=True)
