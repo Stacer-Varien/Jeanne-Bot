@@ -21,7 +21,7 @@ class TopGG(Cog):
     async def update_stats(self):
         try:
             print(
-                f"Posted server count ({self.topggpy.guild_count()}) at {datetime.now().strftime('%H:%M')}"
+                f"Posted server count ({len(self.bot.guilds)}) at {datetime.now().strftime('%H:%M')}"
             )
         except Exception as e:
             print(f"Failed to post server count\n{e.__class__.__name__}: {e}")
