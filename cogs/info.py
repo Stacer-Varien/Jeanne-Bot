@@ -22,7 +22,7 @@ start_time = time()
 class slashinfo(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.bot_version = "4.2.4"
+        self.bot_version = "4.2.4a"
 
     @Jeanne.command(description="See the bot's status from development to now")
     async def stats(self, ctx: Interaction):
@@ -121,7 +121,7 @@ class slashinfo(Cog):
 
             if banner == True:
                 userinfo.set_image(url=user.banner)
-                await ctx.followup.send(embed=embeds)
+                await ctx.followup.send(embeds=embeds)
             else:
                 await ctx.followup.send(embeds=embeds)
 
@@ -249,9 +249,9 @@ class slashinfo(Cog):
             description=f"**{member}'s Avatar**",
             url="https://discordapp.com",
             color=color,
-            type='image'
+            type="image",
         )
-        guildav = Embed(url="https://discordapp.com", color=color, type='image')
+        guildav = Embed(url="https://discordapp.com", color=color, type="image")
 
         if member.guild_avatar != None and member.avatar == None:
             guildav.set_image(url=member.avatar)
