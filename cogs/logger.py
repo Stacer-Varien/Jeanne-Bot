@@ -9,10 +9,7 @@ class LoggerCog(Cog):
 
     @Cog.listener()
     async def on_message_edit(self, before: Message, after: Message):
-        if not before.guild:
-            return
-
-        if before.author.bot:
+        if not before.guild or before.author.bot:
             return
 
         logger_id = Logger(after.guild).get_message_logger()
@@ -22,9 +19,10 @@ class LoggerCog(Cog):
 
         channel = self.bot.get_channel(int(logger_id))
 
-        embed = Embed()
-        embed.description = f"Message edited in {before.channel.mention}"
-        embed.color = Color.random()
+        embed = Embed(
+            description=f"Message edited in {before.channel.mention}",
+            color=Color.random(),
+        )
 
         has_old_content = bool(before.content)
         has_new_content = bool(after.content)
@@ -60,24 +58,23 @@ class LoggerCog(Cog):
 
         try:
             channel = self.bot.get_channel(int(logger_id))
-            embed = Embed()
-            embed.description = f"Message deleted in {message.channel.mention}"
-            embed.color = Color.random()
+            embed = Embed(
+                description=f"Message deleted in {message.channel.mention}",
+                color=Color.random(),
+            )
             attachments = bool(message.attachments)
             content = bool(message.content)
 
-            if content and not attachments:
+            if content:
                 value = message.content[:1020] + "..." if len(message.content) >= 1024 else message.content
                 embed.add_field(name="Message", value=value, inline=False)
-            elif content and attachments:
-                value = message.content[:1020] + "..." if len(message.content) >= 1024 else message.content
-                embed.add_field(name="Message", value=value, inline=False)
-                embed.set_image(
-                    url=message.attachments[0].url.replace(
-                        "cdn.discordapp.com", "media.discordapp.net"
+                if attachments:
+                    embed.set_image(
+                        url=message.attachments[0].url.replace(
+                            "cdn.discordapp.com", "media.discordapp.net"
+                        )
                     )
-                )
-            elif attachments and not content:
+            elif attachments:
                 embed.add_field(
                     name="Image",
                     value="No messages, only media. If you can't see anything, it was a video file",
@@ -101,3 +98,4 @@ class LoggerCog(Cog):
 
 async def setup(bot: Bot):
     await bot.add_cog(LoggerCog(bot))
+
