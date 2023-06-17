@@ -648,10 +648,27 @@ class moderation(Cog):
             await ctx.followup.send(embed=embed)
             return
 
+        banned_ids = {entry.user.id async for entry in ctx.guild.bans()}
+        author_id = ctx.user.id
+        guild_owner_id = ctx.guild.owner.id
+
+        to_ban_ids = [
+            user_id
+            for user_id in ids
+            if user_id not in banned_ids
+            and user_id != str(author_id)
+            and user_id != str(guild_owner_id)
+        ]
+
+        if not to_ban_ids:
+            embed = Embed(description="No users can be banned.", color=Color.red())
+            await ctx.followup.send(embed=embed)
+            return
+
         view = Confirmation(ctx.user)
         alert = Embed(
             title="BEWARE",
-            description="The developer is **NOT** responsible in any way or form if you mess up, even if it was misused (but report anyone misusing them to the developer so they can be banned).\n\nDo you want to proceed?",
+            description="The developer is **NOT** responsible in any way or form if you mess up, even if it was misused.\n\nDo you want to proceed?",
             color=Color.red(),
         )
         await ctx.followup.send(embed=alert, view=view)
@@ -666,34 +683,26 @@ class moderation(Cog):
             )
             await ctx.edit_original_response(embed=em, view=None)
 
-            
-            banned_ids = [entry.user.id async for entry in ctx.guild.bans()]
-
             ban_count = 0
             failed_ids = []
+            banned=[]
 
-            for user_id in ids:
-                if user_id in banned_ids:
-                    continue
-
-                embed=Embed()
-                embed.description = ""
-                embed.color=Color.red()
-
+            for user_id in to_ban_ids:
                 try:
                     user = await self.bot.fetch_user(int(user_id))
                     await ctx.guild.ban(user, reason=reason)
-                    embed=Embed()
-                    embed.title=f"Successfully banned {ban_count} user(s)."
+                    banned.append(f"{user} | `{user.id}`")
                     ban_count += 1
-                    embed.description += f"{user} | `{user.id}`\n"
-                    
                 except Exception:
                     failed_ids.append(user_id)
                     continue
 
             if ban_count > 0:
-
+                embed = Embed(
+                    title="List of banned users",
+                    color=Color.red(),
+                )
+                embed.description="\n".join(banned)
                 embed.add_field(name="Reason", value=reason, inline=False)
                 if failed_ids:
                     embed.add_field(
@@ -702,18 +711,20 @@ class moderation(Cog):
                         inline=False,
                     )
             else:
-                embed = Embed(description="No users were banned.")
+                embed = Embed(description="No users were banned.", color=Color.red())
+
             modlog_id = Logger(ctx.guild).get_modlog_channel()
-            if modlog_id == None:
+            if modlog_id is None:
                 await ctx.edit_original_response(embed=embed)
             else:
                 modlog = ctx.guild.get_channel(modlog_id)
-
-                await ctx.edit_original_response(embed=embed)
-                await modlog.send(embed=Embed(
-                    description=f"Successfully banned {ban_count} user(s). Check {modlog.mention}",
-                    color=Color.red(),
-                ))            
+                await ctx.edit_original_response(
+                    embed=Embed(
+                        description=f"Successfully banned {ban_count} user(s). Check {modlog.mention}",
+                        color=Color.red(),
+                    )
+                )
+                await modlog.send(embed=embed)
 
         elif view.value in [False, None]:
             cancelled = Embed(description="Massban cancelled", color=Color.red())
@@ -733,73 +744,79 @@ class moderation(Cog):
     @Jeanne.command(description="Unban multiple members at once")
     @Jeanne.describe(
         user_ids="How many user IDs? Leave a space after each ID (min is 5 and max is 25)",
-        reason="Why are they being unbanned?",
+        reason="Why are they being banned?",
     )
-    @Jeanne.checks.cooldown(1, 1800, key=lambda i: (i.guild.id))
     @Jeanne.checks.has_permissions(administrator=True)
+    @Jeanne.checks.cooldown(1, 1800, key=lambda i: (i.guild.id))
     async def massunban(self, ctx: Interaction, user_ids: str, reason: str):
-        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user():
             return
 
-        ids = [id.strip() for id in user_ids.split() if id.strip()]
+        await ctx.response.defer()
+        ids = user_ids.split()[:25]
 
         if len(ids) < 5:
             embed = Embed(
-                description=f"There are very few IDs. Please add more and try again after <t:{round((datetime.now() + timedelta(minutes=30)).timestamp())}:R>"
+                description=f"There are too few IDs. Please add more and try again after <t:{round((datetime.now() + timedelta(minutes=30)).timestamp())}:R>"
             )
             await ctx.followup.send(embed=embed)
             return
 
-        if len(ids) > 25:
-            ids = ids[:25]
+        banned_ids = {entry.user.id async for entry in ctx.guild.bans()}
+        author_id = ctx.user.id
+        guild_owner_id = ctx.guild.owner.id
+
+        to_ban_ids = [
+            user_id
+            for user_id in ids
+            if user_id not in banned_ids
+            and user_id != str(author_id)
+            and user_id != str(guild_owner_id)
+        ]
+
+        if not to_ban_ids:
+            embed = Embed(description="No users can be unbanned.", color=Color.red())
+            await ctx.followup.send(embed=embed)
+            return
 
         view = Confirmation(ctx.user)
         alert = Embed(
             title="BEWARE",
-            description="The developer is **NOT** responsible in any way or form if you messed up, even if it was misused (but report anyone misusing them to the developer so he can botban them)",
+            description="The developer is **NOT** responsible in any way or form if you mess up, even if it was misused.\n\nDo you want to proceed?",
             color=Color.red(),
         )
         await ctx.followup.send(embed=alert, view=view)
 
         await view.wait()
 
-        if view.value is True:
+        if view.value == True:
             loading = self.bot.get_emoji(1012677456811016342)
             em = Embed(
-                description=f"Banning user IDs now {loading}",
+                description=f"Unbanning user IDs now {loading}",
                 color=Color.red(),
             )
             await ctx.edit_original_response(embed=em, view=None)
 
-            
-            banned_ids = [entry.user.id async for entry in ctx.guild.bans()]
-
-            ban_count = 0
+            unban_count = 0
             failed_ids = []
+            unbanned=[]
 
-            for user_id in ids:
-                if user_id in banned_ids:
-                    continue
-
-                embed=Embed()
-                embed.description = ""
-                embed.color=Color.red()
-
+            for user_id in to_ban_ids:
                 try:
                     user = await self.bot.fetch_user(int(user_id))
-                    await ctx.guild.ban(user, reason=reason)
-                    embed=Embed()
-                    embed.title=f"Successfully unbanned {ban_count} user(s)."
-                    ban_count += 1
-                    embed.description += f"{user} | `{user.id}`\n"
-                    
+                    await ctx.guild.unban(user, reason=reason)
+                    unbanned.append(f"{user} | `{user.id}`")
+                    unban_count += 1
                 except Exception:
                     failed_ids.append(user_id)
                     continue
 
-            if ban_count > 0:
-
+            if unban_count > 0:
+                embed = Embed(
+                    title="List of unbanned users",
+                    color=Color.red(),
+                )
+                embed.description="\n".join(unbanned)
                 embed.add_field(name="Reason", value=reason, inline=False)
                 if failed_ids:
                     embed.add_field(
@@ -808,21 +825,23 @@ class moderation(Cog):
                         inline=False,
                     )
             else:
-                embed = Embed(description="No users were unbanned.")
+                embed = Embed(description="No users were unbanned.", color=Color.red())
+
             modlog_id = Logger(ctx.guild).get_modlog_channel()
-            if modlog_id == None:
+            if modlog_id is None:
                 await ctx.edit_original_response(embed=embed)
             else:
                 modlog = ctx.guild.get_channel(modlog_id)
-
-                await ctx.edit_original_response(embed=Embed(
-                    description=f"Successfully unbanned {ban_count} user(s). Check {modlog.mention}",
-                    color=Color.red(),
-                ))
-                await modlog.send(embed=embed)            
+                await ctx.edit_original_response(
+                    embed=Embed(
+                        description=f"Successfully unbanned {unban_count} user(s). Check {modlog.mention}",
+                        color=Color.red(),
+                    )
+                )
+                await modlog.send(embed=embed)
 
         elif view.value in [False, None]:
-            cancelled = Embed(description="Massban cancelled", color=Color.red())
+            cancelled = Embed(description="Massunban cancelled", color=Color.red())
             await ctx.edit_original_response(embed=cancelled, view=None)
 
     @massunban.error
