@@ -45,19 +45,20 @@ class Rank_Group(GroupCog, name="rank"):
         embed.set_author(name="Global XP Leaderboard")
 
         leaderboard = Levelling().get_global_rank()
-        
+
         r = 0
-        data=[]
+        data = []
         for i in leaderboard:
             p = await self.bot.fetch_user(i[0])
             r += 1
             data.append([str(r), str(p)])
-        
 
-        headers=["Place", "User"]
-        
-        embed.description=tabulate(data, headers, tablefmt="pretty", colalign=("right",))
-    
+        headers = ["Place", "User"]
+
+        embed.description = tabulate(
+            data, headers, tablefmt="pretty", colalign=("right",)
+        )
+
         await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Check the users with the most XP in the server")
@@ -85,7 +86,6 @@ class levelling(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self._cd = CooldownMapping.from_cooldown(1, 120, BucketType.member)
-        self.topggpy = DBLClient(self.bot, str(TOPGG))
 
     def get_ratelimit(self, message: Message) -> Optional[int]:
         bucket = self._cd.get_bucket(message)
