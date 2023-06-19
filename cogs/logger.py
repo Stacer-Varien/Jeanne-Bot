@@ -9,7 +9,7 @@ class LoggerCog(Cog):
 
     @Cog.listener()
     async def on_message_edit(self, before: Message, after: Message):
-        if not before.guild or before.author.bot:
+        if not after.guild or after.author.bot:
             return
 
         logger_id = Logger(after.guild).get_message_logger()
@@ -20,7 +20,7 @@ class LoggerCog(Cog):
         channel = self.bot.get_channel(int(logger_id))
 
         embed = Embed(
-            description=f"Message edited in {before.channel.mention}",
+            description=f"Message edited in {channel.mention}",
             color=Color.random(),
         )
 
@@ -29,22 +29,22 @@ class LoggerCog(Cog):
 
         old_content = before.content[:1020] + "..." if len(before.content) >= 1024 else before.content
         new_content = after.content[:1020] + "..." if len(after.content) >= 1024 else after.content
+        if after.content:
+            embed.add_field(
+                name="Old message",
+                value=old_content if has_old_content else "None (no message)",
+                inline=False,
+            )
+            embed.add_field(
+                name="New message",
+                value=new_content if has_new_content else "None (no message)",
+                inline=False,
+            )
 
-        embed.add_field(
-            name="Old message",
-            value=old_content if has_old_content else "None (no message)",
-            inline=False,
-        )
-        embed.add_field(
-            name="New message",
-            value=new_content if has_new_content else "None (no message)",
-            inline=False,
-        )
+            embed.set_thumbnail(url=before.author.display_avatar.url)
+            embed.set_footer(text=f"Author: {before.author} | {before.author.id}")
 
-        embed.set_thumbnail(url=before.author.display_avatar.url)
-        embed.set_footer(text=f"Author: {before.author} | {before.author.id}")
-
-        await channel.send(embed=embed)
+            await channel.send(embed=embed)
 
     @Cog.listener()
     async def on_message_delete(self, message: Message):
