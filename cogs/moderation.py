@@ -1,6 +1,5 @@
 from random import randint
 from discord import (
-    BanEntry,
     Color,
     Embed,
     HTTPException,
@@ -8,7 +7,6 @@ from discord import (
     Member,
     Message,
     NotFound,
-    User,
     app_commands as Jeanne,
 )
 from discord.ext.commands import Cog, Bot, GroupCog
