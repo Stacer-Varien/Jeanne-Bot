@@ -19,15 +19,17 @@ class Leaderboard:
         canvas = Image.new(mode="RGBA", size=(60,900))
         
         #x1=9, y1=9, x2=49, y2=49
-        #x1=9, y1=9, x2=49, y2=49
+
         if type=="Server":
             leaderboard=Levelling(self.server).get_server_rank()
         elif type=="Global":
             leaderboard=Levelling().get_global_rank()
 
-        x=1
+        r,y1,y2=1,40,5
         for i in leaderboard:
             user= await self.bot.fetch_user(int(i[0]))
             avatar=user.display_avatar
+            
+
             
 
