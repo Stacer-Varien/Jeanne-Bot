@@ -1317,3 +1317,11 @@ def shorten_url(url: str):
         return short_url
     else:
         return None
+
+class Reminder:
+    def __init__(self, user:User):
+        self.user=user
+
+    def _add(self, reason:str, time:int, dm:Optional[bool]=None):
+        db.execute("INSERT OR IGNORE INTO reminderData (userid, time, reason, dm_status) VALUES (?,?,?,?)", (self.user.id, time, reason, dm,))
+        db.commit()

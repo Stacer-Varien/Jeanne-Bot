@@ -21,6 +21,7 @@ from typing import Optional
 from json import loads
 from requests import get
 from enum import Enum
+from humanfriendly import parse_timespan
 
 bot_invite_url = "https://discord.com/oauth2/authorize?client_id=831993597166747679&scope=bot%20applications.commands&permissions=467480734774"
 
@@ -335,6 +336,16 @@ class Embed_Group(GroupCog, name="embed"):
                         ephemeral=True,
                     )
 
+class ReminderCog(GroupCog, name="reminder"):
+    def __init__(self, bot:Bot):
+        self.bot=bot
+        super().__init__()
+    
+    @Jeanne.command(name="add", description="Add a reminder")
+    async def _add(self, ctx:Interaction, reason:str, time:str, dm:Optional[bool]=None):
+        if Botban(ctx.user).check_botbanned_user():
+            return
+        
 
 class slashutilities(Cog):
     def __init__(self, bot: Bot):
