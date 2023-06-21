@@ -1322,6 +1322,16 @@ class Reminder:
     def __init__(self, user:User):
         self.user=user
 
-    def _add(self, reason:str, time:int, dm:Optional[bool]=None):
-        db.execute("INSERT OR IGNORE INTO reminderData (userid, time, reason, dm_status) VALUES (?,?,?,?)", (self.user.id, time, reason, dm,))
+    def _add(self, reason:str, time:int, dm:Optional[bool]=None, channel:Optional[TextChannel]=None):
+        db.execute("INSERT OR IGNORE INTO reminderData (userid, time, reason, dm_status, channel) VALUES (?,?,?,?)", (self.user.id, time, reason, dm, channel.id))
         db.commit()
+    
+    def get_all_reminders(self):
+        data=db.execute("SELECT * FROM reminderData").fetchall()
+        db.commit()
+        return data
+
+    def get_all_user_reminders(self):
+        data=db.execute("SELECT * FROM reminderData WHERE userid = ?", (self.user.id,)).fetchall()
+        db.commit()
+        return data

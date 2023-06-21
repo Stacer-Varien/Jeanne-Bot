@@ -1,3 +1,4 @@
+from datetime import timedelta, datetime
 from discord import (
     Attachment,
     ButtonStyle,
@@ -13,7 +14,7 @@ from aiohttp import ClientSession
 from discord.ext.commands import Cog, Bot, GroupCog
 from assets.components import ReportModal
 from assets.dictionary import dictionary
-from functions import Botban
+from functions import Botban, Reminder
 from config import WEATHER
 from discord.ui import View
 from py_expression_eval import Parser
@@ -345,6 +346,25 @@ class ReminderCog(GroupCog, name="reminder"):
     async def _add(self, ctx:Interaction, reason:str, time:str, dm:Optional[bool]=None):
         if Botban(ctx.user).check_botbanned_user():
             return
+        await ctx.response.defer()
+        if dm ==None or dm ==False:
+            allowed, parms="No", (reason, time, 0, ctx.channel.id)
+        else:
+            allowed, parms="Yes", (reason, time, 1, ctx.channel.id)
+        Reminder(ctx.user)._add(parms)
+
+        embed=Embed()
+        embed.title="Reminder added"
+        date=datetime.now() + timedelta(seconds=parse_timespan(time))
+        embed.description=f"On <t:{round(date.timestamp())}:F>, I will alert you about your reminder"
+        embed.color=Color.random()
+        embed.add_field(name="Reason", value=reason, inline=False)
+        embed.add_field(name="Send DM?", value=allowed, inline=False)
+        await ctx.followup.send(embed=embed, ephemeral=True)
+    
+    @Jeanne.command(name="list", description="List all the reminders you have")
+    async def _list(self, ctx:Interaction):
+        reminders=Reminder(ctx.user).get_all_user_reminders()
         
 
 class slashutilities(Cog):
