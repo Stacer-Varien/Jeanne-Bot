@@ -5,6 +5,7 @@ import time
 from humanfriendly import parse_timespan
 from discord import Embed, Color, Emoji, Guild, Member, TextChannel, User
 from requests import get
+from tabulate import tabulate
 from config import db
 from typing import Optional
 
@@ -12,68 +13,37 @@ current_time = date.today()
 
 
 class Botban:
-    def __init__(self, user: User) -> None:
+    def __init__(self, user):
         self.user = user
 
-    def check_botbanned_user(self) -> bool:
+    def check_botbanned_user(self):
         botbanned_data = db.execute(
             "SELECT * FROM botbannedData WHERE user_id = ?", (self.user.id,)
         ).fetchone()
 
-        if botbanned_data == None:
-            return False
-        else:
-            if self.user.id == botbanned_data[0]:
-                return True
+        return botbanned_data is not None and self.user.id == botbanned_data[0]
 
     def add_botbanned_user(self, reason: str):
         db.execute(
-            "INSERT OR IGNORE INTO botbannedData (user_id, reason) VALUES (?,?)",
+            "INSERT OR IGNORE INTO botbannedData (user_id, reason) VALUES (?, ?)",
             (
                 self.user.id,
                 reason,
             ),
         )
-        server_xp_data = db.execute(
-            "SELECT * FROM serverxpData WHERE user_id = ?", (self.user.id,)
-        ).fetchall()
-        global_xp_data = db.execute(
-            "SELECT * FROM globalxpData WHERE user_id = ?", (self.user.id,)
-        ).fetchone()
-        inventory_data = db.execute(
-            "SELECT * FROM userWallpaperInventory WHERE user_id = ?", (self.user.id,)
-        ).fetchall()
-        bank_data = db.execute(
-            "SELECT * FROM bankData WHERE user_id = ?", (self.user.id,)
-        ).fetchone()
 
-        if server_xp_data == None:
-            pass
-        else:
-            db.execute("DELETE FROM serverxpData WHERE user_id = ?", (self.user.id,))
-
-        if global_xp_data == None:
-            pass
-        else:
-            db.execute("DELETE * FROM globalxpData WHERE user_id = ?", (self.user.id,))
-
-        if inventory_data == None:
-            pass
-        else:
-            db.execute(
-                "DELETE FROM userWallpaperInventory WHERE user_id = ?", (self.user.id,)
-            )
-
-        if bank_data == None:
-            pass
-        else:
-            db.execute("DELETE FROM bankData WHERE user_id = ?", (self.user.id,))
+        db.execute("DELETE FROM serverxpData WHERE user_id = ?", (self.user.id,))
+        db.execute("DELETE FROM globalxpData WHERE user_id = ?", (self.user.id,))
+        db.execute(
+            "DELETE FROM userWallpaperInventory WHERE user_id = ?", (self.user.id,)
+        )
+        db.execute("DELETE FROM bankData WHERE user_id = ?", (self.user.id,))
 
         db.commit()
 
 
 class Currency:
-    def __init__(self, user: User) -> None:
+    def __init__(self, user):
         self.user = user
 
     def get_balance(self):
@@ -81,15 +51,16 @@ class Currency:
             "SELECT amount FROM bankData WHERE user_id = ?", (self.user.id,)
         ).fetchone()
 
-        if data == None:
-            return 0
-        else:
-            return data[0]
+        return data[0] if data is not None else 0
 
-    def add_qp(self, amount: int) -> int:
+    def add_qp(self, amount: int):
         cur = db.execute(
             "INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)",
-            (self.user.id, amount, (current_time - timedelta(days=1))),
+            (
+                self.user.id,
+                amount,
+                (current_time - timedelta(days=1)),
+            ),
         )
 
         if cur.rowcount == 0:
@@ -100,9 +71,10 @@ class Currency:
                     self.user.id,
                 ),
             )
+
         db.commit()
 
-    def remove_qp(self, amount: int) -> int:
+    def remove_qp(self, amount: int):
         db.execute(
             "UPDATE bankData SET amount = amount - ? WHERE user_id = ?",
             (
@@ -110,54 +82,30 @@ class Currency:
                 self.user.id,
             ),
         )
+
         db.commit()
 
-    def give_daily(self) -> bool:
+    def give_daily(self):
         current_time = datetime.now()
         next_claim = current_time + timedelta(days=1)
         data = db.execute(
             "SELECT * FROM bankData WHERE user_id = ?", (self.user.id,)
         ).fetchone()
 
-        if datetime.today().weekday() > 5:
-            qp = 200
-        else:
-            qp = 100
+        qp = 200 if datetime.today().weekday() > 5 else 100
 
-        if data == None:
-            cur = db.execute(
-                "INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)",
-                (
-                    self.user.id,
-                    qp,
-                    round(next_claim.timestamp()),
-                ),
-            )
-
-            if cur.rowcount == 0:
-                db.execute(
-                    "UPDATE bankData SET claimed_date = ? , amount = amount + ? WHERE user_id = ?",
-                    (
-                        round(next_claim.timestamp()),
-                        qp,
-                        self.user.id,
-                    ),
-                )
-            db.commit()
-            return True
-
-        elif data[2] < round(current_time.timestamp()):
+        if data is None or data[2] < round(current_time.timestamp()):
             db.execute(
-                "UPDATE bankData SET claimed_date = ? , amount = amount + ? WHERE user_id = ?",
+                "INSERT OR REPLACE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)",
                 (
-                    round(next_claim.timestamp()),
-                    qp,
                     self.user.id,
+                    qp,
+                    round(next_claim.timestamp()),
                 ),
             )
+
             db.commit()
             return True
-
         else:
             return False
 
@@ -165,6 +113,7 @@ class Currency:
         data = db.execute(
             "SELECT claimed_date FROM bankData WHERE user_id = ?", (self.user.id,)
         ).fetchone()
+
         db.commit()
         return data[0]
 
@@ -736,25 +685,6 @@ class Manage:
             )
         db.commit()
 
-    def set_reporter(self):
-        cursor = db.execute(
-            "INSERT OR IGNORE INTO reportData (guild_id, channel_id) VALUES (?,?)",
-            (
-                self.server.id,
-                self.channel.id,
-            ),
-        )
-
-        if cursor.rowcount == 0:
-            db.execute(
-                f"UPDATE reportData SET channel_id = ? WHERE guild_id = ?",
-                (
-                    self.server.id,
-                    self.channel.id,
-                ),
-            )
-        db.commit()
-
     def remove_welcomer(self):
         cur = db.cursor()
         cur.execute("SELECT * FROM welcomerData WHERE guild_id = ?", (self.server.id,))
@@ -791,19 +721,6 @@ class Manage:
 
         else:
             cur.execute("DELETE FROM modlogData WHERE guild_id = ?", (self.server.id,))
-            db.commit()
-
-    def remove_reporter(self):
-        cur = db.cursor()
-        cur.execute("SELECT * FROM reportData WHERE guild_id = ?", (self.server.id,))
-        result = cur.fetchone()
-
-        if result == None:
-            return False
-
-        else:
-            cur.execute("DELETE FROM reportData WHERE guild_id = ?", (self.server.id,))
-
             db.commit()
 
     def remove_levelup(self):
@@ -1318,20 +1235,36 @@ def shorten_url(url: str):
     else:
         return None
 
-class Reminder:
-    def __init__(self, user:User):
-        self.user=user
 
-    def _add(self, reason:str, time:int, dm:Optional[bool]=None, channel:Optional[TextChannel]=None):
-        db.execute("INSERT OR IGNORE INTO reminderData (userid, time, reason, dm_status, channel) VALUES (?,?,?,?)", (self.user.id, time, reason, dm, channel.id))
+class Reminder:
+    def __init__(self, user: User):
+        self.user = user
+
+    def _add(self, reason: str, time: int):
+        db.execute(
+            "INSERT OR IGNORE INTO reminderData (userid, time, reason) VALUES (?,?,?)",
+            (
+                self.user.id,
+                time,
+                reason,
+            ),
+        )
         db.commit()
-    
+
     def get_all_reminders(self):
-        data=db.execute("SELECT * FROM reminderData").fetchall()
+        data = db.execute("SELECT * FROM reminderData").fetchall()
         db.commit()
         return data
 
     def get_all_user_reminders(self):
-        data=db.execute("SELECT * FROM reminderData WHERE userid = ?", (self.user.id,)).fetchall()
+        data = db.execute(
+            "SELECT * FROM reminderData WHERE userid = ?", (self.user.id,)
+        ).fetchall()
         db.commit()
-        return data
+        reminders = []
+        for i in data:
+            reminder = i[2]
+            time = f"<t:{i[1]}:F>"
+            reminders.append([str(reminder), str(time)])
+        col_names = ["Reminders", "Time"]
+        return tabulate(reminders, headers=col_names, tablefmt="pretty")
