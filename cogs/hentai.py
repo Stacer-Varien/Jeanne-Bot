@@ -139,18 +139,20 @@ class nsfw(Cog):
 
         if plus:
             images = [image[randint(1, 100) - 1] for _ in range(4)]
+            shortened_urls = [shorten_url(img["file_url"]) for img in images]
+            view = ReportSelect(*shortened_urls)
             color = Color.random()
             embeds = [
                 Embed(color=color, url="https://yande.re")
-                .set_image(url=shorten_url(str(img["file_url"])))
+                .set_image(url=(str(url)))
                 .set_footer(
                     text="Fetched from Yande.re • Credits must go to the artist"
                 )
-                for img in images
+                for url in shortened_urls
             ]
             footer_text = "Fetched from Yande.re • Credits must go to the artist"
             try:
-                await ctx.followup.send(embeds=embeds, view=ReportSelect(*embeds))
+                await ctx.followup.send(embeds=embeds, view=view)
             except:
                 footer_text += "\nIf you see an illegal content, please use /botreport and attach the link when reporting"
                 for embed in embeds:
@@ -158,16 +160,18 @@ class nsfw(Cog):
                 await ctx.followup.send(embeds=embeds)
         else:
             color = Color.random()
+            shortened_url = shorten_url(str(image))  # Apply url_shortener to the image URL
             embed = Embed(color=color, url="https://yande.re")
-            embed.set_image(url=shorten_url(str(image)))
+            embed.set_image(url=shortened_url)  # Use the shortened URL
             footer_text = "Fetched from Yande.re • Credits must go to the artist"
             try:
                 embed.set_footer(text=footer_text)
-                await ctx.followup.send(embed=embed, view=ReportContent(embed))
+                await ctx.followup.send(embed=embed, view=ReportContent(shortened_url))
             except:
                 footer_text += "\nIf you see an illegal content, please use /botreport and attach the link when reporting"
                 embed.set_footer(text=footer_text)
                 await ctx.followup.send(embed=embed)
+
 
     @yandere.error
     async def yandere_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
@@ -194,28 +198,24 @@ class nsfw(Cog):
         if Botban(ctx.user).check_botbanned_user():
             return
 
-        if tag == "02":
-            await ctx.followup.send(
-                "Tag has been blacklisted due to it returning extreme content and guro"
-            )
-            return
-
         image = Hentai(plus).konachan(rating, tag)
 
         if plus:
             images = [image[randint(1, 100) - 1] for _ in range(4)]
+            shortened_urls = [shorten_url(img["file_url"]) for img in images]
+            view = ReportSelect(*shortened_urls)
             color = Color.random()
             embeds = [
                 Embed(color=color, url="https://konachan.com")
-                .set_image(url=shorten_url(str(img["file_url"])))
+                .set_image(url=str(url))
                 .set_footer(
                     text="Fetched from Konachan • Credits must go to the artist"
                 )
-                for img in images
+                for url in shortened_urls
             ]
             footer_text = "Fetched from Konachan • Credits must go to the artist"
             try:
-                await ctx.followup.send(embeds=embeds, view=ReportSelect(*embeds))
+                await ctx.followup.send(embeds=embeds, view=view)
             except:
                 footer_text += "\nIf you see an illegal content, please use /botreport and attach the link when reporting"
                 for embed in embeds:
@@ -228,7 +228,7 @@ class nsfw(Cog):
             footer_text = "Fetched from Konachan • Credits must go to the artist"
             try:
                 embed.set_footer(text=footer_text)
-                await ctx.followup.send(embed=embed, view=ReportContent(embed))
+                await ctx.followup.send(embed=embed, view=ReportContent(shorten_url(str(image))))
             except:
                 footer_text += "\nIf you see an illegal content, please use /botreport and attach the link when reporting"
                 embed.set_footer(text=footer_text)
