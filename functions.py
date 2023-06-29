@@ -1227,14 +1227,15 @@ def shorten_url(url: str):
 
 
 class Reminder:
-    def __init__(self, user: User):
+    def __init__(self, user: Optional[User]=None):
         self.user = user
 
-    def _add(self, reason: str, time: int):
+    def add(self, reason: str, time: int):
         db.execute(
-            "INSERT OR IGNORE INTO reminderData (userid, time, reason) VALUES (?,?,?)",
+            "INSERT OR IGNORE INTO reminderData (userid, id, time, reason) VALUES (?,?,?,?)",
             (
                 self.user.id,
+                randint(1, 999999),
                 time,
                 reason,
             ),
@@ -1253,8 +1254,20 @@ class Reminder:
         db.commit()
         reminders = []
         for i in data:
-            reminder = i[2]
-            time = f"<t:{i[1]}:F>"
-            reminders.append([str(reminder), str(time)])
-        col_names = ["Reminders", "Time"]
+            ids=i[1]
+            reminder = i[3]
+            time = f"<t:{i[2]}:F>"
+            reminders.append([str(ids), str(reminder), str(time)])
+        col_names = ["ID", "Reminders", "Time"]
         return tabulate(reminders, headers=col_names, tablefmt="pretty")
+    
+    def remove(self, id:int):
+        data=db.execute("SELECT * FROM reminderData WHERE userid = ? AND id = ?", (self.user.id, id,)).fetchone()
+        db.commit()
+
+        if data == None:
+            return None
+        else:
+            db.execute("DELETE FROM reminderData WHERE userid = ? AND id = ?", (self.user.id, id,))
+            db.commit()
+        
