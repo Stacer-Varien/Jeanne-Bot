@@ -21,9 +21,7 @@ class LeaderboardR:
 
         canvas = Image.new(mode="RGBA", size=(200, (100 * len(leaderboard))))
         draw = ImageDraw.Draw(canvas)
-        r = 0
-        for i in leaderboard:
-            r += 1
+        for r, i in enumerate(leaderboard, start=1):
             user = await self.bot.fetch_user(int(i[0]))
             profile_bytes = BytesIO(await user.display_avatar.read())
             profile = Image.open(profile_bytes).convert("RGBA").resize((40, 40), resample=Image.LANCZOS)
@@ -35,27 +33,17 @@ class LeaderboardR:
             mask_draw = ImageDraw.Draw(mask)
             mask_draw.ellipse(mask_cor, fill=(255, 25, 255, 255))
 
-            if r == 1:
-                COLOR = (255, 215, 0)
-            elif r == 2:
-                COLOR = (192, 192, 192)
-            elif r == 3:
-                COLOR = (205, 133, 63)
-            else:
-                COLOR = (70, 130, 180)
-
-            draw.rounded_rectangle((10, (10 + yadd), 190, (90 + yadd)), 1, None)
+            COLOR = (255, 215, 0) if r == 1 else (192, 192, 192) if r == 2 else (205, 133, 63) if r == 3 else (70, 130, 180)
             draw.text((15, (20 + yadd)), f"#{r}", COLOR, font=font_normal, stroke_fill=STROKE, stroke_width=1)
             draw.text((100, (30 + yadd)), str(user), COLOR, font=font_small, stroke_fill=STROKE, stroke_width=1)
 
             profile_pic_holder.paste(profile, mask_cor)
-
             pre = Image.composite(profile_pic_holder, canvas, mask)
             blank = Image.new("RGBA", pre.size, 0)
+            canvas = Image.alpha_composite(pre, blank)
 
-        final = Image.alpha_composite(pre, blank)
         final_bytes = BytesIO()
-        final.save(final_bytes, "png")
+        canvas.save(final_bytes, "png")
         final_bytes.seek(0)
         return final_bytes
 
@@ -67,9 +55,7 @@ class LeaderboardR:
 
         canvas = Image.new(mode="RGBA", size=(200, (100 * len(leaderboard))))
         draw = ImageDraw.Draw(canvas)
-        r = 1
-        for i in leaderboard:
-            r += 1
+        for r, i in enumerate(leaderboard, start=1):
             user = self.bot.get_user(int(i[0]))
             profile_bytes = requests.get(user.avatar.with_format("png")).content
             profile_image = Image.open(BytesIO(profile_bytes))
@@ -87,26 +73,18 @@ class LeaderboardR:
 
             STROKE = (151, 151, 151)
 
-            if r == 1:
-                COLOR = (255, 215, 0)
-            elif r == 2:
-                COLOR = (192, 192, 192)
-            elif r == 3:
-                COLOR = (205, 133, 63)
-            else:
-                COLOR = (70, 130, 180)
-
+            COLOR = (255, 215, 0) if r == 1 else (192, 192, 192) if r == 2 else (205, 133, 63) if r == 3 else (70, 130, 180)
             draw.rounded_rectangle((10, (10 + yadd), 190, (90 + yadd)), 1, None)
             draw.text((15, (20 + yadd)), f"#{r}", COLOR, font=font_normal, stroke_fill=STROKE, stroke_width=1)
             draw.text((100, (30 + yadd)), str(user), COLOR, font=font_small, stroke_fill=STROKE, stroke_width=1)
 
             profile_pic_holder.paste(profile, (50, (10 + yadd), 90, (60 + yadd)))
 
-        pre = Image.composite(profile_pic_holder, canvas, mask)
-        blank = Image.new("RGBA", pre.size, (255, 255, 255, 0))
+            pre = Image.composite(profile_pic_holder, canvas, mask)
+            blank = Image.new("RGBA", pre.size, (255, 255, 255, 0))
+            canvas = Image.alpha_composite(pre, blank)
 
-        final = Image.alpha_composite(pre, blank)
         final_bytes = BytesIO()
-        final.save(final_bytes, "png")
+        canvas.save(final_bytes, "png")
         final_bytes.seek(0)
         return final_bytes
