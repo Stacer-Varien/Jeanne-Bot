@@ -71,9 +71,11 @@ class nsfw(Cog):
             else:
                 color = Color.random()
                 embeds = [
-                    Embed(color=color, url="https://gelbooru.com").set_image(
-                        url=img["file_url"]
-                    ).set_footer(text="Fetched from Gelbooru • Credits must go to the artist")
+                    Embed(color=color, url="https://gelbooru.com")
+                    .set_image(url=img["file_url"])
+                    .set_footer(
+                        text="Fetched from Gelbooru • Credits must go to the artist"
+                    )
                     for img in images
                 ]
                 await ctx.followup.send(embeds=embeds, view=view)
@@ -160,7 +162,9 @@ class nsfw(Cog):
                 await ctx.followup.send(embeds=embeds)
         else:
             color = Color.random()
-            shortened_url = shorten_url(str(image))  # Apply url_shortener to the image URL
+            shortened_url = shorten_url(
+                str(image)
+            )  # Apply url_shortener to the image URL
             embed = Embed(color=color, url="https://yande.re")
             embed.set_image(url=shortened_url)  # Use the shortened URL
             footer_text = "Fetched from Yande.re • Credits must go to the artist"
@@ -172,7 +176,6 @@ class nsfw(Cog):
                 embed.set_footer(text=footer_text)
                 await ctx.followup.send(embed=embed)
 
-
     @yandere.error
     async def yandere_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
@@ -181,7 +184,7 @@ class nsfw(Cog):
             no_tag = Embed(description="The tag could not be found", color=Color.red())
             await ctx.followup.send(embed=no_tag)
 
-    @Jeanne.command(description="Get a random hentai from Konachan")
+    @Jeanne.command(description="Get a random hentai from Konachan", nsfw=True)
     @Jeanne.describe(
         rating="Do you want questionable or explicit content?",
         tag="Add your tag",
@@ -228,7 +231,9 @@ class nsfw(Cog):
             footer_text = "Fetched from Konachan • Credits must go to the artist"
             try:
                 embed.set_footer(text=footer_text)
-                await ctx.followup.send(embed=embed, view=ReportContent(shorten_url(str(image))))
+                await ctx.followup.send(
+                    embed=embed, view=ReportContent(shorten_url(str(image)))
+                )
             except:
                 footer_text += "\nIf you see an illegal content, please use /botreport and attach the link when reporting"
                 embed.set_footer(text=footer_text)
@@ -241,7 +246,6 @@ class nsfw(Cog):
         ):
             no_tag = Embed(description="The tag could not be found", color=Color.red())
             await ctx.followup.send(embed=no_tag)
-
 
 async def setup(bot: Bot):
     await bot.add_cog(nsfw(bot))

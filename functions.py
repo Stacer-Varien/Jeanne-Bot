@@ -1,7 +1,8 @@
 from datetime import date, datetime, timedelta
-from json import loads
-from random import choice, randint
+from enum import Enum
+from random import choice, randint, shuffle
 import time
+from aiohttp import ClientSession
 from humanfriendly import parse_timespan
 from discord import Embed, Color, Emoji, Guild, Member, TextChannel, User
 from requests import get
@@ -13,7 +14,7 @@ current_time = date.today()
 
 
 class Botban:
-    def __init__(self, user):
+    def __init__(self, user: User):
         self.user = user
 
     def check_botbanned_user(self):
@@ -43,7 +44,7 @@ class Botban:
 
 
 class Currency:
-    def __init__(self, user):
+    def __init__(self, user: User):
         self.user = user
 
     def get_balance(self):
@@ -1102,14 +1103,74 @@ def get_richest(member: Member):
         return 20
 
 
+class NsfwApis(Enum):
+    KonachanApi = "https://konachan.com/post.json?s=post&q=index&limit=100&tags="
+    YandereApi = "https://yande.re/post.json?limit=100&tags=rating:"
+    GelbooruApi = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=rating:"
+    DanbooruApi="https://danbooru.donmai.us/posts.json?limit=200&tags=rating:"
+
 class Hentai:
     def __init__(self, plus: Optional[bool] = None) -> None:
         self.plus = plus
+        self.blacklisted_tags = {"loli", "shota", "cub", "gore", "vore"}
 
-    def _format_tags(self, tags: List[str] = None) -> List[str]:
-        tags = [tag.strip().lower().replace(' ', '_') for tag in tags] if tags else []
-        exclude_tags = ['-' + tag.strip().lstrip('-').lower().replace(' ', '_') for tag in ['loli', 'cub', 'shota']]
-        return tags + exclude_tags
+    def format_tags(self, tags: str = None):
+        if tags:
+            tags = [
+                tag.strip().replace(" ", "_")
+                for tag in tags.split(",")
+                if tag.strip().replace(" ", "_")
+            ]
+            tags_string = "+".join(tags)
+            return tags_string
+        else:
+            return ""
+
+    def get_nsfw_image(
+        self, provider: NsfwApis, rating: Optional[str] = None, tags: str = None
+    ):
+        bl = self.get_blacklisted_links()
+        tags = tags.lower() if tags else None
+
+        url = provider.value + rating + "+" + self.format_tags(tags)
+
+        nsfw_images = get(url)
+
+        if not nsfw_images:
+            return None
+
+        if provider.value == provider.GelbooruApi.value:
+            nsfw_images_list = list(nsfw_images.json().get("post", []))
+        else:
+            nsfw_images_list = list(nsfw_images.json())
+
+        shuffle(nsfw_images_list)
+
+        if not tags:
+            tags = ""
+
+        tags_list = [
+            tag.strip().replace(" ", "_")
+            for tag in tags.split(",")
+            if tag.strip().replace(" ", "_") not in self.blacklisted_tags
+        ]
+
+        if len(tags_list) == 0 or len(tags_list) > 3:
+            return None
+
+        filtered_ret = [img for img in nsfw_images_list if img["file_url"] not in bl]
+
+        if not filtered_ret:
+            return None
+
+        filtered_images = [
+            img for img in filtered_ret if all(tag in img["tags"] for tag in tags_list)
+        ]
+
+        if len(filtered_images) == 0:
+            return None
+
+        return filtered_images
 
     def add_blacklisted_link(self, link: str):
         db.execute("INSERT OR IGNORE INTO hentaiBlacklist (links) VALUES (?)", (link,))
@@ -1120,71 +1181,41 @@ class Hentai:
         db.commit()
         return data[0] if data else None
 
-    def gelbooru(self, rating: Optional[str] = None, tag: Optional[str] = None) -> Optional[str]:
-        bl = self.get_blacklisted_links()
+    def gelbooru(
+        self, rating: Optional[str] = None, tag: Optional[str] = None
+    ) -> Optional[str]:
         if rating is None:
             rating = choice(["questionable", "explicit"])
-        tags = self._format_tags([tag]) if tag else []
-        tags_string = '+'.join(tags)
-
-        gelbooru_api = f"https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=rating:{rating}+{tags_string}"
-        response = get(gelbooru_api)
-        ret = response.json().get("post", [])
-
-        filtered_ret = [dictionary for dictionary in ret if dictionary["file_url"] not in bl]
-        if not filtered_ret:
-            return None
+        if not tag or tag is None:
+            tag = None
+        images =  self.get_nsfw_image(NsfwApis.GelbooruApi, rating, tag)
 
         if self.plus:
-            return filtered_ret
+            return images
         else:
-            return choice(filtered_ret)["file_url"]
-
+            return choice(images)["file_url"]
 
     def yandere(self, rating: Optional[str] = None, tag: Optional[str] = None):
-        blacklisted_links = self.get_blacklisted_links()
-
         if rating is None:
             rating = choice(["questionable", "explicit"])
 
-        tags = self._format_tags([tag]) if tag else []
-        tags_string = '+'.join(tags)
-
-        yandere_api = get(
-            f"https://yande.re/post.json?limit=100&tags=rating:{rating}+{tags_string}"
-        ).json()
-
-        filtered_ret = [dictionary for dictionary in yandere_api if dictionary["file_url"] not in blacklisted_links]
-        if not filtered_ret:
-            return None
+        images =  self.get_nsfw_image(NsfwApis.YandereApi, rating, tag)
 
         if self.plus:
-            return filtered_ret
+            return images
         else:
-            return choice(filtered_ret)["file_url"]
-
+            return choice(images)["file_url"]
 
     def konachan(self, rating: Optional[str] = None, tag: Optional[str] = None):
-        bl = self.get_blacklisted_links()
         if rating is None:
             rating = choice(["questionable", "explicit"])
-        
-        tags = self._format_tags([tag]) if tag else []
-        tags_string = '+'.join(tags)
 
-        konachan_api = get(
-                f"https://konachan.com/post.json?limit=100&tags=rating:{rating}+{tags_string}"
-            ).json()
-
-        filtered_ret = [dictionary for dictionary in konachan_api if dictionary["file_url"] not in bl]
-        if not filtered_ret:
-            return None
+        images =  self.get_nsfw_image(NsfwApis.KonachanApi, rating, tag)
 
         if self.plus:
-            return filtered_ret
+            return images
         else:
-            return choice(filtered_ret)["file_url"]
-
+            return choice(images)["file_url"]
 
     def hentai(self, rating: Optional[str] = None):
         if rating == None:
@@ -1196,6 +1227,7 @@ class Hentai:
         yandere_image = self.yandere(rating)
 
         konachan_image = self.konachan(rating)
+        
 
         h = [gelbooru_image, yandere_image, konachan_image]
 
@@ -1209,6 +1241,7 @@ class Hentai:
 
         elif hentai == konachan_image:
             source = "Konachan"
+        
         return hentai, source
 
 
@@ -1227,7 +1260,7 @@ def shorten_url(url: str):
 
 
 class Reminder:
-    def __init__(self, user: Optional[User]=None):
+    def __init__(self, user: Optional[User] = None):
         self.user = user
 
     def add(self, reason: str, time: int):
@@ -1254,20 +1287,31 @@ class Reminder:
         db.commit()
         reminders = []
         for i in data:
-            ids=i[1]
+            ids = i[1]
             reminder = i[3]
             time = f"<t:{i[2]}:F>"
             reminders.append([str(ids), str(reminder), str(time)])
         col_names = ["ID", "Reminders", "Time"]
         return tabulate(reminders, headers=col_names, tablefmt="pretty")
-    
-    def remove(self, id:int):
-        data=db.execute("SELECT * FROM reminderData WHERE userid = ? AND id = ?", (self.user.id, id,)).fetchone()
+
+    def remove(self, id: int):
+        data = db.execute(
+            "SELECT * FROM reminderData WHERE userid = ? AND id = ?",
+            (
+                self.user.id,
+                id,
+            ),
+        ).fetchone()
         db.commit()
 
         if data == None:
             return None
         else:
-            db.execute("DELETE FROM reminderData WHERE userid = ? AND id = ?", (self.user.id, id,))
+            db.execute(
+                "DELETE FROM reminderData WHERE userid = ? AND id = ?",
+                (
+                    self.user.id,
+                    id,
+                ),
+            )
             db.commit()
-        
