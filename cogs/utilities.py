@@ -536,12 +536,13 @@ class slashutilities(Cog):
     @Jeanne.command(description="Check the meaning of a word with this command")
     @Jeanne.describe()
     async def dictionary(
-        self, ctx: Interaction, word: str, language: Optional[Languages]
+        self, ctx: Interaction, word: str, language: Optional[Languages]=None
     ):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
             return
-        await dictionary(ctx, word, language if not None else None)
+        lang=language.value if language is not None else 'en'
+        await dictionary(ctx, word.lower(), lang)
 
 async def setup(bot: Bot):
     await bot.add_cog(Weather_Group(bot))

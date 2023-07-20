@@ -2,11 +2,9 @@ from datetime import date, datetime, timedelta
 from enum import Enum
 from random import choice, randint, shuffle
 import time
-from aiohttp import ClientSession
 from humanfriendly import parse_timespan
 from discord import Embed, Color, Emoji, Guild, Member, TextChannel, User
 from requests import get
-from tabulate import tabulate
 from config import db
 from typing import Optional, List
 
@@ -16,7 +14,7 @@ current_time = date.today()
 class Botban:
     def __init__(self, user: User):
         self.user = user
-
+    
     def check_botbanned_user(self):
         botbanned_data = db.execute(
             "SELECT * FROM botbannedData WHERE user_id = ?", (self.user.id,)
@@ -1107,7 +1105,6 @@ class NsfwApis(Enum):
     KonachanApi = "https://konachan.com/post.json?s=post&q=index&limit=100&tags="
     YandereApi = "https://yande.re/post.json?limit=100&tags=rating:"
     GelbooruApi = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=rating:"
-    DanbooruApi="https://danbooru.donmai.us/posts.json?limit=200&tags=rating:"
 
 class Hentai:
     def __init__(self, plus: Optional[bool] = None) -> None:
