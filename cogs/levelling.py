@@ -11,7 +11,6 @@ from discord import (
     app_commands as Jeanne,
     Message,
 )
-from assets.generators.leaderboard_rank import LeaderboardR
 from functions import Botban, Currency, Inventory, Levelling, get_richest
 from typing import Optional
 from assets.generators.level_card import Level
@@ -32,25 +31,33 @@ class Rank_Group(GroupCog, name="rank"):
         self.bot = bot
         super().__init__()
 
-    async def get_leaderboard_global(self):
-        return await LeaderboardR(self.bot).generate_leaderboard_global()
-        
-
-    def get_leaderboard_server(self, args):
-        image = LeaderboardR(self.bot).generate_leaderboard_server(**args)
-        return image
-
     @Jeanne.command(
         name="global", description="Check the users with the most XP globally"
     )
-   # @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
+    @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def _global(self, ctx: Interaction):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user() == True:
             return
-        image= await self.get_leaderboard_global()
-        file = File(fp=image, filename="global_leaderboard.png")
-        await ctx.followup.send(file=file)
+
+        embed = Embed(color=Color.random())
+        embed.set_author(name="Global XP Leaderboard")
+
+        leaderboard = Levelling().get_global_rank()
+        
+        r = 0
+        data=[]
+        for i in leaderboard:
+            p = await self.bot.fetch_user(i[0])
+            r += 1
+            data.append([str(r), str(p)])
+        
+
+        headers=["Place", "User"]
+        
+        embed.description=tabulate(data, headers, tablefmt="pretty", colalign=("right",))
+    
+        await ctx.followup.send(embed=embed)
 
         
 
@@ -61,15 +68,23 @@ class Rank_Group(GroupCog, name="rank"):
         if Botban(ctx.user).check_botbanned_user() == True:
             return
 
-        args = {
-                "server": str(ctx.guild.id)
-            }
+        embed = Embed(color=Color.random())
+        embed.set_author(name="Server XP Leaderboard")
 
-        func = partial(self.get_leaderboard_server, args)
-        image:BytesIO = await get_event_loop().run_in_executor(None, func)
+        leaderboard = Levelling(server=ctx.guild).get_server_rank()
+        
+        r = 0
+        data=[]
+        for i in leaderboard:
+            p = await self.bot.fetch_user(i[0])
+            r += 1
+            data.append([str(r), str(p)])
+        
 
-        file = File(fp=image, filename=f"{ctx.guild.name}_leaderboard.png")
-        await ctx.followup.send(file=file)
+        headers=["Place", "User"]
+        
+        embed.description=tabulate(data, headers, tablefmt="pretty", colalign=("right",))
+        await ctx.followup.send(embed=embed)
 
 
 class levelling(Cog):
