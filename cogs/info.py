@@ -22,12 +22,12 @@ start_time = time()
 class slashinfo(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.bot_version = "4.2.4a"
+        self.bot_version = "4.2.5"
 
     @Jeanne.command(description="See the bot's status from development to now")
     async def stats(self, ctx: Interaction):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
         else:
             botowner = self.bot.get_user(597829930964877369)
@@ -68,32 +68,29 @@ class slashinfo(Cog):
                 inline=True,
             )
 
-            embed.set_thumbnail(url=self.bot.user.avatar)
+            embed.set_thumbnail(url=self.bot.user.avatar.url)
             await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="See the information of a member or yourself")
     @Jeanne.describe(member="Which member?")
     async def userinfo(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
         else:
-            if member == None:
-                member = ctx.user
+            member=ctx.user if member is None else member
             user = await self.bot.fetch_user(member.id)
             hasroles = [role.mention for role in member.roles][1:][::-1]
 
-            if member.bot == True:
-                botr = "Yes"
-            else:
-                botr = "No"
+            botcheck="Yes" if member.bot is True else "No"
 
             joined_date = round(member.joined_at.timestamp())
             create_date = round(member.created_at.timestamp())
             userinfo = Embed(title="{}'s Info".format(member.name), color=member.color)
             userinfo.add_field(name="Name", value=member, inline=True)
+            userinfo.add_field(name="Global Name", value=member.global_name, inline=True)
             userinfo.add_field(name="ID", value=member.id, inline=True)
-            userinfo.add_field(name="Is Bot?", value=botr, inline=True)
+            userinfo.add_field(name="Is Bot?", value=botcheck, inline=True)
             userinfo.add_field(
                 name="Created Account",
                 value="<t:{}:F>".format(str(create_date)),
@@ -128,60 +125,60 @@ class slashinfo(Cog):
     @Jeanne.command(description="Get information about this server")
     async def serverinfo(self, ctx: Interaction):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
-        guild = ctx.guild
-        emojis = [str(x) for x in guild.emojis]
+        emojis = [str(x) for x in ctx.guild.emojis]
         humans = len([member for member in ctx.guild.members if not member.bot])
-        bots = len([bot for bot in ctx.guild.members if bot.bot])
+        bots = len([bot for bot in ctx.guild.members if bot.bot is True])
 
-        date = round(guild.created_at.timestamp())
-        serverinfo = Embed(title="Server's Info", color=Color.random())
-        serverinfo.add_field(name="Name", value=guild.name, inline=True)
-        serverinfo.add_field(name="ID", value=guild.id, inline=True)
-        serverinfo.add_field(
-            name="Creation Date", value="<t:{}:F>".format(str(date)), inline=True
-        )
+        date = round(ctx.guild.created_at.timestamp())
+        serverinfo = Embed(color=Color.random())
+        serverinfo.add_field(name="ID", value=ctx.guild.id, inline=True)
         serverinfo.add_field(
             name="Owner",
-            value=f"• **Name: ** {guild.owner}\n• ** ID: ** {guild.owner.id}",
+            value=f"• **Name: ** {ctx.guild.owner}\n• ** ID: ** {ctx.guild.owner.id}",
             inline=True,
         )
+        serverinfo.add_field(
+            name="Creation Date", value="<t:{}:F>".format(str(date)), inline=True
+        )        
         serverinfo.add_field(
             name="Members",
-            value=f"• **Humans:** {humans}\n• **Bots:** {bots}\n• **Total Members:** {guild.member_count}",
-        )
+            value=f"• **Humans:** {humans}\n• **Bots:** {bots}\n• **Total Members:** {ctx.guild.member_count}",
+        inline=True)
         serverinfo.add_field(
             name="Boost Status",
-            value=f"• **Boosters:** {len(guild.premium_subscribers)}\n• **Boosts:** {guild.premium_subscription_count}\n• **Tier:** {guild.premium_tier}",
+            value=f"• **Boosters:** {len(ctx.guild.premium_subscribers)}\n• **Boosts:** {ctx.guild.premium_subscription_count}\n• **Tier:** {ctx.guild.premium_tier}",
+            inline=True,
+        )
+        verification_level=str(ctx.guild.verification_level).capitalize() if str(ctx.guild.verification_level) != 'none' else None
+        serverinfo.add_field(
+            name="Verification Lever",
+            value=verification_level,
             inline=True,
         )
         serverinfo.add_field(
-            name="Channel Count",
-            value=f"• **All channels:** {len(guild.channels)}\n• **Text Channels:** {len(guild.text_channels)}\n• **Voice Channels:** {len(guild.voice_channels)}\n• **Stage Channels:** {len(guild.stage_channels)}\n• **Categories:** {len(guild.categories)}\n• **Forums:** {len(guild.forums)}",
-            inline=True,
+            name="Count",
+            value=f"**All channels:** {len(ctx.guild.channels)} | **Text Channels:** {len(ctx.guild.text_channels)} |  **Voice Channels:** {len(ctx.guild.voice_channels)} |  **Stage Channels:** {len(ctx.guild.stage_channels)} |  **Categories:** {len(ctx.guild.categories)} |  **Forums:** {len(ctx.guild.forums)} |  **Roles:** {len(ctx.guild.roles)} | **Emojis:** {len(emojis)} | **Stickers:** {len(ctx.guild.stickers)}",
+            inline=False,
         )
-        serverinfo.add_field(name="Features", value=guild.features, inline=False)
+        f=[]
+        for i in ctx.guild.features:
+            f.append(i.replace("_", " ").title())
+        serverinfo.add_field(name="Features", value=" | ".join(f), inline=False)
 
-        if guild.icon == None:
-            pass
-        elif guild.icon.is_animated() is True:
-            serverinfo.set_thumbnail(url=guild.icon.with_size(512))
-        else:
-            serverinfo.set_thumbnail(url=guild.icon)
-
-        if guild.splash == None:
-            pass
-        else:
-            serverinfo.set_image(url=guild.splash)
+        icon=ctx.guild.icon.url if ctx.guild.icon is not None else None
+        splash=ctx.guild.splash.url if ctx.guild.splash is not None and ctx.guild.premium_tier==1 else None
+        serverinfo.set_thumbnail(url=icon)
+        serverinfo.set_image(url=splash)
 
         if len(emojis) == 0:
             await ctx.followup.send(embed=serverinfo)
 
-        else:
+        else:  
             emojie = Embed(
-                title="Emojis", description="".join(emojis[:40]), color=Color.random()
+                title="Emojis", description="".join(emojis[:80]), color=Color.random()
             )
 
             e = [serverinfo, emojie]
@@ -190,7 +187,7 @@ class slashinfo(Cog):
 
     @Jeanne.command(description="Check how fast I respond to a command")
     async def ping(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -215,23 +212,21 @@ class slashinfo(Cog):
     @Jeanne.command(description="See the server's banner")
     async def serverbanner(self, ctx: Interaction):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
-        guild = ctx.guild
-
-        if guild.premium_subscription_count < 2:
+        if ctx.guild.premium_subscription_count < 2:
             nobanner = Embed(
                 description="Server is not boosted at tier 2", color=Color.red()
             )
             await ctx.followup.send(embed=nobanner)
 
-        elif guild.banner == None:
+        elif ctx.guild.banner == None:
             embed = Embed(description="Server has no banner", color=Color.red())
             await ctx.followup.send(embed=embed)
         else:
             embed = Embed(colour=Color.random())
-            embed.set_footer(text=f"{guild.name}'s banner")
+            embed.set_footer(text=f"{ctx.guild.name}'s banner")
             embed.set_image(url=ctx.guild.banner)
             await ctx.followup.send(embed=embed)
 
@@ -239,11 +234,10 @@ class slashinfo(Cog):
     @Jeanne.describe(member="Which member?")
     async def avatar(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
-        if member == None:
-            member = ctx.user
+        member=ctx.user if member is None else member
         color = Color.random()
         normav = Embed(
             description=f"**{member}'s Avatar**",
@@ -272,7 +266,7 @@ class slashinfo(Cog):
         sticker="Insert message ID with the sticker or name of the sticker in the server"
     )
     async def sticker(self, ctx: Interaction, sticker: str):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -300,7 +294,7 @@ class slashinfo(Cog):
         if isinstance(error, Jeanne.CommandInvokeError):
             if IndexError:
                 embed = Embed(
-                    description="No sticker is in that message or the sticker got deleted from its server",
+                    description="No sticker is in that message",
                     color=Color.red(),
                 )
                 await ctx.followup.send(embed=embed)
@@ -314,7 +308,7 @@ class slashinfo(Cog):
     @Jeanne.command(description="View an emoji")
     @Jeanne.describe(emoji="What is the name of the emoji?")
     async def emoji(self, ctx: Interaction, emoji: str):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -336,7 +330,7 @@ class slashinfo(Cog):
         if isinstance(error, Jeanne.CommandInvokeError):
             if AttributeError:
                 embed = Embed(
-                    description="This emoji doesn't exist in the server",
+                    description="This emoji doesn't exist in this server",
                     color=Color.red(),
                 )
                 await ctx.followup.send(embed=embed)
