@@ -1,4 +1,3 @@
-from enum import Enum
 from typing import Literal, Optional
 from json import loads
 from discord import (
@@ -762,37 +761,6 @@ class Edit_Group(GroupCog, name="edit"):
 
         await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(description="Renames an emoji")
-    @Jeanne.describe(emoji="What emoji are you renaming?", name="What is the new name?")
-    @Jeanne.checks.has_permissions(manage_emojis_and_stickers=True)
-    async def emoji(self, ctx: Interaction, emoji: str, name: str):
-        if Botban(ctx.user).check_botbanned_user():
-            return
-
-        await ctx.response.defer()
-        try:
-            e = emoji.split(":")[-1].rstrip(">")
-            emote = self.bot.get_emoji(int(e))
-        except:
-            emote = utils.get(ctx.guild.emojis, name=emoji)
-        embed = Embed(
-            description="{} has been renamed to {}".format(str(emote), name),
-            color=0x00FF68,
-        )
-        await emote.edit(name=name)
-        await ctx.followup.send(embed=embed)
-
-    @emoji.error
-    async def emoji_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-        if isinstance(error, Jeanne.CommandInvokeError):
-            if AttributeError:
-                embed = Embed(
-                    description="This emoji doesn't exist in the server",
-                    color=Color.red(),
-                )
-                await ctx.followup.send(embed=embed)
-
-
 class Set_Group(GroupCog, name="set"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
@@ -842,7 +810,7 @@ class Set_Group(GroupCog, name="set"):
 
     @Jeanne.command(description="Set a modlog channel")
     @Jeanne.describe(
-        channel="Which channel should log warns, mutes, timeouts, kicks and bans?"
+        channel="Which channel should log warns, timeouts, kicks and bans?"
     )
     @Jeanne.checks.has_permissions(manage_guild=True)
     async def modlog(self, ctx: Interaction, channel: TextChannel):
