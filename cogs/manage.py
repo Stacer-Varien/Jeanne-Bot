@@ -292,7 +292,7 @@ class Create_Group(GroupCog, name="create"):
         message_id: str,
         slowmode: Optional[str] = None,
     ):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
         await ctx.response.defer()
         message = await channel.fetch_message(int(message_id))
@@ -331,7 +331,7 @@ class Create_Group(GroupCog, name="create"):
         emoji_link: Optional[str] = None,
         emoji_image: Optional[Attachment] = None,
     ):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -391,7 +391,7 @@ class Create_Group(GroupCog, name="create"):
         sticker_link: Optional[str] = None,
         sticker_image: Optional[Attachment] = None,
     ):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -441,7 +441,7 @@ class Delete_Group(GroupCog, name="delete"):
     @Jeanne.describe(channel="Which channel are you deleting?")
     @Jeanne.checks.has_permissions(manage_channels=True)
     async def channel(self, ctx: Interaction, channel: abc.GuildChannel):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -455,7 +455,7 @@ class Delete_Group(GroupCog, name="delete"):
     @Jeanne.describe(role="Which role are you deleting?")
     @Jeanne.checks.has_permissions(manage_channels=True)
     async def role(self, ctx: Interaction, role: Role):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -469,7 +469,7 @@ class Delete_Group(GroupCog, name="delete"):
     @Jeanne.describe(emoji="Which emoji are you deleting?")
     @Jeanne.checks.has_permissions(manage_emojis_and_stickers=True)
     async def emoji(self, ctx: Interaction, emoji: str):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -498,7 +498,7 @@ class Delete_Group(GroupCog, name="delete"):
     @Jeanne.describe(sticker="Which sticker are you deleting?")
     @Jeanne.checks.has_permissions(manage_emojis_and_stickers=True)
     async def sticker(self, ctx: Interaction, sticker: str):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -546,7 +546,7 @@ class Edit_Group(GroupCog, name="edit"):
         category: Optional[CategoryChannel] = None,
         nsfw_enabled: Optional[bool] = None,
     ) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -609,7 +609,7 @@ class Edit_Group(GroupCog, name="edit"):
         hoisted: Optional[bool] = None,
         mentionable: Optional[bool] = None,
     ) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -665,7 +665,7 @@ class Edit_Group(GroupCog, name="edit"):
         banner: Optional[Attachment] = None,
         verification_level: Literal["none", "low", "medium", "high", "highest"] = None,
     ) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -766,7 +766,7 @@ class Edit_Group(GroupCog, name="edit"):
     @Jeanne.describe(emoji="What emoji are you renaming?", name="What is the new name?")
     @Jeanne.checks.has_permissions(manage_emojis_and_stickers=True)
     async def emoji(self, ctx: Interaction, emoji: str, name: str):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -810,7 +810,7 @@ class Set_Group(GroupCog, name="set"):
         welcoming_channel: Optional[TextChannel] = None,
         leaving_channel: Optional[TextChannel] = None,
     ) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -846,7 +846,7 @@ class Set_Group(GroupCog, name="set"):
     )
     @Jeanne.checks.has_permissions(manage_guild=True)
     async def modlog(self, ctx: Interaction, channel: TextChannel):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -859,7 +859,7 @@ class Set_Group(GroupCog, name="set"):
     @Jeanne.describe(channel="Which channel should log edited and deleted messages?")
     @Jeanne.checks.has_permissions(manage_guild=True)
     async def messagelog(self, ctx: Interaction, channel: TextChannel):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -874,7 +874,7 @@ class Set_Group(GroupCog, name="set"):
     async def welcomingmsg(
         self, ctx: Interaction, jsonfile: Optional[Attachment] = None
     ) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         if jsonfile == None:
@@ -951,7 +951,7 @@ class Set_Group(GroupCog, name="set"):
     async def leavingmsg(
         self, ctx: Interaction, jsonfile: Optional[Attachment] = None
     ) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         if jsonfile == None:
@@ -1031,7 +1031,7 @@ class Set_Group(GroupCog, name="set"):
     async def levelupdate(
         self, ctx: Interaction, channel: TextChannel, levelmsg: Optional[bool] = None
     ) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         if levelmsg == None or False:
@@ -1056,7 +1056,7 @@ class Set_Group(GroupCog, name="set"):
         brightness="Set the level of brightness between 10 - 150. Default is 100"
     )
     async def brightness(self, ctx: Interaction, brightness: int):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -1082,7 +1082,7 @@ class Set_Group(GroupCog, name="set"):
     @Jeanne.command(description="Change your profile bio")
     @Jeanne.describe(bio="Add your bio. Make sure its 60 characters per line")
     async def bio(self, ctx: Interaction, bio: str):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -1102,7 +1102,7 @@ class Set_Group(GroupCog, name="set"):
     @Jeanne.command(description="Change your level and profile card font and bar color")
     @Jeanne.describe(color="Add your color. Must be in HEX code")
     async def color(self, ctx: Interaction, color: str):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -1128,7 +1128,7 @@ class XP_Group(GroupCog, name="xp"):
     @Jeanne.describe(channel="Which channel?")
     @Jeanne.checks.has_permissions(manage_guild=True)
     async def blacklist(self, ctx: Interaction, channel: TextChannel) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -1150,7 +1150,7 @@ class XP_Group(GroupCog, name="xp"):
     @Jeanne.describe(channel="Which channel?")
     @Jeanne.checks.has_permissions(manage_guild=True)
     async def unblacklist(self, ctx: Interaction, channel: TextChannel) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -1171,7 +1171,7 @@ class XP_Group(GroupCog, name="xp"):
 
     @Jeanne.command(description="List all XP blacklisted channels")
     async def blacklistedchannels(self, ctx: Interaction) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -1198,7 +1198,7 @@ class manage(Cog):
     @Jeanne.describe(member="Which member?", role="Which role are you adding?")
     @Jeanne.checks.has_permissions(manage_roles=True)
     async def addrole(self, ctx: Interaction, member: Member, role: Role):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -1213,7 +1213,7 @@ class manage(Cog):
     @Jeanne.describe(member="Which member?", role="Which role are you removing?")
     @Jeanne.checks.has_permissions(manage_roles=True)
     async def removerole(self, ctx: Interaction, member: Member, role: Role):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -1250,7 +1250,7 @@ class manage(Cog):
         leavingmsg: Optional[bool] = None,
         levelupchannel: Optional[bool] = None,
     ) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -1388,7 +1388,7 @@ class manage(Cog):
     async def clone(
         self, ctx: Interaction, channel: abc.GuildChannel, name: Optional[str] = None
     ) -> None:
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -1413,7 +1413,7 @@ class Rename_Group(GroupCog, name="rename"):
     @Jeanne.describe(emoji="What emoji are you renaming?", name="What is the new name?")
     @Jeanne.checks.has_permissions(manage_emojis_and_stickers=True)
     async def emoji(self, ctx: Interaction, emoji: str, name: str):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -1445,7 +1445,7 @@ class Rename_Group(GroupCog, name="rename"):
     )
     @Jeanne.checks.has_permissions(manage_channels=True)
     async def category(self, ctx: Interaction, category: CategoryChannel, name: str):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
@@ -1460,7 +1460,7 @@ class Rename_Group(GroupCog, name="rename"):
     )
     @Jeanne.checks.has_permissions(manage_emojis_and_stickers=True)
     async def sticker(self, ctx: Interaction, sticker: str, name: str):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()

@@ -155,7 +155,7 @@ class Weather_Group(GroupCog, name="weather"):
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     async def zipcode(self, ctx: Interaction, zip_code: str, country_code: str):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         emoji_map = {
@@ -274,7 +274,7 @@ class Embed_Group(GroupCog, name="embed"):
         jsonscript: Optional[str] = None,
         jsonfile: Optional[Attachment] = None,
     ):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer(ephemeral=True)
@@ -331,7 +331,7 @@ class Embed_Group(GroupCog, name="embed"):
         jsonscript: Optional[str] = None,
         jsonfile: Optional[Attachment] = None,
     ):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
         else:
             await ctx.response.defer(ephemeral=True)
@@ -486,7 +486,7 @@ class slashutilities(Cog):
     @Jeanne.describe(channel="Send to which channel?", message="What should I say?")
     @Jeanne.checks.has_permissions(administrator=True)
     async def say(self, ctx: Interaction, channel: TextChannel, message: str):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer(ephemeral=True)
@@ -497,7 +497,7 @@ class slashutilities(Cog):
     @Jeanne.describe(calculate="Add a calculation")
     async def calculator(self, ctx: Interaction, calculate: str):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         try:
@@ -514,7 +514,7 @@ class slashutilities(Cog):
     @Jeanne.command(description="Invite me to your server or join the support server")
     async def invite(self, ctx: Interaction):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         invite = Embed(
@@ -528,7 +528,7 @@ class slashutilities(Cog):
     @Jeanne.command(description="Submit a bot report if you found something wrong")
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     async def botreport(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.send_modal(ReportModal())
@@ -539,7 +539,7 @@ class slashutilities(Cog):
         self, ctx: Interaction, word: str, language: Optional[Languages]=None
     ):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
         lang=language.value if language is not None else 'en'
         await dictionary(ctx, word.lower(), lang)

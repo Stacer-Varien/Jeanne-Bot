@@ -19,7 +19,7 @@ class images(Cog):
     @Jeanne.command(description="Get a kitsune image")
     async def kitsune(self, ctx: Interaction):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         kistune_api = get(kitsune_nekoslife).json()
@@ -33,7 +33,7 @@ class images(Cog):
     @Jeanne.command(description="Need a wallpaper for your PC or phone?")
     async def wallpaper(self, ctx: Interaction):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         wallpaper = Embed(color=Color.random())
@@ -46,7 +46,7 @@ class images(Cog):
     @Jeanne.command(description="Get a Jeanne d'Arc image")
     async def jeanne(self, ctx: Interaction):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
         embed, file=get_jeanne_pic()
         await ctx.followup.send(embed=embed, file=file)
@@ -54,7 +54,7 @@ class images(Cog):
     @Jeanne.command(description="Get a Saber image")
     async def saber(self, ctx: Interaction):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
         embed, file=get_saber_pic()
         await ctx.followup.send(embed=embed, file=file)
@@ -62,7 +62,7 @@ class images(Cog):
     @Jeanne.command(description="Get a neko image")
     async def neko(self, ctx: Interaction):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         neko_api = get(neko_purrbot).json()
@@ -76,7 +76,7 @@ class images(Cog):
     @Jeanne.command(description="Get a Medusa (Fate) image")
     async def medusa(self, ctx: Interaction):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
         embed, file=get_medusa_pic()
         await ctx.followup.send(embed=embed, file=file)

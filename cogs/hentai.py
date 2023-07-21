@@ -18,7 +18,7 @@ class nsfw(Cog):
         rating: Optional[Literal["questionable", "explicit"]] = None,
     ) -> None:
         await ctx.response.defer(thinking=False)
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         hentai, source = Hentai().hentai(rating)

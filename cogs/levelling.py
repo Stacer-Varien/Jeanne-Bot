@@ -1,6 +1,5 @@
 from asyncio import get_event_loop
 from functools import partial
-from io import BytesIO
 from discord.ext.commands import Cog, CooldownMapping, BucketType, Bot, GroupCog
 from discord import (
     Color,
@@ -11,6 +10,7 @@ from discord import (
     app_commands as Jeanne,
     Message,
 )
+from config import TOPGG
 from functions import Botban, Currency, Inventory, Levelling, get_richest
 from typing import Optional
 from assets.generators.level_card import Level
@@ -18,6 +18,7 @@ from assets.generators.profile_card import Profile
 from collections import OrderedDict
 from json import loads
 from tabulate import tabulate
+from topgg import DBLClient
 
 
 def replace_all(text: str, dic: dict):
@@ -37,7 +38,7 @@ class Rank_Group(GroupCog, name="rank"):
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def _global(self, ctx: Interaction):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         embed = Embed(color=Color.random())
@@ -65,7 +66,7 @@ class Rank_Group(GroupCog, name="rank"):
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def server(self, ctx: Interaction):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         embed = Embed(color=Color.random())
@@ -91,6 +92,7 @@ class levelling(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self._cd = CooldownMapping.from_cooldown(1, 120, BucketType.member)
+        self.topggpy = DBLClient(bot=self.bot, token=TOPGG)
 
     def get_ratelimit(self, message: Message) -> Optional[int]:
         bucket = self._cd.get_bucket(message)
@@ -174,11 +176,10 @@ class levelling(Cog):
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     async def level(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
-        if member is None:
-            member = ctx.user
+        member=ctx.user if member is None else member
         try:
             memdata = Levelling(member, ctx.guild)
             slvl = memdata.get_member_level()
@@ -228,11 +229,10 @@ class levelling(Cog):
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     async def profile(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
-        if member is None:
-            member = ctx.user
+        member=ctx.user if member is None else member
         try:
             memdata = Levelling(member, ctx.guild)
             slvl = memdata.get_member_level()
