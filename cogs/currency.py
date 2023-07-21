@@ -7,12 +7,12 @@ from discord import (
     Interaction,
     ui,
 )
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 from discord.ext.commands import Cog, Bot, GroupCog
 from assets.components import Heads_or_Tails
 from functions import Botban, Currency
 
-current_time = date.today()
+
 class Guess_Group(GroupCog, name="guess"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
@@ -22,11 +22,10 @@ class Guess_Group(GroupCog, name="guess"):
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     @Jeanne.describe(number="Guess her number (between 1 and 10)")
     async def free(self, ctx: Interaction, number: int):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
-        qp = str(self.bot.get_emoji(980772736861343774))
 
         answer = randint(1, 10)
 
@@ -34,7 +33,7 @@ class Guess_Group(GroupCog, name="guess"):
             Currency(ctx.user).add_qp(20)
 
             correct = Embed(
-                description=f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given 20 {qp}!",
+                description="YES! YOU GUESSED IT CORRECTLY!\nYou have been given 20 <:quantumpiece:980772736861343774>!",
                 color=Color.random(),
             )
             correct.set_image(url="https://i.imgur.com/ICndRZg.gifv")
@@ -52,24 +51,23 @@ class Guess_Group(GroupCog, name="guess"):
     )
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def bet(self, ctx: Interaction, bet: str, number: int):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
-        qp = str(self.bot.get_emoji(980772736861343774))
         balance = Currency(ctx.user).get_balance()
         if int(bet) < 5:
-            bethigher = Embed(description=f"Please bet an amount higher than 5 {qp}")
+            bethigher = Embed(description="Please bet an amount higher than 5 <:quantumpiece:980772736861343774>")
             await ctx.followup.send(embed=bethigher)
 
         elif int(bet) > int(balance):
             betlower = Embed(
-                description=f"Your balance is too low!\nPlease bet lower than {balance} {qp}"
+                description=f"Your balance is too low!\nPlease bet lower than {balance} <:quantumpiece:980772736861343774>"
             )
             await ctx.followup.send(embed=betlower)
         elif int(balance) == 0:
             zerobal = Embed(
-                description=f"Unfortunately, you have 0 {qp}.\nPlease do a daily and/or wait for a free chance to do `/guess free`, `/flip free` and/or `/dice free`"
+                description="Unfortunately, you have 0 <:quantumpiece:980772736861343774>.\nPlease do a daily and/or wait for a free chance to do `/guess free`, `/flip free` and/or `/dice free`"
             )
             await ctx.followup.send(embed=zerobal)
         else:
@@ -78,14 +76,14 @@ class Guess_Group(GroupCog, name="guess"):
             if int(number) == answer:
                 Currency(ctx.user).add_qp(int(bet))
                 correct = Embed(
-                    description=f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given {int(bet)} {qp}!",
+                    description=f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given {int(bet)} <:quantumpiece:980772736861343774>!",
                     color=Color.random(),
                 )
                 correct.set_image(url="https://i.imgur.com/ICndRZg.gifv")
             else:
                 Currency(ctx.user).remove_qp(int(bet))
                 wrong = Embed(
-                    description=f"Wrong answer. It was {answer}\nAfraid I have to take {int(bet)} {qp} from you...",
+                    description=f"Wrong answer. It was {answer}\nAfraid I have to take {int(bet)} <:quantumpiece:980772736861343774> from you...",
                     color=Color.red(),
                 )
                 wrong.set_image(url="https://i.imgur.com/faD48C3.jpg")
@@ -121,17 +119,16 @@ class Dice_Group(GroupCog, name="dice"):
     @Jeanne.describe(digit="Guess what will roll")
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     async def free(self, ctx: Interaction, digit: str):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
         rolled = randint(1, 6)
-        qp = str(self.bot.get_emoji(980772736861343774))
         if int(digit) == rolled:
             Currency(ctx.user).add_qp(20)
             embed = Embed(color=Color.random())
             embed.add_field(
-                name=f"YAY! You got it!\n20 {qp} has been added",
+                name=f"YAY! You got it!\n20 <:quantumpiece:980772736861343774> has been added",
                 value=f"Dice rolled: **{rolled}**\You guessed: **{digit}**!",
                 inline=False,
             )
@@ -146,25 +143,24 @@ class Dice_Group(GroupCog, name="dice"):
     @Jeanne.describe(bet="How much are you betting?", digit="Guess what will roll")
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def bet(self, ctx: Interaction, bet: str, digit: str):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
-        qp = str(self.bot.get_emoji(980772736861343774))
         rolled = randint(1, 6)
         balance = Currency(ctx.user).get_balance()
         if int(bet) < 5:
-            bethigher = Embed(description=f"Please bet an amount higher than 5 {qp}")
+            bethigher = Embed(description="Please bet an amount higher than 5 <:quantumpiece:980772736861343774>")
             await ctx.followup.send(embed=bethigher)
 
         elif int(bet) > int(balance):
             betlower = Embed(
-                description=f"Your balance is too low!\nPlease bet lower than {balance} {qp}"
+                description=f"Your balance is too low!\nPlease bet lower than {balance} <:quantumpiece:980772736861343774>"
             )
             await ctx.followup.send(embed=betlower)
         elif int(balance) == 0:
             zerobal = Embed(
-                description=f"Unfortunately, you have 0 {qp}.\nPlease do a daily and/or wait for a free chance to do `/guess free` and/or `/dice free`"
+                description="Unfortunately, you have 0 <:quantumpiece:980772736861343774>.\nPlease do a daily and/or wait for a free chance to do `/guess free` and/or `/dice free`"
             )
             await ctx.followup.send(embed=zerobal)
 
@@ -173,7 +169,7 @@ class Dice_Group(GroupCog, name="dice"):
                 Currency(ctx.user).add_qp(int(bet))
                 embed = Embed(color=Color.random())
                 embed.add_field(
-                    name=f"YAY! You got it!\n20 {qp} has been added",
+                    name="YAY! You got it!\n20 <:quantumpiece:980772736861343774> has been added",
                     value=f"Dice rolled: **{rolled}**\You guessed: **{digit}**!",
                     inline=False,
                 )
@@ -216,13 +212,11 @@ class Flip_Group(GroupCog, name="flip"):
     @Jeanne.command(description="Flip a coin and earn 20 QP for free")
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     async def free(self, ctx: Interaction):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
-
+        await ctx.response.defer()
         picks = ["Heads", "Tails"]
         jeannes_pick = choice(picks)
-        qp = str(self.bot.get_emoji(980772736861343774))
         view = Heads_or_Tails(ctx.user)
         ask = Embed(description="Heads or Tails?", color=Color.random())
         await ctx.followup.send(embed=ask, view=view)
@@ -232,7 +226,7 @@ class Flip_Group(GroupCog, name="flip"):
             Currency(ctx.user).add_qp(20)
 
             embed = Embed(
-                description="YAY! You got it!\n20 {} has been added".format(qp)
+                description="YAY! You got it!\n20 <:quantumpiece:980772736861343774> has been added"
             )
 
             await ctx.edit_original_response(embed=embed, view=None)
@@ -256,26 +250,26 @@ class Flip_Group(GroupCog, name="flip"):
     @Jeanne.describe(bet="How much are you betting?")
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def bet(self, ctx: Interaction, bet: str):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
+        
+        await ctx.response.defer()
 
-        qp = str(self.bot.get_emoji(980772736861343774))
         picks = ["Heads", "Tails"]
         jeannes_pick = choice(picks)
         balance = Currency(ctx.user).get_balance()
         if 5 > int(bet):
-            bethigher = Embed(description=f"Please bet an amount higher than 5 {qp}")
+            bethigher = Embed(description="Please bet an amount higher than 5 <:quantumpiece:980772736861343774>")
             await ctx.followup.send(embed=bethigher)
 
         elif int(balance) < int(bet):
             betlower = Embed(
-                description=f"Your balance is too low!\nPlease bet lower than {balance} {qp}"
+                description=f"Your balance is too low!\nPlease bet lower than {balance} <:quantumpiece:980772736861343774>"
             )
             await ctx.followup.send(embed=betlower)
         elif int(balance) == 0:
             zerobal = Embed(
-                description=f"Unfortunately, you have 0 {qp}.\nPlease do a daily and/or wait for a free chance to do `/guess free`, `/flip free` and/or `/dice free`"
+                description="Unfortunately, you have 0 <:quantumpiece:980772736861343774>.\nPlease do a daily and/or wait for a free chance to do `/guess free`, `/flip free` and/or `/dice free`"
             )
             await ctx.followup.send(embed=zerobal)
 
@@ -289,9 +283,7 @@ class Flip_Group(GroupCog, name="flip"):
                 Currency(ctx.user).add_qp(int(bet))
 
                 embed = Embed(
-                    description="YAY! You got it!\n{} {} has been added".format(
-                        int(bet), qp
-                    )
+                    description="YAY! You got it!\n{} <:quantumpiece:980772736861343774> has been added".format(int(bet))
                 )
 
                 await ctx.edit_original_response(embed=embed, view=None)
@@ -307,9 +299,8 @@ class Flip_Group(GroupCog, name="flip"):
                 Currency(ctx.user).remove_qp(int(bet))
                 embed = Embed(color=Color.red())
                 embed = Embed(
-                    description="Oh no, it was {}\nI'm afraid that I have to take {}{} from you".format(
-                        jeannes_pick, int(bet), qp
-                    ),
+                    description="Oh no, it was {}\nI'm afraid that I have to take {} <:quantumpiece:980772736861343774> from you".format(
+                        jeannes_pick, int(bet)),
                     color=Color.red(),
                 )
                 await ctx.edit_original_response(embed=embed, view=None)
@@ -341,10 +332,9 @@ class currency(Cog):
 
     @Jeanne.command(description="Claim your daily")
     async def daily(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
-
-        qp = self.bot.get_emoji(980772736861343774)
+        await ctx.response.defer()
         tomorrow = round((datetime.now() + timedelta(days=1)).timestamp())
 
         if Currency(ctx.user).give_daily() == True:
@@ -358,34 +348,33 @@ class currency(Cog):
 
             if datetime.today().weekday() >= 5:
                 daily.add_field(
-                    name="Rewards (weekend):", value=f"You received 200 {qp}"
+                    name="Rewards (weekend):", value="You received 200 <:quantumpiece:980772736861343774>"
                 )
             else:
-                daily.add_field(name="Rewards:", value=f"You received 100 {qp}")
-            daily.add_field(name="Balance", value=f"{balance} {qp}")
+                daily.add_field(name="Rewards:", value="You received 100 <:quantumpiece:980772736861343774>")
+            daily.add_field(name="Balance", value=f"{balance} <:quantumpiece:980772736861343774>")
             daily.add_field(name="Next Daily:", value=f"<t:{tomorrow}:f>")
-            await ctx.response.send_message(embed=daily)
+            await ctx.followup.send(embed=daily)
 
         elif Currency(ctx.user).give_daily() == False:
             cooldown = Embed(
                 description=f"You have already claimed your daily.\nYour next claim is <t:{Currency(ctx.user).get_next_daily()}:R>",
                 color=Color.red(),
             )
-            await ctx.response.send_message(embed=cooldown)
+            await ctx.followup.send(embed=cooldown)
 
     @Jeanne.command(description="Check how much QP you have")
     @Jeanne.checks.cooldown(1, 30, key=lambda i: (i.user.id))
     async def balance(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
-        qp = str(self.bot.get_emoji(980772736861343774))
         bal = Currency(ctx.user).get_balance()
 
-        balance = Embed(description=f"You have {bal} {qp}", color=Color.blue())
+        balance = Embed(description=f"You have {bal} <:quantumpiece:980772736861343774>", color=Color.blue())
         balance.add_field(
-            name=f"If you want more {qp}:",
+            name=f"If you want more <:quantumpiece:980772736861343774>:",
             value="[Vote for me in TopGG](https://top.gg/bot/831993597166747679/vote)",
             inline=True,
         )
@@ -402,7 +391,7 @@ class currency(Cog):
 
     @Jeanne.command(description="Vote for me in TopGG to get more QP!")
     async def vote(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
         await ctx.response.send_message(
             embed=Embed(
