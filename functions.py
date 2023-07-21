@@ -5,8 +5,10 @@ import time
 from humanfriendly import parse_timespan
 from discord import Embed, Color, Emoji, Guild, Member, TextChannel, User
 from requests import get
+from tabulate import tabulate
 from config import db
 from typing import Optional, List
+
 
 current_time = date.today()
 
@@ -91,7 +93,7 @@ class Currency:
             "SELECT * FROM bankData WHERE user_id = ?", (self.user.id,)
         ).fetchone()
 
-        qp = 200 if datetime.today().weekday() > 5 else 100
+        qp = 200 if datetime.today().weekday() >= 5 else 100
 
         if data is None or data[2] < round(current_time.timestamp()):
             db.execute(
@@ -121,7 +123,7 @@ class Inventory:
     def __init__(self, user: Optional[User] = None) -> None:
         self.user = user
 
-    def fetch_wallpapers(self, qp: Emoji) -> Embed:
+    def fetch_wallpapers(self) -> Embed:
         w = db.execute("SELECT * FROM wallpapers").fetchall()
 
         backgrounds = Embed(
@@ -131,7 +133,7 @@ class Inventory:
         for a in w:
             backgrounds.add_field(
                 name=f"{a[1]}",
-                value="[Item ID: {}]({})\nPrice: 1000 {}".format(a[0], a[2], qp),
+                value="[Item ID: {}]({})\nPrice: 1000 <:quantumpiece:980772736861343774>".format(a[0], a[2]),
                 inline=True,
             )
         db.commit()
