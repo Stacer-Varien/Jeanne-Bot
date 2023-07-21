@@ -1,3 +1,4 @@
+from typing import Optional
 from discord import (
     ButtonStyle,
     Color,
@@ -8,6 +9,7 @@ from discord import (
 )
 from discord.ext.commands import Cog, Bot
 from functions import Botban
+from assets.help.helpcmds import HelpCommands, HelpModules
 
 
 class help_button(ui.View):
@@ -40,7 +42,7 @@ class help(Cog):
     @Jeanne.command(
         description="Get help from the wiki or join the support server for further help"
     )
-    async def help(self, ctx: Interaction):
+    async def help(self, ctx: Interaction, module:Optional[HelpModules]=None, command:Optional[HelpCommands]=None):
         if Botban(ctx.user).check_botbanned_user():
             return
 
