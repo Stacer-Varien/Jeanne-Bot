@@ -10,15 +10,15 @@ from discord import (
     app_commands as Jeanne,
     Message,
 )
+from config import TOPGG
 from functions import Botban, Currency, Inventory, Levelling, get_richest
 from typing import Optional
 from assets.generators.level_card import Level
 from assets.generators.profile_card import Profile
-from config import TOPGG
-from topgg import DBLClient
 from collections import OrderedDict
 from json import loads
 from tabulate import tabulate
+from topgg import DBLClient
 
 
 def replace_all(text: str, dic: dict):
@@ -38,7 +38,7 @@ class Rank_Group(GroupCog, name="rank"):
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def _global(self, ctx: Interaction):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         embed = Embed(color=Color.random())
@@ -60,24 +60,31 @@ class Rank_Group(GroupCog, name="rank"):
     
         await ctx.followup.send(embed=embed)
 
+        
+
     @Jeanne.command(description="Check the users with the most XP in the server")
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def server(self, ctx: Interaction):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
-        embed = Embed(color=0xFFD700)
-        embed.set_author(name="XP Leaderboard")
+        embed = Embed(color=Color.random())
+        embed.set_author(name="Server XP Leaderboard")
 
         leaderboard = Levelling(server=ctx.guild).get_server_rank()
-
-        r = 1
+        
+        r = 0
+        data=[]
         for i in leaderboard:
             p = await self.bot.fetch_user(i[0])
-            embed.add_field(name="_ _", value=f"**{r}**. {p}")
             r += 1
+            data.append([str(r), str(p)])
+        
 
+        headers=["Place", "User"]
+        
+        embed.description=tabulate(data, headers, tablefmt="pretty", colalign=("right",))
         await ctx.followup.send(embed=embed)
 
 
@@ -85,7 +92,7 @@ class levelling(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self._cd = CooldownMapping.from_cooldown(1, 120, BucketType.member)
-        self.topggpy = DBLClient(self.bot, str(TOPGG))
+        self.topggpy = DBLClient(bot=self.bot, token=TOPGG)
 
     def get_ratelimit(self, message: Message) -> Optional[int]:
         bucket = self._cd.get_bucket(message)
@@ -169,11 +176,10 @@ class levelling(Cog):
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     async def level(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
-        if member is None:
-            member = ctx.user
+        member=ctx.user if member is None else member
         try:
             memdata = Levelling(member, ctx.guild)
             slvl = memdata.get_member_level()
@@ -223,11 +229,10 @@ class levelling(Cog):
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     async def profile(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
-        if member is None:
-            member = ctx.user
+        member=ctx.user if member is None else member
         try:
             memdata = Levelling(member, ctx.guild)
             slvl = memdata.get_member_level()

@@ -1,3 +1,4 @@
+from datetime import timedelta, datetime
 from discord import (
     Attachment,
     ButtonStyle,
@@ -11,14 +12,18 @@ from discord import (
 )
 from aiohttp import ClientSession
 from discord.ext.commands import Cog, Bot, GroupCog
+from discord.ext import tasks
 from assets.components import ReportModal
-from functions import Botban
+from assets.dictionary import dictionary
+from functions import Botban, Reminder
 from config import WEATHER
 from discord.ui import View
 from py_expression_eval import Parser
 from typing import Optional
 from json import loads
 from requests import get
+from enum import Enum
+from humanfriendly import parse_timespan, InvalidTimespan
 
 bot_invite_url = "https://discord.com/oauth2/authorize?client_id=831993597166747679&scope=bot%20applications.commands&permissions=467480734774"
 
@@ -27,6 +32,13 @@ topgg_invite = "https://top.gg/bot/831993597166747679"
 discordbots_url = "https://discord.bots.gg/bots/831993597166747679"
 
 orleans = "https://discord.gg/jh7jkuk2pp"
+
+
+class Languages(Enum):
+    English = "en"
+    Spanish = "es"
+    French = "fr"
+    Japanese = "jp"
 
 
 class invite_button(View):
@@ -51,139 +63,194 @@ class Weather_Group(GroupCog, name="weather"):
         super().__init__()
 
     @Jeanne.command(description="Get weather information on a city")
+    @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     @Jeanne.describe(city="Add a city")
     async def city(self, ctx: Interaction, city: str):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
-        min_tempe = self.bot.get_emoji(1009760796017963119)
-        max_tempe = self.bot.get_emoji(1009761541169618964)
-        guste = self.bot.get_emoji(1009766251431743569)
-        globe = self.bot.get_emoji(1009723165305491498)
 
-        urlil = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={WEATHER}&units=metric"
+        emoji_map = {
+            "globe": "🌍",
+            "newspaper": "📰",
+            "min_tempe": "🌡️",
+            "max_tempe": "🔥",
+            "feels_like": "🤚",
+            "humidity": "💧",
+            "visibility": "👁️",
+            "clouds": "☁️",
+            "wind_dir": "➡️",
+            "guste": "💨",
+        }
+
+        url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={WEATHER}&units=metric"
         async with ClientSession() as session:
-            async with session.get(urlil) as r:
+            async with session.get(url) as r:
                 if r.status == 200:
-                    js = await r.json()
-                    feels_like = js["main"]["feels_like"]
-                    min_temp = js["main"]["temp_min"]
-                    max_temp = js["main"]["temp_max"]
-                    desc = js["weather"][0]["description"]
-                    count = js["sys"]["country"]
-                    hum = js["main"]["humidity"]
-                    visibility = js["visibility"]
-                    clouds = js["clouds"]["all"]
-                    windir = js["wind"]["deg"]
-                    wind_gust = js["wind"]["speed"]
+                    weather_data = await r.json()
+
+                    main_data = weather_data["main"]
+                    weather = weather_data["weather"][0]
+                    sys_data = weather_data["sys"]
+                    wind = weather_data["wind"]
 
                     embed = Embed(
-                        title=f"⛅ Weather details of {city} ⛅",
-                        description=f"{globe} Country: {count}",
-                        colour=Color.random(),
+                        title=f"{emoji_map['globe']} Weather details of {city} {emoji_map['globe']}",
+                        description=f"{emoji_map['globe']} Country: {sys_data['country']}",
+                        color=Color.random(),
                     )
                     embed.add_field(
-                        name=":newspaper: Description", value=desc, inline=True
-                    )
-                    embed.add_field(
-                        name=f"{min_tempe} Minimum Temperature",
-                        value=f"{min_temp}°C",
+                        name=f"{emoji_map['newspaper']} Description",
+                        value=weather["description"],
                         inline=True,
                     )
                     embed.add_field(
-                        name=f"{max_tempe} Maximum Temperature",
-                        value=f"{max_temp}°C",
+                        name=f"{emoji_map['min_tempe']} Minimum Temperature",
+                        value=f"{main_data['temp_min']}°C",
                         inline=True,
                     )
                     embed.add_field(
-                        name=":raised_back_of_hand: Feels Like",
-                        value=f"{feels_like}°C",
-                        inline=True,
-                    )
-                    embed.add_field(name=":droplet: Humidity", value=hum, inline=True)
-                    embed.add_field(
-                        name=":eye: Visibility", value=f"{visibility}m", inline=True
-                    )
-                    embed.add_field(
-                        name=":cloud: Clouds", value=f"{clouds}%", inline=True
-                    )
-                    embed.add_field(
-                        name=":arrow_right: Wind Direction",
-                        value=f"{windir}°",
+                        name=f"{emoji_map['max_tempe']} Maximum Temperature",
+                        value=f"{main_data['temp_max']}°C",
                         inline=True,
                     )
                     embed.add_field(
-                        name=f"{guste} Wind Gust", value=f"{wind_gust}m/s", inline=True
+                        name=f"{emoji_map['feels_like']} Feels Like",
+                        value=f"{main_data['feels_like']}°C",
+                        inline=True,
                     )
+                    embed.add_field(
+                        name=f"{emoji_map['humidity']} Humidity",
+                        value=f"{main_data['humidity']}",
+                        inline=True,
+                    )
+                    embed.add_field(
+                        name=f"{emoji_map['visibility']} Visibility",
+                        value=f"{weather_data['visibility']}m",
+                        inline=True,
+                    )
+                    embed.add_field(
+                        name=f"{emoji_map['clouds']} Clouds",
+                        value=f"{weather_data['clouds']['all']}%",
+                        inline=True,
+                    )
+                    embed.add_field(
+                        name=f"{emoji_map['wind_dir']} Wind Direction",
+                        value=f"{wind['deg']}°",
+                        inline=True,
+                    )
+                    embed.add_field(
+                        name=f"{emoji_map['guste']} Wind Gust",
+                        value=f"{wind['speed']}m/s",
+                        inline=True,
+                    )
+
                     await ctx.followup.send(embed=embed)
 
     @Jeanne.command(
         description="Get weather information on a city but with a ZIP code and Country code"
     )
     @Jeanne.describe(zip_code="Add a ZIP code", country_code="Add a country code")
+    @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     async def zipcode(self, ctx: Interaction, zip_code: str, country_code: str):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
-        min_tempe = self.bot.get_emoji(1009760796017963119)
-        max_tempe = self.bot.get_emoji(1009761541169618964)
-        guste = self.bot.get_emoji(1009766251431743569)
-        urlil = f"http://api.openweathermap.org/data/2.5/weather?zip={zip_code},{country_code}&appid={WEATHER}&units=metric"
+        emoji_map = {
+            "newspaper": "📰",
+            "min_tempe": "🌡️",
+            "max_tempe": "🔥",
+            "feels_like": "🤚",
+            "humidity": "💧",
+            "visibility": "👁️",
+            "clouds": "☁️",
+            "wind_dir": "➡️",
+            "guste": "💨"
+        }
+
+        url = f"http://api.openweathermap.org/data/2.5/weather?zip={zip_code},{country_code}&appid={WEATHER}&units=metric"
         async with ClientSession() as session:
-            async with session.get(urlil) as r:
+            async with session.get(url) as r:
                 if r.status == 200:
-                    js = await r.json()
-                    feels_like = js["main"]["feels_like"]
-                    min_temp = js["main"]["temp_min"]
-                    max_temp = js["main"]["temp_max"]
-                    desc = js["weather"][0]["description"]
-                    count = js["sys"]["country"]
-                    hum = js["main"]["humidity"]
-                    visibility = js["visibility"]
-                    clouds = js["clouds"]["all"]
-                    windir = js["wind"]["deg"]
-                    wind_gust = js["wind"]["speed"]
+                    weather_data = await r.json()
+
+                    main_data = weather_data["main"]
+                    weather = weather_data["weather"][0]
+                    sys_data = weather_data["sys"]
+                    wind = weather_data["wind"]
+
                     embed = Embed(
                         title=f"⛅ Weather details of {zip_code} ⛅",
-                        description=f":earth_africa: Country: {count}",
-                        colour=Color.random(),
+                        description=f":earth_africa: Country: {sys_data['country']}",
+                        color=Color.random()
                     )
                     embed.add_field(
-                        name=":newspaper: Description", value=desc, inline=True
+                        name=f"{emoji_map['newspaper']} Description",
+                        value=weather["description"],
+                        inline=True
                     )
                     embed.add_field(
-                        name=f"{min_tempe} Minimum Temperature",
-                        value=f"{min_temp}°C",
-                        inline=True,
+                        name=f"{emoji_map['min_tempe']} Minimum Temperature",
+                        value=f"{main_data['temp_min']}°C",
+                        inline=True
                     )
                     embed.add_field(
-                        name=f"{max_tempe} Maximum Temperature",
-                        value=f"{max_temp}°C",
-                        inline=True,
+                        name=f"{emoji_map['max_tempe']} Maximum Temperature",
+                        value=f"{main_data['temp_max']}°C",
+                        inline=True
                     )
                     embed.add_field(
-                        name=":raised_back_of_hand: Feels Like",
-                        value=f"{feels_like}°C",
-                        inline=True,
-                    )
-                    embed.add_field(name=":droplet: Humidity", value=hum, inline=True)
-                    embed.add_field(
-                        name=":eye: Visibility", value=f"{visibility}m", inline=True
+                        name=f"{emoji_map['feels_like']} Feels Like",
+                        value=f"{main_data['feels_like']}°C",
+                        inline=True
                     )
                     embed.add_field(
-                        name=":cloud: Clouds", value=f"{clouds}%", inline=True
+                        name=f"{emoji_map['humidity']} Humidity",
+                        value=f"{main_data['humidity']}",
+                        inline=True
                     )
                     embed.add_field(
-                        name=":arrow_right: Wind Direction",
-                        value=f"{windir}°",
-                        inline=True,
+                        name=f"{emoji_map['visibility']} Visibility",
+                        value=f"{weather_data['visibility']}m",
+                        inline=True
                     )
                     embed.add_field(
-                        name=f"{guste} Wind Gust", value=f"{wind_gust}m/s", inline=True
+                        name=f"{emoji_map['clouds']} Clouds",
+                        value=f"{weather_data['clouds']['all']}%",
+                        inline=True
                     )
+                    embed.add_field(
+                        name=f"{emoji_map['wind_dir']} Wind Direction",
+                        value=f"{wind['deg']}°",
+                        inline=True
+                    )
+                    embed.add_field(
+                        name=f"{emoji_map['guste']} Wind Gust",
+                        value=f"{wind['speed']}m/s",
+                        inline=True
+                    )
+
                     await ctx.followup.send(embed=embed)
+
+    @city.error
+    async def city_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandOnCooldown):
+            embed = Embed(color=Color.red())
+            embed.description = "Woah, slow down! Give the command a rest.\n\nYou can try again after `{} seconds`".format(
+                round(error.retry_after)
+            )
+            await ctx.followup.send(embed=embed)
+
+    @zipcode.error
+    async def city_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandOnCooldown):
+            embed = Embed(color=Color.red())
+            embed.description = "Woah, slow down! Give the command a rest.\n\nYou can try again after `{} seconds`".format(
+                round(error.retry_after)
+            )
+            await ctx.followup.send(embed=embed)
 
 
 class Embed_Group(GroupCog, name="embed"):
@@ -192,7 +259,7 @@ class Embed_Group(GroupCog, name="embed"):
         super().__init__()
 
     @Jeanne.command(
-        description="Generates an embed message. This needs the Discohooks.org embed generator"
+        description="Generates an embed message. This needs the Discohook.org embed generator"
     )
     @Jeanne.describe(
         channel="Send to which channel?",
@@ -207,7 +274,7 @@ class Embed_Group(GroupCog, name="embed"):
         jsonscript: Optional[str] = None,
         jsonfile: Optional[Attachment] = None,
     ):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer(ephemeral=True)
@@ -242,7 +309,9 @@ class Embed_Group(GroupCog, name="embed"):
                 await channel.send(content=content, embed=embed)
             except:
                 await channel.send(content=content)
-            await ctx.followup.send(content="Embed sent in {}".format(channel.mention), ephemeral=True)
+            await ctx.followup.send(
+                content="Embed sent in {}".format(channel.mention), ephemeral=True
+            )
 
     @Jeanne.command(
         description="Edits an embed message. This needs the Discohook.org embed generator"
@@ -262,7 +331,7 @@ class Embed_Group(GroupCog, name="embed"):
         jsonscript: Optional[str] = None,
         jsonfile: Optional[Attachment] = None,
     ):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
         else:
             await ctx.response.defer(ephemeral=True)
@@ -306,8 +375,107 @@ class Embed_Group(GroupCog, name="embed"):
                         await message.edit(content=content, embed=embed)
                     except:
                         await message.edit(content=content)
-                    await ctx.followup.send(content="[Message]({}) edited".format(message.jump_url), ephemeral=True)
+                    await ctx.followup.send(
+                        content="[Message]({}) edited".format(message.jump_url),
+                        ephemeral=True,
+                    )
 
+
+class ReminderCog(GroupCog, name="reminder"):
+    def __init__(self, bot: Bot):
+        self.bot = bot
+        self.check_reminders.start()
+        super().__init__()
+
+    @tasks.loop(seconds=30)
+    async def check_reminders(self):
+        for reminder in Reminder().get_all_reminders():
+            if int(round(datetime.now().timestamp())) > int(reminder[2]):
+                member = await self.bot.fetch_user(reminder[0])
+                id= reminder[1]
+                reason=reminder[3]
+                try:
+                    embed=Embed(title="Reminder ended", color=Color.random())
+                    embed.add_field(name="Reminder", value=reason, inline=False)
+                    await member.send(embed=embed)
+                except:
+                    pass
+                Reminder(member).remove(id)
+            else:
+                continue
+
+    @Jeanne.command(description="Add a reminder")
+    @Jeanne.describe(reason="Reason for the reminder", time="Time that you want to be reminded at? (1h, 30m, etc)")
+    async def add(
+        self, ctx: Interaction, reason: str, time: str):
+        await ctx.response.defer()
+        if Botban(ctx.user).check_botbanned_user():
+            return
+        embed = Embed()
+        if len(Reminder(ctx.user).get_all_user_reminders()) >= 10:
+            embed.description = "You have too many reminders!\nWait for one of them to be due or cancel a reminder"
+            embed.color = Color.red()
+            ctx.followup.send(embed=embed)
+        else:
+            if parse_timespan(time) < parse_timespan("1 minute"):
+                embed.color=Color.red()
+                embed.description="Please add a time more than 1 minute"
+                await ctx.followup.send(embed=embed, ephemeral=True)
+            else:
+                date = datetime.now() + timedelta(seconds=parse_timespan(time))
+                embed.title = "Reminder added"
+                
+                embed.description = f"On <t:{round(date.timestamp())}:F>, I will alert you about your reminder"
+                embed.color = Color.random()
+                embed.add_field(name="Reason", value=reason, inline=False)
+                embed.set_footer(
+                    text="Please allow your DMs to be opened in this server (or any other server you are mutual to me) to recieve alerts"
+                )
+                Reminder(ctx.user).add(reason, time)
+                await ctx.followup.send(embed=embed, ephemeral=True)
+
+    @add.error
+    async def _add_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandInvokeError):
+            if InvalidTimespan:
+                embed = Embed(
+                    title="Invalid time added",
+                    description="You have entered the time incorrectly!",
+                    color=Color.red(),
+                )
+                embed.add_field(
+                    name="The time units (and abbreviations) supported by this command are:",
+                    value="- ms, millisecond, milliseconds\n- s, sec, secs, second, seconds\n- m, min, mins, minute, minutes\n- h, hour, hours\n- d, day, days\n- w, week, weeks\n- y, year, years",
+                    inline=False,
+                )
+                await ctx.followup.send(embed=embed, ephemeral=True)
+
+    @Jeanne.command(name="list", description="List all the reminders you have")
+    async def _list(self, ctx: Interaction):
+        await ctx.response.defer()
+        if Botban(ctx.user).check_botbanned_user():
+            return        
+        reminders = Reminder(ctx.user).get_all_user_reminders()
+        embed = Embed()
+        embed.description = reminders
+        embed.color = Color.random()
+        await ctx.followup.send(embed=embed, ephemeral=True)
+    
+    @Jeanne.command(name="cancel", description="Cancel a reminder")
+    async def cancel(self, ctx:Interaction, reminder_id:int):
+        await ctx.response.defer()
+        if Botban(ctx.user).check_botbanned_user():
+            return
+        reminder=Reminder(ctx.user)
+        embed=Embed()
+        if reminder.remove(reminder_id) is None:
+            embed.color=Color.red()
+            embed.description="You don't have a reminder with that ID"
+            await ctx.followup.send(embed=embed, ephemeral=True)
+        else:
+            embed.description="Reminder `{}` has been removed".format(reminder_id)
+            reminder.remove(reminder_id)
+            await ctx.followup.send(embed=embed, ephemeral=True)
 
 class slashutilities(Cog):
     def __init__(self, bot: Bot):
@@ -318,7 +486,7 @@ class slashutilities(Cog):
     @Jeanne.describe(channel="Send to which channel?", message="What should I say?")
     @Jeanne.checks.has_permissions(administrator=True)
     async def say(self, ctx: Interaction, channel: TextChannel, message: str):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer(ephemeral=True)
@@ -329,7 +497,7 @@ class slashutilities(Cog):
     @Jeanne.describe(calculate="Add a calculation")
     async def calculator(self, ctx: Interaction, calculate: str):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         try:
@@ -346,7 +514,7 @@ class slashutilities(Cog):
     @Jeanne.command(description="Invite me to your server or join the support server")
     async def invite(self, ctx: Interaction):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         invite = Embed(
@@ -360,11 +528,21 @@ class slashutilities(Cog):
     @Jeanne.command(description="Submit a bot report if you found something wrong")
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     async def botreport(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.send_modal(ReportModal())
 
+    @Jeanne.command(description="Check the meaning of a word")
+    @Jeanne.describe()
+    async def dictionary(
+        self, ctx: Interaction, word: str, language: Optional[Languages]=None
+    ):
+        await ctx.response.defer()
+        if Botban(ctx.user).check_botbanned_user():
+            return
+        lang=language.value if language is not None else 'en'
+        await dictionary(ctx, word.lower(), lang)
 
 async def setup(bot: Bot):
     await bot.add_cog(Weather_Group(bot))

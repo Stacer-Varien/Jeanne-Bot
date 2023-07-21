@@ -3,8 +3,6 @@ from PIL import Image, ImageDraw, ImageFont, ImageColor, ImageEnhance
 import requests
 import math
 import os
-
-
 class Profile:
     def __init__(self):
         self.default_bg = os.path.join(os.path.dirname(__file__), "assets", "card.png")
@@ -28,7 +26,6 @@ class Profile:
         )
         self.partner = os.path.join(os.path.dirname(__file__), "assets", "partner.png")
         self.qp = os.path.join(os.path.dirname(__file__), "assets", "qp.png")
-
     def generate_profile(
         self,
         creator: int,

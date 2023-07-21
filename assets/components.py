@@ -17,7 +17,6 @@ from json import loads
 from config import WEBHOOK
 from functions import Levelling, Welcomer
 
-
 def replace_all(text: str, dic: dict):
     for i, j in dic.items():
         text = text.replace(i, j)
@@ -53,12 +52,12 @@ class Heads_or_Tails(ui.View):
         self.value = None
 
     @ui.button(label="Heads", style=ButtonStyle.green)
-    async def confirm(self, button: ui.Button, ctx: Interaction):
+    async def confirm(self, ctx: Interaction, button: ui.Button):
         self.value = "Heads"
         self.stop()
 
     @ui.button(label="Tails", style=ButtonStyle.green)
-    async def cancel(self, button: ui.Button, ctx: Interaction):
+    async def cancel(self, ctx:Interaction, button: ui.Button):
         self.value = "Tails"
         self.stop()
 
@@ -402,7 +401,7 @@ class ReportSelect(ui.View):
 
 class ReportContent(ui.View):
     def __init__(self, link: str):
-        super().__init__()
+        super().__init__(timeout=180)
         self.link = link
 
     @ui.button(label="Report Content", style=ButtonStyle.grey)

@@ -1,81 +1,50 @@
 from datetime import date, datetime, timedelta
-from json import loads
-from random import choice, randint
+from enum import Enum
+from random import choice, randint, shuffle
+import time
 from humanfriendly import parse_timespan
 from discord import Embed, Color, Emoji, Guild, Member, TextChannel, User
 from requests import get
+from tabulate import tabulate
 from config import db
-from typing import Optional
+from typing import Optional, List
+
 
 current_time = date.today()
 
 
 class Botban:
-    def __init__(self, user: User) -> None:
+    def __init__(self, user: User):
         self.user = user
-
-    def check_botbanned_user(self) -> bool:
+    
+    def check_botbanned_user(self):
         botbanned_data = db.execute(
             "SELECT * FROM botbannedData WHERE user_id = ?", (self.user.id,)
         ).fetchone()
 
-        if botbanned_data == None:
-            return False
-        else:
-            if self.user.id == botbanned_data[0]:
-                return True
+        return botbanned_data is not None and self.user.id == botbanned_data[0]
 
     def add_botbanned_user(self, reason: str):
         db.execute(
-            "INSERT OR IGNORE INTO botbannedData (user_id, reason) VALUES (?,?)",
+            "INSERT OR IGNORE INTO botbannedData (user_id, reason) VALUES (?, ?)",
             (
                 self.user.id,
                 reason,
             ),
         )
-        server_xp_data = db.execute(
-            "SELECT * FROM serverxpData WHERE user_id = ?", (self.user.id,)
-        ).fetchall()
-        global_xp_data = db.execute(
-            "SELECT * FROM globalxpData WHERE user_id = ?", (self.user.id,)
-        ).fetchone()
-        inventory_data = db.execute(
-            "SELECT * FROM userWallpaperInventory WHERE user_id = ?", (self.user.id,)
-        ).fetchall()
-        bank_data = db.execute(
-            "SELECT * FROM bankData WHERE user_id = ?", (self.user.id,)
-        ).fetchone()
 
-        if server_xp_data == None:
-            pass
-        else:
-            db.execute("DELETE FROM serverxpData WHERE user_id = ?", (self.user.id,))
-
-        if global_xp_data == None:
-            pass
-        else:
-
-            db.execute("DELETE * FROM globalxpData WHERE user_id = ?", (self.user.id,))
-
-        if inventory_data == None:
-            pass
-        else:
-
-            db.execute(
-                "DELETE FROM userWallpaperInventory WHERE user_id = ?", (self.user.id,)
-            )
-
-        if bank_data == None:
-            pass
-        else:
-
-            db.execute("DELETE FROM bankData WHERE user_id = ?", (self.user.id,))
+        db.execute("DELETE FROM serverxpData WHERE user_id = ?", (self.user.id,))
+        db.execute("DELETE FROM globalxpData WHERE user_id = ?", (self.user.id,))
+        db.execute(
+            "DELETE FROM userWallpaperInventory WHERE user_id = ?", (self.user.id,)
+        )
+        db.execute("DELETE FROM bankData WHERE user_id = ?", (self.user.id,))
 
         db.commit()
 
 
 class Currency:
-    def __init__(self, user: User) -> None:
+    def __init__(self, user: User):
         self.user = user
 
     def get_balance(self):
@@ -83,15 +52,16 @@ class Currency:
             "SELECT amount FROM bankData WHERE user_id = ?", (self.user.id,)
         ).fetchone()
 
-        if data == None:
-            return 0
-        else:
-            return data[0]
+        return data[0] if data is not None else 0
 
-    def add_qp(self, amount: int) -> int:
+    def add_qp(self, amount: int):
         cur = db.execute(
             "INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)",
-            (self.user.id, amount, (current_time - timedelta(days=1))),
+            (
+                self.user.id,
+                amount,
+                (current_time - timedelta(days=1)),
+            ),
         )
 
         if cur.rowcount == 0:
@@ -102,9 +72,10 @@ class Currency:
                     self.user.id,
                 ),
             )
+
         db.commit()
 
-    def remove_qp(self, amount: int) -> int:
+    def remove_qp(self, amount: int):
         db.execute(
             "UPDATE bankData SET amount = amount - ? WHERE user_id = ?",
             (
@@ -112,54 +83,30 @@ class Currency:
                 self.user.id,
             ),
         )
+
         db.commit()
 
-    def give_daily(self) -> bool:
+    def give_daily(self):
         current_time = datetime.now()
         next_claim = current_time + timedelta(days=1)
         data = db.execute(
             "SELECT * FROM bankData WHERE user_id = ?", (self.user.id,)
         ).fetchone()
 
-        if datetime.today().weekday() > 5:
-            qp = 200
-        else:
-            qp = 100
+        qp = 200 if datetime.today().weekday() >= 5 else 100
 
-        if data == None:
-            cur = db.execute(
-                "INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)",
-                (
-                    self.user.id,
-                    qp,
-                    round(next_claim.timestamp()),
-                ),
-            )
-
-            if cur.rowcount == 0:
-                db.execute(
-                    "UPDATE bankData SET claimed_date = ? , amount = amount + ? WHERE user_id = ?",
-                    (
-                        round(next_claim.timestamp()),
-                        qp,
-                        self.user.id,
-                    ),
-                )
-            db.commit()
-            return True
-
-        elif data[2] < round(current_time.timestamp()):
+        if data is None or data[2] < round(current_time.timestamp()):
             db.execute(
-                "UPDATE bankData SET claimed_date = ? , amount = amount + ? WHERE user_id = ?",
+                "INSERT OR REPLACE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)",
                 (
-                    round(next_claim.timestamp()),
-                    qp,
                     self.user.id,
+                    qp,
+                    round(next_claim.timestamp()),
                 ),
             )
+
             db.commit()
             return True
-
         else:
             return False
 
@@ -167,6 +114,7 @@ class Currency:
         data = db.execute(
             "SELECT claimed_date FROM bankData WHERE user_id = ?", (self.user.id,)
         ).fetchone()
+
         db.commit()
         return data[0]
 
@@ -175,7 +123,7 @@ class Inventory:
     def __init__(self, user: Optional[User] = None) -> None:
         self.user = user
 
-    def fetch_wallpapers(self, qp: Emoji) -> Embed:
+    def fetch_wallpapers(self) -> Embed:
         w = db.execute("SELECT * FROM wallpapers").fetchall()
 
         backgrounds = Embed(
@@ -185,7 +133,7 @@ class Inventory:
         for a in w:
             backgrounds.add_field(
                 name=f"{a[1]}",
-                value="[Item ID: {}]({})\nPrice: 1000 {}".format(a[0], a[2], qp),
+                value="[Item ID: {}]({})\nPrice: 1000 <:quantumpiece:980772736861343774>".format(a[0], a[2]),
                 inline=True,
             )
         db.commit()
@@ -221,7 +169,6 @@ class Inventory:
             db.commit()
 
     def add_user_wallpaper(self, item_id: int):
-
         self.deselect_wallpaper()
 
         wallpaper = self.get_wallpaper(item_id)
@@ -241,7 +188,6 @@ class Inventory:
         Currency(self.user).remove_qp(1000)
 
     def add_user_custom_wallpaper(self, name: str, link: str):
-
         self.deselect_wallpaper()
 
         db.execute(
@@ -740,25 +686,6 @@ class Manage:
             )
         db.commit()
 
-    def set_reporter(self):
-        cursor = db.execute(
-            "INSERT OR IGNORE INTO reportData (guild_id, channel_id) VALUES (?,?)",
-            (
-                self.server.id,
-                self.channel.id,
-            ),
-        )
-
-        if cursor.rowcount == 0:
-            db.execute(
-                f"UPDATE reportData SET channel_id = ? WHERE guild_id = ?",
-                (
-                    self.server.id,
-                    self.channel.id,
-                ),
-            )
-        db.commit()
-
     def remove_welcomer(self):
         cur = db.cursor()
         cur.execute("SELECT * FROM welcomerData WHERE guild_id = ?", (self.server.id,))
@@ -797,19 +724,6 @@ class Manage:
             cur.execute("DELETE FROM modlogData WHERE guild_id = ?", (self.server.id,))
             db.commit()
 
-    def remove_reporter(self):
-        cur = db.cursor()
-        cur.execute("SELECT * FROM reportData WHERE guild_id = ?", (self.server.id,))
-        result = cur.fetchone()
-
-        if result == None:
-            return False
-
-        else:
-            cur.execute("DELETE FROM reportData WHERE guild_id = ?", (self.server.id,))
-
-            db.commit()
-
     def remove_levelup(self):
         cur = db.cursor()
         cur.execute(
@@ -836,7 +750,6 @@ class Moderation:
         self.member = member
 
     def warn_user(self, moderator: int, reason: str, warn_id: int, date: int):
-
         db.execute(
             "INSERT OR IGNORE INTO warnData (guild_id, user_id, moderator_id, reason, warn_id, date) VALUES (?,?,?,?,?,?)",
             (
@@ -949,7 +862,6 @@ class Moderation:
         return data
 
     def softban_member(self, ends: str = None):
-
         if ends == None:
             ends = 99999999999  # infinite value for now
         else:
@@ -986,41 +898,26 @@ class Logger:
         modlog_channel_query = db.execute(
             "SELECT channel_id FROM modlogData WHERE guild_id = ?", (self.server.id,)
         ).fetchone()
+        db.commit()
 
         if modlog_channel_query == None:
             return None
         else:
             return modlog_channel_query[0]
 
-    def get_report_channel(self):
-        data = db.execute(
-            "SELECT channel_id FROM reportData WHERE guild_id = ?", (self.server.id,)
-        ).fetchone()
-        return data
-
-    def fetch_welcomer(self, channel: int):
-        data = db.execute(
-            "SELECT guild_id FROM welcomerData where channel_id = ?", (channel,)
-        ).fetchone()
-        return data[0]
-
     def get_welcomer(self):
         data = db.execute(
-            "SELECT channel_id FROM welcomerData where guild_id = ?", (self.server.id,)
+            "SELECT * FROM welcomerData where guild_id = ?", (self.server.id,)
         ).fetchone()
-        return data[0]
-
-    def fetch_leaver(self, channel: int):
-        data = db.execute(
-            "SELECT guild_id FROM leaverData where channel_id = ?", (channel,)
-        ).fetchone()
-        return data[0]
+        db.commit()
+        return data
 
     def get_leaver(self):
         data = db.execute(
-            "SELECT channel_id FROM leaverData where guild_id = ?", (self.server.id,)
+            "SELECT * FROM leaverData where guild_id = ?", (self.server.id,)
         ).fetchone()
-        return data[0]
+        db.commit()
+        return data
 
     def set_message_logger(self, channel: TextChannel):
         cur = db.execute(
@@ -1051,12 +948,12 @@ class Logger:
         except:
             return False
 
-    def set_member_logger(self, channel: int):
+    def set_member_logger(self, channel: TextChannel):
         cur = db.execute(
             "INSERT OR IGNORE INTO memberLogData (server, channel) VALUES (?,?)",
             (
                 self.server.id,
-                channel,
+                channel.id,
             ),
         )
 
@@ -1064,21 +961,11 @@ class Logger:
             db.execute(
                 "UPDATE memberLogData SET channel = ? WHERE server = ?",
                 (
-                    channel,
+                    channel.id,
                     self.server.id,
                 ),
             )
         db.commit()
-
-    def get_member_logger(self):
-        try:
-            channel = db.execute(
-                "SELECT channel FROM memberLogData WHERE server = ?", (self.server.id,)
-            ).fetchone()
-            db.commit()
-            return channel[0]
-        except:
-            return False
 
     def remove_messagelog(self):
         cur = db.cursor()
@@ -1086,6 +973,7 @@ class Logger:
             "SELECT channel FROM messageLogData WHERE server = ?", (self.server.id,)
         )
         result = cur.fetchone()
+        db.commit()
 
         if result == None:
             return False
@@ -1104,21 +992,15 @@ class Welcomer:
         data = db.execute(
             "SELECT welcoming FROM welcomerMsgData WHERE server = ?", (self.server.id,)
         ).fetchone()
-
-        if data == None or 0:
-            return None
-        else:
-            return data[0]
+        db.commit()
+        return data[0] if data else None
 
     def get_leaving_msg(self):
         data = db.execute(
             "SELECT leaving FROM welcomerMsgData WHERE server = ?", (self.server.id,)
         ).fetchone()
-
-        if data == None or 0:
-            return None
-        else:
-            return data[0]
+        db.commit()
+        return data[0] if data else None
 
     def remove_welcomer_msg(self):
         data = db.execute(
@@ -1221,109 +1103,120 @@ def get_richest(member: Member):
         return 20
 
 
+class NsfwApis(Enum):
+    KonachanApi = "https://konachan.com/post.json?s=post&q=index&limit=100&tags="
+    YandereApi = "https://yande.re/post.json?limit=100&tags=rating:"
+    GelbooruApi = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=rating:"
+
 class Hentai:
     def __init__(self, plus: Optional[bool] = None) -> None:
         self.plus = plus
+        self.blacklisted_tags = {"loli", "shota", "cub", "gore", "vore"}
 
-    def add_blacklisted_link(self, link:str):
-        db.execute("INSERT OR IGNORE INTO hentaiBlacklist (links) VALUES (?)", (link,))
-        db.execute()
+    def format_tags(self, tags: str = None):
+        if tags:
+            tags = [
+                tag.strip().replace(" ", "_")
+                for tag in tags.split(",")
+                if tag.strip().replace(" ", "_")
+            ]
+            tags_string = "+".join(tags)
+            return tags_string
+        else:
+            return ""
 
-    def get_blacklisted_links(self):
-        data = db.execute("SELECT links FROM hentaiBlacklist").fetchall()
+    def get_nsfw_image(
+        self, provider: NsfwApis, rating: Optional[str] = None, tags: str = None
+    ):
+        bl = self.get_blacklisted_links()
+        tags = tags.lower() if tags else None
 
-        if data == None:
+        url = provider.value + rating + "+" + self.format_tags(tags)
+
+        nsfw_images = get(url)
+
+        if not nsfw_images:
             return None
+
+        if provider.value == provider.GelbooruApi.value:
+            nsfw_images_list = list(nsfw_images.json().get("post", []))
         else:
-            for i in data:
-                return i
+            nsfw_images_list = list(nsfw_images.json())
 
+        shuffle(nsfw_images_list)
 
-    def gelbooru(self, rating: Optional[str] = None, tag: Optional[str] = None):
-        bl=self.get_blacklisted_links()
-        if rating == None:
-            rating = ["questionable", "explicit"]
-            rating = choice(rating)
+        if not tags:
+            tags = ""
 
+        tags_list = [
+            tag.strip().replace(" ", "_")
+            for tag in tags.split(",")
+            if tag.strip().replace(" ", "_") not in self.blacklisted_tags
+        ]
 
-        if tag == None:
-            gelbooru_api = f"https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=rating:{rating}+-loli+-shota+-cub"
+        if len(tags_list) == 0 or len(tags_list) > 3:
+            return None
+
+        filtered_ret = [img for img in nsfw_images_list if img["file_url"] not in bl]
+
+        if not filtered_ret:
+            return None
+
+        filtered_images = [
+            img for img in filtered_ret if all(tag in img["tags"] for tag in tags_list)
+        ]
+
+        if len(filtered_images) == 0:
+            return None
+
+        return filtered_images
+
+    def add_blacklisted_link(self, link: str):
+        db.execute("INSERT OR IGNORE INTO hentaiBlacklist (links) VALUES (?)", (link,))
+        db.commit()
+
+    def get_blacklisted_links(self) -> Optional[List[str]]:
+        data = db.execute("SELECT links FROM hentaiBlacklist").fetchall()
+        db.commit()
+        return data[0] if data else None
+
+    def gelbooru(
+        self, rating: Optional[str] = None, tag: Optional[str] = None
+    ) -> Optional[str]:
+        if rating is None:
+            rating = choice(["questionable", "explicit"])
+        if not tag or tag is None:
+            tag = None
+        images =  self.get_nsfw_image(NsfwApis.GelbooruApi, rating, tag)
+
+        if self.plus:
+            return images
         else:
-            formated_tag = tag.replace(" ", "_")
-            gelbooru_api = (
-                f"https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=rating:{rating}+-loli+-shota+-cub+"
-                + formated_tag
-            )
-
-        response = get(gelbooru_api)
-        ret = loads(response.text)
-
-        filtered_ret=[]
-        for dictionary in ret["post"]:
-            if dictionary['file_url'] !=bl[0]:
-                filtered_ret.append(dictionary)
-
-        if self.plus == True:
-            return filtered_ret
-        else:
-            return str(filtered_ret[randint(1, 100) - 1]["file_url"])
+            return choice(images)["file_url"]
 
     def yandere(self, rating: Optional[str] = None, tag: Optional[str] = None):
+        if rating is None:
+            rating = choice(["questionable", "explicit"])
 
-        bl=self.get_blacklisted_links()
-        if rating == None:
-            rating = ["questionable", "explicit"]
-            rating = choice(rating)
+        images =  self.get_nsfw_image(NsfwApis.YandereApi, rating, tag)
 
-        if tag == None:
-            yandere_api = get(
-                f"https://yande.re/post.json?limit=100&shown:true&tags=rating:{rating}+-loli+-shota+-cub"
-            ).json()
-
+        if self.plus:
+            return images
         else:
-            formated_tag = tag.replace(" ", "_")
-            yandere_api = get(
-                f"https://yande.re/post.json?limit=100&shown:true&tags=rating:{rating}+-loli+-shota+-cub+"
-                + formated_tag
-            ).json()
-
-        filtered_ret = []
-        for dictionary in yandere_api:
-            if dictionary['file_url'] != bl[0]:
-                filtered_ret.append(dictionary)
-
-        if self.plus == True:
-            return filtered_ret
-        else:
-            return str(choice(filtered_ret)["file_url"])
+            return choice(images)["file_url"]
 
     def konachan(self, rating: Optional[str] = None, tag: Optional[str] = None):
-        bl=self.get_blacklisted_links()
-        if rating == None:
-            rating = ["questionable", "explicit"]
-            rating = choice(rating)
+        if rating is None:
+            rating = choice(["questionable", "explicit"])
 
-        if tag == None:
-            konachan_api = get(
-                f"https://konachan.com/post.json?limit=100&tags=rating:{rating}+-loli+-shota+-cub"
-            ).json()
+        images =  self.get_nsfw_image(NsfwApis.KonachanApi, rating, tag)
 
+        if self.plus:
+            return images
         else:
-            formated_tag = tag.replace(" ", "_")
-            konachan_api = get(
-                f"https://konachan.com/post.json?limit=100&tags=rating:{rating}+-loli+-shota+-cub+"
-                + formated_tag
-            ).json()
-        filtered_ret = []
-        for dictionary in konachan_api:
-            if dictionary['file_url'] != bl[0]:
-                filtered_ret.append(dictionary)
-        if self.plus == True:
-            return konachan_api
-        else:
-            return str(konachan_api[randint(1, 100) - 1]["file_url"])
+            return choice(images)["file_url"]
 
-    def hentai(self, rating:Optional[str]=None):
+    def hentai(self, rating: Optional[str] = None):
         if rating == None:
             rating = ["questionable", "explicit"]
             rating = choice(rating)
@@ -1333,6 +1226,7 @@ class Hentai:
         yandere_image = self.yandere(rating)
 
         konachan_image = self.konachan(rating)
+        
 
         h = [gelbooru_image, yandere_image, konachan_image]
 
@@ -1346,4 +1240,77 @@ class Hentai:
 
         elif hentai == konachan_image:
             source = "Konachan"
-        return hentai,source
+        
+        return hentai, source
+
+
+def shorten_url(url: str):
+    api_url = "http://tinyurl.com/api-create.php"
+
+    params = {"url": url}
+
+    response = get(api_url, params=params)
+    if response.status_code == 200:
+        short_url = response.text
+        time.sleep(1)
+        return short_url
+    else:
+        return None
+
+
+class Reminder:
+    def __init__(self, user: Optional[User] = None):
+        self.user = user
+
+    def add(self, reason: str, time: int):
+        db.execute(
+            "INSERT OR IGNORE INTO reminderData (userid, id, time, reason) VALUES (?,?,?,?)",
+            (
+                self.user.id,
+                randint(1, 999999),
+                time,
+                reason,
+            ),
+        )
+        db.commit()
+
+    def get_all_reminders(self):
+        data = db.execute("SELECT * FROM reminderData").fetchall()
+        db.commit()
+        return data
+
+    def get_all_user_reminders(self):
+        data = db.execute(
+            "SELECT * FROM reminderData WHERE userid = ?", (self.user.id,)
+        ).fetchall()
+        db.commit()
+        reminders = []
+        for i in data:
+            ids = i[1]
+            reminder = i[3]
+            time = f"<t:{i[2]}:F>"
+            reminders.append([str(ids), str(reminder), str(time)])
+        col_names = ["ID", "Reminders", "Time"]
+        return tabulate(reminders, headers=col_names, tablefmt="pretty")
+
+    def remove(self, id: int):
+        data = db.execute(
+            "SELECT * FROM reminderData WHERE userid = ? AND id = ?",
+            (
+                self.user.id,
+                id,
+            ),
+        ).fetchone()
+        db.commit()
+
+        if data == None:
+            return None
+        else:
+            db.execute(
+                "DELETE FROM reminderData WHERE userid = ? AND id = ?",
+                (
+                    self.user.id,
+                    id,
+                ),
+            )
+            db.commit()

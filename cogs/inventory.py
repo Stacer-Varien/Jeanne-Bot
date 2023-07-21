@@ -15,10 +15,9 @@ class Shop_Group(GroupCog, name="shop"):
     @Jeanne.command(description="Check all the wallpapers available")
     async def backgrounds(self, ctx: Interaction):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
-        qp = self.bot.get_emoji(980772736861343774)
-        await ctx.followup.send(embed=Inventory().fetch_wallpapers(qp))
+        await ctx.followup.send(embed=Inventory().fetch_wallpapers())
 
 
 class Background_Group(GroupCog, name="background"):
@@ -33,16 +32,15 @@ class Background_Group(GroupCog, name="background"):
     @Jeanne.command(description="Preview the inbuild background image")
     @Jeanne.describe(item_id="Which background you are checking?")
     async def preview(self, ctx: Interaction, item_id: str):
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         await ctx.response.defer()
-        qp = self.bot.get_emoji(980772736861343774)
         wallpaper = Inventory().get_wallpaper(item_id)
         embed = Embed(title="Preview background")
         embed.color = Color.random()
         embed.add_field(name="Name", value=wallpaper[1], inline=True)
-        embed.add_field(name="Price", value=f"1000 {qp}", inline=True)
+        embed.add_field(name="Price", value="1000 <:quantumpiece:980772736861343774>", inline=True)
         embed.set_image(url=wallpaper[2])
         await ctx.followup.send(embed=embed)
 
@@ -59,7 +57,7 @@ class Background_Group(GroupCog, name="background"):
     @Jeanne.describe(item_id="Which background you are buying?")
     async def buy(self, ctx: Interaction, item_id: str):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         balance: int = Currency(ctx.user).get_balance()
@@ -142,7 +140,7 @@ class Background_Group(GroupCog, name="background"):
     @Jeanne.describe(name="What is the name of the background?")
     async def use(self, ctx: Interaction, name: str):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         try:
@@ -160,7 +158,7 @@ class Background_Group(GroupCog, name="background"):
     @Jeanne.describe(name="What will you name it?", link="Add an image link")
     async def buycustom(self, ctx: Interaction, name: str, link: str):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         balance = Currency(ctx.user).get_balance()
@@ -239,7 +237,7 @@ class Background_Group(GroupCog, name="background"):
     @Jeanne.command(description="Check which backgrounds you have")
     async def list(self, ctx: Interaction):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user() == True:
+        if Botban(ctx.user).check_botbanned_user():
             return
 
         if Inventory(ctx.user).fetch_user_inventory() == None:

@@ -1,30 +1,39 @@
 from random import choice
+from discord import Color, Embed, File
 import requests
 from config import ANIMEME, JEANNE, MEDUSA, SABER, IMGUR_ID, WALLPAPER
 from json import loads
 import lxml.etree as ET
+from os import listdir, path
 
 
 def get_saber_pic():
-    url = f"https://api.imgur.com/3/album/{SABER}/images"
-    payload = {}
-    files = {}
-    headers = {"Authorization": f"Client-ID {IMGUR_ID}"}
-    response = requests.request("GET", url, headers=headers, data=payload, files=files)
-    json = loads(response.text)
-    pick_link = choice(json["data"])["link"]
-    return pick_link
+    folder_path=SABER
+    files = listdir(folder_path)
+
+    image_files = [file for file in files if file.endswith((".jpg", ".jpeg", ".png", "gif"))]
+    random_image = choice(image_files)
+    embed = Embed(color=Color.random())
+    embed.set_image(url=f"attachment://{random_image}")
+    embed.set_footer(text="Fetched from Saber_1936 • Credits must go to the artist")
+    file=File(path.join(folder_path, random_image), random_image)
+    return embed, file
+
 
 
 def get_jeanne_pic():
-    url = f"https://api.imgur.com/3/album/{JEANNE}/images"
-    payload = {}
-    files = {}
-    headers = {"Authorization": f"Client-ID {IMGUR_ID}"}
-    response = requests.request("GET", url, headers=headers, data=payload, files=files)
-    json = loads(response.text)
-    pick_link = choice(json["data"])["link"]
-    return pick_link
+    folder_path=JEANNE
+    files = listdir(folder_path)
+
+    image_files = [file for file in files if file.endswith((".jpg", ".jpeg", ".png", "gif"))]
+
+    random_image = choice(image_files)
+    File(path.join(folder_path, random_image), filename="image.png")
+    embed = Embed(color=Color.random())
+    embed.set_image(url=f"attachment://{random_image}")
+    embed.set_footer(text="Fetched from Jeanne_1936 • Credits must go to the artist")
+    file=File(path.join(folder_path, random_image), random_image)
+    return embed, file
 
 
 def get_wallpaper_pic():
@@ -39,14 +48,16 @@ def get_wallpaper_pic():
 
 
 def get_medusa_pic():
-    url = f"https://api.imgur.com/3/album/{MEDUSA}/images"
-    payload = {}
-    files = {}
-    headers = {"Authorization": f"Client-ID {IMGUR_ID}"}
-    response = requests.request("GET", url, headers=headers, data=payload, files=files)
-    json = loads(response.text)
-    pick_link = choice(json["data"])["link"]
-    return pick_link
+    folder_path=MEDUSA
+    files = listdir(folder_path)
+
+    image_files = [file for file in files if file.endswith((".jpg", ".jpeg", ".png", "gif"))]
+    random_image = choice(image_files)
+    embed = Embed(color=Color.random())
+    embed.set_image(url=f"attachment://{random_image}")
+    embed.set_footer(text="Fetched from Medusa_1936 • Credits must go to the artist")
+    file=File(path.join(folder_path, random_image), random_image)
+    return embed, file
 
 
 def get_animeme_pic():

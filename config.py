@@ -1,3 +1,5 @@
+"""Everything such as APIs and tokens for the bot, commands and functions to run on"""
+
 from os import getenv
 from dotenv import load_dotenv
 from sqlite3 import connect
@@ -12,10 +14,10 @@ WEBHOOK = getenv("report_webhook")
 BB_WEBHOOK = getenv("botban_webhook")
 IMGUR_ID = getenv("imgur_client_id")
 IMGUR_SECRET = getenv("imgur_client_secret")
-JEANNE = getenv("jeanne_album")
-SABER = getenv("saber_album")
+JEANNE = str(getenv("jeanne_album"))
+SABER = str(getenv("saber_album"))
 WALLPAPER = getenv("wallpaper_album")
-MEDUSA = getenv("medusa_album")
+MEDUSA = str(getenv("medusa_album"))
 ANIMEME = getenv("animeme_album")
 
 db = connect("database.db")
