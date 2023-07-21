@@ -533,7 +533,7 @@ class slashutilities(Cog):
 
         await ctx.response.send_modal(ReportModal())
 
-    @Jeanne.command(description="Check the meaning of a word with this command")
+    @Jeanne.command(description="Check the meaning of a word")
     @Jeanne.describe()
     async def dictionary(
         self, ctx: Interaction, word: str, language: Optional[Languages]=None
