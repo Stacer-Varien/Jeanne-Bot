@@ -5,12 +5,8 @@ import time
 from humanfriendly import parse_timespan
 from discord import Embed, Color, Emoji, Guild, Member, TextChannel, User
 from requests import get
-from tabulate import tabulate
 from config import db
 from typing import Optional, List
-
-
-current_time = date.today()
 
 
 class Botban:
@@ -55,6 +51,7 @@ class Currency:
         return data[0] if data is not None else 0
 
     def add_qp(self, amount: int):
+        current_time = date.today()
         cur = db.execute(
             "INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)",
             (
@@ -1104,7 +1101,7 @@ def get_richest(member: Member):
 
 
 class NsfwApis(Enum):
-    KonachanApi = "https://konachan.com/post.json?s=post&q=index&limit=100&tags="
+    KonachanApi = "https://konachan.com/post.json?s=post&q=index&limit=100&tags=rating:"
     YandereApi = "https://yande.re/post.json?limit=100&tags=rating:"
     GelbooruApi = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=rating:"
 
@@ -1226,7 +1223,6 @@ class Hentai:
         yandere_image = self.yandere(rating)
 
         konachan_image = self.konachan(rating)
-        
 
         h = [gelbooru_image, yandere_image, konachan_image]
 
@@ -1240,7 +1236,7 @@ class Hentai:
 
         elif hentai == konachan_image:
             source = "Konachan"
-        
+
         return hentai, source
 
 
@@ -1284,14 +1280,7 @@ class Reminder:
             "SELECT * FROM reminderData WHERE userid = ?", (self.user.id,)
         ).fetchall()
         db.commit()
-        reminders = []
-        for i in data:
-            ids = i[1]
-            reminder = i[3]
-            time = f"<t:{i[2]}:F>"
-            reminders.append([str(ids), str(reminder), str(time)])
-        col_names = ["ID", "Reminders", "Time"]
-        return tabulate(reminders, headers=col_names, tablefmt="pretty")
+        return data if data is not None else None
 
     def remove(self, id: int):
         data = db.execute(

@@ -24,6 +24,7 @@ from json import loads
 from requests import get
 from enum import Enum
 from humanfriendly import parse_timespan, InvalidTimespan
+from tabulate import tabulate
 
 bot_invite_url = "https://discord.com/oauth2/authorize?client_id=831993597166747679&scope=bot%20applications.commands&permissions=467480734774"
 
@@ -387,7 +388,7 @@ class ReminderCog(GroupCog, name="reminder"):
         self.check_reminders.start()
         super().__init__()
 
-    @tasks.loop(seconds=30)
+    @tasks.loop(seconds=10)
     async def check_reminders(self):
         for reminder in Reminder().get_all_reminders():
             if int(round(datetime.now().timestamp())) > int(reminder[2]):
@@ -408,14 +409,14 @@ class ReminderCog(GroupCog, name="reminder"):
     @Jeanne.describe(reason="Reason for the reminder", time="Time that you want to be reminded at? (1h, 30m, etc)")
     async def add(
         self, ctx: Interaction, reason: str, time: str):
-        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user():
             return
+        await ctx.response.defer(ephemeral=True)
         embed = Embed()
         if len(Reminder(ctx.user).get_all_user_reminders()) >= 10:
             embed.description = "You have too many reminders!\nWait for one of them to be due or cancel a reminder"
             embed.color = Color.red()
-            ctx.followup.send(embed=embed)
+            await ctx.followup.send(embed=embed)
         else:
             if parse_timespan(time) < parse_timespan("1 minute"):
                 embed.color=Color.red()
@@ -424,19 +425,20 @@ class ReminderCog(GroupCog, name="reminder"):
             else:
                 date = datetime.now() + timedelta(seconds=parse_timespan(time))
                 embed.title = "Reminder added"
-                
+
                 embed.description = f"On <t:{round(date.timestamp())}:F>, I will alert you about your reminder"
                 embed.color = Color.random()
                 embed.add_field(name="Reason", value=reason, inline=False)
                 embed.set_footer(
                     text="Please allow your DMs to be opened in this server (or any other server you are mutual to me) to recieve alerts"
                 )
-                Reminder(ctx.user).add(reason, time)
+                Reminder(ctx.user).add(reason, round(date.timestamp()))
                 await ctx.followup.send(embed=embed, ephemeral=True)
 
     @add.error
-    async def _add_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-        if isinstance(error, Jeanne.CommandInvokeError):
+    async def add_error(self, ctx: Interaction, error: Jeanne.errors.AppCommandError):
+        if isinstance(error, Jeanne.errors.CommandInvokeError):
+            await ctx.response.defer(ephemeral=True)
             if InvalidTimespan:
                 embed = Embed(
                     title="Invalid time added",
@@ -452,27 +454,36 @@ class ReminderCog(GroupCog, name="reminder"):
 
     @Jeanne.command(name="list", description="List all the reminders you have")
     async def _list(self, ctx: Interaction):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user():
-            return        
-        reminders = Reminder(ctx.user).get_all_user_reminders()
-        embed = Embed()
-        embed.description = reminders
-        embed.color = Color.random()
-        await ctx.followup.send(embed=embed, ephemeral=True)
-    
-    @Jeanne.command(name="cancel", description="Cancel a reminder")
-    async def cancel(self, ctx:Interaction, reminder_id:int):
-        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user():
             return
+
+        await ctx.response.defer(ephemeral=True)
+        reminders = Reminder(ctx.user).get_all_user_reminders()
+        reminds = []
+        for i in reminders:
+            ids = i[1]
+            reminder = i[3]
+            time = f"<t:{i[2]}:F>"
+            reminds.append([str(ids), str(reminder), str(time)])
+        col_names = ["ID", "Reminders", "Time"]
+        embed = Embed()
+        embed.description = tabulate(reminds, headers=col_names, tablefmt="pretty")
+        embed.color = Color.random()
+        await ctx.followup.send(embed=embed, ephemeral=True)
+
+    @Jeanne.command(name="cancel", description="Cancel a reminder")
+    async def cancel(self, ctx:Interaction, reminder_id:int):
+        if Botban(ctx.user).check_botbanned_user():
+            return
+        await ctx.response.defer(ephemeral=True)
         reminder=Reminder(ctx.user)
         embed=Embed()
-        if reminder.remove(reminder_id) is None:
+        if reminder.remove(reminder_id) == None:
             embed.color=Color.red()
             embed.description="You don't have a reminder with that ID"
             await ctx.followup.send(embed=embed, ephemeral=True)
         else:
+            embed.color=Color.random()
             embed.description="Reminder `{}` has been removed".format(reminder_id)
             reminder.remove(reminder_id)
             await ctx.followup.send(embed=embed, ephemeral=True)
@@ -548,3 +559,4 @@ async def setup(bot: Bot):
     await bot.add_cog(Weather_Group(bot))
     await bot.add_cog(Embed_Group(bot))
     await bot.add_cog(slashutilities(bot))
+    await bot.add_cog(ReminderCog(bot))
