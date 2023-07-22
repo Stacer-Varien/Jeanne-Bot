@@ -1,4 +1,5 @@
 from enum import Enum
+from discord import Color
 
 
 class HelpModules(Enum):
@@ -152,6 +153,8 @@ class HelpCommands(Enum):
     invite='invite'
     botreport='bot report'
     dictionary='dictionary'
+
+
 
 
 

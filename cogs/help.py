@@ -1,3 +1,4 @@
+from json import loads
 from typing import Optional
 from discord import (
     ButtonStyle,
@@ -9,8 +10,13 @@ from discord import (
 )
 from discord.ext.commands import Cog, Bot
 from functions import Botban
+from collections import OrderedDict
 from assets.help.helpcmds import HelpCommands, HelpModules
 
+def replace_all(text: str, dic: dict):
+    for i, j in dic.items():
+        text = text.replace(i, j)
+    return text
 
 class help_button(ui.View):
     def __init__(self):
@@ -45,6 +51,14 @@ class help(Cog):
     async def help(self, ctx: Interaction, module:Optional[HelpModules]=None, command:Optional[HelpCommands]=None):
         if Botban(ctx.user).check_botbanned_user():
             return
+        
+        if module:
+            parms={"%module%" : str(module.value), "%color%": str(Color.random().value)}
+            json_data: dict = loads(
+                    replace_all('', parms)
+                )
+            embed_data = json_data.get("embeds")
+            embed=Embed.from_dict(embed_data[0])
 
         view = help_button()
         help = Embed(
