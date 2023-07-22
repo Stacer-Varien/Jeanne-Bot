@@ -124,6 +124,34 @@ class HelpCommands(Enum):
     ##listwarns
     listwarns_server='listwarns server'
     listwarns_user='listwarns user'
+    #react
+    hug='hug'
+    slap='slap'
+    smug='smug'
+    poke='poke'
+    pat='pat'
+    kiss='kiss'
+    tickle='tickle'
+    baka='baka'
+    feed='feed'
+    cry='cry'
+    bite='bite'
+    blush='blush'
+    cuddle='cuddle'
+    dance='dance'
+    #utilities
+    weather_city='city weather'
+    weather_zipcode='zip code weather'
+    embed_generate='embed generate'
+    embed_edit='embed edit'
+    reminder_add='reminder add'
+    reminder_list='reminder list'
+    reminder_cancel='reminder cancel'
+    say='say'
+    calculator='calculator'
+    invite='invite'
+    botreport='bot report'
+    dictionary='dictionary'
 
 
 
