@@ -478,7 +478,7 @@ class ReminderCog(GroupCog, name="reminder"):
         await ctx.response.defer(ephemeral=True)
         reminder=Reminder(ctx.user)
         embed=Embed()
-        if reminder.remove(reminder_id) == None:
+        if reminder.remove(reminder_id) == False:
             embed.color=Color.red()
             embed.description="You don't have a reminder with that ID"
             await ctx.followup.send(embed=embed, ephemeral=True)

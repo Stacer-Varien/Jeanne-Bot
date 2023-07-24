@@ -1102,13 +1102,13 @@ def get_richest(member: Member):
 
 class NsfwApis(Enum):
     KonachanApi = "https://konachan.com/post.json?s=post&q=index&limit=100&tags=rating:"
-    YandereApi = "https://yande.re/post.json?limit=100&tags=rating:"
+    YandereApi = "https://yande.re/post.json?api_version=2&limit=100&include_tags=1&&tags=rating:"
     GelbooruApi = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=rating:"
 
 class Hentai:
     def __init__(self, plus: Optional[bool] = None) -> None:
         self.plus = plus
-        self.blacklisted_tags = {"loli", "shota", "cub", "gore", "vore"}
+        self.blacklisted_tags = {"loli", "shota", "cub"}
 
     def format_tags(self, tags: str = None):
         if tags:
@@ -1139,8 +1139,6 @@ class Hentai:
             nsfw_images_list = list(nsfw_images.json().get("post", []))
         else:
             nsfw_images_list = list(nsfw_images.json())
-
-        shuffle(nsfw_images_list)
 
         if not tags:
             tags = ""
@@ -1175,7 +1173,7 @@ class Hentai:
     def get_blacklisted_links(self) -> Optional[List[str]]:
         data = db.execute("SELECT links FROM hentaiBlacklist").fetchall()
         db.commit()
-        return data[0] if data else None
+        return list(data)
 
     def gelbooru(
         self, rating: Optional[str] = None, tag: Optional[str] = None
@@ -1293,7 +1291,7 @@ class Reminder:
         db.commit()
 
         if data == None:
-            return None
+            return False
         else:
             db.execute(
                 "DELETE FROM reminderData WHERE userid = ? AND id = ?",
