@@ -4,7 +4,7 @@ from typing import Optional
 from reactionmenu import ViewMenu, ViewButton
 
 
-async def dictionary(ctx: Interaction, word: str, language: Optional[str]):
+async def dictionary(ctx: Interaction, word: str, language: Optional[str]=None):
     if language == None:
         language = "en"
 
@@ -20,18 +20,18 @@ async def dictionary(ctx: Interaction, word: str, language: Optional[str]):
         embed.description = (
             "Sorry, definitions for the word you were looking for could not be found."
         )
-        return embed
+        return await ctx.followup.send(embed=embed)
 
     elif response.status_code == 429:
         embed.color = Color.red()
         embed.title = data["title"]
         embed.description = "Unfortunately, the dictionary API is being rate limited.\nPlease wait for a few minutes."
-        return embed
+        return await ctx.followup.send(embed=embed)
     elif response.status_code != 200:
         embed.color = Color.red()
         embed.title = data["title"]
         embed.description = "It seems the dictionary API is facing problems.\nPlease wait for a few minutes."
-        return embed
+        return await ctx.followup.send(embed=embed)
     else:
         menu = ViewMenu(
             ctx,
@@ -67,6 +67,5 @@ async def dictionary(ctx: Interaction, word: str, language: Optional[str]):
         menu.add_button(ViewButton.back())
         menu.add_button(ViewButton.next())
         menu.add_button(ViewButton.go_to_last_page())
-        menu.add_button(ViewButton.end_session())
 
         await menu.start()

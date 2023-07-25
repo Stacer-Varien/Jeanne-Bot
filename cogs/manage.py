@@ -347,7 +347,7 @@ class Create_Group(GroupCog, name="create"):
         else:
             emojibytes = get(emoji_link if emoji_link else emoji_image.url).content
 
-            emote = await ctx.guild.create_custom_emoji(name=name, image=emojibytes)
+            emote = await ctx.guild.create_custom_emoji(name=name.replace(" ", "_"), image=emojibytes)
             embed.description = "{} | {} has been created".format(
                 emote.name, str(emote)
             )
@@ -410,7 +410,7 @@ class Create_Group(GroupCog, name="create"):
             stickerfile = File(fp=stickerbytes, filename="sticker.png")
 
             sticker = await ctx.guild.create_sticker(
-                name=name, description="None", emoji=emoji, file=stickerfile
+                name=name.lower(), description="None", emoji=emoji, file=stickerfile
             )
             embed.description = "{} has been created".format(sticker.name)
             embed.color = Color.random()
@@ -473,10 +473,10 @@ class Delete_Group(GroupCog, name="delete"):
 
         await ctx.response.defer()
         try:
-            e = emoji.split(":")[-1].rstrip(">")
-            emote = self.bot.get_emoji(int(e))
+            e = emoji.strip().split(":")[-1].rstrip(">")
+            emote = await ctx.guild.fetch_emoji(e)
         except:
-            emote = utils.get(ctx.guild.emojis, name=emoji)
+            emote = utils.get(ctx.guild.emojis, name=emoji.replace(" ", "_"))
         embed = Embed(
             description="{} has been deleted".format(str(emote)), color=0x00FF68
         )
@@ -1386,15 +1386,15 @@ class Rename_Group(GroupCog, name="rename"):
 
         await ctx.response.defer()
         try:
-            e = emoji.split(":")[-1].rstrip(">")
-            emote = self.bot.get_emoji(int(e))
+            e:int = emoji.strip().split(":")[-1].rstrip(">")
+            emote = await ctx.guild.fetch_emoji(e)
         except:
-            emote = utils.get(ctx.guild.emojis, name=emoji)
+            emote = utils.get(ctx.guild.emojis, name=emoji.replace(" ", "_"))
         embed = Embed(
             description="{} has been renamed to {}".format(str(emote), name),
             color=0x00FF68,
         )
-        await emote.edit(name=name)
+        await emote.edit(name=name.replace(" ", "_"))
         await ctx.followup.send(embed=embed)
 
     @emoji.error

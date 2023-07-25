@@ -57,10 +57,10 @@ class nsfw(Cog):
         if Botban(ctx.user).check_botbanned_user():
             return
 
-        image = Hentai(plus).gelbooru(rating, tag)
+        image = await Hentai(plus).gelbooru(rating, tag)
 
         if plus:
-            images = [image[randint(1, 100) - 1] for _ in range(4)]
+            images = [image[randint(1, len(image)) - 1] for _ in range(4)]
             view = ReportSelect(*[img["file_url"] for img in images])
 
             vids = [i for i in images if "mp4" in i["file_url"]]
@@ -137,10 +137,10 @@ class nsfw(Cog):
             )
             return
 
-        image = Hentai(plus).yandere(rating, tag)
+        image = await Hentai(plus).yandere(rating, tag)
 
         if plus:
-            images = [image[randint(1, 100) - 1] for _ in range(4)]
+            images = [image[randint(1, len(image)) - 1] for _ in range(4)]
             shortened_urls = [shorten_url(img["file_url"]) for img in images]
             view = ReportSelect(*shortened_urls)
             color = Color.random()
@@ -179,7 +179,7 @@ class nsfw(Cog):
     @yandere.error
     async def yandere_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, (IndexError, KeyError)
+            error.original, (IndexError, KeyError, TypeError)
         ):
             no_tag = Embed(description="The tag could not be found", color=Color.red())
             await ctx.followup.send(embed=no_tag)
@@ -201,10 +201,10 @@ class nsfw(Cog):
         if Botban(ctx.user).check_botbanned_user():
             return
 
-        image = Hentai(plus).konachan(rating, tag)
+        image = await Hentai(plus).konachan(rating, tag)
 
         if plus:
-            images = [image[randint(1, 100) - 1] for _ in range(4)]
+            images = [image[randint(1, len(image)) - 1] for _ in range(4)]
             shortened_urls = [shorten_url(img["file_url"]) for img in images]
             view = ReportSelect(*shortened_urls)
             color = Color.random()
@@ -242,7 +242,7 @@ class nsfw(Cog):
     @konachan.error
     async def konachan_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, (IndexError, KeyError)
+            error.original, (IndexError, KeyError, TypeError)
         ):
             no_tag = Embed(description="The tag could not be found", color=Color.red())
             await ctx.followup.send(embed=no_tag)
