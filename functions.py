@@ -2,8 +2,9 @@ from datetime import date, datetime, timedelta
 from enum import Enum
 from random import choice, randint, shuffle
 import time
+import aiohttp
 from humanfriendly import parse_timespan
-from discord import Embed, Color, Emoji, Guild, Member, TextChannel, User
+from discord import Embed, Color, Guild, Member, TextChannel, User
 from requests import get
 from config import db
 from typing import Optional, List
@@ -12,7 +13,7 @@ from typing import Optional, List
 class Botban:
     def __init__(self, user: User):
         self.user = user
-    
+
     def check_botbanned_user(self):
         botbanned_data = db.execute(
             "SELECT * FROM botbannedData WHERE user_id = ?", (self.user.id,)
@@ -130,7 +131,9 @@ class Inventory:
         for a in w:
             backgrounds.add_field(
                 name=f"{a[1]}",
-                value="[Item ID: {}]({})\nPrice: 1000 <:quantumpiece:980772736861343774>".format(a[0], a[2]),
+                value="[Item ID: {}]({})\nPrice: 1000 <:quantumpiece:980772736861343774>".format(
+                    a[0], a[2]
+                ),
                 inline=True,
             )
         db.commit()
@@ -1101,12 +1104,15 @@ def get_richest(member: Member):
 
 
 class NsfwApis(Enum):
-    KonachanApi = "https://konachan.com/post.json?s=post&q=index&limit=100&tags=rating:"
-    YandereApi = "https://yande.re/post.json?api_version=2&limit=100&include_tags=1&&tags=rating:"
-    GelbooruApi = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=rating:"
+    KonachanApi = (
+        "https://konachan.com/post.json?s=post&q=index&limit=100&tags=score:>10+rating:"
+    )
+    YandereApi = "https://yande.re/post.json?limit=100&tags=score:>10+rating:"
+    GelbooruApi = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=score:>10+rating:"
+
 
 class Hentai:
-    def __init__(self, plus: Optional[bool] = None) -> None:
+    def __init__(self, plus: Optional[bool] = None):
         self.plus = plus
         self.blacklisted_tags = {"loli", "shota", "cub"}
 
@@ -1122,7 +1128,7 @@ class Hentai:
         else:
             return ""
 
-    def get_nsfw_image(
+    async def get_nsfw_image(
         self, provider: NsfwApis, rating: Optional[str] = None, tags: str = None
     ):
         bl = self.get_blacklisted_links()
@@ -1130,15 +1136,19 @@ class Hentai:
 
         url = provider.value + rating + "+" + self.format_tags(tags)
 
-        nsfw_images = get(url)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                nsfw_images = await resp.json()
 
         if not nsfw_images:
             return None
 
         if provider.value == provider.GelbooruApi.value:
-            nsfw_images_list = list(nsfw_images.json().get("post", []))
+            nsfw_images_list = list(nsfw_images.get("post", []))
         else:
-            nsfw_images_list = list(nsfw_images.json())
+            nsfw_images_list = list(nsfw_images)
+
+        shuffle(nsfw_images_list)
 
         if not tags:
             tags = ""
@@ -1152,59 +1162,65 @@ class Hentai:
         if len(tags_list) == 0 or len(tags_list) > 3:
             return None
 
-        filtered_ret = [img for img in nsfw_images_list if img["file_url"] not in bl]
-
-        if not filtered_ret:
-            return None
-
-        filtered_images = [
-            img for img in filtered_ret if all(tag in img["tags"] for tag in tags_list)
+        filtered_ret = [
+            img
+            for img in nsfw_images_list
+            if all(tag in img["tags"] for tag in tags_list)
         ]
 
-        if len(filtered_images) == 0:
+        if len(filtered_ret) == 0:
             return None
 
+        filtered_images = []
+        for image in filtered_ret:
+            tags = image["tags"].lower().split(" ")
+            urls = image["file_url"]
+            if any(tag in self.blacklisted_tags for tag in tags):
+                continue
+            if any(url in set(bl) for url in urls):
+                continue
+            filtered_images.append(image)
         return filtered_images
 
     def add_blacklisted_link(self, link: str):
         db.execute("INSERT OR IGNORE INTO hentaiBlacklist (links) VALUES (?)", (link,))
         db.commit()
 
-    def get_blacklisted_links(self) -> Optional[List[str]]:
+    def get_blacklisted_links(self) -> List[str]:
         data = db.execute("SELECT links FROM hentaiBlacklist").fetchall()
         db.commit()
-        return list(data)
+        return [link[0] for link in data]
 
-    def gelbooru(
+    async def gelbooru(
         self, rating: Optional[str] = None, tag: Optional[str] = None
     ) -> Optional[str]:
         if rating is None:
             rating = choice(["questionable", "explicit"])
         if not tag or tag is None:
             tag = None
-        images =  self.get_nsfw_image(NsfwApis.GelbooruApi, rating, tag)
+        images = await self.get_nsfw_image(NsfwApis.GelbooruApi, rating, tag)
 
         if self.plus:
             return images
         else:
             return choice(images)["file_url"]
 
-    def yandere(self, rating: Optional[str] = None, tag: Optional[str] = None):
+    async def yandere(self, rating: Optional[str] = None, tag: Optional[str] = None):
         if rating is None:
             rating = choice(["questionable", "explicit"])
 
-        images =  self.get_nsfw_image(NsfwApis.YandereApi, rating, tag)
+        images = await self.get_nsfw_image(NsfwApis.YandereApi, rating, tag)
 
         if self.plus:
             return images
         else:
             return choice(images)["file_url"]
 
-    def konachan(self, rating: Optional[str] = None, tag: Optional[str] = None):
+    async def konachan(self, rating: Optional[str] = None, tag: Optional[str] = None):
         if rating is None:
             rating = choice(["questionable", "explicit"])
 
-        images =  self.get_nsfw_image(NsfwApis.KonachanApi, rating, tag)
+        images = await self.get_nsfw_image(NsfwApis.KonachanApi, rating, tag)
 
         if self.plus:
             return images
