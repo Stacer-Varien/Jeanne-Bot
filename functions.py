@@ -1110,11 +1110,18 @@ class NsfwApis(Enum):
     YandereApi = "https://yande.re/post.json?limit=100&tags=score:>10+rating:"
     GelbooruApi = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=score:>10+rating:"
 
+class NekosFunTags(Enum):
+    anal="anal"
+    blowjob="bj"
+    cum="cum"
+    hentai="hentai"
+    yuri="lesbian"
+
 
 class Hentai:
     def __init__(self, plus: Optional[bool] = None):
         self.plus = plus
-        self.blacklisted_tags = {"loli", "shota", "cub"}
+        self.blacklisted_tags = {"loli", "shota", "cub", "gore", "vore"}
 
     def format_tags(self, tags: str = None):
         if tags:
@@ -1227,16 +1234,16 @@ class Hentai:
         else:
             return choice(images)["file_url"]
 
-    def hentai(self, rating: Optional[str] = None):
+    async def hentai(self, rating: Optional[str] = None):
         if rating == None:
             rating = ["questionable", "explicit"]
             rating = choice(rating)
 
-        gelbooru_image = self.gelbooru(rating)
+        gelbooru_image = await self.gelbooru(rating)
 
-        yandere_image = self.yandere(rating)
+        yandere_image = await self.yandere(rating)
 
-        konachan_image = self.konachan(rating)
+        konachan_image = await self.konachan(rating)
 
         h = [gelbooru_image, yandere_image, konachan_image]
 
@@ -1253,6 +1260,13 @@ class Hentai:
 
         return hentai, source
 
+    async def nekosfun(self, tag:NekosFunTags)->str:
+        url="http://api.nekos.fun:8080/api/" + tag.value
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                nsfw_image = await resp.json()
+        
+        return nsfw_image['image']
 
 def shorten_url(url: str):
     api_url = "http://tinyurl.com/api-create.php"

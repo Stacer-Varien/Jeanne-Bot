@@ -1,7 +1,7 @@
-from random import randint
+from random import choice, randint
 from discord import Color, Embed, Interaction, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
-from functions import Botban, Hentai, shorten_url
+from functions import Botban, Hentai, shorten_url, NekosFunTags
 from typing import Literal, Optional
 from assets.components import ReportContent, ReportSelect
 
@@ -21,7 +21,7 @@ class nsfw(Cog):
         if Botban(ctx.user).check_botbanned_user():
             return
 
-        hentai, source = Hentai().hentai(rating)
+        hentai, source = await Hentai().hentai(rating)
 
         if hentai.endswith("mp4"):
             view = ReportContent(shorten_url(hentai))
@@ -246,6 +246,21 @@ class nsfw(Cog):
         ):
             no_tag = Embed(description="The tag could not be found", color=Color.red())
             await ctx.followup.send(embed=no_tag)
+
+    @Jeanne.command(description="Get hentai from nekos.fun",nsfw=True)
+    @Jeanne.describe(tag="Which tag are you picking")
+    async def nekosfun(self, ctx:Interaction, tag:Optional[NekosFunTags]=None):
+        await ctx.response.defer(thinking=False)
+        if Botban(ctx.user).check_botbanned_user():
+            return
+        
+        tag=tag if tag else choice(list(NekosFunTags))
+        image= await Hentai().nekosfun(tag)
+        embed=Embed(color=Color.random())
+        embed.set_image(url=image)
+        embed.set_footer(text="Fetched from nekos.fun • Credits must go to their respective sources")
+        await ctx.followup.send(embed=embed)  
+
 
 async def setup(bot: Bot):
     await bot.add_cog(nsfw(bot))
