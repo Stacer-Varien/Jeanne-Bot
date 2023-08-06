@@ -347,7 +347,9 @@ class Create_Group(GroupCog, name="create"):
         else:
             emojibytes = get(emoji_link if emoji_link else emoji_image.url).content
 
-            emote = await ctx.guild.create_custom_emoji(name=name.replace(" ", "_"), image=emojibytes)
+            emote = await ctx.guild.create_custom_emoji(
+                name=name.replace(" ", "_"), image=emojibytes
+            )
             embed.description = "{} | {} has been created".format(
                 emote.name, str(emote)
             )
@@ -430,6 +432,7 @@ class Create_Group(GroupCog, name="create"):
                 else:
                     embed.description = "There was a problem making the sticker. Please check that the sticker you are making is:\n\n1. 512kb or less. Use [Ezgif](https://ezgif.com/) to compress it\n2. The file is in a PNG or APNG format"
                 await ctx.followup.send(embed=embed)
+
 
 class Delete_Group(GroupCog, name="delete"):
     def __init__(self, bot: Bot) -> None:
@@ -761,6 +764,7 @@ class Edit_Group(GroupCog, name="edit"):
 
         await ctx.followup.send(embed=embed)
 
+
 class Set_Group(GroupCog, name="set"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
@@ -1023,7 +1027,9 @@ class Set_Group(GroupCog, name="set"):
     @Jeanne.describe(
         brightness="Set the level of brightness between 10 - 150. Default is 100"
     )
-    async def brightness(self, ctx: Interaction, brightness: int):
+    async def brightness(
+        self, ctx: Interaction, brightness: Jeanne.Range[int, 10, 150]
+    ):
         if Botban(ctx.user).check_botbanned_user():
             return
 
@@ -1049,7 +1055,7 @@ class Set_Group(GroupCog, name="set"):
 
     @Jeanne.command(description="Change your profile bio")
     @Jeanne.describe(bio="Add your bio. Make sure its 60 characters per line")
-    async def bio(self, ctx: Interaction, bio: str):
+    async def bio(self, ctx: Interaction, bio: Jeanne.Range[str, 1, 60]):
         if Botban(ctx.user).check_botbanned_user():
             return
 
@@ -1069,7 +1075,7 @@ class Set_Group(GroupCog, name="set"):
 
     @Jeanne.command(description="Change your level and profile card font and bar color")
     @Jeanne.describe(color="Add your color. Must be in HEX code")
-    async def color(self, ctx: Interaction, color: str):
+    async def color(self, ctx: Interaction, color: Jeanne.Range[str, 6, 6]):
         if Botban(ctx.user).check_botbanned_user():
             return
 
@@ -1386,7 +1392,7 @@ class Rename_Group(GroupCog, name="rename"):
 
         await ctx.response.defer()
         try:
-            e:int = emoji.strip().split(":")[-1].rstrip(">")
+            e: int = emoji.strip().split(":")[-1].rstrip(">")
             emote = await ctx.guild.fetch_emoji(e)
         except:
             emote = utils.get(ctx.guild.emojis, name=emoji.replace(" ", "_"))
@@ -1449,6 +1455,32 @@ class Rename_Group(GroupCog, name="rename"):
                     color=Color.red(),
                 )
                 await ctx.followup.send(embed=embed)
+
+
+class Command_Group(GroupCog, name="command"):
+    def __init__(self, bot: Bot) -> None:
+        self.bot = bot
+        super().__init__()
+
+    @Jeanne.command(name="disable", description="Disable a command or module")
+    @Jeanne.checks.has_permissions(manage_guild=True)
+    async def _disable(
+        self, ctx: Interaction, module: Optional[str], command: Optional[str]
+    ):
+        if Botban(ctx.user).check_botbanned_user():
+            return
+
+        await ctx.response.defer()
+
+    @Jeanne.command(name="enable", description="Enable a command or module")
+    @Jeanne.checks.has_permissions(manage_guild=True)
+    async def _enable(
+        self, ctx: Interaction, module: Optional[str], command: Optional[str]
+    ):
+        if Botban(ctx.user).check_botbanned_user():
+            return
+
+        await ctx.response.defer()
 
 
 async def setup(bot: Bot):
