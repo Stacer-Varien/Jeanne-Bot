@@ -1,5 +1,5 @@
-from json import loads
-from typing import Optional
+from json import dump, dumps, loads
+from typing import List, Optional
 from discord import (
     ButtonStyle,
     Color,
@@ -8,15 +8,18 @@ from discord import (
     ui,
     app_commands as Jeanne,
 )
-from discord.ext.commands import Cog, Bot
+from discord.ext.commands import GroupCog, Bot
 from functions import Botban
 from collections import OrderedDict
-from assets.help.helpcmds import HelpCommands, HelpModules
+from assets.help.commands import Commands, Modules
+from assets.help.modules import modules
+
 
 def replace_all(text: str, dic: dict):
     for i, j in dic.items():
         text = text.replace(i, j)
     return text
+
 
 class help_button(ui.View):
     def __init__(self):
@@ -41,24 +44,73 @@ class help_button(ui.View):
         )
 
 
-class help(Cog):
+class HelpGroup(GroupCog, name="help"):
     def __init__(self, bot: Bot):
         self.bot = bot
+
+    async def command_choices(
+        self,
+        ctx: Interaction,
+        current: str,
+    ) -> List[Jeanne.Choice[str]]:
+        commands = list(Commands)
+        return [
+            Jeanne.Choice(name=command.value, value=command.value)
+            for command in commands
+            if current.lower() in command.value.lower()
+        ]
+
+    @Jeanne.command(description="Get help of a certain command")
+    @Jeanne.autocomplete(command=command_choices)
+    async def command(self, ctx: Interaction, command: Jeanne.Range[str, 4]):
+        if Botban(ctx.user).check_botbanned_user():
+            return
+        await ctx.response.defer()
+        cmd = [
+            cmd
+            for cmd in self.bot.tree.walk_commands()
+            if not isinstance(cmd, Jeanne.Group)
+            if cmd.qualified_name == command
+        ][0]
+
+        embed = Embed(title=f"{command.title()} Help", color=Color.random())
+        embed.description = cmd.description
+        parms = []
+        if len(cmd.parameters) > 0:
+            for i in cmd.parameters:
+                parm = f"[{i.name}]" if i.required is True else f"<{i.name}>"
+                parms.append(parm)
+        cmd_usage = "/" + cmd.qualified_name + " " + " ".join(parms)
+        embed.add_field(name="Command Usage", value=f"`{cmd_usage}`", inline=False)
+        embed.set_footer(
+            text="Legend:\n[] - Required\n<> - Optional\n\nIt is best to go to the webiste for detailed explanations and usages"
+        )
+
+        await ctx.followup.send(embed=embed)
+
+    @Jeanne.command(description="Get help of a certain module")
+    async def module(self, ctx: Interaction, module: Modules):
+        if Botban(ctx.user).check_botbanned_user():
+            return
+        await ctx.response.defer()
+        module_data = dumps(modules[module.value])
+
+        if module_data:
+            parms = OrderedDict([("%module%", str(module.name.capitalize()))])
+
+            json_data: dict = loads(replace_all(module_data, parms))
+
+            embed_data = json_data.get("embeds")
+            embed = Embed.from_dict(embed_data[0])
+
+        await ctx.followup.send(embed=embed)
 
     @Jeanne.command(
         description="Get help from the wiki or join the support server for further help"
     )
-    async def help(self, ctx: Interaction, module:Optional[HelpModules]=None, command:Optional[HelpCommands]=None):
+    async def support(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user():
             return
-        
-        if module:
-            parms={"%module%" : str(module.value), "%color%": str(Color.random().value)}
-            json_data: dict = loads(
-                    replace_all('', parms)
-                )
-            embed_data = json_data.get("embeds")
-            embed=Embed.from_dict(embed_data[0])
 
         view = help_button()
         help = Embed(
@@ -69,4 +121,4 @@ class help(Cog):
 
 
 async def setup(bot: Bot):
-    await bot.add_cog(help(bot))
+    await bot.add_cog(HelpGroup(bot))
