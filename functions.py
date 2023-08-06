@@ -1169,17 +1169,8 @@ class Hentai:
         if len(tags_list) == 0 or len(tags_list) > 3:
             return None
 
-        filtered_ret = [
-            img
-            for img in nsfw_images_list
-            if all(tag in img["tags"] for tag in tags_list)
-        ]
-
-        if len(filtered_ret) == 0:
-            return None
-
         filtered_images = []
-        for image in filtered_ret:
+        for image in nsfw_images_list:
             tags = image["tags"].lower().split(" ")
             urls = image["file_url"]
             if any(tag in self.blacklisted_tags for tag in tags):
