@@ -9,11 +9,13 @@ from requests import get
 from config import db
 from typing import Optional, List
 
+current_time = date.today()
+
 
 class Botban:
     def __init__(self, user: User):
         self.user = user
-
+    
     def check_botbanned_user(self):
         botbanned_data = db.execute(
             "SELECT * FROM botbannedData WHERE user_id = ?", (self.user.id,)
@@ -44,7 +46,7 @@ class Currency:
     def __init__(self, user: User):
         self.user = user
 
-    def get_balance(self):
+    def get_balance(self) -> int:
         data = db.execute(
             "SELECT amount FROM bankData WHERE user_id = ?", (self.user.id,)
         ).fetchone()
@@ -52,7 +54,6 @@ class Currency:
         return data[0] if data is not None else 0
 
     def add_qp(self, amount: int):
-        current_time = date.today()
         cur = db.execute(
             "INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)",
             (
@@ -93,29 +94,45 @@ class Currency:
 
         qp = 200 if datetime.today().weekday() >= 5 else 100
 
-        if data is None or data[2] < round(current_time.timestamp()):
-            db.execute(
-                "INSERT OR REPLACE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)",
+        if data == None:
+            cur = db.execute(
+                "INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)",
                 (
                     self.user.id,
                     qp,
                     round(next_claim.timestamp()),
                 ),
             )
+            db.commit()
+            if cur.rowcount == 0:
+                db.execute(
+                    "UPDATE bankData SET claimed_date = ? , amount = amount + ? WHERE user_id = ?",
+                    (
+                        round(next_claim.timestamp()),
+                        qp,
+                        self.user.id,
+                    ),
+                )
+                db.commit()
+            return True
 
+        elif data[2] < round(current_time.timestamp()):
+            db.execute(
+                "UPDATE bankData SET claimed_date = ? , amount = amount + ? WHERE user_id = ?",
+                (
+                    round(next_claim.timestamp()),
+                    qp,
+                    self.user.id,
+                ),
+            )
             db.commit()
             return True
         else:
             return False
 
     def get_next_daily(self):
-        data = db.execute(
-            "SELECT claimed_date FROM bankData WHERE user_id = ?", (self.user.id,)
-        ).fetchone()
-
-        db.commit()
-        return data[0]
-
+        data=db.execute("SELECT claimed_date FROM bankData WHERE user_id = ?", (self.user.id,)).fetchone()
+        return data[0] if data else None
 
 class Inventory:
     def __init__(self, user: Optional[User] = None) -> None:
@@ -131,9 +148,7 @@ class Inventory:
         for a in w:
             backgrounds.add_field(
                 name=f"{a[1]}",
-                value="[Item ID: {}]({})\nPrice: 1000 <:quantumpiece:980772736861343774>".format(
-                    a[0], a[2]
-                ),
+                value="[Item ID: {}]({})\nPrice: 1000 <:quantumpiece:980772736861343774>".format(a[0], a[2]),
                 inline=True,
             )
         db.commit()
@@ -1104,12 +1119,11 @@ def get_richest(member: Member):
 
 
 class NsfwApis(Enum):
-    KonachanApi = (
-        "https://konachan.com/post.json?s=post&q=index&limit=100&tags=score:>10+rating:"
-    )
+    KonachanApi = "https://konachan.com/post.json?s=post&q=index&limit=100&tags=score:>10+rating:"
     YandereApi = "https://yande.re/post.json?limit=100&tags=score:>10+rating:"
     GelbooruApi = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=score:>10+rating:"
 
+<<<<<<< Updated upstream
 class NekosFunTags(Enum):
     anal="anal"
     blowjob="bj"
@@ -1118,6 +1132,8 @@ class NekosFunTags(Enum):
     yuri="lesbian"
 
 
+=======
+>>>>>>> Stashed changes
 class Hentai:
     def __init__(self, plus: Optional[bool] = None):
         self.plus = plus
@@ -1125,19 +1141,21 @@ class Hentai:
 
     def format_tags(self, tags: str = None):
         if tags:
-            tags = [
-                tag.strip().replace(" ", "_")
-                for tag in tags.split(",")
-                if tag.strip().replace(" ", "_")
-            ]
+            tags = [tag.strip().replace(" ", "_") for tag in tags.split(",") if tag.strip().replace(" ", "_")]
             tags_string = "+".join(tags)
             return tags_string
         else:
             return ""
 
-    async def get_nsfw_image(
-        self, provider: NsfwApis, rating: Optional[str] = None, tags: str = None
-    ):
+    def remove_data_from_json_list(self, json_list: List[dict], key_to_check: str, values_to_remove: List[str]):
+        try:
+            data_list = [item for item in json_list if item.get(key_to_check) not in values_to_remove]
+            return data_list
+        except Exception as e:
+            print(f"Error in remove_data_from_json_list: {e}")
+            return None
+
+    async def get_nsfw_image(self, provider: NsfwApis, rating: Optional[str] = None, tags: str = None):
         bl = self.get_blacklisted_links()
         tags = tags.lower() if tags else None
 
@@ -1158,7 +1176,7 @@ class Hentai:
         shuffle(nsfw_images_list)
 
         if not tags:
-            tags = ""
+            tags=""
 
         tags_list = [
             tag.strip().replace(" ", "_")
@@ -1169,10 +1187,15 @@ class Hentai:
         if len(tags_list) == 0 or len(tags_list) > 3:
             return None
 
+<<<<<<< Updated upstream
         filtered_images = []
+=======
+
+        filtered_images=[]
+>>>>>>> Stashed changes
         for image in nsfw_images_list:
             tags = image["tags"].lower().split(" ")
-            urls = image["file_url"]
+            urls=image["file_url"]
             if any(tag in self.blacklisted_tags for tag in tags):
                 continue
             if any(url in set(bl) for url in urls):
@@ -1189,6 +1212,7 @@ class Hentai:
         db.commit()
         return [link[0] for link in data]
 
+
     async def gelbooru(
         self, rating: Optional[str] = None, tag: Optional[str] = None
     ) -> Optional[str]:
@@ -1196,7 +1220,7 @@ class Hentai:
             rating = choice(["questionable", "explicit"])
         if not tag or tag is None:
             tag = None
-        images = await self.get_nsfw_image(NsfwApis.GelbooruApi, rating, tag)
+        images =  await self.get_nsfw_image(NsfwApis.GelbooruApi, rating, tag)
 
         if self.plus:
             return images
@@ -1207,7 +1231,7 @@ class Hentai:
         if rating is None:
             rating = choice(["questionable", "explicit"])
 
-        images = await self.get_nsfw_image(NsfwApis.YandereApi, rating, tag)
+        images =  await self.get_nsfw_image(NsfwApis.YandereApi, rating, tag)
 
         if self.plus:
             return images
@@ -1218,7 +1242,7 @@ class Hentai:
         if rating is None:
             rating = choice(["questionable", "explicit"])
 
-        images = await self.get_nsfw_image(NsfwApis.KonachanApi, rating, tag)
+        images =  await self.get_nsfw_image(NsfwApis.KonachanApi, rating, tag)
 
         if self.plus:
             return images
