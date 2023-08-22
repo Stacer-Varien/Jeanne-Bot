@@ -1123,7 +1123,6 @@ class NsfwApis(Enum):
     YandereApi = "https://yande.re/post.json?limit=100&tags=score:>10+rating:"
     GelbooruApi = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=score:>10+rating:"
 
-<<<<<<< Updated upstream
 class NekosFunTags(Enum):
     anal="anal"
     blowjob="bj"
@@ -1132,8 +1131,6 @@ class NekosFunTags(Enum):
     yuri="lesbian"
 
 
-=======
->>>>>>> Stashed changes
 class Hentai:
     def __init__(self, plus: Optional[bool] = None):
         self.plus = plus
@@ -1187,12 +1184,7 @@ class Hentai:
         if len(tags_list) == 0 or len(tags_list) > 3:
             return None
 
-<<<<<<< Updated upstream
         filtered_images = []
-=======
-
-        filtered_images=[]
->>>>>>> Stashed changes
         for image in nsfw_images_list:
             tags = image["tags"].lower().split(" ")
             urls=image["file_url"]
