@@ -1,4 +1,5 @@
 from discord import (
+    CategoryChannel,
     ui,
     ButtonStyle,
     Interaction,
@@ -43,7 +44,6 @@ class Confirmation(ui.View):
 
     async def interaction_check(self, ctx: Interaction):
         return ctx.user.id == self.author.id
-
 
 class Heads_or_Tails(ui.View):
     def __init__(self, author: User):
@@ -326,6 +326,34 @@ class ReportModal(ui.Modal, title="Bot Report"):
             description="Thank you for submitting your bot report. The dev will look into it but the will not tell you the results.\n\nPlease know that your user ID has been logged if you are trolling around."
         )
         await ctx.response.send_message(embed=embed)
+
+class ForumGuildlines(ui.Modal, title="Forum Guideline"):
+    def __init__(self, name:str, category:CategoryChannel = None):
+        self.name=name
+        self.category=category
+        super().__init__()
+
+    guidelines = ui.TextInput(
+        label="Guidelines",
+        placeholder="Type here. Markdown supported",
+        required=True,
+        min_length=1,
+        max_length=4000,
+        style=TextStyle.paragraph,
+    )
+
+    async def on_submit(self, ctx: Interaction) -> None:
+        embed = Embed()
+        forum = await ctx.guild.create_forum(name=self.name, topic=self.guidelines.value)
+        embed.description = "{} has been created".format(forum.jump_url)
+        embed.color = Color.random()
+        if self.category:
+            await forum.edit(category=self.category)
+            embed.add_field(
+                name="Added into category", value=self.category.name, inline=True
+            )
+
+        await ctx.response.send_message(embed=embed)        
 
 
 class ReportContentM(ui.Modal, title="Illicit Content Report"):
