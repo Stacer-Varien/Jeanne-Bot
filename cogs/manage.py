@@ -24,7 +24,13 @@ from discord.ext.commands import Bot, Cog, GroupCog
 from humanfriendly import format_timespan, parse_timespan, InvalidTimespan
 from collections import OrderedDict
 from functions import Botban, Inventory, Levelling, Logger, Manage, Welcomer
-from assets.components import Confirmation, Levelmsg, Welcomingmsg, Leavingmsg
+from assets.components import (
+    Confirmation,
+    Levelmsg,
+    Welcomingmsg,
+    Leavingmsg,
+    ForumGuildlines,
+)
 from requests import get
 from io import BytesIO
 
@@ -45,41 +51,38 @@ class Create_Group(GroupCog, name="create"):
         name="What will you name it?",
         topic="What is the channel topic?",
         category="Place in which category?",
-        slowmode="What is the slowmode (1hr, 30m, etc) (Max is 6 hours)",
+        slowmode="What is the slowmode (1h, 30m, etc) (Max is 6 hours)",
         nsfw_enabled="Should it be an NSFW channel?",
     )
     @Jeanne.checks.has_permissions(manage_channels=True)
+    @Jeanne.checks.bot_has_permissions(manage_channels=True)
     async def textchannel(
         self,
         ctx: Interaction,
-        name: str,
-        topic: Optional[str] = None,
+        name: Jeanne.Range[str, 1, 100],
+        topic: Optional[Jeanne.Range[str, 1, 1024]] = None,
         category: Optional[CategoryChannel] = None,
         slowmode: str = None,
         nsfw_enabled: Optional[bool] = None,
     ) -> None:
+        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user():
             return
 
-        await ctx.response.defer()
         channel = await ctx.guild.create_text_channel(name=name)
         embed = Embed()
         embed.color = Color.random()
-        embed.description = "Text Channel `{}` has been created".format(channel.mention)
+        embed.description = "{} has been created".format(channel.jump_url)
 
         if category:
             await channel.edit(category=category)
             embed.add_field(
-                name="Added into category", value=category.mention, inline=True
+                name="Added into category", value=category.name, inline=True
             )
 
         if topic:
-            if len(topic) <= 1024:
-                await channel.edit(topic=topic)
-                added_topic = topic
-            else:
-                added_topic = "Too many characters! Please make sure your topic has less than 1024 characters"
-            embed.add_field(name="Topic", value=added_topic, inline=True)
+            await channel.edit(topic=topic)
+            embed.add_field(name="Topic", value=topic, inline=True)
 
         if slowmode:
             try:
@@ -105,12 +108,13 @@ class Create_Group(GroupCog, name="create"):
         users="How many users are allowed in the channel",
     )
     @Jeanne.checks.has_permissions(manage_channels=True)
+    @Jeanne.checks.bot_has_permissions(manage_channels=True)
     async def voicechannel(
         self,
         ctx: Interaction,
-        name: str,
+        name: Jeanne.Range[str, 1, 100],
         category: Optional[CategoryChannel] = None,
-        users: Optional[int] = None,
+        users: Optional[Jeanne.Range[int, None, 99]] = None,
     ) -> None:
         if Botban(ctx.user).check_botbanned_user():
             return
@@ -118,9 +122,7 @@ class Create_Group(GroupCog, name="create"):
         await ctx.response.defer()
         channel = await ctx.guild.create_voice_channel(name=name)
         embed = Embed()
-        embed.description = "Voice Channel `{}` has been created".format(
-            channel.mention
-        )
+        embed.description = "{} has been created".format(channel.jump_url)
         embed.color = Color.random()
 
         if category:
@@ -130,7 +132,6 @@ class Create_Group(GroupCog, name="create"):
             )
 
         if users:
-            users = int(users) if users <= 99 else 99
             await channel.edit(user_limit=users)
             embed.add_field(name="User Limit", value=users, inline=True)
 
@@ -139,14 +140,15 @@ class Create_Group(GroupCog, name="create"):
     @Jeanne.command(description="Create a category")
     @Jeanne.describe(name="What will you name it?")
     @Jeanne.checks.has_permissions(manage_channels=True)
-    async def category(self, ctx: Interaction, name: str):
+    @Jeanne.checks.bot_has_permissions(manage_channels=True)
+    async def category(self, ctx: Interaction, name: Jeanne.Range[str, 1, 100]):
+        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user():
             return
 
-        await ctx.response.defer()
         cat = await ctx.guild.create_category(name=name)
         embed = Embed()
-        embed.description = "Category `{}` has been created".format(cat.mention)
+        embed.description = "{} has been created".format(cat.mention)
         embed.color = Color.random()
 
         await ctx.followup.send(embed=embed)
@@ -154,12 +156,15 @@ class Create_Group(GroupCog, name="create"):
     @Jeanne.command(description="Create a stage channel")
     @Jeanne.describe(
         name="What will you name it?",
-        topic="What is the topic?",
         category="Place in which category?",
     )
     @Jeanne.checks.has_permissions(manage_channels=True)
+    @Jeanne.checks.bot_has_permissions(manage_channels=True)
     async def stagechannel(
-        self, ctx: Interaction, name: str, topic: str, category: CategoryChannel
+        self,
+        ctx: Interaction,
+        name: Jeanne.Range[str, 1, 100],
+        category: CategoryChannel,
     ):
         if Botban(ctx.user).check_botbanned_user():
             return
@@ -167,12 +172,9 @@ class Create_Group(GroupCog, name="create"):
         await ctx.response.defer()
         embed = Embed()
         channel: StageChannel = await ctx.guild.create_stage_channel(
-            name=name, topic=topic
+            name=name, topic=None
         )
-        embed.description = "Stage channel `{}` has been created".format(
-            channel.mention
-        )
-        embed.add_field(name="Topic", value=topic, inline=True)
+        embed.description = "{} has been created".format(channel.jump_url)
 
         if category:
             await channel.edit(category=category)
@@ -186,12 +188,13 @@ class Create_Group(GroupCog, name="create"):
 
     @stagechannel.error
     async def stagechannel_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-        if isinstance(error, Jeanne.CommandInvokeError):
-            if HTTPException:
-                embed = Embed()
-                embed.description = "Couldn't make a new stage channel. Please make sure the server is community enabled"
-                embed.color = Color.red()
-                await ctx.followup.send(embed=embed)
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, HTTPException
+        ):
+            embed = Embed()
+            embed.description = "Couldn't make a new stage channel. Please make sure the server is community enabled"
+            embed.color = Color.red()
+            await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Create a forum")
     @Jeanne.describe(
@@ -201,23 +204,30 @@ class Create_Group(GroupCog, name="create"):
     )
     @Jeanne.checks.has_permissions(manage_channels=True)
     async def forum(
-        self, ctx: Interaction, name: str, topic: str, category: CategoryChannel
+        self,
+        ctx: Interaction,
+        name: Jeanne.Range[str, 1, 100],
+        category: Optional[CategoryChannel] = None,
+        topic: Optional[bool] = None,
     ):
         if Botban(ctx.user).check_botbanned_user():
             return
 
-        await ctx.response.defer()
-        embed = Embed()
-        forum = await ctx.guild.create_forum(name=name, topic=topic)
-        embed.description = "Forum `{}` has been created".format(forum.name)
-        embed.color = Color.random()
-        if category:
-            await forum.edit(category=category)
-            embed.add_field(
-                name="Added into category", value=category.name, inline=True
-            )
+        if topic:
+            await ctx.response.send_modal(ForumGuildlines(name, category))
+        else:
+            await ctx.response.defer()
+            embed = Embed()
+            forum = await ctx.guild.create_forum(name=name, topic=topic)
+            embed.description = "{} has been created".format(forum.jump_url)
+            embed.color = Color.random()
+            if category:
+                await forum.edit(category=category)
+                embed.add_field(
+                    name="Added into category", value=category.name, inline=True
+                )
 
-        await ctx.followup.send(embed=embed)
+            await ctx.followup.send(embed=embed)
 
     @forum.error
     async def forum_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
