@@ -31,15 +31,13 @@ class ErrorsCog(Cog):
             await ctx.followup.send(embed=embed)
         elif isinstance(error, Jeanne.BotMissingPermissions):
             embed = Embed(description=str(error), color=Color.red())
-            await ctx.followup.send(embed=embed)            
+            await ctx.followup.send(embed=embed)
         elif isinstance(error, Jeanne.errors.CommandInvokeError):
             traceback_error = traceback.format_exception(
                 error, error, error.__traceback__
             )
             with open("errors.txt", "a") as f:
                 f.writelines(f"{datetime.now()} --- {''.join(traceback_error)}")
-            embed = Embed(description=str(error), color=Color.red())
-            await ctx.followup.send(embed=embed)            
         elif isinstance(error, Jeanne.errors.NoPrivateMessage):
             embed = Embed(description=str(error), color=Color.red())
             await ctx.followup.send(embed=embed)
