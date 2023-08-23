@@ -108,7 +108,7 @@ class levelling(Cog):
 
     @Cog.listener()
     async def on_message(self, message: Message):
-        if Botban(message.author).check_botbanned_user() == True:
+        if Botban(message.author).check_botbanned_user:
             return
 
         if not message.author.bot:
