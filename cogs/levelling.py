@@ -38,7 +38,7 @@ class Rank_Group(GroupCog, name="rank"):
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def _global(self, ctx: Interaction):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         embed = Embed(color=Color.random())
@@ -66,7 +66,7 @@ class Rank_Group(GroupCog, name="rank"):
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def server(self, ctx: Interaction):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         embed = Embed(color=Color.random())
@@ -176,7 +176,7 @@ class levelling(Cog):
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     async def level(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         member=ctx.user if member is None else member
@@ -229,7 +229,7 @@ class levelling(Cog):
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     async def profile(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         member=ctx.user if member is None else member

@@ -63,7 +63,7 @@ class HelpGroup(GroupCog, name="help"):
     @Jeanne.command(description="Get help of a certain command")
     @Jeanne.autocomplete(command=command_choices)
     async def command(self, ctx: Interaction, command: Jeanne.Range[str, 4]):
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
         await ctx.response.defer()
         cmd = [
@@ -90,7 +90,7 @@ class HelpGroup(GroupCog, name="help"):
 
     @Jeanne.command(description="Get help of a certain module")
     async def module(self, ctx: Interaction, module: Modules):
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
         await ctx.response.defer()
         module_data = dumps(modules[module.value])
@@ -109,7 +109,7 @@ class HelpGroup(GroupCog, name="help"):
         description="Get help from the wiki or join the support server for further help"
     )
     async def support(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         view = help_button()

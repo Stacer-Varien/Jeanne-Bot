@@ -22,7 +22,7 @@ class Guess_Group(GroupCog, name="guess"):
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     @Jeanne.describe(number="Guess her number (between 1 and 10)")
     async def free(self, ctx: Interaction, number: Jeanne.Range[int, 1, 10]):
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         await ctx.response.defer()
@@ -51,7 +51,7 @@ class Guess_Group(GroupCog, name="guess"):
     )
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def bet(self, ctx: Interaction, bet: str, number: Jeanne.Range[int, 1, 10]):
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         await ctx.response.defer()
@@ -119,7 +119,7 @@ class Dice_Group(GroupCog, name="dice"):
     @Jeanne.describe(digit="Guess what will roll")
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     async def free(self, ctx: Interaction, digit: Jeanne.Range[int, 1, 6]):
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         await ctx.response.defer()
@@ -143,7 +143,7 @@ class Dice_Group(GroupCog, name="dice"):
     @Jeanne.describe(bet="How much are you betting?", digit="Guess what will roll")
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def bet(self, ctx: Interaction, bet: int, digit: Jeanne.Range[int, 1, 6]):
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         await ctx.response.defer()
@@ -212,7 +212,7 @@ class Flip_Group(GroupCog, name="flip"):
     @Jeanne.command(description="Flip a coin and earn 20 QP for free")
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     async def free(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
         await ctx.response.defer()
         picks = ["Heads", "Tails"]
@@ -250,7 +250,7 @@ class Flip_Group(GroupCog, name="flip"):
     @Jeanne.describe(bet="How much are you betting?")
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def bet(self, ctx: Interaction, bet: int):
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
         
         await ctx.response.defer()
@@ -332,7 +332,7 @@ class currency(Cog):
 
     @Jeanne.command(description="Claim your daily")
     async def daily(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
         await ctx.response.defer()
         tomorrow = round((datetime.now() + timedelta(days=1)).timestamp())
@@ -371,7 +371,7 @@ class currency(Cog):
     @Jeanne.command(description="Check how much QP you have")
     @Jeanne.checks.cooldown(1, 30, key=lambda i: (i.user.id))
     async def balance(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         await ctx.response.defer()
@@ -396,7 +396,7 @@ class currency(Cog):
 
     @Jeanne.command(description="Vote for me in TopGG to get more QP!")
     async def vote(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
         await ctx.response.send_message(
             embed=Embed(

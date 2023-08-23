@@ -27,7 +27,7 @@ class slashinfo(Cog):
     @Jeanne.command(description="See the bot's status from development to now")
     async def stats(self, ctx: Interaction):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
         else:
             botowner = self.bot.get_user(597829930964877369)
@@ -75,7 +75,7 @@ class slashinfo(Cog):
     @Jeanne.describe(member="Which member?")
     async def userinfo(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
         else:
             member=ctx.user if member is None else member
@@ -125,7 +125,7 @@ class slashinfo(Cog):
     @Jeanne.command(description="Get information about this server")
     async def serverinfo(self, ctx: Interaction):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         emojis = [str(x) for x in ctx.guild.emojis]
@@ -187,7 +187,7 @@ class slashinfo(Cog):
 
     @Jeanne.command(description="Check how fast I respond to a command")
     async def ping(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         await ctx.response.defer()
@@ -212,7 +212,7 @@ class slashinfo(Cog):
     @Jeanne.command(description="See the server's banner")
     async def serverbanner(self, ctx: Interaction):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         if ctx.guild.premium_subscription_count < 2:
@@ -234,7 +234,7 @@ class slashinfo(Cog):
     @Jeanne.describe(member="Which member?")
     async def avatar(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         member=ctx.user if member is None else member
@@ -266,7 +266,7 @@ class slashinfo(Cog):
         sticker="Insert message ID with the sticker or name of the sticker in the server"
     )
     async def sticker(self, ctx: Interaction, sticker: str):
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         await ctx.response.defer()
@@ -308,7 +308,7 @@ class slashinfo(Cog):
     @Jeanne.command(description="View an emoji")
     @Jeanne.describe(emoji="What is the name of the emoji?")
     async def emoji(self, ctx: Interaction, emoji: str):
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         await ctx.response.defer()

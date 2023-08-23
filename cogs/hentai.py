@@ -18,7 +18,7 @@ class nsfw(Cog):
         rating: Optional[Literal["questionable", "explicit"]] = None,
     ) -> None:
         await ctx.response.defer(thinking=False)
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         hentai, source = await Hentai().hentai(rating)
@@ -54,7 +54,7 @@ class nsfw(Cog):
         plus: Optional[bool] = None,
     ) -> None:
         await ctx.response.defer(thinking=False)
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         image = await Hentai(plus).gelbooru(rating, tag)
@@ -128,7 +128,7 @@ class nsfw(Cog):
         plus: Optional[bool] = None,
     ) -> None:
         await ctx.response.defer(thinking=False)
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         if tag == "02":
@@ -198,7 +198,7 @@ class nsfw(Cog):
         plus: Optional[bool] = None,
     ) -> None:
         await ctx.response.defer(thinking=False)
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         image = await Hentai(plus).konachan(rating, tag)
@@ -251,7 +251,7 @@ class nsfw(Cog):
     @Jeanne.describe(tag="Which tag are you picking")
     async def nekosfun(self, ctx:Interaction, tag:Optional[NekosFunTags]=None):
         await ctx.response.defer(thinking=False)
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
         
         tag=tag if tag else choice(list(NekosFunTags))

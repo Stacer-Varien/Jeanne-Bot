@@ -16,6 +16,7 @@ class Botban:
     def __init__(self, user: User):
         self.user = user
     
+    @property
     def check_botbanned_user(self):
         botbanned_data = db.execute(
             "SELECT * FROM botbannedData WHERE user_id = ?", (self.user.id,)
@@ -46,6 +47,7 @@ class Currency:
     def __init__(self, user: User):
         self.user = user
 
+    @property
     def get_balance(self) -> int:
         data = db.execute(
             "SELECT amount FROM bankData WHERE user_id = ?", (self.user.id,)

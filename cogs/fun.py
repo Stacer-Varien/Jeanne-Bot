@@ -24,7 +24,7 @@ class fun(Cog):
     @Jeanne.describe(question="Add your question")
     async def _8ball(self, ctx: Interaction, question: str):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         eight_ball_answers = [
@@ -67,7 +67,7 @@ class fun(Cog):
     @Jeanne.describe(text="What are you reversing?")
     async def reverse(self, ctx: Interaction, text: str):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         filtered_words = ["riffak", "reggin", "aggin"]
@@ -101,7 +101,7 @@ class fun(Cog):
     @Jeanne.command(description="Get a random animeme")
     async def animeme(self, ctx: Interaction):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         animeme = Embed(color=Color.random())
@@ -113,7 +113,7 @@ class fun(Cog):
     @Jeanne.describe(first_word="Add first word", second_word="Add second word")
     async def combine(self, ctx: Interaction, first_word: str, second_word: str):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         option_name1letters = first_word[: round(len(first_word) / 2)]
@@ -136,7 +136,7 @@ class fun(Cog):
     @Jeanne.describe(choices="Add your choices here. Separate them with ','")
     async def choose(self, ctx: Interaction, choices: str):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         choices = choices.split(sep=",")
@@ -149,7 +149,7 @@ class fun(Cog):
     @Jeanne.describe(member="Which member?")
     async def simprate(self, ctx: Interaction, member: Optional[Member] = None):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         perc = randint(0, 100)
@@ -173,7 +173,7 @@ class fun(Cog):
     @Jeanne.describe(member="Which member?")
     async def gayrate(self, ctx: Interaction, member: Optional[Member] = None):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
 
         perc = randint(0, 100)
