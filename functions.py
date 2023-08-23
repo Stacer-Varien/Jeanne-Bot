@@ -87,6 +87,7 @@ class Currency:
 
         db.commit()
 
+    
     def give_daily(self):
         current_time = datetime.now()
         next_claim = current_time + timedelta(days=1)

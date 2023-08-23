@@ -50,22 +50,22 @@ class Guess_Group(GroupCog, name="guess"):
         bet="How much are you betting?", number="Guess her number (between 1 and 10)"
     )
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
-    async def bet(self, ctx: Interaction, bet: str, number: Jeanne.Range[int, 1, 10]):
+    async def bet(self, ctx: Interaction, bet: int, number: Jeanne.Range[int, 1, 10]):
         if Botban(ctx.user).check_botbanned_user:
             return
 
         await ctx.response.defer()
-        balance = Currency(ctx.user).get_balance()
-        if int(bet) < 5:
+        balance = Currency(ctx.user).get_balance
+        if bet < 5:
             bethigher = Embed(description="Please bet an amount higher than 5 <:quantumpiece:980772736861343774>")
             await ctx.followup.send(embed=bethigher)
 
-        elif int(bet) > int(balance):
+        elif bet > balance:
             betlower = Embed(
                 description=f"Your balance is too low!\nPlease bet lower than {balance} <:quantumpiece:980772736861343774>"
             )
             await ctx.followup.send(embed=betlower)
-        elif int(balance) == 0:
+        elif balance == 0:
             zerobal = Embed(
                 description="Unfortunately, you have 0 <:quantumpiece:980772736861343774>.\nPlease do a daily and/or wait for a free chance to do `/guess free`, `/flip free` and/or `/dice free`"
             )
@@ -73,17 +73,17 @@ class Guess_Group(GroupCog, name="guess"):
         else:
             answer = randint(1, 10)
 
-            if int(number) == answer:
-                Currency(ctx.user).add_qp(int(bet))
+            if number == answer:
+                Currency(ctx.user).add_qp(bet)
                 correct = Embed(
-                    description=f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given {int(bet)} <:quantumpiece:980772736861343774>!",
+                    description=f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given {bet} <:quantumpiece:980772736861343774>!",
                     color=Color.random(),
                 )
                 correct.set_image(url="https://i.imgur.com/ICndRZg.gifv")
             else:
-                Currency(ctx.user).remove_qp(int(bet))
+                Currency(ctx.user).remove_qp(bet)
                 wrong = Embed(
-                    description=f"Wrong answer. It was {answer}\nAfraid I have to take {int(bet)} <:quantumpiece:980772736861343774> from you...",
+                    description=f"Wrong answer. It was {answer}\nAfraid I have to take {bet} <:quantumpiece:980772736861343774> from you...",
                     color=Color.red(),
                 )
                 wrong.set_image(url="https://i.imgur.com/faD48C3.jpg")
@@ -148,7 +148,7 @@ class Dice_Group(GroupCog, name="dice"):
 
         await ctx.response.defer()
         rolled = randint(1, 6)
-        balance = Currency(ctx.user).get_balance()
+        balance = Currency(ctx.user).get_balance
         if bet < 5:
             bethigher = Embed(description="Please bet an amount higher than 5 <:quantumpiece:980772736861343774>")
             await ctx.followup.send(embed=bethigher)
@@ -257,7 +257,7 @@ class Flip_Group(GroupCog, name="flip"):
 
         picks = ["Heads", "Tails"]
         jeannes_pick = choice(picks)
-        balance = Currency(ctx.user).get_balance()
+        balance = Currency(ctx.user).get_balance
         if 5 > bet:
             bethigher = Embed(description="Please bet an amount higher than 5 <:quantumpiece:980772736861343774>")
             await ctx.followup.send(embed=bethigher)
@@ -344,7 +344,7 @@ class currency(Cog):
             await ctx.followup.send(embed=cooldown)
         else:
             Currency(ctx.user).give_daily()
-            balance = Currency(ctx.user).get_balance()
+            balance = Currency(ctx.user).get_balance
 
             daily = Embed(
                 title="Daily",
@@ -375,7 +375,7 @@ class currency(Cog):
             return
 
         await ctx.response.defer()
-        bal = Currency(ctx.user).get_balance()
+        bal = Currency(ctx.user).get_balance
 
         balance = Embed(description=f"You have {bal} <:quantumpiece:980772736861343774>", color=Color.blue())
         balance.add_field(

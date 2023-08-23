@@ -60,7 +60,7 @@ class Background_Group(GroupCog, name="background"):
         if Botban(ctx.user).check_botbanned_user:
             return
 
-        balance: int = Currency(ctx.user).get_balance()
+        balance: int = Currency(ctx.user).get_balance
 
         if balance == 0:
             nomoney = Embed(
@@ -161,7 +161,7 @@ class Background_Group(GroupCog, name="background"):
         if Botban(ctx.user).check_botbanned_user:
             return
 
-        balance = Currency(ctx.user).get_balance()
+        balance = Currency(ctx.user).get_balance
 
         if balance == None:
             nomoney = Embed(
