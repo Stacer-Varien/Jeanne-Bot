@@ -1,5 +1,5 @@
-from json import dump, dumps, loads
-from typing import List, Optional
+from json import dumps, loads
+from typing import List
 from discord import (
     ButtonStyle,
     Color,
@@ -65,6 +65,7 @@ class HelpGroup(GroupCog, name="help"):
     async def command(self, ctx: Interaction, command: Jeanne.Range[str, 4]):
         if Botban(ctx.user).check_botbanned_user:
             return
+
         await ctx.response.defer()
         cmd = [
             cmd
@@ -73,13 +74,27 @@ class HelpGroup(GroupCog, name="help"):
             if cmd.qualified_name == command
         ][0]
 
+        bot_perms=cmd.checks[0] if cmd.checks[0] else None
+        member_perms=cmd.checks[0] if cmd.checks[1] else None
+
         embed = Embed(title=f"{command.title()} Help", color=Color.random())
         embed.description = cmd.description
         parms = []
+        descs=[]
         if len(cmd.parameters) > 0:
             for i in cmd.parameters:
                 parm = f"[{i.name}]" if i.required is True else f"<{i.name}>"
+                desc = f"`{parm}` - {i.description}"
                 parms.append(parm)
+                descs.append(desc)
+            embed.add_field(name="Parameters", value="\n".join(descs))
+        
+        if bot_perms:
+            perms=[]
+            for i in bot_perms:
+                perm_dict:dict=i.__closure__[0].cell_contents
+                perm:list=perm_dict.keys()
+                perms.append(perm)
         cmd_usage = "/" + cmd.qualified_name + " " + " ".join(parms)
         embed.add_field(name="Command Usage", value=f"`{cmd_usage}`", inline=False)
         embed.set_footer(
