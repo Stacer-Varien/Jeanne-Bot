@@ -57,7 +57,9 @@ class Guess_Group(GroupCog, name="guess"):
         await ctx.response.defer()
         balance = Currency(ctx.user).get_balance
         if bet < 5:
-            bethigher = Embed(description="Please bet an amount higher than 5 <:quantumpiece:980772736861343774>")
+            bethigher = Embed(
+                description="Please bet an amount higher than 5 <:quantumpiece:980772736861343774>"
+            )
             await ctx.followup.send(embed=bethigher)
 
         elif bet > balance:
@@ -150,7 +152,9 @@ class Dice_Group(GroupCog, name="dice"):
         rolled = randint(1, 6)
         balance = Currency(ctx.user).get_balance
         if bet < 5:
-            bethigher = Embed(description="Please bet an amount higher than 5 <:quantumpiece:980772736861343774>")
+            bethigher = Embed(
+                description="Please bet an amount higher than 5 <:quantumpiece:980772736861343774>"
+            )
             await ctx.followup.send(embed=bethigher)
 
         elif bet > balance:
@@ -226,7 +230,8 @@ class Flip_Group(GroupCog, name="flip"):
             Currency(ctx.user).add_qp(20)
 
             embed = Embed(
-                description="YAY! You got it!\n20 <:quantumpiece:980772736861343774> has been added", color=Color.random()
+                description="YAY! You got it!\n20 <:quantumpiece:980772736861343774> has been added",
+                color=Color.random(),
             )
 
             await ctx.edit_original_response(embed=embed, view=None)
@@ -245,21 +250,22 @@ class Flip_Group(GroupCog, name="flip"):
             )
             await ctx.edit_original_response(embed=timeout, view=None)
 
-
     @Jeanne.command(name="bet", description="Flip a coin and earn with betting")
     @Jeanne.describe(bet="How much are you betting?")
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def bet(self, ctx: Interaction, bet: int):
         if Botban(ctx.user).check_botbanned_user:
             return
-        
+
         await ctx.response.defer()
 
         picks = ["Heads", "Tails"]
         jeannes_pick = choice(picks)
         balance = Currency(ctx.user).get_balance
         if 5 > bet:
-            bethigher = Embed(description="Please bet an amount higher than 5 <:quantumpiece:980772736861343774>")
+            bethigher = Embed(
+                description="Please bet an amount higher than 5 <:quantumpiece:980772736861343774>"
+            )
             await ctx.followup.send(embed=bethigher)
 
         elif balance < bet:
@@ -283,7 +289,9 @@ class Flip_Group(GroupCog, name="flip"):
                 Currency(ctx.user).add_qp(bet)
 
                 embed = Embed(
-                    description="YAY! You got it!\n{} <:quantumpiece:980772736861343774> has been added".format(bet)
+                    description="YAY! You got it!\n{} <:quantumpiece:980772736861343774> has been added".format(
+                        bet
+                    )
                 )
 
                 await ctx.edit_original_response(embed=embed, view=None)
@@ -293,17 +301,17 @@ class Flip_Group(GroupCog, name="flip"):
                 embed = Embed(color=Color.red())
                 embed = Embed(
                     description="Oh no, it was {}\nI'm afraid that I have to take {} <:quantumpiece:980772736861343774> from you".format(
-                        jeannes_pick, bet),
+                        jeannes_pick, bet
+                    ),
                     color=Color.red(),
                 )
-                await ctx.edit_original_response(embed=embed, view=None)                
+                await ctx.edit_original_response(embed=embed, view=None)
             else:
                 timeout = Embed(
                     description=f"Sorry but you took too long. It was {jeannes_pick}",
                     color=Color.red(),
                 )
                 await ctx.edit_original_response(embed=timeout, view=None)
-
 
     @free.error
     async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
@@ -377,7 +385,10 @@ class currency(Cog):
         await ctx.response.defer()
         bal = Currency(ctx.user).get_balance
 
-        balance = Embed(description=f"You have {bal} <:quantumpiece:980772736861343774>", color=Color.blue())
+        balance = Embed(
+            description=f"You have {bal} <:quantumpiece:980772736861343774>",
+            color=Color.blue(),
+        )
         balance.add_field(
             name=f"If you want more <:quantumpiece:980772736861343774>:",
             value="[Vote for me in TopGG](https://top.gg/bot/831993597166747679/vote)",
@@ -386,7 +397,9 @@ class currency(Cog):
         await ctx.followup.send(embed=balance)
 
     @balance.error
-    async def balance_error(self, ctx: Interaction, error: Jeanne.errors.AppCommandError):
+    async def balance_error(
+        self, ctx: Interaction, error: Jeanne.errors.AppCommandError
+    ):
         if isinstance(error, Jeanne.errors.CommandOnCooldown):
             cooldown = Embed(
                 description=f"WOAH! Calm down! Why keep checking again quickly?\nTry again after `{round(error.retry_after, 2)} seconds`",
