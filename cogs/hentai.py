@@ -40,6 +40,11 @@ class nsfw(Cog):
             view = ReportContent(shorten_url(hentai))
             await ctx.followup.send(embed=embed, view=view)
 
+        await view.wait()
+
+        if view.value == None:
+            await ctx.edit_original_response(view=None)
+
     @Jeanne.command(description="Get a random media content from Gelbooru", nsfw=True)
     @Jeanne.describe(
         rating="Do you want questionable or explicit content?",
@@ -93,6 +98,10 @@ class nsfw(Cog):
                         )
                     )
                     await ctx.followup.send(embed=embed, view=view)
+                await view.wait()
+
+                if view.value == None:
+                    await ctx.edit_original_response(view=None)
             except Exception:
                 if image.endswith("mp4"):
                     await ctx.followup.send(image)
@@ -111,7 +120,9 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (IndexError, KeyError)
         ):
-            no_tag = Embed(description="The tag could not be found", color=Color.red())
+            no_tag = Embed(
+                description="The hentai could not be found", color=Color.red()
+            )
             await ctx.followup.send(embed=no_tag)
 
     @Jeanne.command(description="Get a random hentai from Yande.re", nsfw=True)
@@ -162,15 +173,18 @@ class nsfw(Cog):
                 await ctx.followup.send(embeds=embeds)
         else:
             color = Color.random()
-            shortened_url = shorten_url(
-                str(image)
-            )  # Apply url_shortener to the image URL
+            shortened_url = shorten_url(str(image))
             embed = Embed(color=color, url="https://yande.re")
-            embed.set_image(url=shortened_url)  # Use the shortened URL
+            embed.set_image(url=shortened_url)
             footer_text = "Fetched from Yande.re • Credits must go to the artist"
             try:
+                view = ReportContent(shortened_url)
                 embed.set_footer(text=footer_text)
-                await ctx.followup.send(embed=embed, view=ReportContent(shortened_url))
+                await ctx.followup.send(embed=embed, view=view)
+                await view.wait()
+
+                if view.value == None:
+                    await ctx.edit_original_response(view=None)
             except:
                 footer_text += "\nIf you see an illegal content, please use /botreport and attach the link when reporting"
                 embed.set_footer(text=footer_text)
@@ -181,7 +195,9 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (IndexError, KeyError, TypeError)
         ):
-            no_tag = Embed(description="The tag could not be found", color=Color.red())
+            no_tag = Embed(
+                description="The hentai could not be found", color=Color.red()
+            )
             await ctx.followup.send(embed=no_tag)
 
     @Jeanne.command(description="Get a random hentai from Konachan", nsfw=True)
@@ -230,10 +246,13 @@ class nsfw(Cog):
             embed.set_image(url=shorten_url(str(image)))
             footer_text = "Fetched from Konachan • Credits must go to the artist"
             try:
+                view = ReportContent(shorten_url(str(image)))
                 embed.set_footer(text=footer_text)
-                await ctx.followup.send(
-                    embed=embed, view=ReportContent(shorten_url(str(image)))
-                )
+                await ctx.followup.send(embed=embed, view=view)
+                await view.wait()
+
+                if view.value == None:
+                    await ctx.edit_original_response(view=None)
             except:
                 footer_text += "\nIf you see an illegal content, please use /botreport and attach the link when reporting"
                 embed.set_footer(text=footer_text)
@@ -244,22 +263,24 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (IndexError, KeyError, TypeError)
         ):
-            no_tag = Embed(description="The tag could not be found", color=Color.red())
+            no_tag = Embed(description="The hentai could not be found", color=Color.red())
             await ctx.followup.send(embed=no_tag)
 
-    @Jeanne.command(description="Get hentai from nekos.fun",nsfw=True)
+    @Jeanne.command(description="Get hentai from nekos.fun", nsfw=True)
     @Jeanne.describe(tag="Which tag are you picking")
-    async def nekosfun(self, ctx:Interaction, tag:Optional[NekosFunTags]=None):
+    async def nekosfun(self, ctx: Interaction, tag: Optional[NekosFunTags] = None):
         await ctx.response.defer(thinking=False)
         if Botban(ctx.user).check_botbanned_user:
             return
-        
-        tag=tag if tag else choice(list(NekosFunTags))
-        image= await Hentai().nekosfun(tag)
-        embed=Embed(color=Color.random())
+
+        tag = tag if tag else choice(list(NekosFunTags))
+        image = await Hentai().nekosfun(tag)
+        embed = Embed(color=Color.random())
         embed.set_image(url=image)
-        embed.set_footer(text="Fetched from nekos.fun • Credits must go to their respective sources")
-        await ctx.followup.send(embed=embed)  
+        embed.set_footer(
+            text="Fetched from nekos.fun • Credits must go to their respective sources"
+        )
+        await ctx.followup.send(embed=embed)
 
 
 async def setup(bot: Bot):

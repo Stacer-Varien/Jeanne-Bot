@@ -426,11 +426,11 @@ class ReportSelect(ui.View):
         super().__init__()
         self.add_item(ReportContentPlus(self.link1, self.link2, self.link3, self.link4))
 
-
 class ReportContent(ui.View):
     def __init__(self, link: str):
         super().__init__(timeout=180)
         self.link = link
+        self.value=None
 
     @ui.button(label="Report Content", style=ButtonStyle.grey)
     async def report1(self, ctx: Interaction, button: ui.Button):
