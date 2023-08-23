@@ -10,7 +10,7 @@ from discord import (
 from discord.ext.commands import Cog, Bot
 from functions import Botban
 from config import BB_WEBHOOK
-from assets import Images
+from assets.images import get_animeme_pic
 from typing import Optional
 
 
@@ -105,7 +105,7 @@ class fun(Cog):
             return
 
         animeme = Embed(color=Color.random())
-        animeme.set_image(url=Images.get_animeme_pic())
+        animeme.set_image(url=get_animeme_pic())
         animeme.set_footer(text="Fetched from animeme1936")
         await ctx.followup.send(embed=animeme)
 
