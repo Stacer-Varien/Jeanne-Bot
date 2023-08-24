@@ -62,7 +62,8 @@ class HelpGroup(GroupCog, name="help"):
 
     @Jeanne.command(description="Get help of a certain command")
     @Jeanne.autocomplete(command=command_choices)
-    async def command(self, ctx: Interaction, command: Jeanne.Range[str, 4]):
+    @Jeanne.describe(command="Which command you need help with?")
+    async def command(self, ctx: Interaction, command: Jeanne.Range[str, 3]):
         if Botban(ctx.user).check_botbanned_user:
             return
 
@@ -74,27 +75,50 @@ class HelpGroup(GroupCog, name="help"):
             if cmd.qualified_name == command
         ][0]
 
-        bot_perms=cmd.checks[0] if cmd.checks[0] else None
-        member_perms=cmd.checks[0] if cmd.checks[1] else None
+        bot_perms: dict = (
+            cmd.checks[0].__closure__[0].cell_contents
+            if len(cmd.checks) != 0
+            and cmd.checks[0].__qualname__ == "bot_has_permissions.<locals>.predicate"
+            else None
+        )
+
+        member_perms = (
+            cmd.checks[0].__closure__[0].cell_contents
+            if len(cmd.checks) == 1
+            and cmd.checks[0].__qualname__ == "has_permissions.<locals>.predicate"
+            else (
+                cmd.checks[1].__closure__[0].cell_contents
+                if len(cmd.checks) == 2
+                and cmd.checks[1].__qualname__ == "has_permissions.<locals>.predicate"
+                else None
+            )
+        )
 
         embed = Embed(title=f"{command.title()} Help", color=Color.random())
         embed.description = cmd.description
         parms = []
-        descs=[]
+        descs = []
         if len(cmd.parameters) > 0:
             for i in cmd.parameters:
                 parm = f"[{i.name}]" if i.required is True else f"<{i.name}>"
                 desc = f"`{parm}` - {i.description}"
                 parms.append(parm)
                 descs.append(desc)
-            embed.add_field(name="Parameters", value="\n".join(descs))
-        
+            embed.add_field(name="Parameters", value="\n".join(descs), inline=False)
+
         if bot_perms:
-            perms=[]
-            for i in bot_perms:
-                perm_dict:dict=i.__closure__[0].cell_contents
-                perm:list=perm_dict.keys()
-                perms.append(perm)
+            perms = []
+            for i in list(bot_perms.keys()):
+                perms.append(str(i).replace("_", " ").title())
+            embed.add_field(name="Bot Permissions", value="\n".join(perms), inline=True)
+
+        if member_perms:
+            perms = []
+            for i in list(member_perms.keys()):
+                perms.append(str(i).replace("_", " ").title())
+            embed.add_field(
+                name="User Permissions", value="\n".join(perms), inline=True
+            )
         cmd_usage = "/" + cmd.qualified_name + " " + " ".join(parms)
         embed.add_field(name="Command Usage", value=f"`{cmd_usage}`", inline=False)
         embed.set_footer(
