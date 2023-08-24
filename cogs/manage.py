@@ -11,6 +11,7 @@ from discord import (
     HTTPException,
     Interaction,
     Member,
+    NotFound,
     Role,
     StageChannel,
     TextChannel,
@@ -164,16 +165,14 @@ class Create_Group(GroupCog, name="create"):
         self,
         ctx: Interaction,
         name: Jeanne.Range[str, 1, 100],
-        category: CategoryChannel,
+        category: Optional[CategoryChannel] = None,
     ):
         if Botban(ctx.user).check_botbanned_user:
             return
 
         await ctx.response.defer()
         embed = Embed()
-        channel: StageChannel = await ctx.guild.create_stage_channel(
-            name=name, topic=None
-        )
+        channel: StageChannel = await ctx.guild.create_stage_channel(name=name)
         embed.description = "{} has been created".format(channel.jump_url)
 
         if category:
@@ -203,6 +202,7 @@ class Create_Group(GroupCog, name="create"):
         category="Place in which category?",
     )
     @Jeanne.checks.has_permissions(manage_channels=True)
+    @Jeanne.checks.bot_has_permissions(manage_channels=True)
     async def forum(
         self,
         ctx: Interaction,
@@ -231,12 +231,13 @@ class Create_Group(GroupCog, name="create"):
 
     @forum.error
     async def forum_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-        if isinstance(error, Jeanne.CommandInvokeError):
-            if HTTPException:
-                embed = Embed()
-                embed.description = "Couldn't make a new forum. Please make sure the server is community enabled"
-                embed.color = Color.red()
-                await ctx.followup.send(embed=embed)
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, HTTPException
+        ):
+            embed = Embed()
+            embed.description = "Couldn't make a new forum. Please make sure the server is community enabled"
+            embed.color = Color.red()
+            await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Create a role")
     @Jeanne.describe(
@@ -246,6 +247,7 @@ class Create_Group(GroupCog, name="create"):
         mentionable="Should it be mentioned?",
     )
     @Jeanne.checks.has_permissions(manage_roles=True)
+    @Jeanne.checks.bot_has_permissions(manage_roles=True)
     async def role(
         self,
         ctx: Interaction,
@@ -284,34 +286,46 @@ class Create_Group(GroupCog, name="create"):
 
         await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(description="Makes a public thread channel")
+    @Jeanne.command(description="Makes a thread channel")
     @Jeanne.describe(
         name="What will you name it?",
         channel="Which channel is the message in?",
-        message_id="What is the message ID?",
+        message_id="What is the message ID? You can leave it blank for a private thread",
         slowmode="What is the slowmode (1h, 30m, etc) (Max is 6 hours)",
     )
-    @Jeanne.checks.has_permissions(create_public_threads=True)
-    @Jeanne.checks.bot_has_permissions(create_public_threads=True, manage_threads=True)
+    @Jeanne.checks.has_permissions(
+        create_public_threads=True, create_private_threads=True
+    )
+    @Jeanne.checks.bot_has_permissions(
+        create_public_threads=True, create_private_threads=True, manage_threads=True
+    )
     async def thread(
         self,
         ctx: Interaction,
         name: str,
         channel: TextChannel,
-        message_id: str,
+        message_id: Optional[str] = None,
         slowmode: Optional[str] = None,
     ):
         if Botban(ctx.user).check_botbanned_user:
             return
         await ctx.response.defer()
-        message = await channel.fetch_message(int(message_id))
-        thread = await channel.create_thread(name=name, message=message)
 
         embed = Embed()
-        embed.description = "Thread `{}` has been created on {}".format(
-            message.jump_url
-        )
-        embed.color = Color.green()
+        embed.add_field(name="Channel", value=channel.jump_url, inline=True)
+
+        if message_id == None:
+            thread = await channel.create_thread(name=name)
+        else:
+            message = await channel.fetch_message(int(message_id))
+            thread = await channel.create_thread(name=name, message=message)
+            embed.add_field(
+                name="Found in message", value=message.jump_url, inline=True
+            )
+
+        await thread.add_user(ctx.user)
+        embed.description = "{} has been created".format(thread.jump_url)
+        embed.color = Color.random()
 
         if slowmode:
             try:
@@ -326,13 +340,24 @@ class Create_Group(GroupCog, name="create"):
 
         await ctx.followup.send(embed=embed)
 
+    @thread.error
+    async def thread_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, NotFound
+        ):
+            embed = Embed()
+            embed.description = "Message could not be found. Please make sure you have added the correct message ID"
+            embed.color = Color.red()
+            await ctx.followup.send(embed=embed)
+
     @Jeanne.command(description="Make a new emoji")
     @Jeanne.describe(
         name="What will you name it?",
         emoji_link="Insert emoji URL here",
         emoji_image="Insert emoji image here",
     )
-    @Jeanne.checks.has_permissions(manage_emojis_and_stickers=True)
+    @Jeanne.checks.has_permissions(manage_expressions=True)
+    @Jeanne.checks.bot_has_permissions(manage_expressions=True)
     async def emoji(
         self,
         ctx: Interaction,
@@ -393,7 +418,8 @@ class Create_Group(GroupCog, name="create"):
         sticker_link="Insert sticker URL here",
         sticker_image="Insert sticker image here",
     )
-    @Jeanne.checks.has_permissions(manage_emojis_and_stickers=True)
+    @Jeanne.checks.has_permissions(manage_expressions=True)
+    @Jeanne.checks.bot_has_permissions(manage_expressions=True)
     async def sticker(
         self,
         ctx: Interaction,
@@ -440,7 +466,7 @@ class Create_Group(GroupCog, name="create"):
                 if len(ctx.guild.stickers) == ctx.guild.sticker_limit:
                     embed.description = "You have reached the maximum sticker limit"
                 else:
-                    embed.description = "There was a problem making the sticker. Please check that the sticker you are making is:\n\n1. 512kb or less. Use [Ezgif](https://ezgif.com/) to compress it\n2. The file is in a PNG or APNG format"
+                    embed.description = "There was a problem making the sticker. Please check that the sticker you are making is:\n\n1. 512kb or less\n2. The file is in a PNG or APNG format"
                 await ctx.followup.send(embed=embed)
 
 
@@ -452,34 +478,39 @@ class Delete_Group(GroupCog, name="delete"):
     @Jeanne.command(description="Deletes a channel")
     @Jeanne.describe(channel="Which channel are you deleting?")
     @Jeanne.checks.has_permissions(manage_channels=True)
+    @Jeanne.checks.bot_has_permissions(manage_channels=True)
     async def channel(self, ctx: Interaction, channel: abc.GuildChannel):
         if Botban(ctx.user).check_botbanned_user:
             return
 
         await ctx.response.defer()
-        await channel.delete()
+        
         embed = Embed(
             description="{} has been deleted".format(channel.name), color=Color.random()
         )
+        await channel.delete()
         await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Deletes a role")
     @Jeanne.describe(role="Which role are you deleting?")
     @Jeanne.checks.has_permissions(manage_channels=True)
+    @Jeanne.checks.bot_has_permissions(manage_channels=True)    
     async def role(self, ctx: Interaction, role: Role):
         if Botban(ctx.user).check_botbanned_user:
             return
 
         await ctx.response.defer()
-        await role.delete()
+        
         embed = Embed(
             description="{} has been deleted".format(role.name), color=Color.random()
         )
+        await role.delete()
         await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Deletes an emoji")
     @Jeanne.describe(emoji="Which emoji are you deleting?")
-    @Jeanne.checks.has_permissions(manage_emojis_and_stickers=True)
+    @Jeanne.checks.has_permissions(manage_expressions=True)
+    @Jeanne.checks.bot_has_permissions(manage_expressions=True)
     async def emoji(self, ctx: Interaction, emoji: str):
         if Botban(ctx.user).check_botbanned_user:
             return
@@ -487,7 +518,7 @@ class Delete_Group(GroupCog, name="delete"):
         await ctx.response.defer()
         try:
             e = emoji.strip().split(":")[-1].rstrip(">")
-            emote = await ctx.guild.fetch_emoji(e)
+            emote = await ctx.guild.fetch_emoji(int(e))
         except:
             emote = utils.get(ctx.guild.emojis, name=emoji.replace(" ", "_"))
         embed = Embed(
@@ -508,7 +539,8 @@ class Delete_Group(GroupCog, name="delete"):
 
     @Jeanne.command(description="Deletes a sticker")
     @Jeanne.describe(sticker="Which sticker are you deleting?")
-    @Jeanne.checks.has_permissions(manage_emojis_and_stickers=True)
+    @Jeanne.checks.has_permissions(manage_expressions=True)
+    @Jeanne.checks.bot_has_permissions(manage_expressions=True)    
     async def sticker(self, ctx: Interaction, sticker: str):
         if Botban(ctx.user).check_botbanned_user:
             return
@@ -548,6 +580,7 @@ class Edit_Group(GroupCog, name="edit"):
         nsfw_enabled="Should it be an NSFW channel?",
     )
     @Jeanne.checks.has_permissions(manage_channels=True)
+    @Jeanne.checks.bot_has_permissions(manage_channels=True)    
     async def textchannel(
         self,
         ctx: Interaction,
