@@ -15,7 +15,7 @@ current_time = date.today()
 class Botban:
     def __init__(self, user: User):
         self.user = user
-    
+
     @property
     def check_botbanned_user(self):
         botbanned_data = db.execute(
@@ -87,7 +87,6 @@ class Currency:
 
         db.commit()
 
-    
     def give_daily(self):
         current_time = datetime.now()
         next_claim = current_time + timedelta(days=1)
@@ -134,8 +133,11 @@ class Currency:
             return False
 
     def get_next_daily(self):
-        data=db.execute("SELECT claimed_date FROM bankData WHERE user_id = ?", (self.user.id,)).fetchone()
+        data = db.execute(
+            "SELECT claimed_date FROM bankData WHERE user_id = ?", (self.user.id,)
+        ).fetchone()
         return data[0] if data else None
+
 
 class Inventory:
     def __init__(self, user: Optional[User] = None) -> None:
@@ -151,7 +153,9 @@ class Inventory:
         for a in w:
             backgrounds.add_field(
                 name=f"{a[1]}",
-                value="[Item ID: {}]({})\nPrice: 1000 <:quantumpiece:980772736861343774>".format(a[0], a[2]),
+                value="[Item ID: {}]({})\nPrice: 1000 <:quantumpiece:980772736861343774>".format(
+                    a[0], a[2]
+                ),
                 inline=True,
             )
         db.commit()
@@ -631,7 +635,7 @@ class Levelling:
             return None
 
     @property
-    def get_blacklisted_channels(self)->list:
+    def get_blacklisted_channels(self) -> list:
         data = db.execute(
             "SELECT channel FROM xpChannelData WHERE server = ?", (self.server.id,)
         ).fetchall()
@@ -756,6 +760,26 @@ class Manage:
             )
 
             db.commit()
+
+    def disable_command(self, command: str):
+        db.execute(
+            "INSERT OR IGNORE INTO disabledCommandsData (server, command) VALUES (?,?)",
+            (
+                self.server.id,
+                command,
+            ),
+        )
+        db.commit()
+
+    def enable_command(self, command: str):
+        db.execute(
+            "DELETE FROM disabledCommandsData WHERE server = ? AND command = ?",
+            (
+                self.server.id,
+                command,
+            ),
+        )
+        db.commit()
 
 
 class Moderation:
@@ -1120,16 +1144,19 @@ def get_richest(member: Member):
 
 
 class NsfwApis(Enum):
-    KonachanApi = "https://konachan.com/post.json?s=post&q=index&limit=100&tags=score:>10+rating:"
+    KonachanApi = (
+        "https://konachan.com/post.json?s=post&q=index&limit=100&tags=score:>10+rating:"
+    )
     YandereApi = "https://yande.re/post.json?limit=100&tags=score:>10+rating:"
     GelbooruApi = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=score:>10+rating:"
 
+
 class NekosFunTags(Enum):
-    anal="anal"
-    blowjob="bj"
-    cum="cum"
-    hentai="hentai"
-    yuri="lesbian"
+    anal = "anal"
+    blowjob = "bj"
+    cum = "cum"
+    hentai = "hentai"
+    yuri = "lesbian"
 
 
 class Hentai:
@@ -1139,21 +1166,33 @@ class Hentai:
 
     def format_tags(self, tags: str = None):
         if tags:
-            tags = [tag.strip().replace(" ", "_") for tag in tags.split(",") if tag.strip().replace(" ", "_")]
+            tags = [
+                tag.strip().replace(" ", "_")
+                for tag in tags.split(",")
+                if tag.strip().replace(" ", "_")
+            ]
             tags_string = "+".join(tags)
             return tags_string
         else:
             return ""
 
-    def remove_data_from_json_list(self, json_list: List[dict], key_to_check: str, values_to_remove: List[str]):
+    def remove_data_from_json_list(
+        self, json_list: List[dict], key_to_check: str, values_to_remove: List[str]
+    ):
         try:
-            data_list = [item for item in json_list if item.get(key_to_check) not in values_to_remove]
+            data_list = [
+                item
+                for item in json_list
+                if item.get(key_to_check) not in values_to_remove
+            ]
             return data_list
         except Exception as e:
             print(f"Error in remove_data_from_json_list: {e}")
             return None
 
-    async def get_nsfw_image(self, provider: NsfwApis, rating: Optional[str] = None, tags: str = None):
+    async def get_nsfw_image(
+        self, provider: NsfwApis, rating: Optional[str] = None, tags: str = None
+    ):
         bl = self.get_blacklisted_links()
         tags = tags.lower() if tags else None
 
@@ -1174,7 +1213,7 @@ class Hentai:
         shuffle(nsfw_images_list)
 
         if not tags:
-            tags=""
+            tags = ""
 
         tags_list = [
             tag.strip().replace(" ", "_")
@@ -1188,7 +1227,7 @@ class Hentai:
         filtered_images = []
         for image in nsfw_images_list:
             tags = image["tags"].lower().split(" ")
-            urls=image["file_url"]
+            urls = image["file_url"]
             if any(tag in self.blacklisted_tags for tag in tags):
                 continue
             if any(url in set(bl) for url in urls):
@@ -1205,7 +1244,6 @@ class Hentai:
         db.commit()
         return [link[0] for link in data]
 
-
     async def gelbooru(
         self, rating: Optional[str] = None, tag: Optional[str] = None
     ) -> Optional[str]:
@@ -1213,7 +1251,7 @@ class Hentai:
             rating = choice(["questionable", "explicit"])
         if not tag or tag is None:
             tag = None
-        images =  await self.get_nsfw_image(NsfwApis.GelbooruApi, rating, tag)
+        images = await self.get_nsfw_image(NsfwApis.GelbooruApi, rating, tag)
 
         if self.plus:
             return images
@@ -1224,7 +1262,7 @@ class Hentai:
         if rating is None:
             rating = choice(["questionable", "explicit"])
 
-        images =  await self.get_nsfw_image(NsfwApis.YandereApi, rating, tag)
+        images = await self.get_nsfw_image(NsfwApis.YandereApi, rating, tag)
 
         if self.plus:
             return images
@@ -1235,7 +1273,7 @@ class Hentai:
         if rating is None:
             rating = choice(["questionable", "explicit"])
 
-        images =  await self.get_nsfw_image(NsfwApis.KonachanApi, rating, tag)
+        images = await self.get_nsfw_image(NsfwApis.KonachanApi, rating, tag)
 
         if self.plus:
             return images
@@ -1268,13 +1306,14 @@ class Hentai:
 
         return hentai, source
 
-    async def nekosfun(self, tag:NekosFunTags)->str:
-        url="http://api.nekos.fun:8080/api/" + tag.value
+    async def nekosfun(self, tag: NekosFunTags) -> str:
+        url = "http://api.nekos.fun:8080/api/" + tag.value
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 nsfw_image = await resp.json()
-        
-        return nsfw_image['image']
+
+        return nsfw_image["image"]
+
 
 def shorten_url(url: str):
     api_url = "http://tinyurl.com/api-create.php"

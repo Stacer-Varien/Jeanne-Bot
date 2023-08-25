@@ -1591,34 +1591,47 @@ class Command_Group(GroupCog, name="command"):
             if current.lower() in command.value.lower()
         ]
 
-    @Jeanne.command(name="disable", description="Disable a command or module")
+    @Jeanne.command(name="disable", description="Disable a command")
     @Jeanne.autocomplete(command=command_choices)
+    @Jeanne.describe(command="Which command are you disabling?")
     @Jeanne.checks.has_permissions(manage_guild=True)
     async def _disable(
         self,
         ctx: Interaction,
-        module: Optional[Modules],
         command: Optional[Jeanne.Range[str, 3]],
     ):
         if Botban(ctx.user).check_botbanned_user:
             return
 
+        embed=Embed()
+        if command in ["command disable" ,"command enable" ,"help command", "help support", "help module"]:
+            embed.color=Color.red()
+            embed.description="WOAH! Don't disable that command!"
+        else:
+            embed.title="Command Disabled"
+            embed.description=f"`{command}` has been disabled"
+            Manage(server=ctx.guild).disable_command(command)
+
         await ctx.response.defer()
 
-    @Jeanne.command(name="enable", description="Enable a command or module")
+    @Jeanne.command(name="enable", description="Enable a command")
     @Jeanne.autocomplete(command=command_choices)
     @Jeanne.checks.has_permissions(manage_guild=True)
+    @Jeanne.describe(command="Which command are you enabling?")
     async def _enable(
         self,
         ctx: Interaction,
-        module: Optional[Modules],
         command: Optional[Jeanne.Range[str, 3]],
     ):
         if Botban(ctx.user).check_botbanned_user:
             return
 
         await ctx.response.defer()
-
+        embed=Embed()
+        embed.title="Command Enabled"
+        embed.description=f"`{command}` has been enabled"
+        Manage(server=ctx.guild).enable_command(command)
+        await ctx.followup.send(embed=embed)      
 
 async def setup(bot: Bot):
     await bot.add_cog(manage(bot))
