@@ -630,16 +630,14 @@ class Levelling:
         except ValueError:
             return None
 
-    def get_blacklisted_channels(self):
+    @property
+    def get_blacklisted_channels(self)->list:
         data = db.execute(
             "SELECT channel FROM xpChannelData WHERE server = ?", (self.server.id,)
         ).fetchall()
         db.commit()
 
-        if data == None:
-            return None
-        else:
-            return data
+        return data if data else None
 
 
 class Manage:
