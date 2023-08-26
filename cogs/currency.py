@@ -10,7 +10,7 @@ from discord import (
 from datetime import datetime, timedelta
 from discord.ext.commands import Cog, Bot, GroupCog
 from assets.components import Heads_or_Tails
-from functions import Botban, Currency
+from functions import Botban, Command, Currency
 
 
 class Guess_Group(GroupCog, name="guess"):
@@ -24,12 +24,16 @@ class Guess_Group(GroupCog, name="guess"):
     async def free(self, ctx: Interaction, number: Jeanne.Range[int, 1, 10]):
         if Botban(ctx.user).check_botbanned_user:
             return
-
+        
+        if Command(ctx.guild).check_disabled(self.free.qualified_name):
+            await ctx.response.send_message("This command has been disab", ephemeral=True)
+            return
+        
         await ctx.response.defer()
 
         answer = randint(1, 10)
 
-        if int(number) == answer:
+        if number == answer:
             Currency(ctx.user).add_qp(20)
 
             correct = Embed(
@@ -55,6 +59,11 @@ class Guess_Group(GroupCog, name="guess"):
             return
 
         await ctx.response.defer()
+
+        if Command(ctx.guild).check_disabled(self.bet.qualified_name):
+            await ctx.followup.send("This command has been disabled", ephemeral=True)
+            return
+        
         balance = Currency(ctx.user).get_balance
         if bet < 5:
             bethigher = Embed(
@@ -92,8 +101,11 @@ class Guess_Group(GroupCog, name="guess"):
                 await ctx.followup.send(embed=wrong)
 
     @free.error
-    async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+    async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):        
         if isinstance(error, Jeanne.CommandOnCooldown):
+            if Command(ctx.guild).check_disabled(self.free.qualified_name):
+                await ctx.response.send_message("This command has been disabled", ephemeral=True)
+                return            
             reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
             reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
