@@ -761,8 +761,20 @@ class Manage:
 
             db.commit()
 
-    def disable_command(self, command: str):
-        db.execute(
+class Command:
+    def __init__(self, server:Guild) -> None:
+        self.server=server
+    
+    
+    def check_disabled(self, command:str):
+        data = db.execute(
+            "SELECT * FROM disabledCommandsData WHERE server = ? AND command = ?", (self.server.id, command,)
+        ).fetchone()
+
+        return data is not None and command == data[1]
+
+    def disable(self, command: str):
+        data=db.execute(
             "INSERT OR IGNORE INTO disabledCommandsData (server, command) VALUES (?,?)",
             (
                 self.server.id,
@@ -771,15 +783,22 @@ class Manage:
         )
         db.commit()
 
-    def enable_command(self, command: str):
-        db.execute(
-            "DELETE FROM disabledCommandsData WHERE server = ? AND command = ?",
-            (
-                self.server.id,
-                command,
-            ),
-        )
-        db.commit()
+        if data.rowcount == 0:
+            return False
+
+    def enable(self, command: str):
+        check= self.check_disabled(command)
+        if check ==False:
+            return False
+        else:
+            db.execute(
+                "DELETE FROM disabledCommandsData WHERE server = ? AND command = ?",
+                (
+                    self.server.id,
+                    command,
+                ),
+            )
+            db.commit()    
 
 
 class Moderation:

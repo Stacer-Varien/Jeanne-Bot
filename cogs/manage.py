@@ -23,7 +23,7 @@ from discord import (
 from discord.ext.commands import Bot, Cog, GroupCog
 from humanfriendly import format_timespan, parse_timespan, InvalidTimespan
 from collections import OrderedDict
-from functions import Botban, Inventory, Levelling, Logger, Manage, Welcomer
+from functions import Botban, Command, Inventory, Levelling, Logger, Manage, Welcomer
 from assets.components import (
     Confirmation,
     Levelmsg,
@@ -295,7 +295,7 @@ class Create_Group(GroupCog, name="create"):
 
         await ctx.followup.send(embed=embed)
 
-    thread_group = Jeanne.Group(name="thread", description=...)
+    thread_group = Jeanne.Group(name="thread", description="...")
 
     @thread_group.command(description="Make a public thread")
     @Jeanne.describe(
@@ -1600,6 +1600,7 @@ class Command_Group(GroupCog, name="command"):
         ctx: Interaction,
         command: Optional[Jeanne.Range[str, 3]],
     ):
+        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user:
             return
 
@@ -1610,9 +1611,9 @@ class Command_Group(GroupCog, name="command"):
         else:
             embed.title="Command Disabled"
             embed.description=f"`{command}` has been disabled"
-            Manage(server=ctx.guild).disable_command(command)
+            Command(server=ctx.guild).disable(command)
 
-        await ctx.response.defer()
+        await ctx.followup.send(embed=embed)
 
     @Jeanne.command(name="enable", description="Enable a command")
     @Jeanne.autocomplete(command=command_choices)
@@ -1623,14 +1624,14 @@ class Command_Group(GroupCog, name="command"):
         ctx: Interaction,
         command: Optional[Jeanne.Range[str, 3]],
     ):
+        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user:
             return
 
-        await ctx.response.defer()
         embed=Embed()
         embed.title="Command Enabled"
         embed.description=f"`{command}` has been enabled"
-        Manage(server=ctx.guild).enable_command(command)
+        Command(server=ctx.guild).enable(command)
         await ctx.followup.send(embed=embed)      
 
 async def setup(bot: Bot):
@@ -1641,3 +1642,4 @@ async def setup(bot: Bot):
     await bot.add_cog(Set_Group(bot))
     await bot.add_cog(XP_Group(bot))
     await bot.add_cog(Rename_Group(bot))
+    await bot.add_cog(Command_Group(bot))
