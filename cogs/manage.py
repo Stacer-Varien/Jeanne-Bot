@@ -1262,9 +1262,10 @@ class XP_Group(GroupCog, name="xp"):
             embed.title = "List of XP blacklisted channels"
             blchannels = []
             for channel in channels:
-                blchannel = ctx.guild.get_channel(int(channel))
+                blchannel = await ctx.guild.fetch_channel(channel)
                 blchannels.append(blchannel.jump_url)
-            await ctx.followup.send(embed=embed)
+            embed.description="\n".join(blchannels)
+        await ctx.followup.send(embed=embed)
 
 
 class manage(Cog):
@@ -1591,6 +1592,18 @@ class Command_Group(GroupCog, name="command"):
             if current.lower() in command.value.lower()
         ]
 
+    async def disabled_commands_choices(
+        self,
+        ctx: Interaction,
+        current: str,
+    ) -> List[Jeanne.Choice[str]]:
+        commands = Command(ctx.guild).list_all_disabled()
+        return [
+            Jeanne.Choice(name=command, value=command)
+            for command in commands
+            if current.lower() in command.lower()
+        ]    
+
     @Jeanne.command(name="disable", description="Disable a command")
     @Jeanne.autocomplete(command=command_choices)
     @Jeanne.describe(command="Which command are you disabling?")
@@ -1598,41 +1611,88 @@ class Command_Group(GroupCog, name="command"):
     async def _disable(
         self,
         ctx: Interaction,
-        command: Optional[Jeanne.Range[str, 3]],
+        command: Jeanne.Range[str, 3],
     ):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user:
             return
 
-        embed=Embed()
-        if command in ["command disable" ,"command enable" ,"help command", "help support", "help module"]:
-            embed.color=Color.red()
-            embed.description="WOAH! Don't disable that command!"
+        cmd = Command(ctx.guild)
+        embed = Embed()
+        if command in [
+            "command disable",
+            "command enable",
+            "help command",
+            "help support",
+            "help module",
+        ]:
+            embed.color = Color.red()
+            embed.description = "WOAH! Don't disable that command!"
+        elif command not in [i.value for i in list(Commands)]:
+            embed.color = Color.red()
+            embed.description = "There is no such command that I have..."
+        elif cmd.check_disabled(command):
+            embed.color = Color.red()
+            embed.description = "This command is currently disabled"
         else:
-            embed.title="Command Disabled"
-            embed.description=f"`{command}` has been disabled"
-            Command(server=ctx.guild).disable(command)
+            embed.title = "Command Disabled"
+            embed.description = f"`{command}` has been disabled"
+            embed.color=Color.random()
+            cmd.disable(command)
 
         await ctx.followup.send(embed=embed)
 
     @Jeanne.command(name="enable", description="Enable a command")
-    @Jeanne.autocomplete(command=command_choices)
+    @Jeanne.autocomplete(command=disabled_commands_choices)
     @Jeanne.checks.has_permissions(manage_guild=True)
     @Jeanne.describe(command="Which command are you enabling?")
     async def _enable(
         self,
         ctx: Interaction,
-        command: Optional[Jeanne.Range[str, 3]],
+        command: Jeanne.Range[str, 3],
     ):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user:
             return
 
+        embed = Embed()
+        cmd = Command(ctx.guild)
+        if command not in [i.value for i in list(Commands)]:
+            embed.color = Color.red()
+            embed.description = "There is no such command that I have..."
+
+        elif cmd.check_disabled(command) == None:
+            embed.color = Color.red()
+            embed.description = "This command is currently enabled"
+
+        else:
+            embed.title = "Command Enabled"
+            embed.description = f"`{command}` has been enabled"
+            embed.color=Color.random()
+            cmd.enable(command)
+
+        await ctx.followup.send(embed=embed)
+    
+    @Jeanne.command(name="list_disabled", description="List all disabled commands")
+    async def listdisabled(
+        self,
+        ctx: Interaction,
+        command: Jeanne.Range[str, 3],
+    ):    
+        await ctx.response.defer()
+        if Botban(ctx.user).check_botbanned_user:
+            return
+        
+        cmd=Command(ctx.guild)
         embed=Embed()
-        embed.title="Command Enabled"
-        embed.description=f"`{command}` has been enabled"
-        Command(server=ctx.guild).enable(command)
-        await ctx.followup.send(embed=embed)      
+        if cmd.list_all_disabled() == None:
+            embed.description="There are no commands currently disabled"
+            embed.color=Color.red()
+        else:
+            embed.title="List of disabled commands:"
+            embed.description="\n".join(cmd.list_all_disabled())
+            embed.color=Color.random()
+        await ctx.followup.send(embed=embed)
 
 async def setup(bot: Bot):
     await bot.add_cog(manage(bot))
