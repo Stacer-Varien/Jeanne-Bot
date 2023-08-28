@@ -8,7 +8,7 @@ from discord import (
     app_commands as Jeanne,
 )
 from discord.ext.commands import Cog, Bot
-from functions import Botban
+from functions import Botban, Command
 from config import BB_WEBHOOK
 from assets.images import get_animeme_pic
 from typing import Optional
@@ -23,10 +23,14 @@ class fun(Cog):
     )
     @Jeanne.describe(question="Add your question")
     async def _8ball(self, ctx: Interaction, question: str):
-        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user:
             return
 
+        if Command(ctx.guild).check_disabled(self._8ball.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            return        
+
+        await ctx.response.defer()
         eight_ball_answers = [
             "It is certain.",
             "It is decidedly so.",
@@ -66,32 +70,18 @@ class fun(Cog):
     @Jeanne.command(description="Say something and I will say it in reversed text")
     @Jeanne.describe(text="What are you reversing?")
     async def reverse(self, ctx: Interaction, text: str):
-        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user:
             return
-
+        if Command(ctx.guild).check_disabled(self.reverse.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            return 
+        await ctx.response.defer()
         filtered_words = ["riffak", "reggin", "aggin"]
         if any(word in text for word in filtered_words):
             Botban(ctx.user).add_botbanned_user(
                 "Using the reversed version of a common racial slur"
             )
-            botbanned = Embed(
-                title="User has been botbanned!",
-                description="They will no longer use Jeanne,permanently!",
-            )
-            botbanned.add_field(name="User", value=ctx.user)
-            botbanned.add_field(name="ID", value=ctx.user.id, inline=True)
-            botbanned.add_field(
-                name="Reason of ban",
-                value="Using the reversed version of the 'k-word'",
-                inline=False,
-            )
-            botbanned.set_footer(
-                text="Due to this user botbanned, all data except warnings are immediatley deleted from the database! They will have no chance of appealing their botban and all the commands executed by them are now rendered USELESS!"
-            )
-            botbanned.set_thumbnail(url=ctx.user.avatar)
-            webhook = SyncWebhook.from_url(BB_WEBHOOK)
-            webhook.send(embed=botbanned)
+
         else:
             msg = Embed(description=text[::-1], color=Color.random()).set_footer(
                 text="Author: {} | {}".format(ctx.user, ctx.user.id)
@@ -100,10 +90,12 @@ class fun(Cog):
 
     @Jeanne.command(description="Get a random animeme")
     async def animeme(self, ctx: Interaction):
-        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user:
             return
-
+        if Command(ctx.guild).check_disabled(self.reverse.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            return
+        await ctx.response.defer()
         animeme = Embed(color=Color.random())
         animeme.set_image(url=get_animeme_pic())
         animeme.set_footer(text="Fetched from animeme1936")
@@ -112,10 +104,12 @@ class fun(Cog):
     @Jeanne.command(description="Combine 2 words to get 2 combined words")
     @Jeanne.describe(first_word="Add first word", second_word="Add second word")
     async def combine(self, ctx: Interaction, first_word: str, second_word: str):
-        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user:
             return
-
+        if Command(ctx.guild).check_disabled(self.combine.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            return
+        await ctx.response.defer()
         option_name1letters = first_word[: round(len(first_word) / 2)]
         option_name2letters = second_word[round(len(second_word) / 2) :]
 
@@ -135,9 +129,12 @@ class fun(Cog):
     @Jeanne.command(description="Give me a lot of choices and I will pick one for you")
     @Jeanne.describe(choices="Add your choices here. Separate them with ','")
     async def choose(self, ctx: Interaction, choices: str):
-        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user:
             return
+        if Command(ctx.guild).check_disabled(self.choose.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            return
+        await ctx.response.defer()        
 
         choices = choices.split(sep=",")
         choose = Embed(
@@ -148,10 +145,12 @@ class fun(Cog):
     @Jeanne.command(description="Check how much of a simp you are")
     @Jeanne.describe(member="Which member?")
     async def simprate(self, ctx: Interaction, member: Optional[Member] = None):
-        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user:
             return
-
+        if Command(ctx.guild).check_disabled(self.simprate.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            return
+        await ctx.response.defer()
         perc = randint(0, 100)
 
         member=ctx.user if member is None else member
@@ -172,10 +171,12 @@ class fun(Cog):
     @Jeanne.command(description="Check how gay you are")
     @Jeanne.describe(member="Which member?")
     async def gayrate(self, ctx: Interaction, member: Optional[Member] = None):
-        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user:
             return
-
+        if Command(ctx.guild).check_disabled(self.gayrate.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            return
+        await ctx.response.defer()
         perc = randint(0, 100)
 
         member=ctx.user if member is None else member

@@ -135,7 +135,7 @@ manage = {
             "fields": [
                 {
                     "name": "Commands Available",
-                    "value": "- Create Text Channel\n- Create Voice Channel\n- Create Category\n- Create Stage Channel\n- Create Forum\n- Create Role\n- Create Thread\n- Create Emoji\n- Create Sticker\n- Delete Channel\n- Delete Role\n- Delete Emoji\n- Delete Sticker\n- Edit Text Channel\n- Edit Role\n- Edit Server\n- Edit Forum\n- Rename Emoji\n- Rename Sticker\n- Rename Category\n- Set Welcomer\n- Set Modlog\n- Set Messagelog\n- Set Brightness\n- Set Bio\n- Set Color\n- Set Welcoming Message\n- Set Leaving Message\n- Set Level Update\n- Remove\n- Clone\n- Add Role\n- Remove Role\n- XP Blacklist\n- XP Unblacklist\n- XP Blacklisted Channels List",
+                    "value": "- Create Text Channel\n- Create Voice Channel\n- Create Category\n- Create Stage Channel\n- Create Forum\n- Create Role\n- Create Thread\n- Create Emoji\n- Create Sticker\n- Delete Channel\n- Delete Role\n- Delete Emoji\n- Delete Sticker\n- Edit Text Channel\n- Edit Role\n- Edit Server\n- Edit Forum\n- Rename Emoji\n- Rename Sticker\n- Rename Category\n- Set Welcomer\n- Set Modlog\n- Set Messagelog\n- Set Brightness\n- Set Bio\n- Set Color\n- Set Welcoming Message\n- Set Leaving Message\n- Set Level Update\n- Remove\n- Clone\n- Add Role\n- Remove Role\n- XP Blacklist\n- XP Unblacklist\n- XP Blacklisted Channels List\nCommand Enable\nCommand Disabled\nList Disabled Commands",
                 }
             ],
         }

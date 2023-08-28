@@ -153,7 +153,7 @@ class HelpGroup(GroupCog, name="help"):
 
         view = help_button()
         help = Embed(
-            description="Click on one of the buttons to open the documentation or get help on the support server",
+            description="Click on one of the buttons to open the documentation or get help in the support server",
             color=Color.random(),
         )
         await ctx.response.send_message(embed=help, view=view)

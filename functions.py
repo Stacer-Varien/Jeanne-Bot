@@ -4,9 +4,9 @@ from random import choice, randint, shuffle
 import time
 import aiohttp
 from humanfriendly import parse_timespan
-from discord import Embed, Color, Guild, Member, TextChannel, User
+from discord import Embed, Color, Guild, Member, SyncWebhook, TextChannel, User
 from requests import get
-from config import db
+from config import db, BB_WEBHOOK
 from typing import Optional, List
 
 current_time = date.today()
@@ -41,6 +41,23 @@ class Botban:
         db.execute("DELETE FROM bankData WHERE user_id = ?", (self.user.id,))
 
         db.commit()
+        botbanned = Embed(
+                title="User has been botbanned!",
+                description="They will no longer use Jeanne,permanently!",
+            )
+        botbanned.add_field(name="User", value=self.user)
+        botbanned.add_field(name="ID", value=self.user.id, inline=True)
+        botbanned.add_field(
+                name="Reason of ban",
+                value=reason,
+                inline=False,
+            )
+        botbanned.set_footer(
+                text="Due to this user botbanned, all data except warnings are immediatley deleted from the database! They will have no chance of appealing their botban and all the commands executed by them are now rendered USELESS!"
+            )
+        botbanned.set_thumbnail(url=self.user.display_avatar)
+        webhook = SyncWebhook.from_url(BB_WEBHOOK)
+        webhook.send(embed=botbanned)        
 
 
 class Currency:

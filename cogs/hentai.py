@@ -1,7 +1,7 @@
 from random import choice, randint
 from discord import Color, Embed, Interaction, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
-from functions import Botban, Hentai, shorten_url, NekosFunTags
+from functions import Botban, Command, Hentai, shorten_url, NekosFunTags
 from typing import Literal, Optional
 from assets.components import ReportContent, ReportSelect
 
@@ -17,9 +17,12 @@ class nsfw(Cog):
         ctx: Interaction,
         rating: Optional[Literal["questionable", "explicit"]] = None,
     ) -> None:
-        await ctx.response.defer(thinking=False)
         if Botban(ctx.user).check_botbanned_user:
             return
+        if Command(ctx.guild).check_disabled(self.hentai.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            return
+        await ctx.response.defer()        
 
         hentai, source = await Hentai().hentai(rating)
 
@@ -61,7 +64,10 @@ class nsfw(Cog):
         await ctx.response.defer(thinking=False)
         if Botban(ctx.user).check_botbanned_user:
             return
-
+        if Command(ctx.guild).check_disabled(self.gelbooru.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            return
+        await ctx.response.defer()
         image = await Hentai(plus).gelbooru(rating, tag)
 
         if plus:
@@ -138,9 +144,12 @@ class nsfw(Cog):
         tag: Optional[str] = None,
         plus: Optional[bool] = None,
     ) -> None:
-        await ctx.response.defer(thinking=False)
         if Botban(ctx.user).check_botbanned_user:
             return
+        if Command(ctx.guild).check_disabled(self.yandere.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            return
+        await ctx.response.defer()        
 
         if tag == "02":
             await ctx.followup.send(
@@ -213,9 +222,13 @@ class nsfw(Cog):
         tag: Optional[str] = None,
         plus: Optional[bool] = None,
     ) -> None:
-        await ctx.response.defer(thinking=False)
         if Botban(ctx.user).check_botbanned_user:
             return
+
+        if Command(ctx.guild).check_disabled(self.konachan.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            return
+        await ctx.response.defer()        
 
         image = await Hentai(plus).konachan(rating, tag)
 
@@ -269,9 +282,12 @@ class nsfw(Cog):
     @Jeanne.command(description="Get hentai from nekos.fun", nsfw=True)
     @Jeanne.describe(tag="Which tag are you picking")
     async def nekosfun(self, ctx: Interaction, tag: Optional[NekosFunTags] = None):
-        await ctx.response.defer(thinking=False)
         if Botban(ctx.user).check_botbanned_user:
             return
+        if Command(ctx.guild).check_disabled(self.nekosfun.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            return
+        await ctx.response.defer()        
 
         tag = tag if tag else choice(list(NekosFunTags))
         image = await Hentai().nekosfun(tag)
