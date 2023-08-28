@@ -635,13 +635,13 @@ class Levelling:
             return None
 
     @property
-    def get_blacklisted_channels(self) -> list:
+    def get_blacklisted_channels(self) -> (list[int]|None):
         data = db.execute(
             "SELECT channel FROM xpChannelData WHERE server = ?", (self.server.id,)
         ).fetchall()
         db.commit()
 
-        return data if data else None
+        return [int(i[0]) for i in data] if data else None
 
 
 class Manage:
@@ -761,20 +761,24 @@ class Manage:
 
             db.commit()
 
+
 class Command:
-    def __init__(self, server:Guild) -> None:
-        self.server=server
-    
-    
-    def check_disabled(self, command:str):
+    def __init__(self, server: Guild) -> None:
+        self.server = server
+
+    def check_disabled(self, command: str):
         data = db.execute(
-            "SELECT * FROM disabledCommandsData WHERE server = ? AND command = ?", (self.server.id, command,)
+            "SELECT command FROM disabledCommandsData WHERE server = ? AND command = ?",
+            (
+                self.server.id,
+                command,
+            ),
         ).fetchone()
 
-        return data is not None and command == data[1]
+        return str(data[0]) if data else None
 
     def disable(self, command: str):
-        data=db.execute(
+        db.execute(
             "INSERT OR IGNORE INTO disabledCommandsData (server, command) VALUES (?,?)",
             (
                 self.server.id,
@@ -783,22 +787,23 @@ class Command:
         )
         db.commit()
 
-        if data.rowcount == 0:
-            return False
-
     def enable(self, command: str):
-        check= self.check_disabled(command)
-        if check ==False:
-            return False
+        db.execute(
+            "DELETE FROM disabledCommandsData WHERE server = ? AND command = ?",
+            (
+                self.server.id,
+                command,
+            ),
+        )
+        db.commit()
+
+    def list_all_disabled(self):
+        data=db.execute("SELECT command FROM disabledCommandsData WHERE server = ?", (self.server.id,)).fetchall()
+        db.commit()
+        if data == None:
+            return None
         else:
-            db.execute(
-                "DELETE FROM disabledCommandsData WHERE server = ? AND command = ?",
-                (
-                    self.server.id,
-                    command,
-                ),
-            )
-            db.commit()    
+            return [str(i[0]) for i in data]
 
 
 class Moderation:
