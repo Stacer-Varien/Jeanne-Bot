@@ -11,7 +11,7 @@ from discord import (
     Message,
 )
 from config import TOPGG
-from functions import Botban, Currency, Inventory, Levelling, get_richest
+from functions import Botban, Command, Currency, Inventory, Levelling, get_richest
 from typing import Optional
 from assets.generators.level_card import Level
 from assets.generators.profile_card import Profile
@@ -37,10 +37,13 @@ class Rank_Group(GroupCog, name="rank"):
     )
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def _global(self, ctx: Interaction):
-        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self._global.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
 
+        await ctx.response.defer()
         embed = Embed(color=Color.random())
         embed.set_author(name="Global XP Leaderboard")
 
@@ -56,15 +59,17 @@ class Rank_Group(GroupCog, name="rank"):
     
         await ctx.followup.send(embed=embed)
 
-        
 
     @Jeanne.command(description="Check the users with the most XP in the server")
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def server(self, ctx: Interaction):
-        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.server.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
 
+        await ctx.response.defer()
         embed = Embed(color=Color.random())
         embed.set_author(name="Server XP Leaderboard")
 
@@ -167,66 +172,17 @@ class levelling(Cog):
             else:
                 return
 
-    @Jeanne.command(description="See your level or someone else's level")
-    @Jeanne.describe(member="Which member?")
-    @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
-    async def level(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user:
-            return
-
-        member=ctx.user if member is None else member
-        try:
-            memdata = Levelling(member, ctx.guild)
-            slvl = memdata.get_member_level()
-            sexp = memdata.get_member_xp()
-
-            glvl = memdata.get_user_level()
-            gexp = memdata.get_user_xp()
-
-            bg = Inventory(member).selected_wallpaper()
-            font_color = Inventory(member).get_color()
-
-            try:
-                brightness = bg[3]
-            except:
-                brightness = 100
-
-            try:
-                bg_image = bg[2]
-            except:
-                bg_image = ""
-
-            args = {
-                "bg_image": bg_image,
-                "profile_image": str(member.avatar.with_format("png")),
-                "font_color": font_color,
-                "server_level": slvl,
-                "server_user_xp": sexp,
-                "server_next_xp": ((slvl * 50) + ((slvl - 1) * 25) + 50),
-                "global_level": glvl,
-                "global_user_xp": gexp,
-                "global_next_xp": ((glvl * 50) + ((glvl - 1) * 25) + 50),
-                "user_name": str(member),
-                "brightness": brightness,
-            }
-
-            func = partial(self.get_card, args)
-            image = await get_event_loop().run_in_executor(None, func)
-
-            file = File(fp=image, filename=f"{member.name}_level_card.png")
-            await ctx.followup.send(file=file)
-        except:
-            no_exp = Embed(description="Failed to get level stats")
-            await ctx.followup.send(embed=no_exp)
-
     @Jeanne.command(description="See your profile or someone else's profile")
     @Jeanne.describe(member="Which member?")
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     async def profile(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.profile.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
+
+        await ctx.response.defer()
 
         member=ctx.user if member is None else member
         try:
@@ -288,18 +244,12 @@ class levelling(Cog):
             no_exp = Embed(description="Failed to make profile card")
             await ctx.followup.send(embed=no_exp)
 
-    @level.error
-    async def level_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-        if isinstance(error, Jeanne.CommandOnCooldown):
-            cooldown = Embed(
-                description=f"You have already checked your level!\nTry again after `{round(error.retry_after, 2)} seconds`",
-                color=Color.random(),
-            )
-            await ctx.followup.send(embed=cooldown)
-
     @profile.error
     async def profile_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-        if isinstance(error, Jeanne.CommandOnCooldown):
+        if isinstance(error, Jeanne.CommandOnCooldown):     
+            if Command(ctx.guild).check_disabled(self.profile.qualified_name):
+                await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+                return            
             cooldown = Embed(
                 description=f"You have already checked your profile!\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.random(),

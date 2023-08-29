@@ -1,5 +1,5 @@
 from assets.components import Confirmation
-from functions import Botban, Currency, Inventory
+from functions import Botban, Command, Currency, Inventory
 from discord import Color, Embed, File, Interaction, app_commands as Jeanne
 from discord.ext.commands import Bot, GroupCog
 from assets.generators.level_card import Level
@@ -14,9 +14,13 @@ class Shop_Group(GroupCog, name="shop"):
 
     @Jeanne.command(description="Check all the wallpapers available")
     async def backgrounds(self, ctx: Interaction):
-        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.backgrounds.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
+
+        await ctx.response.defer()
         await ctx.followup.send(embed=Inventory().fetch_wallpapers())
 
 
@@ -33,6 +37,9 @@ class Background_Group(GroupCog, name="background"):
     @Jeanne.describe(item_id="Which background you are checking?")
     async def preview(self, ctx: Interaction, item_id: str):
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.preview.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
 
         await ctx.response.defer()
@@ -46,21 +53,29 @@ class Background_Group(GroupCog, name="background"):
 
     @preview.error
     async def preview_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-        if isinstance(error, Jeanne.CommandInvokeError):
-            if TypeError:
-                embed = Embed()
-                embed.description = "Invalid item ID given"
-                embed.color = Color.red()
-                await ctx.followup.send(embed=embed)
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(error.original, TypeError):       
+            if Command(ctx.guild).check_disabled(self.preview.qualified_name):
+                await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+                return
+
+            await ctx.response.defer()            
+            embed = Embed()
+            embed.description = "Invalid item ID given"
+            embed.color = Color.red()
+            await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Buy a background pic for your level card")
     @Jeanne.describe(item_id="Which background you are buying?")
     async def buy(self, ctx: Interaction, item_id: str):
-        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.buy.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
 
-        balance: int = Currency(ctx.user).get_balance
+        await ctx.response.defer()
+
+        balance = Currency(ctx.user).get_balance
 
         if balance == 0:
             nomoney = Embed(
@@ -139,9 +154,13 @@ class Background_Group(GroupCog, name="background"):
     @Jeanne.command(description="Select a wallpaper")
     @Jeanne.describe(name="What is the name of the background?")
     async def use(self, ctx: Interaction, name: str):
-        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.use.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
+
+        await ctx.response.defer()
 
         try:
             Inventory(ctx.user).use_wallpaper(name)
@@ -157,10 +176,13 @@ class Background_Group(GroupCog, name="background"):
     @Jeanne.command(description="Buy a custom background pic for your level card")
     @Jeanne.describe(name="What will you name it?", link="Add an image link")
     async def buycustom(self, ctx: Interaction, name: str, link: str):
-        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.buycustom.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
 
+        await ctx.response.defer()
         balance = Currency(ctx.user).get_balance
 
         if balance == None:
@@ -236,10 +258,13 @@ class Background_Group(GroupCog, name="background"):
 
     @Jeanne.command(description="Check which backgrounds you have")
     async def list(self, ctx: Interaction):
-        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.list.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
 
+        await ctx.response.defer()
         if Inventory(ctx.user).fetch_user_inventory() == None:
             embed = Embed(description="Your inventory is empty", color=Color.red())
             await ctx.followup.send(embed=embed)
