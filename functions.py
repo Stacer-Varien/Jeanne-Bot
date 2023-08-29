@@ -4,7 +4,7 @@ from random import choice, randint, shuffle
 import time
 import aiohttp
 from humanfriendly import parse_timespan
-from discord import Embed, Color, Guild, Member, SyncWebhook, TextChannel, User
+from discord import Embed, Color, Guild, Member, Role, SyncWebhook, TextChannel, User
 from requests import get
 from config import db, BB_WEBHOOK
 from typing import Optional, List
@@ -42,22 +42,22 @@ class Botban:
 
         db.commit()
         botbanned = Embed(
-                title="User has been botbanned!",
-                description="They will no longer use Jeanne,permanently!",
-            )
+            title="User has been botbanned!",
+            description="They will no longer use Jeanne,permanently!",
+        )
         botbanned.add_field(name="User", value=self.user)
         botbanned.add_field(name="ID", value=self.user.id, inline=True)
         botbanned.add_field(
-                name="Reason of ban",
-                value=reason,
-                inline=False,
-            )
+            name="Reason of ban",
+            value=reason,
+            inline=False,
+        )
         botbanned.set_footer(
-                text="Due to this user botbanned, all data except warnings are immediatley deleted from the database! They will have no chance of appealing their botban and all the commands executed by them are now rendered USELESS!"
-            )
+            text="Due to this user botbanned, all data except warnings are immediatley deleted from the database! They will have no chance of appealing their botban and all the commands executed by them are now rendered USELESS!"
+        )
         botbanned.set_thumbnail(url=self.user.display_avatar)
         webhook = SyncWebhook.from_url(BB_WEBHOOK)
-        webhook.send(embed=botbanned)        
+        webhook.send(embed=botbanned)
 
 
 class Currency:
@@ -588,7 +588,7 @@ class Levelling:
 
     def get_global_rank(self):
         leaders_query = db.execute(
-            "SELECT user_id FROM globalxpData ORDER BY lvl DESC LIMIT 15;"
+            "SELECT * FROM globalxpData ORDER BY lvl DESC LIMIT 15;"
         )
         db.commit()
         return leaders_query.fetchall()
@@ -652,13 +652,62 @@ class Levelling:
             return None
 
     @property
-    def get_blacklisted_channels(self) -> (list[int]|None):
+    def get_blacklisted_channels(self) -> list[int] | None:
         data = db.execute(
             "SELECT channel FROM xpChannelData WHERE server = ?", (self.server.id,)
         ).fetchall()
         db.commit()
 
         return [int(i[0]) for i in data] if data else None
+
+    def add_role_reward(self, role: Role, level: int):
+        data = db.execute(
+            "INSERT OR IGNORE INTO levelRewardData (server, role, level) VALUES (?,?,?)",
+            (
+                self.server.id,
+                role.id,
+                level,
+            ),
+        )
+        db.commit()
+        if data.rowcount == 0:
+            db.execute(
+                "UPDATE levelRewardData SET level = ? WHERE server = ? AND role = ?",
+                (
+                    level,
+                    self.server.id,
+                    role.id,
+                ),
+            )
+            db.commit()
+
+    def remove_role_reward(self, role: Role):
+        data = db.execute(
+            "SELECT role FROM levelRewardData WHERE server = ?", (self.server.id,)
+        ).fetchone()
+        db.commit()
+        if data == None:
+            return None
+        else:
+            db.execute(
+                "DELETE FROM levelRewardData WHERE server = ? AND role = ?",
+                (
+                    self.server.id,
+                    role.id,
+                ),
+            )
+            db.commit()
+            return True
+
+    @property
+    def list_all_roles(self):
+        data = db.execute(
+            "SELECT * FROM levelRewardData WHERE server = ?ORDER BY level ASC", (self.server.id,)
+        ).fetchall()
+        db.commit()
+
+        return [i for i in data] if data else None
+
 
 
 class Manage:
@@ -815,7 +864,10 @@ class Command:
         db.commit()
 
     def list_all_disabled(self):
-        data=db.execute("SELECT command FROM disabledCommandsData WHERE server = ?", (self.server.id,)).fetchall()
+        data = db.execute(
+            "SELECT command FROM disabledCommandsData WHERE server = ?",
+            (self.server.id,),
+        ).fetchall()
         db.commit()
         if data == None:
             return None
