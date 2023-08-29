@@ -47,16 +47,12 @@ class Rank_Group(GroupCog, name="rank"):
         leaderboard = Levelling().get_global_rank()
         
         r = 0
-        data=[]
         for i in leaderboard:
             p = await self.bot.fetch_user(i[0])
+            exp=i[3]
             r += 1
-            data.append([str(r), str(p)])
+            embed.add_field(name=f"`{r}.` {p}", value=f"`{exp}XP`", inline=True)
         
-
-        headers=["Place", "User"]
-        
-        embed.description=tabulate(data, headers, tablefmt="pretty", colalign=("right",))
     
         await ctx.followup.send(embed=embed)
 
