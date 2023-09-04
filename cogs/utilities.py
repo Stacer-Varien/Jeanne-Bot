@@ -15,7 +15,7 @@ from discord.ext.commands import Cog, Bot, GroupCog
 from discord.ext import tasks
 from assets.components import ReportModal
 from assets.dictionary import dictionary
-from functions import Botban, Reminder
+from functions import Botban, Command, Reminder
 from config import WEATHER
 from discord.ui import View
 from py_expression_eval import Parser
@@ -66,10 +66,12 @@ class Weather_Group(GroupCog, name="weather"):
     @Jeanne.command(description="Get weather information on a city")
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     @Jeanne.describe(city="Add a city")
-    async def city(self, ctx: Interaction, city: str):
+    async def city(self, ctx: Interaction, city: Jeanne.Range[str, 1]):
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.city.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
-
         await ctx.response.defer()
 
         emoji_map = {
@@ -83,157 +85,37 @@ class Weather_Group(GroupCog, name="weather"):
             "clouds": "☁️",
             "wind_dir": "➡️",
             "guste": "💨",
+            "rain_chance": "💦",
         }
 
-        url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={WEATHER}&units=metric"
-        async with ClientSession() as session:
-            async with session.get(url) as r:
-                if r.status == 200:
-                    weather_data = await r.json()
-
-                    main_data = weather_data["main"]
-                    weather = weather_data["weather"][0]
-                    sys_data = weather_data["sys"]
-                    wind = weather_data["wind"]
-
-                    embed = Embed(
-                        title=f"{emoji_map['globe']} Weather details of {city} {emoji_map['globe']}",
-                        description=f"{emoji_map['globe']} Country: {sys_data['country']}",
-                        color=Color.random(),
-                    )
-                    embed.add_field(
-                        name=f"{emoji_map['newspaper']} Description",
-                        value=weather["description"],
-                        inline=True,
-                    )
-                    embed.add_field(
-                        name=f"{emoji_map['min_tempe']} Minimum Temperature",
-                        value=f"{main_data['temp_min']}°C",
-                        inline=True,
-                    )
-                    embed.add_field(
-                        name=f"{emoji_map['max_tempe']} Maximum Temperature",
-                        value=f"{main_data['temp_max']}°C",
-                        inline=True,
-                    )
-                    embed.add_field(
-                        name=f"{emoji_map['feels_like']} Feels Like",
-                        value=f"{main_data['feels_like']}°C",
-                        inline=True,
-                    )
-                    embed.add_field(
-                        name=f"{emoji_map['humidity']} Humidity",
-                        value=f"{main_data['humidity']}",
-                        inline=True,
-                    )
-                    embed.add_field(
-                        name=f"{emoji_map['visibility']} Visibility",
-                        value=f"{weather_data['visibility']}m",
-                        inline=True,
-                    )
-                    embed.add_field(
-                        name=f"{emoji_map['clouds']} Clouds",
-                        value=f"{weather_data['clouds']['all']}%",
-                        inline=True,
-                    )
-                    embed.add_field(
-                        name=f"{emoji_map['wind_dir']} Wind Direction",
-                        value=f"{wind['deg']}°",
-                        inline=True,
-                    )
-                    embed.add_field(
-                        name=f"{emoji_map['guste']} Wind Gust",
-                        value=f"{wind['speed']}m/s",
-                        inline=True,
-                    )
-
-                    await ctx.followup.send(embed=embed)
-
-    @Jeanne.command(
-        description="Get weather information on a city but with a ZIP code and Country code"
-    )
-    @Jeanne.describe(zip_code="Add a ZIP code", country_code="Add a country code")
-    @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
-    async def zipcode(self, ctx: Interaction, zip_code: str, country_code: str):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user:
-            return
-
-        emoji_map = {
-            "newspaper": "📰",
-            "min_tempe": "🌡️",
-            "max_tempe": "🔥",
-            "feels_like": "🤚",
-            "humidity": "💧",
-            "visibility": "👁️",
-            "clouds": "☁️",
-            "wind_dir": "➡️",
-            "guste": "💨"
-        }
-
-        url = f"http://api.openweathermap.org/data/2.5/weather?zip={zip_code},{country_code}&appid={WEATHER}&units=metric"
-        async with ClientSession() as session:
-            async with session.get(url) as r:
-                if r.status == 200:
-                    weather_data = await r.json()
-
-                    main_data = weather_data["main"]
-                    weather = weather_data["weather"][0]
-                    sys_data = weather_data["sys"]
-                    wind = weather_data["wind"]
-
-                    embed = Embed(
-                        title=f"⛅ Weather details of {zip_code} ⛅",
-                        description=f":earth_africa: Country: {sys_data['country']}",
-                        color=Color.random()
-                    )
-                    embed.add_field(
-                        name=f"{emoji_map['newspaper']} Description",
-                        value=weather["description"],
-                        inline=True
-                    )
-                    embed.add_field(
-                        name=f"{emoji_map['min_tempe']} Minimum Temperature",
-                        value=f"{main_data['temp_min']}°C",
-                        inline=True
-                    )
-                    embed.add_field(
-                        name=f"{emoji_map['max_tempe']} Maximum Temperature",
-                        value=f"{main_data['temp_max']}°C",
-                        inline=True
-                    )
-                    embed.add_field(
-                        name=f"{emoji_map['feels_like']} Feels Like",
-                        value=f"{main_data['feels_like']}°C",
-                        inline=True
-                    )
-                    embed.add_field(
-                        name=f"{emoji_map['humidity']} Humidity",
-                        value=f"{main_data['humidity']}",
-                        inline=True
-                    )
-                    embed.add_field(
-                        name=f"{emoji_map['visibility']} Visibility",
-                        value=f"{weather_data['visibility']}m",
-                        inline=True
-                    )
-                    embed.add_field(
-                        name=f"{emoji_map['clouds']} Clouds",
-                        value=f"{weather_data['clouds']['all']}%",
-                        inline=True
-                    )
-                    embed.add_field(
-                        name=f"{emoji_map['wind_dir']} Wind Direction",
-                        value=f"{wind['deg']}°",
-                        inline=True
-                    )
-                    embed.add_field(
-                        name=f"{emoji_map['guste']} Wind Gust",
-                        value=f"{wind['speed']}m/s",
-                        inline=True
-                    )
-
-                    await ctx.followup.send(embed=embed)
+        url = f"http://api.weatherapi.com/v1/forecast.json?key={WEATHER}&q={city}&days=1&aqi=no&alerts=no"
+        weather_data=get(url).json()
+        city=weather_data["location"]["name"]
+        region=weather_data["location"]["region"]
+        country=weather_data["location"]["country"]
+        min_temp=weather_data["forecast"]["forecastday"][0]["day"]["mintemp_c"]
+        max_temp=weather_data["forecast"]["forecastday"][0]["day"]["maxtemp_c"]
+        feels_like=weather_data["current"]["feelslike_c"]
+        gust=weather_data["current"]["gust_kph"]
+        cloud=weather_data["current"]["cloud"]
+        humidity=weather_data["current"]["humidity"]
+        wind_degree=str(weather_data["current"]["wind_degree"]) + "°/" + str(weather_data["current"]["wind_dir"])
+        visibility=weather_data["current"]["vis_km"]
+        condition=weather_data["forecast"]["forecastday"][0]["day"]["condition"]["text"]
+        chance_of_rain=weather_data["forecast"]["forecastday"][0]["day"]["daily_chance_of_rain"]
+        embed=Embed(title=f"{emoji_map['globe']} Weather details of {city}, {region}/{country}", color=Color.random())
+        embed.description=f"{emoji_map['newspaper']} Condition: {condition}"
+        embed.add_field(name=f"{emoji_map['min_tempe']} Minimum Temperature", value=f"{min_temp}°C", inline=True)
+        embed.add_field(name=f"{emoji_map['max_tempe']} Maxinum Temperature", value=f"{max_temp}°C", inline=True)
+        embed.add_field(name=f"{emoji_map['feels_like']} Feels Like", value=f"{feels_like}°C", inline=True)
+        embed.add_field(name=f"{emoji_map['clouds']} Clouds", value=f"{cloud}%", inline=True)
+        embed.add_field(name=f"{emoji_map['humidity']} Humidity", value=f"{humidity}%", inline=True)
+        embed.add_field(name=f"{emoji_map['wind_dir']} Wind Degrees", value=f"{wind_degree}", inline=True)        
+        embed.add_field(name=f"{emoji_map['guste']} Wind Gust", value=f"{gust}km/h", inline=True)
+        embed.add_field(name=f"{emoji_map['visibility']} Visibility", value=f"{visibility}km", inline=True)
+        embed.add_field(name=f"{emoji_map['rain_chance']} Chance of Rain", value=f"{chance_of_rain}%", inline=True)
+        embed.set_footer(text="Fetched from weatherapi.com")
+        await ctx.followup.send(embed=embed)   
 
     @city.error
     async def city_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
@@ -243,16 +125,6 @@ class Weather_Group(GroupCog, name="weather"):
                 round(error.retry_after)
             )
             await ctx.followup.send(embed=embed)
-
-    @zipcode.error
-    async def city_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-        if isinstance(error, Jeanne.CommandOnCooldown):
-            embed = Embed(color=Color.red())
-            embed.description = "Woah, slow down! Give the command a rest.\n\nYou can try again after `{} seconds`".format(
-                round(error.retry_after)
-            )
-            await ctx.followup.send(embed=embed)
-
 
 class Embed_Group(GroupCog, name="embed"):
     def __init__(self, bot: Bot) -> None:
@@ -276,9 +148,11 @@ class Embed_Group(GroupCog, name="embed"):
         jsonfile: Optional[Attachment] = None,
     ):
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.generate.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
-
-        await ctx.response.defer(ephemeral=True)
+        await ctx.response.defer()
 
         if not jsonscript and not jsonfile:
             embed = Embed(
@@ -333,16 +207,18 @@ class Embed_Group(GroupCog, name="embed"):
         jsonfile: Optional[Attachment] = None,
     ):
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.edit.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
-        else:
-            await ctx.response.defer(ephemeral=True)
+        await ctx.response.defer()
 
-            try:
+        try:
                 message: Message = await channel.fetch_message(int(messageid))
-            except Exception as e:
+        except Exception as e:
                 embed = Embed(description=e)
                 await ctx.followup.send(embed=embed)
-            else:
+        else:
                 if not jsonscript and not jsonfile:
                     embed = Embed(
                         description="You are missing the JSON script or JSON file\nPlease use [Discohooks](https://discohook.org/)"
@@ -498,6 +374,9 @@ class slashutilities(Cog):
     @Jeanne.checks.has_permissions(administrator=True)
     async def say(self, ctx: Interaction, channel: TextChannel, message: str):
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.say.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
 
         await ctx.response.defer(ephemeral=True)
@@ -507,8 +386,10 @@ class slashutilities(Cog):
     @Jeanne.command(description="Do a calculation")
     @Jeanne.describe(calculate="Add a calculation")
     async def calculator(self, ctx: Interaction, calculate: str):
-        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.calculator.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
 
         try:
@@ -549,8 +430,10 @@ class slashutilities(Cog):
     async def dictionary(
         self, ctx: Interaction, word: str, language: Optional[Languages]=None
     ):
-        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.dictionary.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
         lang=language.value if language is not None else 'en'
         await dictionary(ctx, word.lower(), lang)
