@@ -1885,7 +1885,7 @@ class Level_Group(GroupCog, name="level"):
     @role.command(
         name="add", description="Add a level role reward when a user levels up"
     )
-    @Jeanne.checks.has_permissions(manage_guilds=True)
+    @Jeanne.checks.has_permissions(manage_guild=True)
     @Jeanne.describe(
         role="Which role should be given when a user levels up?",
         level="Which level should they be to get that role?",

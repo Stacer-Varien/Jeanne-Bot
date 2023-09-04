@@ -77,18 +77,23 @@ class HelpGroup(GroupCog, name="help"):
 
         bot_perms: dict = (
             cmd.checks[0].__closure__[0].cell_contents
-            if len(cmd.checks) != 0
+            if len(cmd.checks) >= 0
             and cmd.checks[0].__qualname__ == "bot_has_permissions.<locals>.predicate"
-            else None
+            else (
+                cmd.checks[1].__closure__[0].cell_contents
+                if len(cmd.checks) >= 2
+                and cmd.checks[1].__qualname__ == "bot_has_permissions.<locals>.predicate"
+                else None
+            )
         )
 
         member_perms = (
             cmd.checks[0].__closure__[0].cell_contents
-            if len(cmd.checks) == 1
+            if len(cmd.checks) >= 1
             and cmd.checks[0].__qualname__ == "has_permissions.<locals>.predicate"
             else (
                 cmd.checks[1].__closure__[0].cell_contents
-                if len(cmd.checks) == 2
+                if len(cmd.checks) >= 2
                 and cmd.checks[1].__qualname__ == "has_permissions.<locals>.predicate"
                 else None
             )

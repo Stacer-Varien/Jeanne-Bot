@@ -1,4 +1,4 @@
-from functions import Botban
+from functions import Botban, Command
 from discord import Color, Embed, Interaction, Member, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
 from requests import get
@@ -29,6 +29,9 @@ class slashreactions(Cog):
     @Jeanne.describe(member="Who are you hugging?")
     async def hug(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.hug.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
 
         hug_api = get(hug_nekoslife).json()
@@ -47,6 +50,9 @@ class slashreactions(Cog):
     @Jeanne.describe(member="Who are you slapping?")
     async def slap(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.slap.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
         slap_api = get(slap_nekoslife).json()
 
@@ -64,8 +70,11 @@ class slashreactions(Cog):
     @Jeanne.command(description="Show a smuggy look")
     async def smug(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.smug.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
-
+        
         smug_api = get(smug_nekoslife).json()
 
         smug = Embed(color=Color.random())
@@ -77,8 +86,11 @@ class slashreactions(Cog):
     @Jeanne.describe(member="Who are you poking?")
     async def poke(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.poke.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
-
+        
         poke_api = get(poke_nekosfun).json()
         poke = Embed(color=Color.random())
         poke.set_footer(text="Fetched from nekos.fun")
@@ -95,8 +107,11 @@ class slashreactions(Cog):
     @Jeanne.describe(member="Who are you patting?")
     async def pat(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.pat.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
-
+        
         pat_api = get(pat_nekoslife).json()
         pat = Embed(color=Color.random())
         pat.set_footer(text="Fetched from nekos.life")
@@ -113,8 +128,11 @@ class slashreactions(Cog):
     @Jeanne.describe(member="Who are you kissing?")
     async def kiss(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.kiss.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
-
+        
         kiss_api = get(kiss_nekosfun).json()
         if member == None:
             msg = f"*Kissing {ctx.user}*"
@@ -131,8 +149,11 @@ class slashreactions(Cog):
     @Jeanne.describe(member="Who are you tickling?")
     async def tickle(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.tickle.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
-
+        
         tickle_api = get(tickle_nekoslife).json()
         if member == None:
             msg = f"*Tickling {ctx.user}*"
@@ -149,6 +170,9 @@ class slashreactions(Cog):
     @Jeanne.describe(member="Who are you calling a baka?")
     async def baka(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.baka.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
 
         baka_api = get(baka_nekosfun).json()
@@ -167,6 +191,9 @@ class slashreactions(Cog):
     @Jeanne.describe(member="Who are you feeding?")
     async def feed(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.feed.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
 
         feed_api = get(feed_nekoslife).json()
@@ -184,6 +211,9 @@ class slashreactions(Cog):
     @Jeanne.command(description="Make yourself cry")
     async def cry(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.cry.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
 
         cry_api = get(cry_purrbot).json()
@@ -197,6 +227,9 @@ class slashreactions(Cog):
     @Jeanne.describe(member="Who are you biting?")
     async def bite(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.bite.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
 
         bite_api = get(bite_purrbot).json()
@@ -214,6 +247,9 @@ class slashreactions(Cog):
     @Jeanne.command(description="Make yourself blush")
     async def blush(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.blush.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
 
         blush_api = get(blush_purrbot).json()
@@ -227,6 +263,9 @@ class slashreactions(Cog):
     @Jeanne.describe(member="Who are you cuddling?")
     async def cuddle(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.cuddle.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
 
         cuddle_api = get(cuddle_purrbot).json()
@@ -245,6 +284,9 @@ class slashreactions(Cog):
     @Jeanne.describe(member="Who are you dancing with?")
     async def dance(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user:
+            return        
+        if Command(ctx.guild).check_disabled(self.dance.qualified_name):
+            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
             return
 
         dance_api = get(dance_purrbot).json()

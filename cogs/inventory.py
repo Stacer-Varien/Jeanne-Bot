@@ -151,6 +151,18 @@ class Background_Group(GroupCog, name="background"):
                         content="Cancelled", view=None, embed=None
                     )
 
+    @buy.error
+    async def buy_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandOnCooldown):     
+            if Command(ctx.guild).check_disabled(self.buy.qualified_name):
+                await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+                return            
+            cooldown = Embed(
+                description=f"You have already tried to preview this background!\nTry again after `{round(error.retry_after, 2)} seconds`",
+                color=Color.random(),
+            )
+            await ctx.followup.send(embed=cooldown)
+
     @Jeanne.command(description="Select a wallpaper")
     @Jeanne.describe(name="What is the name of the background?")
     async def use(self, ctx: Interaction, name: str):
@@ -174,6 +186,7 @@ class Background_Group(GroupCog, name="background"):
             await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Buy a custom background pic for your level card")
+    @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     @Jeanne.describe(name="What will you name it?", link="Add an image link")
     async def buycustom(self, ctx: Interaction, name: str, link: str):
         if Botban(ctx.user).check_botbanned_user:
@@ -238,11 +251,7 @@ class Background_Group(GroupCog, name="background"):
             )
             await view.wait()
 
-            if view.value == None:
-                await ctx.edit_original_response(
-                    content="Time out", embed=None, view=None
-                )
-            elif view.value == True:
+            if view.value == True:
                 Inventory(ctx.user).add_user_custom_wallpaper(name, link)
 
                 embed1 = Embed(
@@ -255,6 +264,18 @@ class Background_Group(GroupCog, name="background"):
                 await ctx.edit_original_response(
                     content="Cancelled", embed=None, view=None
                 )
+
+    @buycustom.error
+    async def buycustom_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandOnCooldown):     
+            if Command(ctx.guild).check_disabled(self.buycustom.qualified_name):
+                await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+                return            
+            cooldown = Embed(
+                description=f"You have already tried to preview this background!\nTry again after `{round(error.retry_after, 2)} seconds`",
+                color=Color.random(),
+            )
+            await ctx.followup.send(embed=cooldown)
 
     @Jeanne.command(description="Check which backgrounds you have")
     async def list(self, ctx: Interaction):

@@ -35,7 +35,7 @@ class OwnerCog(Cog):
     @group(aliases=["act", "presence"], invoke_without_command=True)
     @is_owner()
     async def activity(self, ctx: Context):
-        if Botban(ctx.author).check_botbanned_user():
+        if Botban(ctx.author).check_botbanned_user:
             return
 
         embed = Embed(
@@ -47,7 +47,7 @@ class OwnerCog(Cog):
     @activity.command(aliases=["playing"])
     @is_owner()
     async def play(self, ctx: Context, *, activity: str):
-        if Botban(ctx.author).check_botbanned_user():
+        if Botban(ctx.author).check_botbanned_user:
             return
 
         await self.bot.change_presence(activity=Game(name=activity))
@@ -56,7 +56,7 @@ class OwnerCog(Cog):
     @activity.command(aliases=["listening"])
     @is_owner()
     async def listen(self, ctx: Context, *, activity: str):
-        if Botban(ctx.author).check_botbanned_user():
+        if Botban(ctx.author).check_botbanned_user:
             return
 
         await self.bot.change_presence(
@@ -67,7 +67,7 @@ class OwnerCog(Cog):
     @activity.command(aliases=["remove", "clean", "stop"])
     @is_owner()
     async def clear(self, ctx: Context):
-        if Botban(ctx.author).check_botbanned_user():
+        if Botban(ctx.author).check_botbanned_user:
             return
 
         await self.bot.change_presence(activity=None)
@@ -77,7 +77,7 @@ class OwnerCog(Cog):
     @is_owner()
     async def finduser(self, ctx: Context, user_id: int):
         await ctx.defer()
-        if Botban(ctx.author).check_botbanned_user():
+        if Botban(ctx.author).check_botbanned_user:
             return
 
         user = await self.bot.fetch_user(user_id)
@@ -92,7 +92,7 @@ class OwnerCog(Cog):
         fuser.add_field(name="Mutuals", value=len(user.mutual_guilds), inline=True)
         fuser.add_field(name="Bot?", value=botr, inline=True)
         fuser.set_image(url=user.display_avatar)
-        if user.banner is None:
+        if user.banner == None:
             await ctx.send(embed=fuser)
         else:
             userbanner = Embed(title="User Banner", color=0xCCFF33)
@@ -104,7 +104,7 @@ class OwnerCog(Cog):
     @is_owner()
     async def update(self, ctx: Context):
         await ctx.defer()
-        if Botban(ctx.author).check_botbanned_user():
+        if Botban(ctx.author).check_botbanned_user:
             return
 
         await ctx.send(f"YAY! NEW UPDATE!")
@@ -113,7 +113,7 @@ class OwnerCog(Cog):
     @command(aliases=["forbid", "disallow", "bban", "bb"])
     @is_owner()
     async def botban(self, ctx: Context, user_id: int, *, reason: str):
-        if Botban(ctx.author).check_botbanned_user():
+        if Botban(ctx.author).check_botbanned_user:
             return
         if not reason:
             await ctx.send("Reason missing for botban", ephemeral=True)
@@ -121,20 +121,6 @@ class OwnerCog(Cog):
 
         user = await self.bot.fetch_user(user_id)
         Botban(user).add_botbanned_user(reason)
-
-        botbanned = Embed(
-            title="User has been botbanned!",
-            description="They will no longer use Jeanne, permanently!",
-        )
-        botbanned.add_field(name="User", value=user)
-        botbanned.add_field(name="ID", value=user.id, inline=True)
-        botbanned.add_field(name="Reason of ban", value=reason, inline=False)
-        botbanned.set_footer(
-            text="Due to this user botbanned, all data except warnings and soft bans are immediately deleted from the database and banned in the developer's servers! They will have no chance of appealing their botban, including their ban, and all the commands executed by them are now rendered USELESS!"
-        )
-        botbanned.set_thumbnail(url=user.avatar)
-        webhook = SyncWebhook.from_url(BB_WEBHOOK)
-        await webhook.send(embed=botbanned)
 
         await ctx.send("User botbanned", ephemeral=True)
 
@@ -148,6 +134,8 @@ class OwnerCog(Cog):
     @command(aliases=["hb", "slice"])
     @is_owner()
     async def hentaiblacklist(self, ctx: Context, link: str):
+        if Botban(ctx.author).check_botbanned_user:
+            return        
         Hentai().add_blacklisted_link(link)
         await ctx.send("Link blacklisted", ephemeral=True)
 
@@ -160,6 +148,8 @@ class OwnerCog(Cog):
         guilds: Greedy[Object],
         spec: Optional[Literal["~", "*", "^"]] = None,
     ) -> None:
+        if Botban(ctx.author).check_botbanned_user:
+            return        
         if not guilds:
             if spec == "~":
                 synced = await self.bot.tree.sync(guild=ctx.guild)
