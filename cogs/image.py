@@ -22,7 +22,9 @@ class images(Cog):
             return
 
         if Command(ctx.guild).check_disabled(self.kitsune.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
 
         await ctx.response.defer()
@@ -40,7 +42,9 @@ class images(Cog):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.wallpaper.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
 
         await ctx.response.defer()
@@ -56,11 +60,13 @@ class images(Cog):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.jeanne.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
 
-        await ctx.response.defer()        
-        embed, file=get_jeanne_pic()
+        await ctx.response.defer()
+        embed, file = get_jeanne_pic()
         await ctx.followup.send(embed=embed, file=file)
 
     @Jeanne.command(description="Get a Saber image")
@@ -68,11 +74,13 @@ class images(Cog):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.saber.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
 
-        await ctx.response.defer()        
-        embed, file=get_saber_pic()
+        await ctx.response.defer()
+        embed, file = get_saber_pic()
         await ctx.followup.send(embed=embed, file=file)
 
     @Jeanne.command(description="Get a neko image")
@@ -80,10 +88,12 @@ class images(Cog):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.neko.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
 
-        await ctx.response.defer()        
+        await ctx.response.defer()
 
         neko_api = get(neko_purrbot).json()
         neko = Embed(color=Color.random())
@@ -98,19 +108,23 @@ class images(Cog):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.medusa.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
 
-        await ctx.response.defer()        
-        embed, file=get_medusa_pic()
+        await ctx.response.defer()
+        embed, file = get_medusa_pic()
         await ctx.followup.send(embed=embed, file=file)
 
     @Jeanne.command(description="Get an image from Safebooru")
     async def safebooru(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user:
-            return        
+            return
         if Command(ctx.guild).check_disabled(self.safebooru.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
 
         await ctx.response.defer()
