@@ -1,4 +1,4 @@
-from json import dumps, loads
+from requests import post
 from functions import Botban, Currency
 from config import TOPGG, TOPGG_AUTH
 from topgg import DBLClient, WebhookManager
