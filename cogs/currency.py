@@ -24,11 +24,13 @@ class Guess_Group(GroupCog, name="guess"):
     async def free(self, ctx: Interaction, number: Jeanne.Range[int, 1, 10]):
         if Botban(ctx.user).check_botbanned_user:
             return
-        
+
         if Command(ctx.guild).check_disabled(self.free.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
-        
+
         await ctx.response.defer()
 
         answer = randint(1, 10)
@@ -58,12 +60,12 @@ class Guess_Group(GroupCog, name="guess"):
         if Botban(ctx.user).check_botbanned_user:
             return
 
-        await ctx.response.defer()
-
         if Command(ctx.guild).check_disabled(self.bet.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
-        
+        await ctx.response.defer()
         balance = Currency(ctx.user).get_balance
         if bet < 5:
             bethigher = Embed(
@@ -101,11 +103,13 @@ class Guess_Group(GroupCog, name="guess"):
                 await ctx.followup.send(embed=wrong)
 
     @free.error
-    async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):        
+    async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
             if Command(ctx.guild).check_disabled(self.free.qualified_name):
-                await ctx.response.send_message("This command has been disabled", ephemeral=True)
-                return            
+                await ctx.response.send_message(
+                    "This command has been disabled", ephemeral=True
+                )
+                return
             reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
             reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
@@ -118,8 +122,10 @@ class Guess_Group(GroupCog, name="guess"):
     async def bet_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
             if Command(ctx.guild).check_disabled(self.bet.qualified_name):
-                await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
-                return            
+                await ctx.response.send_message(
+                    "This command is disabled by the server's managers", ephemeral=True
+                )
+                return
             cooldown = Embed(
                 description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.red(),
@@ -139,7 +145,9 @@ class Dice_Group(GroupCog, name="dice"):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.free.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
         await ctx.response.defer()
         rolled = randint(1, 6)
@@ -165,7 +173,9 @@ class Dice_Group(GroupCog, name="dice"):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.bet.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
         await ctx.response.defer()
         rolled = randint(1, 6)
@@ -210,8 +220,10 @@ class Dice_Group(GroupCog, name="dice"):
     async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
             if Command(ctx.guild).check_disabled(self.free.qualified_name):
-                await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
-                return            
+                await ctx.response.send_message(
+                    "This command is disabled by the server's managers", ephemeral=True
+                )
+                return
             reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
             reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
@@ -224,8 +236,10 @@ class Dice_Group(GroupCog, name="dice"):
     async def bet_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
             if Command(ctx.guild).check_disabled(self.bet.qualified_name):
-                await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
-                return            
+                await ctx.response.send_message(
+                    "This command is disabled by the server's managers", ephemeral=True
+                )
+                return
             cooldown = Embed(
                 description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.red(),
@@ -244,8 +258,10 @@ class Flip_Group(GroupCog, name="flip"):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.free.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
-            return        
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
+            return
         await ctx.response.defer()
         picks = ["Heads", "Tails"]
         jeannes_pick = choice(picks)
@@ -285,7 +301,9 @@ class Flip_Group(GroupCog, name="flip"):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.bet.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
         await ctx.response.defer()
 
@@ -347,8 +365,10 @@ class Flip_Group(GroupCog, name="flip"):
     async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
             if Command(ctx.guild).check_disabled(self.free.qualified_name):
-                await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
-                return            
+                await ctx.response.send_message(
+                    "This command is disabled by the server's managers", ephemeral=True
+                )
+                return
             reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
             reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
@@ -361,8 +381,10 @@ class Flip_Group(GroupCog, name="flip"):
     async def bet_error(self, ctx: Interaction, error: Jeanne.errors.AppCommandError):
         if isinstance(error, Jeanne.errors.CommandOnCooldown):
             if Command(ctx.guild).check_disabled(self.bet.qualified_name):
-                await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
-                return            
+                await ctx.response.send_message(
+                    "This command is disabled by the server's managers", ephemeral=True
+                )
+                return
             cooldown = Embed(
                 description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.red(),
@@ -379,8 +401,10 @@ class currency(Cog):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.daily.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
-            return        
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
+            return
         await ctx.response.defer()
         tomorrow = round((datetime.now() + timedelta(days=1)).timestamp())
         if Currency(ctx.user).give_daily() == False:
@@ -421,7 +445,9 @@ class currency(Cog):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.balance.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
         await ctx.response.defer()
         bal = Currency(ctx.user).get_balance
@@ -443,8 +469,10 @@ class currency(Cog):
     ):
         if isinstance(error, Jeanne.errors.CommandOnCooldown):
             if Command(ctx.guild).check_disabled(self.balance.qualified_name):
-                await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
-                return            
+                await ctx.response.send_message(
+                    "This command is disabled by the server's managers", ephemeral=True
+                )
+                return
             cooldown = Embed(
                 description=f"WOAH! Calm down! Why keep checking again quickly?\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.red(),
@@ -456,8 +484,10 @@ class currency(Cog):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.vote.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
-            return        
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
+            return
         await ctx.response.send_message(
             embed=Embed(
                 color=Color.random(),
