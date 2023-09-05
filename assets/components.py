@@ -18,6 +18,7 @@ from json import loads
 from config import WEBHOOK
 from functions import Levelling, Welcomer
 
+
 def replace_all(text: str, dic: dict):
     for i, j in dic.items():
         text = text.replace(i, j)
@@ -45,6 +46,7 @@ class Confirmation(ui.View):
     async def interaction_check(self, ctx: Interaction):
         return ctx.user.id == self.author.id
 
+
 class Heads_or_Tails(ui.View):
     def __init__(self, author: User):
         self.author = author
@@ -57,7 +59,7 @@ class Heads_or_Tails(ui.View):
         self.stop()
 
     @ui.button(label="Tails", style=ButtonStyle.green)
-    async def cancel(self, ctx:Interaction, button: ui.Button):
+    async def cancel(self, ctx: Interaction, button: ui.Button):
         self.value = "Tails"
         self.stop()
 
@@ -318,19 +320,20 @@ class ReportModal(ui.Modal, title="Bot Report"):
     async def on_submit(self, ctx: Interaction) -> None:
         report = Embed(title=self.report_type.value, color=Color.brand_red())
         report.description = self.report.value
-        if self.steps.value != None or "":
+        if self.steps.value != None or self.steps.value == "":
             report.add_field(name="Steps", value=self.steps.value, inline=False)
         report.set_footer(text="Reporter {}| `{}`".format(ctx.user, ctx.user.id))
         SyncWebhook.from_url(WEBHOOK).send(embed=report)
         embed = Embed(
-            description="Thank you for submitting your bot report. The dev will look into it but the will not tell you the results.\n\nPlease know that your user ID has been logged if you are trolling around."
+            description="Thank you for submitting your bot report. The developer will look into it but the will not tell you the results.\n\nPlease know that your user ID has been logged if you are trolling around."
         )
         await ctx.response.send_message(embed=embed)
 
+
 class ForumGuildlines(ui.Modal, title="Forum Guideline"):
-    def __init__(self, name:str, category:CategoryChannel = None):
-        self.name=name
-        self.category=category
+    def __init__(self, name: str, category: CategoryChannel = None):
+        self.name = name
+        self.category = category
         super().__init__()
 
     guidelines = ui.TextInput(
@@ -344,7 +347,9 @@ class ForumGuildlines(ui.Modal, title="Forum Guideline"):
 
     async def on_submit(self, ctx: Interaction) -> None:
         embed = Embed()
-        forum = await ctx.guild.create_forum(name=self.name, topic=self.guidelines.value)
+        forum = await ctx.guild.create_forum(
+            name=self.name, topic=self.guidelines.value
+        )
         embed.description = "{} has been created".format(forum.jump_url)
         embed.color = Color.random()
         if self.category:
@@ -353,7 +358,7 @@ class ForumGuildlines(ui.Modal, title="Forum Guideline"):
                 name="Added into category", value=self.category.name, inline=True
             )
 
-        await ctx.response.send_message(embed=embed)        
+        await ctx.response.send_message(embed=embed)
 
 
 class ReportContentM(ui.Modal, title="Illicit Content Report"):
@@ -426,14 +431,14 @@ class ReportSelect(ui.View):
         super().__init__()
         self.add_item(ReportContentPlus(self.link1, self.link2, self.link3, self.link4))
 
+
 class ReportContent(ui.View):
     def __init__(self, link: str):
         super().__init__(timeout=180)
         self.link = link
-        self.value=None
+        self.value = None
 
     @ui.button(label="Report Content", style=ButtonStyle.grey)
     async def report1(self, ctx: Interaction, button: ui.Button):
         self.value = "report"
         await ctx.response.send_modal(ReportContentM(self.link))
-
