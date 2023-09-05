@@ -4,12 +4,10 @@ from discord import (
     Embed,
     Interaction,
     Member,
-    SyncWebhook,
     app_commands as Jeanne,
 )
 from discord.ext.commands import Cog, Bot
 from functions import Botban, Command
-from config import BB_WEBHOOK
 from assets.images import get_animeme_pic
 from typing import Optional
 
@@ -27,8 +25,10 @@ class fun(Cog):
             return
 
         if Command(ctx.guild).check_disabled(self._8ball.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
-            return        
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
+            return
 
         await ctx.response.defer()
         eight_ball_answers = [
@@ -73,8 +73,10 @@ class fun(Cog):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.reverse.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
-            return 
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
+            return
         await ctx.response.defer()
         filtered_words = ["riffak", "reggin", "aggin"]
         if any(word in text for word in filtered_words):
@@ -93,7 +95,9 @@ class fun(Cog):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.reverse.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
         await ctx.response.defer()
         animeme = Embed(color=Color.random())
@@ -107,7 +111,9 @@ class fun(Cog):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.combine.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
         await ctx.response.defer()
         option_name1letters = first_word[: round(len(first_word) / 2)]
@@ -132,9 +138,11 @@ class fun(Cog):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.choose.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
-        await ctx.response.defer()        
+        await ctx.response.defer()
 
         choices = choices.split(sep=",")
         choose = Embed(
@@ -148,12 +156,14 @@ class fun(Cog):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.simprate.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
         await ctx.response.defer()
         perc = randint(0, 100)
 
-        member=ctx.user if member is None else member
+        member = ctx.user if member is None else member
 
         simp = Embed(
             description="{}'s simp rate is {}%".format(member, perc),
@@ -174,12 +184,14 @@ class fun(Cog):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.gayrate.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
         await ctx.response.defer()
         perc = randint(0, 100)
 
-        member=ctx.user if member is None else member
+        member = ctx.user if member is None else member
 
         gay = Embed(
             description="{}'s gay rate is {}%".format(member, perc),
