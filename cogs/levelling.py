@@ -38,9 +38,11 @@ class Rank_Group(GroupCog, name="rank"):
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def _global(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user:
-            return        
+            return
         if Command(ctx.guild).check_disabled(self._global.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
 
         await ctx.response.defer()
@@ -48,25 +50,25 @@ class Rank_Group(GroupCog, name="rank"):
         embed.set_author(name="Global XP Leaderboard")
 
         leaderboard = Levelling().get_global_rank()
-        
+
         r = 0
         for i in leaderboard:
             p = await self.bot.fetch_user(i[0])
-            exp=i[3]
+            exp = i[3]
             r += 1
             embed.add_field(name=f"`{r}.` {p}", value=f"`{exp}XP`", inline=True)
-        
-    
-        await ctx.followup.send(embed=embed)
 
+        await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Check the users with the most XP in the server")
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def server(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user:
-            return        
+            return
         if Command(ctx.guild).check_disabled(self.server.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
 
         await ctx.response.defer()
@@ -74,18 +76,19 @@ class Rank_Group(GroupCog, name="rank"):
         embed.set_author(name="Server XP Leaderboard")
 
         leaderboard = Levelling(server=ctx.guild).get_server_rank()
-        
+
         r = 0
-        data=[]
+        data = []
         for i in leaderboard:
             p = await self.bot.fetch_user(i[0])
             r += 1
             data.append([str(r), str(p)])
-        
 
-        headers=["Place", "User"]
-        
-        embed.description=tabulate(data, headers, tablefmt="pretty", colalign=("right",))
+        headers = ["Place", "User"]
+
+        embed.description = tabulate(
+            data, headers, tablefmt="pretty", colalign=("right",)
+        )
         await ctx.followup.send(embed=embed)
 
 
@@ -94,10 +97,6 @@ class levelling(Cog):
         self.bot = bot
         self._cd = CooldownMapping.from_cooldown(1, 120, BucketType.member)
         self.topggpy = DBLClient(bot=self.bot, token=TOPGG)
-
-    def get_ratelimit(self, message: Message) -> Optional[int]:
-        bucket = self._cd.get_bucket(message)
-        return bucket.update_rate_limit()
 
     def get_card(self, args):
         image = Level().generate_level(**args)
@@ -120,53 +119,51 @@ class levelling(Cog):
                 == False
             ):
                 try:
-                    ratelimit = self.get_ratelimit(message)
-                    if ratelimit == None:
-                        lvl = Levelling(message.author, message.guild).add_xp()
+                    lvl = Levelling(message.author, message.guild).add_xp()
 
-                        if lvl == None:
-                            pass
+                    if lvl == None:
+                        pass
+                    else:
+                        if lvl[2] == "0":
+                            msg = "{} has leveled up to `level {}`".format(
+                                message.author,
+                                Levelling(
+                                    message.author, message.guild
+                                ).get_member_level(),
+                            )
+                            lvlup = await self.bot.fetch_channel(lvl[1])
+                            await lvlup.send(msg)
+
                         else:
-                            if lvl[2] == "0":
-                                msg = "{} has leveled up to `level {}`".format(
-                                    message.author,
-                                    Levelling(
-                                        message.author, message.guild
-                                    ).get_member_level(),
-                                )
-                                lvlup = await self.bot.fetch_channel(lvl[1])
-                                await lvlup.send(msg)
+                            msg: str = lvl[2]
 
-                            else:
-                                msg: str = lvl[2]
+                            def replace_all(text: str, dic: dict):
+                                for i, j in dic.items():
+                                    text = text.replace(i, j)
+                                return text
 
-                                def replace_all(text: str, dic: dict):
-                                    for i, j in dic.items():
-                                        text = text.replace(i, j)
-                                    return text
-
-                                parameters = OrderedDict(
-                                    [
-                                        ("%member%", str(message.author)),
-                                        ("%pfp%", str(message.author.display_avatar)),
-                                        ("%server%", str(message.guild.name)),
-                                        ("%mention%", str(message.author.mention)),
-                                        ("%name%", str(message.author.name)),
-                                        (
-                                            "%newlevel%",
-                                            str(
-                                                Levelling(
-                                                    message.author, message.guild
-                                                ).get_member_level()
-                                            ),
+                            parameters = OrderedDict(
+                                [
+                                    ("%member%", str(message.author)),
+                                    ("%pfp%", str(message.author.display_avatar)),
+                                    ("%server%", str(message.guild.name)),
+                                    ("%mention%", str(message.author.mention)),
+                                    ("%name%", str(message.author.name)),
+                                    (
+                                        "%newlevel%",
+                                        str(
+                                            Levelling(
+                                                message.author, message.guild
+                                            ).get_member_level()
                                         ),
-                                    ]
-                                )
-                                json = loads(replace_all(msg, parameters))
-                                msg = json["content"]
-                                embed = Embed.from_dict(json["embeds"][0])
-                                lvlup = await self.bot.fetch_channel(lvl[1])
-                                await lvlup.send(content=msg, embed=embed)
+                                    ),
+                                ]
+                            )
+                            json = loads(replace_all(msg, parameters))
+                            msg = json["content"]
+                            embed = Embed.from_dict(json["embeds"][0])
+                            lvlup = await self.bot.fetch_channel(lvl[1])
+                            await lvlup.send(content=msg, embed=embed)
                 except AttributeError:
                     return
             else:
@@ -177,14 +174,16 @@ class levelling(Cog):
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     async def profile(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user:
-            return        
+            return
         if Command(ctx.guild).check_disabled(self.profile.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
 
         await ctx.response.defer()
 
-        member=ctx.user if member is None else member
+        member = ctx.user if member is None else member
         try:
             memdata = Levelling(member, ctx.guild)
             slvl = memdata.get_member_level()
@@ -246,10 +245,12 @@ class levelling(Cog):
 
     @profile.error
     async def profile_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-        if isinstance(error, Jeanne.CommandOnCooldown):     
+        if isinstance(error, Jeanne.CommandOnCooldown):
             if Command(ctx.guild).check_disabled(self.profile.qualified_name):
-                await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
-                return            
+                await ctx.response.send_message(
+                    "This command is disabled by the server's managers", ephemeral=True
+                )
+                return
             cooldown = Embed(
                 description=f"You have already checked your profile!\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.random(),
