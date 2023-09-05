@@ -20,9 +20,11 @@ class nsfw(Cog):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.hentai.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
-        await ctx.response.defer()        
+        await ctx.response.defer()
 
         hentai, source = await Hentai().hentai(rating)
 
@@ -65,7 +67,9 @@ class nsfw(Cog):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.gelbooru.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
         await ctx.response.defer()
         image = await Hentai(plus).gelbooru(rating, tag)
@@ -126,10 +130,15 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (IndexError, KeyError)
         ):
+            if Command(ctx.guild).check_disabled(self.gelbooru.qualified_name):
+                await ctx.response.send_message(
+                    "This command is disabled by the server's managers", ephemeral=True
+                )
+                return
             no_tag = Embed(
                 description="The hentai could not be found", color=Color.red()
             )
-            await ctx.followup.send(embed=no_tag)
+            await ctx.channel.send(embed=no_tag)
 
     @Jeanne.command(description="Get a random hentai from Yande.re", nsfw=True)
     @Jeanne.describe(
@@ -147,9 +156,11 @@ class nsfw(Cog):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.yandere.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
-        await ctx.response.defer()        
+        await ctx.response.defer()
 
         if tag == "02":
             await ctx.followup.send(
@@ -204,10 +215,15 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (IndexError, KeyError, TypeError)
         ):
+            if Command(ctx.guild).check_disabled(self.yandere.qualified_name):
+                await ctx.response.send_message(
+                    "This command is disabled by the server's managers", ephemeral=True
+                )
+                return
             no_tag = Embed(
                 description="The hentai could not be found", color=Color.red()
             )
-            await ctx.followup.send(embed=no_tag)
+            await ctx.channel.send(embed=no_tag)
 
     @Jeanne.command(description="Get a random hentai from Konachan", nsfw=True)
     @Jeanne.describe(
@@ -226,9 +242,11 @@ class nsfw(Cog):
             return
 
         if Command(ctx.guild).check_disabled(self.konachan.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
-        await ctx.response.defer()        
+        await ctx.response.defer()
 
         image = await Hentai(plus).konachan(rating, tag)
 
@@ -276,7 +294,14 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (IndexError, KeyError, TypeError)
         ):
-            no_tag = Embed(description="The hentai could not be found", color=Color.red())
+            if Command(ctx.guild).check_disabled(self.konachan.qualified_name):
+                await ctx.response.send_message(
+                    "This command is disabled by the server's managers", ephemeral=True
+                )
+                return
+            no_tag = Embed(
+                description="The hentai could not be found", color=Color.red()
+            )
             await ctx.followup.send(embed=no_tag)
 
     @Jeanne.command(description="Get hentai from nekos.fun", nsfw=True)
@@ -285,9 +310,11 @@ class nsfw(Cog):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.nekosfun.qualified_name):
-            await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
-        await ctx.response.defer()        
+        await ctx.response.defer()
 
         tag = tag if tag else choice(list(NekosFunTags))
         image = await Hentai().nekosfun(tag)
