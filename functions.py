@@ -411,6 +411,31 @@ class Levelling:
         else:
             return cumulated_exp[0]
 
+    def get_next_time_server(self):
+        next_time = db.execute(
+            "SELECT next_time FROM serverxpData WHERE user_id = ? AND guild_id = ?",
+            (
+                self.member.id,
+                self.server.id,
+            ),
+        ).fetchone()
+        db.commit()
+        if next_time == None:
+            return round(datetime.now().timestamp)
+        else:
+            return next_time[0]
+
+    def get_next_time_global(self):
+        next_time = db.execute(
+            "SELECT next_time FROM globalxpData WHERE user_id = ?",
+            (self.member.id,),
+        ).fetchone()
+        db.commit()
+        if next_time == None:
+            return round(datetime.now().timestamp)
+        else:
+            return next_time[0]
+
     def get_member_level(self):
         level = db.execute(
             "SELECT lvl FROM serverxpData WHERE user_id = ? AND guild_id = ?",
@@ -436,32 +461,38 @@ class Levelling:
             return level[0]
 
     def add_xp(self):
+        now_time = round(datetime.now().timestamp())
+        next_time = round((datetime.now() + timedelta(minutes=2)).timestamp())
         if datetime.today().weekday() > 4:
             xp = 10
         else:
             xp = 5
         cursor1 = db.execute(
-            "INSERT OR IGNORE INTO serverxpData (guild_id, user_id, lvl, exp, cumulative_exp) VALUES (?,?,?,?,?)",
+            "INSERT OR IGNORE INTO serverxpData (guild_id, user_id, lvl, exp, cumulative_exp, next_time) VALUES (?,?,?,?,?,?)",
             (
                 self.server.id,
                 self.member.id,
                 0,
                 xp,
                 xp,
+                next_time,
             ),
         )
+        db.commit()
 
         cursor2 = db.execute(
-            "INSERT OR IGNORE INTO globalxpData (user_id, lvl, exp, cumulative_exp) VALUES (?,?,?,?)",
+            "INSERT OR IGNORE INTO globalxpData (user_id, lvl, exp, cumulative_exp, next_time) VALUES (?,?,?,?,?)",
             (
                 self.member.id,
                 0,
                 xp,
                 xp,
+                next_time,
             ),
         )
+        db.commit()
 
-        if cursor1.rowcount == 0:
+        if cursor1.rowcount == 0 and now_time >= self.get_next_time_server():
             server_exp = self.get_member_xp()
             cumulated_exp = self.get_member_cumulated_xp()
 
@@ -469,18 +500,19 @@ class Levelling:
             server_updated_cumulative_exp = cumulated_exp + xp
 
             db.execute(
-                "UPDATE serverxpData SET exp = ?, cumulative_exp = ? WHERE guild_id = ? AND user_id = ?",
+                "UPDATE serverxpData SET exp = ?, cumulative_exp = ?, next_time = ? WHERE guild_id = ? AND user_id = ?",
                 (
                     server_updated_exp,
                     server_updated_cumulative_exp,
+                    next_time,
                     self.server.id,
                     self.member.id,
                 ),
             )
 
-        db.commit()
+            db.commit()
 
-        if cursor2.rowcount == 0:
+        if cursor2.rowcount == 0 and now_time >= self.get_next_time_global():
             global_exp = self.get_user_xp()
             global_cumulated_exp = self.get_user_cumulated_xp()
 
@@ -488,15 +520,16 @@ class Levelling:
             global_updated_cumulated_exp = global_cumulated_exp + xp
 
             db.execute(
-                "UPDATE globalxpDATA SET exp = ?, cumulative_exp = ? WHERE user_id = ?",
+                "UPDATE globalxpDATA SET exp = ?, cumulative_exp = ?, next_time = ? WHERE user_id = ?",
                 (
                     global_updated_exp,
                     global_updated_cumulated_exp,
+                    next_time,
                     self.member.id,
                 ),
             )
 
-        db.commit()
+            db.commit()
 
         global_cumulated_exp = self.get_user_cumulated_xp()
         global_level = self.get_user_level()
@@ -512,7 +545,7 @@ class Levelling:
                     self.member.id,
                 ),
             )
-        db.commit()
+            db.commit()
 
         server_cumulated_exp = self.get_member_cumulated_xp()
         server_level = self.get_member_level()
@@ -577,6 +610,16 @@ class Levelling:
             return None
         else:
             return data
+
+    async def get_role_reward(self):
+        data=db.execute("SELECT * FROM levelRewardData WHERE user_id = ? AND guild_id = ?", (self.member.id, self.server.id,)).fetchone()
+        db.commit()
+        if data == None:
+            return
+        if self.get_member_level() == int(data[2]):
+            role=self.server.get_role(int(data[1]))
+            await self.member.add_roles(role)
+            return "" #still working on that
 
     def get_server_rank(self):
         leaders_query = db.execute(
@@ -702,12 +745,12 @@ class Levelling:
     @property
     def list_all_roles(self):
         data = db.execute(
-            "SELECT * FROM levelRewardData WHERE server = ?ORDER BY level ASC", (self.server.id,)
+            "SELECT * FROM levelRewardData WHERE server = ?ORDER BY level ASC",
+            (self.server.id,),
         ).fetchall()
         db.commit()
 
         return [i for i in data] if data else None
-
 
 
 class Manage:
