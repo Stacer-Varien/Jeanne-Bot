@@ -1394,7 +1394,7 @@ class XP_Group(GroupCog, name="xp"):
             embed = Embed(color=Color.random())
             embed.add_field(
                 name="Channel XP blacklisted",
-                value=f"`{channel}` has been added to the XP blacklist",
+                value=f"`{channel}` has been removed from the XP blacklist",
                 inline=False,
             )
             await ctx.followup.send(embed=embed)
