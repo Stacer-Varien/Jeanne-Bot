@@ -12,7 +12,7 @@ from discord import (
 )
 from discord.ext.commands import Cog, Bot, GroupCog
 from discord.ext import tasks
-from assets.components import ReportModal
+from assets.components import ReportModal, RemoveManage
 from assets.dictionary import dictionary
 from functions import Botban, Command, Reminder
 from config import WEATHER
@@ -364,7 +364,6 @@ class slashutilities(Cog):
             gust = f"{current['gust_kph']}km/h"
             visibility = f"{current['vis_km']}km"
 
-        # Create the embed
         embed = Embed(
             title=f"{emoji_map['globe']} Weather details of {location['name']}, {location['region']}/{location['country']}",
             color=Color.random(),
@@ -531,6 +530,15 @@ class slashutilities(Cog):
         lang = language.value if language else None
         await dictionary(ctx, word.lower(), lang)
 
+
+    @Jeanne.command(name='test', description="Test Command")
+    async def _test(self, ctx:Interaction):
+        view=RemoveManage()
+        await ctx.response.send_message("buttons", view=view)
+        await view.wait()
+
+        if view.value==None:
+            await ctx.edit_original_response(view=None)
 
 async def setup(bot: Bot):
     await bot.add_cog(Embed_Group(bot))

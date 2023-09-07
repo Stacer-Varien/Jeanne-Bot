@@ -1,5 +1,6 @@
 from discord import (
     CategoryChannel,
+    Guild,
     ui,
     ButtonStyle,
     Interaction,
@@ -16,7 +17,7 @@ from typing import Optional
 from collections import OrderedDict
 from json import loads
 from config import WEBHOOK
-from functions import Levelling, Welcomer
+from functions import Levelling, Logger, Manage, Welcomer
 
 
 def replace_all(text: str, dic: dict):
@@ -442,3 +443,39 @@ class ReportContent(ui.View):
     async def report1(self, ctx: Interaction, button: ui.Button):
         self.value = "report"
         await ctx.response.send_modal(ReportContentM(self.link))
+
+
+class RemoveManage(ui.View):
+    def __init__(self):
+        super().__init__(timeout=180)
+        self.value = None
+
+    @ui.button(label="Welcoming Channel", style=ButtonStyle.gray)
+    async def welcomer(self, ctx: Interaction, button: ui.Button):    
+        self.value = "welcomer"
+        Embed()
+        check = Logger(ctx.guild).get_welcomer()
+        if check == None:
+            button.label="No welcoming channel found"
+            button.style=ButtonStyle.danger
+            await ctx.response.edit_message(view=self)
+        else:
+            button.style=ButtonStyle.green
+            Manage(ctx.guild).remove_welcomer()
+            button.label="Welcomer Channel Removed"
+            await ctx.response.edit_message(view=self)
+
+    @ui.button(label="Leaving Channel", style=ButtonStyle.gray)
+    async def leaving(self, ctx: Interaction, button: ui.Button):      
+        self.value = "leaver"
+        check = Logger(ctx.guild).get_leaver()
+        if check == None:
+            button.style=ButtonStyle.danger
+            button.label="No leaving channel found"            
+            await ctx.response.edit_message(view=self)
+        else:
+            button.style=ButtonStyle.green
+            button.label="Leaving Channel Removed"
+            Manage(ctx.guild).remove_leaver()           
+            await ctx.response.edit_message(view=self)
+

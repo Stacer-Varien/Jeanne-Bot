@@ -612,14 +612,20 @@ class Levelling:
             return data
 
     async def get_role_reward(self):
-        data=db.execute("SELECT * FROM levelRewardData WHERE user_id = ? AND guild_id = ?", (self.member.id, self.server.id,)).fetchone()
+        data = db.execute(
+            "SELECT * FROM levelRewardData WHERE user_id = ? AND guild_id = ?",
+            (
+                self.member.id,
+                self.server.id,
+            ),
+        ).fetchone()
         db.commit()
         if data == None:
             return
         if self.get_member_level() == int(data[2]):
-            role=self.server.get_role(int(data[1]))
+            role = self.server.get_role(int(data[1]))
             await self.member.add_roles(role)
-            return "" #still working on that
+            return ""  # still working on that
 
     def get_server_rank(self):
         leaders_query = db.execute(
@@ -816,30 +822,12 @@ class Manage:
         db.commit()
 
     def remove_welcomer(self):
-        cur = db.cursor()
-        cur.execute("SELECT * FROM welcomerData WHERE guild_id = ?", (self.server.id,))
-        result = cur.fetchone()
-
-        if result == None:
-            return False
-
-        else:
-            cur.execute(
-                "DELETE FROM welcomerData WHERE guild_id = ?", (self.server.id,)
-            )
-            db.commit()
+        db.execute("DELETE FROM welcomerData WHERE guild_id = ?", (self.server.id,))
+        db.commit()
 
     def remove_leaver(self):
-        cur = db.cursor()
-        cur.execute("SELECT * FROM leaverData WHERE guild_id = ?", (self.server.id,))
-        result = cur.fetchone()
-
-        if result == None:
-            return False
-
-        else:
-            cur.execute("DELETE FROM leaverData WHERE guild_id = ?", (self.server.id,))
-            db.commit()
+        db.execute("DELETE FROM leaverData WHERE guild_id = ?", (self.server.id,))
+        db.commit()
 
     def remove_modloger(self):
         cur = db.cursor()
@@ -1086,7 +1074,7 @@ class Logger:
             "SELECT * FROM welcomerData where guild_id = ?", (self.server.id,)
         ).fetchone()
         db.commit()
-        return data
+        return data if data else None
 
     def get_leaver(self):
         data = db.execute(
