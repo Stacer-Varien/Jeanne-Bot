@@ -530,16 +530,6 @@ class slashutilities(Cog):
         lang = language.value if language else None
         await dictionary(ctx, word.lower(), lang)
 
-
-    @Jeanne.command(name='test', description="Test Command")
-    async def _test(self, ctx:Interaction):
-        view=RemoveManage()
-        await ctx.response.send_message("buttons", view=view)
-        await view.wait()
-
-        if view.value==None:
-            await ctx.edit_original_response(view=None)
-
 async def setup(bot: Bot):
     await bot.add_cog(Embed_Group(bot))
     await bot.add_cog(slashutilities(bot))
