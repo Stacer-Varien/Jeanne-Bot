@@ -830,33 +830,19 @@ class Manage:
         db.commit()
 
     def remove_modloger(self):
-        cur = db.cursor()
-        cur.execute("SELECT * FROM modlogData WHERE guild_id = ?", (self.server.id,))
-        result = cur.fetchone()
-
-        if result == None:
-            return False
-
-        else:
-            cur.execute("DELETE FROM modlogData WHERE guild_id = ?", (self.server.id,))
-            db.commit()
+        db.execute("DELETE FROM modlogData WHERE guild_id = ?", (self.server.id,))
+        db.commit()
 
     def remove_levelup(self):
-        cur = db.cursor()
-        cur.execute(
-            "SELECT * FROM levelNotifierData WHERE server_id = ?", (self.server.id,)
+        db.execute(
+            "DELETE FROM levelNotifierData WHERE server_id = ?", (self.server.id,)
         )
-        result = cur.fetchone()
 
-        if result == None:
-            return False
-
-        else:
-            cur.execute(
-                "DELETE FROM levelNotifierData WHERE server_id = ?", (self.server.id,)
-            )
-
-            db.commit()
+        db.commit()
+    
+    def remove_welcomemsg(self):
+        db.execute("UPDATE welcomerMsgData SET welcoming = ? WHERE server = ?", (0, self.server.id,))
+        db.commit()
 
 
 class Command:
@@ -1103,14 +1089,11 @@ class Logger:
         db.commit()
 
     def get_message_logger(self):
-        try:
-            channel = db.execute(
+        channel = db.execute(
                 "SELECT channel FROM messageLogData WHERE server = ?", (self.server.id,)
             ).fetchone()
-            db.commit()
-            return channel[0]
-        except:
-            return False
+        db.commit()
+        return channel[0] if channel else None
 
     def set_member_logger(self, channel: TextChannel):
         cur = db.execute(
@@ -1132,19 +1115,7 @@ class Logger:
         db.commit()
 
     def remove_messagelog(self):
-        cur = db.cursor()
-        cur.execute(
-            "SELECT channel FROM messageLogData WHERE server = ?", (self.server.id,)
-        )
-        result = cur.fetchone()
-        db.commit()
-
-        if result == None:
-            return False
-
-        else:
             db.execute("DELETE FROM messageLogData WHERE server = ?", (self.server.id,))
-
             db.commit()
 
 
