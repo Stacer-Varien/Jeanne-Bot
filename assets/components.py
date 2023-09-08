@@ -446,9 +446,10 @@ class ReportContent(ui.View):
 
 
 class RemoveManage(ui.View):
-    def __init__(self):
+    def __init__(self, author:User):
         super().__init__(timeout=180)
         self.value = None
+        self.author = author
 
     @ui.button(label="Welcoming Channel", style=ButtonStyle.gray)
     async def welcomer(self, ctx: Interaction, button: ui.Button):    
@@ -478,4 +479,63 @@ class RemoveManage(ui.View):
             button.label="Leaving Channel Removed"
             Manage(ctx.guild).remove_leaver()           
             await ctx.response.edit_message(view=self)
+
+    @ui.button(label="Modlog", style=ButtonStyle.gray)
+    async def modlog(self, ctx: Interaction, button: ui.Button):      
+        self.value = "modlog"
+        check = Logger(ctx.guild).get_modlog_channel()
+        if check == None:
+            button.style=ButtonStyle.danger
+            button.label="No modlog found"            
+            await ctx.response.edit_message(view=self)
+        else:
+            button.style=ButtonStyle.green
+            button.label="Modlog Removed"
+            Manage(ctx.guild).remove_modloger()           
+            await ctx.response.edit_message(view=self)
+
+    @ui.button(label="Level Update Channel", style=ButtonStyle.gray)
+    async def level(self, ctx: Interaction, button: ui.Button):      
+        self.value = "levelnotif"
+        check = Levelling(server=ctx.guild).get_level_channel()
+        if check == None:
+            button.style=ButtonStyle.danger
+            button.label="No level update channel found"            
+            await ctx.response.edit_message(view=self)
+        else:
+            button.style=ButtonStyle.green
+            button.label="Level Update Channel Removed"
+            Manage(ctx.guild).remove_levelup()           
+            await ctx.response.edit_message(view=self)
+
+    @ui.button(label="Message Logger", style=ButtonStyle.gray)
+    async def message(self, ctx: Interaction, button: ui.Button):      
+        self.value = "msglog"
+        check = Logger(ctx.guild).get_message_logger()
+        if check == None:
+            button.style=ButtonStyle.danger
+            button.label="No message logging channel found"            
+            await ctx.response.edit_message(view=self)
+        else:
+            button.style=ButtonStyle.green
+            button.label="Message Loggin Channel Removed"
+            Logger(ctx.guild).remove_messagelog()           
+            await ctx.response.edit_message(view=self)
+
+    @ui.button(label="Welcoming Message", style=ButtonStyle.gray)
+    async def welcomemsg(self, ctx: Interaction, button: ui.Button):      
+        self.value = "welcomemsg"
+        check = Welcomer(ctx.guild).get_welcoming_msg()
+        if check == None:
+            button.style=ButtonStyle.danger
+            button.label="No welcoming message set"            
+            await ctx.response.edit_message(view=self)
+        else:
+            button.style=ButtonStyle.green
+            button.label="Welcoming Message Removed"
+            Manage(ctx.guild).remove_welcomemsg()           
+            await ctx.response.edit_message(view=self)
+
+    async def interaction_check(self, ctx: Interaction):
+        return ctx.user.id == self.author.id
 
