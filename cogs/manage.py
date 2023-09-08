@@ -27,6 +27,7 @@ from functions import Botban, Command, Inventory, Levelling, Logger, Manage, Wel
 from assets.components import (
     Confirmation,
     Levelmsg,
+    RemoveManage,
     Welcomingmsg,
     Leavingmsg,
     ForumGuildlines,
@@ -1470,29 +1471,12 @@ class manage(Cog):
         await ctx.followup.send(embed=embed)
 
     @Jeanne.command(
-        description="Removes a welcoming/modlog/report channel. Set all options to true to remove all"
-    )
-    @Jeanne.describe(
-        welcomer="Remove welcomer channel?",
-        leaving="Remove leaving channel?",
-        modlog="Remove modlog channel?",
-        messagelog="Remove lessage logging channel?",
-        welcomingmsg="Remove the welcoming message and reset to default",
-        leavingmsg="Remove the leaving message and reset to default",
-        levelupchannel="Remove the level up update channel",
+        description="Removes a logging/message feature."
     )
     @Jeanne.checks.has_permissions(manage_guild=True)
     async def remove(
         self,
-        ctx: Interaction,
-        welcomer: Optional[bool] = None,
-        leaving: Optional[bool] = None,
-        modlog: Optional[bool] = None,
-        messagelog: Optional[bool] = None,
-        welcomingmsg: Optional[bool] = None,
-        leavingmsg: Optional[bool] = None,
-        levelupchannel: Optional[bool] = None,
-    ) -> None:
+        ctx: Interaction) -> None:
         if Botban(ctx.user).check_botbanned_user:
             return        
         if Command(ctx.guild).check_disabled(self.remove.qualified_name):
@@ -1500,131 +1484,13 @@ class manage(Cog):
             return
 
         await ctx.response.defer()
-        if (
-            welcomer == None
-            and leaving == None
-            and modlog == None
-            and welcomingmsg == None
-            and leavingmsg == None
-        ):
-            error = Embed(description="Please select a channel to remove")
-            await ctx.followup.send(embed=error)
-        else:
-            embed = Embed(description="Channels removed")
+        embed=Embed(description="Click on one of the buttons to remove", color=Color.random())
+        view=RemoveManage(ctx.user)
+        await ctx.followup.send(embed=embed, view=view)
+        await view.wait()
 
-            if welcomer == True:
-                wel = Manage(ctx.guild).remove_welcomer()
-
-                if wel == False:
-                    embed.add_field(
-                        name="Welcomer channel removal status",
-                        value="Failed. No welcomer channel set",
-                        inline=True,
-                    )
-                else:
-                    embed.add_field(
-                        name="Welcomer channel removal status",
-                        value="Successful",
-                        inline=True,
-                    )
-
-            if leaving == True:
-                leav = Manage(ctx.guild).remove_leaver()
-
-                if leav == False:
-                    embed.add_field(
-                        name="Leaving channel removal status",
-                        value="Failed. No leaving channel set",
-                        inline=True,
-                    )
-                else:
-                    embed.add_field(
-                        name="Leaving channel removal status",
-                        value="Successful",
-                        inline=True,
-                    )
-
-            if modlog == True:
-                mod = Manage(ctx.guild).remove_modloger()
-
-                if mod == False:
-                    embed.add_field(
-                        name="Modlog channel removal status",
-                        value="Failed. No modlog channel set",
-                        inline=True,
-                    )
-                else:
-                    embed.add_field(
-                        name="Modlog channel removal status",
-                        value="Successful",
-                        inline=True,
-                    )
-
-            if messagelog == True:
-                rep = Logger(ctx.guild).remove_messagelog()
-
-                if rep == False:
-                    embed.add_field(
-                        name="Message logging channel removal status",
-                        value="Failed. No Message logging channel set",
-                        inline=True,
-                    )
-                else:
-                    embed.add_field(
-                        name="Message logging channel removal status",
-                        value="Successful",
-                        inline=True,
-                    )
-
-            if welcomingmsg == True:
-                msg = Welcomer(ctx.guild).remove_welcomer_msg()
-
-                if msg == 0 or None:
-                    embed.add_field(
-                        name="Welcoming Message removal status",
-                        value="Failed. No welcoming message set",
-                        inline=True,
-                    )
-                else:
-                    embed.add_field(
-                        name="Welcoming Message removal status",
-                        value="Successful",
-                        inline=True,
-                    )
-
-            if leavingmsg == True:
-                leav = Welcomer(ctx.guild).remove_welcomer_msg()
-
-                if leav == 0 or None:
-                    embed.add_field(
-                        name="Leaving Message removal status",
-                        value="Failed. No leaving message set",
-                        inline=True,
-                    )
-                else:
-                    embed.add_field(
-                        name="Leaving Message removal status",
-                        value="Successful",
-                        inline=True,
-                    )
-
-            if levelupchannel == True:
-                lvlup = Manage(ctx.guild).remove_levelup()
-
-                if lvlup == 0 or None:
-                    embed.add_field(
-                        name="Level Up Channel Update removal status",
-                        value="Failed. No Level Up Channel Update set",
-                        inline=True,
-                    )
-                else:
-                    embed.add_field(
-                        name="Level Up Channel Update removal status",
-                        value="Successful",
-                        inline=True,
-                    )
-
-            await ctx.followup.send(embed=embed)
+        if view.value==None:
+            await ctx.edit_original_response(view=None)
 
     @Jeanne.command(description="Clone a channel")
     @Jeanne.describe(
