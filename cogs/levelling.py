@@ -96,7 +96,6 @@ class Rank_Group(GroupCog, name="rank"):
 class levelling(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self._cd = CooldownMapping.from_cooldown(1, 120, BucketType.member)
         self.topggpy = DBLClient(bot=self.bot, token=TOPGG)
 
     def get_card(self, args):
