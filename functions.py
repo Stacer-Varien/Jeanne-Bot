@@ -53,7 +53,7 @@ class Botban:
             inline=False,
         )
         botbanned.set_footer(
-            text="Due to this user botbanned, all data except warnings are immediatley deleted from the database! They will have no chance of appealing their botban and all the commands executed by them are now rendered USELESS!"
+            text="Due to this user botbanned, all data except warnings are immediately deleted from the database! They will have no chance of appealing their botban and all the commands executed by them are now rendered USELESS!"
         )
         botbanned.set_thumbnail(url=self.user.display_avatar)
         webhook = SyncWebhook.from_url(BB_WEBHOOK)
@@ -103,6 +103,7 @@ class Currency:
         )
 
         db.commit()
+
 
     def give_daily(self):
         current_time = datetime.now()
@@ -160,7 +161,8 @@ class Inventory:
     def __init__(self, user: Optional[User] = None) -> None:
         self.user = user
 
-    def fetch_wallpapers(self) -> Embed:
+    @staticmethod
+    def fetch_wallpapers() -> Embed:
         w = db.execute("SELECT * FROM wallpapers").fetchall()
 
         backgrounds = Embed(
@@ -178,12 +180,13 @@ class Inventory:
         db.commit()
         return backgrounds
 
-    def get_wallpaper(self, item_id: str):
+    @staticmethod
+    def get_wallpaper(item_id: str):
         wallpaper = db.execute(
             "SELECT * FROM wallpapers WHERE id = ?", (item_id,)
         ).fetchone()
         db.commit()
-        return wallpaper
+        return str(wallpaper[1]), str(wallpaper[2]), str(wallpaper[3]) if wallpaper else None
 
     def deselect_wallpaper(self):
         wallpaper = db.execute(
@@ -244,7 +247,6 @@ class Inventory:
         Currency(self.user).remove_qp(1000)
 
     def selected_wallpaper(self):
-        try:
             wallpaper = db.execute(
                 "SELECT * FROM userWallpaperInventory WHERE user_id = ? and selected = ?",
                 (
@@ -253,9 +255,7 @@ class Inventory:
                 ),
             ).fetchone()
             db.commit()
-            return wallpaper
-        except:
-            return ""
+            return str(wallpaper[1]), str(wallpaper[2]), int(wallpaper[3]), int(wallpaper[4]) if wallpaper else ""
 
     def use_wallpaper(self, name: str):
         if self.deselect_wallpaper() == None:
@@ -270,17 +270,14 @@ class Inventory:
         )
         db.commit()
 
-    def fetch_user_inventory(self):
+    @property
+    def fetch_user_inventory(self) -> (list | None):
         wallpapers = db.execute(
             "SELECT * FROM userWallpaperInventory WHERE user_id = ?", (self.user.id,)
         ).fetchall()
 
-        if wallpapers == None:
-            return None
-        else:
-            return wallpapers
-            # for data in wallpapers:
-            #    return f"[{data[1]}]({data[2]})\n"
+        return wallpapers if wallpapers else None
+
 
     def set_brightness(self, brightness: int):
         try:
@@ -320,10 +317,7 @@ class Inventory:
             "SELECT bio FROM userBio WHERE user_id = ?", (self.user.id,)
         ).fetchone()
 
-        if data == None:
-            return None
-        else:
-            return data[0]
+        return data[0] if data else None
 
     def set_color(self, color: str):
         cur = db.execute(
@@ -566,39 +560,7 @@ class Levelling:
 
             return self.get_level_channel()
 
-    def add_level_channel(
-        self, channel: TextChannel, message: Optional[str] = None
-    ) -> None:
-        if message == None:
-            message = 0
 
-        cur = db.execute(
-            "INSERT OR IGNORE INTO levelNotifierData (server_id, channel_id, message) VALUES (?,?,?)",
-            (
-                self.server.id,
-                channel.id,
-                message,
-            ),
-        )
-
-        if cur.rowcount == 0:
-            if channel:
-                db.execute(
-                    "UPDATE levelNotifierData SET channel_id = ? WHERE server_id =?",
-                    (
-                        channel.id,
-                        self.server.id,
-                    ),
-                )
-            if message:
-                db.execute(
-                    "UPDATE levelNotifierData SET message = ? WHERE server_id =?",
-                    (
-                        message,
-                        self.server.id,
-                    ),
-                )
-        db.commit()
 
     def get_level_channel(self):
         data = db.execute(
@@ -656,15 +618,7 @@ class Levelling:
         else:
             return True
 
-    def add_xpblacklist(self, channel: TextChannel):
-        db.execute(
-            "INSERT OR IGNORE INTO xpChannelData (server, channel) VALUES (?,?)",
-            (
-                self.server.id,
-                channel.id,
-            ),
-        )
-        db.commit()
+
 
     def remove_blacklist(self, channel: TextChannel):
         db.execute(
@@ -709,6 +663,68 @@ class Levelling:
 
         return [int(i[0]) for i in data] if data else None
 
+
+
+    @property
+    def list_all_roles(self):
+        data = db.execute(
+            "SELECT * FROM levelRewardData WHERE server = ?ORDER BY level ASC",
+            (self.server.id,),
+        ).fetchall()
+        db.commit()
+
+        return [i for i in data] if data else None
+
+
+class Manage:
+    def __init__(self, server: Guild, channel: Optional[TextChannel] = None) -> None:
+        self.server = server
+        self.channel = channel
+
+    def add_level_channel(
+        self, channel: TextChannel, message: Optional[str] = None
+    ) -> None:
+        if message == None:
+            message = 0
+
+        cur = db.execute(
+            "INSERT OR IGNORE INTO levelNotifierData (server_id, channel_id, message) VALUES (?,?,?)",
+            (
+                self.server.id,
+                channel.id,
+                message,
+            ),
+        )
+
+        if cur.rowcount == 0:
+            if channel:
+                db.execute(
+                    "UPDATE levelNotifierData SET channel_id = ? WHERE server_id =?",
+                    (
+                        channel.id,
+                        self.server.id,
+                    ),
+                )
+            if message:
+                db.execute(
+                    "UPDATE levelNotifierData SET message = ? WHERE server_id =?",
+                    (
+                        message,
+                        self.server.id,
+                    ),
+                )
+        db.commit()
+
+    def add_xpblacklist(self, channel: TextChannel):
+        db.execute(
+            "INSERT OR IGNORE INTO xpChannelData (server, channel) VALUES (?,?)",
+            (
+                self.server.id,
+                channel.id,
+            ),
+        )
+        db.commit()
+        
     def add_role_reward(self, role: Role, level: int):
         data = db.execute(
             "INSERT OR IGNORE INTO levelRewardData (server, role, level) VALUES (?,?,?)",
@@ -748,21 +764,66 @@ class Levelling:
             db.commit()
             return True
 
-    @property
-    def list_all_roles(self):
-        data = db.execute(
-            "SELECT * FROM levelRewardData WHERE server = ?ORDER BY level ASC",
-            (self.server.id,),
-        ).fetchall()
+    def set_welcomer_msg(self, json_script: str):
+        cur = db.execute(
+            "INSERT OR IGNORE INTO welcomerMsgData (server, welcoming, leaving) VALUES (?,?,?)",
+            (
+                self.server.id,
+                json_script,
+                0,
+            ),
+        )
+
+        if cur.rowcount == 0:
+            db.execute(
+                "UPDATE welcomerMsgData SET welcoming = ? WHERE server = ?",
+                (
+                    json_script,
+                    self.server.id,
+                ),
+            )
         db.commit()
 
-        return [i for i in data] if data else None
+    def set_leaving_msg(self, json_script: str):
+        cur = db.execute(
+            "INSERT OR IGNORE INTO welcomerMsgData (server, welcoming, leaving) VALUES (?,?,?)",
+            (
+                self.server.id,
+                0,
+                json_script,
+            ),
+        )
+        db.commit()
 
+        if cur.rowcount == 0:
+            db.execute(
+                "UPDATE welcomerMsgData SET leaving = ? WHERE server = ?",
+                (
+                    json_script,
+                    self.server.id,
+                ),
+            )
+        db.commit()
 
-class Manage:
-    def __init__(self, server: Guild, channel: Optional[TextChannel] = None) -> None:
-        self.server = server
-        self.channel = channel
+    def set_message_logger(self, channel: TextChannel):
+        cur = db.execute(
+            "INSERT OR IGNORE INTO messageLogData (server, channel) VALUES (?,?)",
+            (
+                self.server.id,
+                channel.id,
+            ),
+        )
+        db.commit()
+
+        if cur.rowcount == 0:
+            db.execute(
+                "UPDATE messageLogData SET channel = ? WHERE server = ?",
+                (
+                    channel.id,
+                    self.server.id,
+                ),
+            )
+        db.commit()
 
     def set_welcomer(self):
         cursor = db.execute(
@@ -772,7 +833,7 @@ class Manage:
                 self.channel.id,
             ),
         )
-
+        db.commit()
         if cursor.rowcount == 0:
             db.execute(
                 f"UPDATE welcomerData SET channel_id = ? WHERE guild_id = ?",
@@ -781,7 +842,7 @@ class Manage:
                     self.server.id,
                 ),
             )
-        db.commit()
+            db.commit()
 
     def set_leaver(self):
         cursor = db.execute(
@@ -791,7 +852,7 @@ class Manage:
                 self.channel.id,
             ),
         )
-
+        db.commit()
         if cursor.rowcount == 0:
             db.execute(
                 f"UPDATE leaverData SET channel_id = ? WHERE guild_id = ?",
@@ -844,6 +905,13 @@ class Manage:
         db.execute("UPDATE welcomerMsgData SET welcoming = ? WHERE server = ?", (0, self.server.id,))
         db.commit()
 
+    def remove_leavingmsg(self):
+        db.execute("UPDATE welcomerMsgData SET leaving = ? WHERE server = ?", (0, self.server.id,))
+        db.commit()
+
+    def remove_messagelog(self):
+            db.execute("DELETE FROM messageLogData WHERE server = ?", (self.server.id,))
+            db.commit()
 
 class Command:
     def __init__(self, server: Guild) -> None:
@@ -1045,15 +1113,26 @@ class Logger:
         self.server = server
 
     def get_modlog_channel(self):
-        modlog_channel_query = db.execute(
+        data = db.execute(
             "SELECT channel_id FROM modlogData WHERE guild_id = ?", (self.server.id,)
         ).fetchone()
         db.commit()
 
-        if modlog_channel_query == None:
-            return None
-        else:
-            return modlog_channel_query[0]
+        return data[0] if data else None
+
+
+
+    def get_message_logger(self):
+        channel = db.execute(
+                "SELECT channel FROM messageLogData WHERE server = ?", (self.server.id,)
+            ).fetchone()
+        db.commit()
+        return channel[0] if channel else None
+
+
+class Welcomer:
+    def __init__(self, server: Guild) -> None:
+        self.server = server
 
     def get_welcomer(self):
         data = db.execute(
@@ -1067,61 +1146,7 @@ class Logger:
             "SELECT * FROM leaverData where guild_id = ?", (self.server.id,)
         ).fetchone()
         db.commit()
-        return data
-
-    def set_message_logger(self, channel: TextChannel):
-        cur = db.execute(
-            "INSERT OR IGNORE INTO messageLogData (server, channel) VALUES (?,?)",
-            (
-                self.server.id,
-                channel.id,
-            ),
-        )
-
-        if cur.rowcount == 0:
-            db.execute(
-                "UPDATE messageLogData SET channel = ? WHERE server = ?",
-                (
-                    channel.id,
-                    self.server.id,
-                ),
-            )
-        db.commit()
-
-    def get_message_logger(self):
-        channel = db.execute(
-                "SELECT channel FROM messageLogData WHERE server = ?", (self.server.id,)
-            ).fetchone()
-        db.commit()
-        return channel[0] if channel else None
-
-    def set_member_logger(self, channel: TextChannel):
-        cur = db.execute(
-            "INSERT OR IGNORE INTO memberLogData (server, channel) VALUES (?,?)",
-            (
-                self.server.id,
-                channel.id,
-            ),
-        )
-
-        if cur.rowcount == 0:
-            db.execute(
-                "UPDATE memberLogData SET channel = ? WHERE server = ?",
-                (
-                    channel.id,
-                    self.server.id,
-                ),
-            )
-        db.commit()
-
-    def remove_messagelog(self):
-            db.execute("DELETE FROM messageLogData WHERE server = ?", (self.server.id,))
-            db.commit()
-
-
-class Welcomer:
-    def __init__(self, server: Guild) -> None:
-        self.server = server
+        return data if data else None
 
     def get_welcoming_msg(self):
         data = db.execute(
@@ -1137,79 +1162,7 @@ class Welcomer:
         db.commit()
         return data[0] if data else None
 
-    def remove_welcomer_msg(self):
-        data = db.execute(
-            "SELECT welcoming FROM welcomerMsgData WHERE server = ?", (self.server.id,)
-        ).fetchone()
-        db.commit()
-        if data == None:
-            return None
-        else:
-            db.execute(
-                "UPDATE welcomerMsgData SET welcoming = ? WHERE server = ?",
-                (
-                    0,
-                    self.server.id,
-                ),
-            )
-            db.commit()
 
-    def remove_leaving_msg(self):
-        data = db.execute(
-            "SELECT leaving FROM welcomerMsgData WHERE server = ?", (self.server.id,)
-        ).fetchone()
-        db.commit()
-        if data == None:
-            return None
-        else:
-            db.execute(
-                "UPDATE welcomerMsgData SET leaving = ? WHERE server = ?",
-                (
-                    0,
-                    self.server.id,
-                ),
-            )
-            db.commit()
-
-    def set_welcomer_msg(server: int, json_script: str):
-        cur = db.execute(
-            "INSERT OR IGNORE INTO welcomerMsgData (server, welcoming, leaving) VALUES (?,?,?)",
-            (
-                server,
-                json_script,
-                0,
-            ),
-        )
-
-        if cur.rowcount == 0:
-            db.execute(
-                "UPDATE welcomerMsgData SET welcoming = ? WHERE server = ?",
-                (
-                    json_script,
-                    server,
-                ),
-            )
-        db.commit()
-
-    def set_leaving_msg(self, json_script: str):
-        cur = db.execute(
-            "INSERT OR IGNORE INTO welcomerMsgData (server, welcoming, leaving) VALUES (?,?,?)",
-            (
-                self.server.id,
-                0,
-                json_script,
-            ),
-        )
-
-        if cur.rowcount == 0:
-            db.execute(
-                "UPDATE welcomerMsgData SET leaving = ? WHERE server = ?",
-                (
-                    json_script,
-                    self.server.id,
-                ),
-            )
-        db.commit()
 
 
 def get_cached_users():

@@ -17,7 +17,7 @@ class WelcomerCog(Cog):
 
     @Cog.listener()
     async def on_member_join(self, member: Member):
-        welcomer = Logger(member.guild).get_welcomer()
+        welcomer = Welcomer(member.guild).get_welcomer()
 
         if welcomer is None:
             return
@@ -64,7 +64,7 @@ class WelcomerCog(Cog):
 
     @Cog.listener()
     async def on_member_remove(self, member: Member):
-        leaver = Logger(member.guild).get_leaver()
+        leaver = Welcomer(member.guild).get_leaver()
 
         if leaver is None:
             return

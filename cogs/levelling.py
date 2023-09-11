@@ -35,7 +35,7 @@ class Rank_Group(GroupCog, name="rank"):
     @Jeanne.command(
         name="global", description="Check the users with the most XP globally"
     )
-    @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
+    @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     async def _global(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user:
             return
@@ -50,7 +50,10 @@ class Rank_Group(GroupCog, name="rank"):
         embed.set_author(name="Global XP Leaderboard")
 
         leaderboard = Levelling().get_global_rank()
-
+        
+        if leaderboard == None:
+            return
+        
         r = 0
         for i in leaderboard:
             p = await self.bot.fetch_user(i[0])
@@ -61,7 +64,7 @@ class Rank_Group(GroupCog, name="rank"):
         await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Check the users with the most XP in the server")
-    @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
+    @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     async def server(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user:
             return
@@ -73,22 +76,20 @@ class Rank_Group(GroupCog, name="rank"):
 
         await ctx.response.defer()
         embed = Embed(color=Color.random())
-        embed.set_author(name="Server XP Leaderboard")
+        embed.set_author(name="Global XP Leaderboard")
 
         leaderboard = Levelling(server=ctx.guild).get_server_rank()
 
+        if leaderboard == None:
+            return
+        
         r = 0
-        data = []
         for i in leaderboard:
             p = await self.bot.fetch_user(i[0])
+            exp = i[3]
             r += 1
-            data.append([str(r), str(p)])
+            embed.add_field(name=f"`{r}.` {p}", value=f"`{exp}XP`", inline=True)
 
-        headers = ["Place", "User"]
-
-        embed.description = tabulate(
-            data, headers, tablefmt="pretty", colalign=("right",)
-        )
         await ctx.followup.send(embed=embed)
 
 

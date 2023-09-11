@@ -4,7 +4,7 @@ from typing import Optional
 from reactionmenu import ViewMenu, ViewButton
 
 
-async def dictionary(ctx: Interaction, word: str, language: Optional[str]=None):
+async def dictionary(ctx: Interaction, word: str, language: Optional[str] = None):
     language = language if language else "en"
 
     embed = Embed()

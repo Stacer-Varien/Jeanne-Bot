@@ -37,7 +37,7 @@ class Background_Group(GroupCog, name="background"):
 
     @Jeanne.command(description="Preview the inbuild background image")
     @Jeanne.describe(item_id="Which background you are checking?")
-    async def preview(self, ctx: Interaction, item_id: str):
+    async def preview(self, ctx: Interaction, item_id: Jeanne.Range[int, 1, 16]):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.preview.qualified_name):
@@ -46,36 +46,22 @@ class Background_Group(GroupCog, name="background"):
             )
             return
 
-        wallpaper = Inventory().get_wallpaper(item_id)
+        name, image_url = Inventory().get_wallpaper(item_id)
         await ctx.response.defer()
         embed = Embed(title="Preview background")
         embed.color = Color.random()
-        embed.add_field(name="Name", value=wallpaper[1], inline=True)
+        embed.add_field(name="Name", value=name, inline=True)
         embed.add_field(
             name="Price", value="1000 <:quantumpiece:980772736861343774>", inline=True
         )
-        embed.set_image(url=wallpaper[2])
+        embed.set_image(url=image_url)
         await ctx.followup.send(embed=embed)
 
-    @preview.error
-    async def preview_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, TypeError
-        ):
-            if Command(ctx.guild).check_disabled(self.preview.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
 
-            embed = Embed()
-            embed.description = "Invalid item ID given"
-            embed.color = Color.red()
-            await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Buy a background pic for your level card")
     @Jeanne.describe(item_id="Which background you are buying?")
-    async def buy(self, ctx: Interaction, item_id: str):
+    async def buy(self, ctx: Interaction, item_id: Jeanne.Range[int, 1, 16]):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.buy.qualified_name):
@@ -101,21 +87,14 @@ class Background_Group(GroupCog, name="background"):
             await ctx.followup.send(embed=notenough)
 
         else:
-            qp = self.bot.get_emoji(980772736861343774)
-            wallpaper = Inventory().get_wallpaper(item_id)
+                image_url = Inventory().get_wallpaper(item_id)[2]
 
-            if wallpaper == None:
-                nonexist = Embed(description="Invalid item ID passed")
-                await ctx.followup.send(embed=nonexist)
-
-            else:
                 loading = self.bot.get_emoji(1012677456811016342)
-                qp = self.bot.get_emoji(980772736861343774)
                 await ctx.followup.send(
                     "Creating preview... This will take some time {}".format(loading)
                 )
                 args = {
-                    "bg_image": wallpaper[2],
+                    "bg_image": image_url,
                     "profile_image": str(ctx.user.avatar.with_format("png")),
                     "server_level": 100,
                     "server_user_xp": 50,
@@ -136,7 +115,7 @@ class Background_Group(GroupCog, name="background"):
                         description="This is the preview of the level card.",
                         color=Color.random(),
                     )
-                    .add_field(name="Cost", value=f"{wallpaper[3]} {qp}")
+                    .add_field(name="Cost", value="1000 <:quantumpiece:980772736861343774>")
                     .set_footer(text="Is this the background you wanted?")
                 )
                 view = Confirmation(ctx.user)
@@ -175,6 +154,8 @@ class Background_Group(GroupCog, name="background"):
                 color=Color.random(),
             )
             await ctx.followup.send(embed=cooldown)
+
+    
 
     @Jeanne.command(description="Select a wallpaper")
     @Jeanne.describe(name="What is the name of the background?")
@@ -229,7 +210,6 @@ class Background_Group(GroupCog, name="background"):
 
         else:
             loading = self.bot.get_emoji(1012677456811016342)
-            qp = self.bot.get_emoji(980772736861343774)
             await ctx.followup.send(
                 "Creating preview... This will take some time {}".format(loading)
             )
@@ -256,7 +236,7 @@ class Background_Group(GroupCog, name="background"):
                     description="This is the preview of the level card.",
                     color=Color.blue(),
                 )
-                .add_field(name="Cost", value=f"1000 {qp}")
+                .add_field(name="Cost", value="1000 <:quantumpiece:980772736861343774>")
                 .set_footer(text="Is this the background you wanted?")
                 .set_footer(
                     text="Please note that if the custom background violates ToS or is NSFW, it will be removed with NO REFUNDS!"
