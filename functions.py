@@ -162,23 +162,11 @@ class Inventory:
         self.user = user
 
     @staticmethod
-    def fetch_wallpapers() -> Embed:
-        w = db.execute("SELECT * FROM wallpapers").fetchall()
+    def fetch_wallpapers() -> list:
+        data = db.execute("SELECT * FROM wallpapers").fetchall()
 
-        backgrounds = Embed(
-            title="Avaliable Background Pictures for Level Cards", color=Color.random()
-        ).set_footer(text="To view them, click on the hyperlinked names")
-
-        for a in w:
-            backgrounds.add_field(
-                name=f"{a[1]}",
-                value="[Item ID: {}]({})\nPrice: 1000 <:quantumpiece:980772736861343774>".format(
-                    a[0], a[2]
-                ),
-                inline=True,
-            )
         db.commit()
-        return backgrounds
+        return data
 
     @staticmethod
     def get_wallpaper(item_id: str):
@@ -186,7 +174,7 @@ class Inventory:
             "SELECT * FROM wallpapers WHERE id = ?", (item_id,)
         ).fetchone()
         db.commit()
-        return str(wallpaper[1]), str(wallpaper[2]), str(wallpaper[3]) if wallpaper else None
+        return str(wallpaper[1]), str(wallpaper[2]), str(wallpaper[3])
 
     def deselect_wallpaper(self):
         wallpaper = db.execute(
@@ -312,12 +300,13 @@ class Inventory:
             )
         db.commit()
 
-    def get_bio(self):
+    @property
+    def get_bio(self) -> str | None:
         data = db.execute(
             "SELECT bio FROM userBio WHERE user_id = ?", (self.user.id,)
         ).fetchone()
 
-        return data[0] if data else None
+        return str(data[0]) if data else None
 
     def set_color(self, color: str):
         cur = db.execute(
@@ -327,7 +316,7 @@ class Inventory:
                 color,
             ),
         )
-
+        db.commit()
         if cur.rowcount == 0:
             db.execute(
                 "UPDATE userBio SET color = ? WHERE user_id = ?",
@@ -338,15 +327,13 @@ class Inventory:
             )
         db.commit()
 
-    def get_color(self):
+    @property
+    def get_color(self)-> str | None:
         data = db.execute(
             "SELECT color FROM userBio WHERE user_id = ?", (self.user.id,)
         ).fetchone()
 
-        if data == None:
-            return None
-        else:
-            return data[0]
+        return str(data[0]) if data else None
 
 
 class Levelling:
@@ -356,7 +343,8 @@ class Levelling:
         self.member = member
         self.server = server
 
-    def get_member_xp(self):
+    @property
+    def get_member_xp(self) -> int:
         xp = db.execute(
             "SELECT exp FROM serverxpData WHERE user_id = ? AND guild_id = ?",
             (
@@ -365,22 +353,18 @@ class Levelling:
             ),
         ).fetchone()
         db.commit()
-        if xp == None:
-            return 0
-        else:
-            return xp[0]
+        return int(xp[0]) if xp else 0
 
-    def get_user_xp(self):
+    @property
+    def get_user_xp(self)->int:
         xp = db.execute(
             "SELECT exp FROM globalxpData WHERE user_id = ?", (self.member.id,)
         ).fetchone()
         db.commit()
-        if xp == None:
-            return 0
-        else:
-            return xp[0]
+        return int(xp[0]) if xp else 0
 
-    def get_member_cumulated_xp(self):
+    @property
+    def get_member_cumulated_xp(self)->int:
         cumulated_exp = db.execute(
             "SELECT cumulative_exp FROM serverxpData WHERE user_id = ? AND guild_id = ?",
             (
@@ -389,23 +373,19 @@ class Levelling:
             ),
         ).fetchone()
         db.commit()
-        if cumulated_exp == None:
-            return 0
-        else:
-            return cumulated_exp[0]
+        return int(cumulated_exp[0]) if cumulated_exp else 0
 
+    @property
     def get_user_cumulated_xp(self):
         cumulated_exp = db.execute(
             "SELECT cumulative_exp FROM globalxpData WHERE user_id = ?",
             (self.member.id,),
         ).fetchone()
         db.commit()
-        if cumulated_exp == None:
-            return 0
-        else:
-            return cumulated_exp[0]
+        return int(cumulated_exp[0]) if cumulated_exp else 0
 
-    def get_next_time_server(self):
+    @property
+    def get_next_time_server(self)-> int:
         next_time = db.execute(
             "SELECT next_time FROM serverxpData WHERE user_id = ? AND guild_id = ?",
             (
@@ -414,23 +394,20 @@ class Levelling:
             ),
         ).fetchone()
         db.commit()
-        if next_time == None:
-            return round(datetime.now().timestamp)
-        else:
-            return next_time[0]
+        
+        return next_time[0] if next_time else round(datetime.now().timestamp)
 
-    def get_next_time_global(self):
+    @property
+    def get_next_time_global(self)->int:
         next_time = db.execute(
             "SELECT next_time FROM globalxpData WHERE user_id = ?",
             (self.member.id,),
         ).fetchone()
         db.commit()
-        if next_time == None:
-            return round(datetime.now().timestamp)
-        else:
-            return next_time[0]
+        return next_time[0] if next_time else round(datetime.now().timestamp)
 
-    def get_member_level(self):
+    @property
+    def get_member_level(self)->int:
         level = db.execute(
             "SELECT lvl FROM serverxpData WHERE user_id = ? AND guild_id = ?",
             (
@@ -439,20 +416,15 @@ class Levelling:
             ),
         ).fetchone()
         db.commit()
-        if level == None:
-            return 0
-        else:
-            return level[0]
+        return level[0] if level else 0
 
-    def get_user_level(self):
+    @property
+    def get_user_level(self)->int:
         level = db.execute(
             "SELECT lvl FROM globalxpData WHERE user_id = ?", (self.member.id,)
         ).fetchone()
         db.commit()
-        if level == None:
-            return 0
-        else:
-            return level[0]
+        return level[0] if level else 0
 
     def add_xp(self):
         now_time = round(datetime.now().timestamp())
@@ -559,7 +531,6 @@ class Levelling:
             db.commit()
 
             return self.get_level_channel()
-
 
 
     def get_level_channel(self):
