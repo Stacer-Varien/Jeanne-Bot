@@ -2,9 +2,10 @@ from assets.components import Confirmation
 from functions import Botban, Command, Currency, Inventory
 from discord import Color, Embed, File, Interaction, app_commands as Jeanne
 from discord.ext.commands import Bot, GroupCog
-from assets.generators.level_card import Level
+from assets.generators.profile_card import Profile
 from asyncio import get_event_loop
 from functools import partial
+from reactionmenu import ViewButton, ViewMenu
 
 
 class Shop_Group(GroupCog, name="shop"):
@@ -23,7 +24,29 @@ class Shop_Group(GroupCog, name="shop"):
             return
 
         await ctx.response.defer()
-        await ctx.followup.send(embed=Inventory().fetch_wallpapers())
+        wallpapers=Inventory().fetch_wallpapers()
+        embed=Embed()
+        menu = ViewMenu(
+            ctx,
+            menu_type=ViewMenu.TypeEmbed,
+            disable_items_on_timeout=True,
+            style="Page $/&",
+        )
+        embed.color=Color.random()
+
+        for wallpaper in wallpapers:
+            page_embed=Embed(title=f"Item ID: {wallpaper[0]}", color=embed.color)
+            page_embed.add_field(name="Name", value=str(wallpaper[1]), inline=True)
+            page_embed.add_field(name="Price", value="1000 <:quantumpiece:980772736861343774>")
+            page_embed.set_image(url=str(wallpaper[2]))
+            menu.add_page(embed=page_embed)
+        
+        menu.add_button(ViewButton.go_to_first_page())
+        menu.add_button(ViewButton.back())
+        menu.add_button(ViewButton.next())
+        menu.add_button(ViewButton.go_to_last_page())
+
+        await menu.start()
 
 
 class Background_Group(GroupCog, name="background"):
@@ -32,7 +55,7 @@ class Background_Group(GroupCog, name="background"):
         super().__init__()
 
     def get_card(self, args):
-        image = Level().generate_level(**args)
+        image = Profile().generate_profile(**args)
         return image
 
     @Jeanne.command(description="Preview the inbuild background image")
@@ -87,32 +110,42 @@ class Background_Group(GroupCog, name="background"):
             await ctx.followup.send(embed=notenough)
 
         else:
-                image_url = Inventory().get_wallpaper(item_id)[2]
+                image_url = Inventory().get_wallpaper(item_id)[1]
 
                 loading = self.bot.get_emoji(1012677456811016342)
                 await ctx.followup.send(
                     "Creating preview... This will take some time {}".format(loading)
                 )
                 args = {
-                    "bg_image": image_url,
-                    "profile_image": str(ctx.user.avatar.with_format("png")),
-                    "server_level": 100,
-                    "server_user_xp": 50,
-                    "server_next_xp": 100,
-                    "global_level": 100,
-                    "global_user_xp": 100,
-                    "global_next_xp": 100,
-                    "user_name": str(ctx.user),
-                }
+                "bg_image": image_url,
+                "profile_image": str(ctx.user.avatar.with_format("png")),
+                "font_color": None,
+                "server_level": 100,
+                "server_user_xp": 50,
+                "server_next_xp": 100,
+                "global_level": 100,
+                "global_user_xp": 50,
+                "global_next_xp": 100,
+                "user_name": str(ctx.user),
+                "grank": 1,
+                "srank": 1,
+                "voted": True,
+                "rrank": 1,
+                "creator": self.bot.owner_id,
+                "partner": self.bot.owner_id,
+                "balance": 100,
+                "bio": "This is a preview",
+                "brightness": 100,
+            }
 
                 func = partial(self.get_card, args)
                 image = await get_event_loop().run_in_executor(None, func)
 
-                file = File(fp=image, filename=f"preview_level_card.png")
+                file = File(fp=image, filename=f"preview_profile_card.png")
 
                 preview = (
                     Embed(
-                        description="This is the preview of the level card.",
+                        description="This is the preview of the profile card.",
                         color=Color.random(),
                     )
                     .add_field(name="Cost", value="1000 <:quantumpiece:980772736861343774>")
@@ -126,7 +159,7 @@ class Background_Group(GroupCog, name="background"):
 
                 if view.value == None:
                     await ctx.edit_original_response(
-                        content="Timeout", view=None, embed=None
+                        content="Timeout", view=None, embed=None, attachments=[]
                     )
                 elif view.value == True:
                     Inventory(ctx.user).add_user_wallpaper(item_id)
@@ -137,8 +170,9 @@ class Background_Group(GroupCog, name="background"):
                     await ctx.edit_original_response(embed=embed1, view=None)
 
                 else:
+                    
                     await ctx.edit_original_response(
-                        content="Cancelled", view=None, embed=None
+                        content="Cancelled", view=None, embed=None, attachments=[]
                     )
 
     @buy.error
@@ -217,23 +251,33 @@ class Background_Group(GroupCog, name="background"):
             args = {
                 "bg_image": link,
                 "profile_image": str(ctx.user.avatar.with_format("png")),
+                "font_color": None,
                 "server_level": 100,
                 "server_user_xp": 50,
                 "server_next_xp": 100,
                 "global_level": 100,
-                "global_user_xp": 100,
+                "global_user_xp": 50,
                 "global_next_xp": 100,
                 "user_name": str(ctx.user),
+                "grank": 1,
+                "srank": 1,
+                "voted": True,
+                "rrank": 1,
+                "creator": self.bot.owner_id,
+                "partner": self.bot.owner_id,
+                "balance": 100,
+                "bio": "This is a preview",
+                "brightness": 100,
             }
 
             func = partial(self.get_card, args)
             image = await get_event_loop().run_in_executor(None, func)
 
-            file = File(fp=image, filename="preview_level_card.png")
+            file = File(fp=image, filename="preview_profile_card.png")
 
             preview = (
                 Embed(
-                    description="This is the preview of the level card.",
+                    description="This is the preview of the profile card.",
                     color=Color.blue(),
                 )
                 .add_field(name="Cost", value="1000 <:quantumpiece:980772736861343774>")
@@ -255,11 +299,11 @@ class Background_Group(GroupCog, name="background"):
                     description="Background wallpaper bought and selected",
                     color=Color.random(),
                 )
-                await ctx.edit_original_response(embed=embed1, view=None)
+                await ctx.edit_original_response(embed=embed1, view=None, attachments=[])
 
             else:
                 await ctx.edit_original_response(
-                    content="Cancelled", embed=None, view=None
+                    content="Cancelled", embed=None, view=None, attachments=[]
                 )
 
     @buycustom.error
@@ -287,16 +331,33 @@ class Background_Group(GroupCog, name="background"):
             return
 
         await ctx.response.defer()
-        if Inventory(ctx.user).fetch_user_inventory() == None:
+        if Inventory(ctx.user).fetch_user_inventory == None:
             embed = Embed(description="Your inventory is empty", color=Color.red())
             await ctx.followup.send(embed=embed)
-        else:
-            a = Inventory(ctx.user).fetch_user_inventory()
-            inv = Embed(title="List of wallpapers you have", color=Color.random())
-            inv.description = ""
-            for data in a:
-                inv.description += f"[{data[1]}]({data[2]})\n"
-            await ctx.followup.send(embed=inv)
+            return
+        
+        a = Inventory(ctx.user).fetch_user_inventory
+        embed=Embed()
+        menu = ViewMenu(
+                ctx,
+                menu_type=ViewMenu.TypeEmbed,
+                disable_items_on_timeout=True,
+                style="Page $/&",
+            )
+        embed.color=Color.random()
+
+        for wallpaper in a:
+                page_embed=Embed(color=embed.color)
+                page_embed.add_field(name="Name", value=str(wallpaper[1]), inline=True)
+                page_embed.set_image(url=str(wallpaper[2]))
+                menu.add_page(embed=page_embed)
+            
+        menu.add_button(ViewButton.go_to_first_page())
+        menu.add_button(ViewButton.back())
+        menu.add_button(ViewButton.next())
+        menu.add_button(ViewButton.go_to_last_page())
+
+        await menu.start()
 
 
 async def setup(bot: Bot):
