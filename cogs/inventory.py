@@ -1,5 +1,5 @@
 from assets.components import Confirmation
-from functions import Botban, Command, Currency, Inventory
+from functions import AutoCompleteChoices, Botban, Command, Currency, Inventory
 from discord import Color, Embed, File, Interaction, app_commands as Jeanne
 from discord.ext.commands import Bot, GroupCog
 from assets.generators.profile_card import Profile
@@ -24,23 +24,25 @@ class Shop_Group(GroupCog, name="shop"):
             return
 
         await ctx.response.defer()
-        wallpapers=Inventory().fetch_wallpapers()
-        embed=Embed()
+        wallpapers = Inventory().fetch_wallpapers()
+        embed = Embed()
         menu = ViewMenu(
             ctx,
             menu_type=ViewMenu.TypeEmbed,
             disable_items_on_timeout=True,
             style="Page $/&",
         )
-        embed.color=Color.random()
+        embed.color = Color.random()
 
         for wallpaper in wallpapers:
-            page_embed=Embed(title=f"Item ID: {wallpaper[0]}", color=embed.color)
+            page_embed = Embed(title=f"Item ID: {wallpaper[0]}", color=embed.color)
             page_embed.add_field(name="Name", value=str(wallpaper[1]), inline=True)
-            page_embed.add_field(name="Price", value="1000 <:quantumpiece:980772736861343774>")
+            page_embed.add_field(
+                name="Price", value="1000 <:quantumpiece:980772736861343774>"
+            )
             page_embed.set_image(url=str(wallpaper[2]))
             menu.add_page(embed=page_embed)
-        
+
         menu.add_button(ViewButton.go_to_first_page())
         menu.add_button(ViewButton.back())
         menu.add_button(ViewButton.next())
@@ -58,33 +60,11 @@ class Background_Group(GroupCog, name="background"):
         image = Profile().generate_profile(**args)
         return image
 
-    @Jeanne.command(description="Preview the inbuild background image")
-    @Jeanne.describe(item_id="Which background you are checking?")
-    async def preview(self, ctx: Interaction, item_id: Jeanne.Range[int, 1, 16]):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.preview.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
-
-        name, image_url = Inventory().get_wallpaper(item_id)
-        await ctx.response.defer()
-        embed = Embed(title="Preview background")
-        embed.color = Color.random()
-        embed.add_field(name="Name", value=name, inline=True)
-        embed.add_field(
-            name="Price", value="1000 <:quantumpiece:980772736861343774>", inline=True
-        )
-        embed.set_image(url=image_url)
-        await ctx.followup.send(embed=embed)
-
-
-
     @Jeanne.command(description="Buy a background pic for your level card")
-    @Jeanne.describe(item_id="Which background you are buying?")
-    async def buy(self, ctx: Interaction, item_id: Jeanne.Range[int, 1, 16]):
+    @Jeanne.describe(name="Which background you are buying?")
+    @Jeanne.autocomplete(name=AutoCompleteChoices.get_all_wallpapers)
+    @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
+    async def buy(self, ctx: Interaction, name: str):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.buy.qualified_name):
@@ -110,13 +90,23 @@ class Background_Group(GroupCog, name="background"):
             await ctx.followup.send(embed=notenough)
 
         else:
-                image_url = Inventory().get_wallpaper(item_id)[1]
-
-                loading = self.bot.get_emoji(1012677456811016342)
+            try:
+                Inventory.get_wallpaper(name)
+            except:
                 await ctx.followup.send(
-                    "Creating preview... This will take some time {}".format(loading)
+                    embed=Embed(
+                        description="Unable to find wallpaper", color=Color.red()
+                    )
                 )
-                args = {
+                return
+            
+            image_url = Inventory().get_wallpaper(name)[1]
+
+            loading = self.bot.get_emoji(1012677456811016342)
+            await ctx.followup.send(
+                "Creating preview... This will take some time {}".format(loading)
+            )
+            args = {
                 "bg_image": image_url,
                 "profile_image": str(ctx.user.avatar.with_format("png")),
                 "font_color": None,
@@ -131,49 +121,48 @@ class Background_Group(GroupCog, name="background"):
                 "srank": 1,
                 "voted": True,
                 "rrank": 1,
-                "creator": self.bot.owner_id,
-                "partner": self.bot.owner_id,
+                "creator": self.bot.application.owner.id,
+                "partner": self.bot.application.owner.id,
                 "balance": 100,
                 "bio": "This is a preview",
                 "brightness": 100,
             }
 
-                func = partial(self.get_card, args)
-                image = await get_event_loop().run_in_executor(None, func)
+            func = partial(self.get_card, args)
+            image = await get_event_loop().run_in_executor(None, func)
 
-                file = File(fp=image, filename=f"preview_profile_card.png")
+            file = File(fp=image, filename=f"preview_profile_card.png")
 
-                preview = (
-                    Embed(
-                        description="This is the preview of the profile card.",
-                        color=Color.random(),
-                    )
-                    .add_field(name="Cost", value="1000 <:quantumpiece:980772736861343774>")
-                    .set_footer(text="Is this the background you wanted?")
+            preview = (
+                Embed(
+                    description="This is the preview of the profile card.",
+                    color=Color.random(),
                 )
-                view = Confirmation(ctx.user)
+                .add_field(name="Cost", value="1000 <:quantumpiece:980772736861343774>")
+                .set_footer(text="Is this the background you wanted?")
+            )
+            view = Confirmation(ctx.user)
+            await ctx.edit_original_response(
+                content=None, attachments=[file], embed=preview, view=view
+            )
+            await view.wait()
+
+            if view.value == None:
                 await ctx.edit_original_response(
-                    content=None, attachments=[file], embed=preview, view=view
+                    content="Timeout", view=None, embed=None, attachments=[]
                 )
-                await view.wait()
+            elif view.value == True:
+                Inventory(ctx.user).add_user_wallpaper(name)
+                embed1 = Embed(
+                    description=f"Background wallpaper bought and selected",
+                    color=Color.random(),
+                )
+                await ctx.edit_original_response(embed=embed1, view=None)
 
-                if view.value == None:
-                    await ctx.edit_original_response(
-                        content="Timeout", view=None, embed=None, attachments=[]
-                    )
-                elif view.value == True:
-                    Inventory(ctx.user).add_user_wallpaper(item_id)
-                    embed1 = Embed(
-                        description=f"Background wallpaper bought and selected",
-                        color=Color.random(),
-                    )
-                    await ctx.edit_original_response(embed=embed1, view=None)
-
-                else:
-                    
-                    await ctx.edit_original_response(
-                        content="Cancelled", view=None, embed=None, attachments=[]
-                    )
+            else:
+                await ctx.edit_original_response(
+                    content="Cancelled", view=None, embed=None, attachments=[]
+                )
 
     @buy.error
     async def buy_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
@@ -187,11 +176,10 @@ class Background_Group(GroupCog, name="background"):
                 description=f"You have already tried to preview this background!\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.random(),
             )
-            await ctx.followup.send(embed=cooldown)
-
-    
+            await ctx.response.send_message(embed=cooldown)
 
     @Jeanne.command(description="Select a wallpaper")
+    @Jeanne.autocomplete(name=AutoCompleteChoices.list_all_user_inventory)
     @Jeanne.describe(name="What is the name of the background?")
     async def use(self, ctx: Interaction, name: str):
         if Botban(ctx.user).check_botbanned_user:
@@ -216,7 +204,7 @@ class Background_Group(GroupCog, name="background"):
             await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Buy a custom background pic for your level card")
-    @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
+    @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     @Jeanne.describe(name="What will you name it?", link="Add an image link")
     async def buycustom(self, ctx: Interaction, name: str, link: str):
         if Botban(ctx.user).check_botbanned_user:
@@ -263,8 +251,8 @@ class Background_Group(GroupCog, name="background"):
                 "srank": 1,
                 "voted": True,
                 "rrank": 1,
-                "creator": self.bot.owner_id,
-                "partner": self.bot.owner_id,
+                "creator": self.bot.application.owner.id,
+                "partner": self.bot.application.owner.id,
                 "balance": 100,
                 "bio": "This is a preview",
                 "brightness": 100,
@@ -283,7 +271,7 @@ class Background_Group(GroupCog, name="background"):
                 .add_field(name="Cost", value="1000 <:quantumpiece:980772736861343774>")
                 .set_footer(text="Is this the background you wanted?")
                 .set_footer(
-                    text="Please note that if the custom background violates ToS or is NSFW, it will be removed with NO REFUNDS!"
+                    text="Please note that if the custom background violates ToS (both Discord and Bot) or is NSFW, it will be removed with NO REFUNDS!"
                 )
             )
             view = Confirmation(ctx.user)
@@ -299,7 +287,9 @@ class Background_Group(GroupCog, name="background"):
                     description="Background wallpaper bought and selected",
                     color=Color.random(),
                 )
-                await ctx.edit_original_response(embed=embed1, view=None, attachments=[])
+                await ctx.edit_original_response(
+                    embed=embed1, view=None, attachments=[]
+                )
 
             else:
                 await ctx.edit_original_response(
@@ -318,7 +308,7 @@ class Background_Group(GroupCog, name="background"):
                 description=f"You have already tried to preview this background!\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.random(),
             )
-            await ctx.followup.send(embed=cooldown)
+            await ctx.response.send_message(embed=cooldown)
 
     @Jeanne.command(description="Check which backgrounds you have")
     async def list(self, ctx: Interaction):
@@ -335,23 +325,23 @@ class Background_Group(GroupCog, name="background"):
             embed = Embed(description="Your inventory is empty", color=Color.red())
             await ctx.followup.send(embed=embed)
             return
-        
+
         a = Inventory(ctx.user).fetch_user_inventory
-        embed=Embed()
+        embed = Embed()
         menu = ViewMenu(
-                ctx,
-                menu_type=ViewMenu.TypeEmbed,
-                disable_items_on_timeout=True,
-                style="Page $/&",
-            )
-        embed.color=Color.random()
+            ctx,
+            menu_type=ViewMenu.TypeEmbed,
+            disable_items_on_timeout=True,
+            style="Page $/&",
+        )
+        embed.color = Color.random()
 
         for wallpaper in a:
-                page_embed=Embed(color=embed.color)
-                page_embed.add_field(name="Name", value=str(wallpaper[1]), inline=True)
-                page_embed.set_image(url=str(wallpaper[2]))
-                menu.add_page(embed=page_embed)
-            
+            page_embed = Embed(color=embed.color)
+            page_embed.add_field(name="Name", value=str(wallpaper[1]), inline=True)
+            page_embed.set_image(url=str(wallpaper[2]))
+            menu.add_page(embed=page_embed)
+
         menu.add_button(ViewButton.go_to_first_page())
         menu.add_button(ViewButton.back())
         menu.add_button(ViewButton.next())
