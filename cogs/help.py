@@ -9,7 +9,7 @@ from discord import (
     app_commands as Jeanne,
 )
 from discord.ext.commands import GroupCog, Bot
-from functions import Botban
+from functions import Botban, AutoCompleteChoices
 from collections import OrderedDict
 from assets.help.commands import Commands, Modules
 from assets.help.modules import modules
@@ -48,20 +48,9 @@ class HelpGroup(GroupCog, name="help"):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    async def command_choices(
-        self,
-        ctx: Interaction,
-        current: str,
-    ) -> List[Jeanne.Choice[str]]:
-        commands = list(Commands)
-        return [
-            Jeanne.Choice(name=command.value, value=command.value)
-            for command in commands
-            if current.lower() in command.value.lower()
-        ]
 
     @Jeanne.command(description="Get help of a certain command")
-    @Jeanne.autocomplete(command=command_choices)
+    @Jeanne.autocomplete(command=AutoCompleteChoices.command_choices)
     @Jeanne.describe(command="Which command you need help with?")
     async def command(self, ctx: Interaction, command: Jeanne.Range[str, 3]):
         if Botban(ctx.user).check_botbanned_user:
@@ -77,7 +66,7 @@ class HelpGroup(GroupCog, name="help"):
 
         bot_perms: dict = (
             cmd.checks[0].__closure__[0].cell_contents
-            if len(cmd.checks) >= 0
+            if len(cmd.checks) > 0
             and cmd.checks[0].__qualname__ == "bot_has_permissions.<locals>.predicate"
             else (
                 cmd.checks[1].__closure__[0].cell_contents
