@@ -83,12 +83,12 @@ class fun(Cog):
             Botban(ctx.user).add_botbanned_user(
                 "Using the reversed version of a common racial slur"
             )
+            return
 
-        else:
-            msg = Embed(description=text[::-1], color=Color.random()).set_footer(
-                text="Author: {} | {}".format(ctx.user, ctx.user.id)
-            )
-            await ctx.followup.send(embed=msg)
+        msg = Embed(description=text[::-1], color=Color.random()).set_footer(
+            text="Author: {} | {}".format(ctx.user, ctx.user.id)
+        )
+        await ctx.followup.send(embed=msg)
 
     @Jeanne.command(description="Get a random animeme")
     async def animeme(self, ctx: Interaction):
@@ -170,10 +170,10 @@ class fun(Cog):
             color=Color.random(),
         )
 
-        if perc > 60:
+        if perc >= 60:
             simp.set_image(url="https://i.imgur.com/W4u4Igk.jpg")
 
-        elif perc > 40:
+        else:
             simp.set_image(url="https://i.imgur.com/Rs1IP2I.jpg")
 
         await ctx.followup.send(embed=simp)
@@ -198,10 +198,10 @@ class fun(Cog):
             color=Color.random(),
         )
 
-        if perc > 60:
+        if perc >= 60:
             gay.set_image(url="https://i.imgur.com/itOD0Da.png?1")
 
-        elif perc > 40:
+        else:
             gay.set_image(url="https://i.imgur.com/tYAbWCl.jpg")
 
         await ctx.followup.send(embed=gay)
