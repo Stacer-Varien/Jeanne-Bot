@@ -23,7 +23,7 @@ from discord import (
 from discord.ext.commands import Bot, Cog, GroupCog
 from humanfriendly import format_timespan, parse_timespan, InvalidTimespan
 from collections import OrderedDict
-from functions import Botban, Command, Inventory, Levelling, Logger, Manage, Welcomer
+from functions import AutoCompleteChoices, Botban, Command, Inventory, Levelling, Logger, Manage, Welcomer
 from assets.components import (
     Confirmation,
     Levelmsg,
@@ -1709,32 +1709,9 @@ class Command_Group(GroupCog, name="command"):
         self.bot = bot
         super().__init__()
 
-    async def command_choices(
-        self,
-        ctx: Interaction,
-        current: str,
-    ) -> List[Jeanne.Choice[str]]:
-        commands = list(Commands)
-        return [
-            Jeanne.Choice(name=command.value, value=command.value)
-            for command in commands
-            if current.lower() in command.value.lower()
-        ]
-
-    async def disabled_commands_choices(
-        self,
-        ctx: Interaction,
-        current: str,
-    ) -> List[Jeanne.Choice[str]]:
-        commands = Command(ctx.guild).list_all_disabled()
-        return [
-            Jeanne.Choice(name=command, value=command)
-            for command in commands
-            if current.lower() in command.lower()
-        ]
 
     @Jeanne.command(name="disable", description="Disable a command")
-    @Jeanne.autocomplete(command=command_choices)
+    @Jeanne.autocomplete(command=AutoCompleteChoices.command_choices)
     @Jeanne.describe(command="Which command are you disabling?")
     @Jeanne.checks.has_permissions(manage_guild=True)
     async def _disable(
@@ -1771,7 +1748,7 @@ class Command_Group(GroupCog, name="command"):
         await ctx.followup.send(embed=embed)
 
     @Jeanne.command(name="enable", description="Enable a command")
-    @Jeanne.autocomplete(command=disabled_commands_choices)
+    @Jeanne.autocomplete(command=AutoCompleteChoices.disabled_commands)
     @Jeanne.checks.has_permissions(manage_guild=True)
     @Jeanne.describe(command="Which command are you enabling?")
     async def _enable(
