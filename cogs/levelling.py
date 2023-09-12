@@ -13,7 +13,6 @@ from discord import (
 from config import TOPGG
 from functions import Botban, Command, Currency, Inventory, Levelling, get_richest
 from typing import Optional
-from assets.generators.level_card import Level
 from assets.generators.profile_card import Profile
 from collections import OrderedDict
 from json import loads
@@ -97,10 +96,6 @@ class levelling(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.topggpy = DBLClient(bot=self.bot, token=TOPGG)
-
-    def get_card(self, args):
-        image = Level().generate_level(**args)
-        return image
 
     def get_profile(self, args):
         image = Profile().generate_profile(**args)
