@@ -22,7 +22,7 @@ start_time = time()
 class slashinfo(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.bot_version = "4.2.5"
+        self.bot_version = "4.3"
 
     @Jeanne.command(description="See the bot's status from development to now")
     async def stats(self, ctx: Interaction):
@@ -87,7 +87,7 @@ class slashinfo(Cog):
         user = await self.bot.fetch_user(member.id)
         hasroles = [role.mention for role in member.roles][1:][::-1]
 
-        botcheck = "Yes" if member.bot is True else "No"
+        botcheck = "Yes" if member.bot == True else "No"
 
         joined_date = round(member.joined_at.timestamp())
         create_date = round(member.created_at.timestamp())
@@ -122,8 +122,9 @@ class slashinfo(Cog):
         if banner == True:
             userinfo.set_image(url=user.banner)
             await ctx.followup.send(embeds=embeds)
-        else:
-            await ctx.followup.send(embeds=embeds)
+            return
+
+        await ctx.followup.send(embeds=embeds)
 
     @Jeanne.command(description="Get information about this server")
     async def serverinfo(self, ctx: Interaction):
@@ -181,10 +182,10 @@ class slashinfo(Cog):
             f.append(i.replace("_", " ").title())
         serverinfo.add_field(name="Features", value=" | ".join(f), inline=False)
 
-        icon = ctx.guild.icon.url if ctx.guild.icon is not None else None
+        icon = ctx.guild.icon.url if ctx.guild.icon != None else None
         splash = (
             ctx.guild.splash.url
-            if ctx.guild.splash is not None and ctx.guild.premium_tier == 1
+            if ctx.guild.splash != None and ctx.guild.premium_tier == 1
             else None
         )
         serverinfo.set_thumbnail(url=icon)
@@ -192,15 +193,15 @@ class slashinfo(Cog):
 
         if len(emojis) == 0:
             await ctx.followup.send(embed=serverinfo)
+            return
 
-        else:
-            emojie = Embed(
-                title="Emojis", description="".join(emojis[:80]), color=Color.random()
-            )
+        emojie = Embed(
+            title="Emojis", description="".join(emojis[:80]), color=Color.random()
+        )
 
-            e = [serverinfo, emojie]
+        e = [serverinfo, emojie]
 
-            await ctx.followup.send(embeds=e)
+        await ctx.followup.send(embeds=e)
 
     @Jeanne.command(description="Check how fast I respond to a command")
     async def ping(self, ctx: Interaction):
@@ -248,15 +249,17 @@ class slashinfo(Cog):
                 description="Server is not boosted at tier 2", color=Color.red()
             )
             await ctx.followup.send(embed=nobanner)
+            return
 
-        elif ctx.guild.banner == None:
+        if ctx.guild.banner == None:
             embed = Embed(description="Server has no banner", color=Color.red())
             await ctx.followup.send(embed=embed)
-        else:
-            embed = Embed(colour=Color.random())
-            embed.set_footer(text=f"{ctx.guild.name}'s banner")
-            embed.set_image(url=ctx.guild.banner)
-            await ctx.followup.send(embed=embed)
+            return
+
+        embed = Embed(colour=Color.random())
+        embed.set_footer(text=f"{ctx.guild.name}'s banner")
+        embed.set_image(url=ctx.guild.banner.url)
+        await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="See your avatar or another member's avatar")
     @Jeanne.describe(member="Which member?")
@@ -281,18 +284,23 @@ class slashinfo(Cog):
         guildav = Embed(url="https://discordapp.com", color=color, type="image")
 
         if member.guild_avatar != None and member.avatar == None:
-            guildav.set_image(url=member.avatar)
+            guildav.set_image(url=member.avatar.url)
             await ctx.followup.send(embed=guildav)
-        elif member.guild_avatar == None and member.display_avatar == None:
-            normav.set_image(url=member.default_avatar)
+            return
+
+        if member.guild_avatar == None and member.display_avatar == None:
+            normav.set_image(url=member.default_avatar.url)
             await ctx.followup.send(embed=normav)
-        elif member.guild_avatar == None and member.display_avatar != None:
-            normav.set_image(url=member.display_avatar)
+            return
+
+        if member.guild_avatar == None and member.display_avatar != None:
+            normav.set_image(url=member.display_avatar.url)
             await ctx.followup.send(embed=normav)
-        else:
-            normav.set_image(url=member.avatar)
-            guildav.set_image(url=member.guild_avatar)
-            await ctx.followup.send(embeds=[normav, guildav])
+            return
+
+        normav.set_image(url=member.avatar.url)
+        guildav.set_image(url=member.guild_avatar.url)
+        await ctx.followup.send(embeds=[normav, guildav])
 
     @Jeanne.command(description="View a sticker")
     @Jeanne.describe(
@@ -339,13 +347,16 @@ class slashinfo(Cog):
                     description="No sticker is in that message",
                     color=Color.red(),
                 )
-                await ctx.channel.send(embed=embed)
-            elif AttributeError:
+                await ctx.followup.send(embed=embed)
+                return
+
+            if AttributeError:
                 embed = Embed(
                     description="This sticker doesn't exist in the server",
                     color=Color.red(),
                 )
-                await ctx.channel.send(embed=embed)
+                await ctx.followup.send(embed=embed)
+                return
 
     @Jeanne.command(description="View an emoji")
     @Jeanne.describe(emoji="What is the name of the emoji?")
