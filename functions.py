@@ -4,10 +4,22 @@ from random import choice, randint, shuffle
 import time
 import aiohttp
 from humanfriendly import parse_timespan
-from discord import Embed, Color, Guild, Member, Role, SyncWebhook, TextChannel, User
+from discord import (
+    Embed,
+    Guild,
+    Interaction,
+    Member,
+    Role,
+    SyncWebhook,
+    TextChannel,
+    User,
+    app_commands as Jeanne,
+)
+from discord.ext.commands import Bot
 from requests import get
+from assets.help.commands import Commands
 from config import db, BB_WEBHOOK
-from typing import Optional, List
+from typing import Literal, Optional, List
 
 current_time = date.today()
 
@@ -104,7 +116,6 @@ class Currency:
 
         db.commit()
 
-
     def give_daily(self):
         current_time = datetime.now()
         next_claim = current_time + timedelta(days=1)
@@ -169,9 +180,9 @@ class Inventory:
         return data
 
     @staticmethod
-    def get_wallpaper(item_id: str):
+    def get_wallpaper(name: str):
         wallpaper = db.execute(
-            "SELECT * FROM wallpapers WHERE id = ?", (item_id,)
+            "SELECT * FROM wallpapers WHERE name = ?", (name,)
         ).fetchone()
         db.commit()
         return str(wallpaper[1]), str(wallpaper[2]), str(wallpaper[3])
@@ -198,10 +209,10 @@ class Inventory:
             )
             db.commit()
 
-    def add_user_wallpaper(self, item_id: int):
+    def add_user_wallpaper(self, name: str):
         self.deselect_wallpaper()
 
-        wallpaper = self.get_wallpaper(item_id)
+        wallpaper = self.get_wallpaper(name)
 
         db.execute(
             "INSERT OR IGNORE INTO userWallpaperInventory (user_id, wallpaper, link, brightness, selected) VALUES (?,?,?,?,?)",
@@ -235,15 +246,20 @@ class Inventory:
         Currency(self.user).remove_qp(1000)
 
     def selected_wallpaper(self):
-            wallpaper = db.execute(
-                "SELECT * FROM userWallpaperInventory WHERE user_id = ? and selected = ?",
-                (
-                    self.user.id,
-                    1,
-                ),
-            ).fetchone()
-            db.commit()
-            return str(wallpaper[1]), str(wallpaper[2]), int(wallpaper[3]), int(wallpaper[4]) if wallpaper else ""
+        wallpaper = db.execute(
+            "SELECT * FROM userWallpaperInventory WHERE user_id = ? and selected = ?",
+            (
+                self.user.id,
+                1,
+            ),
+        ).fetchone()
+        db.commit()
+        return (
+            str(wallpaper[1]),
+            str(wallpaper[2]),
+            int(wallpaper[3]),
+            int(wallpaper[4]) if wallpaper else "",
+        )
 
     def use_wallpaper(self, name: str):
         if self.deselect_wallpaper() == None:
@@ -259,13 +275,12 @@ class Inventory:
         db.commit()
 
     @property
-    def fetch_user_inventory(self) -> (list | None):
+    def fetch_user_inventory(self) -> list | None:
         wallpapers = db.execute(
             "SELECT * FROM userWallpaperInventory WHERE user_id = ?", (self.user.id,)
         ).fetchall()
 
         return wallpapers if wallpapers else None
-
 
     def set_brightness(self, brightness: int):
         try:
@@ -328,7 +343,7 @@ class Inventory:
         db.commit()
 
     @property
-    def get_color(self)-> str | None:
+    def get_color(self) -> str | None:
         data = db.execute(
             "SELECT color FROM userBio WHERE user_id = ?", (self.user.id,)
         ).fetchone()
@@ -356,7 +371,7 @@ class Levelling:
         return int(xp[0]) if xp else 0
 
     @property
-    def get_user_xp(self)->int:
+    def get_user_xp(self) -> int:
         xp = db.execute(
             "SELECT exp FROM globalxpData WHERE user_id = ?", (self.member.id,)
         ).fetchone()
@@ -364,7 +379,7 @@ class Levelling:
         return int(xp[0]) if xp else 0
 
     @property
-    def get_member_cumulated_xp(self)->int:
+    def get_member_cumulated_xp(self) -> int:
         cumulated_exp = db.execute(
             "SELECT cumulative_exp FROM serverxpData WHERE user_id = ? AND guild_id = ?",
             (
@@ -385,7 +400,7 @@ class Levelling:
         return int(cumulated_exp[0]) if cumulated_exp else 0
 
     @property
-    def get_next_time_server(self)-> int:
+    def get_next_time_server(self) -> int:
         next_time = db.execute(
             "SELECT next_time FROM serverxpData WHERE user_id = ? AND guild_id = ?",
             (
@@ -394,11 +409,11 @@ class Levelling:
             ),
         ).fetchone()
         db.commit()
-        
+
         return next_time[0] if next_time else round(datetime.now().timestamp)
 
     @property
-    def get_next_time_global(self)->int:
+    def get_next_time_global(self) -> int:
         next_time = db.execute(
             "SELECT next_time FROM globalxpData WHERE user_id = ?",
             (self.member.id,),
@@ -407,7 +422,7 @@ class Levelling:
         return next_time[0] if next_time else round(datetime.now().timestamp)
 
     @property
-    def get_member_level(self)->int:
+    def get_member_level(self) -> int:
         level = db.execute(
             "SELECT lvl FROM serverxpData WHERE user_id = ? AND guild_id = ?",
             (
@@ -419,7 +434,7 @@ class Levelling:
         return level[0] if level else 0
 
     @property
-    def get_user_level(self)->int:
+    def get_user_level(self) -> int:
         level = db.execute(
             "SELECT lvl FROM globalxpData WHERE user_id = ?", (self.member.id,)
         ).fetchone()
@@ -458,9 +473,9 @@ class Levelling:
         )
         db.commit()
 
-        if cursor1.rowcount == 0 and now_time >= self.get_next_time_server():
-            server_exp = self.get_member_xp()
-            cumulated_exp = self.get_member_cumulated_xp()
+        if cursor1.rowcount == 0 and now_time >= self.get_next_time_server:
+            server_exp = self.get_member_xp
+            cumulated_exp = self.get_member_cumulated_xp
 
             server_updated_exp = server_exp + xp
             server_updated_cumulative_exp = cumulated_exp + xp
@@ -478,9 +493,9 @@ class Levelling:
 
             db.commit()
 
-        if cursor2.rowcount == 0 and now_time >= self.get_next_time_global():
-            global_exp = self.get_user_xp()
-            global_cumulated_exp = self.get_user_cumulated_xp()
+        if cursor2.rowcount == 0 and now_time >= self.get_next_time_global:
+            global_exp = self.get_user_xp
+            global_cumulated_exp = self.get_user_cumulated_xp
 
             global_updated_exp = global_exp + xp
             global_updated_cumulated_exp = global_cumulated_exp + xp
@@ -497,8 +512,8 @@ class Levelling:
 
             db.commit()
 
-        global_cumulated_exp = self.get_user_cumulated_xp()
-        global_level = self.get_user_level()
+        global_cumulated_exp = self.get_user_cumulated_xp
+        global_level = self.get_user_level
         global_next_lvl_exp = (global_level * 50) + ((global_level - 1) * 25) + 50
 
         if global_cumulated_exp >= global_next_lvl_exp:
@@ -513,8 +528,8 @@ class Levelling:
             )
             db.commit()
 
-        server_cumulated_exp = self.get_member_cumulated_xp()
-        server_level = self.get_member_level()
+        server_cumulated_exp = self.get_member_cumulated_xp
+        server_level = self.get_member_level
         server_next_lvl_exp = (server_level * 50) + ((server_level - 1) * 25) + 50
 
         if server_cumulated_exp >= server_next_lvl_exp:
@@ -531,7 +546,6 @@ class Levelling:
             db.commit()
 
             return self.get_level_channel()
-
 
     def get_level_channel(self):
         data = db.execute(
@@ -589,8 +603,6 @@ class Levelling:
         else:
             return True
 
-
-
     def remove_blacklist(self, channel: TextChannel):
         db.execute(
             "DELETE FROM xpChannelData WHERE server = ? AND channel = ?",
@@ -633,8 +645,6 @@ class Levelling:
         db.commit()
 
         return [int(i[0]) for i in data] if data else None
-
-
 
     @property
     def list_all_roles(self):
@@ -695,7 +705,7 @@ class Manage:
             ),
         )
         db.commit()
-        
+
     def add_role_reward(self, role: Role, level: int):
         data = db.execute(
             "INSERT OR IGNORE INTO levelRewardData (server, role, level) VALUES (?,?,?)",
@@ -871,18 +881,31 @@ class Manage:
         )
 
         db.commit()
-    
+
     def remove_welcomemsg(self):
-        db.execute("UPDATE welcomerMsgData SET welcoming = ? WHERE server = ?", (0, self.server.id,))
+        db.execute(
+            "UPDATE welcomerMsgData SET welcoming = ? WHERE server = ?",
+            (
+                0,
+                self.server.id,
+            ),
+        )
         db.commit()
 
     def remove_leavingmsg(self):
-        db.execute("UPDATE welcomerMsgData SET leaving = ? WHERE server = ?", (0, self.server.id,))
+        db.execute(
+            "UPDATE welcomerMsgData SET leaving = ? WHERE server = ?",
+            (
+                0,
+                self.server.id,
+            ),
+        )
         db.commit()
 
     def remove_messagelog(self):
-            db.execute("DELETE FROM messageLogData WHERE server = ?", (self.server.id,))
-            db.commit()
+        db.execute("DELETE FROM messageLogData WHERE server = ?", (self.server.id,))
+        db.commit()
+
 
 class Command:
     def __init__(self, server: Guild) -> None:
@@ -1091,12 +1114,10 @@ class Logger:
 
         return data[0] if data else None
 
-
-
     def get_message_logger(self):
         channel = db.execute(
-                "SELECT channel FROM messageLogData WHERE server = ?", (self.server.id,)
-            ).fetchone()
+            "SELECT channel FROM messageLogData WHERE server = ?", (self.server.id,)
+        ).fetchone()
         db.commit()
         return channel[0] if channel else None
 
@@ -1132,8 +1153,6 @@ class Welcomer:
         ).fetchone()
         db.commit()
         return data[0] if data else None
-
-
 
 
 def get_cached_users():
@@ -1397,3 +1416,56 @@ class Reminder:
                 ),
             )
             db.commit()
+
+
+class AutoCompleteChoices:
+    def __init__(self, bot: Bot) -> None:
+        self.bot = bot
+
+    async def command_choices(
+        self,
+        ctx: Interaction,
+        current: str,
+    ) -> List[Jeanne.Choice[str]]:
+        cmds = [
+            cmd.qualified_name
+            for cmd in self.bot.tree.walk_commands()
+            if not isinstance(cmd, Jeanne.Group)
+        ]
+        return [
+            Jeanne.Choice(name=command, value=command)
+            for command in cmds
+            if current.lower() in command.lower()
+        ]
+
+    async def disabled_commands(
+        self,
+        ctx: Interaction,
+        current: str,
+    ) -> List[Jeanne.Choice[str]]:
+        commands = Command(ctx.guild).list_all_disabled()
+        return [
+            Jeanne.Choice(name=command, value=command)
+            for command in commands
+            if current.lower() in command.lower()
+        ]
+    
+    async def list_all_user_inventory(self, ctx:Interaction, current:str)->List[Jeanne.Choice[str]]:
+        inventory=Inventory(ctx.user).fetch_user_inventory
+        return [
+            Jeanne.Choice(name=image[1], value=image[1])
+            for image in inventory
+            if current.lower() in str(image[1]).lower()
+        ]
+    
+    
+    async def get_all_wallpapers(self, ctx:Interaction, current:str)->List[Jeanne.Choice[str]]:
+        wallpapers=Inventory.fetch_wallpapers()
+        return [
+            Jeanne.Choice(name=image[1], value=image[1])
+            for image in wallpapers
+            if current.lower() in str(image[1]).lower()
+        ]
+
+
+
