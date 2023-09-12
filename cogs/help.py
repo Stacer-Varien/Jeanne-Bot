@@ -1,5 +1,4 @@
 from json import dumps, loads
-from typing import List
 from discord import (
     ButtonStyle,
     Color,
@@ -11,7 +10,7 @@ from discord import (
 from discord.ext.commands import GroupCog, Bot
 from functions import Botban, AutoCompleteChoices
 from collections import OrderedDict
-from assets.help.commands import Commands, Modules
+from assets.help.commands import Modules
 from assets.help.modules import modules
 
 
@@ -48,7 +47,6 @@ class HelpGroup(GroupCog, name="help"):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-
     @Jeanne.command(description="Get help of a certain command")
     @Jeanne.autocomplete(command=AutoCompleteChoices.command_choices)
     @Jeanne.describe(command="Which command you need help with?")
@@ -71,7 +69,8 @@ class HelpGroup(GroupCog, name="help"):
             else (
                 cmd.checks[1].__closure__[0].cell_contents
                 if len(cmd.checks) >= 2
-                and cmd.checks[1].__qualname__ == "bot_has_permissions.<locals>.predicate"
+                and cmd.checks[1].__qualname__
+                == "bot_has_permissions.<locals>.predicate"
                 else None
             )
         )
@@ -113,6 +112,7 @@ class HelpGroup(GroupCog, name="help"):
             embed.add_field(
                 name="User Permissions", value="\n".join(perms), inline=True
             )
+
         cmd_usage = "/" + cmd.qualified_name + " " + " ".join(parms)
         embed.add_field(name="Command Usage", value=f"`{cmd_usage}`", inline=False)
         embed.set_footer(
@@ -122,6 +122,7 @@ class HelpGroup(GroupCog, name="help"):
         await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Get help of a certain module")
+    @Jeanne.describe(module="Which module?")
     async def module(self, ctx: Interaction, module: Modules):
         if Botban(ctx.user).check_botbanned_user:
             return
