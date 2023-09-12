@@ -312,7 +312,7 @@ class slashutilities(Cog):
 
     @Jeanne.command(description="Get weather information on a city")
     @Jeanne.checks.cooldown(3, 14400, key=lambda i: (i.user.id))
-    @Jeanne.describe(city="Add a city")
+    @Jeanne.describe(city="Add a city", units="Metric or Imperial? (Default is metric)")
     async def weather(
         self,
         ctx: Interaction,
