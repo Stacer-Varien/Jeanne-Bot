@@ -137,7 +137,7 @@ class Currency:
             db.commit()
             if cur.rowcount == 0:
                 db.execute(
-                    "UPDATE bankData SET claimed_date = ? , amount = amount + ? WHERE user_id = ?",
+                    "UPDATE bankData SET claimed_date = ?, amount = amount + ? WHERE user_id = ?",
                     (
                         round(next_claim.timestamp()),
                         qp,
@@ -149,7 +149,7 @@ class Currency:
 
         elif data[2] < round(current_time.timestamp()):
             db.execute(
-                "UPDATE bankData SET claimed_date = ? , amount = amount + ? WHERE user_id = ?",
+                "UPDATE bankData SET claimed_date = ?, amount = amount + ? WHERE user_id = ?",
                 (
                     round(next_claim.timestamp()),
                     qp,
@@ -1189,14 +1189,6 @@ class NsfwApis(Enum):
     GelbooruApi = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=score:>10+rating:"
 
 
-class NekosFunTags(Enum):
-    anal = "anal"
-    blowjob = "bj"
-    cum = "cum"
-    hentai = "hentai"
-    yuri = "lesbian"
-
-
 class Hentai:
     def __init__(self, plus: Optional[bool] = None):
         self.plus = plus
@@ -1343,15 +1335,6 @@ class Hentai:
             source = "Konachan"
 
         return hentai, source
-
-    async def nekosfun(self, tag: NekosFunTags) -> str:
-        url = "http://api.nekos.fun:8080/api/" + tag.value
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                nsfw_image = await resp.json()
-
-        return nsfw_image["image"]
-
 
 def shorten_url(url: str):
     api_url = "http://tinyurl.com/api-create.php"
