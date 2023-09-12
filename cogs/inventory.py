@@ -82,87 +82,88 @@ class Background_Group(GroupCog, name="background"):
                 description="You have no QP.\nPlease get QP by doing `/daily`, `/guess` and/or `/dice`"
             )
             await ctx.followup.send(embed=nomoney)
+            return
 
-        elif balance < 1000:
+        if balance < 1000:
             notenough = Embed(
                 description="You do not have enough QP.\nPlease get more QP by doing `/daily`, `/guess` and/or `/dice`"
             )
             await ctx.followup.send(embed=notenough)
+            return
+
+        try:
+            Inventory.get_wallpaper(name)
+        except:
+            await ctx.followup.send(
+                embed=Embed(description="Unable to find wallpaper", color=Color.red())
+            )
+            return
+
+        image_url = Inventory().get_wallpaper(name)[1]
+
+        loading = self.bot.get_emoji(1012677456811016342)
+        await ctx.followup.send(
+            "Creating preview... This will take some time {}".format(loading)
+        )
+        args = {
+            "bg_image": image_url,
+            "profile_image": str(ctx.user.avatar.with_format("png")),
+            "font_color": None,
+            "server_level": 100,
+            "server_user_xp": 50,
+            "server_next_xp": 100,
+            "global_level": 100,
+            "global_user_xp": 50,
+            "global_next_xp": 100,
+            "user_name": str(ctx.user),
+            "grank": 1,
+            "srank": 1,
+            "voted": True,
+            "rrank": 1,
+            "creator": self.bot.application.owner.id,
+            "partner": self.bot.application.owner.id,
+            "balance": 100,
+            "bio": "This is a preview",
+            "brightness": 100,
+        }
+
+        func = partial(self.get_card, args)
+        image = await get_event_loop().run_in_executor(None, func)
+
+        file = File(fp=image, filename=f"preview_profile_card.png")
+
+        preview = (
+            Embed(
+                description="This is the preview of the profile card.",
+                color=Color.random(),
+            )
+            .add_field(name="Cost", value="1000 <:quantumpiece:980772736861343774>")
+            .set_footer(text="Is this the background you wanted?")
+        )
+        view = Confirmation(ctx.user)
+        await ctx.edit_original_response(
+            content=None, attachments=[file], embed=preview, view=view
+        )
+        await view.wait()
+
+        if view.value == None:
+            await ctx.edit_original_response(
+                content="Timeout", view=None, embed=None, attachments=[]
+            )
+            return
+
+        if view.value == True:
+            Inventory(ctx.user).add_user_wallpaper(name)
+            embed1 = Embed(
+                description=f"Background wallpaper bought and selected",
+                color=Color.random(),
+            )
+            await ctx.edit_original_response(embed=embed1, view=None)
 
         else:
-            try:
-                Inventory.get_wallpaper(name)
-            except:
-                await ctx.followup.send(
-                    embed=Embed(
-                        description="Unable to find wallpaper", color=Color.red()
-                    )
-                )
-                return
-            
-            image_url = Inventory().get_wallpaper(name)[1]
-
-            loading = self.bot.get_emoji(1012677456811016342)
-            await ctx.followup.send(
-                "Creating preview... This will take some time {}".format(loading)
-            )
-            args = {
-                "bg_image": image_url,
-                "profile_image": str(ctx.user.avatar.with_format("png")),
-                "font_color": None,
-                "server_level": 100,
-                "server_user_xp": 50,
-                "server_next_xp": 100,
-                "global_level": 100,
-                "global_user_xp": 50,
-                "global_next_xp": 100,
-                "user_name": str(ctx.user),
-                "grank": 1,
-                "srank": 1,
-                "voted": True,
-                "rrank": 1,
-                "creator": self.bot.application.owner.id,
-                "partner": self.bot.application.owner.id,
-                "balance": 100,
-                "bio": "This is a preview",
-                "brightness": 100,
-            }
-
-            func = partial(self.get_card, args)
-            image = await get_event_loop().run_in_executor(None, func)
-
-            file = File(fp=image, filename=f"preview_profile_card.png")
-
-            preview = (
-                Embed(
-                    description="This is the preview of the profile card.",
-                    color=Color.random(),
-                )
-                .add_field(name="Cost", value="1000 <:quantumpiece:980772736861343774>")
-                .set_footer(text="Is this the background you wanted?")
-            )
-            view = Confirmation(ctx.user)
             await ctx.edit_original_response(
-                content=None, attachments=[file], embed=preview, view=view
+                content="Cancelled", view=None, embed=None, attachments=[]
             )
-            await view.wait()
-
-            if view.value == None:
-                await ctx.edit_original_response(
-                    content="Timeout", view=None, embed=None, attachments=[]
-                )
-            elif view.value == True:
-                Inventory(ctx.user).add_user_wallpaper(name)
-                embed1 = Embed(
-                    description=f"Background wallpaper bought and selected",
-                    color=Color.random(),
-                )
-                await ctx.edit_original_response(embed=embed1, view=None)
-
-            else:
-                await ctx.edit_original_response(
-                    content="Cancelled", view=None, embed=None, attachments=[]
-                )
 
     @buy.error
     async def buy_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
@@ -223,78 +224,77 @@ class Background_Group(GroupCog, name="background"):
                 description="You have no QP.\nPlease get QP by doing `/daily`, `/guess` and/or `/dice`"
             )
             await ctx.followup.send(embed=nomoney)
+            return
 
-        elif int(balance) < 1000:
+        if balance < 1000:
             notenough = Embed(
                 description="You do not have enough QP.\nPlease get more QP by doing `/daily`, `/guess` and/or `/dice`"
             )
             await ctx.followup.send(embed=notenough)
+            return
+
+        loading = self.bot.get_emoji(1012677456811016342)
+        await ctx.followup.send(
+            "Creating preview... This will take some time {}".format(loading)
+        )
+
+        args = {
+            "bg_image": link,
+            "profile_image": str(ctx.user.avatar.with_format("png")),
+            "font_color": None,
+            "server_level": 100,
+            "server_user_xp": 50,
+            "server_next_xp": 100,
+            "global_level": 100,
+            "global_user_xp": 50,
+            "global_next_xp": 100,
+            "user_name": str(ctx.user),
+            "grank": 1,
+            "srank": 1,
+            "voted": True,
+            "rrank": 1,
+            "creator": self.bot.application.owner.id,
+            "partner": self.bot.application.owner.id,
+            "balance": 100,
+            "bio": "This is a preview",
+            "brightness": 100,
+        }
+
+        func = partial(self.get_card, args)
+        image = await get_event_loop().run_in_executor(None, func)
+
+        file = File(fp=image, filename="preview_profile_card.png")
+
+        preview = (
+            Embed(
+                description="This is the preview of the profile card.",
+                color=Color.blue(),
+            )
+            .add_field(name="Cost", value="1000 <:quantumpiece:980772736861343774>")
+            .set_footer(text="Is this the background you wanted?")
+            .set_footer(
+                text="Please note that if the custom background violates ToS (both Discord and Bot) or is NSFW, it will be removed with NO REFUNDS!"
+            )
+        )
+        view = Confirmation(ctx.user)
+        await ctx.edit_original_response(
+            content=None, embed=preview, attachments=[file], view=view
+        )
+        await view.wait()
+
+        if view.value == True:
+            Inventory(ctx.user).add_user_custom_wallpaper(name, link)
+
+            embed1 = Embed(
+                description="Background wallpaper bought and selected",
+                color=Color.random(),
+            )
+            await ctx.edit_original_response(embed=embed1, view=None, attachments=[])
 
         else:
-            loading = self.bot.get_emoji(1012677456811016342)
-            await ctx.followup.send(
-                "Creating preview... This will take some time {}".format(loading)
-            )
-
-            args = {
-                "bg_image": link,
-                "profile_image": str(ctx.user.avatar.with_format("png")),
-                "font_color": None,
-                "server_level": 100,
-                "server_user_xp": 50,
-                "server_next_xp": 100,
-                "global_level": 100,
-                "global_user_xp": 50,
-                "global_next_xp": 100,
-                "user_name": str(ctx.user),
-                "grank": 1,
-                "srank": 1,
-                "voted": True,
-                "rrank": 1,
-                "creator": self.bot.application.owner.id,
-                "partner": self.bot.application.owner.id,
-                "balance": 100,
-                "bio": "This is a preview",
-                "brightness": 100,
-            }
-
-            func = partial(self.get_card, args)
-            image = await get_event_loop().run_in_executor(None, func)
-
-            file = File(fp=image, filename="preview_profile_card.png")
-
-            preview = (
-                Embed(
-                    description="This is the preview of the profile card.",
-                    color=Color.blue(),
-                )
-                .add_field(name="Cost", value="1000 <:quantumpiece:980772736861343774>")
-                .set_footer(text="Is this the background you wanted?")
-                .set_footer(
-                    text="Please note that if the custom background violates ToS (both Discord and Bot) or is NSFW, it will be removed with NO REFUNDS!"
-                )
-            )
-            view = Confirmation(ctx.user)
             await ctx.edit_original_response(
-                content=None, embed=preview, attachments=[file], view=view
+                content="Cancelled", embed=None, view=None, attachments=[]
             )
-            await view.wait()
-
-            if view.value == True:
-                Inventory(ctx.user).add_user_custom_wallpaper(name, link)
-
-                embed1 = Embed(
-                    description="Background wallpaper bought and selected",
-                    color=Color.random(),
-                )
-                await ctx.edit_original_response(
-                    embed=embed1, view=None, attachments=[]
-                )
-
-            else:
-                await ctx.edit_original_response(
-                    content="Cancelled", embed=None, view=None, attachments=[]
-                )
 
     @buycustom.error
     async def buycustom_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
