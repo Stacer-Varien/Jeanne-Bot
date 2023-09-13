@@ -117,15 +117,22 @@ class levelling(Cog):
                 == False
             ):
                 try:
-                    lvl = Levelling(message.author, message.guild).add_xp()
+                    lvl = await Levelling(message.author, message.guild).add_xp()
 
                     if lvl == None:
                         return
 
                     if str(lvl[2]) == "0":
-                        msg = "{} has leveled up to `level {}`".format(
-                            message.author,
-                            Levelling(message.author, message.guild).get_member_level(),
+                        msg = (
+                            "{} has leveled up to `level {} and has earned {}`".format(
+                                message.author,
+                                Levelling(
+                                    message.author, message.guild
+                                ).get_member_level(),
+                                Levelling(
+                                    message.author, message.guild
+                                ).get_role_reward()[2],
+                            )
                         )
                         lvlup = await self.bot.fetch_channel(lvl[1])
                         await lvlup.send(msg)
@@ -150,7 +157,23 @@ class levelling(Cog):
                                 str(
                                     Levelling(
                                         message.author, message.guild
-                                    ).get_member_level()
+                                    ).get_member_level
+                                ),
+                            ),
+                            (
+                                "%role%",
+                                str(
+                                    await Levelling(
+                                        message.author, message.guild
+                                    ).get_role_reward() #needs more work
+                                ),
+                            ),
+                            (
+                                "%rolemention%",
+                                str(
+                                    Levelling(
+                                        message.author, message.guild
+                                    ).get_role_reward()[2]
                                 ),
                             ),
                         ]
