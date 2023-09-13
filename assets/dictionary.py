@@ -20,51 +20,55 @@ async def dictionary(ctx: Interaction, word: str, language: Optional[str] = None
             "Sorry, definitions for the word you were looking for could not be found."
         )
         await ctx.response.send_message(embed=embed)
+        return
 
-    elif response.status_code == 429:
+    if response.status_code == 429:
         embed.color = Color.red()
         embed.title = data["title"]
         embed.description = "Unfortunately, the dictionary API is being rate limited.\nPlease wait for a few minutes."
         await ctx.response.send_message(embed=embed)
-    elif response.status_code != 200:
+        return
+
+    if response.status_code != 200:
         embed.color = Color.red()
         embed.title = data["title"]
         embed.description = "It seems the dictionary API is facing problems.\nPlease wait for a few minutes."
         await ctx.response.send_message(embed=embed)
-    else:
-        menu = ViewMenu(
-            ctx,
-            menu_type=ViewMenu.TypeEmbed,
-            disable_items_on_timeout=True,
-            style="Page $/& | Fetched from dictionaryapi.dev",
-        )
-        embed.color = Color.random()
-        embed.title = f"Word: {data[0]['word']}"
+        return
 
-        for i in data[0]["meanings"]:
-            partOfSpeech = i["partOfSpeech"]
-            for j in i["definitions"]:
-                definition = j["definition"]
-                try:
-                    example = j["example"]
-                except:
-                    pass
+    menu = ViewMenu(
+        ctx,
+        menu_type=ViewMenu.TypeEmbed,
+        disable_items_on_timeout=True,
+        style="Page $/& | Fetched from dictionaryapi.dev",
+    )
+    embed.color = Color.random()
+    embed.title = f"Word: {data[0]['word']}"
 
-                page_embed = Embed(color=embed.color, title=embed.title)
-                page_embed.add_field(
-                    name="Part of Speech", value=partOfSpeech, inline=False
-                )
-                page_embed.add_field(name="Definition", value=definition, inline=False)
-                try:
-                    page_embed.add_field(name="Example", value=example, inline=False)
-                except:
-                    pass
+    for i in data[0]["meanings"]:
+        partOfSpeech = i["partOfSpeech"]
+        for j in i["definitions"]:
+            definition = j["definition"]
+            try:
+                example = j["example"]
+            except:
+                pass
 
-                menu.add_page(embed=page_embed)
+            page_embed = Embed(color=embed.color, title=embed.title)
+            page_embed.add_field(
+                name="Part of Speech", value=partOfSpeech, inline=False
+            )
+            page_embed.add_field(name="Definition", value=definition, inline=False)
+            try:
+                page_embed.add_field(name="Example", value=example, inline=False)
+            except:
+                pass
 
-        menu.add_button(ViewButton.go_to_first_page())
-        menu.add_button(ViewButton.back())
-        menu.add_button(ViewButton.next())
-        menu.add_button(ViewButton.go_to_last_page())
+            menu.add_page(embed=page_embed)
 
-        await menu.start()
+    menu.add_button(ViewButton.go_to_first_page())
+    menu.add_button(ViewButton.back())
+    menu.add_button(ViewButton.next())
+    menu.add_button(ViewButton.go_to_last_page())
+
+    await menu.start()
