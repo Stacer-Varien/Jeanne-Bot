@@ -17,9 +17,8 @@ from discord import (
 )
 from discord.ext.commands import Bot
 from requests import get
-from assets.help.commands import Commands
 from config import db, BB_WEBHOOK
-from typing import Literal, Optional, List
+from typing import Optional, List
 
 current_time = date.today()
 
@@ -147,7 +146,7 @@ class Currency:
                 db.commit()
             return True
 
-        elif data[2] < round(current_time.timestamp()):
+        if data[2] < round(current_time.timestamp()):
             db.execute(
                 "UPDATE bankData SET claimed_date = ?, amount = amount + ? WHERE user_id = ?",
                 (
@@ -158,8 +157,7 @@ class Currency:
             )
             db.commit()
             return True
-        else:
-            return False
+        return False
 
     def get_next_daily(self):
         data = db.execute(
@@ -198,8 +196,7 @@ class Inventory:
         db.commit()
         if wallpaper == None:
             return None
-        else:
-            db.execute(
+        db.execute(
                 "UPDATE userWallpaperInventory SET selected = ? WHERE user_id = ? AND wallpaper = ?",
                 (
                     0,
@@ -207,7 +204,8 @@ class Inventory:
                     wallpaper[0],
                 ),
             )
-            db.commit()
+        db.commit()
+        return True
 
     def add_user_wallpaper(self, name: str):
         self.deselect_wallpaper()
@@ -258,12 +256,23 @@ class Inventory:
             str(wallpaper[1]),
             str(wallpaper[2]),
             int(wallpaper[3]),
-            int(wallpaper[4]) if wallpaper else "",
+            int(wallpaper[4])
         )
 
     def use_wallpaper(self, name: str):
         if self.deselect_wallpaper() == None:
+            db.execute(
+                "UPDATE userWallpaperInventory SET selected = ? WHERE wallpaper = ? AND user_id = ?",
+                (
+                    1,
+                    name,
+                    self.user.id,
+                ),
+            )
+            db.commit()
             return
+        
+        self.deselect_wallpaper()
         db.execute(
             "UPDATE userWallpaperInventory SET selected = ? WHERE wallpaper = ? AND user_id = ?",
             (
@@ -304,7 +313,7 @@ class Inventory:
                 bio,
             ),
         )
-
+        db.commit()
         if cur.rowcount == 0:
             db.execute(
                 "UPDATE userBio SET bio = ? WHERE user_id = ?",
@@ -320,6 +329,7 @@ class Inventory:
         data = db.execute(
             "SELECT bio FROM userBio WHERE user_id = ?", (self.user.id,)
         ).fetchone()
+        db.commit()
 
         return str(data[0]) if data else None
 
@@ -347,6 +357,7 @@ class Inventory:
         data = db.execute(
             "SELECT color FROM userBio WHERE user_id = ?", (self.user.id,)
         ).fetchone()
+        db.commit()
 
         return str(data[0]) if data else None
 
@@ -391,7 +402,7 @@ class Levelling:
         return int(cumulated_exp[0]) if cumulated_exp else 0
 
     @property
-    def get_user_cumulated_xp(self):
+    def get_user_cumulated_xp(self)->int:
         cumulated_exp = db.execute(
             "SELECT cumulative_exp FROM globalxpData WHERE user_id = ?",
             (self.member.id,),
@@ -553,10 +564,7 @@ class Levelling:
         ).fetchone()
         db.commit()
 
-        if data == None:
-            return None
-        else:
-            return data
+        return data if data else None
 
     async def get_role_reward(self):
         data = db.execute(
@@ -598,20 +606,8 @@ class Levelling:
             ),
         ).fetchone()
         db.commit()
-        if data == None:
-            return False
-        else:
-            return True
+        return data if data else None
 
-    def remove_blacklist(self, channel: TextChannel):
-        db.execute(
-            "DELETE FROM xpChannelData WHERE server = ? AND channel = ?",
-            (
-                self.server.id,
-                channel.id,
-            ),
-        )
-        db.commit()
 
     def get_member_server_rank(self):
         result = db.execute(
@@ -647,7 +643,7 @@ class Levelling:
         return [int(i[0]) for i in data] if data else None
 
     @property
-    def list_all_roles(self):
+    def list_all_roles(self) -> list:
         data = db.execute(
             "SELECT * FROM levelRewardData WHERE server = ?ORDER BY level ASC",
             (self.server.id,),
@@ -658,15 +654,23 @@ class Levelling:
 
 
 class Manage:
-    def __init__(self, server: Guild, channel: Optional[TextChannel] = None) -> None:
+    def __init__(self, server: Guild) -> None:
         self.server = server
-        self.channel = channel
+
+    def remove_blacklist(self, channel: TextChannel):
+        db.execute(
+            "DELETE FROM xpChannelData WHERE server = ? AND channel = ?",
+            (
+                self.server.id,
+                channel.id,
+            ),
+        )
+        db.commit()
 
     def add_level_channel(
         self, channel: TextChannel, message: Optional[str] = None
     ) -> None:
-        if message == None:
-            message = 0
+        message = message if message else 0
 
         cur = db.execute(
             "INSERT OR IGNORE INTO levelNotifierData (server_id, channel_id, message) VALUES (?,?,?)",
@@ -676,6 +680,7 @@ class Manage:
                 message,
             ),
         )
+        db.commit()
 
         if cur.rowcount == 0:
             if channel:
@@ -686,6 +691,7 @@ class Manage:
                         self.server.id,
                     ),
                 )
+                db.commit()
             if message:
                 db.execute(
                     "UPDATE levelNotifierData SET message = ? WHERE server_id =?",
@@ -694,7 +700,7 @@ class Manage:
                         self.server.id,
                     ),
                 )
-        db.commit()
+                db.commit()
 
     def add_xpblacklist(self, channel: TextChannel):
         db.execute(
@@ -734,16 +740,16 @@ class Manage:
         db.commit()
         if data == None:
             return None
-        else:
-            db.execute(
+        
+        db.execute(
                 "DELETE FROM levelRewardData WHERE server = ? AND role = ?",
                 (
                     self.server.id,
                     role.id,
                 ),
             )
-            db.commit()
-            return True
+        db.commit()
+        return True
 
     def set_welcomer_msg(self, json_script: str):
         cur = db.execute(
@@ -754,6 +760,7 @@ class Manage:
                 0,
             ),
         )
+        db.commit()
 
         if cur.rowcount == 0:
             db.execute(
@@ -763,7 +770,7 @@ class Manage:
                     self.server.id,
                 ),
             )
-        db.commit()
+            db.commit()
 
     def set_leaving_msg(self, json_script: str):
         cur = db.execute(
@@ -784,7 +791,7 @@ class Manage:
                     self.server.id,
                 ),
             )
-        db.commit()
+            db.commit()
 
     def set_message_logger(self, channel: TextChannel):
         cur = db.execute(
@@ -806,12 +813,12 @@ class Manage:
             )
         db.commit()
 
-    def set_welcomer(self):
+    def set_welcomer(self, channel:TextChannel):
         cursor = db.execute(
             "INSERT OR IGNORE INTO welcomerData (guild_id, channel_id) VALUES (?,?)",
             (
                 self.server.id,
-                self.channel.id,
+                channel.id,
             ),
         )
         db.commit()
@@ -819,18 +826,18 @@ class Manage:
             db.execute(
                 f"UPDATE welcomerData SET channel_id = ? WHERE guild_id = ?",
                 (
-                    self.channel.id,
+                    channel.id,
                     self.server.id,
                 ),
             )
             db.commit()
 
-    def set_leaver(self):
+    def set_leaver(self, channel:TextChannel):
         cursor = db.execute(
             "INSERT OR IGNORE INTO leaverData (guild_id, channel_id) VALUES (?,?)",
             (
                 self.server.id,
-                self.channel.id,
+                channel.id,
             ),
         )
         db.commit()
@@ -838,7 +845,7 @@ class Manage:
             db.execute(
                 f"UPDATE leaverData SET channel_id = ? WHERE guild_id = ?",
                 (
-                    self.channel.id,
+                    channel.id,
                     self.server.id,
                 ),
             )
@@ -852,6 +859,7 @@ class Manage:
                 channel.id,
             ),
         )
+        db.commit()
 
         if cursor.rowcount == 0:
             db.execute(
@@ -861,7 +869,7 @@ class Manage:
                     self.server.id,
                 ),
             )
-        db.commit()
+            db.commit()
 
     def remove_welcomer(self):
         db.execute("DELETE FROM welcomerData WHERE guild_id = ?", (self.server.id,))
@@ -919,6 +927,7 @@ class Command:
                 command,
             ),
         ).fetchone()
+        db.commit()
 
         return str(data[0]) if data else None
 
@@ -942,16 +951,14 @@ class Command:
         )
         db.commit()
 
-    def list_all_disabled(self):
+    @property
+    def list_all_disabled(self) -> list[str]:
         data = db.execute(
             "SELECT command FROM disabledCommandsData WHERE server = ?",
             (self.server.id,),
         ).fetchall()
         db.commit()
-        if data == None:
-            return None
-        else:
-            return [str(i[0]) for i in data]
+        return [str(i[0]) for i in data] if data else None
 
 
 class Moderation:
@@ -973,18 +980,20 @@ class Moderation:
                 date,
             ),
         )
+        db.commit()
 
         cur = db.execute(
             "INSERT OR IGNORE INTO warnDatav2 (guild_id, user_id, warn_points) VALUES (?,?,?)",
             (self.server.id, self.member.id, 1),
         )
+        db.commit()
 
         if cur.rowcount == 0:
             db.execute(
                 "UPDATE warnDatav2 SET warn_points = warn_points + ? WHERE guild_id = ? and user_id = ?",
                 (1, self.server.id, self.member.id),
             )
-        db.commit()
+            db.commit()
 
     def fetch_warnings_server(self):
         cur = db.cursor()
@@ -992,12 +1001,10 @@ class Moderation:
             "SELECT * FROM warnDATAv2 WHERE guild_id = ?", (self.server.id,)
         ).fetchall()
         db.commit()
-        if len(warnings) == 0:
+        if len(warnings) == 0 or warnings == None:
             return None
-        elif warnings == None:
-            return None
-        else:
-            return warnings
+
+        return warnings
 
     def fetch_warnings_user(self):
         cur = db.cursor()
@@ -1010,12 +1017,10 @@ class Moderation:
         ).fetchall()
         db.commit()
 
-        if len(warnings) == 0:
+        if len(warnings) == 0 or warnings == None:
             return None
-        elif warnings == None:
-            return None
-        else:
-            return warnings
+
+        return warnings
 
     def check_warn_id(self, warn_id: int):
         cur = db.cursor()
@@ -1029,15 +1034,12 @@ class Moderation:
         result = cur.fetchone()
         db.commit()
 
-        if result == None:
-            return None
-
-        else:
-            return result
+        return result if result else None
 
     def revoke_warn(self, warn_id: int):
         cur = db.cursor()
         cur.execute("DELETE FROM warnData WHERE warn_id = ?", (warn_id,))
+        db.commit()
 
         cur.execute(
             "UPDATE warnDatav2 SET warn_points = warn_points - ? WHERE user_id = ? AND guild_id = ?",
@@ -1047,6 +1049,7 @@ class Moderation:
                 self.server.id,
             ),
         )
+        db.commit()
 
         wp_query = cur.execute(
             f"SELECT warn_points FROM warnDatav2 WHERE user_id = ? AND guild_id = ?",
@@ -1056,6 +1059,7 @@ class Moderation:
             ),
         )
         warnpoints = wp_query.fetchone()[0]
+        db.commit()
 
         if warnpoints == 0:
             cur.execute(
@@ -1066,7 +1070,7 @@ class Moderation:
                 ),
             )
 
-        db.commit()
+            db.commit()
 
     def get_softban_data(self):
         data = db.execute("SELECT * FROM softbannedMembers").fetchall()
