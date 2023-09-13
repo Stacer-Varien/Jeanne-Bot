@@ -322,7 +322,7 @@ class Inventory:
                     self.user.id,
                 ),
             )
-        db.commit()
+            db.commit()
 
     @property
     def get_bio(self) -> str | None:
@@ -350,7 +350,7 @@ class Inventory:
                     self.user.id,
                 ),
             )
-        db.commit()
+            db.commit()
 
     @property
     def get_color(self) -> str | None:
@@ -452,7 +452,7 @@ class Levelling:
         db.commit()
         return level[0] if level else 0
 
-    def add_xp(self):
+    async def add_xp(self):
         now_time = round(datetime.now().timestamp())
         next_time = round((datetime.now() + timedelta(minutes=2)).timestamp())
         if datetime.today().weekday() > 4:
@@ -555,7 +555,7 @@ class Levelling:
                 ),
             )
             db.commit()
-
+            await self.get_role_reward()
             return self.get_level_channel()
 
     def get_level_channel(self):
@@ -568,19 +568,18 @@ class Levelling:
 
     async def get_role_reward(self):
         data = db.execute(
-            "SELECT * FROM levelRewardData WHERE user_id = ? AND guild_id = ?",
+            "SELECT * FROM levelRewardData WHERE server = ?",
             (
-                self.member.id,
                 self.server.id,
             ),
         ).fetchone()
         db.commit()
         if data == None:
-            return
-        if self.get_member_level() == int(data[2]):
+            return 
+        if self.get_member_level >= int(data[2]):
             role = self.server.get_role(int(data[1]))
             await self.member.add_roles(role)
-            return ""  # still working on that
+            return role, role.name, role.mention
 
     def get_server_rank(self):
         leaders_query = db.execute(
@@ -606,7 +605,7 @@ class Levelling:
             ),
         ).fetchone()
         db.commit()
-        return data if data else None
+        return data if data else False
 
 
     def get_member_server_rank(self):
@@ -645,7 +644,7 @@ class Levelling:
     @property
     def list_all_roles(self) -> list:
         data = db.execute(
-            "SELECT * FROM levelRewardData WHERE server = ?ORDER BY level ASC",
+            "SELECT * FROM levelRewardData WHERE server = ? ORDER BY level ASC",
             (self.server.id,),
         ).fetchall()
         db.commit()
