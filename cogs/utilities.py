@@ -298,11 +298,12 @@ class ReminderCog(GroupCog, name="reminder"):
             embed.color = Color.red()
             embed.description = "You don't have a reminder with that ID"
             await ctx.followup.send(embed=embed, ephemeral=True)
-        else:
-            embed.color = Color.random()
-            embed.description = "Reminder `{}` has been removed".format(reminder_id)
-            reminder.remove(reminder_id)
-            await ctx.followup.send(embed=embed, ephemeral=True)
+            return
+
+        embed.color = Color.random()
+        embed.description = "Reminder `{}` has been removed".format(reminder_id)
+        reminder.remove(reminder_id)
+        await ctx.followup.send(embed=embed, ephemeral=True)
 
 
 class slashutilities(Cog):
@@ -326,7 +327,6 @@ class slashutilities(Cog):
                 "This command is disabled by the server's managers", ephemeral=True
             )
             return
-        
 
         emoji_map = {
             "globe": "🌍",
@@ -529,6 +529,7 @@ class slashutilities(Cog):
             return
         lang = language.value if language else None
         await dictionary(ctx, word.lower(), lang)
+
 
 async def setup(bot: Bot):
     await bot.add_cog(Embed_Group(bot))
