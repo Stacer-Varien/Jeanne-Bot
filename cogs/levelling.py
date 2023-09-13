@@ -1,6 +1,6 @@
 from asyncio import get_event_loop
 from functools import partial
-from discord.ext.commands import Cog, CooldownMapping, BucketType, Bot, GroupCog
+from discord.ext.commands import Cog, Bot, GroupCog
 from discord import (
     Color,
     Embed,
@@ -16,7 +16,6 @@ from typing import Optional
 from assets.generators.profile_card import Profile
 from collections import OrderedDict
 from json import loads
-from tabulate import tabulate
 from topgg import DBLClient
 
 
@@ -49,10 +48,12 @@ class Rank_Group(GroupCog, name="rank"):
         embed.set_author(name="Global XP Leaderboard")
 
         leaderboard = Levelling().get_global_rank()
-        
+
         if leaderboard == None:
+            embed.description = "No global leaderboard provided"
+            await ctx.followup.send(embed=embed)
             return
-        
+
         r = 0
         for i in leaderboard:
             p = await self.bot.fetch_user(i[0])
@@ -75,13 +76,15 @@ class Rank_Group(GroupCog, name="rank"):
 
         await ctx.response.defer()
         embed = Embed(color=Color.random())
-        embed.set_author(name="Global XP Leaderboard")
+        embed.set_author(name="Server XP Leaderboard")
 
         leaderboard = Levelling(server=ctx.guild).get_server_rank()
 
         if leaderboard == None:
+            embed.description = "No server leaderboard provided"
+            await ctx.followup.send(embed=embed)
             return
-        
+
         r = 0
         for i in leaderboard:
             p = await self.bot.fetch_user(i[0])
@@ -117,52 +120,48 @@ class levelling(Cog):
                     lvl = Levelling(message.author, message.guild).add_xp()
 
                     if lvl == None:
-                        pass
-                    else:
-                        if lvl[2] == "0":
-                            msg = "{} has leveled up to `level {}`".format(
-                                message.author,
-                                Levelling(
-                                    message.author, message.guild
-                                ).get_member_level(),
-                            )
-                            lvlup = await self.bot.fetch_channel(lvl[1])
-                            await lvlup.send(msg)
+                        return
 
-                        else:
-                            msg: str = lvl[2]
+                    if str(lvl[2]) == "0":
+                        msg = "{} has leveled up to `level {}`".format(
+                            message.author,
+                            Levelling(message.author, message.guild).get_member_level(),
+                        )
+                        lvlup = await self.bot.fetch_channel(lvl[1])
+                        await lvlup.send(msg)
+                        return
 
-                            def replace_all(text: str, dic: dict):
-                                for i, j in dic.items():
-                                    text = text.replace(i, j)
-                                return text
+                    msg: str = lvl[2]
 
-                            parameters = OrderedDict(
-                                [
-                                    ("%member%", str(message.author)),
-                                    ("%pfp%", str(message.author.display_avatar)),
-                                    ("%server%", str(message.guild.name)),
-                                    ("%mention%", str(message.author.mention)),
-                                    ("%name%", str(message.author.name)),
-                                    (
-                                        "%newlevel%",
-                                        str(
-                                            Levelling(
-                                                message.author, message.guild
-                                            ).get_member_level()
-                                        ),
-                                    ),
-                                ]
-                            )
-                            json = loads(replace_all(msg, parameters))
-                            msg = json["content"]
-                            embed = Embed.from_dict(json["embeds"][0])
-                            lvlup = await self.bot.fetch_channel(lvl[1])
-                            await lvlup.send(content=msg, embed=embed)
+                    def replace_all(text: str, dic: dict):
+                        for i, j in dic.items():
+                            text = text.replace(i, j)
+                        return text
+
+                    parameters = OrderedDict(
+                        [
+                            ("%member%", str(message.author)),
+                            ("%pfp%", str(message.author.display_avatar)),
+                            ("%server%", str(message.guild.name)),
+                            ("%mention%", str(message.author.mention)),
+                            ("%name%", str(message.author.name)),
+                            (
+                                "%newlevel%",
+                                str(
+                                    Levelling(
+                                        message.author, message.guild
+                                    ).get_member_level()
+                                ),
+                            ),
+                        ]
+                    )
+                    json = loads(replace_all(msg, parameters))
+                    msg = json["content"]
+                    embed = Embed.from_dict(json["embeds"][0])
+                    lvlup = await self.bot.fetch_channel(int(lvl[1]))
+                    await lvlup.send(content=msg, embed=embed)
                 except AttributeError:
                     return
-            else:
-                return
 
     @Jeanne.command(description="See your profile or someone else's profile")
     @Jeanne.describe(member="Which member?")
@@ -181,29 +180,26 @@ class levelling(Cog):
         member = ctx.user if member is None else member
         try:
             memdata = Levelling(member, ctx.guild)
-            slvl = memdata.get_member_level()
-            sexp = memdata.get_member_xp()
+            slvl = memdata.get_member_level
+            sexp = memdata.get_member_xp
 
-            glvl = memdata.get_user_level()
-            gexp = memdata.get_user_xp()
+            glvl = memdata.get_user_level
+            gexp = memdata.get_user_xp
 
             bg = Inventory(member).selected_wallpaper()
             grank = memdata.get_member_global_rank()
             srank = memdata.get_member_server_rank()
             rrank = get_richest(member)
 
-            bio = Inventory(member).get_bio()
-            font_color = Inventory(member).get_color()
+            bio = Inventory(member).get_bio
+            font_color = Inventory(member).get_color
 
             voted = await self.topggpy.get_user_vote(member.id)
 
-            try:
-                brightness = bg[3]
-            except:
-                brightness = 100
+            brightness = bg[2]
 
             try:
-                bg_image = bg[2]
+                bg_image = bg[1]
             except:
                 bg_image = ""
 
@@ -224,7 +220,7 @@ class levelling(Cog):
                 "rrank": rrank,
                 "creator": member.id,
                 "partner": member.id,
-                "balance": Currency(member).get_balance(),
+                "balance": Currency(member).get_balance,
                 "bio": str(bio),
                 "brightness": brightness,
             }
