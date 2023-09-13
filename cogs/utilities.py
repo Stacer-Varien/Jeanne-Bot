@@ -12,7 +12,7 @@ from discord import (
 )
 from discord.ext.commands import Cog, Bot, GroupCog
 from discord.ext import tasks
-from assets.components import ReportModal, RemoveManage
+from assets.components import ReportModal
 from assets.dictionary import dictionary
 from functions import Botban, Command, Reminder
 from config import WEATHER
