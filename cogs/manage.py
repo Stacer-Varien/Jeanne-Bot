@@ -1308,23 +1308,20 @@ class Set_Group(GroupCog, name="set"):
             )
             return
 
-        await ctx.response.defer()
+        if levelmsg == True:
+            await ctx.response.send_modal(Levelmsg(channel))
+            return
 
-        if levelmsg == None or levelmsg == False:
-            await ctx.response.defer()
-            Manage(server=ctx.guild).add_level_channel(channel)
-            embed = Embed()
-            embed.description = (
+        await ctx.response.defer()
+        Manage(server=ctx.guild).add_level_channel(channel)
+        embed = Embed()
+        embed.description = (
                 "{} will post level updates when someone levels up".format(
                     channel.mention
                 )
             )
-            embed.color = Color.random()
-            await ctx.followup.send(embed=embed)
-            return
-
-        if levelmsg == True:
-            await ctx.response.send_modal(Levelmsg(channel))
+        embed.color = Color.random()
+        await ctx.followup.send(embed=embed)        
 
     @Jeanne.command(
         description="Change the brightness of your level and profile card background"
