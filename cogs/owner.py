@@ -94,11 +94,11 @@ class OwnerCog(Cog):
         fuser.set_image(url=user.display_avatar)
         if user.banner == None:
             await ctx.send(embed=fuser)
-        else:
-            userbanner = Embed(title="User Banner", color=0xCCFF33)
-            userbanner.set_image(url=user.banner)
+            return
+        userbanner = Embed(title="User Banner", color=0xCCFF33)
+        userbanner.set_image(url=user.banner)
 
-            await ctx.send(embeds=[fuser, userbanner])
+        await ctx.send(embeds=[fuser, userbanner])
 
     @command(aliases=["restart", "refresh"])
     @is_owner()
