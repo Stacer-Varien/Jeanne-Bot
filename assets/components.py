@@ -239,7 +239,9 @@ class Levelmsg(ui.Modal, title="Level Update Message"):
                 ("%server%", str(ctx.guild.name)),
                 ("%mention%", str(ctx.user.mention)),
                 ("%name%", str(ctx.user.name)),
-                ("%newlevel%", str(Levelling(ctx.user, ctx.guild).get_member_level())),
+                ("%newlevel%", str(Levelling(ctx.user, ctx.guild).get_member_level)),
+                ("%role%", str(ctx.user.top_role)),
+                ("%rolemention%", str(ctx.user.top_role.mention)),
             ]
         )
 
