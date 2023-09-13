@@ -5,6 +5,7 @@ from discord.ext.commands import Bot, GroupCog
 from assets.generators.profile_card import Profile
 from asyncio import get_event_loop
 from functools import partial
+from requests import exceptions
 from reactionmenu import ViewButton, ViewMenu
 
 
@@ -309,6 +310,13 @@ class Background_Group(GroupCog, name="background"):
                 color=Color.random(),
             )
             await ctx.response.send_message(embed=cooldown)
+            return
+
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, exceptions.MissingSchema
+        ):
+            embed = Embed(description="Invalid image URL", color=Color.red())
+            await ctx.edit_original_response(content=None, embed=embed)
 
     @Jeanne.command(description="Check which backgrounds you have")
     async def list(self, ctx: Interaction):
