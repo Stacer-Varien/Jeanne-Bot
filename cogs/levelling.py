@@ -47,7 +47,7 @@ class Rank_Group(GroupCog, name="rank"):
         embed = Embed(color=Color.random())
         embed.set_author(name="Global XP Leaderboard")
 
-        leaderboard = Levelling().get_global_rank()
+        leaderboard = Levelling().get_global_rank
 
         if leaderboard == None:
             embed.description = "No global leaderboard provided"
@@ -78,7 +78,7 @@ class Rank_Group(GroupCog, name="rank"):
         embed = Embed(color=Color.random())
         embed.set_author(name="Server XP Leaderboard")
 
-        leaderboard = Levelling(server=ctx.guild).get_server_rank()
+        leaderboard = Levelling(server=ctx.guild).get_server_rank
 
         if leaderboard == None:
             embed.description = "No server leaderboard provided"
