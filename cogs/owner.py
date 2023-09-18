@@ -11,6 +11,7 @@ from discord.ext.commands import (
 from discord import (
     ActivityType,
     Embed,
+    File,
     Game,
     Activity,
     Object,
@@ -137,7 +138,21 @@ class OwnerCog(Cog):
         if Botban(ctx.author).check_botbanned_user:
             return        
         Hentai().add_blacklisted_link(link)
-        await ctx.send("Link blacklisted", ephemeral=True)
+        await ctx.send("Link blacklisted")
+
+    @command(aliases=["db", "database"])
+    @is_owner()
+    async def senddb(self, ctx:Context):
+        with open('database.db', 'rb') as file:
+            try:
+                await ctx.author.send(file=File(file))
+            except:
+                content="""
+# ERROR!
+## Failed to send database! 
+        
+Make sure private messages between **me and you are opened** or check the server if the database exists"""
+                await ctx.send(content, delete_after=10)
 
     @command()
     @guild_only()
