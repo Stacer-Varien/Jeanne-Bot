@@ -421,7 +421,7 @@ class currency(Cog):
 
         if Currency(ctx.user).give_daily() == False:
             cooldown = Embed(
-                description=f"You have already claimed your daily.\nYour next claim is <t:{Currency(ctx.user).get_next_daily()}:R>",
+                description=f"You have already claimed your daily.\nYour next claim is <t:{Currency(ctx.user).get_next_daily}:R>",
                 color=Color.red(),
             )
             await ctx.followup.send(embed=cooldown)
