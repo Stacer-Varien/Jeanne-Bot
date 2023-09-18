@@ -95,34 +95,36 @@ class Embed_Group(GroupCog, name="embed"):
                 description="You are missing the JSON script or JSON file\nPlease use [Discohook](https://discohook.org/)"
             )
             await ctx.followup.send(embed=embed)
-        elif jsonscript and jsonfile:
+            return
+        if jsonscript and jsonfile:
             embed = Embed(
                 description="You are using both the JSON script and JSON file\nPlease use one"
             )
             await ctx.followup.send(embed=embed)
-        else:
-            if jsonscript and not jsonfile:
-                json = loads(jsonscript)
+            return
 
-            elif jsonfile and not jsonscript:
-                json_file = jsonfile.url
-                json_request = get(json_file)
-                json_content = json_request.content
-                json = loads(json_content)
+        if jsonscript and not jsonfile:
+            json = loads(jsonscript)
 
-            try:
-                content = json["content"]
-            except:
-                pass
+        elif jsonfile and not jsonscript:
+            json_file = jsonfile.url
+            json_request = get(json_file)
+            json_content = json_request.content
+            json = loads(json_content)
 
-            try:
-                embed = Embed.from_dict(json["embeds"][0])
-                await channel.send(content=content, embed=embed)
-            except:
-                await channel.send(content=content)
-            await ctx.followup.send(
-                content="Embed sent in {}".format(channel.mention), ephemeral=True
-            )
+        try:
+            content = json["content"]
+        except:
+            pass
+
+        try:
+            embed = Embed.from_dict(json["embeds"][0])
+            await channel.send(content=content, embed=embed)
+        except:
+            await channel.send(content=content)
+        await ctx.followup.send(
+            content="Embed sent in {}".format(channel.mention), ephemeral=True
+        )
 
     @Jeanne.command(
         description="Edits an embed message. This needs the Discohook.org embed generator"
@@ -156,44 +158,47 @@ class Embed_Group(GroupCog, name="embed"):
         except Exception as e:
             embed = Embed(description=e)
             await ctx.followup.send(embed=embed)
-        else:
-            if not jsonscript and not jsonfile:
-                embed = Embed(
-                    description="You are missing the JSON script or JSON file\nPlease use [Discohooks](https://discohook.org/)"
-                )
-                await ctx.followup.send(embed=embed)
-            elif jsonscript and jsonfile:
-                embed = Embed(
-                    description="You are using both the JSON script and JSON file\nPlease use one"
-                )
-                await ctx.followup.send(embed=embed)
-            else:
-                if jsonscript and not jsonfile:
-                    json = loads(jsonscript)
+            return
 
-                elif jsonfile and not jsonscript:
-                    json_file = jsonfile.url
-                    json_request = get(json_file)
-                    json_content = json_request.content
-                    json = loads(json_content)
+        if not jsonscript and not jsonfile:
+            embed = Embed(
+                description="You are missing the JSON script or JSON file\nPlease use [Discohooks](https://discohook.org/)"
+            )
+            await ctx.followup.send(embed=embed)
+            return
+        if jsonscript and jsonfile:
+            embed = Embed(
+                description="You are using both the JSON script and JSON file\nPlease use one"
+            )
+            await ctx.followup.send(embed=embed)
+            return
 
-                try:
-                    content = json["content"]
+        if jsonscript and not jsonfile:
+            json = loads(jsonscript)
 
-                    if content == "":
-                        content = None
-                except:
-                    pass
+        elif jsonfile and not jsonscript:
+            json_file = jsonfile.url
+            json_request = get(json_file)
+            json_content = json_request.content
+            json = loads(json_content)
 
-                try:
-                    embed = Embed.from_dict(json["embeds"][0])
-                    await message.edit(content=content, embed=embed)
-                except:
-                    await message.edit(content=content)
-                await ctx.followup.send(
-                    content="[Message]({}) edited".format(message.jump_url),
-                    ephemeral=True,
-                )
+        try:
+            content = json["content"]
+
+            if content == "":
+                content = None
+        except:
+            pass
+
+        try:
+            embed = Embed.from_dict(json["embeds"][0])
+            await message.edit(content=content, embed=embed)
+        except:
+            await message.edit(content=content)
+        await ctx.followup.send(
+            content="[Message]({}) edited".format(message.jump_url),
+            ephemeral=True,
+        )
 
 
 class ReminderCog(GroupCog, name="reminder"):
