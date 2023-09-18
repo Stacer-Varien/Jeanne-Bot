@@ -90,18 +90,19 @@ class BanCog(GroupCog, name="ban"):
                     ban.add_field(name="Reason", value=reason, inline=False)
                     ban.set_thumbnail(url=user.display_avatar)
 
-                    modlog_id = Logger(ctx.guild).get_modlog_channel()
+                    modlog_id = Logger(ctx.guild).get_modlog_channel
 
                     if modlog_id == None:
                         await ctx.edit_original_response(embed=ban, view=None)
-                    else:
-                        modlog = ctx.guild.get_channel(modlog_id)
-                        banned = Embed(
-                            description=f"{user} has been banned. Check {modlog.mention}",
-                            color=0xFF0000,
-                        )
-                        await ctx.edit_original_response(embed=banned, view=None)
-                        await modlog.send(embed=ban)
+                        return
+
+                    modlog = ctx.guild.get_channel(modlog_id)
+                    banned = Embed(
+                        description=f"{user} has been banned. Check {modlog.mention}",
+                        color=0xFF0000,
+                    )
+                    await ctx.edit_original_response(embed=banned, view=None)
+                    await modlog.send(embed=ban)
 
                 elif view.value == False:
                     cancelled = Embed(description="Ban cancelled", color=Color.red())
@@ -134,59 +135,64 @@ class BanCog(GroupCog, name="ban"):
         if member == ctx.user:
             failed = Embed(description="You can't ban yourself")
             await ctx.followup.send(embed=failed)
-        elif member.id == ctx.guild.owner.id:
+            return
+
+        if member.id == ctx.guild.owner.id:
             failed = Embed(
                 description="You can't ban the owner of the server...",
                 color=Color.red(),
             )
             await ctx.followup.send(embed=failed)
-        elif ctx.user.top_role.position < member.top_role.position:
+            return
+
+        if ctx.user.top_role.position < member.top_role.position:
             failed = Embed(
                 description="{}'s position is higher than you...".format(member),
                 color=Color.red(),
             )
             await ctx.followup.send(embed=failed)
-        else:
+            return
+
+        try:
+            banmsg = Embed(
+                description=f"You are banned from **{ctx.guild.name}** for **{reason}**"
+            )
+            await member.send(embed=banmsg)
+        except:
+            pass
+
+        reason = reason if reason else "Unspecified"
+
+        await member.ban(reason="{} | {}".format(reason, ctx.user))
+
+        ban = Embed(title="Member Banned", color=0xFF0000)
+        ban.add_field(name="Name", value=member, inline=True)
+        ban.add_field(name="ID", value=member.id, inline=True)
+        ban.add_field(name="Moderator", value=ctx.user, inline=True)
+        ban.add_field(name="Reason", value=reason, inline=False)
+        if time:
             try:
-                banmsg = Embed(
-                    description=f"You are banned from **{ctx.guild.name}** for **{reason}**"
-                )
-                await member.send(embed=banmsg)
+                a = parse_timespan(time)
+                Moderation(ctx.guild, member).softban_member(time)
+                time = format_timespan(a)
             except:
-                return
+                time = "Invalid time added. User is banned permanently!"
+            ban.add_field(name="Duration", value=time, inline=True)
+        ban.set_thumbnail(url=member.display_avatar)
 
-            if reason == None:
-                reason = "None"
+        modlog_id = Logger(ctx.guild).get_modlog_channel
 
-            await member.ban(reason="{} | {}".format(reason, ctx.user))
+        if modlog_id == None:
+            await ctx.followup.send(embed=ban)
+            return
 
-            ban = Embed(title="Member Banned", color=0xFF0000)
-            ban.add_field(name="Name", value=member, inline=True)
-            ban.add_field(name="ID", value=member.id, inline=True)
-            ban.add_field(name="Moderator", value=ctx.user, inline=True)
-            ban.add_field(name="Reason", value=reason, inline=False)
-            if time:
-                try:
-                    a = parse_timespan(time)
-                    Moderation(ctx.guild, member).softban_member(time)
-                    time = format_timespan(a)
-                except:
-                    time = "Invalid time added. User is banned permanently!"
-                ban.add_field(name="Duration", value=time, inline=True)
-            ban.set_thumbnail(url=member.display_avatar)
-
-            modlog_id = Logger(ctx.guild).get_modlog_channel()
-
-            if modlog_id == None:
-                await ctx.followup.send(embed=ban)
-            else:
-                modlog = ctx.guild.get_channel(modlog_id)
-                banned = Embed(
-                    description=f"{member} has been banned. Check {modlog.mention}",
-                    color=0xFF0000,
-                )
-                await ctx.followup.send(embed=banned)
-                await modlog.send(embed=ban)
+        modlog = ctx.guild.get_channel(modlog_id)
+        banned = Embed(
+            description=f"{member} has been banned. Check {modlog.mention}",
+            color=0xFF0000,
+        )
+        await ctx.followup.send(embed=banned)
+        await modlog.send(embed=ban)
 
     @user.error
     async def ban_user_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
@@ -224,17 +230,17 @@ class ListWarns(GroupCog, name="listwarns"):
         record = Moderation(ctx.guild).fetch_warnings_server()
         if record == None:
             await ctx.followup.send("No warnings up to date")
-        else:
-            embed = Embed(title=f"Currently warned members", colour=Color.red())
-            embed.description = ""
-            for i in record:
-                warned_member = await self.bot.fetch_user(i[0])
-                warn_points = i[2]
+            return
+        embed = Embed(title=f"Currently warned members", colour=Color.red())
+        embed.description = ""
+        for i in record:
+            warned_member = await self.bot.fetch_user(i[0])
+            warn_points = i[2]
 
-                embed.description += (
-                    f"**{warned_member}**\n**Warn points**: {warn_points}\n\n"
-                )
-            await ctx.followup.send(embed=embed)
+            embed.description += (
+                f"**{warned_member}**\n**Warn points**: {warn_points}\n\n"
+            )
+        await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="View warnings that a member has")
     @Jeanne.describe(member="Which member are you checking the warns?")
@@ -253,26 +259,26 @@ class ListWarns(GroupCog, name="listwarns"):
         record = Moderation(ctx.guild, member).fetch_warnings_user()
         if record == None:
             await ctx.followup.send(f"{member} has no warn IDs")
+            return
 
-        else:
-            embed = Embed(title=f"{member}'s warnings", colour=0xFF0000)
-            embed.description = ""
-            embed.set_thumbnail(url=member.display_avatar)
-            for i in record:
-                moderator = await self.bot.fetch_user(i[2])
-                reason = i[3]
-                warn_id = i[4]
-                date = i[5]
+        embed = Embed(title=f"{member}'s warnings", colour=0xFF0000)
+        embed.description = ""
+        embed.set_thumbnail(url=member.display_avatar)
+        for i in record:
+            moderator = await self.bot.fetch_user(i[2])
+            reason = i[3]
+            warn_id = i[4]
+            try:
+                date = f"<t:{i[5]}:F>"
+            except:
+                date = "None due to new update"
 
-                if date == None:
-                    date = "None due to new update"
-
-                embed.add_field(
-                    name=f"`{warn_id}`",
-                    value=f"**Moderator:** {moderator}\n**Reason:** {reason}\n**Date:** <t:{date}:F>",
-                    inline=False,
-                )
-            await ctx.followup.send(embed=embed)
+        embed.add_field(
+            name=f"`{warn_id}`",
+            value=f"**Moderator:** {moderator}\n**Reason:** {reason}\n**Date:** {date}",
+            inline=False,
+        )
+        await ctx.followup.send(embed=embed)
 
 
 class moderation(Cog):
@@ -334,48 +340,55 @@ class moderation(Cog):
                 color=Color.red(),
             )
             await ctx.followup.send(embed=failed)
-        elif member.id == ctx.guild.owner.id:
+            return
+        if member.id == ctx.guild.owner.id:
             failed = Embed(
                 description="You can't warn the owner of the server...",
                 color=Color.red(),
             )
             await ctx.followup.send(embed=failed)
-        elif member == ctx.user:
+            return
+        if member == ctx.user:
             failed = Embed(description="You can't warn yourself")
             await ctx.followup.send(embed=failed)
-        else:
-            reason = reason if reason else "Unspecified"
+            return
 
-            warn_id = f"{randint(0,100000)}"
-            date = round(datetime.now().timestamp())
-            Moderation(ctx.guild, member).warn_user(ctx.user.id, reason, warn_id, date)
+        reason = reason if reason else "Unspecified"
 
-            warn = Embed(title="Member warned", color=0xFF0000)
-            warn.add_field(name="Member", value=member, inline=True)
-            warn.add_field(name="ID", value=member.id, inline=True)
-            warn.add_field(name="Moderator", value=ctx.user, inline=True)
-            warn.add_field(name="Reason", value=reason, inline=False)
-            warn.add_field(name="Warn ID", value=warn_id, inline=True)
-            warn.add_field(name="Date", value="<t:{}:F>".format(date), inline=True)
-            warn.set_thumbnail(url=member.display_avatar)
+        warn_id = f"{randint(0,100000)}"
+        date = round(datetime.now().timestamp())
+        Moderation(ctx.guild, member).warn_user(ctx.user.id, reason, warn_id, date)
 
-            modlog_id = Logger(ctx.guild).get_modlog_channel()
+        warn = Embed(title="Member warned", color=0xFF0000)
+        warn.add_field(name="Member", value=member, inline=True)
+        warn.add_field(name="ID", value=member.id, inline=True)
+        warn.add_field(name="Moderator", value=ctx.user, inline=True)
+        warn.add_field(name="Reason", value=reason, inline=False)
+        warn.add_field(name="Warn ID", value=warn_id, inline=True)
+        warn.add_field(name="Date", value="<t:{}:F>".format(date), inline=True)
+        warn.set_thumbnail(url=member.display_avatar)
 
-            if modlog_id == None:
-                await ctx.followup.send(embed=warn)
-            else:
-                modlog = ctx.guild.get_channel(modlog_id)
-                warned = Embed(
-                    description=f"{member} has been warned. Check {modlog.mention}",
-                    color=0xFF0000,
-                )
-                await ctx.followup.send(embed=warned)
-                await modlog.send(embed=warn)
+        modlog_id = Logger(ctx.guild).get_modlog_channel
+
+        if modlog_id == None:
+            await ctx.followup.send(embed=warn)
+            return
+
+        modlog = ctx.guild.get_channel(modlog_id)
+        warned = Embed(
+            description=f"{member} has been warned. Check {modlog.mention}",
+            color=0xFF0000,
+        )
+        await ctx.followup.send(embed=warned)
+        await modlog.send(embed=warn)
 
     @Jeanne.command(description="Revoke a warn by warn ID")
-    @Jeanne.describe(warn_id="What is the warn ID you want to remove?")
+    @Jeanne.describe(
+        member="Which member got warned?",
+        warn_id="What is their warn ID you want to remove?",
+    )
     @Jeanne.checks.has_permissions(kick_members=True)
-    async def clearwarn(self, ctx: Interaction, warn_id: str):
+    async def clearwarn(self, ctx: Interaction, member: Member, warn_id: str):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.clearwarn.qualified_name):
@@ -385,32 +398,33 @@ class moderation(Cog):
             return
 
         await ctx.response.defer()
-        mod = Moderation(ctx.guild)
+        mod = Moderation(ctx.guild, member)
         result = mod.check_warn_id(warn_id)
 
         if result == None:
             await ctx.followup.send("Invalid warn ID")
+            return
 
-        else:
-            member = await ctx.guild.fetch_member(result[0])
-            Moderation(ctx.guild, member).revoke_warn(warn_id)
+        member = await ctx.guild.fetch_member(result[0])
+        mod.revoke_warn(warn_id)
 
-            revoked_warn = Embed(
-                title="Warn removed!",
-                description=f"{ctx.user} has revoked warn ID ({warn_id})",
-            )
+        revoked_warn = Embed(
+            title="Warn removed!",
+            description=f"{ctx.user} has revoked warn ID ({warn_id})",
+        )
 
-            modlog_id = Logger(ctx.guild).get_modlog_channel()
+        modlog_id = Logger(ctx.guild).get_modlog_channel
 
-            if modlog_id == None:
-                await ctx.followup.send(embed=revoked_warn)
-            else:
-                modlog = ctx.guild.get_channel(modlog_id)
-                revoke = Embed(
-                    description=f"Warn revoked. Check {modlog.mention}", color=0xFF0000
-                )
-                await modlog.send(embed=revoke)
-                await ctx.followup.send(embed=revoked_warn)
+        if modlog_id == None:
+            await ctx.followup.send(embed=revoked_warn)
+            return
+
+        modlog = ctx.guild.get_channel(modlog_id)
+        revoke = Embed(
+            description=f"Warn revoked. Check {modlog.mention}", color=0xFF0000
+        )
+        await modlog.send(embed=revoke)
+        await ctx.followup.send(embed=revoked_warn)
 
     @Jeanne.command(description="Kick a member out of the server")
     @Jeanne.describe(
@@ -436,52 +450,57 @@ class moderation(Cog):
         if member.id == ctx.user.id:
             failed = Embed(description="You can't kick yourself out")
             await ctx.followup.send(embed=failed)
-        elif ctx.user.top_role.position < member.top_role.position:
+            return
+        if ctx.user.top_role.position < member.top_role.position:
             failed = Embed(
                 description="{}'s position is higher than you...".format(member),
                 color=Color.red(),
             )
             await ctx.followup.send(embed=failed)
-        elif member.id == ctx.guild.owner.id:
+            return
+        if member.id == ctx.guild.owner.id:
             failed = Embed(
                 description="You cannot kick the owner of the server out...",
                 color=Color.red(),
             )
             await ctx.followup.send(embed=failed)
-        elif member == ctx.user:
+            return
+        if member == ctx.user:
             failed = Embed(description="You can't kick yourself out")
             await ctx.followup.send(embed=failed)
-        else:
-            reason = reason if reason else "Unspecified"
+            return
 
-            try:
-                kickmsg = Embed(
-                    description=f"You are kicked from **{ctx.guild.name}** for **{reason}**"
-                )
-                await member.send(embed=kickmsg)
-            except:
-                return
+        reason = reason if reason else "Unspecified"
 
-            await member.kick(reason="{} | {}".format(reason, ctx.user))
-            kick = Embed(title="Member Kicked", color=0xFF0000)
-            kick.add_field(name="Member", value=member, inline=True)
-            kick.add_field(name="ID", value=member.id, inline=True)
-            kick.add_field(name="Resposible Moderator", value=ctx.user, inline=True)
-            kick.add_field(name="Reason", value=reason, inline=True)
-            kick.set_thumbnail(url=member.display_avatar)
+        try:
+            kickmsg = Embed(
+                description=f"You are kicked from **{ctx.guild.name}** for **{reason}**"
+            )
+            await member.send(embed=kickmsg)
+        except:
+            pass
 
-            modlog_id = Logger(ctx.guild).get_modlog_channel()
+        await member.kick(reason="{} | {}".format(reason, ctx.user))
+        kick = Embed(title="Member Kicked", color=0xFF0000)
+        kick.add_field(name="Member", value=member, inline=True)
+        kick.add_field(name="ID", value=member.id, inline=True)
+        kick.add_field(name="Resposible Moderator", value=ctx.user, inline=True)
+        kick.add_field(name="Reason", value=reason, inline=True)
+        kick.set_thumbnail(url=member.display_avatar)
 
-            if modlog_id == None:
-                await ctx.followup.send(embed=kick)
-            else:
-                modlog = ctx.guild.get_channel(modlog_id)
-                kicked = Embed(
-                    description=f"{member} has been kicked. Check {modlog.mention}",
-                    color=0xFF0000,
-                )
-                await ctx.followup.send(embed=kicked)
-                await modlog.send(embed=kick)
+        modlog_id = Logger(ctx.guild).get_modlog_channel
+
+        if modlog_id == None:
+            await ctx.followup.send(embed=kick)
+            return
+
+        modlog = ctx.guild.get_channel(modlog_id)
+        kicked = Embed(
+            description=f"{member} has been kicked. Check {modlog.mention}",
+            color=0xFF0000,
+        )
+        await ctx.followup.send(embed=kicked)
+        await modlog.send(embed=kick)
 
     @Jeanne.command(description="Bulk delete messages")
     @Jeanne.describe(
@@ -513,9 +532,9 @@ class moderation(Cog):
                 return m.author == member
 
             await ctx.channel.purge(limit=limit, check=is_member)
+            return
 
-        else:
-            await ctx.channel.purge(limit=limit)
+        await ctx.channel.purge(limit=limit)
 
     @Jeanne.command(description="Change someone's nickname")
     @Jeanne.describe(member="Which member?", nickname="What is their new nickname")
@@ -576,18 +595,18 @@ class moderation(Cog):
         unban.add_field(name="Reason", value=reason, inline=False)
         unban.set_thumbnail(url=user.display_avatar)
 
-        modlog_id = Logger(ctx.guild).get_modlog_channel()
+        modlog_id = Logger(ctx.guild).get_modlog_channel
 
         if modlog_id == None:
             await ctx.followup.send(embed=unban)
-        else:
-            modlog = ctx.guild.get_channel(modlog_id)
-            unbanned = Embed(
-                description=f"{user} has been unbanned. Check {modlog.mention}",
-                color=0xFF0000,
-            )
-            await ctx.followup.send(embed=unbanned)
-            await modlog.send(embed=unban)
+            return
+        modlog = ctx.guild.get_channel(modlog_id)
+        unbanned = Embed(
+            description=f"{user} has been unbanned. Check {modlog.mention}",
+            color=0xFF0000,
+        )
+        await ctx.followup.send(embed=unbanned)
+        await modlog.send(embed=unban)
 
     @Jeanne.command(description="Timeout a member using Discord's timeout feature")
     @Jeanne.describe(
@@ -614,42 +633,41 @@ class moderation(Cog):
         await ctx.response.defer()
 
         if member == ctx.user:
-            failed = Embed(description="You can't mute yourself")
+            failed = Embed(description="You can't time yourself out")
             await ctx.followup.send(embed=failed)
 
-        else:
-            reason = reason if reason else "Unspecified"
+            return
+        reason = reason if reason else "Unspecified"
 
-            if time == None:
-                time = "28d"
-            elif parse_timespan(time) > 2505600.0:
-                time = "28d"
+        if not time or parse_timespan(time) > 2505600.0:
+            time = "28d"
 
-            timed = parse_timespan(time)
-            await member.edit(
-                timed_out_until=utcnow() + timedelta(seconds=timed),
-                reason="{} | {}".format(reason, ctx.user),
-            )
-            mute = Embed(title="Member Timeout", color=0xFF0000)
-            mute.add_field(name="Member", value=member, inline=True)
-            mute.add_field(name="ID", value=member.id, inline=True)
-            mute.add_field(name="Moderator", value=ctx.user, inline=True)
-            mute.add_field(name="Duration", value=time, inline=True)
-            mute.add_field(name="Reason", value=reason, inline=False)
-            mute.set_thumbnail(url=member.display_avatar)
+        timed = parse_timespan(time)
+        await member.edit(
+            timed_out_until=utcnow() + timedelta(seconds=timed),
+            reason="{} | {}".format(reason, ctx.user),
+        )
+        mute = Embed(title="Member Timeout", color=0xFF0000)
+        mute.add_field(name="Member", value=member, inline=True)
+        mute.add_field(name="ID", value=member.id, inline=True)
+        mute.add_field(name="Moderator", value=ctx.user, inline=True)
+        mute.add_field(name="Duration", value=time, inline=True)
+        mute.add_field(name="Reason", value=reason, inline=False)
+        mute.set_thumbnail(url=member.display_avatar)
 
-            modlog_id = Logger(ctx.guild).get_modlog_channel()
+        modlog_id = Logger(ctx.guild).get_modlog_channel
 
-            if modlog_id == None:
-                await ctx.followup.send(embed=mute)
-            else:
-                modlog = ctx.guild.get_channel(modlog_id)
-                muted = Embed(
-                    description=f"{member} has been muted. Check {modlog.mention}",
-                    color=0xFF0000,
-                )
-                await ctx.followup.send(embed=muted)
-                await modlog.send(embed=mute)
+        if modlog_id == None:
+            await ctx.followup.send(embed=mute)
+            return
+
+        modlog = ctx.guild.get_channel(modlog_id)
+        muted = Embed(
+            description=f"{member} has been muted. Check {modlog.mention}",
+            color=0xFF0000,
+        )
+        await ctx.followup.send(embed=muted)
+        await modlog.send(embed=mute)
 
     @timeout.error
     async def timeout_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
@@ -686,35 +704,36 @@ class moderation(Cog):
             return
 
         await ctx.response.defer()
-        reason = reason if reason else None
+        reason = reason if reason else "Unspecified"
 
         if member == ctx.user:
-            failed = Embed(description="You can't unmute yourself")
+            failed = Embed(description="You can't untime yourself out")
             await ctx.followup.send(embed=failed)
+            return
 
-        else:
-            await member.edit(
-                timed_out_until=None, reason="{} | {}".format(reason, ctx.user)
-            )
-            unmute = Embed(title="Member Untimeout", color=0xFF0000)
-            unmute.add_field(name="Member", value=member, inline=True)
-            unmute.add_field(name="ID", value=member.id, inline=True)
-            unmute.add_field(name="Moderator", value=ctx.user, inline=True)
-            unmute.add_field(name="Reason", value=reason, inline=False)
-            unmute.set_thumbnail(url=member.display_avatar)
+        await member.edit(
+            timed_out_until=None, reason="{} | {}".format(reason, ctx.user)
+        )
+        unmute = Embed(title="Member Untimeout", color=0xFF0000)
+        unmute.add_field(name="Member", value=member, inline=True)
+        unmute.add_field(name="ID", value=member.id, inline=True)
+        unmute.add_field(name="Moderator", value=ctx.user, inline=True)
+        unmute.add_field(name="Reason", value=reason, inline=False)
+        unmute.set_thumbnail(url=member.display_avatar)
 
-            modlog_id = Logger(ctx.guild).get_modlog_channel()
+        modlog_id = Logger(ctx.guild).get_modlog_channel
 
-            if modlog_id == None:
-                await ctx.followup.send(embed=unmute)
-            else:
-                modlog = ctx.guild.get_channel(modlog_id)
-                unmuted = Embed(
-                    description=f"{member} has been untimeouted. Check {modlog.mention}",
-                    color=0xFF0000,
-                )
-                await ctx.followup.send(embed=unmuted)
-                await modlog.send(embed=unmute)
+        if modlog_id == None:
+            await ctx.followup.send(embed=unmute)
+            return
+
+        modlog = ctx.guild.get_channel(modlog_id)
+        unmuted = Embed(
+            description=f"{member} has been untimeouted. Check {modlog.mention}",
+            color=0xFF0000,
+        )
+        await ctx.followup.send(embed=unmuted)
+        await modlog.send(embed=unmute)
 
     @Jeanne.command(description="Ban multiple members at once")
     @Jeanne.describe(
@@ -808,7 +827,7 @@ class moderation(Cog):
             else:
                 embed = Embed(description="No users were banned.", color=Color.red())
 
-            modlog_id = Logger(ctx.guild).get_modlog_channel()
+            modlog_id = Logger(ctx.guild).get_modlog_channel
             if modlog_id == None:
                 await ctx.edit_original_response(embed=embed)
                 return
@@ -935,7 +954,7 @@ class moderation(Cog):
             else:
                 embed = Embed(description="No users were unbanned.", color=Color.red())
 
-            modlog_id = Logger(ctx.guild).get_modlog_channel()
+            modlog_id = Logger(ctx.guild).get_modlog_channel
             if modlog_id == None:
                 await ctx.edit_original_response(embed=embed)
                 return
