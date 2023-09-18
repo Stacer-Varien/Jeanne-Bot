@@ -12,7 +12,7 @@ class LoggerCog(Cog):
         if not after.guild or after.author.bot:
             return
 
-        logger_id = Logger(after.guild).get_message_logger()
+        logger_id = Logger(after.guild).get_message_logger
 
         if not logger_id:
             return
@@ -51,7 +51,7 @@ class LoggerCog(Cog):
         if message.author.bot:
             return
 
-        logger_id = Logger(message.guild).get_message_logger()
+        logger_id = Logger(message.guild).get_message_logger
 
         if not logger_id:
             return
