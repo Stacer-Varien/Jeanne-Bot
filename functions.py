@@ -18,7 +18,7 @@ from discord import (
 from discord.ext.commands import Bot
 from requests import get
 from config import db, BB_WEBHOOK
-from typing import Optional, List
+from typing import Literal, Optional, List
 
 current_time = date.today()
 
@@ -32,7 +32,7 @@ class Botban:
         botbanned_data = db.execute(
             "SELECT * FROM botbannedData WHERE user_id = ?", (self.user.id,)
         ).fetchone()
-
+        db.commit()
         return botbanned_data is not None and self.user.id == botbanned_data[0]
 
     def add_botbanned_user(self, reason: str):
@@ -81,7 +81,7 @@ class Currency:
             "SELECT amount FROM bankData WHERE user_id = ?", (self.user.id,)
         ).fetchone()
 
-        return data[0] if data is not None else 0
+        return int(data[0]) if data else 0
 
     def add_qp(self, amount: int):
         cur = db.execute(
@@ -92,6 +92,7 @@ class Currency:
                 (current_time - timedelta(days=1)),
             ),
         )
+        db.commit()
 
         if cur.rowcount == 0:
             db.execute(
@@ -102,7 +103,7 @@ class Currency:
                 ),
             )
 
-        db.commit()
+            db.commit()
 
     def remove_qp(self, amount: int):
         db.execute(
@@ -115,12 +116,13 @@ class Currency:
 
         db.commit()
 
-    def give_daily(self):
+    def give_daily(self)->bool:
         current_time = datetime.now()
         next_claim = current_time + timedelta(days=1)
         data = db.execute(
             "SELECT * FROM bankData WHERE user_id = ?", (self.user.id,)
         ).fetchone()
+        db.commit()
 
         qp = 200 if datetime.today().weekday() >= 5 else 100
 
@@ -159,11 +161,13 @@ class Currency:
             return True
         return False
 
-    def get_next_daily(self):
+    @property
+    def get_next_daily(self)->int:
         data = db.execute(
             "SELECT claimed_date FROM bankData WHERE user_id = ?", (self.user.id,)
         ).fetchone()
-        return data[0] if data else None
+        db.commit()
+        return int(data[0]) if data else None
 
 
 class Inventory:
@@ -178,14 +182,14 @@ class Inventory:
         return data
 
     @staticmethod
-    def get_wallpaper(name: str):
+    def get_wallpaper(name: str) -> tuple[str, str, str]:
         wallpaper = db.execute(
             "SELECT * FROM wallpapers WHERE name = ?", (name,)
         ).fetchone()
         db.commit()
         return str(wallpaper[1]), str(wallpaper[2]), str(wallpaper[3])
 
-    def deselect_wallpaper(self):
+    def deselect_wallpaper(self)-> (Literal[True] | None):
         wallpaper = db.execute(
             "SELECT wallpaper FROM userWallpaperInventory WHERE user_id = ? AND selected = ?",
             (
@@ -243,7 +247,7 @@ class Inventory:
 
         Currency(self.user).remove_qp(1000)
 
-    def selected_wallpaper(self):
+    def selected_wallpaper(self) -> tuple[str, str, int, int]:
         wallpaper = db.execute(
             "SELECT * FROM userWallpaperInventory WHERE user_id = ? and selected = ?",
             (
@@ -284,14 +288,14 @@ class Inventory:
         db.commit()
 
     @property
-    def fetch_user_inventory(self) -> list | None:
+    def fetch_user_inventory(self) -> (list | None):
         wallpapers = db.execute(
             "SELECT * FROM userWallpaperInventory WHERE user_id = ?", (self.user.id,)
         ).fetchall()
 
         return wallpapers if wallpapers else None
 
-    def set_brightness(self, brightness: int):
+    def set_brightness(self, brightness: int)-> (Literal[False] | None):
         try:
             db.execute(
                 "UPDATE userWallpaperInventory SET brightness = ? WHERE user_id = ? AND selected = ?",
@@ -452,7 +456,7 @@ class Levelling:
         db.commit()
         return level[0] if level else 0
 
-    async def add_xp(self):
+    def add_xp(self):
         now_time = round(datetime.now().timestamp())
         next_time = round((datetime.now() + timedelta(minutes=2)).timestamp())
         if datetime.today().weekday() > 4:
@@ -555,7 +559,6 @@ class Levelling:
                 ),
             )
             db.commit()
-            await self.get_role_reward()
             return self.get_level_channel()
 
     def get_level_channel(self):
@@ -566,7 +569,7 @@ class Levelling:
 
         return data if data else None
 
-    async def get_role_reward(self):
+    def get_role_reward(self):
         data = db.execute(
             "SELECT * FROM levelRewardData WHERE server = ?",
             (
@@ -574,14 +577,10 @@ class Levelling:
             ),
         ).fetchone()
         db.commit()
-        if data == None:
-            return 
-        if self.get_member_level >= int(data[2]):
-            role = self.server.get_role(int(data[1]))
-            await self.member.add_roles(role)
-            return role, role.name, role.mention
+        return data if data else None
 
-    def get_server_rank(self):
+    @property
+    def get_server_rank(self)->(list | None):
         leaders_query = db.execute(
             "SELECT user_id FROM serverxpData WHERE guild_id = ? ORDER BY lvl DESC LIMIT 15;",
             (self.server.id,),
@@ -589,7 +588,8 @@ class Levelling:
         db.commit()
         return leaders_query.fetchall()
 
-    def get_global_rank(self):
+    @property
+    def get_global_rank(self)->(list | None):
         leaders_query = db.execute(
             "SELECT * FROM globalxpData ORDER BY lvl DESC LIMIT 15;"
         )
@@ -1109,7 +1109,8 @@ class Logger:
     def __init__(self, server: Optional[Guild] = None) -> None:
         self.server = server
 
-    def get_modlog_channel(self):
+    @property
+    def get_modlog_channel(self)->(int | None):
         data = db.execute(
             "SELECT channel_id FROM modlogData WHERE guild_id = ?", (self.server.id,)
         ).fetchone()
@@ -1117,7 +1118,8 @@ class Logger:
 
         return data[0] if data else None
 
-    def get_message_logger(self):
+    @property
+    def get_message_logger(self)->int:
         channel = db.execute(
             "SELECT channel FROM messageLogData WHERE server = ?", (self.server.id,)
         ).fetchone()
