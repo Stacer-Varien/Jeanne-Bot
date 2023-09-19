@@ -118,27 +118,25 @@ class levelling(Cog):
             ):
                 try:
                     lvl = await Levelling(message.author, message.guild).add_xp()
+                    
 
                     if lvl == None:
                         return
+                    
+                    channel, update=int(lvl[0]), str(lvl[1])
 
-                    if str(lvl[2]) == "0":
+                    if update == "0" or update == None:
                         msg = (
                             "{} has leveled up to `level {} and has earned {}`".format(
                                 message.author,
                                 Levelling(
                                     message.author, message.guild
-                                ).get_member_level(),
-                                Levelling(
-                                    message.author, message.guild
-                                ).get_role_reward()[2],
+                                ).get_member_level
                             )
                         )
-                        lvlup = await self.bot.fetch_channel(lvl[1])
+                        lvlup = await message.guild.fetch_channel(channel)
                         await lvlup.send(msg)
                         return
-
-                    msg: str = lvl[2]
 
                     def replace_all(text: str, dic: dict):
                         for i, j in dic.items():
@@ -160,28 +158,12 @@ class levelling(Cog):
                                     ).get_member_level
                                 ),
                             ),
-                            (
-                                "%role%",
-                                str(
-                                    await Levelling(
-                                        message.author, message.guild
-                                    ).get_role_reward() #needs more work
-                                ),
-                            ),
-                            (
-                                "%rolemention%",
-                                str(
-                                    Levelling(
-                                        message.author, message.guild
-                                    ).get_role_reward()[2]
-                                ),
-                            ),
                         ]
                     )
-                    json = loads(replace_all(msg, parameters))
+                    json = loads(replace_all(update, parameters))
                     msg = json["content"]
                     embed = Embed.from_dict(json["embeds"][0])
-                    lvlup = await self.bot.fetch_channel(int(lvl[1]))
+                    lvlup = await message.guild.fetch_channel(channel)
                     await lvlup.send(content=msg, embed=embed)
                 except AttributeError:
                     return
@@ -209,9 +191,9 @@ class levelling(Cog):
             glvl = memdata.get_user_level
             gexp = memdata.get_user_xp
 
-            bg = Inventory(member).selected_wallpaper()
-            grank = memdata.get_member_global_rank()
-            srank = memdata.get_member_server_rank()
+            bg = Inventory(member).selected_wallpaper
+            grank = memdata.get_member_global_rank
+            srank = memdata.get_member_server_rank
             rrank = get_richest(member)
 
             bio = Inventory(member).get_bio
@@ -219,15 +201,8 @@ class levelling(Cog):
 
             voted = await self.topggpy.get_user_vote(member.id)
 
-            brightness = bg[2]
-
-            try:
-                bg_image = bg[1]
-            except:
-                bg_image = ""
-
             args = {
-                "bg_image": bg_image,
+                "bg_image": (bg[1] if bg else ""),
                 "profile_image": str(member.avatar.with_format("png")),
                 "font_color": font_color,
                 "server_level": slvl,
@@ -245,7 +220,7 @@ class levelling(Cog):
                 "partner": member.id,
                 "balance": Currency(member).get_balance,
                 "bio": str(bio),
-                "brightness": brightness,
+                "brightness": (bg[2] if bg else 100),
             }
 
             func = partial(self.get_profile, args)
