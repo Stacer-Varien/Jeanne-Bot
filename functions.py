@@ -35,7 +35,7 @@ class Botban:
         db.commit()
         return botbanned_data is not None and self.user.id == botbanned_data[0]
 
-    def add_botbanned_user(self, reason: str):
+    async def add_botbanned_user(self, reason: str):
         db.execute(
             "INSERT OR IGNORE INTO botbannedData (user_id, reason) VALUES (?, ?)",
             (
@@ -83,7 +83,7 @@ class Currency:
 
         return int(data[0]) if data else 0
 
-    def add_qp(self, amount: int):
+    async def add_qp(self, amount: int):
         cur = db.execute(
             "INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)",
             (
@@ -105,7 +105,7 @@ class Currency:
 
             db.commit()
 
-    def remove_qp(self, amount: int):
+    async def remove_qp(self, amount: int):
         db.execute(
             "UPDATE bankData SET amount = amount - ? WHERE user_id = ?",
             (
@@ -116,7 +116,7 @@ class Currency:
 
         db.commit()
 
-    def give_daily(self)->bool:
+    async def give_daily(self)->bool:
         current_time = datetime.now()
         next_claim = current_time + timedelta(days=1)
         data = db.execute(
@@ -189,7 +189,7 @@ class Inventory:
         db.commit()
         return str(wallpaper[1]), str(wallpaper[2]), str(wallpaper[3])
 
-    def deselect_wallpaper(self)-> (Literal[True] | None):
+    async def deselect_wallpaper(self)-> (Literal[True] | None):
         wallpaper = db.execute(
             "SELECT wallpaper FROM userWallpaperInventory WHERE user_id = ? AND selected = ?",
             (
@@ -211,8 +211,8 @@ class Inventory:
         db.commit()
         return True
 
-    def add_user_wallpaper(self, name: str):
-        self.deselect_wallpaper()
+    async def add_user_wallpaper(self, name: str):
+        await self.deselect_wallpaper()
 
         wallpaper = self.get_wallpaper(name)
 
@@ -230,8 +230,8 @@ class Inventory:
 
         Currency(self.user).remove_qp(1000)
 
-    def add_user_custom_wallpaper(self, name: str, link: str):
-        self.deselect_wallpaper()
+    async def add_user_custom_wallpaper(self, name: str, link: str):
+        await self.deselect_wallpaper()
 
         db.execute(
             "INSERT OR IGNORE INTO userWallpaperInventory (user_id, wallpaper, link, brightness, selected) VALUES (?,?,?,?,?)",
@@ -264,20 +264,8 @@ class Inventory:
             int(wallpaper[4])
         ) if wallpaper else None
 
-    def use_wallpaper(self, name: str):
-        if self.deselect_wallpaper() == None:
-            db.execute(
-                "UPDATE userWallpaperInventory SET selected = ? WHERE wallpaper = ? AND user_id = ?",
-                (
-                    1,
-                    name,
-                    self.user.id,
-                ),
-            )
-            db.commit()
-            return
-        
-        self.deselect_wallpaper()
+    async def use_wallpaper(self, name: str):       
+        await self.deselect_wallpaper()
         db.execute(
             "UPDATE userWallpaperInventory SET selected = ? WHERE wallpaper = ? AND user_id = ?",
             (
@@ -289,14 +277,14 @@ class Inventory:
         db.commit()
 
     @property
-    def fetch_user_inventory(self) -> (list | None):
+    def get_user_inventory(self) -> (list | None):
         wallpapers = db.execute(
             "SELECT * FROM userWallpaperInventory WHERE user_id = ?", (self.user.id,)
         ).fetchall()
 
         return wallpapers if wallpapers else None
 
-    def set_brightness(self, brightness: int)-> (Literal[False] | None):
+    async def set_brightness(self, brightness: int)-> (Literal[False] | None):
         try:
             db.execute(
                 "UPDATE userWallpaperInventory SET brightness = ? WHERE user_id = ? AND selected = ?",
@@ -310,7 +298,7 @@ class Inventory:
         except:
             return False
 
-    def set_bio(self, bio: str):
+    async def set_bio(self, bio: str):
         cur = db.execute(
             "INSERT OR IGNORE INTO userBio (user_id, bio) VALUES (?,?)",
             (
@@ -330,7 +318,7 @@ class Inventory:
             db.commit()
 
     @property
-    def get_bio(self) -> str | None:
+    def get_bio(self) -> (str | None):
         data = db.execute(
             "SELECT bio FROM userBio WHERE user_id = ?", (self.user.id,)
         ).fetchone()
@@ -338,7 +326,7 @@ class Inventory:
 
         return str(data[0]) if data else None
 
-    def set_color(self, color: str):
+    async def set_color(self, color: str):
         cur = db.execute(
             "INSERT OR IGNORE INTO userBio (user_id, color) VALUES (?,?)",
             (
@@ -358,7 +346,7 @@ class Inventory:
             db.commit()
 
     @property
-    def get_color(self) -> str | None:
+    def get_color(self) -> (str | None):
         data = db.execute(
             "SELECT color FROM userBio WHERE user_id = ?", (self.user.id,)
         ).fetchone()
@@ -426,7 +414,7 @@ class Levelling:
         ).fetchone()
         db.commit()
 
-        return next_time[0] if next_time else round(datetime.now().timestamp)
+        return int(next_time[0]) if next_time else round(datetime.now().timestamp())
 
     @property
     def get_next_time_global(self) -> int:
@@ -435,7 +423,7 @@ class Levelling:
             (self.member.id,),
         ).fetchone()
         db.commit()
-        return next_time[0] if next_time else round(datetime.now().timestamp)
+        return int(next_time[0]) if next_time else round(datetime.now().timestamp())
 
     @property
     def get_member_level(self) -> int:
@@ -447,7 +435,7 @@ class Levelling:
             ),
         ).fetchone()
         db.commit()
-        return level[0] if level else 0
+        return int(level[0]) if level else 0
 
     @property
     def get_user_level(self) -> int:
@@ -455,9 +443,9 @@ class Levelling:
             "SELECT lvl FROM globalxpData WHERE user_id = ?", (self.member.id,)
         ).fetchone()
         db.commit()
-        return level[0] if level else 0
+        return int(level[0]) if level else 0
 
-    def add_xp(self)-> (tuple[int, str | None] |None):
+    async def add_xp(self)-> (tuple[int, str | None] |None):
         now_time = round(datetime.now().timestamp())
         next_time = round((datetime.now() + timedelta(minutes=2)).timestamp())
         if datetime.today().weekday() > 4:
@@ -659,7 +647,7 @@ class Manage:
     def __init__(self, server: Guild) -> None:
         self.server = server
 
-    def remove_blacklist(self, channel: TextChannel):
+    async def remove_blacklist(self, channel: TextChannel):
         db.execute(
             "DELETE FROM xpChannelData WHERE server = ? AND channel = ?",
             (
@@ -669,7 +657,7 @@ class Manage:
         )
         db.commit()
 
-    def add_level_channel(
+    async def add_level_channel(
         self, channel: TextChannel, message: Optional[str] = None
     ) -> None:
         message = message if message else None
@@ -704,7 +692,7 @@ class Manage:
                 )
                 db.commit()
 
-    def add_xpblacklist(self, channel: TextChannel):
+    async def add_xpblacklist(self, channel: TextChannel):
         db.execute(
             "INSERT OR IGNORE INTO xpChannelData (server, channel) VALUES (?,?)",
             (
@@ -714,7 +702,7 @@ class Manage:
         )
         db.commit()
 
-    def add_role_reward(self, role: Role, level: int):
+    async def add_role_reward(self, role: Role, level: int):
         data = db.execute(
             "INSERT OR IGNORE INTO levelRewardData (server, role, level) VALUES (?,?,?)",
             (
@@ -735,7 +723,7 @@ class Manage:
             )
             db.commit()
 
-    def remove_role_reward(self, role: Role)->(Literal[True]|None):
+    async def remove_role_reward(self, role: Role)->(Literal[True]|None):
         data = db.execute(
             "SELECT role FROM levelRewardData WHERE server = ?", (self.server.id,)
         ).fetchone()
@@ -753,7 +741,7 @@ class Manage:
         db.commit()
         return True
 
-    def set_welcomer_msg(self, json_script: str):
+    async def set_welcomer_msg(self, json_script: str):
         cur = db.execute(
             "INSERT OR IGNORE INTO serverData (server, welcoming_message, leaving_message) VALUES (?,?,?)",
             (
@@ -774,7 +762,7 @@ class Manage:
             )
             db.commit()
 
-    def set_leaving_msg(self, json_script: str):
+    async def set_leaving_msg(self, json_script: str):
         cur = db.execute(
             "INSERT OR IGNORE INTO serverData (server, welcoming_message, leaving_message) VALUES (?,?,?)",
             (
@@ -795,27 +783,7 @@ class Manage:
             )
             db.commit()
 
-    def set_message_logger(self, channel: TextChannel):
-        cur = db.execute(
-            "INSERT OR IGNORE INTO serverData (server, messagelog) VALUES (?,?)",
-            (
-                self.server.id,
-                channel.id,
-            ),
-        )
-        db.commit()
-
-        if cur.rowcount == 0:
-            db.execute(
-                "UPDATE serverData SET messagelog = ? WHERE server = ?",
-                (
-                    channel.id,
-                    self.server.id,
-                ),
-            )
-        db.commit()
-
-    def set_welcomer(self, channel:TextChannel):
+    async def set_welcomer(self, channel:TextChannel):
         cursor = db.execute(
             "INSERT OR IGNORE INTO serverData (server, welcoming_channel) VALUES (?,?)",
             (
@@ -834,7 +802,7 @@ class Manage:
             )
             db.commit()
 
-    def set_leaver(self, channel:TextChannel):
+    async def set_leaver(self, channel:TextChannel):
         cursor = db.execute(
             "INSERT OR IGNORE INTO serverData (server, leaving_channel) VALUES (?,?)",
             (
@@ -853,7 +821,7 @@ class Manage:
             )
         db.commit()
 
-    def set_modloger(self, channel: TextChannel):
+    async def set_modloger(self, channel: TextChannel):
         cursor = db.execute(
             "INSERT OR IGNORE INTO serverData (server, modlog) VALUES (?,?)",
             (
@@ -873,55 +841,50 @@ class Manage:
             )
             db.commit()
 
-    def remove_welcomer(self):
-        db.execute("DELETE FROM serverData WHERE server = ?", (self.server.id,))
+    async def remove_welcomer(self):
+        db.execute("UPDATE serverData SET welcoming_channel = ? WHERE server = ?", (None, self.server.id,))
         db.commit()
 
-    def remove_leaver(self):
-        db.execute("DELETE FROM serverData WHERE server = ?", (self.server.id,))
+    async def remove_leaver(self):
+        db.execute("UPDATE serverData SET leaving_channel = ? WHERE server = ?", (None, self.server.id,))
         db.commit()
 
-    def remove_modloger(self):
-        db.execute("DELETE FROM serverData WHERE server = ?", (self.server.id,))
+    async def remove_modloger(self):
+        db.execute("UPDATE serverData SET modlog = ? WHERE server = ?", (None, self.server.id,))
         db.commit()
 
-    def remove_levelup(self):
+    async def remove_levelup(self):
         db.execute(
-            "DELETE FROM serverData WHERE server = ?", (self.server.id,)
+            "UPDATE serverData SET levelup_channel = ? WHERE server = ?", (None, self.server.id,)
         )
 
         db.commit()
 
-    def remove_welcomemsg(self):
+    async def remove_welcomemsg(self):
         db.execute(
             "UPDATE serverData SET welcoming_message = ? WHERE server = ?",
             (
-                0,
+                None,
                 self.server.id,
             ),
         )
         db.commit()
 
-    def remove_leavingmsg(self):
+    async def remove_leavingmsg(self):
         db.execute(
             "UPDATE serverData SET leaving_message = ? WHERE server = ?",
             (
-                0,
+                None,
                 self.server.id,
             ),
         )
         db.commit()
-
-    def remove_messagelog(self):
-        db.execute("DELETE FROM serverData WHERE server = ?", (self.server.id,))
-        db.commit()
-
 
 class Command:
     def __init__(self, server: Guild) -> None:
         self.server = server
 
-    def check_disabled(self, command: str):
+    def check_disabled(self, command: str)->(str|None):
         data = db.execute(
             "SELECT command FROM disabledCommandsData WHERE server = ? AND command = ?",
             (
@@ -933,7 +896,7 @@ class Command:
 
         return str(data[0]) if data else None
 
-    def disable(self, command: str):
+    async def disable(self, command: str):
         db.execute(
             "INSERT OR IGNORE INTO disabledCommandsData (server, command) VALUES (?,?)",
             (
@@ -943,7 +906,7 @@ class Command:
         )
         db.commit()
 
-    def enable(self, command: str):
+    async def enable(self, command: str):
         db.execute(
             "DELETE FROM disabledCommandsData WHERE server = ? AND command = ?",
             (
@@ -965,17 +928,15 @@ class Command:
 
 class Moderation:
     def __init__(
-        self, server: Optional[Guild] = None, member: Optional[Member] = None
-    ) -> None:
+        self, server: Optional[Guild] = None) -> None:
         self.server = server
-        self.member = member
 
-    def warn_user(self, moderator: int, reason: str, warn_id: int, date: int):
+    async def warn_user(self, member:Member,moderator: int, reason: str, warn_id: int, date: int):
         db.execute(
             "INSERT OR IGNORE INTO warnData (guild_id, user_id, moderator_id, reason, warn_id, date) VALUES (?,?,?,?,?,?)",
             (
                 self.server.id,
-                self.member.id,
+                member.id,
                 moderator,
                 reason,
                 warn_id,
@@ -986,20 +947,19 @@ class Moderation:
 
         cur = db.execute(
             "INSERT OR IGNORE INTO warnDatav2 (guild_id, user_id, warn_points) VALUES (?,?,?)",
-            (self.server.id, self.member.id, 1),
+            (self.server.id, member.id, 1,),
         )
         db.commit()
 
         if cur.rowcount == 0:
             db.execute(
                 "UPDATE warnDatav2 SET warn_points = warn_points + ? WHERE guild_id = ? and user_id = ?",
-                (1, self.server.id, self.member.id),
+                (1, self.server.id, member.id,),
             )
             db.commit()
 
-    def fetch_warnings_server(self):
-        cur = db.cursor()
-        warnings = cur.execute(
+    def fetch_warnings_server(self)-> (list|None):
+        warnings = db.execute(
             "SELECT * FROM warnDATAv2 WHERE guild_id = ?", (self.server.id,)
         ).fetchall()
         db.commit()
@@ -1008,12 +968,12 @@ class Moderation:
 
         return warnings
 
-    def fetch_warnings_user(self):
+    def fetch_warnings_user(self, member:Member)->(list|None):
         cur = db.cursor()
         warnings = cur.execute(
             "SELECT * FROM warnDATA user WHERE user_id = ? AND guild_id = ?",
             (
-                self.member.id,
+                member.id,
                 self.server.id,
             ),
         ).fetchall()
@@ -1024,50 +984,48 @@ class Moderation:
 
         return warnings
 
-    def check_warn_id(self, warn_id: int):
-        cur = db.cursor()
-        cur.execute(
-            "SELECT * FROM warnData WHERE guild_id = ? AND warn_id = ?",
+    def check_warn_id(self, warn_id: int)->(int|None):
+        data=db.execute(
+            "SELECT warn_id FROM warnData WHERE guild_id = ? AND warn_id = ?",
             (
                 self.server.id,
                 warn_id,
             ),
         )
-        result = cur.fetchone()
+        result = data.fetchone()
         db.commit()
 
-        return result if result else None
+        return int(result[0]) if result else None
 
-    def revoke_warn(self, warn_id: int):
-        cur = db.cursor()
-        cur.execute("DELETE FROM warnData WHERE warn_id = ?", (warn_id,))
+    async def revoke_warn(self, member:Member, warn_id: int):
+        db.execute("DELETE FROM warnData WHERE warn_id = ?", (warn_id,))
         db.commit()
 
-        cur.execute(
+        db.execute(
             "UPDATE warnDatav2 SET warn_points = warn_points - ? WHERE user_id = ? AND guild_id = ?",
             (
                 1,
-                self.member.id,
+                member.id,
                 self.server.id,
             ),
         )
         db.commit()
 
-        wp_query = cur.execute(
+        wp_query = db.execute(
             f"SELECT warn_points FROM warnDatav2 WHERE user_id = ? AND guild_id = ?",
             (
-                self.member.id,
+                member.id,
                 self.server.id,
             ),
         )
-        warnpoints = wp_query.fetchone()[0]
+        warnpoints:int = wp_query.fetchone()[0]
         db.commit()
 
         if warnpoints == 0:
-            cur.execute(
+            db.execute(
                 f"DELETE FROM warnDatav2 WHERE user_id = ? AND guild_id = ?",
                 (
-                    self.member.id,
+                    member.id,
                     self.server.id,
                 ),
             )
@@ -1079,29 +1037,29 @@ class Moderation:
         db.commit()
         return data
 
-    def softban_member(self, ends: str = None):
+    async def softban_member(self, member:Member, ends: int = None):
         if ends == None:
             ends = 99999999999  # infinite value for now
         else:
             seconds = parse_timespan(ends)
-            ends = round((datetime.now() + timedelta(seconds=seconds)).timestamp())
+            ending = round((datetime.now() + timedelta(seconds=seconds)).timestamp())
 
         db.execute(
             "INSERT OR IGNORE INTO softbannedMembers (user_id, guild_id, ends) VALUES (?,?,?)",
             (
-                self.member.id,
+                member.id,
                 self.server.id,
-                ends,
+                ending,
             ),
         )
 
         db.commit()
 
-    def remove_softban(self):
+    def remove_softban(self, member:Member):
         db.execute(
             "DELETE FROM softbannedMembers WHERE user_id = ? AND guild_id = ?",
             (
-                self.member.id,
+                member.id,
                 self.server.id,
             ),
         )
@@ -1121,59 +1079,57 @@ class Logger:
 
         return data[0] if data else None
 
-    @property
-    def get_message_logger(self)->int:
-        channel = db.execute(
-            "SELECT messagelog FROM serverData WHERE server = ?", (self.server.id,)
-        ).fetchone()
-        db.commit()
-        return int(channel[0]) if channel else None
+
 
 
 class Welcomer:
     def __init__(self, server: Guild) -> None:
         self.server = server
-
-    def get_welcomer(self):
+    
+    @property
+    def get_welcomer(self)-> (int | None):
         data = db.execute(
-            "SELECT * FROM serverData where server = ?", (self.server.id,)
+            "SELECT welcoming_channel FROM serverData where server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
-        return data if data else None
-
-    def get_leaver(self):
+        return int(data[0]) if data else None
+    
+    @property
+    def get_leaver(self)-> (int | None):
         data = db.execute(
-            "SELECT * FROM serverData where server = ?", (self.server.id,)
+            "SELECT leaving_channel FROM serverData where server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
-        return data if data else None
-
-    def get_welcoming_msg(self):
+        return int(data[0]) if data else None
+    
+    @property
+    def get_welcoming_msg(self) -> (int | None):
         data = db.execute(
-            "SELECT welcoming FROM serverData WHERE server = ?", (self.server.id,)
+            "SELECT welcoming_message FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
-        return data[0] if data else None
-
-    def get_leaving_msg(self):
+        return int(data[0]) if data else None
+    
+    @property
+    def get_leaving_msg(self)-> (int | None):
         data = db.execute(
-            "SELECT leaving FROM serverData WHERE server = ?", (self.server.id,)
+            "SELECT leaving_message FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
-        return data[0] if data else None
+        return int(data[0]) if data else None
 
-
-def get_cached_users():
+@property
+def get_cached_users()->int:
     data = db.execute("SELECT * FROM globalxpData").fetchall()
     return len(data)
 
-
-def get_true_members():
+@property
+def get_true_members()->int:
     data = db.execute("SELECT * FROM bankData").fetchall()
     return len(data)
 
 
-def get_richest(member: Member):
+def get_richest(member: Member) ->int:
     try:
         result = db.execute(
             "SELECT user_id FROM bankData ORDER BY amount DESC"
@@ -1238,7 +1194,7 @@ class Hentai:
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
-                nsfw_images = await resp.json()
+                nsfw_images:dict = await resp.json()
 
         if not nsfw_images:
             return None
@@ -1250,7 +1206,7 @@ class Hentai:
 
         shuffle(nsfw_images_list)
 
-        if not tags:
+        if not tags or tags == None:
             tags = ""
 
         tags_list = [
@@ -1264,8 +1220,8 @@ class Hentai:
 
         filtered_images = []
         for image in nsfw_images_list:
-            tags = image["tags"].lower().split(" ")
-            urls = image["file_url"]
+            tags = str(image["tags"]).lower().split(" ")
+            urls = str(image["file_url"])
             if any(tag in self.blacklisted_tags for tag in tags):
                 continue
             if any(url in set(bl) for url in urls):
@@ -1453,9 +1409,9 @@ class AutoCompleteChoices:
     async def get_all_wallpapers(self, ctx:Interaction, current:str)->List[Jeanne.Choice[str]]:
         wallpapers=Inventory.fetch_wallpapers()
         return [
-            Jeanne.Choice(name=image[1], value=image[1])
+            Jeanne.Choice(name=image[0], value=image[0])
             for image in wallpapers
-            if current.lower() in str(image[1]).lower()
+            if current.lower() in str(image[0]).lower()
         ]
 
 
