@@ -2,7 +2,6 @@ from discord.ext.commands import Bot, when_mentioned_or
 from discord import Intents, AllowedMentions
 from os import listdir
 from config import TOKEN
-from assets.handler import handler
 
 
 class Jeanne(Bot):
@@ -38,4 +37,4 @@ async def on_ready():
     print("Bot ID: {}".format(bot.user.id))
 
 
-bot.run(TOKEN, log_handler=handler())
+bot.run(TOKEN)
