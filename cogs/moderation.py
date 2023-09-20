@@ -388,7 +388,7 @@ class moderation(Cog):
         warn_id="What is their warn ID you want to remove?",
     )
     @Jeanne.checks.has_permissions(kick_members=True)
-    async def clearwarn(self, ctx: Interaction, member: Member, warn_id: str):
+    async def clearwarn(self, ctx: Interaction, member: Member, warn_id: int):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.clearwarn.qualified_name):
