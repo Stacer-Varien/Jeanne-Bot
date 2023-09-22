@@ -209,20 +209,24 @@ class ReminderCog(GroupCog, name="reminder"):
 
     @tasks.loop(seconds=10)
     async def check_reminders(self):
-        for reminder in Reminder().get_all_reminders():
-            if int(round(datetime.now().timestamp())) > int(reminder[2]):
-                member = await self.bot.fetch_user(reminder[0])
-                id = reminder[1]
-                reason = reminder[3]
-                try:
-                    embed = Embed(title="Reminder ended", color=Color.random())
-                    embed.add_field(name="Reminder", value=reason, inline=False)
-                    await member.send(embed=embed)
-                except:
-                    pass
-                Reminder(member).remove(id)
-            else:
-                continue
+        data=Reminder().get_all_reminders
+        if data == None:
+            return
+        for reminder in data:
+                if int(round(datetime.now().timestamp())) > int(reminder[2]):
+                    member = await self.bot.fetch_user(reminder[0])
+                    id = reminder[1]
+                    reason = reminder[3]
+                    try:
+                        embed = Embed(title="Reminder ended", color=Color.random())
+                        embed.add_field(name="Reminder", value=reason, inline=False)
+                        await member.send(embed=embed)
+                    except:
+                        pass
+                    Reminder(member).remove(id)
+                else:
+                    continue
+
 
     @Jeanne.command(description="Add a reminder")
     @Jeanne.describe(
