@@ -36,5 +36,4 @@ async def on_ready():
     print("Connected to bot: {}".format(bot.user.name))
     print("Bot ID: {}".format(bot.user.id))
 
-
 bot.run(TOKEN)
