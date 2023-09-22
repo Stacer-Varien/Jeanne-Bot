@@ -7,7 +7,7 @@ import lxml.etree as ET
 from os import listdir, path
 
 
-def get_saber_pic():
+def get_saber_pic()->tuple[Embed,File]:
     folder_path=SABER
     files = listdir(folder_path)
 
@@ -21,7 +21,7 @@ def get_saber_pic():
 
 
 
-def get_jeanne_pic():
+def get_jeanne_pic()->tuple[Embed,File]:
     folder_path=JEANNE
     files = listdir(folder_path)
 
@@ -36,7 +36,7 @@ def get_jeanne_pic():
     return embed, file
 
 
-def get_wallpaper_pic():
+def get_wallpaper_pic()->str:
     url = f"https://api.imgur.com/3/album/{WALLPAPER}/images"
     payload = {}
     files = {}
@@ -44,10 +44,10 @@ def get_wallpaper_pic():
     response = requests.request("GET", url, headers=headers, data=payload, files=files)
     json = loads(response.text)
     pick_link = choice(json["data"])["link"]
-    return pick_link
+    return str(pick_link)
 
 
-def get_medusa_pic():
+def get_medusa_pic()->tuple[Embed, File]:
     folder_path=MEDUSA
     files = listdir(folder_path)
 
@@ -60,7 +60,7 @@ def get_medusa_pic():
     return embed, file
 
 
-def get_animeme_pic():
+def get_animeme_pic()->str:
     url = f"https://api.imgur.com/3/album/{ANIMEME}/images"
     payload = {}
     files = {}
@@ -68,10 +68,10 @@ def get_animeme_pic():
     response = requests.request("GET", url, headers=headers, data=payload, files=files)
     json = loads(response.text)
     pick_link = choice(json["data"])["link"]
-    return pick_link
+    return str(pick_link)
 
 
-def safebooru_pic():
+def safebooru_pic()->str:
     response = requests.get(
         "https://safebooru.org/index.php?page=dapi&s=post&q=index&limit=100&tags=-rating:questionable+-animated+score:>=10"
     ).text.encode("utf-8")
@@ -79,4 +79,4 @@ def safebooru_pic():
     tree = ET.ElementTree(ET.fromstring(response, parser=parser))
     root = tree.getroot()
     image = choice(root).attrib["file_url"]
-    return image
+    return str(image)
