@@ -96,7 +96,7 @@ class nsfw(Cog):
 
         try:
             view = ReportContent(image)
-            if image.endswith("mp4"):
+            if str(image).endswith("mp4"):
                 await ctx.followup.send(image, view=view)
                 return
 
@@ -112,8 +112,8 @@ class nsfw(Cog):
 
             if view.value == None:
                 await ctx.edit_original_response(view=None)
-        except Exception:
-            if image.endswith("mp4"):
+        except:
+            if str(image).endswith("mp4"):
                 await ctx.followup.send(image)
                 return
 
@@ -165,7 +165,7 @@ class nsfw(Cog):
 
         if tag == "02":
             await ctx.followup.send(
-                "Tag has been blacklisted due to it returning extreme content and guro"
+                "Tag has been blacklisted due to it returning extreme content"
             )
             return
 
