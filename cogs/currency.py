@@ -36,7 +36,7 @@ class Guess_Group(GroupCog, name="guess"):
         answer = randint(1, 10)
 
         if number == answer:
-            Currency(ctx.user).add_qp(20)
+            await Currency(ctx.user).add_qp(20)
 
             correct = Embed(
                 description="YES! YOU GUESSED IT CORRECTLY!\nYou have been given 20 <:quantumpiece:980772736861343774>!",
@@ -90,7 +90,7 @@ class Guess_Group(GroupCog, name="guess"):
         answer = randint(1, 10)
 
         if number == answer:
-            Currency(ctx.user).add_qp(bet)
+            await Currency(ctx.user).add_qp(bet)
             correct = Embed(
                 description=f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given {bet} <:quantumpiece:980772736861343774>!",
                 color=Color.random(),
@@ -156,7 +156,7 @@ class Dice_Group(GroupCog, name="dice"):
         await ctx.response.defer()
         rolled = randint(1, 6)
         if digit == rolled:
-            Currency(ctx.user).add_qp(20)
+            await Currency(ctx.user).add_qp(20)
             embed = Embed(color=Color.random())
             embed.add_field(
                 name=f"YAY! You got it!\n20 <:quantumpiece:980772736861343774> has been added",
@@ -206,7 +206,7 @@ class Dice_Group(GroupCog, name="dice"):
             return
 
         if rolled == digit:
-            Currency(ctx.user).add_qp(bet)
+            await Currency(ctx.user).add_qp(bet)
             embed = Embed(color=Color.random())
             embed.add_field(
                 name="YAY! You got it!\n20 <:quantumpiece:980772736861343774> has been added",
@@ -216,7 +216,7 @@ class Dice_Group(GroupCog, name="dice"):
             await ctx.followup.send(embed=embed)
             return
 
-        Currency(ctx.user).remove_qp(bet)
+        await Currency(ctx.user).remove_qp(bet)
         embed = Embed(color=Color.red())
         embed = Embed(description=f"Oh no. It rolled a **{rolled}**", color=Color.red())
         await ctx.followup.send(embed=embed)
@@ -276,7 +276,7 @@ class Flip_Group(GroupCog, name="flip"):
         await view.wait()
 
         if view.value == jeannes_pick:
-            Currency(ctx.user).add_qp(20)
+            await Currency(ctx.user).add_qp(20)
 
             embed = Embed(
                 description="YAY! You got it!\n20 <:quantumpiece:980772736861343774> has been added",
@@ -340,7 +340,7 @@ class Flip_Group(GroupCog, name="flip"):
         await view.wait()
 
         if view.value == jeannes_pick:
-            Currency(ctx.user).add_qp(bet)
+            await Currency(ctx.user).add_qp(bet)
 
             embed = Embed(
                 description="YAY! You got it!\n{} <:quantumpiece:980772736861343774> has been added".format(
@@ -352,7 +352,7 @@ class Flip_Group(GroupCog, name="flip"):
             return
 
         if view.value != jeannes_pick:
-            Currency(ctx.user).remove_qp(int(bet))
+            await Currency(ctx.user).remove_qp(int(bet))
             embed = Embed(color=Color.red())
             embed = Embed(
                 description="Oh no, it was {}\nI'm afraid that I have to take {} <:quantumpiece:980772736861343774> from you".format(
@@ -419,7 +419,7 @@ class currency(Cog):
 
         tomorrow = round((datetime.now() + timedelta(days=1)).timestamp())
 
-        if Currency(ctx.user).give_daily() == False:
+        if await Currency(ctx.user).give_daily() == False:
             cooldown = Embed(
                 description=f"You have already claimed your daily.\nYour next claim is <t:{Currency(ctx.user).get_next_daily}:R>",
                 color=Color.red(),
@@ -427,7 +427,7 @@ class currency(Cog):
             await ctx.followup.send(embed=cooldown)
             return
 
-        Currency(ctx.user).give_daily()
+        await Currency(ctx.user).give_daily()
         balance = Currency(ctx.user).get_balance
 
         daily = Embed(
