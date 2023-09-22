@@ -480,11 +480,12 @@ class moderation(Cog):
         except:
             pass
 
-        await member.kick(reason="{} | {}".format(reason, ctx.user))
+        #await member.kick(reason="{} | {}".format(reason, ctx.user))
+        await ctx.guild.kick(member, reason="{} | {}".format(reason, ctx.user))
         kick = Embed(title="Member Kicked", color=0xFF0000)
         kick.add_field(name="Member", value=member, inline=True)
         kick.add_field(name="ID", value=member.id, inline=True)
-        kick.add_field(name="Resposible Moderator", value=ctx.user, inline=True)
+        kick.add_field(name="Moderator", value=ctx.user, inline=True)
         kick.add_field(name="Reason", value=reason, inline=True)
         kick.set_thumbnail(url=member.display_avatar)
 
@@ -499,8 +500,9 @@ class moderation(Cog):
             description=f"{member} has been kicked. Check {modlog.mention}",
             color=0xFF0000,
         )
-        await ctx.followup.send(embed=kicked)
         await modlog.send(embed=kick)
+        await ctx.followup.send(embed=kicked)
+        
 
     @Jeanne.command(description="Bulk delete messages")
     @Jeanne.describe(
