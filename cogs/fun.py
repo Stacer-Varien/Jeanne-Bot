@@ -80,7 +80,7 @@ class fun(Cog):
         await ctx.response.defer()
         filtered_words = ["riffak", "reggin", "aggin"]
         if any(word in text for word in filtered_words):
-            Botban(ctx.user).add_botbanned_user(
+            await Botban(ctx.user).add_botbanned_user(
                 "Using the reversed version of a common racial slur"
             )
             return
@@ -163,7 +163,7 @@ class fun(Cog):
         await ctx.response.defer()
         perc = randint(0, 100)
 
-        member = ctx.user if member is None else member
+        member = member if member else ctx.user
 
         simp = Embed(
             description="{}'s simp rate is {}%".format(member, perc),
@@ -191,7 +191,7 @@ class fun(Cog):
         await ctx.response.defer()
         perc = randint(0, 100)
 
-        member = ctx.user if member is None else member
+        member = member if member else ctx.user
 
         gay = Embed(
             description="{}'s gay rate is {}%".format(member, perc),
