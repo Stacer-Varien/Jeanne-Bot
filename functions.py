@@ -1055,7 +1055,7 @@ class Moderation:
 
         db.commit()
 
-    def remove_softban(self, member:Member):
+    async def remove_softban(self, member:Member):
         db.execute(
             "DELETE FROM softbannedMembers WHERE user_id = ? AND guild_id = ?",
             (
@@ -1118,12 +1118,12 @@ class Welcomer:
         db.commit()
         return int(data[0]) if data else None
 
-@property
+
 def get_cached_users()->int:
     data = db.execute("SELECT * FROM globalxpData").fetchall()
     return len(data)
 
-@property
+
 def get_true_members()->int:
     data = db.execute("SELECT * FROM bankData").fetchall()
     return len(data)
@@ -1158,7 +1158,7 @@ class Hentai:
         self.plus = plus
         self.blacklisted_tags = {"loli", "shota", "cub", "gore", "vore"}
 
-    def format_tags(self, tags: str = None):
+    def format_tags(self, tags: str = None)->str:
         if tags:
             tags = [
                 tag.strip().replace(" ", "_")
@@ -1172,7 +1172,7 @@ class Hentai:
 
     def remove_data_from_json_list(
         self, json_list: List[dict], key_to_check: str, values_to_remove: List[str]
-    ):
+    )-> (list[dict]|None):
         try:
             data_list = [
                 item
@@ -1186,7 +1186,7 @@ class Hentai:
 
     async def get_nsfw_image(
         self, provider: NsfwApis, rating: Optional[str] = None, tags: str = None
-    ):
+    )->(list|None):
         bl = self.get_blacklisted_links()
         tags = tags.lower() if tags else None
 
@@ -1233,14 +1233,14 @@ class Hentai:
         db.execute("INSERT OR IGNORE INTO hentaiBlacklist (links) VALUES (?)", (link,))
         db.commit()
 
-    def get_blacklisted_links(self) -> List[str]:
+    def get_blacklisted_links(self) -> (List[str]|None):
         data = db.execute("SELECT links FROM hentaiBlacklist").fetchall()
         db.commit()
-        return [link[0] for link in data]
+        return [str(link[0]) for link in data] if data else None
 
     async def gelbooru(
         self, rating: Optional[str] = None, tag: Optional[str] = None
-    ) -> Optional[str]:
+    ) :
         if rating is None:
             rating = choice(["questionable", "explicit"])
         if not tag or tag is None:
@@ -1300,7 +1300,7 @@ class Hentai:
 
         return hentai, source
 
-def shorten_url(url: str):
+def shorten_url(url: str)->(str|None):
     api_url = "http://tinyurl.com/api-create.php"
 
     params = {"url": url}
@@ -1318,7 +1318,7 @@ class Reminder:
     def __init__(self, user: Optional[User] = None):
         self.user = user
 
-    def add(self, reason: str, time: int):
+    async def add(self, reason: str, time: int):
         db.execute(
             "INSERT OR IGNORE INTO reminderData (userid, id, time, reason) VALUES (?,?,?,?)",
             (
@@ -1330,19 +1330,21 @@ class Reminder:
         )
         db.commit()
 
-    def get_all_reminders(self):
+    @property
+    def get_all_reminders(self)->(list|None):
         data = db.execute("SELECT * FROM reminderData").fetchall()
         db.commit()
-        return data
+        return data if data else None
 
-    def get_all_user_reminders(self):
+    @property
+    def get_all_user_reminders(self)->(list|None):
         data = db.execute(
             "SELECT * FROM reminderData WHERE userid = ?", (self.user.id,)
         ).fetchall()
         db.commit()
-        return data if data is not None else None
+        return data if data else None
 
-    def remove(self, id: int):
+    async def remove(self, id: int)->(Literal[False]|None):
         data = db.execute(
             "SELECT * FROM reminderData WHERE userid = ? AND id = ?",
             (
@@ -1354,15 +1356,15 @@ class Reminder:
 
         if data == None:
             return False
-        else:
-            db.execute(
+        
+        db.execute(
                 "DELETE FROM reminderData WHERE userid = ? AND id = ?",
                 (
                     self.user.id,
                     id,
                 ),
             )
-            db.commit()
+        db.commit()
 
 
 class AutoCompleteChoices:
@@ -1398,7 +1400,7 @@ class AutoCompleteChoices:
         ]
     
     async def list_all_user_inventory(self, ctx:Interaction, current:str)->List[Jeanne.Choice[str]]:
-        inventory=Inventory(ctx.user).fetch_user_inventory
+        inventory=Inventory(ctx.user).get_user_inventory
         return [
             Jeanne.Choice(name=image[1], value=image[1])
             for image in inventory
