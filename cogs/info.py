@@ -30,13 +30,12 @@ class slashinfo(Cog):
             return
 
         await ctx.response.defer()
-        botowner = self.bot.get_user(597829930964877369)
         all_users = get_cached_users()
         true_users = get_true_members()
         embed = Embed(title="Bot stats", color=Color.random())
         embed.add_field(
             name="Developer",
-            value=f"• **Name:** {botowner}\n• **ID:** {botowner.id}",
+            value=f"• **Name:** {self.bot.application.owner}\n• **ID:** {self.bot.application.owner.id}",
             inline=True,
         )
         embed.add_field(name="Bot ID", value=self.bot.user.id, inline=True)
