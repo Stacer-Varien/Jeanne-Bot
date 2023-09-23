@@ -1,3 +1,5 @@
+from humanfriendly import format_timespan
+from assets.components import RolesButton
 from functions import Botban, Command, get_cached_users, get_true_members
 from time import time
 from datetime import timedelta
@@ -59,7 +61,7 @@ class slashinfo(Cog):
         current_time = time()
         difference = int(round(current_time - start_time))
         uptime = str(timedelta(seconds=difference))
-        embed.add_field(name="Uptime", value=f"{uptime} hours", inline=True)
+        embed.add_field(name="Uptime", value=format_timespan(uptime), inline=True)
 
         embed.add_field(
             name="Invites",
@@ -93,37 +95,34 @@ class slashinfo(Cog):
         userinfo = Embed(title="{}'s Info".format(member.name), color=member.color)
         userinfo.add_field(name="Name", value=member, inline=True)
         userinfo.add_field(name="Global Name", value=member.global_name, inline=True)
+        if member.nick:
+            userinfo.add_field(name="Nickname", value=member.nick, inline=True)
         userinfo.add_field(name="ID", value=member.id, inline=True)
         userinfo.add_field(name="Is Bot?", value=botcheck, inline=True)
         userinfo.add_field(
             name="Created Account",
-            value="<t:{}:F>".format(str(create_date)),
+            value=f"<t:{create_date}:F>",
             inline=True,
         )
         userinfo.add_field(
             name="Joined Server",
-            value="<t:{}:F>".format(str(joined_date)),
+            value=f"<t:{joined_date}:F>",
             inline=True,
         )
         userinfo.add_field(name="Number of Roles", value=len(member.roles), inline=True)
 
         userinfo.set_thumbnail(url=member.display_avatar)
-        roles = Embed(
-            title="{}'s roles".format(member),
-            description=" ".join(hasroles) + " @everyone",
-            color=member.color,
-        )
 
-        embeds = [userinfo, roles]
+        
 
-        banner = bool(user.banner)
-
-        if banner == True:
+        if user.banner:
             userinfo.set_image(url=user.banner)
-            await ctx.followup.send(embeds=embeds)
-            return
+        view=RolesButton(member, userinfo, hasroles)
+        await ctx.followup.send(embeds=[userinfo], view=view)
+        await view.wait()
 
-        await ctx.followup.send(embeds=embeds)
+        if view.value == None:
+            await ctx.edit_original_response(embeds=[userinfo], view=None)
 
     @Jeanne.command(description="Get information about this server")
     async def serverinfo(self, ctx: Interaction):
@@ -138,7 +137,7 @@ class slashinfo(Cog):
         await ctx.response.defer()
         emojis = [str(x) for x in ctx.guild.emojis]
         humans = len([member for member in ctx.guild.members if not member.bot])
-        bots = len([bot for bot in ctx.guild.members if bot.bot is True])
+        bots = len([bot for bot in ctx.guild.members if bot.bot == True])
 
         date = round(ctx.guild.created_at.timestamp())
         serverinfo = Embed(color=Color.random())
@@ -149,7 +148,7 @@ class slashinfo(Cog):
             inline=True,
         )
         serverinfo.add_field(
-            name="Creation Date", value="<t:{}:F>".format(str(date)), inline=True
+            name="Creation Date", value=f"<t:{date}:F>", inline=True
         )
         serverinfo.add_field(
             name="Members",
@@ -162,8 +161,8 @@ class slashinfo(Cog):
             inline=True,
         )
         verification_level = (
-            str(ctx.guild.verification_level).capitalize()
-            if str(ctx.guild.verification_level) != "none"
+            ctx.guild.verification_level.name.capitalize()
+            if ctx.guild.verification_level.name != "none"
             else None
         )
         serverinfo.add_field(
