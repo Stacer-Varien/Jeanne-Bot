@@ -595,7 +595,7 @@ class Levelling:
             ),
         ).fetchone()
         db.commit()
-        return int(data[1]) if data else False
+        return int(data[0]) if data else False
 
     @property
     def get_member_server_rank(self) -> (int |None):
