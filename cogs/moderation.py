@@ -52,61 +52,62 @@ class BanCog(GroupCog, name="ban"):
                 color=Color.red(),
             )
             await ctx.followup.send(embed=failed)
+            return
 
-        elif int(user_id) == ctx.user.id:
+        if int(user_id) == ctx.user.id:
             failed = Embed(description="You cannot ban yourself...", color=Color.red())
             await ctx.followup.send(embed=failed)
+            return
 
-        else:
-            try:
-                banned = await ctx.guild.fetch_ban(user)
-                if banned:
-                    already_banned = Embed(
-                        description=f"{user} is already banned here", color=Color.red()
-                    )
-                    await ctx.followup.send(embed=already_banned)
-            except NotFound:
-                view = Confirmation(ctx.user)
-                confirm = Embed(
-                    description="Is {} the one you want to ban from your server?".format(
-                        user
-                    ),
-                    color=Color.dark_red(),
-                ).set_thumbnail(url=user.display_avatar)
-                await ctx.followup.send(embed=confirm, view=view)
-                await view.wait()
+        try:
+            banned = await ctx.guild.fetch_ban(user)
+            if banned:
+                already_banned = Embed(
+                    description=f"{user} is already banned here", color=Color.red()
+                )
+                await ctx.followup.send(embed=already_banned)
+        except NotFound:
+            view = Confirmation(ctx.user)
+            confirm = Embed(
+                description="Is {} the one you want to ban from your server?".format(
+                    user
+                ),
+                color=Color.dark_red(),
+            ).set_thumbnail(url=user.display_avatar)
+            await ctx.followup.send(embed=confirm, view=view)
+            await view.wait()
 
-                if view.value == None:
-                    cancelled = Embed(description="Ban cancelled", color=Color.red())
-                    await ctx.edit_original_response(embed=cancelled, view=None)
+            if view.value == None:
+                cancelled = Embed(description="Ban cancelled", color=Color.red())
+                await ctx.edit_original_response(embed=cancelled, view=None)
 
-                elif view.value == True:
-                    await ctx.guild.ban(user, reason="{} | {}".format(reason, ctx.user))
+            elif view.value == True:
+                await ctx.guild.ban(user, reason="{} | {}".format(reason, ctx.user))
 
-                    ban = Embed(title="User Banned", color=0xFF0000)
-                    ban.add_field(name="Name", value=user, inline=True)
-                    ban.add_field(name="ID", value=user.id, inline=True)
-                    ban.add_field(name="Moderator", value=ctx.user, inline=True)
-                    ban.add_field(name="Reason", value=reason, inline=False)
-                    ban.set_thumbnail(url=user.display_avatar)
+                ban = Embed(title="User Banned", color=0xFF0000)
+                ban.add_field(name="Name", value=user, inline=True)
+                ban.add_field(name="ID", value=user.id, inline=True)
+                ban.add_field(name="Moderator", value=ctx.user, inline=True)
+                ban.add_field(name="Reason", value=reason, inline=False)
+                ban.set_thumbnail(url=user.display_avatar)
 
-                    modlog_id = Logger(ctx.guild).get_modlog_channel
+                modlog_id = Logger(ctx.guild).get_modlog_channel
 
-                    if modlog_id == None:
-                        await ctx.edit_original_response(embed=ban, view=None)
-                        return
+                if modlog_id == None:
+                    await ctx.edit_original_response(embed=ban, view=None)
+                    return
 
-                    modlog = ctx.guild.get_channel(modlog_id)
-                    banned = Embed(
-                        description=f"{user} has been banned. Check {modlog.mention}",
-                        color=0xFF0000,
-                    )
-                    await ctx.edit_original_response(embed=banned, view=None)
-                    await modlog.send(embed=ban)
+                modlog = ctx.guild.get_channel(modlog_id)
+                banned = Embed(
+                    description=f"{user} has been banned. Check {modlog.mention}",
+                    color=0xFF0000,
+                )
+                await ctx.edit_original_response(embed=banned, view=None)
+                await modlog.send(embed=ban)
 
-                elif view.value == False:
-                    cancelled = Embed(description="Ban cancelled", color=Color.red())
-                    await ctx.edit_original_response(embed=cancelled, view=None)
+            elif view.value == False:
+                cancelled = Embed(description="Ban cancelled", color=Color.red())
+                await ctx.edit_original_response(embed=cancelled, view=None)
 
     @Jeanne.command(description="Ban someone in this server")
     @Jeanne.describe(
@@ -480,7 +481,7 @@ class moderation(Cog):
         except:
             pass
 
-        #await member.kick(reason="{} | {}".format(reason, ctx.user))
+        # await member.kick(reason="{} | {}".format(reason, ctx.user))
         await ctx.guild.kick(member, reason="{} | {}".format(reason, ctx.user))
         kick = Embed(title="Member Kicked", color=0xFF0000)
         kick.add_field(name="Member", value=member, inline=True)
@@ -502,7 +503,6 @@ class moderation(Cog):
         )
         await modlog.send(embed=kick)
         await ctx.followup.send(embed=kicked)
-        
 
     @Jeanne.command(description="Bulk delete messages")
     @Jeanne.describe(
