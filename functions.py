@@ -1416,5 +1416,21 @@ class AutoCompleteChoices:
             if current.lower() in str(image[0]).lower()
         ]
 
+class Partner:
+    def __init__(self) -> None:
+        pass
 
+    @staticmethod
+    async def add(user:User):
+        cur=db.execute("INSERT OR IGNORE INTO partnerData (user_id) VALUES (?)", (user.id,))
+        db.commit()
+        if cur.rowcount==0:
+            return True
+    
+    @staticmethod
+    def check(user:User.id):
+        data=db.execute("SELECT * FROM partnerData WHERE user_id = ?", (user,)).fetchone()
+        db.commit()
+
+        return data[0] if data else None
 
