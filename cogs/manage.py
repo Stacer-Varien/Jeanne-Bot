@@ -20,6 +20,7 @@ from discord import (
     abc,
     utils,
 )
+from PIL import ImageColor
 from discord.ext.commands import Bot, Cog, GroupCog
 from humanfriendly import format_timespan, parse_timespan, InvalidTimespan
 from collections import OrderedDict
@@ -249,21 +250,20 @@ class Create_Group(GroupCog, name="create"):
             )
             return
 
-        
         if topic:
             await ctx.response.send_modal(ForumGuildlines(name, category))
             return
-        
+
         await ctx.response.defer()
         embed = Embed()
         forum = await ctx.guild.create_forum(name=name, topic=topic)
         embed.description = "{} has been created".format(forum.jump_url)
         embed.color = Color.random()
         if category:
-                await forum.edit(category=category)
-                embed.add_field(
-                    name="Added into category", value=category.name, inline=True
-                )
+            await forum.edit(category=category)
+            embed.add_field(
+                name="Added into category", value=category.name, inline=True
+            )
 
         await ctx.followup.send(embed=embed)
 
@@ -377,9 +377,7 @@ class Create_Group(GroupCog, name="create"):
 
         message = await channel.fetch_message(int(message_id))
         thread = await channel.create_thread(name=name, message=message)
-        embed.add_field(
-                name="Found in message", value=message.jump_url, inline=True
-            )
+        embed.add_field(name="Found in message", value=message.jump_url, inline=True)
 
         await thread.add_user(ctx.user)
         embed.description = "{} has been created".format(thread.jump_url)
@@ -1067,23 +1065,23 @@ class Set_Group(GroupCog, name="set"):
             )
             await ctx.followup.send(embed=error)
             return
-        
+
         setup = Embed(description="Welcomer channels set", color=Color.random())
         if welcoming_channel:
-                Manage(ctx.guild, welcoming_channel).set_welcomer()
-                setup.add_field(
-                    name="Channel welcoming users",
-                    value=welcoming_channel.mention,
-                    inline=True,
-                )
+            Manage(ctx.guild, welcoming_channel).set_welcomer()
+            setup.add_field(
+                name="Channel welcoming users",
+                value=welcoming_channel.mention,
+                inline=True,
+            )
 
         if leaving_channel:
-                Manage(ctx.guild, leaving_channel).set_leaver()
-                setup.add_field(
-                    name="Channel showing users that left",
-                    value=leaving_channel.mention,
-                    inline=True,
-                )
+            Manage(ctx.guild, leaving_channel).set_leaver()
+            setup.add_field(
+                name="Channel showing users that left",
+                value=leaving_channel.mention,
+                inline=True,
+            )
 
         await ctx.followup.send(embed=setup)
 
@@ -1315,13 +1313,11 @@ class Set_Group(GroupCog, name="set"):
         await ctx.response.defer()
         Manage(server=ctx.guild).add_level_channel(channel)
         embed = Embed()
-        embed.description = (
-                "{} will post level updates when someone levels up".format(
-                    channel.mention
-                )
-            )
+        embed.description = "{} will post level updates when someone levels up".format(
+            channel.mention
+        )
         embed.color = Color.random()
-        await ctx.followup.send(embed=embed)        
+        await ctx.followup.send(embed=embed)
 
     @Jeanne.command(
         description="Change the brightness of your level and profile card background"
@@ -1347,7 +1343,7 @@ class Set_Group(GroupCog, name="set"):
             embed.color = Color.red()
             await ctx.followup.send(embed=embed)
             return
-        
+
         Inventory(ctx.user).set_brightness(brightness)
         embed.description = "Brightness has been changed to {}".format(brightness)
         embed.color = Color.random()
@@ -1372,8 +1368,8 @@ class Set_Group(GroupCog, name="set"):
         await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Change your level and profile card font and bar color")
-    @Jeanne.describe(color="Add your color. Must be in HEX code")
-    async def color(self, ctx: Interaction, color: Jeanne.Range[str, 6, 6]):
+    @Jeanne.describe(color="Add your color")
+    async def color(self, ctx: Interaction, color: Jeanne.Range[str, 1]):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.color.qualified_name):
@@ -1385,13 +1381,14 @@ class Set_Group(GroupCog, name="set"):
         await ctx.response.defer()
         embed = Embed()
         try:
+            ImageColor.getcolor(color)
             Inventory(ctx.user).set_color(color)
             embed.description = "Profile and Level card font and bar color changed to {} as showing in the embed color".format(
                 color
             )
             embed.color = int(color, 16)
         except:
-            embed.description = "Invalid HEX code entered"
+            embed.description = "Invalid color"
             embed.color = Color.red()
         await ctx.followup.send(embed=embed)
 
@@ -1419,14 +1416,14 @@ class XP_Group(GroupCog, name="xp"):
             embed.description = "Channel is already XP blacklisted"
             await ctx.followup.send(embed=embed)
             return
-        
+
         Manage(server=ctx.guild).add_xpblacklist(channel)
         embed = Embed(color=Color.random())
         embed.add_field(
-                name="Channel XP blacklisted",
-                value=f"`{channel}` has been added to the XP blacklist",
-                inline=False,
-            )
+            name="Channel XP blacklisted",
+            value=f"`{channel}` has been added to the XP blacklist",
+            inline=False,
+        )
         await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Unblacklists a channel for gaining XP")
@@ -1448,14 +1445,14 @@ class XP_Group(GroupCog, name="xp"):
             embed.color = Color.red()
             await ctx.followup.send(embed=embed)
             return
-        
+
         Manage(server=ctx.guild).remove_blacklist(channel)
         embed = Embed(color=Color.random())
         embed.add_field(
-                name="Channel XP blacklisted",
-                value=f"`{channel}` has been removed from the XP blacklist",
-                inline=False,
-            )
+            name="Channel XP blacklisted",
+            value=f"`{channel}` has been removed from the XP blacklist",
+            inline=False,
+        )
         await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="List all XP blacklisted channels")
@@ -1711,7 +1708,6 @@ class Command_Group(GroupCog, name="command"):
         self.bot = bot
         super().__init__()
 
-
     @Jeanne.command(name="disable", description="Disable a command")
     @Jeanne.autocomplete(command=AutoCompleteChoices.command_choices)
     @Jeanne.describe(command="Which command are you disabling?")
@@ -1723,7 +1719,7 @@ class Command_Group(GroupCog, name="command"):
     ):
         if Botban(ctx.user).check_botbanned_user:
             return
-        
+
         await ctx.response.defer()
 
         cmd = Command(ctx.guild)
