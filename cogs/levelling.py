@@ -100,7 +100,8 @@ class levelling(Cog):
         self.bot = bot
         self.topggpy = DBLClient(bot=self.bot, token=TOPGG)
 
-    def get_profile(self, args):
+    @staticmethod
+    def get_profile(args):
         image = Profile().generate_profile(**args)
         return image
 
@@ -116,14 +117,30 @@ class levelling(Cog):
                 )
                 == False
             ):
+               
                 try:
                     lvl = await Levelling(message.author, message.guild).add_xp()
                     
-
                     if lvl == None:
                         return
                     
                     channel, update=int(lvl[0]), str(lvl[1])
+                    def replace_all(text: str, dic: dict):
+                            for i, j in dic.items():
+                                text = text.replace(i, j)
+                            return text
+
+                    parameters = OrderedDict(
+                            [
+                                ("%member%", str(message.author)),
+                                ("%pfp%", str(message.author.display_avatar)),
+                                ("%server%", str(message.guild.name)),
+                                ("%mention%", str(message.author.mention)),
+                                ("%name%", str(message.author.name)),
+                                ("%newlevel%", str(Levelling(message.author, message.guild).get_member_level),
+                                ),
+                            ]
+                        )                     
 
                     if update == "0" or update == None:
                         msg = (
@@ -138,28 +155,6 @@ class levelling(Cog):
                         await lvlup.send(msg)
                         return
 
-                    def replace_all(text: str, dic: dict):
-                        for i, j in dic.items():
-                            text = text.replace(i, j)
-                        return text
-
-                    parameters = OrderedDict(
-                        [
-                            ("%member%", str(message.author)),
-                            ("%pfp%", str(message.author.display_avatar)),
-                            ("%server%", str(message.guild.name)),
-                            ("%mention%", str(message.author.mention)),
-                            ("%name%", str(message.author.name)),
-                            (
-                                "%newlevel%",
-                                str(
-                                    Levelling(
-                                        message.author, message.guild
-                                    ).get_member_level
-                                ),
-                            ),
-                        ]
-                    )
                     json = loads(replace_all(update, parameters))
                     msg = json["content"]
                     embed = Embed.from_dict(json["embeds"][0])
