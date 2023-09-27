@@ -20,7 +20,7 @@ WALLPAPER = getenv("wallpaper_album")
 MEDUSA = str(getenv("medusa_album"))
 ANIMEME = getenv("animeme_album")
 
-db = connect("database.db")
+db = connect("database.db", check_same_thread=False)
 
 kitsune_nekoslife = "https://nekos.life/api/v2/img/fox_girl"
 hug_nekoslife = "https://nekos.life/api/v2/img/hug"
