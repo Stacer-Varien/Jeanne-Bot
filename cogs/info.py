@@ -60,7 +60,7 @@ class slashinfo(Cog):
 
         current_time = time()
         difference = int(round(current_time - start_time))
-        uptime = str(timedelta(seconds=difference))
+        uptime = timedelta(seconds=difference).total_seconds()
         embed.add_field(name="Uptime", value=format_timespan(uptime), inline=True)
 
         embed.add_field(
