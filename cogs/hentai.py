@@ -306,5 +306,98 @@ class nsfw(Cog):
             )
             await ctx.followup.send(embed=no_tag)
 
+    @Jeanne.command(description="Get a random media content from Danbooru", nsfw=True)
+    @Jeanne.describe(
+        rating="Do you want questionable or explicit content?",
+        tag="Add your tag (up to 2 tags)",
+        plus="Need more content? (up to 4)",
+    )
+    async def danbooru(
+        self,
+        ctx: Interaction,
+        rating: Optional[Literal["questionable", "explicit"]],
+        tag: Optional[str] = None,
+        plus: Optional[bool] = None,
+    ) -> None:
+        if Botban(ctx.user).check_botbanned_user:
+            return
+        if Command(ctx.guild).check_disabled(self.danbooru.qualified_name):
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
+            return
+        await ctx.response.defer()
+        image = await Hentai(plus).danbooru(rating, tag)
+
+        if plus:
+            images = [image[randint(1, len(image)) - 1] for _ in range(4)]
+            view = ReportSelect(*[img["file_url"] for img in images])
+
+            vids = [i for i in images if "mp4" in i["file_url"]]
+            media = [j["file_url"] for j in vids]
+
+            if media:
+                await ctx.followup.send("\n".join(media), view=view)
+                return
+
+            color = Color.random()
+            embeds = [
+                Embed(color=color, url="https://danbooru.donmai.us/")
+                .set_image(url=img["file_url"])
+                .set_footer(
+                    text="Fetched from Danbooru • Credits must go to the artist"
+                )
+                for img in images
+            ]
+            await ctx.followup.send(embeds=embeds, view=view)
+            return
+
+        try:
+            view = ReportContent(image)
+            if str(image).endswith("mp4"):
+                await ctx.followup.send(image, view=view)
+                return
+
+            embed = (
+                Embed(color=Color.purple())
+                .set_image(url=image)
+                .set_footer(
+                    text="Fetched from Danbooru • Credits must go to the artist"
+                )
+            )
+            await ctx.followup.send(embed=embed, view=view)
+            await view.wait()
+
+            if view.value == None:
+                await ctx.edit_original_response(view=None)
+        except:
+            if str(image).endswith("mp4"):
+                await ctx.followup.send(image)
+                return
+
+            embed = (
+                Embed(color=Color.purple())
+                .set_image(url=image)
+                .set_footer(
+                    text="Fetched from Danbooru • Credits must go to the artist\nIf you see an illegal content, please use /botreport and attach the link when reporting"
+                )
+            )
+            await ctx.followup.send(embed=embed)
+
+    @danbooru.error
+    async def danbooru_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, (IndexError, KeyError, TypeError)
+        ):
+            if Command(ctx.guild).check_disabled(self.danbooru.qualified_name):
+                await ctx.response.send_message(
+                    "This command is disabled by the server's managers", ephemeral=True
+                )
+                return
+            no_tag = Embed(
+                description="The hentai could not be found", color=Color.red()
+            )
+            await ctx.followup.send(embed=no_tag)
+
 async def setup(bot: Bot):
     await bot.add_cog(nsfw(bot))

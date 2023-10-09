@@ -416,41 +416,41 @@ class currency(Cog):
             return
 
         await ctx.response.defer()
-
+        bank = Currency(ctx.user)
         tomorrow = round((datetime.now() + timedelta(days=1)).timestamp())
 
-        if await Currency(ctx.user).give_daily() == False:
-            cooldown = Embed(
-                description=f"You have already claimed your daily.\nYour next claim is <t:{Currency(ctx.user).get_next_daily}:R>",
-                color=Color.red(),
+        if bank.check_daily == True:
+            await bank.give_daily()
+            balance = bank.get_balance
+
+            daily = Embed(
+                title="Daily",
+                description=f"**{ctx.user}**, you claimed your daily reward.",
+                color=Color.random(),
             )
-            await ctx.followup.send(embed=cooldown)
+
+            if datetime.today().weekday() >= 5:
+                daily.add_field(
+                    name="Rewards (weekend):",
+                    value="You received 200 <:quantumpiece:1161010445205905418>",
+                )
+            else:
+                daily.add_field(
+                    name="Rewards:",
+                    value="You received 100 <:quantumpiece:1161010445205905418>",
+                )
+                daily.add_field(
+                    name="Balance",
+                    value=f"{balance} <:quantumpiece:1161010445205905418>",
+                )
+                daily.add_field(name="Next Daily:", value=f"<t:{tomorrow}:f>")
+                await ctx.followup.send(embed=daily)
             return
-
-        await Currency(ctx.user).give_daily()
-        balance = Currency(ctx.user).get_balance
-
-        daily = Embed(
-            title="Daily",
-            description=f"**{ctx.user}**, you claimed your daily reward.",
-            color=Color.random(),
+        cooldown = Embed(
+            description=f"You have already claimed your daily.\nYour next claim is <t:{bank.check_daily}:R>",
+            color=Color.red(),
         )
-
-        if datetime.today().weekday() >= 5:
-            daily.add_field(
-                name="Rewards (weekend):",
-                value="You received 200 <:quantumpiece:1161010445205905418>",
-            )
-        else:
-            daily.add_field(
-                name="Rewards:",
-                value="You received 100 <:quantumpiece:1161010445205905418>",
-            )
-            daily.add_field(
-                name="Balance", value=f"{balance} <:quantumpiece:1161010445205905418>"
-            )
-            daily.add_field(name="Next Daily:", value=f"<t:{tomorrow}:f>")
-            await ctx.followup.send(embed=daily)
+        await ctx.followup.send(embed=cooldown)
 
     @Jeanne.command(description="Check how much QP you have")
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))

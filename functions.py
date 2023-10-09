@@ -116,18 +116,15 @@ class Currency:
 
         db.commit()
 
-    async def give_daily(self)->bool:
+    async def give_daily(self):
         current_time = datetime.now()
         next_claim = current_time + timedelta(days=1)
-        data = db.execute(
-            "SELECT * FROM bankData WHERE user_id = ?", (self.user.id,)
-        ).fetchone()
         db.commit()
 
-        qp = 200 if datetime.today().weekday() >= 5 else 100
+        qp = 200 if (datetime.today().weekday() >= 5) else 100
 
-        if data == None:
-            cur = db.execute(
+
+        cur = db.execute(
                 "INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)",
                 (
                     self.user.id,
@@ -135,8 +132,8 @@ class Currency:
                     round(next_claim.timestamp()),
                 ),
             )
-            db.commit()
-            if cur.rowcount == 0:
+        db.commit()
+        if cur.rowcount == 0:
                 db.execute(
                     "UPDATE bankData SET claimed_date = ?, amount = amount + ? WHERE user_id = ?",
                     (
@@ -146,28 +143,17 @@ class Currency:
                     ),
                 )
                 db.commit()
-            return True
 
-        if data[2] < round(current_time.timestamp()):
-            db.execute(
-                "UPDATE bankData SET claimed_date = ?, amount = amount + ? WHERE user_id = ?",
-                (
-                    round(next_claim.timestamp()),
-                    qp,
-                    self.user.id,
-                ),
-            )
-            db.commit()
-            return True
-        return False
 
     @property
-    def get_next_daily(self)->int:
+    def check_daily(self)->(int|Literal[True]):
         data = db.execute(
             "SELECT claimed_date FROM bankData WHERE user_id = ?", (self.user.id,)
         ).fetchone()
         db.commit()
-        return int(data[0]) if data else None
+        if (data == None) or (int(data[0]) < round(datetime.now().timestamp())):
+            return True
+        return int(data[0])
 
 
 class Inventory:
@@ -1151,6 +1137,7 @@ class NsfwApis(Enum):
     )
     YandereApi = "https://yande.re/post.json?limit=100&tags=score:>10+rating:"
     GelbooruApi = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=score:>10+rating:"
+    DanbooruApi = "https://danbooru.donmai.us/posts.json?limit=100&tags=rating:"
 
 
 class Hentai:
@@ -1220,11 +1207,17 @@ class Hentai:
 
         filtered_images = []
         for image in nsfw_images_list:
-            tags = str(image["tags"]).lower().split(" ")
-            urls = str(image["file_url"])
-            if any(tag in self.blacklisted_tags for tag in tags):
-                continue
-            if any(url in set(bl) for url in urls):
+            if provider.value == provider.DanbooruApi.value:
+                tags = str(image["tag_string"]).lower().split(" ")
+            else:
+                tags = str(image["tags"]).lower().split(" ")
+            try:
+                urls = str(image["file_url"])
+                if any(tag in self.blacklisted_tags for tag in tags):
+                    continue
+                if any(url in set(bl) for url in urls):
+                    continue
+            except:
                 continue
             filtered_images.append(image)
         return filtered_images
@@ -1249,8 +1242,8 @@ class Hentai:
 
         if self.plus:
             return images
-        else:
-            return choice(images)["file_url"]
+
+        return choice(images)["file_url"]
 
     async def yandere(self, rating: Optional[str] = None, tag: Optional[str] = None):
         if rating is None:
@@ -1260,8 +1253,8 @@ class Hentai:
 
         if self.plus:
             return images
-        else:
-            return choice(images)["file_url"]
+        
+        return choice(images)["file_url"]
 
     async def konachan(self, rating: Optional[str] = None, tag: Optional[str] = None):
         if rating is None:
@@ -1271,8 +1264,25 @@ class Hentai:
 
         if self.plus:
             return images
+        
+        return choice(images)["file_url"]
+    
+    async def danbooru(self, rating:Optional[str]= None, tag:Optional[str]=None):
+        if rating is None:
+            rating = choice(["questionable", "explicit"])
+        
+        if not tag or tag is None:
+            tag = None
         else:
-            return choice(images)["file_url"]
+            tag=",".join(tag.split(",")[:2])
+        
+        
+        images = await self.get_nsfw_image(NsfwApis.DanbooruApi, rating, tag)
+        if self.plus:
+            return images
+        
+        return choice(images)["file_url"]        
+
 
     async def hentai(self, rating: Optional[str] = None):
         if rating == None:
@@ -1285,20 +1295,24 @@ class Hentai:
 
         konachan_image = await self.konachan(rating)
 
-        h = [gelbooru_image, yandere_image, konachan_image]
+        danbooru_image = await self.danbooru(rating)
+
+        h = [gelbooru_image, yandere_image, konachan_image, danbooru_image]
 
         hentai: str = choice(h)
 
         if hentai == gelbooru_image:
-            source = "Gelbooru"
+            return hentai, "Gelbooru"
 
-        elif hentai == yandere_image:
-            source = "Yande.re"
+        if hentai == yandere_image:
+            return hentai, "Yande.re"
 
-        elif hentai == konachan_image:
-            source = "Konachan"
-
-        return hentai, source
+        if hentai == konachan_image:
+            return hentai, "Konachan"
+        
+        if hentai == danbooru_image:
+            return hentai, "Danbooru"
+        
 
 def shorten_url(url: str)->(str|None):
     api_url = "http://tinyurl.com/api-create.php"
