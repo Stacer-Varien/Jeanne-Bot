@@ -102,9 +102,9 @@ class Background_Group(GroupCog, name="background"):
 
         image_url = Inventory().get_wallpaper(name)[1]
 
-        loading = self.bot.get_emoji(1012677456811016342)
+        
         await ctx.followup.send(
-            "Creating preview... This will take some time {}".format(loading)
+            "Creating preview... This will take some time <a:loading:1161038734620373062>"
         )
         args = {
             "bg_image": image_url,
@@ -234,9 +234,9 @@ class Background_Group(GroupCog, name="background"):
             await ctx.followup.send(embed=notenough)
             return
 
-        loading = self.bot.get_emoji(1012677456811016342)
+        
         await ctx.followup.send(
-            "Creating preview... This will take some time {}".format(loading)
+            "Creating preview... This will take some time <a:loading:1161038734620373062>"
         )
 
         args = {
