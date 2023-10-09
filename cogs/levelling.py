@@ -2,6 +2,7 @@ from asyncio import get_event_loop
 from functools import partial
 from discord.ext.commands import Cog, Bot, GroupCog
 from discord import (
+    AllowedMentions,
     Color,
     Embed,
     File,
@@ -124,12 +125,13 @@ class levelling(Cog):
                     if lvl == None:
                         return
                     
-                    channel, update=int(lvl[0]), str(lvl[1])
+                    channel, update, levelup=int(lvl[0]), str(lvl[1]), str(lvl[2])
                     def replace_all(text: str, dic: dict):
                             for i, j in dic.items():
                                 text = text.replace(i, j)
                             return text
 
+                    role_reward= message.guild.get_role(Levelling(message.author, message.guild).get_role_reward)
                     parameters = OrderedDict(
                             [
                                 ("%member%", str(message.author)),
@@ -138,13 +140,14 @@ class levelling(Cog):
                                 ("%mention%", str(message.author.mention)),
                                 ("%name%", str(message.author.name)),
                                 ("%newlevel%", str(Levelling(message.author, message.guild).get_member_level),
+                                ),("%rolereward%", str((role_reward.mention if role_reward else None)),
                                 ),
                             ]
                         )                     
 
-                    if update == "0" or update == None:
+                    if update == "0":
                         msg = (
-                            "{} has leveled up to `level {} and has earned {}`".format(
+                            "{} has leveled up to `level {}`".format(
                                 message.author,
                                 Levelling(
                                     message.author, message.guild
@@ -152,14 +155,33 @@ class levelling(Cog):
                             )
                         )
                         lvlup = await message.guild.fetch_channel(channel)
-                        await lvlup.send(msg)
-                        return
+                        await lvlup.send(msg, allowed_mentions=AllowedMentions(roles=False, everyone=False, users=True))
+                    elif update == None:
+                        pass
+                    else:
+                        json = loads(replace_all(update, parameters))
+                        msg = json["content"]
+                        embed = Embed.from_dict(json["embeds"][0])
+                        lvlup = await message.guild.fetch_channel(channel)
+                        await lvlup.send(content=msg, embed=embed)
 
-                    json = loads(replace_all(update, parameters))
-                    msg = json["content"]
-                    embed = Embed.from_dict(json["embeds"][0])
-                    lvlup = await message.guild.fetch_channel(channel)
-                    await lvlup.send(content=msg, embed=embed)
+                    if levelup == "0":
+                        msg = (
+                            "CONGRATS {}! You were role awarded `{}`".format(
+                                message.author,
+                                (role_reward.mention if role_reward else None)
+                            )
+                        )
+                        lvlup = await message.guild.fetch_channel(channel)
+                        await lvlup.send(msg, allowed_mentions=AllowedMentions(roles=False, everyone=False, users=True))
+                    elif levelup == None:
+                        pass
+                    else:
+                        json = loads(replace_all(levelup, parameters))
+                        msg = json["content"]
+                        embed = Embed.from_dict(json["embeds"][0])
+                        lvlup = await message.guild.fetch_channel(channel)
+                        await lvlup.send(content=msg, embed=embed)
                 except AttributeError:
                     return
 
