@@ -1311,7 +1311,7 @@ class Set_Group(GroupCog, name="set"):
             return
 
         await ctx.response.defer()
-        Manage(server=ctx.guild).add_level_channel(channel)
+        await Manage(server=ctx.guild).add_level_channel(channel)
         embed = Embed()
         embed.description = "{} will post level updates when someone levels up".format(
             channel.mention
