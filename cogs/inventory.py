@@ -1,6 +1,7 @@
 from assets.components import Confirmation
 from functions import AutoCompleteChoices, Botban, Command, Currency, Inventory
 from discord import Color, Embed, File, Interaction, app_commands as Jeanne
+from PIL import UnidentifiedImageError
 from discord.ext.commands import Bot, GroupCog
 from assets.generators.profile_card import Profile
 from asyncio import get_event_loop
@@ -313,7 +314,7 @@ class Background_Group(GroupCog, name="background"):
             return
 
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, exceptions.MissingSchema
+            error.original, (exceptions.MissingSchema, exceptions.ConnectionError, UnidentifiedImageError)
         ):
             embed = Embed(description="Invalid image URL", color=Color.red())
             await ctx.edit_original_response(content=None, embed=embed)
@@ -329,12 +330,12 @@ class Background_Group(GroupCog, name="background"):
             return
 
         await ctx.response.defer()
-        if Inventory(ctx.user).fetch_user_inventory == None:
+        if Inventory(ctx.user).get_user_inventory == None:
             embed = Embed(description="Your inventory is empty", color=Color.red())
             await ctx.followup.send(embed=embed)
             return
 
-        a = Inventory(ctx.user).fetch_user_inventory
+        a = Inventory(ctx.user).get_user_inventory
         embed = Embed()
         menu = ViewMenu(
             ctx,
