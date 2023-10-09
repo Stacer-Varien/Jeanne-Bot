@@ -39,7 +39,7 @@ class Guess_Group(GroupCog, name="guess"):
             await Currency(ctx.user).add_qp(20)
 
             correct = Embed(
-                description="YES! YOU GUESSED IT CORRECTLY!\nYou have been given 20 <:quantumpiece:980772736861343774>!",
+                description="YES! YOU GUESSED IT CORRECTLY!\nYou have been given 20 <:quantumpiece:1161010445205905418>!",
                 color=Color.random(),
             )
             correct.set_image(url="https://i.imgur.com/ICndRZg.gif")
@@ -75,14 +75,14 @@ class Guess_Group(GroupCog, name="guess"):
 
         if bet > balance:
             betlower = Embed(
-                description=f"Your balance is too low!\nPlease bet lower than {balance} <:quantumpiece:980772736861343774>"
+                description=f"Your balance is too low!\nPlease bet lower than {balance} <:quantumpiece:1161010445205905418>"
             )
             await ctx.followup.send(embed=betlower)
             return
 
         if balance == 0:
             zerobal = Embed(
-                description="Unfortunately, you have 0 <:quantumpiece:980772736861343774>.\nPlease do a daily and/or wait for a free chance to do `/guess free`, `/flip free` and/or `/dice free`"
+                description="Unfortunately, you have 0 <:quantumpiece:1161010445205905418>.\nPlease do a daily and/or wait for a free chance to do `/guess free`, `/flip free` and/or `/dice free`"
             )
             await ctx.followup.send(embed=zerobal)
             return
@@ -92,7 +92,7 @@ class Guess_Group(GroupCog, name="guess"):
         if number == answer:
             await Currency(ctx.user).add_qp(bet)
             correct = Embed(
-                description=f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given {bet} <:quantumpiece:980772736861343774>!",
+                description=f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given {bet} <:quantumpiece:1161010445205905418>!",
                 color=Color.random(),
             )
             correct.set_image(url="https://i.imgur.com/ICndRZg.gifv")
@@ -100,7 +100,7 @@ class Guess_Group(GroupCog, name="guess"):
 
         Currency(ctx.user).remove_qp(bet)
         wrong = Embed(
-            description=f"Wrong answer. It was {answer}\nAfraid I have to take {bet} <:quantumpiece:980772736861343774> from you...",
+            description=f"Wrong answer. It was {answer}\nAfraid I have to take {bet} <:quantumpiece:1161010445205905418> from you...",
             color=Color.red(),
         )
         wrong.set_image(url="https://i.imgur.com/faD48C3.jpg")
@@ -159,7 +159,7 @@ class Dice_Group(GroupCog, name="dice"):
             await Currency(ctx.user).add_qp(20)
             embed = Embed(color=Color.random())
             embed.add_field(
-                name=f"YAY! You got it!\n20 <:quantumpiece:980772736861343774> has been added",
+                name=f"YAY! You got it!\n20 <:quantumpiece:1161010445205905418> has been added",
                 value=f"Dice rolled: **{rolled}**\You guessed: **{digit}**!",
                 inline=False,
             )
@@ -193,14 +193,14 @@ class Dice_Group(GroupCog, name="dice"):
 
         if bet > balance:
             betlower = Embed(
-                description=f"Your balance is too low!\nPlease bet lower than {balance} <:quantumpiece:980772736861343774>"
+                description=f"Your balance is too low!\nPlease bet lower than {balance} <:quantumpiece:1161010445205905418>"
             )
             await ctx.followup.send(embed=betlower)
             return
 
         if balance == 0:
             zerobal = Embed(
-                description="Unfortunately, you have 0 <:quantumpiece:980772736861343774>.\nPlease do a daily and/or wait for a free chance to do `/guess free` and/or `/dice free`"
+                description="Unfortunately, you have 0 <:quantumpiece:1161010445205905418>.\nPlease do a daily and/or wait for a free chance to do `/guess free` and/or `/dice free`"
             )
             await ctx.followup.send(embed=zerobal)
             return
@@ -209,7 +209,7 @@ class Dice_Group(GroupCog, name="dice"):
             await Currency(ctx.user).add_qp(bet)
             embed = Embed(color=Color.random())
             embed.add_field(
-                name="YAY! You got it!\n20 <:quantumpiece:980772736861343774> has been added",
+                name="YAY! You got it!\n20 <:quantumpiece:1161010445205905418> has been added",
                 value=f"Dice rolled: **{rolled}**\You guessed: **{digit}**!",
                 inline=False,
             )
@@ -279,7 +279,7 @@ class Flip_Group(GroupCog, name="flip"):
             await Currency(ctx.user).add_qp(20)
 
             embed = Embed(
-                description="YAY! You got it!\n20 <:quantumpiece:980772736861343774> has been added",
+                description="YAY! You got it!\n20 <:quantumpiece:1161010445205905418> has been added",
                 color=Color.random(),
             )
 
@@ -322,14 +322,14 @@ class Flip_Group(GroupCog, name="flip"):
 
         if balance < bet:
             betlower = Embed(
-                description=f"Your balance is too low!\nPlease bet lower than {balance} <:quantumpiece:980772736861343774>"
+                description=f"Your balance is too low!\nPlease bet lower than {balance} <:quantumpiece:1161010445205905418>"
             )
             await ctx.followup.send(embed=betlower)
             return
 
         if balance == 0:
             zerobal = Embed(
-                description="Unfortunately, you have 0 <:quantumpiece:980772736861343774>.\nPlease do a daily and/or wait for a free chance to do `/guess free`, `/flip free` and/or `/dice free`"
+                description="Unfortunately, you have 0 <:quantumpiece:1161010445205905418>.\nPlease do a daily and/or wait for a free chance to do `/guess free`, `/flip free` and/or `/dice free`"
             )
             await ctx.followup.send(embed=zerobal)
             return
@@ -343,7 +343,7 @@ class Flip_Group(GroupCog, name="flip"):
             await Currency(ctx.user).add_qp(bet)
 
             embed = Embed(
-                description="YAY! You got it!\n{} <:quantumpiece:980772736861343774> has been added".format(
+                description="YAY! You got it!\n{} <:quantumpiece:1161010445205905418> has been added".format(
                     bet
                 )
             )
@@ -355,7 +355,7 @@ class Flip_Group(GroupCog, name="flip"):
             await Currency(ctx.user).remove_qp(int(bet))
             embed = Embed(color=Color.red())
             embed = Embed(
-                description="Oh no, it was {}\nI'm afraid that I have to take {} <:quantumpiece:980772736861343774> from you".format(
+                description="Oh no, it was {}\nI'm afraid that I have to take {} <:quantumpiece:1161010445205905418> from you".format(
                     jeannes_pick, bet
                 ),
                 color=Color.red(),
@@ -439,15 +439,15 @@ class currency(Cog):
         if datetime.today().weekday() >= 5:
             daily.add_field(
                 name="Rewards (weekend):",
-                value="You received 200 <:quantumpiece:980772736861343774>",
+                value="You received 200 <:quantumpiece:1161010445205905418>",
             )
         else:
             daily.add_field(
                 name="Rewards:",
-                value="You received 100 <:quantumpiece:980772736861343774>",
+                value="You received 100 <:quantumpiece:1161010445205905418>",
             )
             daily.add_field(
-                name="Balance", value=f"{balance} <:quantumpiece:980772736861343774>"
+                name="Balance", value=f"{balance} <:quantumpiece:1161010445205905418>"
             )
             daily.add_field(name="Next Daily:", value=f"<t:{tomorrow}:f>")
             await ctx.followup.send(embed=daily)
@@ -466,11 +466,11 @@ class currency(Cog):
         bal = Currency(ctx.user).get_balance
 
         balance = Embed(
-            description=f"You have {bal} <:quantumpiece:980772736861343774>",
+            description=f"You have {bal} <:quantumpiece:1161010445205905418>",
             color=Color.blue(),
         )
         balance.add_field(
-            name=f"If you want more <:quantumpiece:980772736861343774>:",
+            name=f"If you want more <:quantumpiece:1161010445205905418>:",
             value="[Vote for me in TopGG](https://top.gg/bot/831993597166747679/vote)",
             inline=True,
         )

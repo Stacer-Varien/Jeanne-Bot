@@ -39,7 +39,7 @@ class Shop_Group(GroupCog, name="shop"):
             page_embed = Embed(title=f"Item ID: {wallpaper[0]}", color=embed.color)
             page_embed.add_field(name="Name", value=str(wallpaper[1]), inline=True)
             page_embed.add_field(
-                name="Price", value="1000 <:quantumpiece:980772736861343774>"
+                name="Price", value="1000 <:quantumpiece:1161010445205905418>"
             )
             page_embed.set_image(url=str(wallpaper[2]))
             menu.add_page(embed=page_embed)
@@ -138,7 +138,7 @@ class Background_Group(GroupCog, name="background"):
                 description="This is the preview of the profile card.",
                 color=Color.random(),
             )
-            .add_field(name="Cost", value="1000 <:quantumpiece:980772736861343774>")
+            .add_field(name="Cost", value="1000 <:quantumpiece:1161010445205905418>")
             .set_footer(text="Is this the background you wanted?")
         )
         view = Confirmation(ctx.user)
@@ -271,7 +271,7 @@ class Background_Group(GroupCog, name="background"):
                 description="This is the preview of the profile card.",
                 color=Color.blue(),
             )
-            .add_field(name="Cost", value="1000 <:quantumpiece:980772736861343774>")
+            .add_field(name="Cost", value="1000 <:quantumpiece:1161010445205905418>")
             .set_footer(text="Is this the background you wanted?")
             .set_footer(
                 text="Please note that if the custom background violates ToS (both Discord and Bot) or is NSFW, it will be removed with NO REFUNDS!"
