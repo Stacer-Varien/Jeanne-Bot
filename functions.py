@@ -173,7 +173,7 @@ class Inventory:
             "SELECT * FROM wallpapers WHERE name = ?", (name,)
         ).fetchone()
         db.commit()
-        return str(wallpaper[1]), str(wallpaper[2]), str(wallpaper[3])
+        return str(wallpaper[0]), str(wallpaper[1]), str(wallpaper[2])
 
     async def deselect_wallpaper(self)-> (Literal[True] | None):
         wallpaper = db.execute(
@@ -431,7 +431,7 @@ class Levelling:
         db.commit()
         return int(level[0]) if level else 0
 
-    async def add_xp(self)-> (tuple[int, str | None] |None):
+    async def add_xp(self)->(list|None):
         now_time = round(datetime.now().timestamp())
         next_time = round((datetime.now() + timedelta(minutes=2)).timestamp())
         if datetime.today().weekday() > 4:
@@ -537,23 +537,30 @@ class Levelling:
             return self.get_level_channel
 
     @property
-    def get_level_channel(self)->tuple[int, str | None]:
+    def get_level_channel(self)->(list|None):
         data = db.execute(
             "SELECT * FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
 
-        return int(data[4]), str(data[8]) if data else None
+        return [int(data[3]), str(data[4]), self.get_rank_up_update] if data else None
 
-    def get_role_reward(self):
+    @property
+    def get_rank_up_update(self)-> (str|None):
+        data=db.execute("SELECT rankup_message FROM serverData WHERE server = ?", (self.server.id,)).fetchone()
+        return str(data[0]) if data else None
+
+    @property
+    def get_role_reward(self)->(int|None):
         data = db.execute(
-            "SELECT * FROM levelRewardData WHERE server = ?",
+            "SELECT role FROM levelRewardData WHERE server = ? AND level = ?",
             (
                 self.server.id,
+                self.get_member_level
             ),
         ).fetchone()
         db.commit()
-        return data if data else None
+        return int(data[0]) if data else None
 
     @property
     def get_server_rank(self)->(list | None):
@@ -646,10 +653,10 @@ class Manage:
     async def add_level_channel(
         self, channel: TextChannel, message: Optional[str] = None
     ) -> None:
-        message = message if message else None
+        message = message if message else "0"
 
         cur = db.execute(
-            "INSERT OR IGNORE INTO serverData (server_id, levelup_channel, levelup_message) VALUES (?,?,?)",
+            "INSERT OR IGNORE INTO serverData (server, levelup_channel, levelup_message) VALUES (?,?,?)",
             (
                 self.server.id,
                 channel.id,
