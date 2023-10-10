@@ -32,6 +32,7 @@ from assets.components import (
     Welcomingmsg,
     Leavingmsg,
     ForumGuildlines,
+    RankUpmsg
 )
 from requests import get
 from io import BytesIO
@@ -1289,6 +1290,30 @@ class Set_Group(GroupCog, name="set"):
                     content=None, embeds=[embed], view=None
                 )
 
+    @Jeanne.command(description="Set a role reward message. This will be posted in the levelup channel")
+    @Jeanne.checks.has_permissions(manage_guild=True)
+    async def rolereward_message(
+        self, ctx: Interaction, message: Optional[bool] = None
+    ) -> None:
+        if Botban(ctx.user).check_botbanned_user:
+            return
+        if Command(ctx.guild).check_disabled(self.rolereward_message.qualified_name):
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
+            return
+
+        if message == True:
+            await ctx.response.send_modal(RankUpmsg())
+            return
+
+        await ctx.response.defer()
+        await Manage(ctx.guild).add_rankup_rolereward(message)
+        embed = Embed()
+        embed.description = "Default Role Reward message set"
+        embed.color = Color.random()
+        await ctx.followup.send(embed=embed)
+
     @Jeanne.command(description="Set a level up notification channel")
     @Jeanne.describe(
         channel="Which channel will update when a member levels up?",
@@ -1318,6 +1343,7 @@ class Set_Group(GroupCog, name="set"):
         )
         embed.color = Color.random()
         await ctx.followup.send(embed=embed)
+
 
     @Jeanne.command(
         description="Change the brightness of your level and profile card background"
@@ -1391,8 +1417,7 @@ class Set_Group(GroupCog, name="set"):
             embed.description = "Invalid color"
             embed.color = Color.red()
         await ctx.followup.send(embed=embed)
-
-
+       
 class XP_Group(GroupCog, name="xp"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
@@ -1531,7 +1556,7 @@ class manage(Cog):
         )
         await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(description="Remove a logger/welcomer.")
+    @Jeanne.command(description="Remove something for the server.")
     @Jeanne.checks.has_permissions(manage_guild=True)
     async def remove(self, ctx: Interaction) -> None:
         if Botban(ctx.user).check_botbanned_user:
@@ -1724,13 +1749,7 @@ class Command_Group(GroupCog, name="command"):
 
         cmd = Command(ctx.guild)
         embed = Embed()
-        if command in [
-            "command disable",
-            "command enable",
-            "help command",
-            "help support",
-            "help module",
-        ]:
+        if command.startswith(('help', 'command')):
             embed.color = Color.red()
             embed.description = "WOAH! Don't disable that command!"
         elif command not in [i.value for i in list(Commands)]:
@@ -1823,7 +1842,12 @@ class Level_Group(GroupCog, name="level"):
 
         await ctx.response.defer()
 
-        Manage(server=ctx.guild).add_role_reward(role, level)
+        await Manage(server=ctx.guild).add_role_reward(role, level)
+
+        embed=Embed(color=Color.random())
+        embed.description="{} has been selected if someone levels up to {}".format(role.mention, level)
+        await ctx.followup.send(embed=embed)
+
 
 
 async def setup(bot: Bot):
@@ -1835,3 +1859,4 @@ async def setup(bot: Bot):
     await bot.add_cog(XP_Group(bot))
     await bot.add_cog(Rename_Group(bot))
     await bot.add_cog(Command_Group(bot))
+    await bot.add_cog(Level_Group(bot))
