@@ -26,13 +26,14 @@ from humanfriendly import format_timespan, parse_timespan, InvalidTimespan
 from collections import OrderedDict
 from functions import AutoCompleteChoices, Botban, Command, Inventory, Levelling, Manage
 from assets.components import (
+    BioModal,
     Confirmation,
     Levelmsg,
     RemoveManage,
     Welcomingmsg,
     Leavingmsg,
     ForumGuildlines,
-    RankUpmsg
+    RankUpmsg,
 )
 from requests import get
 from io import BytesIO
@@ -1290,7 +1291,9 @@ class Set_Group(GroupCog, name="set"):
                     content=None, embeds=[embed], view=None
                 )
 
-    @Jeanne.command(description="Set a role reward message. This will be posted in the levelup channel")
+    @Jeanne.command(
+        description="Set a role reward message. This will be posted in the levelup channel"
+    )
     @Jeanne.checks.has_permissions(manage_guild=True)
     async def rolereward_message(
         self, ctx: Interaction, message: Optional[bool] = None
@@ -1344,7 +1347,6 @@ class Set_Group(GroupCog, name="set"):
         embed.color = Color.random()
         await ctx.followup.send(embed=embed)
 
-
     @Jeanne.command(
         description="Change the brightness of your level and profile card background"
     )
@@ -1376,8 +1378,7 @@ class Set_Group(GroupCog, name="set"):
         await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Change your profile bio")
-    @Jeanne.describe(bio="Add your bio into your profile card")
-    async def bio(self, ctx: Interaction, bio: Jeanne.Range[str, 1, 60]):
+    async def bio(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.bio.qualified_name):
@@ -1386,12 +1387,7 @@ class Set_Group(GroupCog, name="set"):
             )
             return
 
-        await ctx.response.defer()
-        embed = Embed()
-        Inventory(ctx.user).set_bio(bio)
-        embed.description = "New bio has been set to:\n{}".format(bio)
-        embed.color = Color.random()
-        await ctx.followup.send(embed=embed)
+        await ctx.response.send_modal(BioModal())
 
     @Jeanne.command(description="Change your level and profile card font and bar color")
     @Jeanne.describe(color="Add your color")
@@ -1407,17 +1403,18 @@ class Set_Group(GroupCog, name="set"):
         await ctx.response.defer()
         embed = Embed()
         try:
-            ImageColor.getcolor(color)
-            Inventory(ctx.user).set_color(color)
+            c = ImageColor.getcolor(color, "RGB")
+            await Inventory(ctx.user).set_color(color)
             embed.description = "Profile and Level card font and bar color changed to {} as showing in the embed color".format(
                 color
             )
-            embed.color = int(color, 16)
+            embed.color = int("{:02X}{:02X}{:02X}".format(*c), 16)
         except:
             embed.description = "Invalid color"
             embed.color = Color.red()
         await ctx.followup.send(embed=embed)
-       
+
+
 class XP_Group(GroupCog, name="xp"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
@@ -1749,7 +1746,7 @@ class Command_Group(GroupCog, name="command"):
 
         cmd = Command(ctx.guild)
         embed = Embed()
-        if command.startswith(('help', 'command')):
+        if command.startswith(("help", "command")):
             embed.color = Color.red()
             embed.description = "WOAH! Don't disable that command!"
         elif command not in [i.value for i in list(Commands)]:
@@ -1844,10 +1841,11 @@ class Level_Group(GroupCog, name="level"):
 
         await Manage(server=ctx.guild).add_role_reward(role, level)
 
-        embed=Embed(color=Color.random())
-        embed.description="{} has been selected if someone levels up to {}".format(role.mention, level)
+        embed = Embed(color=Color.random())
+        embed.description = "{} has been selected if someone levels up to {}".format(
+            role.mention, level
+        )
         await ctx.followup.send(embed=embed)
-
 
 
 async def setup(bot: Bot):

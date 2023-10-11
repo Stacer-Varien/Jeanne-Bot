@@ -16,7 +16,7 @@ from typing import Optional
 from collections import OrderedDict
 from json import loads
 from config import WEBHOOK
-from functions import Levelling, Logger, Manage, Welcomer
+from functions import Inventory, Levelling, Logger, Manage, Welcomer
 
 
 def replace_all(text: str, dic: dict):
@@ -658,3 +658,31 @@ class RolesButton(ui.View):
 
         await ctx.response.edit_message(embeds=[self.Uinfo, roles], view=None)
         self.stop()
+
+class BioModal(ui.Modal, title="Bio"):
+    def __init__(self):
+        super().__init__()
+
+    line1 = ui.TextInput(
+        label="Line 1",
+        style=TextStyle.short,
+        required=True,
+        min_length=1,
+        max_length=60,
+    )
+
+    line2 = ui.TextInput(
+        label="Line 2",
+        style=TextStyle.short,
+        required=False,
+        min_length=1,
+        max_length=60,
+    )
+
+    async def on_submit(self, ctx: Interaction) -> None:
+        bio=self.line1.value + "\n" + (self.line2.value if self.line2.value else "")
+        embed=Embed()
+        await Inventory(ctx.user).set_bio(bio)
+        embed.description = "New bio has been set to:\n{}".format(bio)
+        embed.color = Color.random()
+        await ctx.response.send_message(embed=embed)
