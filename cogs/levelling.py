@@ -159,48 +159,49 @@ class levelling(Cog):
                             ),
                         ]
                     )
+                    try:
+                        await message.author.add_roles(role_reward)
+                        if levelup == "0":
+                            msg = "CONGRATS {}! You were role awarded {}".format(
+                                message.author, (role_reward.name if role_reward else None)
+                            )
+                            lvlup = await message.guild.fetch_channel(channel)
+                            await lvlup.send(
+                                msg,
+                                allowed_mentions=AllowedMentions(
+                                    roles=False, everyone=False, users=True
+                                ),
+                            )
+                        elif levelup == None:
+                            pass
+                        else:
+                            json = loads(replace_all(levelup, parameters))
+                            msg = json["content"]
+                            embed = Embed.from_dict(json["embeds"][0])
+                            lvlup = await message.guild.fetch_channel(channel)
+                            await lvlup.send(content=msg, embed=embed)
+                    except:
+                        if update == "0":
+                            msg = "{} has leveled up to `level {}`".format(
+                                message.author,
+                                Levelling(message.author, message.guild).get_member_level,
+                            )
+                            lvlup = await message.guild.fetch_channel(channel)
+                            await lvlup.send(
+                                msg,
+                                allowed_mentions=AllowedMentions(
+                                    roles=False, everyone=False, users=True
+                                ),
+                            )
+                        elif update == None:
+                            pass
+                        else:
+                            json = loads(replace_all(update, parameters))
+                            msg = json["content"]
+                            embed = Embed.from_dict(json["embeds"][0])
+                            lvlup = await message.guild.fetch_channel(channel)
+                            await lvlup.send(content=msg, embed=embed)
 
-                    if update == "0":
-                        msg = "{} has leveled up to `level {}`".format(
-                            message.author,
-                            Levelling(message.author, message.guild).get_member_level,
-                        )
-                        lvlup = await message.guild.fetch_channel(channel)
-                        await lvlup.send(
-                            msg,
-                            allowed_mentions=AllowedMentions(
-                                roles=False, everyone=False, users=True
-                            ),
-                        )
-                    elif update == None:
-                        pass
-                    else:
-                        json = loads(replace_all(update, parameters))
-                        msg = json["content"]
-                        embed = Embed.from_dict(json["embeds"][0])
-                        lvlup = await message.guild.fetch_channel(channel)
-                        await lvlup.send(content=msg, embed=embed)
-
-                    if levelup == "0":
-                        msg = "CONGRATS {}! You were role awarded {}".format(
-                            message.author, (role_reward.name if role_reward else None)
-                        )
-                        lvlup = await message.guild.fetch_channel(channel)
-                        await lvlup.send(
-                            msg,
-                            allowed_mentions=AllowedMentions(
-                                roles=False, everyone=False, users=True
-                            ),
-                        )
-                    elif levelup == None:
-                        pass
-                    else:
-                        json = loads(replace_all(levelup, parameters))
-                        msg = json["content"]
-                        embed = Embed.from_dict(json["embeds"][0])
-                        lvlup = await message.guild.fetch_channel(channel)
-                        await lvlup.send(content=msg, embed=embed)
-                    await message.author.add_roles(role_reward)
                 except AttributeError:
                     return
 
@@ -235,7 +236,7 @@ class levelling(Cog):
             bio = Inventory(member).get_bio
             font_color = Inventory(member).get_color
 
-            voted = await self.topggpy.get_user_vote(member.id)
+            #voted = await self.topggpy.get_user_vote(member.id)
 
             args = {
                 "bg_image": (bg[1] if bg else ""),
@@ -250,7 +251,7 @@ class levelling(Cog):
                 "user_name": str(member),
                 "grank": grank,
                 "srank": srank,
-                "voted": voted,
+                "voted": True,
                 "rrank": rrank,
                 "creator": member.id,
                 "partner": member.id,
