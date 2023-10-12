@@ -255,6 +255,7 @@ class levelling(Cog):
                 "rrank": rrank,
                 "creator": member.id,
                 "partner": member.id,
+                "beta":member.id,
                 "balance": Currency(member).get_balance,
                 "bio": str(bio),
                 "brightness": (bg[2] if bg else 100),

@@ -1157,7 +1157,7 @@ class Welcomer:
             (self.server.id,),
         ).fetchone()
         db.commit()
-        return int(data[0]) if data else None
+        return data[0] if data else None
 
     @property
     def get_leaver(self) -> int | None:
@@ -1165,7 +1165,7 @@ class Welcomer:
             "SELECT leaving_channel FROM serverData where server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
-        return int(data[0]) if data else None
+        return data[0] if data else None
 
     @property
     def get_welcoming_msg(self) -> int | None:
@@ -1174,15 +1174,15 @@ class Welcomer:
             (self.server.id,),
         ).fetchone()
         db.commit()
-        return int(data[0]) if data else None
+        return data[0] if data else None
 
     @property
-    def get_leaving_msg(self) -> int | None:
+    def get_leaving_msg(self) -> str | None:
         data = db.execute(
             "SELECT leaving_message FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
-        return int(data[0]) if data else None
+        return data[0] if data else None
 
 
 def get_cached_users() -> int:
@@ -1531,3 +1531,33 @@ class Partner:
         db.commit()
 
         return data[0] if data else None
+
+    @staticmethod
+    async def remove(user:User):
+        db.execute("DELETE FROM partnerData WHERE user_id = ?", (user.id,))
+
+class BetaTest:
+    def __init__(self) -> None:
+        pass
+
+    @staticmethod
+    async def add(user: User):
+        cur = db.execute(
+            "INSERT OR IGNORE INTO betaData (user) VALUES (?)", (user.id,)
+        )
+        db.commit()
+        if cur.rowcount == 0:
+            return True
+
+    @staticmethod
+    def check(user: User.id):
+        data = db.execute(
+            "SELECT * FROM betaData WHERE user = ?", (user,)
+        ).fetchone()
+        db.commit()
+
+        return data[0] if data else None
+    
+    @staticmethod
+    async def remove(user:User):
+        db.execute("DELETE FROM betaData WHERE user = ?", (user.id,))

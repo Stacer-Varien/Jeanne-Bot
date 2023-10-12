@@ -1,9 +1,11 @@
 from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont, ImageColor, ImageEnhance
-from functions import Partner
+from functions import BetaTest, Partner
 import requests
 import math
 import os
+
+
 class Profile:
     def __init__(self):
         self.default_bg = os.path.join(os.path.dirname(__file__), "assets", "card.png")
@@ -26,11 +28,13 @@ class Profile:
         )
         self.partner = os.path.join(os.path.dirname(__file__), "assets", "partner.png")
         self.qp = os.path.join(os.path.dirname(__file__), "assets", "qp.png")
+        self.beta = os.path.join(os.path.dirname(__file__), "assets", "beta.png")
 
     def generate_profile(
         self,
         creator: int,
         partner: int,
+        beta:int,
         bg_image: str = None,
         profile_image: str = None,
         font_color: str = None,
@@ -50,8 +54,10 @@ class Profile:
         balance: int = None,
         bio: str = None,
         brightness: int = None,
-    )->BytesIO:
-        background= BytesIO(requests.get(bg_image).content) if bg_image else self.default_bg
+    ) -> BytesIO:
+        background = (
+            BytesIO(requests.get(bg_image).content) if bg_image else self.default_bg
+        )
         card = Image.open(background).convert("RGBA")
 
         card = ImageEnhance.Brightness(card).enhance(float(brightness / 100))
@@ -103,9 +109,13 @@ class Profile:
 
         # ======== Colors ========================
 
-        COLOR = tuple(ImageColor.getcolor(font_color, "RGB")) if font_color else (204, 204, 255)
+        COLOR = (
+            tuple(ImageColor.getcolor(font_color, "RGB"))
+            if font_color
+            else (204, 204, 255)
+        )
 
-        def get_str(xp:int):
+        def get_str(xp: int):
             if xp < 1000:
                 return str(xp)
             if xp >= 1000 and xp < 1000000:
@@ -113,7 +123,7 @@ class Profile:
             if xp > 1000000:
                 return str(round(xp / 1000000, 1)) + "M"
 
-        def get_str_qp(balance:int):
+        def get_str_qp(balance: int):
             if balance < 1000:
                 return str(balance)
             if balance >= 1000 and balance < 1000000:
@@ -142,6 +152,7 @@ class Profile:
         creator_badge = Image.open(self.creator_badge).resize((50, 50))
         partner_badge = Image.open(self.partner).resize((50, 50))
         qp = Image.open(self.qp).resize((50, 50))
+        betatest = Image.open(self.beta).resize((50, 50))
 
         if voted == True:
             enhancer = ImageEnhance.Brightness(voter)
@@ -163,7 +174,6 @@ class Profile:
             ranked = ImageEnhance.Brightness(ranked).enhance(1.1)
             card.paste(ranked, (780, 430), ranked)
 
-
         if rrank < 15:
             richest = ImageEnhance.Brightness(richest).enhance(1.1)
             card.paste(richest, (720, 430), richest)
@@ -175,6 +185,10 @@ class Profile:
         if Partner.check(partner):
             partner_badge = ImageEnhance.Brightness(partner_badge).enhance(1.1)
             card.paste(partner_badge, (600, 430), partner_badge)
+
+        if BetaTest.check(beta):
+            betatest = ImageEnhance.Brightness(betatest).enhance(1.1)
+            card.paste(betatest, (540, 430), betatest)
 
         profile_pic_holder.paste(profile, (30, 250))
 
@@ -205,22 +219,22 @@ class Profile:
             stroke_width=1,
         )
 
-        global_rank=('#' + str(grank)) if grank else 'N/A'
+        global_rank = ("#" + str(grank)) if grank else "N/A"
         profile_draw.text(
-                (70, 570),
-                global_rank,
-                COLOR,
-                font=ImageFont.truetype(self.font1, 45),
-                stroke_width=1,
-            )
-        server_rank=('#' + str(srank)) if srank else 'N/A'
+            (70, 570),
+            global_rank,
+            COLOR,
+            font=ImageFont.truetype(self.font1, 45),
+            stroke_width=1,
+        )
+        server_rank = ("#" + str(srank)) if srank else "N/A"
         profile_draw.text(
-                (370, 570),
-                server_rank,
-                COLOR,
-                font=ImageFont.truetype(self.font1, 45),
-                stroke_width=1,
-            )
+            (370, 570),
+            server_rank,
+            COLOR,
+            font=ImageFont.truetype(self.font1, 45),
+            stroke_width=1,
+        )
 
         profile_draw.text(
             (640, 570),
@@ -281,7 +295,7 @@ class Profile:
 
         profile_draw.rectangle((12, 752, server_length_of_bar, 761), fill=COLOR)
 
-        bio=bio if bio else "No bio available"
+        bio = bio if bio else "No bio available"
 
         profile_draw.rounded_rectangle(
             (10, 780, 890, 890), radius=7, width=2, outline=COLOR, fill=(59, 59, 59)
