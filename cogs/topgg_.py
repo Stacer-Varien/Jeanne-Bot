@@ -38,7 +38,7 @@ class TopGG(Cog):
             else:
                 credits = 50
 
-            Currency(voter).add_qp(credits)
+            await Currency(voter).add_qp(credits)
             print(f"Received a vote:\n{data}")
 
 async def setup(bot: Bot):
