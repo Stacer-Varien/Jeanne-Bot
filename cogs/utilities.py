@@ -119,11 +119,11 @@ class Embed_Group(GroupCog, name="embed"):
 
         try:
             embed = Embed.from_dict(json["embeds"][0])
-            await channel.send(content=content, embed=embed)
+            m=await channel.send(content=content, embed=embed)
         except:
-            await channel.send(content=content)
+            m=await channel.send(content=content)
         await ctx.followup.send(
-            content="Embed sent in {}".format(channel.mention), ephemeral=True
+            content="{} sent in {}".format(m.jump_url, channel.mention), ephemeral=True
         )
 
     @Jeanne.command(
@@ -196,7 +196,7 @@ class Embed_Group(GroupCog, name="embed"):
         except:
             await message.edit(content=content)
         await ctx.followup.send(
-            content="[Message]({}) edited".format(message.jump_url),
+            content="{} edited".format(message.jump_url),
             ephemeral=True,
         )
 
