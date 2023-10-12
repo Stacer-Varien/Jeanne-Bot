@@ -358,7 +358,7 @@ class moderation(Cog):
 
         warn_id = f"{randint(0,100000)}"
         date = round(datetime.now().timestamp())
-        Moderation(ctx.guild, member).warn_user(ctx.user.id, reason, warn_id, date)
+        await Moderation(ctx.guild, member).warn_user(ctx.user.id, reason, warn_id, date)
 
         warn = Embed(title="Member warned", color=0xFF0000)
         warn.add_field(name="Member", value=member, inline=True)
