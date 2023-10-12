@@ -16,12 +16,11 @@ from discord import (
     Activity,
     Object,
     HTTPException,
-    SyncWebhook,
+    User,
 )
 from os import execv
 from sys import executable, argv
-from functions import Botban, Hentai
-from config import BB_WEBHOOK
+from functions import BetaTest, Botban, Hentai, Partner
 from typing import Literal, Optional
 
 
@@ -32,6 +31,64 @@ def restart_bot():
 class OwnerCog(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
+
+    @group(invoke_without_command=True)
+    @is_owner()
+    async def partner(self, ctx: Context):
+        if Botban(ctx.author).check_botbanned_user:
+            return
+        embed = Embed(
+            title="This is a group command. However, the available commands for this are:",
+            description="`partner add USER`\n`partner remove USER`",
+        )
+        await ctx.send(embed=embed)
+
+    @partner.command(aliases=["add"])
+    @is_owner()
+    async def _add(self, ctx: Context, user: User):
+        if Botban(ctx.author).check_botbanned_user:
+            return
+
+        await Partner().add(user)
+        await ctx.send(f"{user} has been added as a partner")
+
+    @partner.command(aliases=["remove"])
+    @is_owner()
+    async def _remove(self, ctx: Context, user: User):
+        if Botban(ctx.author).check_botbanned_user:
+            return
+
+        await Partner().remove(user)
+        await ctx.send(f"{user} has been removed as a partner")
+
+    @group(invoke_without_command=True)
+    @is_owner()
+    async def beta(self, ctx: Context):
+        if Botban(ctx.author).check_botbanned_user:
+            return
+        embed = Embed(
+            title="This is a group command. However, the available commands for this are:",
+            description="`beta add USER`\n`beta remove USER`",
+        )
+        await ctx.send(embed=embed)
+
+    @beta.command(aliases=["add"])
+    @is_owner()
+    async def _add(self, ctx: Context, user: User):
+        if Botban(ctx.author).check_botbanned_user:
+            return
+
+        await BetaTest().add(user)
+        await ctx.send(f"{user} has been added as a Beta Tester")
+
+    @beta.command(aliases=["remove"])
+    @is_owner()
+    async def _remove(self, ctx: Context, user: User):
+        if Botban(ctx.author).check_botbanned_user:
+            return
+
+        await BetaTest().remove(user)
+        await ctx.send(f"{user} has been added as a Beta Tester")
 
     @group(aliases=["act", "presence"], invoke_without_command=True)
     @is_owner()
@@ -136,18 +193,18 @@ class OwnerCog(Cog):
     @is_owner()
     async def hentaiblacklist(self, ctx: Context, link: str):
         if Botban(ctx.author).check_botbanned_user:
-            return        
+            return
         Hentai().add_blacklisted_link(link)
         await ctx.send("Link blacklisted")
 
     @command(aliases=["db", "database"])
     @is_owner()
-    async def senddb(self, ctx:Context):
-        with open('database.db', 'rb') as file:
+    async def senddb(self, ctx: Context):
+        with open("database.db", "rb") as file:
             try:
                 await ctx.author.send(file=File(file))
             except:
-                content="""
+                content = """
 # ERROR!
 ## Failed to send database! 
         
@@ -164,7 +221,7 @@ Make sure private messages between **me and you are opened** or check the server
         spec: Optional[Literal["~", "*", "^"]] = None,
     ) -> None:
         if Botban(ctx.author).check_botbanned_user:
-            return        
+            return
         if not guilds:
             if spec == "~":
                 synced = await self.bot.tree.sync(guild=ctx.guild)
