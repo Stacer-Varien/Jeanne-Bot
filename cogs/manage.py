@@ -399,7 +399,9 @@ class Create_Group(GroupCog, name="create"):
         await ctx.followup.send(embed=embed)
 
     @public.error
-    async def thread_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+    async def public_thread_error(
+        self, ctx: Interaction, error: Jeanne.AppCommandError
+    ):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, NotFound
         ):
@@ -462,7 +464,9 @@ class Create_Group(GroupCog, name="create"):
         await ctx.followup.send(embed=embed)
 
     @private.error
-    async def thread_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+    async def private_thread_error(
+        self, ctx: Interaction, error: Jeanne.AppCommandError
+    ):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, NotFound
         ):
@@ -1107,24 +1111,6 @@ class Set_Group(GroupCog, name="set"):
         embed.add_field(name="Channel selected", value=channel.mention, inline=True)
         await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(description="Set a message logging channel")
-    @Jeanne.describe(channel="Which channel should log edited and deleted messages?")
-    @Jeanne.checks.has_permissions(manage_guild=True)
-    async def messagelog(self, ctx: Interaction, channel: TextChannel):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.messagelog.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
-
-        await ctx.response.defer()
-        Manage(ctx.guild).set_message_logger(channel)
-        embed = Embed(description="Message logging channel set", color=Color.red())
-        embed.add_field(name="Channel selected", value=channel.mention, inline=True)
-        await ctx.followup.send(embed=embed)
-
     @Jeanne.command(description="Set a welcoming message when someone joins the server")
     @Jeanne.describe(jsonfile="Upload JSON file with the welcoming message")
     @Jeanne.checks.has_permissions(manage_guild=True)
@@ -1415,101 +1401,11 @@ class Set_Group(GroupCog, name="set"):
         await ctx.followup.send(embed=embed)
 
 
-class XP_Group(GroupCog, name="xp"):
-    def __init__(self, bot: Bot) -> None:
-        self.bot = bot
-        super().__init__()
-
-    @Jeanne.command(description="Blacklists a channel for gaining XP")
-    @Jeanne.describe(channel="Which channel?")
-    @Jeanne.checks.has_permissions(manage_guild=True)
-    async def blacklist(self, ctx: Interaction, channel: TextChannel) -> None:
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.blacklist.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
-
-        await ctx.response.defer()
-        if Levelling(server=ctx.guild).check_xpblacklist_channel(channel) == True:
-            embed = Embed(color=Color.red())
-            embed.description = "Channel is already XP blacklisted"
-            await ctx.followup.send(embed=embed)
-            return
-
-        Manage(server=ctx.guild).add_xpblacklist(channel)
-        embed = Embed(color=Color.random())
-        embed.add_field(
-            name="Channel XP blacklisted",
-            value=f"`{channel}` has been added to the XP blacklist",
-            inline=False,
-        )
-        await ctx.followup.send(embed=embed)
-
-    @Jeanne.command(description="Unblacklists a channel for gaining XP")
-    @Jeanne.describe(channel="Which channel?")
-    @Jeanne.checks.has_permissions(manage_guild=True)
-    async def unblacklist(self, ctx: Interaction, channel: TextChannel) -> None:
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.unblacklist.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
-
-        await ctx.response.defer()
-        if Levelling(server=ctx.guild).check_xpblacklist_channel(channel) == False:
-            embed = Embed(color=Color.red())
-            embed.description = "Channel is not in the XP blacklisted"
-            embed.color = Color.red()
-            await ctx.followup.send(embed=embed)
-            return
-
-        Manage(server=ctx.guild).remove_blacklist(channel)
-        embed = Embed(color=Color.random())
-        embed.add_field(
-            name="Channel XP blacklisted",
-            value=f"`{channel}` has been removed from the XP blacklist",
-            inline=False,
-        )
-        await ctx.followup.send(embed=embed)
-
-    @Jeanne.command(description="List all XP blacklisted channels")
-    async def blacklistedchannels(self, ctx: Interaction) -> None:
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.blacklistedchannels.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
-
-        await ctx.response.defer()
-        embed = Embed()
-        channels = Levelling(server=ctx.guild).get_blacklisted_channels
-
-        if channels == None:
-            embed.description = "There are no XP blacklisted channels"
-            embed.color = Color.red()
-        else:
-            embed.color = Color.random()
-            embed.title = "List of XP blacklisted channels"
-            blchannels = []
-            for channel in channels:
-                blchannel = await ctx.guild.fetch_channel(channel)
-                blchannels.append(blchannel.jump_url)
-            embed.description = "\n".join(blchannels)
-        await ctx.followup.send(embed=embed)
-
-
 class manage(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @Jeanne.command(description="Add a role to a member")
+    @Jeanne.command(name="add-role", description="Add a role to a member")
     @Jeanne.describe(member="Which member?", role="Which role are you adding?")
     @Jeanne.checks.has_permissions(manage_roles=True)
     @Jeanne.checks.bot_has_permissions(manage_roles=True)
@@ -1530,7 +1426,7 @@ class manage(Cog):
         )
         await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(description="Remove a role from a member")
+    @Jeanne.command(name="remove-role", description="Remove a role from a member")
     @Jeanne.describe(member="Which member?", role="Which role are you removing?")
     @Jeanne.checks.has_permissions(manage_roles=True)
     @Jeanne.checks.bot_has_permissions(manage_roles=True)
@@ -1597,7 +1493,7 @@ class manage(Cog):
             return
 
         await ctx.response.defer()
-        name = channel.name if name == None else name
+        name = channel.name if (name == None) else name
 
         c = await channel.clone(name=name)
 
@@ -1818,7 +1714,7 @@ class Level_Group(GroupCog, name="level"):
         self.bot = bot
         super().__init__()
 
-    role = Jeanne.Group(name="role", description="...")
+    role = Jeanne.Group(name="role-reward", description="...")
 
     @role.command(
         name="add", description="Add a level role reward when a user levels up"
@@ -1828,7 +1724,90 @@ class Level_Group(GroupCog, name="level"):
         role="Which role should be given when a user levels up?",
         level="Which level should they be to get that role?",
     )
-    async def add(self, ctx: Interaction, role: Role, level: Jeanne.Range[int, 1]):
+    async def _add(self, ctx: Interaction, role: Role, level: Jeanne.Range[int, 1]):
+        if Botban(ctx.user).check_botbanned_user:
+            return
+        if Command(ctx.guild).check_disabled(self._add.qualified_name):
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
+            return
+
+        await ctx.response.defer()
+
+        botmember=await ctx.guild.fetch_member(self.bot.user.id)
+
+        if role.position >= botmember.top_role.position:
+            embed=Embed(color=Color.red())
+            embed.description="This role is above me"
+            await ctx.followup.send(embed=embed)
+            return
+
+        await Manage(server=ctx.guild).add_role_reward(role, level)
+
+        embed = Embed(color=Color.random())
+        embed.description = "{} will be given to a member if they level up to {}".format(
+            role.mention, level
+        )
+        await ctx.followup.send(embed=embed)
+
+    @role.command(name="remove", description="Removes a level role reward")
+    @Jeanne.checks.has_permissions(manage_guild=True)
+    @Jeanne.describe(
+        role="Which role should be removed?",
+    )
+    async def _remove(self, ctx: Interaction, role: Role):
+        if Botban(ctx.user).check_botbanned_user:
+            return
+        if Command(ctx.guild).check_disabled(self._remove.qualified_name):
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
+            return
+
+        await ctx.response.defer()
+
+        await Manage(server=ctx.guild).remove_role_reward(role)
+
+        embed = Embed(color=Color.random())
+        embed.description = "{} has been removed for level role reward".format(
+            role.mention
+        )
+        await ctx.followup.send(embed=embed)
+
+    @role.command(
+        name="list", description="Add a level role reward when a user levels up"
+    )
+    async def _list(self, ctx: Interaction):
+        if Botban(ctx.user).check_botbanned_user:
+            return
+        if Command(ctx.guild).check_disabled(self._list.qualified_name):
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
+            return
+
+        await ctx.response.defer()
+
+        roles = Levelling(server=ctx.guild).list_all_roles
+
+        data = []
+
+        for i in roles:
+            role = f"<@&{i[1]}>"
+            level = i[2]
+            data.append(f"Level {level}: {role}\n")
+        embed = Embed(color=Color.random())
+        embed.description = "".join(data)
+        embed.title = "Level Rewards"
+        await ctx.followup.send(embed=embed)
+
+    channel_blacklist = Jeanne.Group(name="blacklist-channel", description="...")
+
+    @channel_blacklist.command(description="Blacklists a channel for gaining XP")
+    @Jeanne.describe(channel="Which channel?")
+    @Jeanne.checks.has_permissions(manage_guild=True)
+    async def add(self, ctx: Interaction, channel: TextChannel) -> None:
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.add.qualified_name):
@@ -1838,13 +1817,77 @@ class Level_Group(GroupCog, name="level"):
             return
 
         await ctx.response.defer()
+        if Levelling(server=ctx.guild).check_xpblacklist_channel(channel) == False:
+            await Manage(server=ctx.guild).add_xpblacklist(channel)
+            embed = Embed(color=Color.random())
+            embed.add_field(
+                name="Channel XP blacklisted",
+                value=f"{channel.jump_url} has been added to the XP blacklist",
+                inline=False,
+            )
+            await ctx.followup.send(embed=embed)
+            return
 
-        await Manage(server=ctx.guild).add_role_reward(role, level)
+        embed = Embed(color=Color.red())
+        embed.description = f"{channel.jump_url} is already XP blacklisted"
+        await ctx.followup.send(embed=embed)
 
+    @channel_blacklist.command(description="Unblacklists a channel for gaining XP")
+    @Jeanne.describe(channel="Which channel?")
+    @Jeanne.checks.has_permissions(manage_guild=True)
+    async def remove(self, ctx: Interaction, channel: TextChannel) -> None:
+        if Botban(ctx.user).check_botbanned_user:
+            return
+        if Command(ctx.guild).check_disabled(self.remove.qualified_name):
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
+            return
+
+        await ctx.response.defer()
+        if Levelling(server=ctx.guild).check_xpblacklist_channel(channel) == False:
+            embed = Embed(color=Color.red())
+            embed.description = f"{channel.jump_url} is not in the XP blacklisted"
+            embed.color = Color.red()
+            await ctx.followup.send(embed=embed)
+            return
+
+        await Manage(server=ctx.guild).remove_blacklist(channel)
         embed = Embed(color=Color.random())
-        embed.description = "{} has been selected if someone levels up to {}".format(
-            role.mention, level
+        embed.add_field(
+            name="Channel XP unblacklisted",
+            value=f"{channel.jump_url} has been removed from the XP blacklist",
+            inline=False,
         )
+        await ctx.followup.send(embed=embed)
+
+    @channel_blacklist.command(
+        name="list", description="List all XP blacklisted channels"
+    )
+    async def _list(self, ctx: Interaction) -> None:
+        if Botban(ctx.user).check_botbanned_user:
+            return
+        if Command(ctx.guild).check_disabled(self._list.qualified_name):
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
+            return
+
+        await ctx.response.defer()
+        embed = Embed()
+        channels = Levelling(server=ctx.guild).get_blacklisted_channels
+
+        if channels == None:
+            embed.description = "There are no XP blacklisted channels"
+            embed.color = Color.red()
+        else:
+            embed.color = Color.random()
+            embed.title = "List of XP blacklisted channels"
+            blchannels = []
+            for channel in channels:
+                blchannel = await ctx.guild.fetch_channel(channel)
+                blchannels.append(blchannel.jump_url)
+            embed.description = "\n".join(blchannels)
         await ctx.followup.send(embed=embed)
 
 
@@ -1854,7 +1897,6 @@ async def setup(bot: Bot):
     await bot.add_cog(Edit_Group(bot))
     await bot.add_cog(Delete_Group(bot))
     await bot.add_cog(Set_Group(bot))
-    await bot.add_cog(XP_Group(bot))
     await bot.add_cog(Rename_Group(bot))
     await bot.add_cog(Command_Group(bot))
     await bot.add_cog(Level_Group(bot))
