@@ -1050,11 +1050,12 @@ class Moderation:
 
         return warnings
 
-    def check_warn_id(self, warn_id: int) -> int | None:
+    def check_warn_id(self, member: Member, warn_id: int) -> int | None:
         data = db.execute(
-            "SELECT warn_id FROM warnData WHERE guild_id = ? AND warn_id = ?",
+            "SELECT warn_id FROM warnData WHERE guild_id = ?, user_id = ? AND warn_id = ?",
             (
                 self.server.id,
+                member.id,
                 warn_id,
             ),
         )
@@ -1302,7 +1303,7 @@ class Hentai:
             filtered_images.append(image)
         return filtered_images
 
-    def add_blacklisted_link(self, link: str):
+    async def add_blacklisted_link(self, link: str):
         db.execute("INSERT OR IGNORE INTO hentaiBlacklist (links) VALUES (?)", (link,))
         db.commit()
 
@@ -1533,8 +1534,9 @@ class Partner:
         return data[0] if data else None
 
     @staticmethod
-    async def remove(user:User):
+    async def remove(user: User):
         db.execute("DELETE FROM partnerData WHERE user_id = ?", (user.id,))
+
 
 class BetaTest:
     def __init__(self) -> None:
@@ -1542,22 +1544,18 @@ class BetaTest:
 
     @staticmethod
     async def add(user: User):
-        cur = db.execute(
-            "INSERT OR IGNORE INTO betaData (user) VALUES (?)", (user.id,)
-        )
+        cur = db.execute("INSERT OR IGNORE INTO betaData (user) VALUES (?)", (user.id,))
         db.commit()
         if cur.rowcount == 0:
             return True
 
     @staticmethod
     def check(user: User.id):
-        data = db.execute(
-            "SELECT * FROM betaData WHERE user = ?", (user,)
-        ).fetchone()
+        data = db.execute("SELECT * FROM betaData WHERE user = ?", (user,)).fetchone()
         db.commit()
 
         return data[0] if data else None
-    
+
     @staticmethod
-    async def remove(user:User):
+    async def remove(user: User):
         db.execute("DELETE FROM betaData WHERE user = ?", (user.id,))
