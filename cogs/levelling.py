@@ -163,7 +163,8 @@ class levelling(Cog):
                         await message.author.add_roles(role_reward)
                         if levelup == "0":
                             msg = "CONGRATS {}! You were role awarded {}".format(
-                                message.author, (role_reward.name if role_reward else None)
+                                message.author,
+                                (role_reward.name if role_reward else None),
                             )
                             lvlup = await message.guild.fetch_channel(channel)
                             await lvlup.send(
@@ -184,7 +185,9 @@ class levelling(Cog):
                         if update == "0":
                             msg = "{} has leveled up to `level {}`".format(
                                 message.author,
-                                Levelling(message.author, message.guild).get_member_level,
+                                Levelling(
+                                    message.author, message.guild
+                                ).get_member_level,
                             )
                             lvlup = await message.guild.fetch_channel(channel)
                             await lvlup.send(
@@ -236,7 +239,7 @@ class levelling(Cog):
             bio = Inventory(member).get_bio
             font_color = Inventory(member).get_color
 
-            #voted = await self.topggpy.get_user_vote(member.id)
+            voted = await self.topggpy.get_user_vote(member.id)
 
             args = {
                 "bg_image": (bg[1] if bg else ""),
@@ -251,11 +254,11 @@ class levelling(Cog):
                 "user_name": str(member),
                 "grank": grank,
                 "srank": srank,
-                "voted": True,
+                "voted": voted,
                 "rrank": rrank,
                 "creator": member.id,
                 "partner": member.id,
-                "beta":member.id,
+                "beta": member.id,
                 "balance": Currency(member).get_balance,
                 "bio": str(bio),
                 "brightness": (bg[2] if bg else 100),
