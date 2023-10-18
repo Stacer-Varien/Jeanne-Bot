@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Optional
 from json import loads
 from discord import (
     AllowedMentions,
@@ -890,6 +890,7 @@ class Edit_Group(GroupCog, name="edit"):
         name="What is the new name?",
         description="What is the new description (only for public servers)",
         avatar="What is the new server avatar?",
+        splash="What will be the new invite splash screen?",
         banner="What will be the new banner?",
         verification_level="How high should the verification level be?",
     )
@@ -903,7 +904,7 @@ class Edit_Group(GroupCog, name="edit"):
         avatar: Optional[Attachment] = None,
         splash: Optional[Attachment] = None,
         banner: Optional[Attachment] = None,
-        verification_level: Literal["none", "low", "medium", "high", "highest"] = None,
+        verification_level: Optional[VerificationLevel] = None,
     ) -> None:
         if Botban(ctx.user).check_botbanned_user:
             return
@@ -987,50 +988,52 @@ class Edit_Group(GroupCog, name="edit"):
                     pass
 
         if verification_level:
-            if verification_level == "none":
+            if verification_level.name == "none":
                 await ctx.guild.edit(verification_level=VerificationLevel.none)
                 embed.add_field(
                     name="Verification Level",
-                    value="{}\nNo verification required".format(verification_level),
+                    value="**{}**\nNo verification required".format(
+                        verification_level.name.title()
+                    ),
                     inline=True,
                 )
 
-            elif verification_level == "low":
+            elif verification_level.name == "low":
                 await ctx.guild.edit(verification_level=VerificationLevel.low)
                 embed.add_field(
                     name="Verification Level",
-                    value="{}\nMembers must have a verified email".format(
-                        verification_level
+                    value="**{}**\nMembers must have a verified email".format(
+                        verification_level.name.title()
                     ),
                     inline=True,
                 )
 
-            elif verification_level == "medium":
+            elif verification_level.name == "medium":
                 await ctx.guild.edit(verification_level=VerificationLevel.medium)
                 embed.add_field(
                     name="Verification Level",
-                    value="{}\nMembers must have a verified email and be registered on Discord for more than 5 minutes".format(
-                        verification_level
+                    value="**{}**\nMembers must have a verified email and be registered on Discord for more than 5 minutes".format(
+                        verification_level.name.title()
                     ),
                     inline=True,
                 )
 
-            elif verification_level == "high":
+            elif verification_level.name == "high":
                 await ctx.guild.edit(verification_level=VerificationLevel.high)
                 embed.add_field(
                     name="Verification Level",
-                    value="{}\nMembers must have a verified email, be registered on Discord for more than 5 minutes and stay in the server for more than 10 minutes".format(
-                        verification_level
+                    value="**{}**\nMembers must have a verified email, be registered on Discord for more than 5 minutes and stay in the server for more than 10 minutes".format(
+                        verification_level.name.title()
                     ),
                     inline=True,
                 )
 
-            elif verification_level == "highest":
+            elif verification_level.name == "highest":
                 await ctx.guild.edit(verification_level=VerificationLevel.highest)
                 embed.add_field(
                     name="Verification Level",
-                    value="{}\nMembers must have a verified phone number".format(
-                        verification_level
+                    value="**{}**\nMembers must have a verified phone number".format(
+                        verification_level.name.title()
                     ),
                     inline=True,
                 )
@@ -1064,7 +1067,7 @@ class Set_Group(GroupCog, name="set"):
             return
 
         await ctx.response.defer()
-        if welcoming_channel == None and leaving_channel == None:
+        if (welcoming_channel == None) and (leaving_channel == None):
             error = Embed(
                 description="Both options are empty. Please set at least a welcomer or leaving channel",
                 color=Color.red(),
@@ -1691,7 +1694,7 @@ class Command_Group(GroupCog, name="command"):
 
         await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(name="list_disabled", description="List all disabled commands")
+    @Jeanne.command(name="list-disabled", description="List all disabled commands")
     async def listdisabled(self, ctx: Interaction):
         await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user:
@@ -1735,19 +1738,21 @@ class Level_Group(GroupCog, name="level"):
 
         await ctx.response.defer()
 
-        botmember=await ctx.guild.fetch_member(self.bot.user.id)
+        botmember = await ctx.guild.fetch_member(self.bot.user.id)
 
         if role.position >= botmember.top_role.position:
-            embed=Embed(color=Color.red())
-            embed.description="This role is above me"
+            embed = Embed(color=Color.red())
+            embed.description = "This role is above me"
             await ctx.followup.send(embed=embed)
             return
 
         await Manage(server=ctx.guild).add_role_reward(role, level)
 
         embed = Embed(color=Color.random())
-        embed.description = "{} will be given to a member if they level up to {}".format(
-            role.mention, level
+        embed.description = (
+            "{} will be given to a member if they level up to {}".format(
+                role.mention, level
+            )
         )
         await ctx.followup.send(embed=embed)
 
@@ -1797,6 +1802,7 @@ class Level_Group(GroupCog, name="level"):
             role = f"<@&{i[1]}>"
             level = i[2]
             data.append(f"Level {level}: {role}\n")
+
         embed = Embed(color=Color.random())
         embed.description = "".join(data)
         embed.title = "Level Rewards"
