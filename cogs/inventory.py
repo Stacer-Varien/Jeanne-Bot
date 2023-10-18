@@ -103,7 +103,6 @@ class Background_Group(GroupCog, name="background"):
 
         image_url = Inventory().get_wallpaper(name)[1]
 
-        
         await ctx.followup.send(
             "Creating preview... This will take some time <a:loading:1161038734620373062>"
         )
@@ -206,7 +205,9 @@ class Background_Group(GroupCog, name="background"):
             )
             await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(description="Buy a custom background pic for your level card")
+    @Jeanne.command(
+        name="buy-custom", description="Buy a custom background pic for your level card"
+    )
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     @Jeanne.describe(name="What will you name it?", link="Add an image link")
     async def buycustom(self, ctx: Interaction, name: str, link: str):
@@ -235,7 +236,6 @@ class Background_Group(GroupCog, name="background"):
             await ctx.followup.send(embed=notenough)
             return
 
-        
         await ctx.followup.send(
             "Creating preview... This will take some time <a:loading:1161038734620373062>"
         )
@@ -314,7 +314,12 @@ class Background_Group(GroupCog, name="background"):
             return
 
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, (exceptions.MissingSchema, exceptions.ConnectionError, UnidentifiedImageError)
+            error.original,
+            (
+                exceptions.MissingSchema,
+                exceptions.ConnectionError,
+                UnidentifiedImageError,
+            ),
         ):
             embed = Embed(description="Invalid image URL", color=Color.red())
             await ctx.edit_original_response(content=None, embed=embed)
