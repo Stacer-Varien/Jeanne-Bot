@@ -1,6 +1,6 @@
 from discord import AllowedMentions, Color, Embed, Member
 from discord.ext.commands import Cog, Bot
-from functions import Logger, Welcomer
+from functions import Welcomer
 from collections import OrderedDict
 from json import loads
 
@@ -46,7 +46,7 @@ class WelcomerCog(Cog):
             }
 
             json_data: dict = loads(
-                replace_all(Welcomer(member.guild).get_welcoming_msg(), parameters)
+                replace_all(Welcomer(member.guild).get_welcoming_msg, parameters)
             )
 
             content: str = json_data.get("content")
@@ -96,7 +96,7 @@ class WelcomerCog(Cog):
             )
 
             json_data: dict = loads(
-                replace_all(Welcomer(member.guild).get_leaving_msg(), parameters)
+                replace_all(Welcomer(member.guild).get_leaving_msg, parameters)
             )
 
             content: str = json_data.get("content")
