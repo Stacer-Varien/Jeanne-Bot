@@ -399,5 +399,6 @@ class nsfw(Cog):
             )
             await ctx.followup.send(embed=no_tag)
 
+
 async def setup(bot: Bot):
     await bot.add_cog(nsfw(bot))
