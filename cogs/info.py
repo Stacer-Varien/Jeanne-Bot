@@ -21,7 +21,7 @@ from typing import Optional
 start_time = time()
 
 
-class slashinfo(Cog):
+class InfoCog(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.bot_version = "4.3"
@@ -113,11 +113,9 @@ class slashinfo(Cog):
 
         userinfo.set_thumbnail(url=member.display_avatar)
 
-        
-
         if user.banner:
             userinfo.set_image(url=user.banner)
-        view=RolesButton(member, userinfo, hasroles)
+        view = RolesButton(member, userinfo, hasroles)
         await ctx.followup.send(embeds=[userinfo], view=view)
         await view.wait()
 
@@ -147,9 +145,7 @@ class slashinfo(Cog):
             value=f"• **Name: ** {ctx.guild.owner}\n• ** ID: ** {ctx.guild.owner.id}",
             inline=True,
         )
-        serverinfo.add_field(
-            name="Creation Date", value=f"<t:{date}:F>", inline=True
-        )
+        serverinfo.add_field(name="Creation Date", value=f"<t:{date}:F>", inline=True)
         serverinfo.add_field(
             name="Members",
             value=f"• **Humans:** {humans}\n• **Bots:** {bots}\n• **Total Members:** {ctx.guild.member_count}",
@@ -398,4 +394,4 @@ class slashinfo(Cog):
 
 
 async def setup(bot: Bot):
-    await bot.add_cog(slashinfo(bot))
+    await bot.add_cog(InfoCog(bot))
