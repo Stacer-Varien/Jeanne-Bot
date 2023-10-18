@@ -212,7 +212,7 @@ class BanCog(GroupCog, name="ban"):
             await ctx.followup.send(embed=embed)
 
 
-class ListWarns(GroupCog, name="listwarns"):
+class ListWarns(GroupCog, name="list-warns"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()
@@ -297,9 +297,9 @@ class moderation(Cog):
 
                 await guild.unban(member, reason="Softban expired")
 
-                Moderation(guild, member).remove_softban()
+                await Moderation(guild, member).remove_softban()
 
-                mod_channel = Logger(guild).get_modlog_channel()
+                mod_channel = Logger(guild).get_modlog_channel
 
                 if mod_channel != None:
                     unmute = Embed(title="Member unbanned", color=0xFF0000)
@@ -313,9 +313,9 @@ class moderation(Cog):
                     modlog = await guild.fetch_channel(mod_channel)
 
                     await modlog.send(embed=unmute)
+                    return
 
-                else:
-                    continue
+                continue
 
     @Jeanne.command(description="Warn a member")
     @Jeanne.describe(member="Which member are you warning?", reason="What did they do?")
@@ -356,9 +356,11 @@ class moderation(Cog):
 
         reason = reason if reason else "Unspecified"
 
-        warn_id = f"{randint(0,100000)}"
+        warn_id = randint(0, 100000)
         date = round(datetime.now().timestamp())
-        await Moderation(ctx.guild, member).warn_user(ctx.user.id, reason, warn_id, date)
+        await Moderation(ctx.guild).warn_user(
+            member, ctx.user.id, reason, warn_id, date
+        )
 
         warn = Embed(title="Member warned", color=0xFF0000)
         warn.add_field(name="Member", value=member, inline=True)
@@ -383,7 +385,7 @@ class moderation(Cog):
         await ctx.followup.send(embed=warned)
         await modlog.send(embed=warn)
 
-    @Jeanne.command(description="Revoke a warn by warn ID")
+    @Jeanne.command(name="clear-warn", description="Revoke a warn by warn ID")
     @Jeanne.describe(
         member="Which member got warned?",
         warn_id="What is their warn ID you want to remove?",
@@ -399,18 +401,17 @@ class moderation(Cog):
             return
 
         await ctx.response.defer()
-        mod = Moderation(ctx.guild, member)
-        result = mod.check_warn_id(warn_id)
+        mod = Moderation(ctx.guild)
+        result = mod.check_warn_id(member, warn_id)
 
         if result == None:
             await ctx.followup.send("Invalid warn ID")
             return
 
-        member = await ctx.guild.fetch_member(result[0])
-        mod.revoke_warn(warn_id)
+        await mod.revoke_warn(member, warn_id)
 
         revoked_warn = Embed(
-            title="Warn removed!",
+            title="Warn removed",
             description=f"{ctx.user} has revoked warn ID ({warn_id})",
         )
 
@@ -538,7 +539,7 @@ class moderation(Cog):
 
         await ctx.channel.purge(limit=limit)
 
-    @Jeanne.command(description="Change someone's nickname")
+    @Jeanne.command(name="change-nickname", description="Change someone's nickname")
     @Jeanne.describe(member="Which member?", nickname="What is their new nickname")
     @Jeanne.checks.has_permissions(manage_nicknames=True)
     @Jeanne.checks.bot_has_permissions(manage_nicknames=True)
@@ -555,11 +556,17 @@ class moderation(Cog):
 
         await ctx.response.defer()
 
+        if member.nick == None:
+            embed = Embed(color=Color.red())
+            embed.description = f"{member} has no nickname"
+            await ctx.followup.send(embed=embed)
+            return
+
         await member.edit(nick=nickname)
         setnick = Embed(color=0x00FF68)
         setnick.add_field(
             name="Nickname changed",
-            value=f"{member}'s nickname is now `{nickname}`",
+            value=f"{member}'s nickname is now `{member.nick}`",
             inline=False,
         )
         await ctx.followup.send(embed=setnick)
@@ -602,6 +609,7 @@ class moderation(Cog):
         if modlog_id == None:
             await ctx.followup.send(embed=unban)
             return
+
         modlog = ctx.guild.get_channel(modlog_id)
         unbanned = Embed(
             description=f"{user} has been unbanned. Check {modlog.mention}",
@@ -610,7 +618,7 @@ class moderation(Cog):
         await ctx.followup.send(embed=unbanned)
         await modlog.send(embed=unban)
 
-    @Jeanne.command(description="Timeout a member using Discord's timeout feature")
+    @Jeanne.command(description="Timeout a member")
     @Jeanne.describe(
         member="Which member?",
         time="How long should they be on timeout (1m, 1h30m, etc)",
@@ -641,7 +649,7 @@ class moderation(Cog):
             return
         reason = reason if reason else "Unspecified"
 
-        if not time or parse_timespan(time) > 2505600.0:
+        if not time or (parse_timespan(time) > 2505600.0):
             time = "28d"
 
         timed = parse_timespan(time)
@@ -665,7 +673,7 @@ class moderation(Cog):
 
         modlog = ctx.guild.get_channel(modlog_id)
         muted = Embed(
-            description=f"{member} has been muted. Check {modlog.mention}",
+            description=f"{member} has been put on timeout. Check {modlog.mention}",
             color=0xFF0000,
         )
         await ctx.followup.send(embed=muted)
@@ -792,9 +800,8 @@ class moderation(Cog):
         await view.wait()
 
         if view.value == True:
-            loading = self.bot.get_emoji(1012677456811016342)
             em = Embed(
-                description=f"Banning user IDs now {loading}",
+                description="Banning user IDs now <a:loading:1161038734620373062>",
                 color=Color.red(),
             )
             await ctx.edit_original_response(embed=em, view=None)
@@ -919,9 +926,8 @@ class moderation(Cog):
         await view.wait()
 
         if view.value == True:
-            loading = self.bot.get_emoji(1012677456811016342)
             em = Embed(
-                description=f"Unbanning user IDs now {loading}",
+                description="Unbanning user IDs now <a:loading:1161038734620373062>",
                 color=Color.red(),
             )
             await ctx.edit_original_response(embed=em, view=None)
