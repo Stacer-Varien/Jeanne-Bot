@@ -1,3 +1,4 @@
+from json import dump
 from requests import post
 from functions import Botban, Currency
 from config import TOPGG, TOPGG_AUTH
@@ -27,8 +28,8 @@ class TopGG(Cog):
             print(f"Failed to post server count\n{e.__class__.__name__}: {e}")
 
     @Cog.listener()
-    async def on_dbl_vote(self, data:dict):
-        if str(data["type"]) == "upvote":
+    async def on_dbl_vote(self, data: dict):
+        if data["type"] == "upvote":
             voter = await self.bot.fetch_user(int(data["user"]))
             if Botban(voter).check_botbanned_user():
                 return
@@ -39,7 +40,9 @@ class TopGG(Cog):
                 credits = 50
 
             await Currency(voter).add_qp(credits)
-            print(f"Received a vote:\n{data}")
+            with open("voterdata.txt", "w") as f:
+                dump(data, f)
+
 
 async def setup(bot: Bot):
     await bot.add_cog(TopGG(bot))
