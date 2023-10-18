@@ -24,13 +24,13 @@ from functions import BetaTest, Botban, Hentai, Partner
 from typing import Literal, Optional
 
 
-def restart_bot():
-    execv(executable, [executable] + argv)
-
-
 class OwnerCog(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
+
+    @staticmethod
+    def restart_bot():
+        execv(executable, [executable] + argv)
 
     @group(invoke_without_command=True)
     @is_owner()
@@ -77,9 +77,17 @@ class OwnerCog(Cog):
     async def _add(self, ctx: Context, user: User):
         if Botban(ctx.author).check_botbanned_user:
             return
-
-        await BetaTest().add(user)
-        await ctx.send(f"{user} has been added as a Beta Tester")
+        server = await self.bot.fetch_guild(740584420645535775)
+        betarole = server.get_role(1130430961587335219)
+        try:
+            m = await server.fetch_member(user.id)
+            await m.add_roles(betarole, reason="Added to the Beta Programme")
+            await BetaTest().add(user)
+            await ctx.send(f"{user} has been added as a Beta Tester")
+        except:
+            await ctx.send(
+                f"Member is not in {server}. This is required so they can be added in the Beta Programme"
+            )
 
     @beta.command(aliases=["remove"])
     @is_owner()
@@ -87,8 +95,16 @@ class OwnerCog(Cog):
         if Botban(ctx.author).check_botbanned_user:
             return
 
+        server = await self.bot.fetch_guild(740584420645535775)
+        betarole = server.get_role(1130430961587335219)
+        try:
+            m = await server.fetch_member(user.id)
+            await m.add_roles(betarole, reason="Removed from the Beta Programme")
+        except:
+            await ctx.send(
+                f"Member is not in {server}. This is required so they can be added in the Beta Programme"
+            )
         await BetaTest().remove(user)
-        await ctx.send(f"{user} has been added as a Beta Tester")
 
     @group(aliases=["act", "presence"], invoke_without_command=True)
     @is_owner()
@@ -165,8 +181,8 @@ class OwnerCog(Cog):
         if Botban(ctx.author).check_botbanned_user:
             return
 
-        await ctx.send(f"YAY! NEW UPDATE!")
-        restart_bot()
+        await ctx.send("YAY! NEW UPDATE!")
+        self.restart_bot()
 
     @command(aliases=["forbid", "disallow", "bban", "bb"])
     @is_owner()
@@ -178,7 +194,7 @@ class OwnerCog(Cog):
             return
 
         user = await self.bot.fetch_user(user_id)
-        Botban(user).add_botbanned_user(reason)
+        await Botban(user).add_botbanned_user(reason)
 
         await ctx.send("User botbanned", ephemeral=True)
 
@@ -194,7 +210,7 @@ class OwnerCog(Cog):
     async def hentaiblacklist(self, ctx: Context, link: str):
         if Botban(ctx.author).check_botbanned_user:
             return
-        Hentai().add_blacklisted_link(link)
+        await Hentai().add_blacklisted_link(link)
         await ctx.send("Link blacklisted")
 
     @command(aliases=["db", "database"])
