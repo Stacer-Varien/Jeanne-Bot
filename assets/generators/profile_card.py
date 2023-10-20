@@ -1,13 +1,15 @@
 from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont, ImageColor, ImageEnhance
+from functions import BetaTest, Partner
 import requests
 import math
 import os
+
+
 class Profile:
     def __init__(self):
         self.default_bg = os.path.join(os.path.dirname(__file__), "assets", "card.png")
         self.font1 = os.path.join(os.path.dirname(__file__), "assets", "font.ttf")
-        self.font2 = os.path.join(os.path.dirname(__file__), "assets", "font2.ttf")
         self.vote_badge = os.path.join(os.path.dirname(__file__), "assets", "voted.png")
         self.first_badge = os.path.join(os.path.dirname(__file__), "assets", "1st.png")
         self.second_badge = os.path.join(os.path.dirname(__file__), "assets", "2nd.png")
@@ -26,10 +28,13 @@ class Profile:
         )
         self.partner = os.path.join(os.path.dirname(__file__), "assets", "partner.png")
         self.qp = os.path.join(os.path.dirname(__file__), "assets", "qp.png")
+        self.beta = os.path.join(os.path.dirname(__file__), "assets", "beta.png")
+
     def generate_profile(
         self,
         creator: int,
         partner: int,
+        beta:int,
         bg_image: str = None,
         profile_image: str = None,
         font_color: str = None,
@@ -49,12 +54,11 @@ class Profile:
         balance: int = None,
         bio: str = None,
         brightness: int = None,
-    ):
-        if not bg_image:
-            card = Image.open(self.default_bg).convert("RGBA")
-        else:
-            bg_bytes = BytesIO(requests.get(bg_image).content)
-            card = Image.open(bg_bytes).convert("RGBA")
+    ) -> BytesIO:
+        background = (
+            BytesIO(requests.get(bg_image).content) if bg_image else self.default_bg
+        )
+        card = Image.open(background).convert("RGBA")
 
         card = ImageEnhance.Brightness(card).enhance(float(brightness / 100))
 
@@ -105,17 +109,13 @@ class Profile:
 
         # ======== Colors ========================
 
-        if not font_color:
-            COLOR = (204, 204, 255)
-        elif font_color == None:
-            COLOR = (204, 204, 255)
-        else:
-            hex = ImageColor.getcolor(("#" + font_color), "RGB")
-            COLOR = tuple(hex)
+        COLOR = (
+            tuple(ImageColor.getcolor(font_color, "RGB"))
+            if font_color
+            else (204, 204, 255)
+        )
 
-        STROKE = (151, 151, 151)
-
-        def get_str(xp):
+        def get_str(xp: int):
             if xp < 1000:
                 return str(xp)
             if xp >= 1000 and xp < 1000000:
@@ -123,7 +123,7 @@ class Profile:
             if xp > 1000000:
                 return str(round(xp / 1000000, 1)) + "M"
 
-        def get_str_qp(balance):
+        def get_str_qp(balance: int):
             if balance < 1000:
                 return str(balance)
             if balance >= 1000 and balance < 1000000:
@@ -152,61 +152,43 @@ class Profile:
         creator_badge = Image.open(self.creator_badge).resize((50, 50))
         partner_badge = Image.open(self.partner).resize((50, 50))
         qp = Image.open(self.qp).resize((50, 50))
+        betatest = Image.open(self.beta).resize((50, 50))
 
         if voted == True:
             enhancer = ImageEnhance.Brightness(voter)
             voter = enhancer.enhance(1.1)
             card.paste(voter, (840, 430), voter)
-        else:
-            pass
 
-        if grank == 1:
-            ranked = _1st
+        if grank <= 100:
+            if grank == 1:
+                ranked = _1st
+            elif grank == 2:
+                ranked = _2nd
+            elif grank == 3:
+                ranked = _3rd
+            elif grank <= 30:
+                ranked = top30
+            else:
+                ranked = top100
+
             ranked = ImageEnhance.Brightness(ranked).enhance(1.1)
             card.paste(ranked, (780, 430), ranked)
-        elif grank == 2:
-            ranked = _2nd
-            ranked = ImageEnhance.Brightness(ranked).enhance(1.1)
-            card.paste(ranked, (780, 430), ranked)
-        elif grank == 3:
-            ranked = _3rd
-            ranked = ImageEnhance.Brightness(ranked).enhance(1.1)
-            card.paste(ranked, (780, 430), ranked)
-        elif grank <= 30 and grank > 3:
-            ranked = top30
-            ranked = ImageEnhance.Brightness(ranked).enhance(1.1)
-            card.paste(ranked, (780, 430), ranked)
-        elif grank <= 100 and grank > 30:
-            ranked = top100
-            ranked = ImageEnhance.Brightness(ranked).enhance(1.1)
-            card.paste(ranked, (780, 430), ranked)
-        else:
-            pass
 
         if rrank < 15:
             richest = ImageEnhance.Brightness(richest).enhance(1.1)
             card.paste(richest, (720, 430), richest)
-        else:
-            pass
 
         if creator == 597829930964877369:
             creator_badge = ImageEnhance.Brightness(creator_badge).enhance(1.1)
             card.paste(creator_badge, (660, 430), creator_badge)
-        else:
-            pass
 
-        partner_ids = [
-            533792698331824138,
-            597829930964877369,
-            336891933911678977,
-            995330806056755321,
-        ]
-
-        if partner in partner_ids:
+        if Partner.check(partner):
             partner_badge = ImageEnhance.Brightness(partner_badge).enhance(1.1)
             card.paste(partner_badge, (600, 430), partner_badge)
-        else:
-            pass
+
+        if BetaTest.check(beta):
+            betatest = ImageEnhance.Brightness(betatest).enhance(1.1)
+            card.paste(betatest, (540, 430), betatest)
 
         profile_pic_holder.paste(profile, (30, 250))
 
@@ -237,39 +219,22 @@ class Profile:
             stroke_width=1,
         )
 
-        if grank == None:
-            profile_draw.text(
-                (70, 570),
-                "N/A",
-                COLOR,
-                font=ImageFont.truetype(self.font1, 45),
-                stroke_width=1,
-            )
-        else:
-            profile_draw.text(
-                (70, 570),
-                f"#{grank}",
-                COLOR,
-                font=ImageFont.truetype(self.font1, 45),
-                stroke_width=1,
-            )
-
-        if srank == None:
-            profile_draw.text(
-                (370, 570),
-                "N/A",
-                COLOR,
-                font=ImageFont.truetype(self.font1, 45),
-                stroke_width=1,
-            )
-        else:
-            profile_draw.text(
-                (370, 570),
-                f"#{srank}",
-                COLOR,
-                font=ImageFont.truetype(self.font1, 45),
-                stroke_width=1,
-            )
+        global_rank = ("#" + str(grank)) if grank else "N/A"
+        profile_draw.text(
+            (70, 570),
+            global_rank,
+            COLOR,
+            font=ImageFont.truetype(self.font1, 45),
+            stroke_width=1,
+        )
+        server_rank = ("#" + str(srank)) if srank else "N/A"
+        profile_draw.text(
+            (370, 570),
+            server_rank,
+            COLOR,
+            font=ImageFont.truetype(self.font1, 45),
+            stroke_width=1,
+        )
 
         profile_draw.text(
             (640, 570),
@@ -330,8 +295,7 @@ class Profile:
 
         profile_draw.rectangle((12, 752, server_length_of_bar, 761), fill=COLOR)
 
-        if bio == None:
-            bio = "No bio available"
+        bio = bio if bio else "No bio available"
 
         profile_draw.rounded_rectangle(
             (10, 780, 890, 890), radius=7, width=2, outline=COLOR, fill=(59, 59, 59)

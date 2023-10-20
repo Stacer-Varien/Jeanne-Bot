@@ -1,4 +1,4 @@
-from functions import Botban
+from functions import Botban, Command
 from discord import Color, Embed, Interaction, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
 from config import kitsune_nekoslife, neko_purrbot
@@ -18,9 +18,16 @@ class images(Cog):
 
     @Jeanne.command(description="Get a kitsune image")
     async def kitsune(self, ctx: Interaction):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
+
+        if Command(ctx.guild).check_disabled(self.kitsune.qualified_name):
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
+            return
+
+        await ctx.response.defer()
 
         kistune_api = get(kitsune_nekoslife).json()
         kitsune = Embed(color=Color.random())
@@ -32,10 +39,15 @@ class images(Cog):
 
     @Jeanne.command(description="Need a wallpaper for your PC or phone?")
     async def wallpaper(self, ctx: Interaction):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
+            return
+        if Command(ctx.guild).check_disabled(self.wallpaper.qualified_name):
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
             return
 
+        await ctx.response.defer()
         wallpaper = Embed(color=Color.random())
         wallpaper.set_image(url=get_wallpaper_pic())
         wallpaper.set_footer(
@@ -45,25 +57,43 @@ class images(Cog):
 
     @Jeanne.command(description="Get a Jeanne d'Arc image")
     async def jeanne(self, ctx: Interaction):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
-        embed, file=get_jeanne_pic()
+        if Command(ctx.guild).check_disabled(self.jeanne.qualified_name):
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
+            return
+
+        await ctx.response.defer()
+        embed, file = get_jeanne_pic()
         await ctx.followup.send(embed=embed, file=file)
 
     @Jeanne.command(description="Get a Saber image")
     async def saber(self, ctx: Interaction):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
-        embed, file=get_saber_pic()
+        if Command(ctx.guild).check_disabled(self.saber.qualified_name):
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
+            return
+
+        await ctx.response.defer()
+        embed, file = get_saber_pic()
         await ctx.followup.send(embed=embed, file=file)
 
     @Jeanne.command(description="Get a neko image")
     async def neko(self, ctx: Interaction):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
+        if Command(ctx.guild).check_disabled(self.neko.qualified_name):
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
+            return
+
+        await ctx.response.defer()
 
         neko_api = get(neko_purrbot).json()
         neko = Embed(color=Color.random())
@@ -75,14 +105,28 @@ class images(Cog):
 
     @Jeanne.command(description="Get a Medusa (Fate) image")
     async def medusa(self, ctx: Interaction):
-        await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user():
+        if Botban(ctx.user).check_botbanned_user:
             return
-        embed, file=get_medusa_pic()
+        if Command(ctx.guild).check_disabled(self.medusa.qualified_name):
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
+            return
+
+        await ctx.response.defer()
+        embed, file = get_medusa_pic()
         await ctx.followup.send(embed=embed, file=file)
 
     @Jeanne.command(description="Get an image from Safebooru")
     async def safebooru(self, ctx: Interaction):
+        if Botban(ctx.user).check_botbanned_user:
+            return
+        if Command(ctx.guild).check_disabled(self.safebooru.qualified_name):
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
+            return
+
         await ctx.response.defer()
         embed = Embed(color=Color.random())
         embed.set_image(url=safebooru_pic())

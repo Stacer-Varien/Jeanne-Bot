@@ -4,9 +4,8 @@ from typing import Optional
 from reactionmenu import ViewMenu, ViewButton
 
 
-async def dictionary(ctx: Interaction, word: str, language: Optional[str]=None):
-    if language == None:
-        language = "en"
+async def dictionary(ctx: Interaction, word: str, language: Optional[str] = None):
+    language = language if language else "en"
 
     embed = Embed()
     response = requests.get(
@@ -20,52 +19,56 @@ async def dictionary(ctx: Interaction, word: str, language: Optional[str]=None):
         embed.description = (
             "Sorry, definitions for the word you were looking for could not be found."
         )
-        return await ctx.followup.send(embed=embed)
+        await ctx.response.send_message(embed=embed)
+        return
 
-    elif response.status_code == 429:
+    if response.status_code == 429:
         embed.color = Color.red()
         embed.title = data["title"]
         embed.description = "Unfortunately, the dictionary API is being rate limited.\nPlease wait for a few minutes."
-        return await ctx.followup.send(embed=embed)
-    elif response.status_code != 200:
+        await ctx.response.send_message(embed=embed)
+        return
+
+    if response.status_code != 200:
         embed.color = Color.red()
         embed.title = data["title"]
         embed.description = "It seems the dictionary API is facing problems.\nPlease wait for a few minutes."
-        return await ctx.followup.send(embed=embed)
-    else:
-        menu = ViewMenu(
-            ctx,
-            menu_type=ViewMenu.TypeEmbed,
-            disable_items_on_timeout=True,
-            style="Page $/& | Fetched from dictionaryapi.dev",
-        )
-        embed.color = Color.random()
-        embed.title = f"Word: {data[0]['word']}"
+        await ctx.response.send_message(embed=embed)
+        return
 
-        for i in data[0]["meanings"]:
-            partOfSpeech = i["partOfSpeech"]
-            for j in i["definitions"]:
-                definition = j["definition"]
-                try:
-                    example = j["example"]
-                except:
-                    pass
+    menu = ViewMenu(
+        ctx,
+        menu_type=ViewMenu.TypeEmbed,
+        disable_items_on_timeout=True,
+        style="Page $/& | Fetched from dictionaryapi.dev",
+    )
+    embed.color = Color.random()
+    embed.title = f"Word: {data[0]['word']}"
 
-                page_embed = Embed(color=embed.color, title=embed.title)
-                page_embed.add_field(
-                    name="Part of Speech", value=partOfSpeech, inline=False
-                )
-                page_embed.add_field(name="Definition", value=definition, inline=False)
-                try:
-                    page_embed.add_field(name="Example", value=example, inline=False)
-                except:
-                    pass
+    for i in data[0]["meanings"]:
+        partOfSpeech = i["partOfSpeech"]
+        for j in i["definitions"]:
+            definition = j["definition"]
+            try:
+                example = j["example"]
+            except:
+                pass
 
-                menu.add_page(embed=page_embed)
+            page_embed = Embed(color=embed.color, title=embed.title)
+            page_embed.add_field(
+                name="Part of Speech", value=partOfSpeech, inline=False
+            )
+            page_embed.add_field(name="Definition", value=definition, inline=False)
+            try:
+                page_embed.add_field(name="Example", value=example, inline=False)
+            except:
+                pass
 
-        menu.add_button(ViewButton.go_to_first_page())
-        menu.add_button(ViewButton.back())
-        menu.add_button(ViewButton.next())
-        menu.add_button(ViewButton.go_to_last_page())
+            menu.add_page(embed=page_embed)
 
-        await menu.start()
+    menu.add_button(ViewButton.go_to_first_page())
+    menu.add_button(ViewButton.back())
+    menu.add_button(ViewButton.next())
+    menu.add_button(ViewButton.go_to_last_page())
+
+    await menu.start()
