@@ -117,10 +117,8 @@ class Currency:
         db.commit()
 
     async def give_daily(self):
-        current_time = datetime.now()
-        next_claim = current_time + timedelta(days=1)
-        db.commit()
-
+        next_claim = round((datetime.now() + timedelta(days=1)).timestamp())
+        
         qp = 200 if (datetime.today().weekday() >= 5) else 100
 
         cur = db.execute(
@@ -128,7 +126,7 @@ class Currency:
             (
                 self.user.id,
                 qp,
-                round(next_claim.timestamp()),
+                next_claim,
             ),
         )
         db.commit()
@@ -136,7 +134,7 @@ class Currency:
             db.execute(
                 "UPDATE bankData SET claimed_date = ?, amount = amount + ? WHERE user_id = ?",
                 (
-                    round(next_claim.timestamp()),
+                    next_claim,
                     qp,
                     self.user.id,
                 ),

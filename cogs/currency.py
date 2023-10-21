@@ -444,7 +444,7 @@ class currency(Cog):
                     value=f"{balance} <:quantumpiece:1161010445205905418>",
                 )
                 daily.add_field(name="Next Daily:", value=f"<t:{tomorrow}:f>")
-                await ctx.followup.send(embed=daily)
+            await ctx.followup.send(embed=daily)
             return
         cooldown = Embed(
             description=f"You have already claimed your daily.\nYour next claim is <t:{bank.check_daily}:R>",
