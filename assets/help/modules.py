@@ -46,7 +46,7 @@ hentai = {
             "fields": [
                 {
                     "name": "Commands Available",
-                    "value": "- Hentai\n- Gelbooru\n- Yandere\n- Konachan",
+                    "value": "- Hentai\n- Gelbooru\n- Yandere\n- Konachan\n- Danbooru",
                 }
             ],
         }
@@ -117,7 +117,7 @@ levelling = {
             "fields": [
                 {
                     "name": "Commands Available",
-                    "value": "- Level\n- Profile\n- Server Rank\n- Global Rank",
+                    "value": "- Profile\n- Server Rank\n- Global Rank",
                 }
             ],
         }
@@ -135,7 +135,7 @@ manage = {
             "fields": [
                 {
                     "name": "Commands Available",
-                    "value": "- Create Text Channel\n- Create Voice Channel\n- Create Category\n- Create Stage Channel\n- Create Forum\n- Create Role\n- Create Thread\n- Create Emoji\n- Create Sticker\n- Delete Channel\n- Delete Role\n- Delete Emoji\n- Delete Sticker\n- Edit Text Channel\n- Edit Role\n- Edit Server\n- Edit Forum\n- Rename Emoji\n- Rename Sticker\n- Rename Category\n- Set Welcomer\n- Set Modlog\n- Set Messagelog\n- Set Brightness\n- Set Bio\n- Set Color\n- Set Welcoming Message\n- Set Leaving Message\n- Set Level Update\n- Remove\n- Clone\n- Add Role\n- Remove Role\n- XP Blacklist\n- XP Unblacklist\n- XP Blacklisted Channels List\nCommand Enable\nCommand Disabled\nList Disabled Commands",
+                    "value": "- Create Text Channel\n- Create Voice Channel\n- Create Category\n- Create Stage Channel\n- Create Forum\n- Create Role\n- Create Thread\n- Create Emoji\n- Create Sticker\n- Delete Channel\n- Delete Role\n- Delete Emoji\n- Delete Sticker\n- Edit Text Channel\n- Edit Role\n- Edit Server\n- Edit Forum\n- Rename Emoji\n- Rename Sticker\n- Rename Category\n- Set Welcomer\n- Set Modlog\n- Set Messagelog\n- Set Brightness\n- Set Bio\n- Set Color\n- Set Welcoming Message\n- Set Leaving Message\n- Set Level Update\n- Remove\n- Clone\n- Add Role\n- Remove Role\n- XP Blacklist\n- XP Unblacklist\n- XP Blacklisted Channels List\n- Command Enable\n- Command Disabled\n- List Disabled Commands",
                 }
             ],
         }
@@ -177,23 +177,6 @@ reaction = {
     "attachments": [],
 }
 
-reaction = {
-    "content": None,
-    "embeds": [
-        {
-            "title": "%module% help",
-            "color": int(Color.random().value),
-            "fields": [
-                {
-                    "name": "Commands Available",
-                    "value": "- Hug\n- Slap\n- Tickle\n- Poke\n- Kiss\n- Baka\n- Feed\n- Bite\n- Blush\n- Cuddle\n- Dance",
-                }
-            ],
-        }
-    ],
-    "attachments": [],
-}
-
 utility = {
     "content": None,
     "embeds": [
@@ -203,7 +186,7 @@ utility = {
             "fields": [
                 {
                     "name": "Commands Available",
-                    "value": "- Weather City\n- Weather ZIP Code\n- Calculator\n- Invite\n- Say\n- Embed Generator\n- Embed Edit\n- Bot Report\n- Add Reminder\n- List Reminders\n- Cancel Reminder\n- Dictionary",
+                    "value": "- Weather\n- Calculator\n- Invite\n- Say\n- Embed Generator\n- Embed Edit\n- Bot Report\n- Add Reminder\n- List Reminders\n- Cancel Reminder\n- Dictionary",
                 }
             ],
         }
@@ -218,6 +201,7 @@ modules = [
     image,
     info,
     inventory,
+    levelling,
     manage,
     moderation,
     reaction,
