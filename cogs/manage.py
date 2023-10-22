@@ -1077,7 +1077,7 @@ class Set_Group(GroupCog, name="set"):
 
         setup = Embed(description="Welcomer channels set", color=Color.random())
         if welcoming_channel:
-            Manage(ctx.guild, welcoming_channel).set_welcomer()
+            Manage(ctx.guild).set_welcomer(welcoming_channel)
             setup.add_field(
                 name="Channel welcoming users",
                 value=welcoming_channel.mention,
@@ -1085,7 +1085,7 @@ class Set_Group(GroupCog, name="set"):
             )
 
         if leaving_channel:
-            Manage(ctx.guild, leaving_channel).set_leaver()
+            Manage(ctx.guild).set_leaver(leaving_channel)
             setup.add_field(
                 name="Channel showing users that left",
                 value=leaving_channel.mention,
