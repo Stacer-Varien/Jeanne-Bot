@@ -18,7 +18,7 @@ class TopGG(Cog):
         self.topgg_webhook.run(5000)
         self.update_stats.start()
 
-    @tasks.loop(minutes=30)
+    @tasks.loop(minutes=30, reconnect=True)
     async def update_stats(self):
         try:
             print(
@@ -27,11 +27,16 @@ class TopGG(Cog):
         except Exception as e:
             print(f"Failed to post server count\n{e.__class__.__name__}: {e}")
 
+    @update_stats.before_loop
+    async def before_update_stats(self):
+        print('waiting...')
+        await self.bot.wait_until_ready()       
+
     @Cog.listener()
     async def on_dbl_vote(self, data: dict):
         if data["type"] == "upvote":
             voter = await self.bot.fetch_user(int(data["user"]))
-            if Botban(voter).check_botbanned_user():
+            if Botban(voter).check_botbanned_user:
                 return
 
             if await self.topggpy.get_weekend_status() == True:
@@ -40,7 +45,7 @@ class TopGG(Cog):
                 credits = 50
 
             await Currency(voter).add_qp(credits)
-            with open("voterdata.txt", "w") as f:
+            with open("voterdata.json", "w") as f:
                 dump(data, f)
 
 

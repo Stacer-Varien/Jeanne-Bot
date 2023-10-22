@@ -17,14 +17,14 @@ class WelcomerCog(Cog):
 
     @Cog.listener()
     async def on_member_join(self, member: Member):
-        welcomer = Welcomer(member.guild).get_welcomer()
+        welcomer = Welcomer(member.guild).get_welcomer
 
         if welcomer is None:
             return
 
-        if member.guild.id == int(welcomer[0]):
+        if member.guild.id == welcomer:
             channel = self.bot.get_channel(int(welcomer[1]))
-            welcomemsg = Welcomer(member.guild).get_welcoming_msg()
+            welcomemsg = Welcomer(member.guild).get_welcoming_msg
 
             if welcomemsg == None:
                 welcome = Embed(
@@ -65,14 +65,14 @@ class WelcomerCog(Cog):
 
     @Cog.listener()
     async def on_member_remove(self, member: Member):
-        leaver = Welcomer(member.guild).get_leaver()
+        leaver = Welcomer(member.guild).get_leaver
 
         if leaver is None:
             return
 
-        if member.guild.id == int(leaver[0]):
+        if member.guild.id == leaver:
             channel = self.bot.get_channel(int(leaver[1]))
-            leavingmsg = Welcomer(member.guild).get_leaving_msg()
+            leavingmsg = Welcomer(member.guild).get_leaving_msg
 
             if leavingmsg == None:
                 leave = Embed(

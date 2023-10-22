@@ -559,7 +559,7 @@ class Levelling:
     @property
     def get_server_rank(self) -> list | None:
         leaders_query = db.execute(
-            "SELECT user_id FROM serverxpData WHERE guild_id = ? ORDER BY lvl DESC LIMIT 15;",
+            "SELECT * FROM serverxpData WHERE guild_id = ? ORDER BY lvl DESC LIMIT 15;",
             (self.server.id,),
         )
         db.commit()
