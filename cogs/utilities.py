@@ -119,9 +119,9 @@ class Embed_Group(GroupCog, name="embed"):
 
         try:
             embed = Embed.from_dict(json["embeds"][0])
-            m=await channel.send(content=content, embed=embed)
+            m = await channel.send(content=content, embed=embed)
         except:
-            m=await channel.send(content=content)
+            m = await channel.send(content=content)
         await ctx.followup.send(
             content="{} sent in {}".format(m.jump_url, channel.mention), ephemeral=True
         )
@@ -207,26 +207,30 @@ class ReminderCog(GroupCog, name="reminder"):
         self.check_reminders.start()
         super().__init__()
 
-    @tasks.loop(seconds=10)
+    @tasks.loop(seconds=30, reconnect=True)
     async def check_reminders(self):
-        data=Reminder().get_all_reminders
+        data = Reminder().get_all_reminders
         if data == None:
             return
         for reminder in data:
-                if int(round(datetime.now().timestamp())) > int(reminder[2]):
-                    member = await self.bot.fetch_user(reminder[0])
-                    id = reminder[1]
-                    reason = reminder[3]
-                    try:
-                        embed = Embed(title="Reminder ended", color=Color.random())
-                        embed.add_field(name="Reminder", value=reason, inline=False)
-                        await member.send(embed=embed)
-                    except:
-                        pass
-                    Reminder(member).remove(id)
-                else:
-                    continue
+            if int(round(datetime.now().timestamp())) > int(reminder[2]):
+                member = await self.bot.fetch_user(reminder[0])
+                id = reminder[1]
+                reason = reminder[3]
+                try:
+                    embed = Embed(title="Reminder ended", color=Color.random())
+                    embed.add_field(name="Reminder", value=reason, inline=False)
+                    await member.send(embed=embed)
+                except:
+                    pass
+                await Reminder(member).remove(id)
+            else:
+                continue
 
+    @check_reminders.before_loop
+    async def before_check_reminders(self):
+        print("waiting...")
+        await self.bot.wait_until_ready()
 
     @Jeanne.command(description="Add a reminder")
     @Jeanne.describe(
@@ -242,23 +246,26 @@ class ReminderCog(GroupCog, name="reminder"):
             embed.description = "You have too many reminders!\nWait for one of them to be due or cancel a reminder"
             embed.color = Color.red()
             await ctx.followup.send(embed=embed)
-        else:
-            if parse_timespan(time) < parse_timespan("1 minute"):
-                embed.color = Color.red()
-                embed.description = "Please add a time more than 1 minute"
-                await ctx.followup.send(embed=embed, ephemeral=True)
-            else:
-                date = datetime.now() + timedelta(seconds=parse_timespan(time))
-                embed.title = "Reminder added"
+            return
+        if parse_timespan(time) < parse_timespan("1 minute"):
+            embed.color = Color.red()
+            embed.description = "Please add a time more than 1 minute"
+            await ctx.followup.send(embed=embed, ephemeral=True)
+            return
 
-                embed.description = f"On <t:{round(date.timestamp())}:F>, I will alert you about your reminder"
-                embed.color = Color.random()
-                embed.add_field(name="Reason", value=reason, inline=False)
-                embed.set_footer(
-                    text="Please allow your DMs to be opened in this server (or any other server you are mutual to me) to recieve alerts"
-                )
-                Reminder(ctx.user).add(reason, round(date.timestamp()))
-                await ctx.followup.send(embed=embed, ephemeral=True)
+        date = datetime.now() + timedelta(seconds=parse_timespan(time))
+        embed.title = "Reminder added"
+
+        embed.description = (
+            f"On <t:{round(date.timestamp())}:F>, I will alert you about your reminder"
+        )
+        embed.color = Color.random()
+        embed.add_field(name="Reason", value=reason, inline=False)
+        embed.set_footer(
+            text="Please allow your DMs to be opened in this server (or any other server you are mutual to me) to recieve alerts"
+        )
+        await Reminder(ctx.user).add(reason, round(date.timestamp()))
+        await ctx.followup.send(embed=embed, ephemeral=True)
 
     @add.error
     async def add_error(self, ctx: Interaction, error: Jeanne.errors.AppCommandError):
