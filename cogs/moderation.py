@@ -287,7 +287,7 @@ class moderation(Cog):
         self.bot = bot
         self.check_db.start()
 
-    @tasks.loop(seconds=30, reconnect=True)
+    @tasks.loop(seconds=60, reconnect=True)
     async def check_db(self):
         for bans in Moderation().get_softban_data():
             if int(round(datetime.now().timestamp())) > int(bans[2]):
@@ -313,9 +313,13 @@ class moderation(Cog):
                     modlog = await guild.fetch_channel(mod_channel)
 
                     await modlog.send(embed=unmute)
-                    return
+                else:
+                    continue
 
-                continue
+    @check_db.before_loop
+    async def before_check_db(self):
+        print("waiting...")
+        await self.bot.wait_until_ready()
 
     @Jeanne.command(description="Warn a member")
     @Jeanne.describe(member="Which member are you warning?", reason="What did they do?")
@@ -544,7 +548,10 @@ class moderation(Cog):
     @Jeanne.checks.has_permissions(manage_nicknames=True)
     @Jeanne.checks.bot_has_permissions(manage_nicknames=True)
     async def changenickname(
-        self, ctx: Interaction, member: Member, nickname: Jeanne.Range[str, 1, 32]
+        self,
+        ctx: Interaction,
+        member: Member,
+        nickname: Optional[Jeanne.Range[str, 1, 32]],
     ):
         if Botban(ctx.user).check_botbanned_user:
             return
@@ -556,6 +563,17 @@ class moderation(Cog):
 
         await ctx.response.defer()
 
+        if (not nickname) or (nickname == None):
+            await member.edit(nick=None)
+            setnick = Embed(color=0x00FF68)
+            setnick.add_field(
+                name="Nickname changed",
+                value=f"{member}'s nickname has been removed",
+                inline=False,
+            )
+            await ctx.followup.send(embed=setnick)
+            return
+
         if member.nick == None:
             embed = Embed(color=Color.red())
             embed.description = f"{member} has no nickname"
@@ -566,7 +584,7 @@ class moderation(Cog):
         setnick = Embed(color=0x00FF68)
         setnick.add_field(
             name="Nickname changed",
-            value=f"{member}'s nickname is now `{member.nick}`",
+            value=f"{member}'s nickname is now `{nickname}`",
             inline=False,
         )
         await ctx.followup.send(embed=setnick)
