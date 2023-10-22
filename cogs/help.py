@@ -116,10 +116,16 @@ class HelpGroup(GroupCog, name="help"):
         cmd_usage = "/" + cmd.qualified_name + " " + " ".join(parms)
         embed.add_field(name="Command Usage", value=f"`{cmd_usage}`", inline=False)
         embed.set_footer(
-            text="Legend:\n[] - Required\n<> - Optional\n\nIt is best to go to the webiste for detailed explanations and usages"
+            text="Legend:\n[] - Required\n<> - Optional\n\nIt is best to go to the websites for detailed explanations and usages"
         )
 
         await ctx.followup.send(embed=embed)
+    
+    @command.error
+    async def command_error(self, ctx:Interaction, error:Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(error.original, IndexError):
+            embed = Embed(description="I don't have this command", color=Color.red())
+            await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Get help of a certain module")
     @Jeanne.describe(module="Which module?")
