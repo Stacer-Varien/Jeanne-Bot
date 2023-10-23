@@ -22,7 +22,7 @@ class WelcomerCog(Cog):
         if welcomer is None:
             return
 
-        if member.guild.id == welcomer:
+        if member.guild.id == welcomer[0]:
             channel = self.bot.get_channel(int(welcomer[1]))
             welcomemsg = Welcomer(member.guild).get_welcoming_msg
 
@@ -70,7 +70,7 @@ class WelcomerCog(Cog):
         if leaver is None:
             return
 
-        if member.guild.id == leaver:
+        if member.guild.id == leaver[0]:
             channel = self.bot.get_channel(int(leaver[1]))
             leavingmsg = Welcomer(member.guild).get_leaving_msg
 
@@ -114,3 +114,4 @@ class WelcomerCog(Cog):
 
 async def setup(bot: Bot):
     await bot.add_cog(WelcomerCog(bot))
+

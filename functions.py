@@ -1150,30 +1150,30 @@ class Welcomer:
         self.server = server
 
     @property
-    def get_welcomer(self) -> int | None:
+    def get_welcomer(self)->(tuple[int, int] | None):
         data = db.execute(
-            "SELECT welcoming_channel FROM serverData where server = ?",
+            "SELECT * FROM serverData where server = ?",
             (self.server.id,),
         ).fetchone()
         db.commit()
-        return data[0] if data else None
+        return (int(data[0]), int(data[2])) if data else None
 
     @property
-    def get_leaver(self) -> int | None:
+    def get_leaver(self) -> (tuple[int, int] | None):
         data = db.execute(
-            "SELECT leaving_channel FROM serverData where server = ?", (self.server.id,)
+            "SELECT * FROM serverData where server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
-        return data[0] if data else None
+        return (int(data[0]), int(data[1])) if data else None
 
     @property
-    def get_welcoming_msg(self) -> int | None:
+    def get_welcoming_msg(self) -> str | None:
         data = db.execute(
             "SELECT welcoming_message FROM serverData WHERE server = ?",
             (self.server.id,),
         ).fetchone()
         db.commit()
-        return data[0] if data else None
+        return str(data[0]) if data else None
 
     @property
     def get_leaving_msg(self) -> str | None:
@@ -1181,7 +1181,7 @@ class Welcomer:
             "SELECT leaving_message FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
-        return data[0] if data else None
+        return str(data[0]) if data else None
 
 
 def get_cached_users() -> int:
