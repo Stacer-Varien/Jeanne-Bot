@@ -1077,7 +1077,7 @@ class Set_Group(GroupCog, name="set"):
 
         setup = Embed(description="Welcomer channels set", color=Color.random())
         if welcoming_channel:
-            Manage(ctx.guild).set_welcomer(welcoming_channel)
+            await Manage(ctx.guild).set_welcomer(welcoming_channel)
             setup.add_field(
                 name="Channel welcoming users",
                 value=welcoming_channel.mention,
@@ -1085,7 +1085,7 @@ class Set_Group(GroupCog, name="set"):
             )
 
         if leaving_channel:
-            Manage(ctx.guild).set_leaver(leaving_channel)
+            await Manage(ctx.guild).set_leaver(leaving_channel)
             setup.add_field(
                 name="Channel showing users that left",
                 value=leaving_channel.mention,
@@ -1109,7 +1109,7 @@ class Set_Group(GroupCog, name="set"):
             return
 
         await ctx.response.defer()
-        Manage(ctx.guild).set_modloger(channel)
+        await Manage(ctx.guild).set_modloger(channel)
         embed = Embed(description="Modlog channel set", color=Color.red())
         embed.add_field(name="Channel selected", value=channel.mention, inline=True)
         await ctx.followup.send(embed=embed)
@@ -1179,7 +1179,7 @@ class Set_Group(GroupCog, name="set"):
             await view.wait()
 
             if view.value == True:
-                Manage(ctx.guild).set_welcomer_msg(str(json_request.content))
+                await Manage(ctx.guild).set_welcomer_msg(str(json_request.content))
 
                 embed = Embed(description="Welcoming message set")
                 await ctx.edit_original_response(
@@ -1262,7 +1262,7 @@ class Set_Group(GroupCog, name="set"):
             await view.wait()
 
             if view.value == True:
-                Manage(ctx.guild).set_leaving_msg(str(json_request.content))
+                await Manage(ctx.guild).set_leaving_msg(str(json_request.content))
 
                 embed = Embed(description="Leaving message set")
                 await ctx.edit_original_response(

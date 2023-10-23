@@ -137,7 +137,7 @@ class Welcomingmsg(ui.Modal, title="Welcoming Message"):
         await view.wait()
 
         if view.value == True:
-            Manage(ctx.guild).set_welcomer_msg(self.jsonscript.value)
+            await Manage(ctx.guild).set_welcomer_msg(self.jsonscript.value)
 
             embed = Embed(description="Welcoming message set")
             await ctx.edit_original_response(content=None, embeds=[embed], view=None)
@@ -204,7 +204,7 @@ class Leavingmsg(ui.Modal, title="Leaving Message"):
         await view.wait()
 
         if view.value == True:
-            Manage(ctx.guild).set_leaving_msg(self.jsonscript.value)
+            await Manage(ctx.guild).set_leaving_msg(self.jsonscript.value)
 
             embed = Embed(description="Leaving message set")
             await ctx.edit_original_response(content=None, embeds=[embed], view=None)
