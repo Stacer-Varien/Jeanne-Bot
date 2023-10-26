@@ -481,19 +481,21 @@ class ReportContentPlus(ui.Select):
         await ctx.response.send_modal(ReportContentM(self.values[0]))
 
 
+
 class ReportSelect(ui.View):
     def __init__(
         self,
         link1: Optional[str] = None,
         link2: Optional[str] = None,
         link3: Optional[str] = None,
-        link4: Optional[str] = None,
+        link4: Optional[str] = None
     ):
         self.link1 = link1
         self.link2 = link2
         self.link3 = link3
         self.link4 = link4
-        super().__init__()
+        self.value=None
+        super().__init__(timeout=60)
         self.add_item(ReportContentPlus(self.link1, self.link2, self.link3, self.link4))
 
 
@@ -659,6 +661,7 @@ class RolesButton(ui.View):
         await ctx.response.edit_message(embeds=[self.Uinfo, roles], view=None)
         self.stop()
 
+
 class BioModal(ui.Modal, title="Bio"):
     def __init__(self):
         super().__init__()
@@ -680,8 +683,8 @@ class BioModal(ui.Modal, title="Bio"):
     )
 
     async def on_submit(self, ctx: Interaction) -> None:
-        bio=self.line1.value + "\n" + (self.line2.value if self.line2.value else "")
-        embed=Embed()
+        bio = self.line1.value + "\n" + (self.line2.value if self.line2.value else "")
+        embed = Embed()
         await Inventory(ctx.user).set_bio(bio)
         embed.description = "New bio has been set to:\n{}".format(bio)
         embed.color = Color.random()
