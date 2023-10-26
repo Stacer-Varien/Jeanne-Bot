@@ -45,9 +45,8 @@ class TopGG(Cog):
                 credits = 50
 
             await Currency(voter).add_qp(credits)
-            with open("voterdata.json", "w") as f:
-                dump(data, f)
-
+            with open("voterdata.txt", "w") as f:
+            	f.writelines(str(data))
 
 async def setup(bot: Bot):
     await bot.add_cog(TopGG(bot))
