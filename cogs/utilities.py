@@ -290,7 +290,7 @@ class ReminderCog(GroupCog, name="reminder"):
             return
 
         await ctx.response.defer(ephemeral=True)
-        reminders = Reminder(ctx.user).get_all_user_reminders()
+        reminders = Reminder(ctx.user).get_all_user_reminders
         reminds = []
         for i in reminders:
             ids = i[1]
