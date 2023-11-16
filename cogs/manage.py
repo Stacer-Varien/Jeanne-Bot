@@ -1150,9 +1150,8 @@ class Set_Group(GroupCog, name="set"):
                 ]
             )
 
-            json_file = jsonfile.url
-            json_request = get(json_file)
-            json_content = replace_all(json_request.content, parameters)
+            json_request = str(get(jsonfile.url).content)
+            json_content = replace_all(json_request, parameters)
             json = loads(json_content)
 
             try:
@@ -1179,7 +1178,7 @@ class Set_Group(GroupCog, name="set"):
             await view.wait()
 
             if view.value == True:
-                await Manage(ctx.guild).set_welcomer_msg(str(json_request.content))
+                await Manage(ctx.guild).set_welcomer_msg(str(json_request))
 
                 embed = Embed(description="Welcoming message set")
                 await ctx.edit_original_response(
@@ -1233,9 +1232,8 @@ class Set_Group(GroupCog, name="set"):
                 ]
             )
 
-            json_file = jsonfile.url
-            json_request = get(json_file)
-            json_content = replace_all(json_request.content, parameters)
+            json_request = str(get(jsonfile.url).content)
+            json_content = replace_all(json_request, parameters)
             json = loads(json_content)
 
             try:
@@ -1262,7 +1260,7 @@ class Set_Group(GroupCog, name="set"):
             await view.wait()
 
             if view.value == True:
-                await Manage(ctx.guild).set_leaving_msg(str(json_request.content))
+                await Manage(ctx.guild).set_leaving_msg(str(json_request))
 
                 embed = Embed(description="Leaving message set")
                 await ctx.edit_original_response(
