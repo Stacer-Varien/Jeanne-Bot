@@ -1150,33 +1150,33 @@ class Welcomer:
         self.server = server
 
     @property
-    def get_welcomer(self) -> int | None:
+    def get_welcomer(self):
         data = db.execute(
-            "SELECT welcoming_channel FROM serverData where server = ?",
+            "SELECT * FROM serverData where server = ?",
             (self.server.id,),
         ).fetchone()
         db.commit()
-        return data[0] if data else None
+        return data if data else None
 
     @property
-    def get_leaver(self) -> int | None:
+    def get_leaver(self):
         data = db.execute(
-            "SELECT leaving_channel FROM serverData where server = ?", (self.server.id,)
+            "SELECT * FROM serverData where server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
-        return data[0] if data else None
+        return data if data else None
 
     @property
-    def get_welcoming_msg(self) -> int | None:
+    def get_welcoming_msg(self):
         data = db.execute(
             "SELECT welcoming_message FROM serverData WHERE server = ?",
-            (self.server.id,),
+            (self.server.id,)
         ).fetchone()
         db.commit()
         return data[0] if data else None
 
     @property
-    def get_leaving_msg(self) -> str | None:
+    def get_leaving_msg(self):
         data = db.execute(
             "SELECT leaving_message FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
@@ -1222,7 +1222,7 @@ class NsfwApis(Enum):
 class Hentai:
     def __init__(self, plus: Optional[bool] = None):
         self.plus = plus
-        self.blacklisted_tags = {"loli", "shota", "cub", "gore", "vore"}
+        self.blacklisted_tags = ["loli", "shota", "cub", "gore", "vore", "underage", "minor", "oppai_loli", "child"]
 
     def format_tags(self, tags: str = None) -> str:
         if tags:
@@ -1235,20 +1235,6 @@ class Hentai:
             return tags_string
         else:
             return ""
-
-    def remove_data_from_json_list(
-        self, json_list: List[dict], key_to_check: str, values_to_remove: List[str]
-    ) -> list[dict] | None:
-        try:
-            data_list = [
-                item
-                for item in json_list
-                if item.get(key_to_check) not in values_to_remove
-            ]
-            return data_list
-        except Exception as e:
-            print(f"Error in remove_data_from_json_list: {e}")
-            return None
 
     async def get_nsfw_image(
         self, provider: NsfwApis, rating: Optional[str] = None, tags: str = None
@@ -1272,7 +1258,7 @@ class Hentai:
 
         shuffle(nsfw_images_list)
 
-        if not tags or tags == None:
+        if (not tags) or (tags == None):
             tags = ""
 
         tags_list = [
@@ -1287,17 +1273,17 @@ class Hentai:
         filtered_images = []
         for image in nsfw_images_list:
             if provider.value == provider.DanbooruApi.value:
-                tags = str(image["tag_string"]).lower().split(" ")
+                img_tags = str(image["tag_string"]).lower().split(" ")
             else:
-                tags = str(image["tags"]).lower().split(" ")
+                img_tags = str(image["tags"]).lower().split(" ")
             try:
                 urls = str(image["file_url"])
-                if any(tag in self.blacklisted_tags for tag in tags):
-                    continue
-                if any(url in set(bl) for url in urls):
-                    continue
             except:
                 continue
+            if any(tag in self.blacklisted_tags for tag in img_tags):
+                continue
+            if any(url in set(bl) for url in urls):
+                continue            
             filtered_images.append(image)
         return filtered_images
 
@@ -1397,7 +1383,6 @@ def shorten_url(url: str) -> str | None:
     response = get(api_url, params=params)
     if response.status_code == 200:
         short_url = response.text
-        time.sleep(1)
         return short_url
     else:
         return None

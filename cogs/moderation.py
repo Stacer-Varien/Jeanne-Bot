@@ -318,7 +318,6 @@ class moderation(Cog):
 
     @check_db.before_loop
     async def before_check_db(self):
-        print("waiting...")
         await self.bot.wait_until_ready()
 
     @Jeanne.command(description="Warn a member")

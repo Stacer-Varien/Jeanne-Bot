@@ -229,7 +229,6 @@ class ReminderCog(GroupCog, name="reminder"):
 
     @check_reminders.before_loop
     async def before_check_reminders(self):
-        print("waiting...")
         await self.bot.wait_until_ready()
 
     @Jeanne.command(description="Add a reminder")
@@ -290,16 +289,19 @@ class ReminderCog(GroupCog, name="reminder"):
             return
 
         await ctx.response.defer(ephemeral=True)
-        reminders = Reminder(ctx.user).get_all_user_reminders()
-        reminds = []
-        for i in reminders:
-            ids = i[1]
-            reminder = i[3]
-            time = f"<t:{i[2]}:F>"
-            reminds.append([str(ids), str(reminder), str(time)])
-        col_names = ["ID", "Reminders", "Time"]
-        embed = Embed()
-        embed.description = tabulate(reminds, headers=col_names, tablefmt="pretty")
+        reminders = Reminder(ctx.user).get_all_user_reminders
+        try:
+            reminds = []
+            for i in reminders:
+                ids = i[1]
+                reminder = i[3]
+                time = f"<t:{i[2]}:F>"
+                reminds.append([str(ids), str(reminder), str(time)])
+            col_names = ["ID", "Reminders", "Time"]
+            embed = Embed()
+            embed.description = tabulate(reminds, headers=col_names, tablefmt="pretty")
+        except:
+            embed.description="No reminders"
         embed.color = Color.random()
         await ctx.followup.send(embed=embed, ephemeral=True)
 
@@ -494,7 +496,7 @@ class slashutilities(Cog):
                 "This command is disabled by the server's managers", ephemeral=True
             )
             return
-
+        await ctx.response.defer()
         try:
             answer = self.parser.parse(calculate).evaluate({})
             calculation = Embed(title="Result", color=Color.random())
