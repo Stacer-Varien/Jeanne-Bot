@@ -439,11 +439,11 @@ class currency(Cog):
                     name="Rewards:",
                     value="You received 100 <:quantumpiece:1161010445205905418>",
                 )
-                daily.add_field(
+            daily.add_field(
                     name="Balance",
                     value=f"{balance} <:quantumpiece:1161010445205905418>",
                 )
-                daily.add_field(name="Next Daily:", value=f"<t:{tomorrow}:f>")
+            daily.add_field(name="Next Daily:", value=f"<t:{tomorrow}:f>")
             await ctx.followup.send(embed=daily)
             return
         cooldown = Embed(
