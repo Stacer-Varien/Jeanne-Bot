@@ -29,7 +29,6 @@ class TopGG(Cog):
 
     @update_stats.before_loop
     async def before_update_stats(self):
-        print('waiting...')
         await self.bot.wait_until_ready()       
 
     @Cog.listener()
@@ -45,9 +44,8 @@ class TopGG(Cog):
                 credits = 50
 
             await Currency(voter).add_qp(credits)
-            with open("voterdata.json", "w") as f:
-                dump(data, f)
-
+            with open("voterdata.txt", "a") as f:
+            	f.writelines(str(f"{data}\n"))
 
 async def setup(bot: Bot):
     await bot.add_cog(TopGG(bot))
