@@ -37,12 +37,11 @@ class slashreactions(Cog):
             return
 
         hug_api = get(hug_nekoslife).json()
-        if member == None:
-            msg = f"*Hugging {ctx.user}*"
-        elif member == ctx.user:
-            msg = f"*Hugging {ctx.user}*"
-        else:
-            msg = f"*{ctx.user} hugged {member.mention}*"
+        msg = (
+            f"*Hugging {ctx.user}*"
+            if member == None
+            else f"*{ctx.user} hugged {member.mention}*"
+        )
         hug = Embed(color=Color.random())
         hug.set_footer(text="Fetched from nekos.life")
         hug.set_image(url=hug_api["url"])
@@ -63,12 +62,11 @@ class slashreactions(Cog):
         slap = Embed(color=Color.random())
         slap.set_footer(text="Fetched from nekos.life")
         slap.set_image(url=slap_api["url"])
-        if member == None:
-            msg = f"*Slapping {ctx.user}*"
-        elif member == ctx.user:
-            msg = f"*Slapping {ctx.user}*"
-        else:
-            msg = f"*{ctx.user} slapped {member.mention}*"
+        msg = (
+            f"*Slapping {ctx.user}*"
+            if member == None
+            else f"*{ctx.user} slapped {member.mention}*"
+        )
         await ctx.response.send_message(msg, embed=slap)
 
     @Jeanne.command(description="Show a smuggy look")
@@ -103,12 +101,12 @@ class slashreactions(Cog):
         poke = Embed(color=Color.random())
         poke.set_footer(text="Fetched from nekos.fun")
         poke.set_image(url=poke_api["image"])
-        if member == None:
-            msg = f"*Poking {ctx.user}*"
-        elif member == ctx.user:
-            msg = f"*Poking {ctx.user}*"
-        else:
-            msg = f"*{ctx.user} poked {member.mention}*"
+
+        msg = (
+            f"*Poking {ctx.user}*"
+            if member == None
+            else f"*{ctx.user} poked {member.mention}*"
+        )
         await ctx.response.send_message(msg, embed=poke)
 
     @Jeanne.command(description="Pat someone or yourself")
@@ -126,12 +124,12 @@ class slashreactions(Cog):
         pat = Embed(color=Color.random())
         pat.set_footer(text="Fetched from nekos.life")
         pat.set_image(url=pat_api["url"])
-        if member == None:
-            msg = f"*Patting {ctx.user}*"
-        elif member == ctx.user:
-            msg = f"*Patting {ctx.user}*"
-        else:
-            msg = f"*{ctx.user} patted {member.mention}*"
+
+        msg = (
+            f"Patting {ctx.user}"
+            if member == None
+            else f"*{ctx.user} patted {member.mention}*"
+        )
         await ctx.response.send_message(msg, embed=pat)
 
     @Jeanne.command(description="Kiss someone or yourself")
@@ -146,12 +144,12 @@ class slashreactions(Cog):
             return
 
         kiss_api = get(kiss_nekosfun).json()
-        if member == None:
-            msg = f"*Kissing {ctx.user}*"
-        if member == ctx.user:
-            msg = f"*Kissing {ctx.user}*"
-        else:
-            msg = f"*{ctx.user} kissed {member.mention}*"
+
+        msg = (
+            f"Kissing {ctx.user}"
+            if member == None
+            else f"*{ctx.user} kissed {member.mention}*"
+        )
         kiss = Embed(color=Color.random())
         kiss.set_footer(text="Fetched from nekos.life")
         kiss.set_image(url=kiss_api["image"])
@@ -169,12 +167,12 @@ class slashreactions(Cog):
             return
 
         tickle_api = get(tickle_nekoslife).json()
-        if member == None:
-            msg = f"*Tickling {ctx.user}*"
-        elif member == ctx.user:
-            msg = f"*Tickling {ctx.user}*"
-        else:
-            msg = f"*{ctx.user} tickled {member.mention}*"
+
+        msg = (
+            f"*Tickling {ctx.user}*"
+            if member == None
+            else f"*{ctx.user} tickled {member.mention}*"
+        )
         tickle = Embed(color=Color.random())
         tickle.set_footer(text="Fetched from nekos.life")
         tickle.set_image(url=tickle_api["url"])
@@ -192,12 +190,12 @@ class slashreactions(Cog):
             return
 
         baka_api = get(baka_nekosfun).json()
-        if member == None:
-            msg = f"*{ctx.user}, you are a baka!*"
-        elif member == ctx.user:
-            msg = f"*{ctx.user}, you are a baka!*"
-        else:
-            msg = f"*{member}, {ctx.user.mention} called you a baka!*"
+
+        msg = (
+            f"*{ctx.user}, you are a baka!*"
+            if member == None
+            else f"*{member}, {ctx.user.mention} called you a baka!*"
+        )
         baka = Embed(color=Color.random())
         baka.set_footer(text="Fetched from nekos.fun")
         baka.set_image(url=baka_api["image"])
@@ -215,12 +213,12 @@ class slashreactions(Cog):
             return
 
         feed_api = get(feed_nekoslife).json()
-        if member == None:
-            msg = f"*Feeding {ctx.user}*"
-        elif member == ctx.user:
-            msg = f"*Feeding {ctx.user}*"
-        else:
-            msg = f"*{ctx.user} fed {member.mention}*"
+
+        msg = (
+            f"*Feeding {ctx.user}*"
+            if member == None
+            else f"*{ctx.user} fed {member.mention}*"
+        )
         feed = Embed(color=Color.random())
         feed.set_footer(text="Fetched from nekos.life")
         feed.set_image(url=feed_api["url"])
@@ -255,12 +253,12 @@ class slashreactions(Cog):
             return
 
         bite_api = get(bite_purrbot).json()
-        if member == None:
-            msg = f"*Biting {ctx.user}*"
-        elif member == ctx.user:
-            msg = f"*Biting {ctx.user}*"
-        else:
-            msg = f"*{ctx.user} bit {member.mention}*"
+
+        msg = (
+            f"*Biting {ctx.user}*"
+            if member == None
+            else f"*{ctx.user} bit {member.mention}*"
+        )
         bite = Embed(color=Color.random())
         bite.set_footer(text="Fetched from PurrBot.site")
         bite.set_image(url=bite_api["link"])
@@ -295,12 +293,12 @@ class slashreactions(Cog):
             return
 
         cuddle_api = get(cuddle_purrbot).json()
-        if member == None:
-            msg = f"*Cuddling with {ctx.user}*"
-        elif member == ctx.user:
-            msg = f"*Cuddling with {ctx.user}*"
-        else:
-            msg = f"*{ctx.user} cuddled with {member.mention}*"
+
+        msg = (
+            f"*Cuddling with {ctx.user}*"
+            if member == None
+            else f"*{ctx.user} cuddled with {member.mention}*"
+        )
         cuddle = Embed(color=Color.random())
         cuddle.set_footer(text="Fetched from PurrBot.site")
         cuddle.set_image(url=cuddle_api["link"])
@@ -318,12 +316,12 @@ class slashreactions(Cog):
             return
 
         dance_api = get(dance_purrbot).json()
-        if member == None:
-            msg = f"*{ctx.user} is dancing*"
-        elif member == ctx.user:
-            msg = f"*{ctx.user} is dancing*"
-        else:
-            msg = f"*{ctx.user} is dancing with {member.mention}*"
+
+        msg = (
+            f"*{ctx.user} is dancing*"
+            if member == None
+            else f"*{ctx.user} is dancing with {member.mention}*"
+        )
         dance = Embed(color=Color.random())
         dance.set_footer(text="Fetched from PurrBot.site")
         dance.set_image(url=dance_api["link"])
