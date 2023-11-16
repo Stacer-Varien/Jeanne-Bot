@@ -100,11 +100,76 @@ class levelling(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.topggpy = DBLClient(bot=self.bot, token=TOPGG)
+        self.profile_context = Jeanne.ContextMenu(
+            name="Profile", callback=self.profile_generate
+        )
+        self.bot.tree.add_command(self.profile_context)
+
+    async def cog_unload(self) -> None:
+        self.bot.tree.remove_command(
+            self.profile_context.name, type=self.profile_context.type
+        )
 
     @staticmethod
     def get_profile(args):
         image = Profile().generate_profile(**args)
         return image
+
+    async def generate_profile_card(self, ctx: Interaction, member: Member):
+        try:
+            memdata = Levelling(member, ctx.guild)
+            slvl = memdata.get_member_level
+            sexp = memdata.get_member_xp
+
+            glvl = memdata.get_user_level
+            gexp = memdata.get_user_xp
+
+            bg = Inventory(member).selected_wallpaper
+            grank = memdata.get_member_global_rank
+            srank = memdata.get_member_server_rank
+            rrank = get_richest(member)
+
+            bio = Inventory(member).get_bio
+            font_color = Inventory(member).get_color
+
+            voted = await self.topggpy.get_user_vote(member.id) 
+
+            args = {
+                "bg_image": (bg[1] if bg else ""),
+                "profile_image": str(member.avatar.with_format("png")),
+                "font_color": font_color,
+                "server_level": slvl,
+                "server_user_xp": sexp,
+                "server_next_xp": ((slvl * 50) + ((slvl - 1) * 25) + 50),
+                "global_level": glvl,
+                "global_user_xp": gexp,
+                "global_next_xp": ((glvl * 50) + ((glvl - 1) * 25) + 50),
+                "user_name": str(member),
+                "grank": grank,
+                "srank": srank,
+                "voted": voted,
+                "rrank": rrank,
+                "creator": member.id,
+                "partner": member.id,
+                "beta": member.id,
+                "balance": Currency(member).get_balance,
+                "bio": str(bio),
+                "brightness": (bg[2] if bg else 100),
+            }
+
+            func = partial(self.get_profile, args)
+            image = await get_event_loop().run_in_executor(None, func)
+
+            file = File(fp=image, filename=f"{member.name}_profile_card.png")
+            await ctx.followup.send(file=file)
+        except:
+            no_exp = Embed(description="Failed to make profile card")
+            await ctx.followup.send(embed=no_exp)
+
+    @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
+    async def profile_generate(self, ctx: Interaction, member: Member):
+        await ctx.response.defer()
+        await self.generate_profile_card(ctx, member)
 
     @Cog.listener()
     async def on_message(self, message: Message):
@@ -222,56 +287,9 @@ class levelling(Cog):
 
         await ctx.response.defer()
 
-        member = ctx.user if member is None else member
-        try:
-            memdata = Levelling(member, ctx.guild)
-            slvl = memdata.get_member_level
-            sexp = memdata.get_member_xp
+        member = ctx.user if member == None else member
 
-            glvl = memdata.get_user_level
-            gexp = memdata.get_user_xp
-
-            bg = Inventory(member).selected_wallpaper
-            grank = memdata.get_member_global_rank
-            srank = memdata.get_member_server_rank
-            rrank = get_richest(member)
-
-            bio = Inventory(member).get_bio
-            font_color = Inventory(member).get_color
-
-            voted = await self.topggpy.get_user_vote(member.id)
-
-            args = {
-                "bg_image": (bg[1] if bg else ""),
-                "profile_image": str(member.avatar.with_format("png")),
-                "font_color": font_color,
-                "server_level": slvl,
-                "server_user_xp": sexp,
-                "server_next_xp": ((slvl * 50) + ((slvl - 1) * 25) + 50),
-                "global_level": glvl,
-                "global_user_xp": gexp,
-                "global_next_xp": ((glvl * 50) + ((glvl - 1) * 25) + 50),
-                "user_name": str(member),
-                "grank": grank,
-                "srank": srank,
-                "voted": voted,
-                "rrank": rrank,
-                "creator": member.id,
-                "partner": member.id,
-                "beta": member.id,
-                "balance": Currency(member).get_balance,
-                "bio": str(bio),
-                "brightness": (bg[2] if bg else 100),
-            }
-
-            func = partial(self.get_profile, args)
-            image = await get_event_loop().run_in_executor(None, func)
-
-            file = File(fp=image, filename=f"{member.name}_profile_card.png")
-            await ctx.followup.send(file=file)
-        except:
-            no_exp = Embed(description="Failed to make profile card")
-            await ctx.followup.send(embed=no_exp)
+        await self.generate_profile_card(ctx, member)
 
     @profile.error
     async def profile_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
@@ -285,7 +303,7 @@ class levelling(Cog):
                 description=f"You have already checked your profile!\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.random(),
             )
-            await ctx.followup.send(embed=cooldown)
+            await ctx.response.send_message(embed=cooldown)
 
 
 async def setup(bot: Bot):
