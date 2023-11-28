@@ -1,8 +1,10 @@
 from random import choice, randint
+from typing import Optional
 from discord import (
     ButtonStyle,
     Color,
     Embed,
+    Member,
     app_commands as Jeanne,
     Interaction,
     ui,
@@ -403,6 +405,50 @@ class Flip_Group(GroupCog, name="flip"):
 class currency(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
+        self.balance_context = Jeanne.ContextMenu(
+            name="Balance", callback=self.balance_callback
+        )
+        self.bot.tree.add_command(self.balance_context)
+
+    async def cog_unload(self) -> None:
+        self.bot.tree.remove_command(
+            self.balance_context.name, type=self.balance_context.type
+        )
+        self.balance_callback_error = self.balance_callback.error(
+            self.balance_callback_error
+        )
+
+    @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
+    async def balance_callback(self, ctx: Interaction, member: Member):
+        await self.get_balance(ctx, member)
+
+    async def balance_callback_error(self, ctx: Interaction, error: Exception):
+        if isinstance(error, Jeanne.CommandOnCooldown):
+            if Command(ctx.guild).check_disabled(self.balance.qualified_name):
+                await ctx.response.send_message(
+                    "This command is disabled by the server's managers", ephemeral=True
+                )
+                return
+            cooldown = Embed(
+                description=f"WOAH! Calm down! Why keep checking again quickly?\nTry again after `{round(error.retry_after, 2)} seconds`",
+                color=Color.red(),
+            )
+            await ctx.response.send_message(embed=cooldown)
+
+    async def get_balance(self, ctx: Interaction, member: Member):
+        member = ctx.user if (member == None) else member
+        bal = Currency(ctx.user).get_balance
+
+        balance = Embed(
+            description=f"You have {bal} <:quantumpiece:1161010445205905418>",
+            color=Color.blue(),
+        )
+        balance.add_field(
+            name=f"If you want more <:quantumpiece:1161010445205905418>:",
+            value="[Vote for me in TopGG](https://top.gg/bot/831993597166747679/vote)",
+            inline=True,
+        )
+        await ctx.followup.send(embed=balance)
 
     @Jeanne.command(description="Claim your daily")
     async def daily(self, ctx: Interaction):
@@ -440,9 +486,9 @@ class currency(Cog):
                     value="You received 100 <:quantumpiece:1161010445205905418>",
                 )
             daily.add_field(
-                    name="Balance",
-                    value=f"{balance} <:quantumpiece:1161010445205905418>",
-                )
+                name="Balance",
+                value=f"{balance} <:quantumpiece:1161010445205905418>",
+            )
             daily.add_field(name="Next Daily:", value=f"<t:{tomorrow}:f>")
             await ctx.followup.send(embed=daily)
             return
@@ -454,7 +500,7 @@ class currency(Cog):
 
     @Jeanne.command(description="Check how much QP you have")
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
-    async def balance(self, ctx: Interaction):
+    async def balance(self, ctx: Interaction, member: Optional[Member] = None):
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.balance.qualified_name):
@@ -462,19 +508,9 @@ class currency(Cog):
                 "This command is disabled by the server's managers", ephemeral=True
             )
             return
-        await ctx.response.defer()
-        bal = Currency(ctx.user).get_balance
 
-        balance = Embed(
-            description=f"You have {bal} <:quantumpiece:1161010445205905418>",
-            color=Color.blue(),
-        )
-        balance.add_field(
-            name=f"If you want more <:quantumpiece:1161010445205905418>:",
-            value="[Vote for me in TopGG](https://top.gg/bot/831993597166747679/vote)",
-            inline=True,
-        )
-        await ctx.followup.send(embed=balance)
+        await ctx.response.defer()
+        await self.get_balance(ctx, member)
 
     @balance.error
     async def balance_error(
