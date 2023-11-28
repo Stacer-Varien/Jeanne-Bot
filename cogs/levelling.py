@@ -104,6 +104,9 @@ class levelling(Cog):
             name="Profile", callback=self.profile_generate
         )
         self.bot.tree.add_command(self.profile_context)
+        self.profile_generate_error = self.profile_context.error(
+            self.profile_generate_error
+        )
 
     async def cog_unload(self) -> None:
         self.bot.tree.remove_command(
@@ -132,7 +135,7 @@ class levelling(Cog):
             bio = Inventory(member).get_bio
             font_color = Inventory(member).get_color
 
-            voted = await self.topggpy.get_user_vote(member.id) 
+            voted = await self.topggpy.get_user_vote(member.id)
 
             args = {
                 "bg_image": (bg[1] if bg else ""),
@@ -168,8 +171,42 @@ class levelling(Cog):
 
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     async def profile_generate(self, ctx: Interaction, member: Member):
-        await ctx.response.defer()
-        await self.generate_profile_card(ctx, member)
+        if Botban(ctx.user).check_botbanned_user:
+            return
+        if Command(ctx.guild).check_disabled(self.profile.qualified_name):
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
+            return
+        server = await self.bot.fetch_guild(740584420645535775)
+        author = await server.fetch_member(ctx.user.id)
+        role = server.get_role(1130430961587335219)
+
+        if role in author.roles:
+            await ctx.response.defer()
+            await self.generate_profile_card(ctx, member)
+            return
+
+        await ctx.response.send_message(
+            embed=Embed(
+                description="Uh Oh!\n\nIt seems you are trying something that is meant for beta users.\nIf you wish to join the beta programme, join [Orleans](https://discord.gg/Vfa796yvNq) and ask the bot developer.",
+                color=Color.red(),
+            ),
+            ephemeral=True,
+        )
+
+    async def profile_generate_error(self, ctx: Interaction, error: Exception) -> None:
+        if isinstance(error, Jeanne.CommandOnCooldown):
+            if Command(ctx.guild).check_disabled(self.profile.qualified_name):
+                await ctx.response.send_message(
+                    "This command is disabled by the server's managers", ephemeral=True
+                )
+                return
+            cooldown = Embed(
+                description=f"You have already used the profile command!\nTry again after `{round(error.retry_after, 2)} seconds`",
+                color=Color.red(),
+            )
+            await ctx.response.send_message(embed=cooldown)
 
     @Cog.listener()
     async def on_message(self, message: Message):
@@ -279,7 +316,9 @@ class levelling(Cog):
     async def profile(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user:
             return
-        if Command(ctx.guild).check_disabled(self.profile.qualified_name):
+        if Command(ctx.guild).check_disabled(self.profile.qualified_name) or (
+            ctx.channel != ctx.user.dm_channel
+        ):
             await ctx.response.send_message(
                 "This command is disabled by the server's managers", ephemeral=True
             )
@@ -294,14 +333,14 @@ class levelling(Cog):
     @profile.error
     async def profile_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if Command(ctx.guild).check_disabled(self.profile.qualified_name):
+            if Command(ctx.guild).check_disabled(self.profile.qualified_name)==True:
                 await ctx.response.send_message(
                     "This command is disabled by the server's managers", ephemeral=True
                 )
                 return
             cooldown = Embed(
-                description=f"You have already checked your profile!\nTry again after `{round(error.retry_after, 2)} seconds`",
-                color=Color.random(),
+                description=f"You have already used the profile command!\nTry again after `{round(error.retry_after, 2)} seconds`",
+                color=Color.red(),
             )
             await ctx.response.send_message(embed=cooldown)
 
