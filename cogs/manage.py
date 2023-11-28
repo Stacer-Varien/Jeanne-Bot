@@ -1656,7 +1656,7 @@ class Command_Group(GroupCog, name="command"):
             embed.title = "Command Disabled"
             embed.description = f"`{command}` has been disabled"
             embed.color = Color.random()
-            cmd.disable(command)
+            await cmd.disable(command)
 
         await ctx.followup.send(embed=embed)
 
@@ -1688,7 +1688,7 @@ class Command_Group(GroupCog, name="command"):
             embed.title = "Command Enabled"
             embed.description = f"`{command}` has been enabled"
             embed.color = Color.random()
-            cmd.enable(command)
+            await cmd.enable(command)
 
         await ctx.followup.send(embed=embed)
 

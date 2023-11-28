@@ -939,17 +939,20 @@ class Command:
     def __init__(self, server: Guild) -> None:
         self.server = server
 
-    def check_disabled(self, command: str) -> str | None:
-        data = db.execute(
-            "SELECT command FROM disabledCommandsData WHERE server = ? AND command = ?",
-            (
-                self.server.id,
-                command,
-            ),
-        ).fetchone()
-        db.commit()
+    def check_disabled(self, command:str):
+        try:
+            data = db.execute(
+                    "SELECT command FROM disabledCommandsData WHERE server = ? AND command = ?",
+                    (
+                        self.server.id,
+                        command,
+                    ),
+                ).fetchone()
+            db.commit()
 
-        return str(data[0]) if data else None
+            return data is not None and command == data[0]
+        except:
+            pass
 
     async def disable(self, command: str):
         db.execute(
