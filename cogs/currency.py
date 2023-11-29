@@ -420,7 +420,20 @@ class currency(Cog):
 
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     async def balance_callback(self, ctx: Interaction, member: Member):
-        await self.get_balance(ctx, member)
+        server = await self.bot.fetch_guild(740584420645535775)
+        author = await server.fetch_member(ctx.user.id)
+        role = server.get_role(1130430961587335219)
+
+        if role in author.roles:        
+            await self.get_balance(ctx, member)
+            return
+        await ctx.response.send_message(
+            embed=Embed(
+                description="Uh Oh!\n\nIt seems you are trying something that is meant for beta users.\nIf you wish to join the beta programme, join [Orleans](https://discord.gg/Vfa796yvNq) and ask the bot developer.",
+                color=Color.red(),
+            ),
+            ephemeral=True,
+        )        
 
     async def balance_callback_error(self, ctx: Interaction, error: Exception):
         if isinstance(error, Jeanne.CommandOnCooldown):
@@ -436,11 +449,11 @@ class currency(Cog):
             await ctx.response.send_message(embed=cooldown)
 
     async def get_balance(self, ctx: Interaction, member: Member):
-        member = ctx.user if (member == None) else member
-        bal = Currency(ctx.user).get_balance
+        await ctx.response.defer()
+        bal = Currency(member).get_balance
 
         balance = Embed(
-            description=f"You have {bal} <:quantumpiece:1161010445205905418>",
+            description=f"{'You' if (member == ctx.user) else member} have {bal} <:quantumpiece:1161010445205905418>",
             color=Color.blue(),
         )
         balance.add_field(
@@ -508,8 +521,7 @@ class currency(Cog):
                 "This command is disabled by the server's managers", ephemeral=True
             )
             return
-
-        await ctx.response.defer()
+        member = ctx.user if (member == None) else member
         await self.get_balance(ctx, member)
 
     @balance.error
