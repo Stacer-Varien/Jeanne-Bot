@@ -24,7 +24,80 @@ start_time = time()
 class InfoCog(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.bot_version = "4.3"
+        self.bot_version = "4.3 Beta"
+        self.userinfo_context = Jeanne.ContextMenu(
+            name="Userinfo", callback=self.userinfo_callback
+        )
+        self.bot.tree.add_command(self.userinfo_context)
+
+
+    async def cog_unload(self) -> None:
+        self.bot.tree.remove_command(
+            self.userinfo_context.name, type=self.userinfo_context.type
+        )
+
+    async def userinfo_callback(self, ctx: Interaction, member: Member):
+        server = await self.bot.fetch_guild(740584420645535775)
+        author = await server.fetch_member(ctx.user.id)
+        role = server.get_role(1130430961587335219)
+
+        if role in author.roles:
+            await self.get_userinfo(ctx, member)
+            return
+        await ctx.response.send_message(
+            embed=Embed(
+                description="Uh Oh!\n\nIt seems you are trying something that is meant for beta users.\nIf you wish to join the beta programme, join [Orleans](https://discord.gg/Vfa796yvNq) and ask the bot developer.",
+                color=Color.red(),
+            ),
+            ephemeral=True,
+        )
+
+    async def get_userinfo(self, ctx:Interaction, member:Member):
+        if Botban(ctx.user).check_botbanned_user:
+            return
+        if Command(ctx.guild).check_disabled(self.userinfo.qualified_name):
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
+            return
+
+        await ctx.response.defer()
+        user = await self.bot.fetch_user(member.id)
+        hasroles = [role.mention for role in member.roles][1:][::-1]
+
+        botcheck = "Yes" if member.bot == True else "No"
+
+        joined_date = round(member.joined_at.timestamp())
+        create_date = round(member.created_at.timestamp())
+        userinfo = Embed(title="{}'s Info".format(member.name), color=member.color)
+        userinfo.add_field(name="Name", value=member, inline=True)
+        userinfo.add_field(name="Global Name", value=member.global_name, inline=True)
+        if member.nick:
+            userinfo.add_field(name="Nickname", value=member.nick, inline=True)
+        userinfo.add_field(name="ID", value=member.id, inline=True)
+        userinfo.add_field(name="Is Bot?", value=botcheck, inline=True)
+        userinfo.add_field(
+            name="Created Account",
+            value=f"<t:{create_date}:F>",
+            inline=True,
+        )
+        userinfo.add_field(
+            name="Joined Server",
+            value=f"<t:{joined_date}:F>",
+            inline=True,
+        )
+        userinfo.add_field(name="Number of Roles", value=len(member.roles), inline=True)
+
+        userinfo.set_thumbnail(url=member.display_avatar)
+
+        if user.banner:
+            userinfo.set_image(url=user.banner)
+        view = RolesButton(member, userinfo, hasroles)
+        await ctx.followup.send(embeds=[userinfo], view=view)
+        await view.wait()
+
+        if view.value == None:
+            await ctx.edit_original_response(embeds=[userinfo], view=None)        
 
     @Jeanne.command(description="See the bot's status from development to now")
     async def stats(self, ctx: Interaction):
@@ -75,52 +148,8 @@ class InfoCog(Cog):
     @Jeanne.command(description="See the information of a member or yourself")
     @Jeanne.describe(member="Which member?")
     async def userinfo(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.userinfo.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
-
-        await ctx.response.defer()
         member = ctx.user if member is None else member
-        user = await self.bot.fetch_user(member.id)
-        hasroles = [role.mention for role in member.roles][1:][::-1]
-
-        botcheck = "Yes" if member.bot == True else "No"
-
-        joined_date = round(member.joined_at.timestamp())
-        create_date = round(member.created_at.timestamp())
-        userinfo = Embed(title="{}'s Info".format(member.name), color=member.color)
-        userinfo.add_field(name="Name", value=member, inline=True)
-        userinfo.add_field(name="Global Name", value=member.global_name, inline=True)
-        if member.nick:
-            userinfo.add_field(name="Nickname", value=member.nick, inline=True)
-        userinfo.add_field(name="ID", value=member.id, inline=True)
-        userinfo.add_field(name="Is Bot?", value=botcheck, inline=True)
-        userinfo.add_field(
-            name="Created Account",
-            value=f"<t:{create_date}:F>",
-            inline=True,
-        )
-        userinfo.add_field(
-            name="Joined Server",
-            value=f"<t:{joined_date}:F>",
-            inline=True,
-        )
-        userinfo.add_field(name="Number of Roles", value=len(member.roles), inline=True)
-
-        userinfo.set_thumbnail(url=member.display_avatar)
-
-        if user.banner:
-            userinfo.set_image(url=user.banner)
-        view = RolesButton(member, userinfo, hasroles)
-        await ctx.followup.send(embeds=[userinfo], view=view)
-        await view.wait()
-
-        if view.value == None:
-            await ctx.edit_original_response(embeds=[userinfo], view=None)
+        await self.get_userinfo(ctx, member)
 
     @Jeanne.command(description="Get information about this server")
     async def serverinfo(self, ctx: Interaction):
