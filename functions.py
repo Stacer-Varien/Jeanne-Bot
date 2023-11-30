@@ -1536,8 +1536,8 @@ class BetaTest:
             return True
 
     @staticmethod
-    def check(user: User.id):
-        data = db.execute("SELECT * FROM betaData WHERE user = ?", (user,)).fetchone()
+    def check(user: Member):
+        data = db.execute("SELECT * FROM betaData WHERE user = ?", (user.id,)).fetchone()
         db.commit()
 
         return data[0] if data else None

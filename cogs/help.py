@@ -10,8 +10,7 @@ from discord import (
 from discord.ext.commands import GroupCog, Bot
 from functions import Botban, AutoCompleteChoices
 from collections import OrderedDict
-from assets.help.commands import Modules
-from assets.help.modules import modules
+from assets.help.modules import modules, Modules
 
 
 def replace_all(text: str, dic: dict):

@@ -437,7 +437,7 @@ class nsfw(Cog):
                 if view.value == None:
                     await ctx.edit_original_response(view=None)
                     return
-                return
+                
 
             color = Color.random()
             embeds = [

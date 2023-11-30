@@ -1646,7 +1646,11 @@ class Command_Group(GroupCog, name="command"):
         if command.startswith(("help", "command")):
             embed.color = Color.red()
             embed.description = "WOAH! Don't disable that command!"
-        elif command not in [i.value for i in list(Commands)]:
+        elif command not in [
+            cmd.qualified_name
+            for cmd in self.bot.tree.walk_commands()
+            if not isinstance(cmd, Jeanne.Group)
+        ]:
             embed.color = Color.red()
             embed.description = "There is no such command that I have..."
         elif cmd.check_disabled(command):
@@ -1676,7 +1680,11 @@ class Command_Group(GroupCog, name="command"):
 
         embed = Embed()
         cmd = Command(ctx.guild)
-        if command not in [i.value for i in list(Commands)]:
+        if command not in [
+            cmd.qualified_name
+            for cmd in self.bot.tree.walk_commands()
+            if not isinstance(cmd, Jeanne.Group)
+        ]:
             embed.color = Color.red()
             embed.description = "There is no such command that I have..."
 
