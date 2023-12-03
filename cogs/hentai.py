@@ -11,7 +11,7 @@ class nsfw(Cog):
         self.bot = bot
 
     @Jeanne.command(description="Get a random hentai from Jeanne", nsfw=True)
-    @Jeanne.checks.cooldown(1, 2, key=lambda i: (i.user.id))
+    @Jeanne.checks.cooldown(1, 3, key=lambda i: (i.user.id))
     @Jeanne.describe(rating="Do you want questionable or explicit content?")
     async def hentai(
         self,
@@ -67,7 +67,7 @@ class nsfw(Cog):
             return
 
     @Jeanne.command(description="Get a random media content from Gelbooru", nsfw=True)
-    @Jeanne.checks.cooldown(1, 2, key=lambda i: (i.user.id))
+    @Jeanne.checks.cooldown(1, 3, key=lambda i: (i.user.id))
     @Jeanne.describe(
         rating="Do you want questionable or explicit content?",
         tag="Add your tag",
@@ -190,7 +190,7 @@ class nsfw(Cog):
             return
 
     @Jeanne.command(description="Get a random hentai from Yande.re", nsfw=True)
-    @Jeanne.checks.cooldown(1, 2, key=lambda i: (i.user.id))
+    @Jeanne.checks.cooldown(1, 3, key=lambda i: (i.user.id))
     @Jeanne.describe(
         rating="Do you want questionable or explicit content?",
         tag="Add your tag",
@@ -294,7 +294,7 @@ class nsfw(Cog):
             return
 
     @Jeanne.command(description="Get a random hentai from Konachan", nsfw=True)
-    @Jeanne.checks.cooldown(1, 2, key=lambda i: (i.user.id))
+    @Jeanne.checks.cooldown(1, 3, key=lambda i: (i.user.id))
     @Jeanne.describe(
         rating="Do you want questionable or explicit content?",
         tag="Add your tag",
@@ -402,7 +402,7 @@ class nsfw(Cog):
             return
 
     @Jeanne.command(description="Get a random media content from Danbooru", nsfw=True)
-    @Jeanne.checks.cooldown(1, 2, key=lambda i: (i.user.id))
+    @Jeanne.checks.cooldown(1, 3, key=lambda i: (i.user.id))
     @Jeanne.describe(
         rating="Do you want questionable or explicit content?",
         tag="Add your tag (up to 2 tags)",
