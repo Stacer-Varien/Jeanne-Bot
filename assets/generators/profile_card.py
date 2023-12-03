@@ -1,5 +1,6 @@
 from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont, ImageColor, ImageEnhance
+from discord import User
 from functions import BetaTest, Partner
 import requests
 import math
@@ -34,7 +35,7 @@ class Profile:
         self,
         creator: int,
         partner: int,
-        beta:int,
+        beta:User,
         bg_image: str = None,
         profile_image: str = None,
         font_color: str = None,
