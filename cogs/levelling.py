@@ -154,7 +154,7 @@ class levelling(Cog):
                 "rrank": rrank,
                 "creator": member.id,
                 "partner": member.id,
-                "beta": member.id,
+                "beta": member,
                 "balance": Currency(member).get_balance,
                 "bio": str(bio),
                 "brightness": (bg[2] if bg else 100),
@@ -316,9 +316,7 @@ class levelling(Cog):
     async def profile(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user:
             return
-        if Command(ctx.guild).check_disabled(self.profile.qualified_name) or (
-            ctx.channel != ctx.user.dm_channel
-        ):
+        if Command(ctx.guild).check_disabled(self.profile.qualified_name):
             await ctx.response.send_message(
                 "This command is disabled by the server's managers", ephemeral=True
             )
