@@ -48,12 +48,8 @@ class images(Cog):
             return
 
         await ctx.response.defer()
-        wallpaper = Embed(color=Color.random())
-        wallpaper.set_image(url=get_wallpaper_pic())
-        wallpaper.set_footer(
-            text="Fetched from Wallpaper_1936 • Credits must go to the artist"
-        )
-        await ctx.followup.send(embed=wallpaper)
+        embed, file = get_wallpaper_pic()
+        await ctx.followup.send(embed=embed, file=file)
 
     @Jeanne.command(description="Get a Jeanne d'Arc image")
     async def jeanne(self, ctx: Interaction):

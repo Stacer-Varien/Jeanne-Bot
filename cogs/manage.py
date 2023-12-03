@@ -37,7 +37,6 @@ from assets.components import (
 )
 from requests import get
 from io import BytesIO
-from assets.help.commands import Commands
 
 
 def replace_all(text: str, dic: dict):
