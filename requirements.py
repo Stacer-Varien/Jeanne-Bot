@@ -8,7 +8,7 @@ if platform.system() == "Windows":  # If you are using a Windows Operating Syste
     os.system("python.exe -m pip install -U pip")
 
 elif platform.system() == "Linux":  # If you are using a Linux Operating System
-    # Upgrades the pip package for fluent installation #You need Python3.10 with an activated venv
+    # Upgrades the pip package for fluent installation #You need Python3.11 with an activated venv
     os.system("python3 -m pip install -U pip")
 
 # Required packages for the bot to use. Also upgrades it if a new release is found
