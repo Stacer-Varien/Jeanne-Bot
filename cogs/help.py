@@ -46,7 +46,7 @@ class HelpGroup(GroupCog, name="help"):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @Jeanne.command(description="Get help of a certain command")
+    @Jeanne.command(description="Get help on a certain command")
     @Jeanne.autocomplete(command=AutoCompleteChoices.command_choices)
     @Jeanne.describe(command="Which command you need help with?")
     async def command(self, ctx: Interaction, command: Jeanne.Range[str, 3]):
