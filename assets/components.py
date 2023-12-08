@@ -684,8 +684,7 @@ class BioModal(ui.Modal, title="Bio"):
 
     async def on_submit(self, ctx: Interaction) -> None:
         bio = self.line1.value + "\n" + (self.line2.value if self.line2.value else "")
-        embed = Embed()
+        embed = Embed(title="New bio has been set to:", color=Color.random())
         await Inventory(ctx.user).set_bio(bio)
-        embed.description = "New bio has been set to:\n{}".format(bio)
-        embed.color = Color.random()
+        embed.description = bio
         await ctx.response.send_message(embed=embed)

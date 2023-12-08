@@ -12,13 +12,12 @@ TOPGG = getenv("topgg")
 TOPGG_AUTH = getenv("topgg_auth")
 WEBHOOK = getenv("report_webhook")
 BB_WEBHOOK = getenv("botban_webhook")
-IMGUR_ID = getenv("imgur_client_id")
-IMGUR_SECRET = getenv("imgur_client_secret")
+
 JEANNE = str(getenv("jeanne_album"))
 SABER = str(getenv("saber_album"))
-WALLPAPER = getenv("wallpaper_album")
+WALLPAPER = str(getenv("wallpaper_album"))
 MEDUSA = str(getenv("medusa_album"))
-ANIMEME = getenv("animeme_album")
+ANIMEME = str(getenv("animeme_album"))
 
 db = connect("database.db", check_same_thread=False)
 

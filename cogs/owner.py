@@ -224,7 +224,7 @@ class OwnerCog(Cog):
 # ERROR!
 ## Failed to send database! 
         
-Make sure private messages between **me and you are opened** or check the server if the database exists"""
+Make sure private messages between **me and you are opened** or check the host if the database exists"""
                 await ctx.send(content, delete_after=10)
 
     @command()

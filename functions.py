@@ -210,7 +210,7 @@ class Inventory:
         )
         db.commit()
 
-        Currency(self.user).remove_qp(1000)
+        await Currency(self.user).remove_qp(1000)
 
     async def add_user_custom_wallpaper(self, name: str, link: str):
         await self.deselect_wallpaper()
@@ -227,7 +227,7 @@ class Inventory:
         )
         db.commit()
 
-        Currency(self.user).remove_qp(1000)
+        await Currency(self.user).remove_qp(1000)
 
     @property
     def selected_wallpaper(self) -> tuple[str, str, int, int] | None:
@@ -538,7 +538,7 @@ class Levelling:
         ).fetchone()
         db.commit()
 
-        return [int(data[3]), str(data[4]), self.get_rank_up_update] if data else None
+        return [data[3], data[4], self.get_rank_up_update] if data else None
 
     @property
     def get_rank_up_update(self) -> str | None:
@@ -1536,7 +1536,7 @@ class BetaTest:
             return True
 
     @staticmethod
-    def check(user: Member):
+    def check(user: User):
         data = db.execute("SELECT * FROM betaData WHERE user = ?", (user.id,)).fetchone()
         db.commit()
 
