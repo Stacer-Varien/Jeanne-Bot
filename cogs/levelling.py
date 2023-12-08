@@ -154,7 +154,7 @@ class levelling(Cog):
                 "rrank": rrank,
                 "creator": member.id,
                 "partner": member.id,
-                "beta": member.id,
+                "beta": member,
                 "balance": Currency(member).get_balance,
                 "bio": str(bio),
                 "brightness": (bg[2] if bg else 100),
@@ -181,19 +181,18 @@ class levelling(Cog):
         server = await self.bot.fetch_guild(740584420645535775)
         author = await server.fetch_member(ctx.user.id)
         role = server.get_role(1130430961587335219)
-
-        if role in author.roles:
-            await ctx.response.defer()
-            await self.generate_profile_card(ctx, member)
-            return
-
-        await ctx.response.send_message(
-            embed=Embed(
-                description="Uh Oh!\n\nIt seems you are trying something that is meant for beta users.\nIf you wish to join the beta programme, join [Orleans](https://discord.gg/Vfa796yvNq) and ask the bot developer.",
-                color=Color.red(),
-            ),
-            ephemeral=True,
-        )
+        try:
+            if role in author.roles:
+                await ctx.response.defer()
+                await self.generate_profile_card(ctx, member)
+        except:
+            await ctx.response.send_message(
+                embed=Embed(
+                    description="Uh Oh!\n\nIt seems you are trying something that is meant for beta users.\nIf you wish to join the beta programme, join [Orleans](https://discord.gg/Vfa796yvNq) and ask the bot developer.",
+                    color=Color.red(),
+                ),
+                ephemeral=True,
+            )
 
     async def profile_generate_error(self, ctx: Interaction, error: Exception) -> None:
         if isinstance(error, Jeanne.CommandOnCooldown):
@@ -316,18 +315,14 @@ class levelling(Cog):
     async def profile(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user:
             return
-        if Command(ctx.guild).check_disabled(self.profile.qualified_name) or (
-            ctx.channel != ctx.user.dm_channel
-        ):
+        if Command(ctx.guild).check_disabled(self.profile.qualified_name):
             await ctx.response.send_message(
                 "This command is disabled by the server's managers", ephemeral=True
             )
             return
 
-        await ctx.response.defer()
-
         member = ctx.user if member == None else member
-
+        await ctx.response.defer()
         await self.generate_profile_card(ctx, member)
 
     @profile.error
