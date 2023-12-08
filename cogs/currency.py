@@ -423,17 +423,17 @@ class currency(Cog):
         server = await self.bot.fetch_guild(740584420645535775)
         author = await server.fetch_member(ctx.user.id)
         role = server.get_role(1130430961587335219)
-
-        if role in author.roles:        
-            await self.get_balance(ctx, member)
-            return
-        await ctx.response.send_message(
-            embed=Embed(
-                description="Uh Oh!\n\nIt seems you are trying something that is meant for beta users.\nIf you wish to join the beta programme, join [Orleans](https://discord.gg/Vfa796yvNq) and ask the bot developer.",
-                color=Color.red(),
-            ),
-            ephemeral=True,
-        )        
+        try:
+            if role in author.roles:
+                await self.get_balance(ctx, member)
+        except:
+            await ctx.response.send_message(
+                embed=Embed(
+                    description="Uh Oh!\n\nIt seems you are trying something that is meant for beta users.\nIf you wish to join the beta programme, join [Orleans](https://discord.gg/Vfa796yvNq) and ask the bot developer.",
+                    color=Color.red(),
+                ),
+                ephemeral=True,
+            )
 
     async def balance_callback_error(self, ctx: Interaction, error: Exception):
         if isinstance(error, Jeanne.CommandOnCooldown):
@@ -480,29 +480,54 @@ class currency(Cog):
 
         if bank.check_daily == True:
             await bank.give_daily()
-            balance = bank.get_balance
 
             daily = Embed(
                 title="Daily",
                 description=f"**{ctx.user}**, you claimed your daily reward.",
                 color=Color.random(),
             )
+            try:
+                server = await self.bot.fetch_guild(740584420645535775)
+                author = await server.fetch_member(ctx.user.id)
+                role = server.get_role(1130430961587335219)
+            except:
+                pass
 
             if datetime.today().weekday() >= 5:
                 daily.add_field(
                     name="Rewards (weekend):",
                     value="You received 200 <:quantumpiece:1161010445205905418>",
                 )
+
+                try:
+                    if role in author.roles:
+                        await bank.add_qp(50)
+                        daily.add_field(
+                            name="Beta Bonus (weekend)",
+                            value="50 <:quantumpiece:1161010445205905418>",
+                        )
+                except:
+                    pass
             else:
                 daily.add_field(
                     name="Rewards:",
                     value="You received 100 <:quantumpiece:1161010445205905418>",
                 )
+                try:
+                    if role in author.roles:
+                        await bank.add_qp(25)
+                        daily.add_field(
+                            name="Beta Bonus",
+                            value="25 <:quantumpiece:1161010445205905418>",
+                        )
+                except:
+                    pass
             daily.add_field(
                 name="Balance",
-                value=f"{balance} <:quantumpiece:1161010445205905418>",
+                value=f"{bank.get_balance} <:quantumpiece:1161010445205905418>",
             )
             daily.add_field(name="Next Daily:", value=f"<t:{tomorrow}:f>")
+
             await ctx.followup.send(embed=daily)
             return
         cooldown = Embed(

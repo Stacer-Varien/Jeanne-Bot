@@ -42,6 +42,16 @@ class TopGG(Cog):
                 credits = 100
             else:
                 credits = 50
+            
+            try:
+                server = await self.bot.fetch_guild(740584420645535775)
+                author = await server.fetch_member(voter.id)
+                role = server.get_role(1130430961587335219)
+
+                if role in author.roles:
+                    credits=round(credits * 1.25)
+            except:
+                pass
 
             await Currency(voter).add_qp(credits)
             with open("voterdata.txt", "a") as f:

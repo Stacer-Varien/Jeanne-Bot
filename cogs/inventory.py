@@ -81,14 +81,14 @@ class Background_Group(GroupCog, name="background"):
 
         if balance == 0:
             nomoney = Embed(
-                description="You have no QP.\nPlease get QP by doing `/daily`, `/guess` and/or `/dice`"
+                description="You have no QP.\nPlease get QP by doing `/daily`, `/guess`, `/flip` and/or `/dice`"
             )
             await ctx.followup.send(embed=nomoney)
             return
 
         if balance < 1000:
             notenough = Embed(
-                description="You do not have enough QP.\nPlease get more QP by doing `/daily`, `/guess` and/or `/dice`"
+                description="You do not have enough QP.\nPlease get more QP by doing `/daily`, `/guess`, `/flip` and/or `/dice`"
             )
             await ctx.followup.send(embed=notenough)
             return
@@ -123,7 +123,7 @@ class Background_Group(GroupCog, name="background"):
             "rrank": 1,
             "creator": self.bot.application.owner.id,
             "partner": self.bot.application.owner.id,
-            "beta": self.bot.application.owner.id,
+            "beta": self.bot.application.owner,
             "balance": 100,
             "bio": "This is a preview",
             "brightness": 100,
@@ -155,7 +155,7 @@ class Background_Group(GroupCog, name="background"):
             return
 
         if view.value == True:
-            Inventory(ctx.user).add_user_wallpaper(name)
+            await Inventory(ctx.user).add_user_wallpaper(name)
             embed1 = Embed(
                 description=f"Background wallpaper bought and selected",
                 color=Color.random(),
@@ -196,7 +196,7 @@ class Background_Group(GroupCog, name="background"):
         await ctx.response.defer()
 
         try:
-            Inventory(ctx.user).use_wallpaper(name)
+            await Inventory(ctx.user).use_wallpaper(name)
             embed = Embed(description=f"{name} has been selected", color=Color.random())
             await ctx.followup.send(embed=embed)
         except:
@@ -225,14 +225,14 @@ class Background_Group(GroupCog, name="background"):
 
         if balance == None:
             nomoney = Embed(
-                description="You have no QP.\nPlease get QP by doing `/daily`, `/guess` and/or `/dice`"
+                description="You have no QP.\nPlease get QP by doing `/daily`, `/guess`, `/flip` and/or `/dice`"
             )
             await ctx.followup.send(embed=nomoney)
             return
 
         if balance < 1000:
             notenough = Embed(
-                description="You do not have enough QP.\nPlease get more QP by doing `/daily`, `/guess` and/or `/dice`"
+                description="You do not have enough QP.\nPlease get more QP by doing `/daily`, `/guess`, `/flip` and/or `/dice`"
             )
             await ctx.followup.send(embed=notenough)
             return
@@ -258,7 +258,7 @@ class Background_Group(GroupCog, name="background"):
             "rrank": 1,
             "creator": self.bot.application.owner.id,
             "partner": self.bot.application.owner.id,
-            "beta": self.bot.application.owner.id,
+            "beta": self.bot.application.owner,
             "balance": 100,
             "bio": "This is a preview",
             "brightness": 100,
@@ -287,7 +287,7 @@ class Background_Group(GroupCog, name="background"):
         await view.wait()
 
         if view.value == True:
-            Inventory(ctx.user).add_user_custom_wallpaper(name, link)
+            await Inventory(ctx.user).add_user_custom_wallpaper(name, link)
 
             embed1 = Embed(
                 description="Background wallpaper bought and selected",
