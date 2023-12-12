@@ -178,10 +178,11 @@ class levelling(Cog):
                 "This command is disabled by the server's managers", ephemeral=True
             )
             return
-        server = await self.bot.fetch_guild(740584420645535775)
-        author = await server.fetch_member(ctx.user.id)
-        role = server.get_role(1130430961587335219)
         try:
+            server = await self.bot.fetch_guild(740584420645535775)
+            author = await server.fetch_member(ctx.user.id)
+            role = server.get_role(1130430961587335219)
+    
             if role in author.roles:
                 await ctx.response.defer()
                 await self.generate_profile_card(ctx, member)
