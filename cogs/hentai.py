@@ -20,33 +20,37 @@ class nsfw(Cog):
     ) -> None:
         if Botban(ctx.user).check_botbanned_user:
             return
+
         if Command(ctx.guild).check_disabled(self.hentai.qualified_name):
             await ctx.response.send_message(
                 "This command is disabled by the server's managers", ephemeral=True
             )
             return
+
         await ctx.response.defer()
 
         hentai, source = await Hentai().hentai(rating)
+        is_mp4 = hentai.endswith("mp4")
 
-        if hentai.endswith("mp4"):
+        if is_mp4:
             view = ReportContent(shorten_url(hentai))
             await ctx.followup.send(hentai, view=view)
-            return
-
-        embed = (
-            Embed(color=Color.purple())
-            .set_image(url=hentai)
-            .set_footer(
-                text="Fetched from {} • Credits must go to the artist".format(source)
+        else:
+            embed = (
+                Embed(color=Color.purple())
+                .set_image(url=hentai)
+                .set_footer(
+                    text="Fetched from {} • Credits must go to the artist".format(
+                        source
+                    )
+                )
             )
-        )
-        view = ReportContent(shorten_url(hentai))
-        await ctx.followup.send(embed=embed, view=view)
+            view = ReportContent(shorten_url(hentai))
+            await ctx.followup.send(embed=embed, view=view)
 
         await view.wait()
 
-        if view.value == None:
+        if view.value is None:
             await ctx.edit_original_response(view=None)
 
     @hentai.error
@@ -54,7 +58,7 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
-            if Command(ctx.guild).check_disabled(self.danbooru.qualified_name):
+            if Command(ctx.guild).check_disabled(self.hentai.qualified_name):
                 await ctx.response.send_message(
                     "This command is disabled by the server's managers", ephemeral=True
                 )
@@ -64,7 +68,6 @@ class nsfw(Cog):
                 color=Color.red(),
             )
             await ctx.followup.send(embed=slow)
-            return
 
     @Jeanne.command(description="Get a random media content from Gelbooru", nsfw=True)
     @Jeanne.checks.cooldown(1, 5, key=lambda i: (i.user.id))
@@ -103,7 +106,6 @@ class nsfw(Cog):
 
                 if view.value == None:
                     await ctx.edit_original_response(view=None)
-                    return
                 return
 
             color = Color.random()
@@ -120,8 +122,6 @@ class nsfw(Cog):
 
             if view.value == None:
                 await ctx.edit_original_response(view=None)
-                return
-
             return
 
         try:
@@ -131,7 +131,6 @@ class nsfw(Cog):
                 await view.wait()
                 if view.value == None:
                     await ctx.edit_original_response(view=None)
-                    return
                 return
 
             embed = (
@@ -210,6 +209,7 @@ class nsfw(Cog):
                 "This command is disabled by the server's managers", ephemeral=True
             )
             return
+
         await ctx.response.defer()
 
         if tag == "02":
@@ -239,7 +239,7 @@ class nsfw(Cog):
                 await view.wait()
                 if view.value == None:
                     await ctx.edit_original_response(view=None)
-                    return
+
             except:
                 footer_text += "\nIf you see an illegal content, please use /botreport and attach the link when reporting"
                 for embed in embeds:
@@ -278,6 +278,7 @@ class nsfw(Cog):
                 description="The hentai could not be found", color=Color.red()
             )
             await ctx.followup.send(embed=no_tag)
+
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
@@ -291,7 +292,6 @@ class nsfw(Cog):
                 color=Color.red(),
             )
             await ctx.followup.send(embed=slow)
-            return
 
     @Jeanne.command(description="Get a random hentai from Konachan", nsfw=True)
     @Jeanne.checks.cooldown(1, 5, key=lambda i: (i.user.id))
@@ -339,7 +339,7 @@ class nsfw(Cog):
                 await view.wait()
                 if view.value == None:
                     await ctx.edit_original_response(view=None)
-                    return
+
             except:
                 color = Color.random()
                 embeds = [
@@ -354,6 +354,7 @@ class nsfw(Cog):
                 for embed in embeds:
                     embed.set_footer(text=footer_text)
                 await ctx.followup.send(embeds=embeds)
+            return
 
         color = Color.random()
         embed = Embed(color=color, url="https://konachan.com")
@@ -399,7 +400,6 @@ class nsfw(Cog):
                 color=Color.red(),
             )
             await ctx.followup.send(embed=slow)
-            return
 
     @Jeanne.command(description="Get a random media content from Danbooru", nsfw=True)
     @Jeanne.checks.cooldown(1, 5, key=lambda i: (i.user.id))
@@ -436,8 +436,7 @@ class nsfw(Cog):
                 await view.wait()
                 if view.value == None:
                     await ctx.edit_original_response(view=None)
-                    return
-                
+                return
 
             color = Color.random()
             embeds = [
@@ -512,7 +511,6 @@ class nsfw(Cog):
                 color=Color.red(),
             )
             await ctx.followup.send(embed=slow)
-            return
 
 
 async def setup(bot: Bot):

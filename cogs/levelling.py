@@ -225,7 +225,7 @@ class levelling(Cog):
                     if lvl == None:
                         return
 
-                    channel, update, levelup = int(lvl[0]), str(lvl[1]), str(lvl[2])
+                    channel, update, levelup = lvl
 
                     def replace_all(text: str, dic: dict):
                         for i, j in dic.items():

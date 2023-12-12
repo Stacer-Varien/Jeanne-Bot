@@ -532,13 +532,13 @@ class Levelling:
             return self.get_level_channel
 
     @property
-    def get_level_channel(self) -> list | None:
+    def get_level_channel(self)->tuple[int, int, str | None]:
         data = db.execute(
             "SELECT * FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
 
-        return [data[3], data[4], self.get_rank_up_update] if data else None
+        return int(data[3]), int(data[4]), self.get_rank_up_update if data else None
 
     @property
     def get_rank_up_update(self) -> str | None:
