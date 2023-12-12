@@ -420,10 +420,11 @@ class currency(Cog):
 
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     async def balance_callback(self, ctx: Interaction, member: Member):
-        server = await self.bot.fetch_guild(740584420645535775)
-        author = await server.fetch_member(ctx.user.id)
-        role = server.get_role(1130430961587335219)
         try:
+            server = await self.bot.fetch_guild(740584420645535775)
+            author = await server.fetch_member(ctx.user.id)
+            role = server.get_role(1130430961587335219)
+
             if role in author.roles:
                 await self.get_balance(ctx, member)
         except:
@@ -478,7 +479,7 @@ class currency(Cog):
         bank = Currency(ctx.user)
         tomorrow = round((datetime.now() + timedelta(days=1)).timestamp())
 
-        if bank.check_daily == True:
+        if bank.check_daily:
             await bank.give_daily()
 
             daily = Embed(
@@ -486,42 +487,40 @@ class currency(Cog):
                 description=f"**{ctx.user}**, you claimed your daily reward.",
                 color=Color.random(),
             )
+
             try:
                 server = await self.bot.fetch_guild(740584420645535775)
                 author = await server.fetch_member(ctx.user.id)
                 role = server.get_role(1130430961587335219)
+
+                is_weekend = datetime.today().weekday() >= 5
+                rewards_text = "Rewards (weekend):" if is_weekend else "Rewards:"
+                rewards_value = (
+                    "You received 200 <:quantumpiece:1161010445205905418>"
+                    if is_weekend
+                    else "You received 100 <:quantumpiece:1161010445205905418>"
+                )
+                bonus_text = "Beta Bonus (weekend)" if is_weekend else "Beta Bonus"
+                bonus_value = (
+                    "50 <:quantumpiece:1161010445205905418>"
+                    if is_weekend
+                    else "25 <:quantumpiece:1161010445205905418>"
+                )
+
+                daily.add_field(
+                    name=rewards_text,
+                    value=rewards_value,
+                )
+
+                if role in author.roles:
+                    await bank.add_qp(50 if is_weekend else 25)
+                    daily.add_field(
+                        name=bonus_text,
+                        value=bonus_value,
+                    )
             except:
                 pass
 
-            if datetime.today().weekday() >= 5:
-                daily.add_field(
-                    name="Rewards (weekend):",
-                    value="You received 200 <:quantumpiece:1161010445205905418>",
-                )
-
-                try:
-                    if role in author.roles:
-                        await bank.add_qp(50)
-                        daily.add_field(
-                            name="Beta Bonus (weekend)",
-                            value="50 <:quantumpiece:1161010445205905418>",
-                        )
-                except:
-                    pass
-            else:
-                daily.add_field(
-                    name="Rewards:",
-                    value="You received 100 <:quantumpiece:1161010445205905418>",
-                )
-                try:
-                    if role in author.roles:
-                        await bank.add_qp(25)
-                        daily.add_field(
-                            name="Beta Bonus",
-                            value="25 <:quantumpiece:1161010445205905418>",
-                        )
-                except:
-                    pass
             daily.add_field(
                 name="Balance",
                 value=f"{bank.get_balance} <:quantumpiece:1161010445205905418>",
@@ -530,6 +529,7 @@ class currency(Cog):
 
             await ctx.followup.send(embed=daily)
             return
+
         cooldown = Embed(
             description=f"You have already claimed your daily.\nYour next claim is <t:{bank.check_daily}:R>",
             color=Color.red(),
