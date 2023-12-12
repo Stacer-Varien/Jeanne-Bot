@@ -24,7 +24,7 @@ start_time = time()
 class InfoCog(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.bot_version = "4.3 Beta"
+        self.bot_version = "4.3 Beta1"
         self.userinfo_context = Jeanne.ContextMenu(
             name="Userinfo", callback=self.userinfo_callback
         )
@@ -37,10 +37,11 @@ class InfoCog(Cog):
         )
 
     async def userinfo_callback(self, ctx: Interaction, member: Member):
-        server = await self.bot.fetch_guild(740584420645535775)
-        author = await server.fetch_member(ctx.user.id)
-        role = server.get_role(1130430961587335219)
         try:
+            server = await self.bot.fetch_guild(740584420645535775)
+            author = await server.fetch_member(ctx.user.id)
+            role = server.get_role(1130430961587335219)
+        
             if role in author.roles:
                 await self.get_userinfo(ctx, member)
         except:
@@ -257,7 +258,6 @@ class InfoCog(Cog):
 
     @Jeanne.command(description="See the server's banner")
     async def serverbanner(self, ctx: Interaction):
-        await ctx.response.defer()
         if Botban(ctx.user).check_botbanned_user:
             return
         if Command(ctx.guild).check_disabled(self.serverbanner.qualified_name):
