@@ -145,7 +145,7 @@ class HelpGroup(GroupCog, name="help"):
         await ctx.followup.send(embed=embed)
 
     @Jeanne.command(
-        description="Get help from the wiki or join the support server for further help"
+        description="Get help from the website or join the support server for further help"
     )
     async def support(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user:

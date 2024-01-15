@@ -173,6 +173,7 @@ class nsfw(Cog):
                 description="The hentai could not be found", color=Color.red()
             )
             await ctx.followup.send(embed=no_tag)
+            return
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
@@ -186,7 +187,7 @@ class nsfw(Cog):
                 color=Color.red(),
             )
             await ctx.followup.send(embed=slow)
-            return
+            
 
     @Jeanne.command(description="Get a random hentai from Yande.re", nsfw=True)
     @Jeanne.checks.cooldown(1, 5, key=lambda i: (i.user.id))
@@ -278,6 +279,7 @@ class nsfw(Cog):
                 description="The hentai could not be found", color=Color.red()
             )
             await ctx.followup.send(embed=no_tag)
+            return
 
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
@@ -387,6 +389,7 @@ class nsfw(Cog):
                 description="The hentai could not be found", color=Color.red()
             )
             await ctx.followup.send(embed=no_tag)
+            return
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
