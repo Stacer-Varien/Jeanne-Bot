@@ -194,7 +194,7 @@ class slashreactions(Cog):
         msg = (
             f"*{ctx.user}, you are a baka!*"
             if member == None
-            else f"*{member}, {ctx.user.mention} called you a baka!*"
+            else f"*{member.mention}, {ctx.user} called you a baka!*"
         )
         baka = Embed(color=Color.random())
         baka.set_footer(text="Fetched from nekos.fun")
