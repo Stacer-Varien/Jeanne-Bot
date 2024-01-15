@@ -37,21 +37,7 @@ class InfoCog(Cog):
         )
 
     async def userinfo_callback(self, ctx: Interaction, member: Member):
-        try:
-            server = await self.bot.fetch_guild(740584420645535775)
-            author = await server.fetch_member(ctx.user.id)
-            role = server.get_role(1130430961587335219)
-        
-            if role in author.roles:
-                await self.get_userinfo(ctx, member)
-        except:
-            await ctx.response.send_message(
-                embed=Embed(
-                    description="Uh Oh!\n\nIt seems you are trying something that is meant for beta users.\nIf you wish to join the beta programme, join [Orleans](https://discord.gg/Vfa796yvNq) and ask the bot developer.",
-                    color=Color.red(),
-                ),
-                ephemeral=True,
-            )
+        await self.get_userinfo(ctx, member)
 
     async def get_userinfo(self, ctx:Interaction, member:Member):
         if Botban(ctx.user).check_botbanned_user:

@@ -178,22 +178,9 @@ class levelling(Cog):
                 "This command is disabled by the server's managers", ephemeral=True
             )
             return
-        try:
-            server = await self.bot.fetch_guild(740584420645535775)
-            author = await server.fetch_member(ctx.user.id)
-            role = server.get_role(1130430961587335219)
-    
-            if role in author.roles:
-                await ctx.response.defer()
-                await self.generate_profile_card(ctx, member)
-        except:
-            await ctx.response.send_message(
-                embed=Embed(
-                    description="Uh Oh!\n\nIt seems you are trying something that is meant for beta users.\nIf you wish to join the beta programme, join [Orleans](https://discord.gg/Vfa796yvNq) and ask the bot developer.",
-                    color=Color.red(),
-                ),
-                ephemeral=True,
-            )
+
+        await self.generate_profile_card(ctx, member)
+
 
     async def profile_generate_error(self, ctx: Interaction, error: Exception) -> None:
         if isinstance(error, Jeanne.CommandOnCooldown):
