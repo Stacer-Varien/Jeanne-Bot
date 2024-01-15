@@ -1333,7 +1333,7 @@ class Set_Group(GroupCog, name="set"):
         embed.color = Color.random()
         await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(
+    @Jeanne.command(name="profile-brightness",
         description="Change the brightness of your level and profile card background"
     )
     @Jeanne.describe(
@@ -1363,7 +1363,7 @@ class Set_Group(GroupCog, name="set"):
         embed.color = Color.random()
         await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(description="Change your profile bio")
+    @Jeanne.command(name="profile-bio",description="Change your profile bio")
     async def bio(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user:
             return
@@ -1375,7 +1375,7 @@ class Set_Group(GroupCog, name="set"):
 
         await ctx.response.send_modal(BioModal())
 
-    @Jeanne.command(description="Change your level and profile card font and bar color")
+    @Jeanne.command(name="profile-color",description="Change your level and profile card font and bar color")
     @Jeanne.describe(color="Add your color")
     async def color(self, ctx: Interaction, color: Jeanne.Range[str, 1]):
         if Botban(ctx.user).check_botbanned_user:
@@ -1391,7 +1391,7 @@ class Set_Group(GroupCog, name="set"):
         try:
             c = ImageColor.getcolor(color, "RGB")
             await Inventory(ctx.user).set_color(color)
-            embed.description = "Profile and Level card font and bar color changed to {} as showing in the embed color".format(
+            embed.description = "Profile card font and bar color changed to {} as showing in the embed color".format(
                 color
             )
             embed.color = int("{:02X}{:02X}{:02X}".format(*c), 16)
@@ -1482,7 +1482,7 @@ class manage(Cog):
         self,
         ctx: Interaction,
         channel: abc.GuildChannel,
-        name: Optional[Jeanne.Range[str, 1, 100]] = None,
+        name: Optional[Jeanne.Range[str, 1, 100]] = None, category:Optional[CategoryChannel]=None, nsfw_enabled:Optional[bool]=None
     ) -> None:
         if Botban(ctx.user).check_botbanned_user:
             return
@@ -1500,6 +1500,13 @@ class manage(Cog):
         cloned = Embed(
             description="{} was cloned as {}".format(channel.jump_url, c.jump_url)
         )
+        cloned_channel=await ctx.guild.fetch_channel(c.id)
+        if category:
+            cloned_channel.edit(category=category)
+            cloned.add_field(name="Category", value=category.name, inline=True)
+        if nsfw_enabled:
+            cloned_channel.edit(nsfw=nsfw_enabled)
+            cloned.add_field(name="NSFW Enabled", value=nsfw_enabled, inline=True)
         cloned.color = Color.random()
         await ctx.followup.send(embed=cloned)
 
