@@ -90,7 +90,7 @@ class Embed_Group(GroupCog, name="embed"):
             return
         await ctx.response.defer()
 
-        if not jsonscript and not jsonfile:
+        if not (jsonscript or jsonfile):
             embed = Embed(
                 description="You are missing the JSON script or JSON file\nPlease use [Discohook](https://discohook.org/)"
             )
@@ -103,28 +103,28 @@ class Embed_Group(GroupCog, name="embed"):
             await ctx.followup.send(embed=embed)
             return
 
-        if jsonscript and not jsonfile:
-            json = loads(jsonscript)
-
-        elif jsonfile and not jsonscript:
-            json_file = jsonfile.url
-            json_request = get(json_file)
-            json_content = json_request.content
-            json = loads(json_content)
+        json: dict = (
+            loads(jsonscript) if jsonscript else loads(get(jsonfile.url).content)
+        )
 
         try:
-            content = json["content"]
+            content = json.get("content", None)
         except:
             pass
 
         try:
-            embed = Embed.from_dict(json["embeds"][0])
-            m = await channel.send(content=content, embed=embed)
+            embeds = [Embed.from_dict(i) for i in json.get("embeds", [])]
+            if len(embeds) > 10:
+                await ctx.followup.send(
+                    content="Too many embeds! 10 is the maximum limit",
+                    ephemeral=True,
+                )
+                return
+            m = await channel.send(content=content, embeds=embeds)
         except:
             m = await channel.send(content=content)
         await ctx.followup.send(
-            content="{} sent in {}".format(m.jump_url, channel.mention), ephemeral=True
-        )
+            content="{} sent in {}".format(m.jump_url, channel.mention))
 
     @Jeanne.command(
         description="Edits an embed message. This needs the Discohook.org embed generator"
@@ -160,9 +160,9 @@ class Embed_Group(GroupCog, name="embed"):
             await ctx.followup.send(embed=embed)
             return
 
-        if not jsonscript and not jsonfile:
+        if not (jsonscript or jsonfile):
             embed = Embed(
-                description="You are missing the JSON script or JSON file\nPlease use [Discohooks](https://discohook.org/)"
+                description="You are missing the JSON script or JSON file\nPlease use [Discohook](https://discohook.org/)"
             )
             await ctx.followup.send(embed=embed)
             return
@@ -173,32 +173,28 @@ class Embed_Group(GroupCog, name="embed"):
             await ctx.followup.send(embed=embed)
             return
 
-        if jsonscript and not jsonfile:
-            json = loads(jsonscript)
-
-        elif jsonfile and not jsonscript:
-            json_file = jsonfile.url
-            json_request = get(json_file)
-            json_content = json_request.content
-            json = loads(json_content)
+        json: dict = (
+            loads(jsonscript) if jsonscript else loads(get(jsonfile.url).content)
+        )
 
         try:
-            content = json["content"]
-
-            if content == "":
-                content = None
+            content = json.get("content", None)
         except:
             pass
 
         try:
-            embed = Embed.from_dict(json["embeds"][0])
-            await message.edit(content=content, embed=embed)
+            embeds = [Embed.from_dict(i) for i in json.get("embeds", [])]
+            if len(embeds) > 10:
+                await ctx.followup.send(
+                    content="Too many embeds! 10 is the maximum limit",
+                    ephemeral=True,
+                )
+                return
+            await message.edit(content=content, embeds=embeds)
         except:
             await message.edit(content=content)
         await ctx.followup.send(
-            content="{} edited".format(message.jump_url),
-            ephemeral=True,
-        )
+            content="{} edited in {}".format(message.jump_url, channel.jump_url))
 
 
 class ReminderCog(GroupCog, name="reminder"):
@@ -207,7 +203,7 @@ class ReminderCog(GroupCog, name="reminder"):
         self.check_reminders.start()
         super().__init__()
 
-    @tasks.loop(seconds=30, reconnect=True)
+    @tasks.loop(seconds=60, reconnect=True)
     async def check_reminders(self):
         data = Reminder().get_all_reminders
         if data == None:
@@ -301,7 +297,7 @@ class ReminderCog(GroupCog, name="reminder"):
             embed = Embed()
             embed.description = tabulate(reminds, headers=col_names, tablefmt="pretty")
         except:
-            embed.description="No reminders"
+            embed.description = "No reminders"
         embed.color = Color.random()
         await ctx.followup.send(embed=embed, ephemeral=True)
 
