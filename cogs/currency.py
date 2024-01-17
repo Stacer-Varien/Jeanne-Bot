@@ -454,13 +454,10 @@ class currency(Cog):
     @Jeanne.command(description="Claim your daily")
     async def daily(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user:
-            return
-
+         return
+         
         if Command(ctx.guild).check_disabled(self.daily.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
+            return await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
 
         await ctx.response.defer()
         bank = Currency(ctx.user)
@@ -482,17 +479,9 @@ class currency(Cog):
 
                 is_weekend = datetime.today().weekday() >= 5
                 rewards_text = "Rewards (weekend):" if is_weekend else "Rewards:"
-                rewards_value = (
-                    "You received 200 <:quantumpiece:1161010445205905418>"
-                    if is_weekend
-                    else "You received 100 <:quantumpiece:1161010445205905418>"
-                )
+                rewards_value = "You received 200 <:quantumpiece:1161010445205905418>" if is_weekend else "You received 100 <:quantumpiece:1161010445205905418>"
                 bonus_text = "Beta Bonus (weekend)" if is_weekend else "Beta Bonus"
-                bonus_value = (
-                    "50 <:quantumpiece:1161010445205905418>"
-                    if is_weekend
-                    else "25 <:quantumpiece:1161010445205905418>"
-                )
+                bonus_value = "50 <:quantumpiece:1161010445205905418>" if is_weekend else "25 <:quantumpiece:1161010445205905418>"
 
                 daily.add_field(
                     name=rewards_text,
@@ -515,13 +504,13 @@ class currency(Cog):
             daily.add_field(name="Next Daily:", value=f"<t:{tomorrow}:f>")
 
             await ctx.followup.send(embed=daily)
-            return
+        else:
+            cooldown = Embed(
+                description=f"You have already claimed your daily.\nYour next claim is <t:{bank.check_daily}:R>",
+                color=Color.red(),
+            )
+            await ctx.followup.send(embed=cooldown)
 
-        cooldown = Embed(
-            description=f"You have already claimed your daily.\nYour next claim is <t:{bank.check_daily}:R>",
-            color=Color.red(),
-        )
-        await ctx.followup.send(embed=cooldown)
 
     @Jeanne.command(description="Check how much QP you have")
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
