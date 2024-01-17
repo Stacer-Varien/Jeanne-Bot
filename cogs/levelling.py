@@ -272,7 +272,7 @@ class levelling(Cog):
 
     @Jeanne.command(description="See your profile or someone else's profile")
     @Jeanne.describe(member="Which member?")
-    @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
+    @Jeanne.checks.cooldown(1, 120, key=lambda i: (i.user.id))
     async def profile(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if Botban(ctx.user).check_botbanned_user:
             return
