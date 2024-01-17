@@ -223,18 +223,9 @@ class Background_Group(GroupCog, name="background"):
         await ctx.response.defer()
         balance = Currency(ctx.user).get_balance
 
-        if balance == None:
-            nomoney = Embed(
-                description="You have no QP.\nPlease get QP by doing `/daily`, `/guess`, `/flip` and/or `/dice`"
-            )
+        if balance is None or balance < 1000:
+            nomoney = Embed(description="You do not have enough QP.")
             await ctx.followup.send(embed=nomoney)
-            return
-
-        if balance < 1000:
-            notenough = Embed(
-                description="You do not have enough QP.\nPlease get more QP by doing `/daily`, `/guess`, `/flip` and/or `/dice`"
-            )
-            await ctx.followup.send(embed=notenough)
             return
 
         await ctx.followup.send(
@@ -277,24 +268,23 @@ class Background_Group(GroupCog, name="background"):
             .add_field(name="Cost", value="1000 <:quantumpiece:1161010445205905418>")
             .set_footer(text="Is this the background you wanted?")
             .set_footer(
-                text="Please note that if the custom background violates ToS (both Discord and Bot) or is NSFW, it will be removed with NO REFUNDS!"
+                text="Please note that if the custom background violates ToS or is NSFW, it will be removed with NO REFUNDS!"
             )
         )
+
         view = Confirmation(ctx.user)
         await ctx.edit_original_response(
             content=None, embed=preview, attachments=[file], view=view
         )
         await view.wait()
 
-        if view.value == True:
+        if view.value:
             await Inventory(ctx.user).add_user_custom_wallpaper(name, link)
-
             embed1 = Embed(
                 description="Background wallpaper bought and selected",
                 color=Color.random(),
             )
             await ctx.edit_original_response(embed=embed1, view=None, attachments=[])
-
         else:
             await ctx.edit_original_response(
                 content="Cancelled", embed=None, view=None, attachments=[]
