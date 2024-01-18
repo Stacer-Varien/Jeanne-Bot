@@ -118,7 +118,7 @@ class Currency:
 
     async def give_daily(self):
         next_claim = round((datetime.now() + timedelta(days=1)).timestamp())
-        
+
         qp = 200 if (datetime.today().weekday() >= 5) else 100
 
         cur = db.execute(
@@ -429,32 +429,17 @@ class Levelling:
     async def add_xp(self) -> (list | None):
         now_time = round(datetime.now().timestamp())
         next_time = round((datetime.now() + timedelta(minutes=2)).timestamp())
-        if datetime.today().weekday() > 4:
-            xp = 10
-        else:
-            xp = 5
+        xp = 10 if datetime.today().weekday() > 4 else 5
+
         cursor1 = db.execute(
             "INSERT OR IGNORE INTO serverxpData (guild_id, user_id, lvl, exp, cumulative_exp, next_time) VALUES (?,?,?,?,?,?)",
-            (
-                self.server.id,
-                self.member.id,
-                0,
-                xp,
-                xp,
-                next_time,
-            ),
+            (self.server.id, self.member.id, 0, xp, xp, next_time),
         )
         db.commit()
 
         cursor2 = db.execute(
             "INSERT OR IGNORE INTO globalxpData (user_id, lvl, exp, cumulative_exp, next_time) VALUES (?,?,?,?,?)",
-            (
-                self.member.id,
-                0,
-                xp,
-                xp,
-                next_time,
-            ),
+            (self.member.id, 0, xp, xp, next_time),
         )
         db.commit()
 
@@ -475,7 +460,6 @@ class Levelling:
                     self.member.id,
                 ),
             )
-
             db.commit()
 
         if (cursor2.rowcount == 0) and (now_time >= self.get_next_time_global):
@@ -494,13 +478,13 @@ class Levelling:
                     self.member.id,
                 ),
             )
-
             db.commit()
 
-        global_cumulated_exp = self.get_user_cumulated_xp
-        global_level = self.get_user_level
-        global_next_lvl_exp = (global_level * 50) + ((global_level - 1) * 25) + 50
-
+        global_cumulated_exp, global_level, global_next_lvl_exp = (
+            self.get_user_cumulated_xp,
+            self.get_user_level,
+            (self.get_user_level * 50) + ((self.get_user_level - 1) * 25) + 50,
+        )
         if global_cumulated_exp >= global_next_lvl_exp:
             global_updated_exp = global_cumulated_exp - global_next_lvl_exp
             db.execute(
@@ -513,10 +497,11 @@ class Levelling:
             )
             db.commit()
 
-        server_cumulated_exp = self.get_member_cumulated_xp
-        server_level = self.get_member_level
-        server_next_lvl_exp = (server_level * 50) + ((server_level - 1) * 25) + 50
-
+        server_cumulated_exp, server_level, server_next_lvl_exp = (
+            self.get_member_cumulated_xp,
+            self.get_member_level,
+            (self.get_member_level * 50) + ((self.get_member_level - 1) * 25) + 50,
+        )
         if server_cumulated_exp >= server_next_lvl_exp:
             server_updated_exp = server_cumulated_exp - server_next_lvl_exp
             db.execute(
@@ -532,13 +517,13 @@ class Levelling:
             return self.get_level_channel
 
     @property
-    def get_level_channel(self)->tuple[int, int, str | None]:
+    def get_level_channel(self):
         data = db.execute(
             "SELECT * FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
 
-        return int(data[3]), int(data[4]), self.get_rank_up_update if data else None
+        return data[3], data[4], self.get_rank_up_update if data else None
 
     @property
     def get_rank_up_update(self) -> str | None:
@@ -939,15 +924,15 @@ class Command:
     def __init__(self, server: Guild) -> None:
         self.server = server
 
-    def check_disabled(self, command:str):
+    def check_disabled(self, command: str):
         try:
             data = db.execute(
-                    "SELECT command FROM disabledCommandsData WHERE server = ? AND command = ?",
-                    (
-                        self.server.id,
-                        command,
-                    ),
-                ).fetchone()
+                "SELECT command FROM disabledCommandsData WHERE server = ? AND command = ?",
+                (
+                    self.server.id,
+                    command,
+                ),
+            ).fetchone()
             db.commit()
 
             return data is not None and command == data[0]
@@ -1173,7 +1158,7 @@ class Welcomer:
     def get_welcoming_msg(self):
         data = db.execute(
             "SELECT welcoming_message FROM serverData WHERE server = ?",
-            (self.server.id,)
+            (self.server.id,),
         ).fetchone()
         db.commit()
         return data[0] if data else None
@@ -1225,7 +1210,17 @@ class NsfwApis(Enum):
 class Hentai:
     def __init__(self, plus: Optional[bool] = None):
         self.plus = plus
-        self.blacklisted_tags = ["loli", "shota", "cub", "gore", "vore", "underage", "minor", "oppai_loli", "child"]
+        self.blacklisted_tags = [
+            "loli",
+            "shota",
+            "cub",
+            "gore",
+            "vore",
+            "underage",
+            "minor",
+            "oppai_loli",
+            "child",
+        ]
 
     def format_tags(self, tags: str = None) -> str:
         if tags:
@@ -1286,7 +1281,7 @@ class Hentai:
             if any(tag in self.blacklisted_tags for tag in img_tags):
                 continue
             if any(url in set(bl) for url in urls):
-                continue            
+                continue
             filtered_images.append(image)
         return filtered_images
 
@@ -1537,7 +1532,9 @@ class BetaTest:
 
     @staticmethod
     def check(user: User):
-        data = db.execute("SELECT * FROM betaData WHERE user = ?", (user.id,)).fetchone()
+        data = db.execute(
+            "SELECT * FROM betaData WHERE user = ?", (user.id,)
+        ).fetchone()
         db.commit()
 
         return data[0] if data else None
