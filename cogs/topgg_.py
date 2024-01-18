@@ -29,24 +29,36 @@ class TopGG(Cog):
 
     @update_stats.before_loop
     async def before_update_stats(self):
-        print('waiting...')
-        await self.bot.wait_until_ready()       
+        await self.bot.wait_until_ready()
 
     @Cog.listener()
     async def on_dbl_vote(self, data: dict):
         if data["type"] == "upvote":
-            voter = await self.bot.fetch_user(int(data["user"]))
+            voter_id = int(data["user"])
+            voter = await self.bot.fetch_user(voter_id)
+
             if Botban(voter).check_botbanned_user:
                 return
 
-            if await self.topggpy.get_weekend_status() == True:
-                credits = 100
-            else:
-                credits = 50
+            credits = 100 if await self.topggpy.get_weekend_status() else 50
+
+            try:
+                server_id = 740584420645535775
+                server = await self.bot.fetch_guild(server_id)
+                author = await server.fetch_member(voter_id)
+                role_id = 1130430961587335219
+                role = server.get_role(role_id)
+
+                if role in author.roles:
+                    credits = round(credits * 1.25)
+            except:
+                pass
 
             await Currency(voter).add_qp(credits)
-            with open("voterdata.txt", "w") as f:
-            	f.writelines(str(data))
+
+            with open("voterdata.txt", "a") as f:
+                f.writelines(f"{data}\n")
+
 
 async def setup(bot: Bot):
     await bot.add_cog(TopGG(bot))

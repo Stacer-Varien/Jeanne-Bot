@@ -1,8 +1,10 @@
 from random import choice, randint
+from typing import Optional
 from discord import (
     ButtonStyle,
     Color,
     Embed,
+    Member,
     app_commands as Jeanne,
     Interaction,
     ui,
@@ -403,70 +405,43 @@ class Flip_Group(GroupCog, name="flip"):
 class currency(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
-
-    @Jeanne.command(description="Claim your daily")
-    async def daily(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-
-        if Command(ctx.guild).check_disabled(self.daily.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
-
-        await ctx.response.defer()
-        bank = Currency(ctx.user)
-        tomorrow = round((datetime.now() + timedelta(days=1)).timestamp())
-
-        if bank.check_daily == True:
-            await bank.give_daily()
-            balance = bank.get_balance
-
-            daily = Embed(
-                title="Daily",
-                description=f"**{ctx.user}**, you claimed your daily reward.",
-                color=Color.random(),
-            )
-
-            if datetime.today().weekday() >= 5:
-                daily.add_field(
-                    name="Rewards (weekend):",
-                    value="You received 200 <:quantumpiece:1161010445205905418>",
-                )
-            else:
-                daily.add_field(
-                    name="Rewards:",
-                    value="You received 100 <:quantumpiece:1161010445205905418>",
-                )
-                daily.add_field(
-                    name="Balance",
-                    value=f"{balance} <:quantumpiece:1161010445205905418>",
-                )
-                daily.add_field(name="Next Daily:", value=f"<t:{tomorrow}:f>")
-            await ctx.followup.send(embed=daily)
-            return
-        cooldown = Embed(
-            description=f"You have already claimed your daily.\nYour next claim is <t:{bank.check_daily}:R>",
-            color=Color.red(),
+        self.balance_context = Jeanne.ContextMenu(
+            name="Balance", callback=self.balance_callback
         )
-        await ctx.followup.send(embed=cooldown)
+        self.bot.tree.add_command(self.balance_context)
 
-    @Jeanne.command(description="Check how much QP you have")
+    async def cog_unload(self) -> None:
+        self.bot.tree.remove_command(
+            self.balance_context.name, type=self.balance_context.type
+        )
+        self.balance_callback_error = self.balance_callback.error(
+            self.balance_callback_error
+        )
+
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
-    async def balance(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.balance.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
+    async def balance_callback(self, ctx: Interaction, member: Member):
+        await self.get_balance(ctx, member)
+
+
+    async def balance_callback_error(self, ctx: Interaction, error: Exception):
+        if isinstance(error, Jeanne.CommandOnCooldown):
+            if Command(ctx.guild).check_disabled(self.balance.qualified_name):
+                await ctx.response.send_message(
+                    "This command is disabled by the server's managers", ephemeral=True
+                )
+                return
+            cooldown = Embed(
+                description=f"WOAH! Calm down! Why keep checking again quickly?\nTry again after `{round(error.retry_after, 2)} seconds`",
+                color=Color.red(),
             )
-            return
+            await ctx.response.send_message(embed=cooldown)
+
+    async def get_balance(self, ctx: Interaction, member: Member):
         await ctx.response.defer()
-        bal = Currency(ctx.user).get_balance
+        bal = Currency(member).get_balance
 
         balance = Embed(
-            description=f"You have {bal} <:quantumpiece:1161010445205905418>",
+            description=f"{'You' if (member == ctx.user) else member} have {bal} <:quantumpiece:1161010445205905418>",
             color=Color.blue(),
         )
         balance.add_field(
@@ -475,6 +450,80 @@ class currency(Cog):
             inline=True,
         )
         await ctx.followup.send(embed=balance)
+
+    @Jeanne.command(description="Claim your daily")
+    async def daily(self, ctx: Interaction):
+        if Botban(ctx.user).check_botbanned_user:
+         return
+         
+        if Command(ctx.guild).check_disabled(self.daily.qualified_name):
+            return await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
+
+        await ctx.response.defer()
+        bank = Currency(ctx.user)
+        tomorrow = round((datetime.now() + timedelta(days=1)).timestamp())
+
+        if bank.check_daily:
+            await bank.give_daily()
+
+            daily = Embed(
+                title="Daily",
+                description=f"**{ctx.user}**, you claimed your daily reward.",
+                color=Color.random(),
+            )
+
+            try:
+                server = await self.bot.fetch_guild(740584420645535775)
+                author = await server.fetch_member(ctx.user.id)
+                role = server.get_role(1130430961587335219)
+
+                is_weekend = datetime.today().weekday() >= 5
+                rewards_text = "Rewards (weekend):" if is_weekend else "Rewards:"
+                rewards_value = "You received 200 <:quantumpiece:1161010445205905418>" if is_weekend else "You received 100 <:quantumpiece:1161010445205905418>"
+                bonus_text = "Beta Bonus (weekend)" if is_weekend else "Beta Bonus"
+                bonus_value = "50 <:quantumpiece:1161010445205905418>" if is_weekend else "25 <:quantumpiece:1161010445205905418>"
+
+                daily.add_field(
+                    name=rewards_text,
+                    value=rewards_value,
+                )
+
+                if role in author.roles:
+                    await bank.add_qp(50 if is_weekend else 25)
+                    daily.add_field(
+                        name=bonus_text,
+                        value=bonus_value,
+                    )
+            except:
+                pass
+
+            daily.add_field(
+                name="Balance",
+                value=f"{bank.get_balance} <:quantumpiece:1161010445205905418>",
+            )
+            daily.add_field(name="Next Daily:", value=f"<t:{tomorrow}:f>")
+
+            await ctx.followup.send(embed=daily)
+        else:
+            cooldown = Embed(
+                description=f"You have already claimed your daily.\nYour next claim is <t:{bank.check_daily}:R>",
+                color=Color.red(),
+            )
+            await ctx.followup.send(embed=cooldown)
+
+
+    @Jeanne.command(description="Check how much QP you have")
+    @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
+    async def balance(self, ctx: Interaction, member: Optional[Member] = None):
+        if Botban(ctx.user).check_botbanned_user:
+            return
+        if Command(ctx.guild).check_disabled(self.balance.qualified_name):
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
+            return
+        member = ctx.user if (member == None) else member
+        await self.get_balance(ctx, member)
 
     @balance.error
     async def balance_error(

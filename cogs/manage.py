@@ -37,7 +37,6 @@ from assets.components import (
 )
 from requests import get
 from io import BytesIO
-from assets.help.commands import Commands
 
 
 def replace_all(text: str, dic: dict):
@@ -1150,9 +1149,8 @@ class Set_Group(GroupCog, name="set"):
                 ]
             )
 
-            json_file = jsonfile.url
-            json_request = get(json_file)
-            json_content = replace_all(json_request.content, parameters)
+            json_request = str(get(jsonfile.url).content)
+            json_content = replace_all(json_request, parameters)
             json = loads(json_content)
 
             try:
@@ -1179,7 +1177,7 @@ class Set_Group(GroupCog, name="set"):
             await view.wait()
 
             if view.value == True:
-                await Manage(ctx.guild).set_welcomer_msg(str(json_request.content))
+                await Manage(ctx.guild).set_welcomer_msg(str(json_request))
 
                 embed = Embed(description="Welcoming message set")
                 await ctx.edit_original_response(
@@ -1233,9 +1231,8 @@ class Set_Group(GroupCog, name="set"):
                 ]
             )
 
-            json_file = jsonfile.url
-            json_request = get(json_file)
-            json_content = replace_all(json_request.content, parameters)
+            json_request = str(get(jsonfile.url).content)
+            json_content = replace_all(json_request, parameters)
             json = loads(json_content)
 
             try:
@@ -1262,7 +1259,7 @@ class Set_Group(GroupCog, name="set"):
             await view.wait()
 
             if view.value == True:
-                await Manage(ctx.guild).set_leaving_msg(str(json_request.content))
+                await Manage(ctx.guild).set_leaving_msg(str(json_request))
 
                 embed = Embed(description="Leaving message set")
                 await ctx.edit_original_response(
@@ -1336,7 +1333,7 @@ class Set_Group(GroupCog, name="set"):
         embed.color = Color.random()
         await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(
+    @Jeanne.command(name="profile-brightness",
         description="Change the brightness of your level and profile card background"
     )
     @Jeanne.describe(
@@ -1361,12 +1358,12 @@ class Set_Group(GroupCog, name="set"):
             await ctx.followup.send(embed=embed)
             return
 
-        Inventory(ctx.user).set_brightness(brightness)
+        await Inventory(ctx.user).set_brightness(brightness)
         embed.description = "Brightness has been changed to {}".format(brightness)
         embed.color = Color.random()
         await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(description="Change your profile bio")
+    @Jeanne.command(name="profile-bio",description="Change your profile bio")
     async def bio(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user:
             return
@@ -1378,7 +1375,7 @@ class Set_Group(GroupCog, name="set"):
 
         await ctx.response.send_modal(BioModal())
 
-    @Jeanne.command(description="Change your level and profile card font and bar color")
+    @Jeanne.command(name="profile-color",description="Change your level and profile card font and bar color")
     @Jeanne.describe(color="Add your color")
     async def color(self, ctx: Interaction, color: Jeanne.Range[str, 1]):
         if Botban(ctx.user).check_botbanned_user:
@@ -1394,7 +1391,7 @@ class Set_Group(GroupCog, name="set"):
         try:
             c = ImageColor.getcolor(color, "RGB")
             await Inventory(ctx.user).set_color(color)
-            embed.description = "Profile and Level card font and bar color changed to {} as showing in the embed color".format(
+            embed.description = "Profile card font and bar color changed to {} as showing in the embed color".format(
                 color
             )
             embed.color = int("{:02X}{:02X}{:02X}".format(*c), 16)
@@ -1485,7 +1482,7 @@ class manage(Cog):
         self,
         ctx: Interaction,
         channel: abc.GuildChannel,
-        name: Optional[Jeanne.Range[str, 1, 100]] = None,
+        name: Optional[Jeanne.Range[str, 1, 100]] = None, category:Optional[CategoryChannel]=None, nsfw_enabled:Optional[bool]=None
     ) -> None:
         if Botban(ctx.user).check_botbanned_user:
             return
@@ -1503,6 +1500,13 @@ class manage(Cog):
         cloned = Embed(
             description="{} was cloned as {}".format(channel.jump_url, c.jump_url)
         )
+        cloned_channel=await ctx.guild.fetch_channel(c.id)
+        if category:
+            cloned_channel.edit(category=category)
+            cloned.add_field(name="Category", value=category.name, inline=True)
+        if nsfw_enabled:
+            cloned_channel.edit(nsfw=nsfw_enabled)
+            cloned.add_field(name="NSFW Enabled", value=nsfw_enabled, inline=True)
         cloned.color = Color.random()
         await ctx.followup.send(embed=cloned)
 
@@ -1648,7 +1652,11 @@ class Command_Group(GroupCog, name="command"):
         if command.startswith(("help", "command")):
             embed.color = Color.red()
             embed.description = "WOAH! Don't disable that command!"
-        elif command not in [i.value for i in list(Commands)]:
+        elif command not in [
+            cmd.qualified_name
+            for cmd in self.bot.tree.walk_commands()
+            if not isinstance(cmd, Jeanne.Group)
+        ]:
             embed.color = Color.red()
             embed.description = "There is no such command that I have..."
         elif cmd.check_disabled(command):
@@ -1658,7 +1666,7 @@ class Command_Group(GroupCog, name="command"):
             embed.title = "Command Disabled"
             embed.description = f"`{command}` has been disabled"
             embed.color = Color.random()
-            cmd.disable(command)
+            await cmd.disable(command)
 
         await ctx.followup.send(embed=embed)
 
@@ -1678,7 +1686,11 @@ class Command_Group(GroupCog, name="command"):
 
         embed = Embed()
         cmd = Command(ctx.guild)
-        if command not in [i.value for i in list(Commands)]:
+        if command not in [
+            cmd.qualified_name
+            for cmd in self.bot.tree.walk_commands()
+            if not isinstance(cmd, Jeanne.Group)
+        ]:
             embed.color = Color.red()
             embed.description = "There is no such command that I have..."
 
@@ -1690,7 +1702,7 @@ class Command_Group(GroupCog, name="command"):
             embed.title = "Command Enabled"
             embed.description = f"`{command}` has been enabled"
             embed.color = Color.random()
-            cmd.enable(command)
+            await cmd.enable(command)
 
         await ctx.followup.send(embed=embed)
 

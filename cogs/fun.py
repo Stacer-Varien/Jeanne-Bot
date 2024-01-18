@@ -100,10 +100,8 @@ class fun(Cog):
             )
             return
         await ctx.response.defer()
-        animeme = Embed(color=Color.random())
-        animeme.set_image(url=get_animeme_pic())
-        animeme.set_footer(text="Fetched from animeme1936")
-        await ctx.followup.send(embed=animeme)
+        embed, file = get_animeme_pic()
+        await ctx.followup.send(embed=embed, file=file)
 
     @Jeanne.command(description="Combine 2 words to get 2 combined words")
     @Jeanne.describe(first_word="Add first word", second_word="Add second word")

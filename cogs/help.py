@@ -10,8 +10,7 @@ from discord import (
 from discord.ext.commands import GroupCog, Bot
 from functions import Botban, AutoCompleteChoices
 from collections import OrderedDict
-from assets.help.commands import Modules
-from assets.help.modules import modules
+from assets.help.modules import modules, Modules
 
 
 def replace_all(text: str, dic: dict):
@@ -47,7 +46,8 @@ class HelpGroup(GroupCog, name="help"):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @Jeanne.command(description="Get help of a certain command")
+
+    @Jeanne.command(description="Get help on a certain command")
     @Jeanne.autocomplete(command=AutoCompleteChoices.command_choices)
     @Jeanne.describe(command="Which command you need help with?")
     async def command(self, ctx: Interaction, command: Jeanne.Range[str, 3]):
@@ -55,75 +55,53 @@ class HelpGroup(GroupCog, name="help"):
             return
 
         await ctx.response.defer()
-        cmd = [
-            cmd
-            for cmd in self.bot.tree.walk_commands()
-            if not isinstance(cmd, Jeanne.Group)
-            if cmd.qualified_name == command
-        ][0]
-
-        bot_perms: dict = (
-            cmd.checks[0].__closure__[0].cell_contents
-            if len(cmd.checks) > 0
-            and cmd.checks[0].__qualname__ == "bot_has_permissions.<locals>.predicate"
-            else (
-                cmd.checks[1].__closure__[0].cell_contents
-                if len(cmd.checks) >= 2
-                and cmd.checks[1].__qualname__
-                == "bot_has_permissions.<locals>.predicate"
-                else None
-            )
+        cmd = next(
+            (
+                cmd
+                for cmd in self.bot.tree.walk_commands()
+                if not isinstance(cmd, Jeanne.Group) and cmd.qualified_name == command
+            ),
+            None,
         )
 
-        member_perms = (
-            cmd.checks[0].__closure__[0].cell_contents
-            if len(cmd.checks) >= 1
-            and cmd.checks[0].__qualname__ == "has_permissions.<locals>.predicate"
-            else (
-                cmd.checks[1].__closure__[0].cell_contents
-                if len(cmd.checks) >= 2
-                and cmd.checks[1].__qualname__ == "has_permissions.<locals>.predicate"
-                else None
-            )
-        )
+        if cmd:
+            bot_perms:dict = getattr(cmd, "bot_perms", None)
+            member_perms:dict = getattr(cmd, "member_perms", None)
 
-        embed = Embed(title=f"{command.title()} Help", color=Color.random())
-        embed.description = cmd.description
-        parms = []
-        descs = []
-        if len(cmd.parameters) > 0:
-            for i in cmd.parameters:
-                parm = f"[{i.name}]" if i.required is True else f"<{i.name}>"
-                desc = f"`{parm}` - {i.description}"
-                parms.append(parm)
-                descs.append(desc)
-            embed.add_field(name="Parameters", value="\n".join(descs), inline=False)
+            embed = Embed(title=f"{command.title()} Help", color=Color.random())
+            embed.description = cmd.description
 
-        if bot_perms:
-            perms = []
-            for i in list(bot_perms.keys()):
-                perms.append(str(i).replace("_", " ").title())
-            embed.add_field(name="Bot Permissions", value="\n".join(perms), inline=True)
+            parms = [f"[{i.name}]" if i.required else f"<{i.name}>" for i in cmd.parameters]
+            descs = [
+                f"`{parm}` - {i.description}" for i, parm in zip(cmd.parameters, parms)
+            ]
 
-        if member_perms:
-            perms = []
-            for i in list(member_perms.keys()):
-                perms.append(str(i).replace("_", " ").title())
-            embed.add_field(
-                name="User Permissions", value="\n".join(perms), inline=True
+            if parms:
+                embed.add_field(name="Parameters", value="\n".join(descs), inline=False)
+
+            if bot_perms:
+                perms = [str(i).replace("_", " ").title() for i in bot_perms.keys()]
+                embed.add_field(name="Bot Permissions", value="\n".join(perms), inline=True)
+
+            if member_perms:
+                perms = [str(i).replace("_", " ").title() for i in member_perms.keys()]
+                embed.add_field(
+                    name="User Permissions", value="\n".join(perms), inline=True
+                )
+
+            cmd_usage = "/" + cmd.qualified_name + " " + " ".join(parms)
+            embed.add_field(name="Command Usage", value=f"`{cmd_usage}`", inline=False)
+            embed.set_footer(
+                text="Legend:\n[] - Required\n<> - Optional\n\nIt is best to go to the websites for detailed explanations and usages"
             )
 
-        cmd_usage = "/" + cmd.qualified_name + " " + " ".join(parms)
-        embed.add_field(name="Command Usage", value=f"`{cmd_usage}`", inline=False)
-        embed.set_footer(
-            text="Legend:\n[] - Required\n<> - Optional\n\nIt is best to go to the websites for detailed explanations and usages"
-        )
+            await ctx.followup.send(embed=embed)
 
-        await ctx.followup.send(embed=embed)
-    
     @command.error
-    async def command_error(self, ctx:Interaction, error:Jeanne.AppCommandError):
-        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(error.original, IndexError):
+    async def command_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, IndexError
+        ):
             embed = Embed(description="I don't have this command", color=Color.red())
             await ctx.followup.send(embed=embed)
 
@@ -146,7 +124,7 @@ class HelpGroup(GroupCog, name="help"):
         await ctx.followup.send(embed=embed)
 
     @Jeanne.command(
-        description="Get help from the wiki or join the support server for further help"
+        description="Get help from the website or join the support server for further help"
     )
     async def support(self, ctx: Interaction):
         if Botban(ctx.user).check_botbanned_user:

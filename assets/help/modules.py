@@ -1,4 +1,18 @@
-from discord import Color
+from discord import Color, Enum
+
+
+class Modules(Enum):
+    currency = 0
+    fun = 1
+    hentai = 2
+    image = 3
+    info = 4
+    inventory = 5
+    levelling = 6
+    manage = 7
+    moderation = 8
+    reactions = 9
+    utilities = 10
 
 
 currency = {
