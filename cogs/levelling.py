@@ -216,7 +216,7 @@ class levelling(Cog):
                         ("%server%", str(message.guild.name)),
                         ("%mention%", str(message.author.mention)),
                         ("%name%", str(message.author.name)),
-                        ("%newlevel%", str(levelling_instance.get_member_level())),
+                        ("%newlevel%", str(levelling_instance.get_member_level)),
                         ("%role%", str((role_reward.name if role_reward else None))),
                         (
                             "%rolemention%",
