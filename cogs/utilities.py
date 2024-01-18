@@ -4,8 +4,10 @@ from discord import (
     ButtonStyle,
     Color,
     Embed,
+    Forbidden,
     Interaction,
     Message,
+    NotFound,
     TextChannel,
     app_commands as Jeanne,
     ui,
@@ -195,6 +197,20 @@ class Embed_Group(GroupCog, name="embed"):
             await message.edit(content=content)
         await ctx.followup.send(
             content="{} edited in {}".format(message.jump_url, channel.jump_url))
+
+    @edit.error
+    async def edit_error(self, ctx:Interaction, error:Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(error.original, (Forbidden, NotFound)):
+            if Command(ctx.guild).check_disabled(self.edit.qualified_name):
+                await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
+                return
+            embed = Embed(
+                description=error,
+                color=Color.red(),
+            )
+            await ctx.followup.send(embed=embed)
 
 
 class ReminderCog(GroupCog, name="reminder"):

@@ -207,7 +207,7 @@ class levelling(Cog):
                 channel, update, levelup = level_data
 
                 role_reward = message.guild.get_role(
-                    levelling_instance.get_role_reward()
+                    levelling_instance.get_role_reward
                 )
                 parameters = OrderedDict(
                     [
@@ -247,18 +247,18 @@ class levelling(Cog):
                     await self.send_level_message(channel, msg, embed)
 
                 except:
-                    if update == "0":
+                    if update[4] == "0":
                         msg = "{} has leveled up to `level {}`".format(
                             message.author, levelling_instance.get_member_level()
                         )
                     elif update is None:
                         pass
                     else:
-                        json = loads(replace_all(update, parameters))
+                        json = loads(replace_all(update[4], parameters))
                         msg = json["content"]
                         embed = Embed.from_dict(json["embeds"][0])
 
-                    await self.send_level_message(channel, msg, embed)
+                    await self.send_level_message(channel[3], msg, embed)
 
             except AttributeError:
                 pass

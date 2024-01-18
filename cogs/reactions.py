@@ -51,6 +51,14 @@ class SlashReactions(Cog):
             url=reaction_api["url"] if "nekos.life" in api_url else reaction_api["link"]
         )
 
+        if action=="baka":
+            msg = (
+                f"*{ctx.user}*, you are a baka!"
+                if member is None
+                else f"*{member.mention}*, *{ctx.user} called you a baka!"
+            )
+            return
+
         msg = (
             f"*{action.capitalize()}ing {ctx.user}*"
             if member is None

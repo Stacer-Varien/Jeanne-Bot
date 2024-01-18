@@ -523,7 +523,7 @@ class Levelling:
         ).fetchone()
         db.commit()
 
-        return data[3], data[4], self.get_rank_up_update if data else None
+        return data, data, self.get_rank_up_update if data else None
 
     @property
     def get_rank_up_update(self) -> str | None:
