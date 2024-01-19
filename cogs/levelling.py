@@ -89,7 +89,7 @@ class Rank_Group(GroupCog, name="rank"):
         r = 0
         for i in leaderboard:
             p = await self.bot.fetch_user(i[0])
-            exp = i[3]
+            exp = i[4]
             r += 1
             embed.add_field(name=f"`{r}.` {p}", value=f"`{exp}XP`", inline=True)
 
@@ -175,7 +175,7 @@ class levelling(Cog):
                 "This command is disabled by the server's managers", ephemeral=True
             )
             return
-
+        await ctx.response.defer()
         await self.generate_profile_card(ctx, member)
 
     async def profile_generate_error(self, ctx: Interaction, error: Exception) -> None:
