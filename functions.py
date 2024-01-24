@@ -539,7 +539,7 @@ class Levelling:
             (self.server.id, self.get_member_level),
         ).fetchone()
         db.commit()
-        return int(data[0]) if data else None
+        return data[0] if data else None
 
     @property
     def get_server_rank(self) -> list | None:

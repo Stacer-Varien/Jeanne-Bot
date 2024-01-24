@@ -217,10 +217,10 @@ class levelling(Cog):
                         ("%mention%", str(message.author.mention)),
                         ("%name%", str(message.author.name)),
                         ("%newlevel%", str(levelling_instance.get_member_level)),
-                        ("%role%", str((role_reward.name if role_reward else None))),
+                        ("%role%", str(role_reward.name if role_reward else None)),
                         (
                             "%rolemention%",
-                            str((role_reward.mention if role_reward else None)),
+                            str(role_reward.mention if role_reward else None),
                         ),
                     ]
                 )
@@ -232,7 +232,7 @@ class levelling(Cog):
 
                 try:
                     await message.author.add_roles(role_reward)
-                    if levelup == "0":
+                    if levelup[4] == "0":
                         msg = "CONGRATS {}! You were role awarded {}".format(
                             message.author,
                             (role_reward.name if role_reward else None),
@@ -240,11 +240,11 @@ class levelling(Cog):
                     elif levelup is None:
                         pass
                     else:
-                        json = loads(replace_all(levelup, parameters))
+                        json = loads(replace_all(levelup[4], parameters))
                         msg = json["content"]
                         embed = Embed.from_dict(json["embeds"][0])
 
-                    await self.send_level_message(channel, msg, embed)
+                    await self.send_level_message(channel[3], msg, embed)
 
                 except:
                     if update[4] == "0":
