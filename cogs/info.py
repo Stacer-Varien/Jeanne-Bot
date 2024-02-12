@@ -120,6 +120,7 @@ class InfoCog(Cog):
         difference = int(round(current_time - start_time))
         uptime = timedelta(seconds=difference).total_seconds()
         embed.add_field(name="Uptime", value=format_timespan(uptime), inline=True)
+        embed.add_field(name="Shards", value=self.bot.shard_count, inline=True)
 
         embed.add_field(
             name="Invites",
@@ -180,6 +181,7 @@ class InfoCog(Cog):
             value=verification_level,
             inline=True,
         )
+        serverinfo.add_field(name="Shard ID", value=ctx.guild.shard_id, inline=True)
         serverinfo.add_field(
             name="Count",
             value=f"**All channels:** {len(ctx.guild.channels)} | **Text Channels:** {len(ctx.guild.text_channels)} |  **Voice Channels:** {len(ctx.guild.voice_channels)} |  **Stage Channels:** {len(ctx.guild.stage_channels)} |  **Categories:** {len(ctx.guild.categories)} |  **Forums:** {len(ctx.guild.forums)} |  **Roles:** {len(ctx.guild.roles)} | **Emojis:** {len(emojis)} | **Stickers:** {len(ctx.guild.stickers)}",

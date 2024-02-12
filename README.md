@@ -2,6 +2,9 @@
 
 Jeanne is a multipurpose Discord bot with miscellaneous, moderation, management, and fun commands. It offers a range of features to enhance your server's functionality and user experience.
 
+## Before You Run This:
+This is a sharded version of the bot. It is kept seperately from the other branches until the bot has reached 1000 servers and it will be pushed in the main branch. Breakdowns and problems are expected
+
 ## Features
 
 ✨ **Slash Commands:** Jeanne supports slash commands for easy and intuitive interaction.

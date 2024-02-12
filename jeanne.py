@@ -1,10 +1,10 @@
-from discord.ext.commands import Bot, when_mentioned_or
+from discord.ext.commands import AutoShardedBot, when_mentioned_or
 from discord import Intents, AllowedMentions
 from os import listdir
 from config import TOKEN
 
 
-class Jeanne(Bot):
+class Jeanne(AutoShardedBot):
     async def setup_hook(self):
         for filename in listdir("./cogs"):
             if filename.endswith(".py"):
