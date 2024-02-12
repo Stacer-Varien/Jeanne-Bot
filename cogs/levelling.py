@@ -193,6 +193,7 @@ class levelling(Cog):
 
     @Cog.listener()
     async def on_message(self, message: Message):
+        global msg
         if Botban(message.author).check_botbanned_user or message.author.bot:
             return
 
@@ -233,12 +234,13 @@ class levelling(Cog):
                 try:
                     await message.author.add_roles(role_reward)
                     try:
-                        if levelup[4] == "0":
+                        if levelup == "0":
                             msg = "CONGRATS {}! You were role awarded {}".format(
                                 message.author,
                                 (role_reward.name if role_reward else None),
                             )
-                        elif levelup is None:
+                    except:
+                        if levelup is None:
                             pass
                         else:
                             json = loads(replace_all(levelup[4], parameters))
@@ -246,16 +248,15 @@ class levelling(Cog):
                             embed = Embed.from_dict(json["embeds"][0])
 
                         await self.send_level_message(channel[3], msg, embed)
-                    except:
-                        pass
 
                 except:
                     try:
-                        if update[4] == "0":
+                        if update == "0":
                             msg = "{} has leveled up to `level {}`".format(
                                 message.author, levelling_instance.get_member_level()
                             )
-                        elif update is None:
+                    except:
+                        if update is None:
                             pass
                         else:
                             json = loads(replace_all(update[4], parameters))
@@ -263,8 +264,7 @@ class levelling(Cog):
                             embed = Embed.from_dict(json["embeds"][0])
 
                         await self.send_level_message(channel[3], msg, embed)
-                    except:
-                        pass
+
 
             except AttributeError:
                 pass
