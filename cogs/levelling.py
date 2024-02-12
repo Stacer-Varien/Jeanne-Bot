@@ -89,7 +89,7 @@ class Rank_Group(GroupCog, name="rank"):
         r = 0
         for i in leaderboard:
             p = await self.bot.fetch_user(i[0])
-            exp = i[3]
+            exp = i[4]
             r += 1
             embed.add_field(name=f"`{r}.` {p}", value=f"`{exp}XP`", inline=True)
 
@@ -175,7 +175,7 @@ class levelling(Cog):
                 "This command is disabled by the server's managers", ephemeral=True
             )
             return
-
+        await ctx.response.defer()
         await self.generate_profile_card(ctx, member)
 
     async def profile_generate_error(self, ctx: Interaction, error: Exception) -> None:
@@ -193,6 +193,7 @@ class levelling(Cog):
 
     @Cog.listener()
     async def on_message(self, message: Message):
+        global msg
         if Botban(message.author).check_botbanned_user or message.author.bot:
             return
 
@@ -216,11 +217,11 @@ class levelling(Cog):
                         ("%server%", str(message.guild.name)),
                         ("%mention%", str(message.author.mention)),
                         ("%name%", str(message.author.name)),
-                        ("%newlevel%", str(levelling_instance.get_member_level())),
-                        ("%role%", str((role_reward.name if role_reward else None))),
+                        ("%newlevel%", str(levelling_instance.get_member_level)),
+                        ("%role%", str(role_reward.name if role_reward else None)),
                         (
                             "%rolemention%",
-                            str((role_reward.mention if role_reward else None)),
+                            str(role_reward.mention if role_reward else None),
                         ),
                     ]
                 )
@@ -232,33 +233,38 @@ class levelling(Cog):
 
                 try:
                     await message.author.add_roles(role_reward)
-                    if levelup == "0":
-                        msg = "CONGRATS {}! You were role awarded {}".format(
-                            message.author,
-                            (role_reward.name if role_reward else None),
-                        )
-                    elif levelup is None:
-                        pass
-                    else:
-                        json = loads(replace_all(levelup, parameters))
-                        msg = json["content"]
-                        embed = Embed.from_dict(json["embeds"][0])
+                    try:
+                        if levelup == "0":
+                            msg = "CONGRATS {}! You were role awarded {}".format(
+                                message.author,
+                                (role_reward.name if role_reward else None),
+                            )
+                    except:
+                        if levelup is None:
+                            pass
+                        else:
+                            json = loads(replace_all(levelup[4], parameters))
+                            msg = json["content"]
+                            embed = Embed.from_dict(json["embeds"][0])
 
-                    await self.send_level_message(channel, msg, embed)
+                        await self.send_level_message(channel[3], msg, embed)
 
                 except:
-                    if update[4] == "0":
-                        msg = "{} has leveled up to `level {}`".format(
-                            message.author, levelling_instance.get_member_level()
-                        )
-                    elif update is None:
-                        pass
-                    else:
-                        json = loads(replace_all(update[4], parameters))
-                        msg = json["content"]
-                        embed = Embed.from_dict(json["embeds"][0])
+                    try:
+                        if update == "0":
+                            msg = "{} has leveled up to `level {}`".format(
+                                message.author, levelling_instance.get_member_level()
+                            )
+                    except:
+                        if update is None:
+                            pass
+                        else:
+                            json = loads(replace_all(update[4], parameters))
+                            msg = json["content"]
+                            embed = Embed.from_dict(json["embeds"][0])
 
-                    await self.send_level_message(channel[3], msg, embed)
+                        await self.send_level_message(channel[3], msg, embed)
+
 
             except AttributeError:
                 pass

@@ -426,7 +426,7 @@ class Levelling:
         db.commit()
         return int(level[0]) if level else 0
 
-    async def add_xp(self) -> (list | None):
+    async def add_xp(self) -> tuple[int | None, int | None, str | None] | None:
         now_time = round(datetime.now().timestamp())
         next_time = round((datetime.now() + timedelta(minutes=2)).timestamp())
         xp = 10 if datetime.today().weekday() > 4 else 5
@@ -517,13 +517,27 @@ class Levelling:
             return self.get_level_channel
 
     @property
-    def get_level_channel(self):
+    def get_level_channel(self) -> tuple[int | None, int | None, str | None]:
         data = db.execute(
             "SELECT * FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
 
-        return data, data, self.get_rank_up_update if data else None
+        channel = None
+        levelup = None
+
+        if data:
+            try:
+                channel = int(data[3])
+            except:
+                pass
+
+            try:
+                levelup = int(data[4])
+            except:
+                pass
+
+        return channel, levelup, self.get_rank_up_update
 
     @property
     def get_rank_up_update(self) -> str | None:
@@ -539,7 +553,7 @@ class Levelling:
             (self.server.id, self.get_member_level),
         ).fetchone()
         db.commit()
-        return int(data[0]) if data else None
+        return data[0] if data else None
 
     @property
     def get_server_rank(self) -> list | None:

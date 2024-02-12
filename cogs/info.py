@@ -24,7 +24,7 @@ start_time = time()
 class InfoCog(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.bot_version = "4.3 Beta1"
+        self.bot_version = "4.4"
         self.userinfo_context = Jeanne.ContextMenu(
             name="Userinfo", callback=self.userinfo_callback
         )
