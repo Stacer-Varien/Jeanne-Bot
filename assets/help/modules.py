@@ -14,7 +14,6 @@ class Modules(Enum):
     reactions = 9
     utilities = 10
 
-
 currency = {
     "content": None,
     "embeds": [
@@ -221,3 +220,5 @@ modules = [
     reaction,
     utility,
 ]
+
+
