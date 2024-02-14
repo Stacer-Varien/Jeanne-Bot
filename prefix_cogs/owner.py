@@ -24,7 +24,7 @@ from functions import BetaTest, Botban, Hentai, Partner
 from typing import Literal, Optional
 
 
-class OwnerCog(Cog):
+class OwnerCog(Cog, name="Owner"):
     def __init__(self, bot: Bot):
         self.bot = bot
 

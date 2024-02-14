@@ -1,18 +1,12 @@
 from json import dumps, loads
+from typing import Mapping
 from discord import ButtonStyle, Color, Embed, ui
-from discord.ext.commands import (
-    Bot,
-    Cog,
-    group,
-    Context,
-    Range,
-    CommandInvokeError,
-    CommandError
-)
+from discord.ext.commands import Bot, Cog, group, Context, Range
 from discord.ext import commands as Jeanne
 from functions import Botban
 from collections import OrderedDict
 from assets.help.modules import modules, Modules
+from reactionmenu import ViewMenu, ViewButton
 
 
 def replace_all(text: str, dic: dict):
@@ -44,20 +38,42 @@ class help_button(ui.View):
         )
 
 
-class HelpGroupPrefix(Cog):
+class HelpGroupPrefix(Cog, name="Help"):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @group(invoke_without_command=True)
-    async def help(self, ctx: Context):
+    @group(
+        invoke_without_command=True,
+        description="Main Help command for the help subcommands",
+    )
+    async def help(self, ctx: Context): 
         ...
 
-    @help.command(aliases=['allcmds'], description="Get a list of all the available commands")
-    async def allcommands(self, ctx:Context):
-        ...
+    @help.command(
+        aliases=["allcmds"],
+        description="Get a list of all the available commands"
+    )
+    async def allcommands(self, ctx: Context):
+        await ctx.typing()
+        embed = Embed(
+            color=Color.random(),
+            description="Here is a list of all commands in their modules"
+        )
+        excluded_cogs = ["Jishaku", "Owner"]
+        for cog_name, cog in self.bot.cogs.items():
+            if cog_name not in excluded_cogs:
+                cmds = [command.qualified_name for command in cog.walk_commands()]
+                if cmds:
+                    embed.add_field(
+                        name=cog_name,
+                        value="\n".join(cmds),
+                        inline=True
+                    )
+        await ctx.send(embed=embed)
+
 
     @help.command(aliases=["cmd"], description="Get help on a certain command")
-    async def command(self, ctx: Context, command: Range[str, 3]):
+    async def command(self, ctx: Context, *, command: Range[str, 3]):
         if Botban(ctx.author).check_botbanned_user:
             return
 
@@ -78,8 +94,10 @@ class HelpGroupPrefix(Cog):
             embed = Embed(title=f"{command.title()} Help", color=Color.random())
             embed.description = cmd.description
 
-            if len(cmd.aliases) >=1:
-                embed.add_field(name="Aliases", value=", ".join(cmd.aliases), inline=True)
+            if len(cmd.aliases) >= 1:
+                embed.add_field(
+                    name="Aliases", value=", ".join(cmd.aliases), inline=True
+                )
             parms = cmd.signature
 
             if parms:
@@ -109,14 +127,36 @@ class HelpGroupPrefix(Cog):
         await ctx.send(embed=embed)
 
     @help.command(description="Get help of a certain module")
-    async def module(self, ctx: Context, module: Modules):
+    async def module(self, ctx: Context, module: str):
         if Botban(ctx.author).check_botbanned_user:
             return
         await ctx.defer()
-        module_data = dumps(modules[module.value])
+
+        module_mapping = {
+            "currency": Modules.currency,
+            "fun": Modules.fun,
+            "hentai": Modules.hentai,
+            "image": Modules.image,
+            "pictures": Modules.image,
+            "pics": Modules.image,
+            "images": Modules.image,
+            "info": Modules.info,
+            "information": Modules.info,
+            "levelling": Modules.levelling,
+            "lvl": Modules.levelling,
+            "rank": Modules.levelling,
+            "moderation": Modules.moderation,
+            "mod": Modules.moderation,
+            "reactions": Modules.reactions,
+            "react": Modules.reactions,
+        }
+
+        module_instance = module_mapping.get(module.lower())
+
+        module_data = dumps(modules[module_instance.value])
 
         if module_data:
-            parms = OrderedDict([("%module%", str(module.name.capitalize()))])
+            parms = OrderedDict([("%module%", str(module.capitalize()))])
 
             json_data: dict = loads(replace_all(module_data, parms))
 
