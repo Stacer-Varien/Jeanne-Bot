@@ -46,8 +46,7 @@ class HelpGroupPrefix(Cog, name="Help"):
         invoke_without_command=True,
         description="Main Help command for the help subcommands",
     )
-    async def help(self, ctx: Context):
-        ...
+    async def help(self, ctx: Context): ...
 
     @help.command(
         aliases=["allcmds"], description="Get a list of all the available commands"
@@ -87,7 +86,6 @@ class HelpGroupPrefix(Cog, name="Help"):
         if Botban(ctx.author).check_botbanned_user:
             return
         check = await BetaTest(self.bot).check(ctx.author)
-
         if check == True:
             await ctx.defer()
             cmd = next(
@@ -103,13 +101,7 @@ class HelpGroupPrefix(Cog, name="Help"):
                 bot_perms: dict = getattr(cmd, "bot_perms", None)
                 member_perms: dict = getattr(cmd, "member_perms", None)
 
-                for name, param in cmd.clean_params.items():
-                    if isinstance(param.annotation, ArgumentConverter):
-                        arguments = param.annotation.arguments
-                        if len(arguments) >= 1:
-                            string = []
-                            for name, argument in arguments.items():
-                                string.append(f"{name} = {argument.doc}")
+
 
                 embed = Embed(title=f"{command.title()} Help", color=Color.random())
                 embed.description = cmd.description
@@ -118,7 +110,13 @@ class HelpGroupPrefix(Cog, name="Help"):
                     embed.add_field(
                         name="Aliases", value=", ".join(cmd.aliases), inline=True
                     )
-                parms = cmd.signature
+                try:
+                    actions=cmd.clean_params["combine_parser"].default._actions
+                    parms = "".join(
+                        [f"{i.option_strings[1]} {i.help} " for i in actions]
+                    )
+                except:
+                    parms = cmd.signature
 
                 if parms:
                     embed.add_field(name="Parameters", value=parms, inline=False)

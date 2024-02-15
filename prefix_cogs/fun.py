@@ -5,7 +5,7 @@ from discord.ext.commands import Bot, Cog, Context
 from discord.ext import commands as Jeanne
 from assets.images import get_animeme_pic
 from functions import BetaTest, Botban, Command
-from discord_argparse import ArgumentConverter, RequiredArgument, OptionalArgument
+import argparse
 
 
 class fun(Cog, name="Fun"):
@@ -135,24 +135,19 @@ class fun(Cog, name="Fun"):
             ephemeral=True,
         )
 
-    combine_parms = ArgumentConverter(
-        first=RequiredArgument(
-            str,
-            doc="First word",
-        ),
-        second=RequiredArgument(
-            str,
-            doc="Second word",
-        ),
-    )
+    combine_parser = argparse.ArgumentParser(add_help=False)
+    combine_parser.add_argument(
+                "--first", "-f", type=str, help="First Word", required=True,
+            )
+    combine_parser.add_argument(
+                "--second", "-s", type=str, help="Second Word", required=True
+            )
 
     @Jeanne.command(
         aliases=["join"],
         description="""Combine 2 words to get 2 combined words. Use "" to seperate the words""",
     )
-    async def combine(
-        self, ctx: Context, *, words: combine_parms = combine_parms.defaults()
-    ):
+    async def combine(self, ctx: Context, *, words:str, combine_parser=combine_parser): # type: ignore
         if Botban(ctx.author).check_botbanned_user:
             return
         check = await BetaTest(self.bot).check(ctx.author)
@@ -164,11 +159,12 @@ class fun(Cog, name="Fun"):
                 )
                 return
             await ctx.defer()
-            option_name1letters = words["first"][: round(len(words["first"]) / 2)]
-            option_name2letters = words["second"][round(len(words["second"]) / 2) :]
+            namespace = combine_parser.parse_args(words.split())
+            option_name1letters = namespace.first[: round(len(namespace.first) / 2)]
+            option_name2letters = namespace.second[round(len(namespace.second) / 2) :]
 
-            option2_name1letters = words["first"][round(len(words["first"]) / 2) :]
-            option2_name2letters = words["second"][: round(len(words["second"]) / 2)]
+            option2_name1letters = namespace.first[round(len(namespace.first) / 2) :]
+            option2_name2letters = namespace.second[: round(len(namespace.second) / 2)]
 
             combine1 = "".join([option_name1letters, option_name2letters])
             combine2 = "".join([option2_name1letters, option2_name2letters])
@@ -177,7 +173,7 @@ class fun(Cog, name="Fun"):
                 description=f"**1st combine word**: {combine1}\n**2nd combined word**:{combine2}",
                 color=Color.random(),
             )
-            combine.set_author(name=f"""{words["first"]} + {words["second"]}""")
+            combine.set_author(name=f"""{namespace.first} + {namespace.second}""")
             await ctx.send(embed=combine)
             return
         await ctx.send(
