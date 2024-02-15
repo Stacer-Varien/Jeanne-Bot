@@ -77,34 +77,15 @@ class OwnerCog(Cog, name="Owner"):
     async def _add(self, ctx: Context, user: User):
         if Botban(ctx.author).check_botbanned_user:
             return
-        server = await self.bot.fetch_guild(740584420645535775)
-        betarole = server.get_role(1130430961587335219)
-        try:
-            m = await server.fetch_member(user.id)
-            await m.add_roles(betarole, reason="Added to the Beta Programme")
-            await BetaTest().add(user)
-            await ctx.send(f"{user} has been added as a Beta Tester")
-        except:
-            await ctx.send(
-                f"Member is not in {server}. This is required so they can be added in the Beta Programme"
-            )
+        await BetaTest(self.bot).add(ctx, user)
 
-    @beta.command(aliases=["remove"])
+    @beta.command(description="Removes a user from the Beta Programme")
     @is_owner()
-    async def _remove(self, ctx: Context, user: User):
+    async def remove(self, ctx: Context, user: User):
         if Botban(ctx.author).check_botbanned_user:
             return
 
-        server = await self.bot.fetch_guild(740584420645535775)
-        betarole = server.get_role(1130430961587335219)
-        try:
-            m = await server.fetch_member(user.id)
-            await m.add_roles(betarole, reason="Removed from the Beta Programme")
-        except:
-            await ctx.send(
-                f"Member is not in {server}. This is required so they can be added in the Beta Programme"
-            )
-        await BetaTest().remove(user)
+        await BetaTest(self.bot).remove(ctx, user)
 
     @group(aliases=["act", "presence"], invoke_without_command=True)
     @is_owner()
