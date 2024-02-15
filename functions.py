@@ -1,7 +1,6 @@
 from datetime import date, datetime, timedelta
 from enum import Enum
 from random import choice, randint, shuffle
-import time
 import aiohttp
 from humanfriendly import parse_timespan
 from discord import (
@@ -15,7 +14,7 @@ from discord import (
     User,
     app_commands as Jeanne,
 )
-from discord.ext.commands import Bot
+from discord.ext.commands import Bot, Context
 from requests import get
 from config import db, BB_WEBHOOK
 from typing import Literal, Optional, List
@@ -1534,25 +1533,41 @@ class Partner:
 
 
 class BetaTest:
-    def __init__(self) -> None:
-        pass
+    def __init__(self, bot: Bot) -> None:
+        self.bot = bot
 
-    @staticmethod
-    async def add(user: User):
-        cur = db.execute("INSERT OR IGNORE INTO betaData (user) VALUES (?)", (user.id,))
-        db.commit()
-        if cur.rowcount == 0:
-            return True
+    
+    async def add(self, ctx:Context, user: User):
+                server = await self.bot.fetch_guild(740584420645535775)
+                betarole = server.get_role(1130430961587335219)
+                try:
+                    m = await server.fetch_member(user.id)
+                    await m.add_roles(betarole, reason="Added to the Beta Programme")
+                    await ctx.send(f"{user} has been added as a Beta Tester")
+                except:
+                    await ctx.send(
+                        f"Member is not in {server}. This is required so they can be added in the Beta Programme"
+                    )
 
-    @staticmethod
-    def check(user: User):
-        data = db.execute(
-            "SELECT * FROM betaData WHERE user = ?", (user.id,)
-        ).fetchone()
-        db.commit()
+    async def check(self, user: User)-> bool|None:
+        server = await self.bot.fetch_guild(740584420645535775)
+        beta_role = server.get_role(1130430961587335219)
+        try:
+            member= await server.fetch_member(user.id)
 
-        return data[0] if data else None
+            if beta_role in member.roles:
+                return True
+        except:
+            return False
 
-    @staticmethod
-    async def remove(user: User):
-        db.execute("DELETE FROM betaData WHERE user = ?", (user.id,))
+    async def remove(self, ctx:Context, user: User):
+        server = await self.bot.fetch_guild(740584420645535775)
+        betarole = server.get_role(1130430961587335219)
+        try:
+            m = await server.fetch_member(user.id)
+            await m.remove_roles(betarole, reason="Removed from the Beta Programme")
+        except:
+            await ctx.send(
+                f"Member is not in {server}. This is required so they can be added in the Beta Programme"
+            )
+        
