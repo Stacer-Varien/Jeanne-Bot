@@ -532,7 +532,7 @@ class Levelling:
                 pass
 
             try:
-                levelup = int(data[4])
+                levelup = str(data[4])
             except:
                 pass
 
