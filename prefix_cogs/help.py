@@ -1,11 +1,9 @@
 from json import dumps, loads
 from discord import ButtonStyle, Color, Embed, ui
 from discord.ext.commands import Bot, Cog, group, Context, Range
-from discord.ext import commands as Jeanne
 from functions import BetaTest, Botban
 from collections import OrderedDict
 from assets.help.modules import modules, Modules
-from discord_argparse import ArgumentConverter
 
 
 def replace_all(text: str, dic: dict):
@@ -44,14 +42,9 @@ class HelpGroupPrefix(Cog, name="Help"):
     @group(
         aliases=["h"],
         invoke_without_command=True,
-        description="Main Help command for the help subcommands",
+        description="Main Help command for the help subcommands and shows all the commands and modules available",
     )
-    async def help(self, ctx: Context): ...
-
-    @help.command(
-        aliases=["allcmds"], description="Get a list of all the available commands"
-    )
-    async def allcommands(self, ctx: Context):
+    async def help(self, ctx: Context):
         check = await BetaTest(self.bot).check(ctx.author)
 
         if check == True:
@@ -101,8 +94,6 @@ class HelpGroupPrefix(Cog, name="Help"):
                 bot_perms: dict = getattr(cmd, "bot_perms", None)
                 member_perms: dict = getattr(cmd, "member_perms", None)
 
-
-
                 embed = Embed(title=f"{command.title()} Help", color=Color.random())
                 embed.description = cmd.description
 
@@ -112,12 +103,28 @@ class HelpGroupPrefix(Cog, name="Help"):
                     )
                 try:
                     actions = cmd.clean_params["combine_parser"].default._actions
-                    parms = "".join([f"<{i.option_strings[1]} {i.help}> " if i.required else f"[{i.option_strings[1]} {i.help}] " for i in actions])
-                    desc=[f"`<{i.option_strings[1]} {i.help}>`" if i.required else f"`[{i.option_strings[1]} {i.help}]`" for i in actions]
-                    value="\n".join(desc)
+                    parms = "".join(
+                        [
+                            (
+                                f"<{i.option_strings[1]} {i.help}> "
+                                if i.required
+                                else f"[{i.option_strings[1]} {i.help}] "
+                            )
+                            for i in actions
+                        ]
+                    )
+                    desc = [
+                        (
+                            f"`<{i.option_strings[1]} {i.help}>`"
+                            if i.required
+                            else f"`[{i.option_strings[1]} {i.help}]`"
+                        )
+                        for i in actions
+                    ]
+                    value = "\n".join(desc)
                 except:
                     parms = cmd.signature
-                    value=f"`{parms}`"
+                    value = f"`{parms}`"
 
                 if parms:
                     embed.add_field(name="Parameters", value=value, inline=False)
