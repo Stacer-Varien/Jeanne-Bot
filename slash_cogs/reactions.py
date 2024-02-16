@@ -48,9 +48,9 @@ class SlashReactions(Cog):
             else "Fetched from PurrBot.site"
         )
         reaction_embed.set_image(
-            url=reaction_api["url"] if "nekos.life" in api_url else reaction_api["link"]
+            url=reaction_api["url"] if "nekos.life" in api_url else reaction_api["image"]
         )
-
+        other_actions=["baka", "smug", "hug"]
         if action=="baka":
             msg = (
                 f"*{ctx.user}*, you are a baka!"
@@ -59,11 +59,25 @@ class SlashReactions(Cog):
             )
             return
 
-        msg = (
-            f"*{action.capitalize()}ing {ctx.user}*"
-            if member is None
-            else f"*{ctx.user} {action}ed {member.mention}*"
-        )
+        if action=="smug":
+            msg = (
+                        f"*{ctx.user}* is smugging"
+                    )
+            return
+
+        if action=="hug":
+            msg = (
+                f"*Hugging {ctx.user}*"
+                if member is None
+                else f"*{ctx.user} hugged {member.mention}*"
+            )
+
+        if action not in other_actions:
+            msg = (
+                f"*{action.capitalize()}ing {ctx.user}*"
+                if member is None
+                else f"*{ctx.user} {action}ed {member.mention}*"
+            )
 
         await ctx.response.send_message(msg, embed=reaction_embed)
 
