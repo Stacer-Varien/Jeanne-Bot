@@ -414,7 +414,7 @@ class currency(Cog):
         self.bot.tree.remove_command(
             self.balance_context.name, type=self.balance_context.type
         )
-        self.balance_callback_error = self.balance_callback.error(
+        self.balance_callback_error = self.balance_context.error(
             self.balance_callback_error
         )
 
