@@ -111,15 +111,16 @@ class HelpGroupPrefix(Cog, name="Help"):
                         name="Aliases", value=", ".join(cmd.aliases), inline=True
                     )
                 try:
-                    actions=cmd.clean_params["combine_parser"].default._actions
-                    parms = "".join(
-                        [f"{i.option_strings[1]} {i.help} " for i in actions]
-                    )
+                    actions = cmd.clean_params["combine_parser"].default._actions
+                    parms = "".join([f"<{i.option_strings[1]} {i.help}> " if i.required else f"[{i.option_strings[1]} {i.help}] " for i in actions])
+                    desc=[f"`<{i.option_strings[1]} {i.help}>`" if i.required else f"`[{i.option_strings[1]} {i.help}]`" for i in actions]
+                    value="\n".join(desc)
                 except:
                     parms = cmd.signature
+                    value=f"`{parms}`"
 
                 if parms:
-                    embed.add_field(name="Parameters", value=parms, inline=False)
+                    embed.add_field(name="Parameters", value=value, inline=False)
 
                 if bot_perms:
                     perms = [str(i).replace("_", " ").title() for i in bot_perms.keys()]
