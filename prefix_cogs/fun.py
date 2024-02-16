@@ -145,7 +145,7 @@ class fun(Cog, name="Fun"):
 
     @Jeanne.command(
         aliases=["join"],
-        description="""Combine 2 words to get 2 combined words. Use "" to seperate the words""",
+        description="Combine 2 words to get 2 combined words",
     )
     async def combine(self, ctx: Context, *, words:str, combine_parser=combine_parser): # type: ignore
         if Botban(ctx.author).check_botbanned_user:
@@ -159,7 +159,11 @@ class fun(Cog, name="Fun"):
                 )
                 return
             await ctx.defer()
-            namespace = combine_parser.parse_args(words.split())
+            try:
+                namespace = combine_parser.parse_args(words.split())
+            except:
+                await ctx.send(embed=Embed(description=f"You are missing some arguments for this command", color=Color.red()))
+                return
             option_name1letters = namespace.first[: round(len(namespace.first) / 2)]
             option_name2letters = namespace.second[round(len(namespace.second) / 2) :]
 
@@ -183,6 +187,7 @@ class fun(Cog, name="Fun"):
             ),
             ephemeral=True,
         )
+               
 
     @Jeanne.command(
         aliases=["pick", "choice"],
