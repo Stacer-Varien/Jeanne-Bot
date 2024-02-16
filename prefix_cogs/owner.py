@@ -32,7 +32,9 @@ class OwnerCog(Cog, name="Owner"):
     def restart_bot():
         execv(executable, [executable] + argv)
 
-    @group(invoke_without_command=True)
+    @group(
+        invoke_without_command=True, description="Main partner command (Developer Only)"
+    )
     @is_owner()
     async def partner(self, ctx: Context):
         if Botban(ctx.author).check_botbanned_user:
@@ -43,7 +45,7 @@ class OwnerCog(Cog, name="Owner"):
         )
         await ctx.send(embed=embed)
 
-    @partner.command()
+    @partner.command(description="Adds a partner (Developer Only)")
     @is_owner()
     async def add(self, ctx: Context, user: User):
         if Botban(ctx.author).check_botbanned_user:
@@ -52,7 +54,7 @@ class OwnerCog(Cog, name="Owner"):
         await Partner().add(user)
         await ctx.send(f"{user} has been added as a partner")
 
-    @partner.command()
+    @partner.command(description="Removes a partner (Developer Only)")
     @is_owner()
     async def remove(self, ctx: Context, user: User):
         if Botban(ctx.author).check_botbanned_user:
@@ -61,7 +63,9 @@ class OwnerCog(Cog, name="Owner"):
         await Partner().remove(user)
         await ctx.send(f"{user} has been removed as a partner")
 
-    @group(invoke_without_command=True)
+    @group(
+        invoke_without_command=True, description="Main beta command (Developer Only)"
+    )
     @is_owner()
     async def beta(self, ctx: Context):
         if Botban(ctx.author).check_botbanned_user:
@@ -72,14 +76,14 @@ class OwnerCog(Cog, name="Owner"):
         )
         await ctx.send(embed=embed)
 
-    @beta.command(aliases=["add"])
+    @beta.command(description="Add a user to the Beta Programme (Developer Only)")
     @is_owner()
-    async def _add(self, ctx: Context, user: User):
+    async def add(self, ctx: Context, user: User):
         if Botban(ctx.author).check_botbanned_user:
             return
         await BetaTest(self.bot).add(ctx, user)
 
-    @beta.command(description="Removes a user from the Beta Programme")
+    @beta.command(description="Removes a user from the Beta Programme (Developer Only)")
     @is_owner()
     async def remove(self, ctx: Context, user: User):
         if Botban(ctx.author).check_botbanned_user:
@@ -87,7 +91,11 @@ class OwnerCog(Cog, name="Owner"):
 
         await BetaTest(self.bot).remove(ctx, user)
 
-    @group(aliases=["act", "presence"], invoke_without_command=True)
+    @group(
+        aliases=["act", "presence"],
+        invoke_without_command=True,
+        description="Changes the bot's activity (Developer Only)",
+    )
     @is_owner()
     async def activity(self, ctx: Context):
         if Botban(ctx.author).check_botbanned_user:
@@ -99,7 +107,9 @@ class OwnerCog(Cog, name="Owner"):
         )
         await ctx.send(embed=embed)
 
-    @activity.command(aliases=["playing"])
+    @activity.command(
+        aliases=["playing"], description="Make the bot play something (Developer Only)"
+    )
     @is_owner()
     async def play(self, ctx: Context, *, activity: str):
         if Botban(ctx.author).check_botbanned_user:
@@ -108,7 +118,10 @@ class OwnerCog(Cog, name="Owner"):
         await self.bot.change_presence(activity=Game(name=activity))
         await ctx.send(f"Jeanne is now playing `{activity}`")
 
-    @activity.command(aliases=["listening"])
+    @activity.command(
+        aliases=["listening"],
+        description="Make the bot listen to something (Developer Only)",
+    )
     @is_owner()
     async def listen(self, ctx: Context, *, activity: str):
         if Botban(ctx.author).check_botbanned_user:
@@ -119,7 +132,10 @@ class OwnerCog(Cog, name="Owner"):
         )
         await ctx.send(f"Jeanne is now listening to `{activity}`")
 
-    @activity.command(aliases=["remove", "clean", "stop"])
+    @activity.command(
+        aliases=["remove", "clean", "stop"],
+        description="Clears the bot's activity (Developer Only)",
+    )
     @is_owner()
     async def clear(self, ctx: Context):
         if Botban(ctx.author).check_botbanned_user:
@@ -128,7 +144,7 @@ class OwnerCog(Cog, name="Owner"):
         await self.bot.change_presence(activity=None)
         await ctx.send(f"Jeanne's activity has been removed")
 
-    @command(aliases=["fuser"])
+    @command(aliases=["fuser"], description="Finds a user (Developer Only)")
     @is_owner()
     async def finduser(self, ctx: Context, user_id: int):
         await ctx.defer()
@@ -155,7 +171,9 @@ class OwnerCog(Cog, name="Owner"):
 
         await ctx.send(embeds=[fuser, userbanner])
 
-    @command(aliases=["restart", "refresh"])
+    @command(
+        aliases=["restart", "refresh"], description="Updates the bot (Developer Only)"
+    )
     @is_owner()
     async def update(self, ctx: Context):
         await ctx.defer()
@@ -165,7 +183,10 @@ class OwnerCog(Cog, name="Owner"):
         await ctx.send("YAY! NEW UPDATE!")
         self.restart_bot()
 
-    @command(aliases=["forbid", "disallow", "bban", "bb"], description="Ban a user from using Jeanne PERMANENTLY!")
+    @command(
+        aliases=["forbid", "disallow", "bban", "bb"],
+        description="Ban a user from using Jeanne PERMANENTLY! (Developer Only)",
+    )
     @is_owner()
     async def botban(self, ctx: Context, user_id: int, *, reason: str):
         if Botban(ctx.author).check_botbanned_user:
@@ -186,7 +207,10 @@ class OwnerCog(Cog, name="Owner"):
         for server in [orleans, ha, vhf]:
             await server.ban(user, reason=f"Botbanned - {reason}")
 
-    @command(aliases=["hb", "slice"])
+    @command(
+        aliases=["hb", "slice"],
+        description="Blacklists a hentai link to prevent it to be shown again (Developer Only)",
+    )
     @is_owner()
     async def hentaiblacklist(self, ctx: Context, link: str):
         if Botban(ctx.author).check_botbanned_user:
@@ -194,7 +218,10 @@ class OwnerCog(Cog, name="Owner"):
         await Hentai().add_blacklisted_link(link)
         await ctx.send("Link blacklisted")
 
-    @command(aliases=["db", "database"])
+    @command(
+        aliases=["db", "database"],
+        description="Sends the bot's database to the developer (Developer Only)",
+    )
     @is_owner()
     async def senddb(self, ctx: Context):
         with open("database.db", "rb") as file:
@@ -208,7 +235,7 @@ class OwnerCog(Cog, name="Owner"):
 Make sure private messages between **me and you are opened** or check the host if the database exists"""
                 await ctx.send(content, delete_after=10)
 
-    @command()
+    @command(description="Synchronizes all commands to servers (Developer Only)")
     @guild_only()
     @is_owner()
     async def sync(

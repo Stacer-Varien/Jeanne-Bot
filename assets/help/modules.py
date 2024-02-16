@@ -125,7 +125,7 @@ levelling = {
     "embeds": [
         {
             "title": "%module% help",
-            "description": "## How to gain XP\nYou gain experience by sending a message. You gain 5XP/2 Minutes/Message meaning if you send a message now, you will gain 5XP but you have to wait for 2 minutes to gain another 5 XP on the next message. On weekends, you get 10XP/2 Minutes/Message.",
+            "description": "## How to gain XP\nYou gain XP by sending a message. You gain **5XP/2 Minutes/Message** meaning if you send a message **now**, you will gain **5XP** but you have to wait for **2 minutes** to gain another 5XP on the next message. On weekends, you get **10XP/2 Minutes/Message**.",
             "color": int(Color.random().value),
             "fields": [
                 {
@@ -143,12 +143,12 @@ manage = {
     "embeds": [
         {
             "title": "%module% help",
-            "description": "Channel commands requires the manage channel permission, role commands require the manage role permission and setting a logging channel and editing the server requires the manage server permission. Creating, renaming and deleting emojis and stickers requires the manage emojis and stickers permission",
+            "description": "Channel commands requires the **manage channel** permission, role commands require the **manage role** permission and setting a logging channel and editing the server requires the **manage server** permission. Creating, renaming and deleting emojis and stickers requires the **manage emojis and stickers permission**.",
             "color": int(Color.random().value),
             "fields": [
                 {
                     "name": "Commands Available",
-                    "value": "- Create Text Channel\n- Create Voice Channel\n- Create Category\n- Create Stage Channel\n- Create Forum\n- Create Role\n- Create Thread\n- Create Emoji\n- Create Sticker\n- Delete Channel\n- Delete Role\n- Delete Emoji\n- Delete Sticker\n- Edit Text Channel\n- Edit Role\n- Edit Server\n- Edit Forum\n- Rename Emoji\n- Rename Sticker\n- Rename Category\n- Set Welcomer\n- Set Modlog\n- Set Messagelog\n- Set Brightness\n- Set Bio\n- Set Color\n- Set Welcoming Message\n- Set Leaving Message\n- Set Level Update\n- Remove\n- Clone\n- Add Role\n- Remove Role\n- XP Blacklist\n- XP Unblacklist\n- XP Blacklisted Channels List\n- Command Enable\n- Command Disabled\n- List Disabled Commands",
+                    "value": "- Create Text Channel\n- Create Voice Channel\n- Create Category\n- Create Stage Channel\n- Create Forum\n- Create Role\n- Create Thread\n- Create Emoji\n- Create Sticker\n- Delete Channel\n- Delete Role\n- Delete Emoji\n- Delete Sticker\n- Edit Text Channel\n- Edit Role\n- Edit Server\n- Edit Forum\n- Rename Emoji\n- Rename Sticker\n- Rename Category\n- Set Welcomer\n- Set Modlog\n- Set Messagelog\n- Set Profile Brightness\n- Set Profile Bio\n- Set Profile Color\n- Set Welcoming Message\n- Set Leaving Message\n- Set Level Update\n- Remove\n- Clone\n- Add Role\n- Remove Role\n- XP Blacklist\n- XP Unblacklist\n- XP Blacklisted Channels List\n- Command Enable\n- Command Disabled\n- List Disabled Commands",
                 }
             ],
         }

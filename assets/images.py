@@ -7,7 +7,7 @@ import lxml.etree as ET
 from os import listdir, path
 
 
-def get_saber_pic() -> tuple[Embed, File]:
+def get_saber_pic() -> tuple[File, Embed]:
     folder_path = SABER
     files = listdir(folder_path)
 
@@ -15,11 +15,12 @@ def get_saber_pic() -> tuple[Embed, File]:
         file for file in files if file.endswith((".jpg", ".jpeg", ".png", "gif"))
     ]
     random_image = choice(image_files)
+    file = File(path.join(folder_path, random_image), random_image)
     embed = Embed(color=Color.random())
     embed.set_image(url=f"attachment://{random_image}")
     embed.set_footer(text="Fetched from Saber_1936 • Credits must go to the artist")
-    file = File(path.join(folder_path, random_image), random_image)
-    return embed, file
+
+    return file, embed
 
 
 def get_jeanne_pic() -> tuple[Embed, File]:
@@ -47,10 +48,11 @@ def get_wallpaper_pic() -> tuple[Embed, File]:
         file for file in files if file.endswith((".jpg", ".jpeg", ".png", "gif"))
     ]
     random_image = choice(image_files)
+    file = File(path.join(folder_path, random_image), random_image)
     embed = Embed(color=Color.random())
     embed.set_image(url=f"attachment://{random_image}")
     embed.set_footer(text="Fetched from Wallpaper_1936 • Credits must go to the artist")
-    file = File(path.join(folder_path, random_image), random_image)
+
     return embed, file
 
 

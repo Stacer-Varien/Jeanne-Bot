@@ -42,13 +42,5 @@ class ErrorsCog(Cog):
         elif isinstance(error, Jeanne.CommandOnCooldown):
             pass
 
-    @Cog.listener()
-    async def on_command_error(self, ctx: Context, error):
-        if isinstance(error, CommandNotFound):
-            return
-        if isinstance(error, NotOwner):
-            return
-
-
 async def setup(bot: Bot):
     await bot.add_cog(ErrorsCog(bot))
