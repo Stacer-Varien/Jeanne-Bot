@@ -509,16 +509,28 @@ class slashutilities(Cog):
             )
             return
         await ctx.response.defer()
-        try:
-            answer = self.parser.parse(calculate).evaluate({})
-            calculation = Embed(title="Result", color=Color.random())
-            calculation.add_field(name=f"`{calculate}`", value=answer)
-            await ctx.followup.send(embed=calculation)
-        except Exception as e:
+        
+        answer = self.parser.parse(calculate).evaluate({})
+        calculation = Embed(title="Result", color=Color.random())
+        calculation.add_field(name=f"`{calculate}`", value=answer)
+        await ctx.followup.send(embed=calculation)
+
+
+    @calculator.error
+    async def calculator_error(self, ctx:Interaction, error:Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(error.original, OverflowError):
             failed = Embed(
-                description=f"{e}\nPlease refer to [Python Operators](https://www.geeksforgeeks.org/python-operators/?ref=lbp) if you don't know how to use the command"
+                description=str(error)
             )
             await ctx.followup.send(embed=failed)
+        elif isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, Exception
+        ):
+            failed = Embed(
+                description=f"{error}\nPlease refer to [Python Operators](https://www.geeksforgeeks.org/python-operators/?ref=lbp) if you don't know how to use the command"
+            )
+            await ctx.followup.send(embed=failed)
+
 
     @Jeanne.command(description="Invite me to your server or join the support server")
     async def invite(self, ctx: Interaction):
