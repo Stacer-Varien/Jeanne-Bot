@@ -117,7 +117,6 @@ class levelling(Cog):
     def get_profile(args):
         return Profile().generate_profile(**args)
 
-
     async def generate_profile_card(self, ctx: Interaction, member: Member):
         try:
             memdata = Levelling(member, ctx.guild)
@@ -207,9 +206,7 @@ class levelling(Cog):
 
                 channel, update, levelup = level_data
 
-                role_reward = message.guild.get_role(
-                    levelling_instance.get_role_reward
-                )
+                role_reward = message.guild.get_role(levelling_instance.get_role_reward)
                 parameters = OrderedDict(
                     [
                         ("%member%", str(message.author)),
@@ -264,7 +261,6 @@ class levelling(Cog):
                             embed = Embed.from_dict(json["embeds"][0])
 
                         await self.send_level_message(channel[3], msg, embed)
-
 
             except AttributeError:
                 pass

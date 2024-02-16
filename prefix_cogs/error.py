@@ -1,5 +1,5 @@
 from datetime import datetime
-from discord import Color, Embed, Interaction
+from discord import Color, Embed
 from discord.ext import commands as Jeanne
 from discord.ext.commands import Bot, Cog, Context, NotOwner, CommandNotFound
 import traceback

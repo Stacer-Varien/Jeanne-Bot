@@ -43,15 +43,21 @@ class SlashReactions(Cog):
         reaction_api = get(api_url).json()
         reaction_embed = Embed(color=Color.random())
         reaction_embed.set_footer(
-            text="Fetched from nekos.life"
-            if "nekos.life" in api_url
-            else "Fetched from PurrBot.site"
+            text=(
+                "Fetched from nekos.life"
+                if "nekos.life" in api_url
+                else "Fetched from PurrBot.site"
+            )
         )
         reaction_embed.set_image(
-            url=reaction_api["url"] if "nekos.life" in api_url else reaction_api["image"]
+            url=(
+                reaction_api["url"]
+                if "nekos.life" in api_url
+                else reaction_api["image"]
+            )
         )
-        other_actions=["baka", "smug", "hug"]
-        if action=="baka":
+        other_actions = ["baka", "smug", "hug"]
+        if action == "baka":
             msg = (
                 f"*{ctx.user}*, you are a baka!"
                 if member is None
@@ -59,13 +65,11 @@ class SlashReactions(Cog):
             )
             return
 
-        if action=="smug":
-            msg = (
-                        f"*{ctx.user}* is smugging"
-                    )
+        if action == "smug":
+            msg = f"*{ctx.user}* is smugging"
             return
 
-        if action=="hug":
+        if action == "hug":
             msg = (
                 f"*Hugging {ctx.user}*"
                 if member is None

@@ -170,7 +170,7 @@ class Inventory:
         db.commit()
         return str(wallpaper[0]), str(wallpaper[1]), str(wallpaper[2])
 
-    async def deselect_wallpaper(self) -> (Literal[True] | None):
+    async def deselect_wallpaper(self) -> Literal[True] | None:
         wallpaper = db.execute(
             "SELECT wallpaper FROM userWallpaperInventory WHERE user_id = ? AND selected = ?",
             (
@@ -264,7 +264,7 @@ class Inventory:
 
         return wallpapers if wallpapers else None
 
-    async def set_brightness(self, brightness: int) -> (Literal[False] | None):
+    async def set_brightness(self, brightness: int) -> Literal[False] | None:
         try:
             db.execute(
                 "UPDATE userWallpaperInventory SET brightness = ? WHERE user_id = ? AND selected = ?",
@@ -731,7 +731,7 @@ class Manage:
             )
             db.commit()
 
-    async def remove_role_reward(self, role: Role) -> (Literal[True] | None):
+    async def remove_role_reward(self, role: Role) -> Literal[True] | None:
         data = db.execute(
             "SELECT role FROM levelRewardData WHERE server = ?", (self.server.id,)
         ).fetchone()
@@ -1249,7 +1249,7 @@ class Hentai:
 
     async def get_nsfw_image(
         self, provider: NsfwApis, rating: Optional[str] = None, tags: str = None
-    ) -> (list | None):
+    ) -> list | None:
         bl = self.get_blacklisted_links()
         tags = tags.lower() if tags else None
 
@@ -1429,7 +1429,7 @@ class Reminder:
         db.commit()
         return data if data else None
 
-    async def remove(self, id: int) -> (Literal[False] | None):
+    async def remove(self, id: int) -> Literal[False] | None:
         data = db.execute(
             "SELECT * FROM reminderData WHERE userid = ? AND id = ?",
             (
@@ -1536,31 +1536,30 @@ class BetaTest:
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
-    
-    async def add(self, ctx:Context, user: User):
-                server = await self.bot.fetch_guild(740584420645535775)
-                betarole = server.get_role(1130430961587335219)
-                try:
-                    m = await server.fetch_member(user.id)
-                    await m.add_roles(betarole, reason="Added to the Beta Programme")
-                    await ctx.send(f"{user} has been added as a Beta Tester")
-                except:
-                    await ctx.send(
-                        f"Member is not in {server}. This is required so they can be added in the Beta Programme"
-                    )
+    async def add(self, ctx: Context, user: User):
+        server = await self.bot.fetch_guild(740584420645535775)
+        betarole = server.get_role(1130430961587335219)
+        try:
+            m = await server.fetch_member(user.id)
+            await m.add_roles(betarole, reason="Added to the Beta Programme")
+            await ctx.send(f"{user} has been added as a Beta Tester")
+        except:
+            await ctx.send(
+                f"Member is not in {server}. This is required so they can be added in the Beta Programme"
+            )
 
-    async def check(self, user: User)-> bool|None:
+    async def check(self, user: User) -> bool | None:
         server = await self.bot.fetch_guild(740584420645535775)
         beta_role = server.get_role(1130430961587335219)
         try:
-            member= await server.fetch_member(user.id)
+            member = await server.fetch_member(user.id)
 
             if beta_role in member.roles:
                 return True
         except:
             return False
 
-    async def remove(self, ctx:Context, user: User):
+    async def remove(self, ctx: Context, user: User):
         server = await self.bot.fetch_guild(740584420645535775)
         betarole = server.get_role(1130430961587335219)
         try:
@@ -1570,4 +1569,3 @@ class BetaTest:
             await ctx.send(
                 f"Member is not in {server}. This is required so they can be added in the Beta Programme"
             )
-        

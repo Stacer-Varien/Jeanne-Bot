@@ -1,7 +1,7 @@
 from datetime import datetime
 from discord import Color, Embed, Interaction
-from discord import app_commands as Jeanne, Forbidden
-from discord.ext.commands import Bot, Cog, Context, NotOwner, CommandNotFound
+from discord import app_commands as Jeanne
+from discord.ext.commands import Bot, Cog
 import traceback
 
 
