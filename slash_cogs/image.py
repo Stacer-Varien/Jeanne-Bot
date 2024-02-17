@@ -6,6 +6,8 @@ from requests import get
 from assets.images import (
     get_jeanne_pic,
     get_medusa_pic,
+    get_morgan_pic,
+    get_neko_pic,
     get_saber_pic,
     get_wallpaper_pic,
     safebooru_pic,
@@ -91,13 +93,24 @@ class images(Cog):
 
         await ctx.response.defer()
 
-        neko_api = get(neko_purrbot).json()
-        neko = Embed(color=Color.random())
-        neko.set_image(url=neko_api["link"])
-        neko.set_footer(
-            text="Fetched from PurrBot.site • Credits must go to the artist"
-        )
-        await ctx.followup.send(embed=neko)
+        embed, file = get_neko_pic()
+        await ctx.followup.send(file=file, embed=embed)
+
+    @Jeanne.command(description="Get a Morgan le Fay (Fate) image")
+    async def morgan(self, ctx: Interaction):
+        if Botban(ctx.user).check_botbanned_user:
+            return
+
+        if Command(ctx.guild).check_disabled(self.morgan.qualified_name):
+            await ctx.response.send_message(
+                "This command is disabled by the server's managers", ephemeral=True
+            )
+            return
+
+        await ctx.response.defer()
+
+        embed, file = get_morgan_pic()
+        await ctx.followup.send(file=file, embed=embed)
 
     @Jeanne.command(description="Get a Medusa (Fate) image")
     async def medusa(self, ctx: Interaction):
