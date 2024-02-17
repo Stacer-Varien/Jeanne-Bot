@@ -18,6 +18,8 @@ SABER = str(getenv("saber_album"))
 WALLPAPER = str(getenv("wallpaper_album"))
 MEDUSA = str(getenv("medusa_album"))
 ANIMEME = str(getenv("animeme_album"))
+NEKO = str(getenv("neko_album"))
+MORGAN = str(getenv("morgan_album"))
 
 db = connect("database.db", check_same_thread=False)
 
@@ -36,4 +38,3 @@ bite_purrbot = "https://purrbot.site/api/img/sfw/bite/gif"
 blush_purrbot = "https://purrbot.site/api/img/sfw/blush/gif"
 cuddle_purrbot = "https://purrbot.site/api/img/sfw/cuddle/gif"
 dance_purrbot = "https://purrbot.site/api/img/sfw/dance/gif"
-neko_purrbot = "https://purrbot.site/api/img/sfw/neko/" + choice(["img", "gif"])
