@@ -1,7 +1,7 @@
 from functions import Botban, Command
 from discord import Color, Embed, Interaction, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
-from config import kitsune_nekoslife, neko_purrbot
+from config import kitsune_nekoslife
 from requests import get
 from assets.images import (
     get_jeanne_pic,

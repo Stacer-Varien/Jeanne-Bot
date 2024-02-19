@@ -2,7 +2,7 @@ from functions import BetaTest, Botban, Command
 from discord import Color, Embed
 from discord.ext.commands import Cog, Bot, Context
 import discord.ext.commands as Jeanne
-from config import kitsune_nekoslife, neko_purrbot
+from config import kitsune_nekoslife
 from requests import get
 from assets.images import (
     get_jeanne_pic,
