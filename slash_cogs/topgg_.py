@@ -1,4 +1,4 @@
-from functions import Botban, Currency
+from functions import BetaTest, Botban, Currency
 from config import TOPGG, TOPGG_AUTH
 from topgg import DBLClient, WebhookManager
 from discord.ext import tasks
@@ -40,17 +40,10 @@ class TopGG(Cog):
 
             credits = 100 if await self.topggpy.get_weekend_status() else 50
 
-            try:
-                server_id = 740584420645535775
-                server = await self.bot.fetch_guild(server_id)
-                author = await server.fetch_member(voter_id)
-                role_id = 1130430961587335219
-                role = server.get_role(role_id)
 
-                if role in author.roles:
-                    credits = round(credits * 1.25)
-            except:
-                pass
+
+            if await BetaTest(self.bot).check(voter):
+                credits = round(credits * 1.25)
 
             await Currency(voter).add_qp(credits)
 
