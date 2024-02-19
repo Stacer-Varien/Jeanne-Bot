@@ -126,7 +126,8 @@ class Embed_Group(GroupCog, name="embed"):
         except:
             m = await channel.send(content=content)
         await ctx.followup.send(
-            content="{} sent in {}".format(m.jump_url, channel.mention))
+            content="{} sent in {}".format(m.jump_url, channel.mention)
+        )
 
     @Jeanne.command(
         description="Edits an embed message. This needs the Discohook.org embed generator"
@@ -196,15 +197,18 @@ class Embed_Group(GroupCog, name="embed"):
         except:
             await message.edit(content=content)
         await ctx.followup.send(
-            content="{} edited in {}".format(message.jump_url, channel.jump_url))
+            content="{} edited in {}".format(message.jump_url, channel.jump_url)
+        )
 
     @edit.error
-    async def edit_error(self, ctx:Interaction, error:Jeanne.AppCommandError):
-        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(error.original, (Forbidden, NotFound)):
+    async def edit_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, (Forbidden, NotFound)
+        ):
             if Command(ctx.guild).check_disabled(self.edit.qualified_name):
                 await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
+                    "This command is disabled by the server's managers", ephemeral=True
+                )
                 return
             embed = Embed(
                 description=error,
@@ -253,47 +257,50 @@ class ReminderCog(GroupCog, name="reminder"):
             return
         await ctx.response.defer(ephemeral=True)
         embed = Embed()
-        if len(Reminder(ctx.user).get_all_user_reminders()) >= 10:
-            embed.description = "You have too many reminders!\nWait for one of them to be due or cancel a reminder"
-            embed.color = Color.red()
-            await ctx.followup.send(embed=embed)
-            return
-        if parse_timespan(time) < parse_timespan("1 minute"):
-            embed.color = Color.red()
-            embed.description = "Please add a time more than 1 minute"
+        user_reminders = Reminder(ctx.user).get_all_user_reminders
+
+        try:
+            if len(user_reminders) >= 10:
+                embed.description = (
+                    "You have too many reminders! Wait for one to be due or cancel one."
+                )
+                embed.color = Color.red()
+                await ctx.followup.send(embed=embed)
+                return
+        except:
+            if parse_timespan(time) < parse_timespan("1 minute"):
+                embed.color = Color.red()
+                embed.description = "Please add a time more than 1 minute."
+                await ctx.followup.send(embed=embed, ephemeral=True)
+                return
+
+            date = datetime.now() + timedelta(seconds=parse_timespan(time))
+            embed.title = "Reminder added"
+            embed.description = f"On <t:{round(date.timestamp())}:F>, I will alert you about your reminder."
+            embed.color = Color.random()
+            embed.add_field(name="Reason", value=reason, inline=False)
+            embed.set_footer(
+                text="Please allow your DMs to be opened in this server (or any other server you are mutual to me) to receive alerts."
+            )
+            await Reminder(ctx.user).add(reason, round(date.timestamp()))
             await ctx.followup.send(embed=embed, ephemeral=True)
-            return
-
-        date = datetime.now() + timedelta(seconds=parse_timespan(time))
-        embed.title = "Reminder added"
-
-        embed.description = (
-            f"On <t:{round(date.timestamp())}:F>, I will alert you about your reminder"
-        )
-        embed.color = Color.random()
-        embed.add_field(name="Reason", value=reason, inline=False)
-        embed.set_footer(
-            text="Please allow your DMs to be opened in this server (or any other server you are mutual to me) to recieve alerts"
-        )
-        await Reminder(ctx.user).add(reason, round(date.timestamp()))
-        await ctx.followup.send(embed=embed, ephemeral=True)
 
     @add.error
     async def add_error(self, ctx: Interaction, error: Jeanne.errors.AppCommandError):
-        if isinstance(error, Jeanne.errors.CommandInvokeError):
-            await ctx.response.defer(ephemeral=True)
-            if InvalidTimespan:
-                embed = Embed(
-                    title="Invalid time added",
-                    description="You have entered the time incorrectly!",
-                    color=Color.red(),
-                )
-                embed.add_field(
-                    name="The time units (and abbreviations) supported by this command are:",
-                    value="- ms, millisecond, milliseconds\n- s, sec, secs, second, seconds\n- m, min, mins, minute, minutes\n- h, hour, hours\n- d, day, days\n- w, week, weeks\n- y, year, years",
-                    inline=False,
-                )
-                await ctx.followup.send(embed=embed, ephemeral=True)
+        if isinstance(error, Jeanne.errors.CommandInvokeError) and isinstance(
+            error.original, InvalidTimespan
+        ):
+            embed = Embed(
+                title="Invalid time added",
+                description="You have entered the time incorrectly!",
+                color=Color.red(),
+            )
+            embed.add_field(
+                name="The time units (and abbreviations) supported by this command are:",
+                value="- ms, millisecond, milliseconds\n- s, sec, secs, second, seconds\n- m, min, mins, minute, minutes\n- h, hour, hours\n- d, day, days\n- w, week, weeks\n- y, year, years",
+                inline=False,
+            )
+            await ctx.followup.send(embed=embed, ephemeral=True)
 
     @Jeanne.command(name="list", description="List all the reminders you have")
     async def _list(self, ctx: Interaction):
@@ -324,7 +331,7 @@ class ReminderCog(GroupCog, name="reminder"):
         await ctx.response.defer(ephemeral=True)
         reminder = Reminder(ctx.user)
         embed = Embed()
-        if reminder.remove(reminder_id) == False:
+        if await reminder.remove(reminder_id) == False:
             embed.color = Color.red()
             embed.description = "You don't have a reminder with that ID"
             await ctx.followup.send(embed=embed, ephemeral=True)
@@ -357,7 +364,7 @@ class slashutilities(Cog):
                 "This command is disabled by the server's managers", ephemeral=True
             )
             return
-
+        await ctx.response.defer()
         emoji_map = {
             "globe": "🌍",
             "newspaper": "📰",
@@ -377,7 +384,7 @@ class slashutilities(Cog):
         weather_data = get(url).json()
 
         location = weather_data["location"]
-        await ctx.response.defer()
+
         current = weather_data["current"]
         forecast = weather_data["forecast"]["forecastday"][0]["day"]
 
@@ -471,16 +478,16 @@ class slashutilities(Cog):
         ):
             if isinstance(error, Jeanne.CommandOnCooldown):
                 if Command(ctx.guild).check_disabled(self.weather.qualified_name):
-                    await ctx.response.send_message(
+                    await ctx.followup.send(
                         "This command is disabled by the server's managers",
                         ephemeral=True,
                     )
                     return
             no_city = Embed(
-                description="Failed to get weather information on this city\nPlease note that ZIP codes and Postal Codes only work on this command if you live in US, Canada or UK.",
+                description="Failed to get weather information on this city\nPlease note that ZIP/postal codes are only supported for Canada, the US, and the UK for this command.",
                 color=Color.red(),
             )
-            await ctx.response.send_message(embed=no_city)
+            await ctx.followup.send(embed=no_city)
 
     @Jeanne.command(description="Type something and I will say it")
     @Jeanne.describe(channel="Send to which channel?", message="What should I say?")
@@ -509,19 +516,18 @@ class slashutilities(Cog):
             )
             return
         await ctx.response.defer()
-        
+
         answer = self.parser.parse(calculate).evaluate({})
         calculation = Embed(title="Result", color=Color.random())
         calculation.add_field(name=f"`{calculate}`", value=answer)
         await ctx.followup.send(embed=calculation)
 
-
     @calculator.error
-    async def calculator_error(self, ctx:Interaction, error:Jeanne.AppCommandError):
-        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(error.original, OverflowError):
-            failed = Embed(
-                description=str(error)
-            )
+    async def calculator_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, OverflowError
+        ):
+            failed = Embed(description=str(error))
             await ctx.followup.send(embed=failed)
         elif isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, Exception
@@ -530,7 +536,6 @@ class slashutilities(Cog):
                 description=f"{error}\nPlease refer to [Python Operators](https://www.geeksforgeeks.org/python-operators/?ref=lbp) if you don't know how to use the command"
             )
             await ctx.followup.send(embed=failed)
-
 
     @Jeanne.command(description="Invite me to your server or join the support server")
     async def invite(self, ctx: Interaction):
