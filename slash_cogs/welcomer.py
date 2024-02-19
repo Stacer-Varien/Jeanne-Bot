@@ -1,4 +1,4 @@
-from discord import AllowedMentions, Color, Embed, Member
+from discord import Color, Embed, Member, AllowedMentions
 from discord.ext.commands import Cog, Bot
 from functions import Welcomer
 from collections import OrderedDict
@@ -17,6 +17,7 @@ class WelcomerCog(Cog):
 
     @Cog.listener()
     async def on_member_join(self, member: Member):
+
         welcomer = Welcomer(member.guild).get_welcomer
 
         if welcomer is None:
@@ -26,13 +27,14 @@ class WelcomerCog(Cog):
             channel = await self.bot.fetch_channel(int(welcomer[2]))
             welcomemsg = Welcomer(member.guild).get_welcoming_msg
 
-            if (welcomemsg == "None") or (welcomemsg == None):
+            if (welcomemsg == "None") or (welcomemsg is None):
                 welcome = Embed(
                     description=f"Hi {member} and welcome to {member.guild.name}!",
                     color=Color.random(),
                 ).set_thumbnail(url=member.display_avatar.url)
                 await channel.send(embed=welcome)
                 return
+
             humans = sum(not member.bot for member in member.guild.members)
             parameters = OrderedDict(
                 [
@@ -46,11 +48,7 @@ class WelcomerCog(Cog):
                     ("%icon%", str(member.guild.icon)),
                 ]
             )
-
-            json_data: dict = loads(
-                replace_all(str(welcomemsg), parameters)
-            )
-
+            json_data: dict = loads(replace_all(str(welcomemsg), parameters))
             content: str = json_data.get("content")
             embed_data = json_data.get("embeds")
 
@@ -76,7 +74,7 @@ class WelcomerCog(Cog):
             channel = await self.bot.fetch_channel(int(leaver[1]))
             leavingmsg = Welcomer(member.guild).get_leaving_msg
 
-            if (leavingmsg == "None") or (leavingmsg == None):
+            if (leavingmsg == "None") or (leavingmsg is None):
                 leave = Embed(
                     description=f"{member} left the server", color=Color.random()
                 ).set_thumbnail(url=member.display_avatar.url)
@@ -96,11 +94,7 @@ class WelcomerCog(Cog):
                     ("%icon%", str(member.guild.icon)),
                 ]
             )
-
-            json_data: dict = loads(
-                replace_all(str(leavingmsg), parameters)
-            )
-
+            json_data: dict = loads(replace_all(str(leavingmsg), parameters))
             content: str = json_data.get("content")
 
             try:
@@ -116,4 +110,3 @@ class WelcomerCog(Cog):
 
 async def setup(bot: Bot):
     await bot.add_cog(WelcomerCog(bot))
-
