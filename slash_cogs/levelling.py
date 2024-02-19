@@ -12,7 +12,7 @@ from discord import (
     Message,
 )
 from config import TOPGG
-from functions import Botban, Command, Currency, Inventory, Levelling, get_richest
+from functions import BetaTest, Botban, Command, Currency, Inventory, Levelling, get_richest
 from typing import Optional
 from assets.generators.profile_card import Profile
 from collections import OrderedDict
@@ -131,6 +131,7 @@ class levelling(Cog):
             )
             bio, font_color = Inventory(member).get_bio, Inventory(member).get_color
             voted = await self.topggpy.get_user_vote(member.id)
+            beta=await BetaTest(self.bot).check(member)
 
             args = {
                 "bg_image": bg[1] if bg else "",
@@ -149,7 +150,7 @@ class levelling(Cog):
                 "rrank": rrank,
                 "creator": member.id,
                 "partner": member.id,
-                "beta": member,
+                "beta": beta,
                 "balance": Currency(member).get_balance,
                 "bio": str(bio),
                 "brightness": bg[2] if bg else 100,

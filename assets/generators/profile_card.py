@@ -1,7 +1,6 @@
 from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont, ImageColor, ImageEnhance
-from discord import User
-from functions import BetaTest, Partner
+from functions import Partner
 import requests
 import math
 import os
@@ -35,7 +34,7 @@ class Profile:
         self,
         creator: int,
         partner: int,
-        beta:User,
+        beta: bool = None,
         bg_image: str = None,
         profile_image: str = None,
         font_color: str = None,
@@ -56,7 +55,11 @@ class Profile:
         bio: str = None,
         brightness: int = None,
     ) -> BytesIO:
-        background = BytesIO(requests.get(bg_image).content) if (bg_image!=None) else self.default_bg
+        background = (
+            BytesIO(requests.get(bg_image).content)
+            if (bg_image != None)
+            else self.default_bg
+        )
         card = Image.open(background).convert("RGBA")
 
         card = ImageEnhance.Brightness(card).enhance(float(brightness / 100))
@@ -185,7 +188,7 @@ class Profile:
             partner_badge = ImageEnhance.Brightness(partner_badge).enhance(1.1)
             card.paste(partner_badge, (600, 430), partner_badge)
 
-        if BetaTest.check(beta):
+        if beta == True:
             betatest = ImageEnhance.Brightness(betatest).enhance(1.1)
             card.paste(betatest, (540, 430), betatest)
 
