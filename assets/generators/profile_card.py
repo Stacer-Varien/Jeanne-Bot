@@ -1,5 +1,6 @@
 from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont, ImageColor, ImageEnhance
+from discord import User
 from functions import Partner
 import requests
 import math
@@ -32,6 +33,7 @@ class Profile:
 
     def generate_profile(
         self,
+        user:User,
         creator: int,
         partner: int,
         beta: bool = None,
@@ -55,8 +57,8 @@ class Profile:
         bio: str = None,
         brightness: int = None,
     ) -> BytesIO:
-        background = (
-            BytesIO(requests.get(bg_image).content)
+        background = BytesIO(
+            requests.get(bg_image).content
             if (bg_image != None)
             else self.default_bg
         )

@@ -518,9 +518,8 @@ class slashutilities(Cog):
             return
         await ctx.response.defer()
 
-        parts = re.split(r'(\D+)', calculate)
-        converted_parts = [str(float(part)) if part.isdigit() else part for part in parts]
-        check = ''.join(converted_parts)
+        numeric_parts = re.findall(r'\d+\.\d+|\d+', calculate)
+        check = ''.join([str(float(part)) if part.isdigit() else part for part in re.split(r'(\d+\.\d+|\d+)', calculate)])
         self.parser.parse(check).evaluate({})
 
         answer = self.parser.parse(calculate).evaluate({})
