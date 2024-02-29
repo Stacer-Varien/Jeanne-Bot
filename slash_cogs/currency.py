@@ -162,7 +162,7 @@ class Dice_Group(GroupCog, name="dice"):
             embed = Embed(color=Color.random())
             embed.add_field(
                 name=f"YAY! You got it!\n20 <:quantumpiece:1161010445205905418> has been added",
-                value=f"Dice rolled: **{rolled}**\You guessed: **{digit}**!",
+                value=f"Dice rolled: **{rolled}**\nYou guessed: **{digit}**!",
                 inline=False,
             )
             await ctx.followup.send(embed=embed)
@@ -212,7 +212,7 @@ class Dice_Group(GroupCog, name="dice"):
             embed = Embed(color=Color.random())
             embed.add_field(
                 name="YAY! You got it!\n20 <:quantumpiece:1161010445205905418> has been added",
-                value=f"Dice rolled: **{rolled}**\You guessed: **{digit}**!",
+                value=f"Dice rolled: **{rolled}**\nYou guessed: **{digit}**!",
                 inline=False,
             )
             await ctx.followup.send(embed=embed)
