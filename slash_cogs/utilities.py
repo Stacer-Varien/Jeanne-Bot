@@ -1,4 +1,5 @@
 from datetime import timedelta, datetime
+import re
 from discord import (
     Attachment,
     ButtonStyle,
@@ -517,7 +518,13 @@ class slashutilities(Cog):
             return
         await ctx.response.defer()
 
+        parts = re.split(r'(\D+)', calculate)
+        converted_parts = [str(float(part)) if part.isdigit() else part for part in parts]
+        check = ''.join(converted_parts)
+        self.parser.parse(check).evaluate({})
+
         answer = self.parser.parse(calculate).evaluate({})
+
         calculation = Embed(title="Result", color=Color.random())
         calculation.add_field(name=f"`{calculate}`", value=answer)
         await ctx.followup.send(embed=calculation)
