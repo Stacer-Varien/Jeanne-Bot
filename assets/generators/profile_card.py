@@ -34,21 +34,17 @@ class Profile:
     def generate_profile(
         self,
         user:User,
-        creator: int,
-        partner: int,
         beta: bool = None,
         bg_image: str = None,
-        profile_image: str = None,
         font_color: str = None,
-        server_level: int = None,
+        server_level: int = 0,
         server_current_xp: int = 0,
-        server_user_xp: int = None,
+        server_user_xp: int = 0,
         server_next_xp: int = None,
-        global_level: int = None,
+        global_level: int = 0,
         global_current_xp: int = 0,
-        global_user_xp: int = None,
+        global_user_xp: int = 0,
         global_next_xp: int = None,
-        user_name: str = None,
         srank: int = None,
         grank: int = None,
         rrank: int = None,
@@ -98,7 +94,7 @@ class Profile:
                 (900, 500), resample=Image.LANCZOS
             )
         # profile
-        profile_bytes = BytesIO(requests.get(profile_image).content)
+        profile_bytes = BytesIO(requests.get(user.display_avatar.url).content)
         profile = Image.open(profile_bytes)
         profile = profile.convert("RGBA").resize((180, 180), resample=Image.LANCZOS)
 
@@ -138,7 +134,7 @@ class Profile:
         draw = ImageDraw.Draw(card)
         draw.text(
             (215, 320),
-            user_name,
+            str(user),
             COLOR,
             font=ImageFont.truetype(self.font1, 45),
             stroke_width=1,
@@ -182,11 +178,11 @@ class Profile:
             richest = ImageEnhance.Brightness(richest).enhance(1.1)
             card.paste(richest, (720, 430), richest)
 
-        if creator == 597829930964877369:
+        if user.id == 597829930964877369:
             creator_badge = ImageEnhance.Brightness(creator_badge).enhance(1.1)
             card.paste(creator_badge, (660, 430), creator_badge)
 
-        if Partner.check(partner):
+        if Partner.check(user.id):
             partner_badge = ImageEnhance.Brightness(partner_badge).enhance(1.1)
             card.paste(partner_badge, (600, 430), partner_badge)
 

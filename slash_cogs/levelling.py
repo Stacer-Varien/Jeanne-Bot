@@ -119,23 +119,25 @@ class levelling(Cog):
 
     async def generate_profile_card(self, ctx: Interaction, member: Member):
         try:
+            inventory=Inventory(member)
             memdata = Levelling(member, ctx.guild)
             slvl, sexp = memdata.get_member_level, memdata.get_member_xp
             glvl, gexp = memdata.get_user_level, memdata.get_user_xp
 
-            bg = Inventory(member).selected_wallpaper
+            background = inventory.selected_wallpaper
+            brightness=inventory.get_brightness
             grank, srank, rrank = (
                 memdata.get_member_global_rank,
                 memdata.get_member_server_rank,
                 get_richest(member),
             )
-            bio, font_color = Inventory(member).get_bio, Inventory(member).get_color
+            bio, font_color = inventory.get_bio, inventory.get_color
             voted = await self.topggpy.get_user_vote(member.id)
             beta=await BetaTest(self.bot).check(member)
 
             args = {
-                "bg_image": bg[1] if bg else "",
-                "profile_image": str(member.avatar.with_format("png")),
+                "user": member,
+                "bg_image": background,
                 "font_color": font_color,
                 "server_level": slvl,
                 "server_user_xp": sexp,
@@ -153,7 +155,7 @@ class levelling(Cog):
                 "beta": beta,
                 "balance": Currency(member).get_balance,
                 "bio": str(bio),
-                "brightness": bg[2] if bg else 100,
+                "brightness": brightness,
             }
 
             image = await get_event_loop().run_in_executor(

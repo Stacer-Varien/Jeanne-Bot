@@ -15,8 +15,8 @@ from discord import (
     app_commands as Jeanne,
 )
 from discord.ext.commands import Bot, Context
-from requests import get
-from config import db, BB_WEBHOOK
+from requests import get, post
+from config import db, BB_WEBHOOK, CATBOX_HASH
 from typing import Literal, Optional, List
 
 current_time = date.today()
@@ -156,6 +156,18 @@ class Inventory:
         self.user = user
 
     @staticmethod
+    def upload_to_catbox(image_url: str) -> str | None:
+        url = "https://catbox.moe/user/api.php"
+        userhash = CATBOX_HASH
+        data = {"reqtype": "urlupload", "userhash": userhash, "url": image_url}
+        response = post(url, data=data)
+
+        if response.status_code == 200:
+            return response.text
+        else:
+            return None
+
+    @staticmethod
     def fetch_wallpapers() -> list:
         data = db.execute("SELECT * FROM wallpapers").fetchall()
 
@@ -168,6 +180,7 @@ class Inventory:
             "SELECT * FROM wallpapers WHERE name = ?", (name,)
         ).fetchone()
         db.commit()
+
         return str(wallpaper[0]), str(wallpaper[1]), str(wallpaper[2])
 
     async def deselect_wallpaper(self) -> Literal[True] | None:
@@ -211,8 +224,9 @@ class Inventory:
 
         await Currency(self.user).remove_qp(1000)
 
-    async def add_user_custom_wallpaper(self, name: str, link: str):
+    async def add_user_custom_wallpaper(self, name: str, url: str):
         await self.deselect_wallpaper()
+        link = self.upload_to_catbox(url)
 
         db.execute(
             "INSERT OR IGNORE INTO userWallpaperInventory (user_id, wallpaper, link, brightness, selected) VALUES (?,?,?,?,?)",
@@ -229,20 +243,16 @@ class Inventory:
         await Currency(self.user).remove_qp(1000)
 
     @property
-    def selected_wallpaper(self) -> tuple[str, str, int, int] | None:
+    def selected_wallpaper(self)->str|None:
         wallpaper = db.execute(
-            "SELECT * FROM userWallpaperInventory WHERE user_id = ? and selected = ?",
+            "SELECT link FROM userWallpaperInventory WHERE user_id = ? and selected = ?",
             (
                 self.user.id,
                 1,
             ),
         ).fetchone()
         db.commit()
-        return (
-            (str(wallpaper[1]), str(wallpaper[2]), int(wallpaper[3]), int(wallpaper[4]))
-            if wallpaper
-            else None
-        )
+        return None if (wallpaper == None) else str(wallpaper[2])
 
     async def use_wallpaper(self, name: str):
         await self.deselect_wallpaper()
@@ -263,6 +273,14 @@ class Inventory:
         ).fetchall()
 
         return wallpapers if wallpapers else None
+
+    @property
+    def get_brightness(self) -> int:
+        data = db.execute(
+            "SELECT brightness FROM userWallpaperInventory WHERE user_id = ? and selected = ?",
+            (self.user.id, 1),
+        ).fetchone()
+        return 100 if (data == None) else int(data[0])
 
     async def set_brightness(self, brightness: int) -> Literal[False] | None:
         try:
@@ -428,7 +446,7 @@ class Levelling:
     async def add_xp(self) -> tuple[int | None, int | None, str | None] | None:
         now_time = round(datetime.now().timestamp())
         next_time = round((datetime.now() + timedelta(minutes=2)).timestamp())
-        xp = 10 if datetime.today().weekday() > 4 else 5
+        xp = 10 if (datetime.today().weekday() > 4) else 5
 
         cursor1 = db.execute(
             "INSERT OR IGNORE INTO serverxpData (guild_id, user_id, lvl, exp, cumulative_exp, next_time) VALUES (?,?,?,?,?,?)",
@@ -543,7 +561,7 @@ class Levelling:
         data = db.execute(
             "SELECT rankup_message FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
-        return str(data[0]) if data else None
+        return None if data ==None else str(data[0])
 
     @property
     def get_role_reward(self) -> int | None:
@@ -1530,6 +1548,7 @@ class Partner:
     @staticmethod
     async def remove(user: User):
         db.execute("DELETE FROM partnerData WHERE user_id = ?", (user.id,))
+        db.commit()
 
 
 class BetaTest:

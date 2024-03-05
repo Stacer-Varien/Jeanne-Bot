@@ -107,8 +107,8 @@ class Background_Group(GroupCog, name="background"):
             "Creating preview... This will take some time <a:loading:1161038734620373062>"
         )
         args = {
+            "user":ctx.user,
             "bg_image": image_url,
-            "profile_image": str(ctx.user.avatar.with_format("png")),
             "font_color": None,
             "server_level": 100,
             "server_user_xp": 50,
@@ -233,8 +233,8 @@ class Background_Group(GroupCog, name="background"):
         )
 
         args = {
+            "user":ctx.user,
             "bg_image": link,
-            "profile_image": str(ctx.user.avatar.with_format("png")),
             "font_color": None,
             "server_level": 100,
             "server_user_xp": 50,
