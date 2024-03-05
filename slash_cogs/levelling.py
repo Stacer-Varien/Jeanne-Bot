@@ -124,7 +124,8 @@ class levelling(Cog):
     async def generate_profile_card(self, ctx: Interaction, member: Member):
         try:
             voted = await self.topggpy.get_user_vote(member.id)
-            image = await Profile(self.bot).generate_profile(member, voted)
+            bg_image = Inventory(member).selected_wallpaper
+            image = await Profile(self.bot).generate_profile(member, bg_image, voted)
             file = File(fp=image, filename=f"{member.name}_profile_card.png")
             await ctx.followup.send(file=file)
 
@@ -195,7 +196,6 @@ class levelling(Cog):
                         json_data:dict = loads(replace_all(levelup, parameters))
                         content:str = json_data.get("content")
                         embed = Embed.from_dict(json_data.get("embeds", [{}])[0])
-                    
 
                 elif levelup is not None:
                     try:

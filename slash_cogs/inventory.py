@@ -58,10 +58,6 @@ class Background_Group(GroupCog, name="background"):
         self.bot = bot
         super().__init__()
 
-    def get_card(self, args):
-        image = Profile().generate_profile(**args)
-        return image
-
     @Jeanne.command(description="Buy a background pic for your level card")
     @Jeanne.describe(name="Which background you are buying?")
     @Jeanne.autocomplete(name=AutoCompleteChoices.get_all_wallpapers)
@@ -106,32 +102,7 @@ class Background_Group(GroupCog, name="background"):
         await ctx.followup.send(
             "Creating preview... This will take some time <a:loading:1161038734620373062>"
         )
-        args = {
-            "user":ctx.user,
-            "bg_image": image_url,
-            "font_color": None,
-            "server_level": 100,
-            "server_user_xp": 50,
-            "server_next_xp": 100,
-            "global_level": 100,
-            "global_user_xp": 50,
-            "global_next_xp": 100,
-            "user_name": str(ctx.user),
-            "grank": 1,
-            "srank": 1,
-            "voted": True,
-            "rrank": 1,
-            "creator": self.bot.application.owner.id,
-            "partner": self.bot.application.owner.id,
-            "beta": self.bot.application.owner,
-            "balance": 100,
-            "bio": "This is a preview",
-            "brightness": 100,
-        }
-
-        func = partial(self.get_card, args)
-        image = await get_event_loop().run_in_executor(None, func)
-
+        image = await Profile(self.bot).generate_profile(ctx.user, image_url, True)
         file = File(fp=image, filename=f"preview_profile_card.png")
 
         preview = (
@@ -232,33 +203,8 @@ class Background_Group(GroupCog, name="background"):
             "Creating preview... This will take some time <a:loading:1161038734620373062>"
         )
 
-        args = {
-            "user":ctx.user,
-            "bg_image": link,
-            "font_color": None,
-            "server_level": 100,
-            "server_user_xp": 50,
-            "server_next_xp": 100,
-            "global_level": 100,
-            "global_user_xp": 50,
-            "global_next_xp": 100,
-            "user_name": str(ctx.user),
-            "grank": 1,
-            "srank": 1,
-            "voted": True,
-            "rrank": 1,
-            "creator": self.bot.application.owner.id,
-            "partner": self.bot.application.owner.id,
-            "beta": self.bot.application.owner,
-            "balance": 100,
-            "bio": "This is a preview",
-            "brightness": 100,
-        }
-
-        func = partial(self.get_card, args)
-        image = await get_event_loop().run_in_executor(None, func)
-
-        file = File(fp=image, filename="preview_profile_card.png")
+        image = await Profile(self.bot).generate_profile(ctx.user, link, True)
+        file = File(fp=image, filename=f"preview_profile_card.png")
 
         preview = (
             Embed(

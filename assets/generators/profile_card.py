@@ -37,10 +37,11 @@ class Profile:
     async def generate_profile(
         self,
         user: User | Member,
+        bg_image:str=None,
         voted: bool = None,
     )->BytesIO|Literal[False]:
         inventory_instance = Inventory(user)
-        bg_image=inventory_instance.selected_wallpaper
+        
         background = BytesIO(
             requests.get(bg_image).content if (bg_image != None) else self.default_bg
         )
