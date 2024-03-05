@@ -20,6 +20,7 @@ MEDUSA = str(getenv("medusa_album"))
 ANIMEME = str(getenv("animeme_album"))
 NEKO = str(getenv("neko_album"))
 MORGAN = str(getenv("morgan_album"))
+CATBOX_HASH=str(getenv("catbox_hash"))
 
 db = connect("database.db", check_same_thread=False)
 
