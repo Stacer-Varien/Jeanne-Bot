@@ -243,7 +243,7 @@ class Inventory:
         await Currency(self.user).remove_qp(1000)
 
     @property
-    def selected_wallpaper(self)->str|None:
+    def selected_wallpaper(self) -> str | None:
         wallpaper = db.execute(
             "SELECT link FROM userWallpaperInventory WHERE user_id = ? and selected = ?",
             (
@@ -252,7 +252,7 @@ class Inventory:
             ),
         ).fetchone()
         db.commit()
-        return None if (wallpaper == None) else str(wallpaper[2])
+        return None if (wallpaper == None) else str(wallpaper[0])
 
     async def use_wallpaper(self, name: str):
         await self.deselect_wallpaper()
@@ -370,7 +370,7 @@ class Levelling:
             ),
         ).fetchone()
         db.commit()
-        return int(xp[0]) if xp else 0
+        return 0 if xp == None else int(xp[0])
 
     @property
     def get_user_xp(self) -> int:
@@ -378,7 +378,7 @@ class Levelling:
             "SELECT exp FROM globalxpData WHERE user_id = ?", (self.member.id,)
         ).fetchone()
         db.commit()
-        return int(xp[0]) if xp else 0
+        return 0 if xp == None else int(xp[0])
 
     @property
     def get_member_cumulated_xp(self) -> int:
@@ -390,7 +390,7 @@ class Levelling:
             ),
         ).fetchone()
         db.commit()
-        return int(cumulated_exp[0]) if cumulated_exp else 0
+        return 0 if cumulated_exp == None else int(cumulated_exp[0])
 
     @property
     def get_user_cumulated_xp(self) -> int:
@@ -399,7 +399,7 @@ class Levelling:
             (self.member.id,),
         ).fetchone()
         db.commit()
-        return int(cumulated_exp[0]) if cumulated_exp else 0
+        return 0 if cumulated_exp == None else int(cumulated_exp[0])
 
     @property
     def get_next_time_server(self) -> int:
@@ -446,7 +446,7 @@ class Levelling:
     async def add_xp(self) -> tuple[int | None, int | None, str | None] | None:
         now_time = round(datetime.now().timestamp())
         next_time = round((datetime.now() + timedelta(minutes=2)).timestamp())
-        xp = 10 if (datetime.today().weekday() > 4) else 5
+        xp = 10 if datetime.today().weekday() > 4 else 5
 
         cursor1 = db.execute(
             "INSERT OR IGNORE INTO serverxpData (guild_id, user_id, lvl, exp, cumulative_exp, next_time) VALUES (?,?,?,?,?,?)",
@@ -460,7 +460,7 @@ class Levelling:
         )
         db.commit()
 
-        if (cursor1.rowcount == 0) and (now_time >= self.get_next_time_server):
+        if cursor1.rowcount == 0 and now_time >= self.get_next_time_server:
             server_exp = self.get_member_xp
             cumulated_exp = self.get_member_cumulated_xp
 
@@ -479,7 +479,7 @@ class Levelling:
             )
             db.commit()
 
-        if (cursor2.rowcount == 0) and (now_time >= self.get_next_time_global):
+        if cursor2.rowcount == 0 and now_time >= self.get_next_time_global:
             global_exp = self.get_user_xp
             global_cumulated_exp = self.get_user_cumulated_xp
 
@@ -487,7 +487,7 @@ class Levelling:
             global_updated_cumulated_exp = global_cumulated_exp + xp
 
             db.execute(
-                "UPDATE globalxpDATA SET exp = ?, cumulative_exp = ?, next_time = ? WHERE user_id = ?",
+                "UPDATE globalxpData SET exp = ?, cumulative_exp = ?, next_time = ? WHERE user_id = ?",
                 (
                     global_updated_exp,
                     global_updated_cumulated_exp,
@@ -497,12 +497,11 @@ class Levelling:
             )
             db.commit()
 
-        global_cumulated_exp, global_level, global_next_lvl_exp = (
-            self.get_user_cumulated_xp,
-            self.get_user_level,
-            (self.get_user_level * 50) + ((self.get_user_level - 1) * 25) + 50,
-        )
-        if global_cumulated_exp >= global_next_lvl_exp:
+        if global_cumulated_exp := self.get_user_cumulated_xp >= (
+            global_next_lvl_exp := (self.get_user_level * 50)
+            + ((self.get_user_level - 1) * 25)
+            + 50
+        ):
             global_updated_exp = global_cumulated_exp - global_next_lvl_exp
             db.execute(
                 "UPDATE globalxpData SET lvl = lvl + ?, exp = ? WHERE user_id = ?",
@@ -514,12 +513,11 @@ class Levelling:
             )
             db.commit()
 
-        server_cumulated_exp, server_level, server_next_lvl_exp = (
-            self.get_member_cumulated_xp,
-            self.get_member_level,
-            (self.get_member_level * 50) + ((self.get_member_level - 1) * 25) + 50,
-        )
-        if server_cumulated_exp >= server_next_lvl_exp:
+        if server_cumulated_exp := self.get_member_cumulated_xp >= (
+            server_next_lvl_exp := (self.get_member_level * 50)
+            + ((self.get_member_level - 1) * 25)
+            + 50
+        ):
             server_updated_exp = server_cumulated_exp - server_next_lvl_exp
             db.execute(
                 "UPDATE serverxpData SET lvl = lvl + ?, exp = ? WHERE guild_id = ? AND user_id = ?",
@@ -538,21 +536,12 @@ class Levelling:
         data = db.execute(
             "SELECT * FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
-        db.commit()
-
         channel = None
         levelup = None
 
         if data:
-            try:
-                channel = int(data[3])
-            except:
-                pass
-
-            try:
-                levelup = str(data[4])
-            except:
-                pass
+            channel = int(data[3]) if isinstance(data[3], int) else None
+            levelup = str(data[4]) if isinstance(data[4], str) else None
 
         return channel, levelup, self.get_rank_up_update
 
@@ -561,7 +550,7 @@ class Levelling:
         data = db.execute(
             "SELECT rankup_message FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
-        return None if data ==None else str(data[0])
+        return None if data == None else str(data[0])
 
     @property
     def get_role_reward(self) -> int | None:
@@ -569,7 +558,6 @@ class Levelling:
             "SELECT role FROM levelRewardData WHERE server = ? AND level = ?",
             (self.server.id, self.get_member_level),
         ).fetchone()
-        db.commit()
         return data[0] if data else None
 
     @property
