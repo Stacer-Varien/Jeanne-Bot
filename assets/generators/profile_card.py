@@ -1,14 +1,17 @@
 from io import BytesIO
+from typing import Literal
 from PIL import Image, ImageDraw, ImageFont, ImageColor, ImageEnhance
-from discord import User
-from functions import Partner
+from discord import Member, User
+from functions import BetaTest, Currency, Inventory, Levelling, Partner, get_richest
 import requests
 import math
 import os
+from discord.ext.commands import Bot
 
 
 class Profile:
-    def __init__(self):
+    def __init__(self, bot: Bot):
+        self.bot = bot
         self.default_bg = os.path.join(os.path.dirname(__file__), "assets", "card.png")
         self.font1 = os.path.join(os.path.dirname(__file__), "assets", "font.ttf")
         self.vote_badge = os.path.join(os.path.dirname(__file__), "assets", "voted.png")
@@ -31,36 +34,24 @@ class Profile:
         self.qp = os.path.join(os.path.dirname(__file__), "assets", "qp.png")
         self.beta = os.path.join(os.path.dirname(__file__), "assets", "beta.png")
 
-    def generate_profile(
+    async def generate_profile(
         self,
-        user:User,
-        beta: bool = None,
-        bg_image: str = None,
-        font_color: str = None,
-        server_level: int = 0,
-        server_current_xp: int = 0,
-        server_user_xp: int = 0,
-        server_next_xp: int = None,
-        global_level: int = 0,
-        global_current_xp: int = 0,
-        global_user_xp: int = 0,
-        global_next_xp: int = None,
-        srank: int = None,
-        grank: int = None,
-        rrank: int = None,
+        user: User | Member,
         voted: bool = None,
-        balance: int = None,
-        bio: str = None,
-        brightness: int = None,
-    ) -> BytesIO:
+    )->BytesIO|Literal[False]:
+        inventory_instance = Inventory(user)
+        bg_image=inventory_instance.selected_wallpaper
         background = BytesIO(
-            requests.get(bg_image).content
-            if (bg_image != None)
-            else self.default_bg
+            requests.get(bg_image).content if (bg_image != None) else self.default_bg
         )
+        
+        currency_instance = Currency(user)
+        levelling_instance = Levelling(user, user.guild)
         card = Image.open(background).convert("RGBA")
 
-        card = ImageEnhance.Brightness(card).enhance(float(brightness / 100))
+        card = ImageEnhance.Brightness(card).enhance(
+            float(inventory_instance.get_brightness / 100)
+        )
 
         width, height = card.size
         if width == 900 and height == 500:
@@ -81,18 +72,8 @@ class Profile:
             )
 
         else:
-            x1 = 0
-            y1 = 0
-            x2 = width
-            nh = math.ceil(width * 0.528888)
-            y2 = 0
-
-            if nh < height:
-                y2 = nh + y1
-
-            card = card.crop((x1, y1, x2, y2)).resize(
-                (900, 500), resample=Image.LANCZOS
-            )
+            return False
+        
         # profile
         profile_bytes = BytesIO(requests.get(user.display_avatar.url).content)
         profile = Image.open(profile_bytes)
@@ -108,7 +89,7 @@ class Profile:
         font_small = ImageFont.truetype(self.font1, 30)
 
         # ======== Colors ========================
-
+        font_color = inventory_instance.get_color
         COLOR = (
             tuple(ImageColor.getcolor(font_color, "RGB"))
             if font_color
@@ -158,6 +139,11 @@ class Profile:
             enhancer = ImageEnhance.Brightness(voter)
             voter = enhancer.enhance(1.1)
             card.paste(voter, (840, 430), voter)
+        grank, srank, rrank = (
+            levelling_instance.get_member_global_rank,
+            levelling_instance.get_member_server_rank,
+            get_richest(user),
+        )
 
         if grank <= 100:
             if grank == 1:
@@ -186,6 +172,7 @@ class Profile:
             partner_badge = ImageEnhance.Brightness(partner_badge).enhance(1.1)
             card.paste(partner_badge, (600, 430), partner_badge)
 
+        beta = await BetaTest(self.bot).check(user)
         if beta == True:
             betatest = ImageEnhance.Brightness(betatest).enhance(1.1)
             card.paste(betatest, (540, 430), betatest)
@@ -238,7 +225,7 @@ class Profile:
 
         profile_draw.text(
             (640, 570),
-            f"{get_str_qp(balance)}",
+            f"{get_str_qp(currency_instance.get_balance)}",
             COLOR,
             font=ImageFont.truetype(self.font1, 45),
             stroke_width=1,
@@ -246,7 +233,10 @@ class Profile:
         profile_canvas.paste(qp, (760, 570), qp)
 
         profile_draw.rectangle((10, 680, 890, 693), outline=COLOR, width=2)
-
+        global_level, global_user_xp = (
+            levelling_instance.get_user_level,
+            levelling_instance.get_user_xp,
+        )
         profile_draw.text(
             (20, 640),
             f"Global Level: {global_level}",
@@ -254,6 +244,7 @@ class Profile:
             font=font_small,
             stroke_width=1,
         )
+        global_next_xp = (global_level * 50) + ((global_level - 1) * 25) + 50
         profile_draw.text(
             (520, 640),
             f"Global XP: {get_str(global_user_xp)}/{get_str(global_next_xp)}",
@@ -262,13 +253,17 @@ class Profile:
             stroke_width=1,
         )
 
-        global_xpneed = global_next_xp - global_current_xp
-        global_xphave = global_user_xp - global_current_xp
+        global_xpneed = global_next_xp - levelling_instance.get_user_xp
+        global_xphave = global_user_xp - levelling_instance.get_user_xp
 
         global_current_percentage = (global_xphave / global_xpneed) * 100
         global_length_of_bar = (global_current_percentage * 8.76) + 12
 
         profile_draw.rectangle((12, 682, global_length_of_bar, 691), fill=COLOR)
+        server_level, server_user_xp = (
+            levelling_instance.get_member_level,
+            levelling_instance.get_member_xp,
+        )
 
         profile_draw.text(
             (20, 710),
@@ -277,6 +272,7 @@ class Profile:
             font=font_small,
             stroke_width=1,
         )
+        server_next_xp = (server_level * 50) + ((server_level - 1) * 25) + 50
         profile_draw.text(
             (520, 710),
             f"Server XP: {get_str(server_user_xp)}/{get_str(server_next_xp)}",
@@ -287,15 +283,16 @@ class Profile:
 
         profile_draw.rectangle((10, 750, 890, 763), outline=COLOR, width=2)
 
-        server_xpneed = server_next_xp - server_current_xp
-        server_xphave = server_user_xp - server_current_xp
+        server_xpneed = server_next_xp - levelling_instance.get_member_xp
+        server_xphave = server_user_xp - levelling_instance.get_member_xp
 
         server_current_percentage = (server_xphave / server_xpneed) * 100
         server_length_of_bar = (server_current_percentage * 8.76) + 12
 
         profile_draw.rectangle((12, 752, server_length_of_bar, 761), fill=COLOR)
 
-        bio = bio if bio else "No bio available"
+        bio = inventory_instance.get_bio
+        bio = "No bio available" if bio == None else bio
 
         profile_draw.rounded_rectangle(
             (10, 780, 890, 890), radius=7, width=2, outline=COLOR, fill=(59, 59, 59)
