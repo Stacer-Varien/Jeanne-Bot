@@ -204,6 +204,14 @@ class Background_Group(GroupCog, name="background"):
         )
 
         image = await Profile(self.bot).generate_profile(ctx.user, link, True)
+
+        if image == False:
+            size_error = Embed(
+                description="The image is below the 900x500 size.\nPlease enlarge the image and try again"
+            )
+            await ctx.edit_original_response(content=None, embed=size_error)
+            return
+
         file = File(fp=image, filename=f"preview_profile_card.png")
 
         preview = (
