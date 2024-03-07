@@ -135,19 +135,19 @@ class fun(Cog, name="Fun"):
             ephemeral=True,
         )
 
-    combine_parser = argparse.ArgumentParser(add_help=False)
-    combine_parser.add_argument(
-                "--first", "-f", type=str, help="First Word", required=True,
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument(
+                "--first", "-f", type=str, help="First Word", required=True, nargs="+"
             )
-    combine_parser.add_argument(
-                "--second", "-s", type=str, help="Second Word", required=True
+    parser.add_argument(
+                "--second", "-s", type=str, help="Second Word", required=True, nargs="+"
             )
 
     @Jeanne.command(
         aliases=["join"],
         description="Combine 2 words to get 2 combined words",
     )
-    async def combine(self, ctx: Context, *, words:str, combine_parser=combine_parser): # type: ignore
+    async def combine(self, ctx: Context, *words:str, parser=parser): # type: ignore
         if Botban(ctx.author).check_botbanned_user:
             return
         check = await BetaTest(self.bot).check(ctx.author)
@@ -160,15 +160,17 @@ class fun(Cog, name="Fun"):
                 return
             await ctx.defer()
             try:
-                namespace = combine_parser.parse_args(words.split())
+                namespace = parser.parse_known_args(words)
             except:
                 await ctx.send(embed=Embed(description=f"You are missing some arguments for this command", color=Color.red()))
                 return
-            option_name1letters = namespace.first[: round(len(namespace.first) / 2)]
-            option_name2letters = namespace.second[round(len(namespace.second) / 2) :]
+            option_name1letters = namespace.first[: round(len(' '.join(namespace.first)) / 2)]
+            option_name2letters = namespace.second[round(len(' '.join(namespace.second)) / 2) :]
 
-            option2_name1letters = namespace.first[round(len(namespace.first) / 2) :]
-            option2_name2letters = namespace.second[: round(len(namespace.second) / 2)]
+            option2_name1letters = namespace.first[
+                round(len(" ".join(namespace.first)) / 2) :
+            ]
+            option2_name2letters = namespace.second[: round(len(' '.join(namespace.second)) / 2)]
 
             combine1 = "".join([option_name1letters, option_name2letters])
             combine2 = "".join([option2_name1letters, option2_name2letters])
@@ -187,7 +189,6 @@ class fun(Cog, name="Fun"):
             ),
             ephemeral=True,
         )
-               
 
     @Jeanne.command(
         aliases=["pick", "choice"],

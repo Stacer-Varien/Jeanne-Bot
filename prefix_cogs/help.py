@@ -102,7 +102,7 @@ class HelpGroupPrefix(Cog, name="Help"):
                         name="Aliases", value=", ".join(cmd.aliases), inline=True
                     )
                 try:
-                    actions = cmd.clean_params["combine_parser"].default._actions
+                    actions = cmd.clean_params["parser"].default._actions
                     parms = "".join(
                         [
                             (
