@@ -497,11 +497,10 @@ class Levelling:
             )
             db.commit()
 
-        if global_cumulated_exp := self.get_user_cumulated_xp >= (
-            global_next_lvl_exp := (self.get_user_level * 50)
-            + ((self.get_user_level - 1) * 25)
-            + 50
-        ):
+        global_cumulated_exp = self.get_user_cumulated_xp
+        global_level = self.get_user_level
+        global_next_lvl_exp = (global_level * 50) + ((global_level - 1) * 25) + 50
+        if global_cumulated_exp >= global_next_lvl_exp:
             global_updated_exp = global_cumulated_exp - global_next_lvl_exp
             db.execute(
                 "UPDATE globalxpData SET lvl = lvl + ?, exp = ? WHERE user_id = ?",
@@ -512,12 +511,11 @@ class Levelling:
                 ),
             )
             db.commit()
-
-        if server_cumulated_exp := self.get_member_cumulated_xp >= (
-            server_next_lvl_exp := (self.get_member_level * 50)
-            + ((self.get_member_level - 1) * 25)
-            + 50
-        ):
+            
+        server_cumulated_exp = self.get_member_cumulated_xp
+        server_level = self.get_member_level
+        server_next_lvl_exp = (server_level * 50) + ((server_level - 1) * 25) + 50
+        if server_cumulated_exp >= server_next_lvl_exp:
             server_updated_exp = server_cumulated_exp - server_next_lvl_exp
             db.execute(
                 "UPDATE serverxpData SET lvl = lvl + ?, exp = ? WHERE guild_id = ? AND user_id = ?",

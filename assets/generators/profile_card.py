@@ -38,7 +38,7 @@ class Profile:
         self,
         user: User | Member,
         bg_image:str=None,
-        voted: bool = None,
+        voted: bool = False,
     )->BytesIO|Literal[False]:
         inventory_instance = Inventory(user)
         

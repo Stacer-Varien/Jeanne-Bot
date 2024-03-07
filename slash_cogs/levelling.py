@@ -123,9 +123,9 @@ class levelling(Cog):
 
     async def generate_profile_card(self, ctx: Interaction, member: Member):
         try:
-            voted = await self.topggpy.get_user_vote(member.id)
+            #voted = await self.topggpy.get_user_vote(member.id)
             bg_image = Inventory(member).selected_wallpaper
-            image = await Profile(self.bot).generate_profile(member, bg_image, voted)
+            image = await Profile(self.bot).generate_profile(member, bg_image, False)
             file = File(fp=image, filename=f"{member.name}_profile_card.png")
             await ctx.followup.send(file=file)
 
@@ -174,21 +174,21 @@ class levelling(Cog):
                 channel, update, levelup = level_data
                 role_reward = message.guild.get_role(levelling_instance.get_role_reward)
 
-                parameters = {
-                    "%member%": str(message.author),
-                    "%pfp%": str(message.author.display_avatar),
-                    "%server%": str(message.guild.name),
-                    "%mention%": str(message.author.mention),
-                    "%name%": str(message.author.name),
-                    "%newlevel%": str(levelling_instance.get_member_level),
-                    "%role%": str(role_reward.name if role_reward else None),
-                    "%rolemention%": str(role_reward.mention if role_reward else None),
-                }
+                parameters = OrderedDict([
+                    ("%member%", str(message.author)),
+                    ("%pfp%", str(message.author.display_avatar)),
+                    ("%server%", str(message.guild.name)),
+                    ("%mention%", str(message.author.mention)),
+                    ("%name%", str(message.author.name)),
+                    ("%newlevel%", str(levelling_instance.get_member_level)),
+                    ("%role%", str(role_reward.name if role_reward else None)),
+                    ("%rolemention%", str(role_reward.mention if role_reward else None)),
+                ])
 
                 content = ""
                 embed = None
 
-                if role_reward:  # Check if role_reward exists
+                if role_reward:
                     await message.author.add_roles(role_reward)
                     try:
                         content = f"CONGRATS {message.author}! You were role awarded {role_reward.name}"
