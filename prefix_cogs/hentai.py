@@ -107,9 +107,9 @@ class nsfw(Cog, name="hentai"):
                     ephemeral=True,
                 )
                          
-    hentai_parser = argparse.ArgumentParser(add_help=False)
-    hentai_parser.add_argument("--tags", "-t", type=str, required=False, default="")
-    hentai_parser.add_argument("--plus", "-p", action="store_true", help="Enable plus mode")
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("--tags", "-t", type=str, nargs="+", required=False, default=[], help="tags")
+    parser.add_argument("--plus", "-p", action="store_true", help="Enable plus mode")
 
 
     @Jeanne.command(description="Get a random media content from Gelbooru", nsfw=True)
@@ -118,9 +118,8 @@ class nsfw(Cog, name="hentai"):
         self,
         ctx: Context,
         rating: Optional[Literal["questionable", "explicit", "q", "e"]],
-        *,
-        words: str,
-        parser=hentai_parser,
+        *words:str,
+        parser=parser,
     ) -> None:
         if Botban(ctx.author).check_botbanned_user:
             return
@@ -130,9 +129,11 @@ class nsfw(Cog, name="hentai"):
             )
             return
         await ctx.defer()
+        
+        parsed_args, unknown = parser.parse_known_args(words)
+        tags = parsed_args.tags + unknown
+        tags=' '.join(tags)
 
-        parsed_args = parser.parse_args(words.split())
-        tags = parsed_args.tags
         plus = parsed_args.plus
 
         image = await Hentai(plus).gelbooru(rating, tags)
@@ -202,7 +203,7 @@ class nsfw(Cog, name="hentai"):
     @gelbooru.error
     async def gelbooru_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, (IndexError, KeyError)
+            error.original, (IndexError, KeyError, ValueError)
         ):
             if Command(ctx.guild).check_disabled(self.gelbooru.qualified_name):
                 await ctx.send(
