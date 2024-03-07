@@ -1,6 +1,6 @@
 import argparse
 from random import randint
-from discord import Color, Embed, HTTPException
+from discord import Color, Embed, HTTPException, Message
 from discord.ext.commands import Bot, Cog, group, Context, Range, BucketType
 import discord.ext.commands as Jeanne
 from functions import BetaTest, Botban, Command, Hentai, shorten_url
@@ -11,7 +11,6 @@ from assets.components import ReportContent, ReportSelect
 class nsfw(Cog, name="hentai"):
     def __init__(self, bot: Bot):
         self.bot = bot
-
 
     @Jeanne.command(description="Get a random hentai from Jeanne", nsfw=True)
     @Jeanne.cooldown(1, 5, type=BucketType.member)
@@ -28,65 +27,100 @@ class nsfw(Cog, name="hentai"):
                 "This command is disabled by the server's managers", ephemeral=True
             )
             return
+        check = await BetaTest(self.bot).check(ctx.author)
 
-        await ctx.defer()
+        if check == True:        
 
-        hentai, source = await Hentai().hentai(rating)
-        is_mp4 = hentai.endswith("mp4")
+            await ctx.defer()
 
-        if is_mp4:
-            view = ReportContent(shorten_url(hentai))
-            m=await ctx.send(hentai, view=view)
-        else:
-            embed = (
-                Embed(color=Color.purple())
-                .set_image(url=hentai)
-                .set_footer(
-                    text="Fetched from {} • Credits must go to the artist".format(
-                        source
+            hentai, source = await Hentai().hentai(rating)
+            is_mp4 = hentai.endswith("mp4")
+
+            if is_mp4:
+                view = ReportContent(shorten_url(hentai))
+                m=await ctx.send(hentai, view=view)
+            else:
+                embed = (
+                    Embed(color=Color.purple())
+                    .set_image(url=hentai)
+                    .set_footer(
+                        text="Fetched from {} • Credits must go to the artist".format(
+                            source
+                        )
                     )
                 )
-            )
-            view = ReportContent(shorten_url(hentai))
-            m = await ctx.send(embed=embed, view=view)
+                view = ReportContent(shorten_url(hentai))
+                m = await ctx.send(embed=embed, view=view)
 
-        await view.wait()
+            await view.wait()
 
-        if view.value is None:
-            await m.edit(view=None)
+            if view.value is None:
+                await m.edit(view=None)
+                return
+        await ctx.send(
+            embed=Embed(
+                description="Uh Oh!\n\nIt seems you are trying something that is meant for beta users.\nIf you wish to join the beta programme, join [Orleans](https://discord.gg/Vfa796yvNq) and ask the bot developer.",
+                color=Color.red(),
+            ),
+            ephemeral=True,
+        )
 
     @hentai.error
     async def hentai_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
+            check = await BetaTest(self.bot).check(ctx.author)
             if Command(ctx.guild).check_disabled(self.hentai.qualified_name):
                 await ctx.send(
                     "This command is disabled by the server's managers", ephemeral=True
                 )
                 return
-            slow = Embed(
-                description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
-                color=Color.red(),
+            if check == True:   
+                slow = Embed(
+                    description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
+                    color=Color.red(),
+                )
+                await ctx.send(embed=slow)
+                return
+            await ctx.send(
+                embed=Embed(
+                    description="Uh Oh!\n\nIt seems you are trying something that is meant for beta users.\nIf you wish to join the beta programme, join [Orleans](https://discord.gg/Vfa796yvNq) and ask the bot developer.",
+                    color=Color.red(),
+                ),
+                ephemeral=True,
             )
-            await ctx.send(embed=slow)
+            return
+        if isinstance(error, Jeanne.CommandOnCooldown):
+            if check == True:   
+                slow = Embed(
+                        description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
+                        color=Color.red(),
+                    )
+                await ctx.send(embed=slow)
+                return
+            await ctx.send(
+                    embed=Embed(
+                        description="Uh Oh!\n\nIt seems you are trying something that is meant for beta users.\nIf you wish to join the beta programme, join [Orleans](https://discord.gg/Vfa796yvNq) and ask the bot developer.",
+                        color=Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+                         
+    hentai_parser = argparse.ArgumentParser(add_help=False)
+    hentai_parser.add_argument("--tags", "-t", type=str, required=False, default="")
+    hentai_parser.add_argument("--plus", "-p", action="store_true", help="Enable plus mode")
 
-    plus_parser = argparse.ArgumentParser(add_help=False)
-    plus_parser.add_argument(
-                "--first", "-f", type=str, help="First Word", required=True,
-            )
-    plus_parser.add_argument(
-                "--second", "-s", type=str, help="Second Word", required=True
-            )
 
     @Jeanne.command(description="Get a random media content from Gelbooru", nsfw=True)
     @Jeanne.cooldown(1, 5, type=BucketType.member)
     async def gelbooru(
         self,
         ctx: Context,
-        rating: Optional[Literal["questionable", "explicit"]],
-        tag: Optional[str] = None,
-        plus: Optional[bool] = None,
+        rating: Optional[Literal["questionable", "explicit", "q", "e"]],
+        *,
+        words: str,
+        parser=hentai_parser,
     ) -> None:
         if Botban(ctx.author).check_botbanned_user:
             return
@@ -96,7 +130,12 @@ class nsfw(Cog, name="hentai"):
             )
             return
         await ctx.defer()
-        image = await Hentai(plus).gelbooru(rating, tag)
+
+        parsed_args = parser.parse_args(words.split())
+        tags = parsed_args.tags
+        plus = parsed_args.plus
+
+        image = await Hentai(plus).gelbooru(rating, tags)
 
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
@@ -109,7 +148,7 @@ class nsfw(Cog, name="hentai"):
                 m = await ctx.send("\n".join(media), view=view)
                 await view.wait()
 
-                if view.value == None:
+                if view.value is None:
                     await m.edit(view=None)
                 return
 
@@ -117,38 +156,34 @@ class nsfw(Cog, name="hentai"):
             embeds = [
                 Embed(color=color, url="https://gelbooru.com")
                 .set_image(url=img["file_url"])
-                .set_footer(
-                    text="Fetched from Gelbooru • Credits must go to the artist"
-                )
+                .set_footer(text="Fetched from Gelbooru • Credits must go to the artist")
                 for img in images
             ]
-            await ctx.send(embeds=embeds, view=view)
+            m = await ctx.send(embeds=embeds, view=view)
             await view.wait()
 
-            if view.value == None:
+            if view.value is None:
                 await m.edit(view=None)
             return
 
         try:
             view = ReportContent(image)
             if str(image).endswith("mp4"):
-                await ctx.send(image, view=view)
+                m = await ctx.send(image, view=view)
                 await view.wait()
-                if view.value == None:
+                if view.value is None:
                     await m.edit(view=None)
                 return
 
             embed = (
                 Embed(color=Color.purple())
                 .set_image(url=image)
-                .set_footer(
-                    text="Fetched from Gelbooru • Credits must go to the artist"
-                )
+                .set_footer(text="Fetched from Gelbooru • Credits must go to the artist")
             )
-            await ctx.send(embed=embed, view=view)
+            m = await ctx.send(embed=embed, view=view)
             await view.wait()
 
-            if view.value == None:
+            if view.value is None:
                 await m.edit(view=None)
         except:
             if str(image).endswith("mp4"):
