@@ -255,7 +255,7 @@ class Profile:
         )
 
         global_xpneed = global_next_xp - levelling_instance.get_user_xp
-        global_xphave = global_user_xp - levelling_instance.get_user_xp
+        global_xphave = global_user_xp
 
         global_current_percentage = (global_xphave / global_xpneed) * 100
         global_length_of_bar = (global_current_percentage * 8.76) + 12
@@ -285,7 +285,7 @@ class Profile:
         profile_draw.rectangle((10, 750, 890, 763), outline=COLOR, width=2)
 
         server_xpneed = server_next_xp - levelling_instance.get_member_xp
-        server_xphave = server_user_xp - levelling_instance.get_member_xp
+        server_xphave = server_user_xp
 
         server_current_percentage = (server_xphave / server_xpneed) * 100
         server_length_of_bar = (server_current_percentage * 8.76) + 12
