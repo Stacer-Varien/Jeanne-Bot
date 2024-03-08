@@ -12,12 +12,23 @@ class nsfw(Cog, name="hentai"):
     def __init__(self, bot: Bot):
         self.bot = bot
 
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument(
+        "--rating", "-r", type=str, choices=["questionable", "explicit", "e", "q"], required=False, default=None
+    )
+    parser.add_argument(
+        "--tags", "-t", type=str, nargs="+", required=False, default=[], help="tags"
+    )
+    parser.add_argument("--plus", "-p", action="store_true", help="Enable plus mode")
+
     @Jeanne.command(description="Get a random hentai from Jeanne", nsfw=True)
     @Jeanne.cooldown(1, 5, type=BucketType.member)
     async def hentai(
         self,
         ctx: Context,
-        rating: Optional[Literal["questionable", "explicit", "e", "q"]] = None,
+        *,
+        words:str=None,
+        parser=parser
     ) -> None:
         if Botban(ctx.author).check_botbanned_user:
             return
@@ -29,16 +40,25 @@ class nsfw(Cog, name="hentai"):
             return
         check = await BetaTest(self.bot).check(ctx.author)
 
-        if check == True:        
+        if check == True:
 
             await ctx.defer()
+            try:
+                parser=parser.parse_args(words.split())
+                rating=parser.rating
+            except SystemExit:
+                await ctx.send(embed=Embed(description=f"You are missing some arguments or using incorrect arguments for this command", color=Color.red()))
+                return
+            except AttributeError:
+                rating=None
+                
 
             hentai, source = await Hentai().hentai(rating)
             is_mp4 = hentai.endswith("mp4")
 
             if is_mp4:
                 view = ReportContent(shorten_url(hentai))
-                m=await ctx.send(hentai, view=view)
+                m = await ctx.send(hentai, view=view)
             else:
                 embed = (
                     Embed(color=Color.purple())
@@ -50,7 +70,7 @@ class nsfw(Cog, name="hentai"):
                     )
                 )
                 view = ReportContent(shorten_url(hentai))
-                m = await ctx.send(embed=embed, view=view)
+                m: Message = await ctx.send(embed=embed, view=view)
 
             await view.wait()
 
@@ -76,7 +96,7 @@ class nsfw(Cog, name="hentai"):
                     "This command is disabled by the server's managers", ephemeral=True
                 )
                 return
-            if check == True:   
+            if check == True:
                 slow = Embed(
                     description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
                     color=Color.red(),
@@ -92,25 +112,20 @@ class nsfw(Cog, name="hentai"):
             )
             return
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if check == True:   
+            if check == True:
                 slow = Embed(
-                        description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
-                        color=Color.red(),
-                    )
+                    description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
+                    color=Color.red(),
+                )
                 await ctx.send(embed=slow)
                 return
             await ctx.send(
-                    embed=Embed(
-                        description="Uh Oh!\n\nIt seems you are trying something that is meant for beta users.\nIf you wish to join the beta programme, join [Orleans](https://discord.gg/Vfa796yvNq) and ask the bot developer.",
-                        color=Color.red(),
-                    ),
-                    ephemeral=True,
-                )
-                         
-    parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument("--tags", "-t", type=str, nargs="+", required=False, default=[], help="tags")
-    parser.add_argument("--plus", "-p", action="store_true", help="Enable plus mode")
-
+                embed=Embed(
+                    description="Uh Oh!\n\nIt seems you are trying something that is meant for beta users.\nIf you wish to join the beta programme, join [Orleans](https://discord.gg/Vfa796yvNq) and ask the bot developer.",
+                    color=Color.red(),
+                ),
+                ephemeral=True,
+            )
 
     @Jeanne.command(description="Get a random media content from Gelbooru", nsfw=True)
     @Jeanne.cooldown(1, 5, type=BucketType.member)
@@ -118,7 +133,7 @@ class nsfw(Cog, name="hentai"):
         self,
         ctx: Context,
         rating: Optional[Literal["questionable", "explicit", "q", "e"]],
-        *words:str,
+        *words: str,
         parser=parser,
     ) -> None:
         if Botban(ctx.author).check_botbanned_user:
@@ -129,12 +144,16 @@ class nsfw(Cog, name="hentai"):
             )
             return
         await ctx.defer()
-        
-        parsed_args, unknown = parser.parse_known_args(words)
-        tags = parsed_args.tags + unknown
-        tags=' '.join(tags)
 
-        plus = parsed_args.plus
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            tags = parsed_args.tags + unknown
+            tags = " ".join(tags)
+
+            plus = parsed_args.plus
+        except SystemExit:
+            await ctx.send(embed=Embed(description=f"You are missing some arguments or using incorrect arguments for this command", color=Color.red()))
+            return
 
         image = await Hentai(plus).gelbooru(rating, tags)
 
@@ -146,7 +165,7 @@ class nsfw(Cog, name="hentai"):
             media = [j["file_url"] for j in vids]
 
             if media:
-                m = await ctx.send("\n".join(media), view=view)
+                m: Message = await ctx.send("\n".join(media), view=view)
                 await view.wait()
 
                 if view.value is None:
@@ -157,10 +176,12 @@ class nsfw(Cog, name="hentai"):
             embeds = [
                 Embed(color=color, url="https://gelbooru.com")
                 .set_image(url=img["file_url"])
-                .set_footer(text="Fetched from Gelbooru • Credits must go to the artist")
+                .set_footer(
+                    text="Fetched from Gelbooru • Credits must go to the artist"
+                )
                 for img in images
             ]
-            m = await ctx.send(embeds=embeds, view=view)
+            m: Message = await ctx.send(embeds=embeds, view=view)
             await view.wait()
 
             if view.value is None:
@@ -170,7 +191,7 @@ class nsfw(Cog, name="hentai"):
         try:
             view = ReportContent(image)
             if str(image).endswith("mp4"):
-                m = await ctx.send(image, view=view)
+                m: Message = await ctx.send(image, view=view)
                 await view.wait()
                 if view.value is None:
                     await m.edit(view=None)
@@ -179,9 +200,11 @@ class nsfw(Cog, name="hentai"):
             embed = (
                 Embed(color=Color.purple())
                 .set_image(url=image)
-                .set_footer(text="Fetched from Gelbooru • Credits must go to the artist")
+                .set_footer(
+                    text="Fetched from Gelbooru • Credits must go to the artist"
+                )
             )
-            m = await ctx.send(embed=embed, view=view)
+            m: Message = await ctx.send(embed=embed, view=view)
             await view.wait()
 
             if view.value is None:
@@ -271,7 +294,7 @@ class nsfw(Cog, name="hentai"):
             ]
             footer_text = "Fetched from Yande.re • Credits must go to the artist"
             try:
-                m = await ctx.send(embeds=embeds, view=view)
+                m: Message = await ctx.send(embeds=embeds, view=view)
                 await view.wait()
                 if view.value == None:
                     await m.edit(view=None)
@@ -367,7 +390,7 @@ class nsfw(Cog, name="hentai"):
                 ]
                 footer_text = "Fetched from Konachan • Credits must go to the artist"
 
-                m = await ctx.send(embeds=embeds, view=view)
+                m: Message = await ctx.send(embeds=embeds, view=view)
                 await view.wait()
                 if view.value == None:
                     await m.edit(view=None)
@@ -460,7 +483,7 @@ class nsfw(Cog, name="hentai"):
             media = [j["file_url"] for j in vids]
 
             if media:
-                m = await ctx.send("\n".join(media), view=view)
+                m: Message = await ctx.send("\n".join(media), view=view)
                 await view.wait()
                 if view.value == None:
                     await m.edit(view=None)
@@ -491,7 +514,7 @@ class nsfw(Cog, name="hentai"):
                     text="Fetched from Danbooru • Credits must go to the artist"
                 )
             )
-            m=await ctx.send(embed=embed, view=view)
+            m = await ctx.send(embed=embed, view=view)
             await view.wait()
 
             if view.value == None:
