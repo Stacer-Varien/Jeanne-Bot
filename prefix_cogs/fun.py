@@ -160,17 +160,23 @@ class fun(Cog, name="Fun"):
                 return
             await ctx.defer()
             try:
-                namespace = parser.parse_known_args(words)
-            except:
-                await ctx.send(embed=Embed(description=f"You are missing some arguments for this command", color=Color.red()))
-                return
-            option_name1letters = namespace.first[: round(len(' '.join(namespace.first)) / 2)]
-            option_name2letters = namespace.second[round(len(' '.join(namespace.second)) / 2) :]
+                parsed_args, unknown = parser.parse_known_args(words)
+                first = parsed_args.first + unknown
+                first=" ".join(first)
 
-            option2_name1letters = namespace.first[
-                round(len(" ".join(namespace.first)) / 2) :
+                second = parsed_args.second + unknown
+                second = " ".join(second)
+            except SystemExit:
+                await ctx.send(embed=Embed(description=f"You are missing some arguments or using incorrect arguments for this command", color=Color.red()))
+                return
+
+            option_name1letters = first[: round(len(first) / 2)]
+            option_name2letters = second[round(len(second) / 2) :]
+
+            option2_name1letters = first[
+                round(len(" ".join(first)) / 2) :
             ]
-            option2_name2letters = namespace.second[: round(len(' '.join(namespace.second)) / 2)]
+            option2_name2letters = second[: round(len(second) / 2)]
 
             combine1 = "".join([option_name1letters, option_name2letters])
             combine2 = "".join([option2_name1letters, option2_name2letters])
@@ -179,7 +185,7 @@ class fun(Cog, name="Fun"):
                 description=f"**1st combine word**: {combine1}\n**2nd combined word**:{combine2}",
                 color=Color.random(),
             )
-            combine.set_author(name=f"""{namespace.first} + {namespace.second}""")
+            combine.set_author(name=f"""{first} + {second}""")
             await ctx.send(embed=combine)
             return
         await ctx.send(
