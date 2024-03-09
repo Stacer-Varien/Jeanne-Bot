@@ -177,7 +177,7 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
-            if Command(ctx.guild).check_disabled(self.danbooru.qualified_name):
+            if Command(ctx.guild).check_disabled(self.gelbooru.qualified_name):
                 await ctx.response.send_message(
                     "This command is disabled by the server's managers", ephemeral=True
                 )
@@ -284,7 +284,7 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
-            if Command(ctx.guild).check_disabled(self.danbooru.qualified_name):
+            if Command(ctx.guild).check_disabled(self.yandere.qualified_name):
                 await ctx.response.send_message(
                     "This command is disabled by the server's managers", ephemeral=True
                 )

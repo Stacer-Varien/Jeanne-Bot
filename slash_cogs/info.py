@@ -6,6 +6,7 @@ from datetime import timedelta
 from sys import version_info as py_version
 from discord.ext.commands import Cog, Bot
 from discord import (
+    ButtonStyle,
     Color,
     Embed,
     Interaction,
@@ -13,12 +14,39 @@ from discord import (
     Message,
     StickerItem,
     app_commands as Jeanne,
-    utils,
+    utils, ui
 )
 from discord import __version__ as discord_version
 from typing import Optional
 
 start_time = time()
+
+
+class stat_buttons(ui.View):
+    def __init__(self):
+        super().__init__()
+
+        invite = "https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=1429553343542&scope=bot%20applications.commands"
+        vote = "https://top.gg/bot/831993597166747679"
+        orleans_url = "https://discord.gg/jh7jkuk2pp"
+        website = "https://jeannebot.gitbook.io/jeannebot/"
+
+        self.add_item(
+            ui.Button(style=ButtonStyle.link, label="Invite me", url=invite)
+        )
+        self.add_item(
+            ui.Button(style=ButtonStyle.link, label="Vote for me", url=vote)
+        )
+        self.add_item(
+            ui.Button(style=ButtonStyle.link, label="Support Server", url=orleans_url)
+        )
+        self.add_item(
+            ui.Button(
+                style=ButtonStyle.link,
+                label="Jeanne Website",
+                url=website,
+            )
+        )
 
 
 class InfoCog(Cog):
@@ -121,14 +149,9 @@ class InfoCog(Cog):
         uptime = timedelta(seconds=difference).total_seconds()
         embed.add_field(name="Uptime", value=format_timespan(uptime), inline=True)
 
-        embed.add_field(
-            name="Invites",
-            value="• [Invite me to your server](https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=1429553343542&scope=bot%20applications.commands)\n• [Vote for me](https://top.gg/bot/831993597166747679)\n• [Join the support server](https://discord.gg/jh7jkuk2pp)\n• [Go to my website to learn more about me](https://jeannebot.gitbook.io/jeannebot/)",
-            inline=True,
-        )
 
         embed.set_thumbnail(url=self.bot.user.avatar.url)
-        await ctx.followup.send(embed=embed)
+        await ctx.followup.send(embed=embed, view=stat_buttons())
 
     @Jeanne.command(description="See the information of a member or yourself")
     @Jeanne.describe(member="Which member?")

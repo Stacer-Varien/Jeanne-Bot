@@ -187,14 +187,14 @@ class levelling(Cog):
                 content = ""
                 embed = None
 
-                if role_reward!=None:
+                if role_reward is not None:
                     await message.author.add_roles(role_reward)
 
-                    try:
+                    if rankup is not None:
                         json_data: dict = loads(replace_all(rankup, parameters))
                         content: str = json_data.get("content")
                         embed = Embed.from_dict(json_data.get("embeds", [{}])[0])
-                    except:
+                    else:
                         content = f"CONGRATS {message.author}! You were role awarded {role_reward.name}"
 
                 elif levelup is not None:
