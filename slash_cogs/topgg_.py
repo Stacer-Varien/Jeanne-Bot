@@ -40,8 +40,6 @@ class TopGG(Cog):
 
             credits = 100 if await self.topggpy.get_weekend_status() else 50
 
-
-
             if await BetaTest(self.bot).check(voter):
                 credits = round(credits * 1.25)
 

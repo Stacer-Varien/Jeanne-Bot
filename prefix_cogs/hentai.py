@@ -12,14 +12,25 @@ class nsfw(Cog, name="hentai"):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument(
+    rating_parser = argparse.ArgumentParser(add_help=False)
+    rating_parser.add_argument(
+        "--rating",
+        "-r",
+        type=str,
+        choices=["questionable", "explicit", "e", "q"],
+        help="questionable | explicit | q | e",
+        required=False,
+        default=None,
+    )
+
+    hentai_api_parser = argparse.ArgumentParser(add_help=False)
+    hentai_api_parser.add_argument(
         "--rating", "-r", type=str, choices=["questionable", "explicit", "e", "q"], required=False, default=None
     )
-    parser.add_argument(
+    hentai_api_parser.add_argument(
         "--tags", "-t", type=str, nargs="+", required=False, default=[], help="tags"
     )
-    parser.add_argument("--plus", "-p", action="store_true", help="Enable plus mode")
+    hentai_api_parser.add_argument("--plus", "-p", action="store_true", help="Enable plus mode")
 
     @Jeanne.command(description="Get a random hentai from Jeanne", nsfw=True)
     @Jeanne.cooldown(1, 5, type=BucketType.member)
@@ -28,7 +39,7 @@ class nsfw(Cog, name="hentai"):
         ctx: Context,
         *,
         words:str=None,
-        parser=parser
+        parser=rating_parser
     ) -> None:
         if Botban(ctx.author).check_botbanned_user:
             return
@@ -51,7 +62,6 @@ class nsfw(Cog, name="hentai"):
                 return
             except AttributeError:
                 rating=None
-                
 
             hentai, source = await Hentai().hentai(rating)
             is_mp4 = hentai.endswith("mp4")
@@ -132,9 +142,8 @@ class nsfw(Cog, name="hentai"):
     async def gelbooru(
         self,
         ctx: Context,
-        rating: Optional[Literal["questionable", "explicit", "q", "e"]],
         *words: str,
-        parser=parser,
+        parser=hentai_api_parser,
     ) -> None:
         if Botban(ctx.author).check_botbanned_user:
             return
@@ -151,6 +160,7 @@ class nsfw(Cog, name="hentai"):
             tags = " ".join(tags)
 
             plus = parsed_args.plus
+            rating=parsed_args.rating
         except SystemExit:
             await ctx.send(embed=Embed(description=f"You are missing some arguments or using incorrect arguments for this command", color=Color.red()))
             return
