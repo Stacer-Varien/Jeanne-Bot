@@ -443,7 +443,7 @@ class Levelling:
         db.commit()
         return int(level[0]) if level else 0
 
-    async def add_xp(self) -> tuple[int | None, int | None, str | None] | None:
+    async def add_xp(self) -> tuple[int | None, str | None, str | None] | None:
         now_time = round(datetime.now().timestamp())
         next_time = round((datetime.now() + timedelta(minutes=2)).timestamp())
         xp = 10 if datetime.today().weekday() > 4 else 5
@@ -530,7 +530,7 @@ class Levelling:
             return self.get_level_channel
 
     @property
-    def get_level_channel(self) -> tuple[int | None, int | None, str | None]:
+    def get_level_channel(self) -> tuple[int | None, str | None, str | None]:
         data = db.execute(
             "SELECT * FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()

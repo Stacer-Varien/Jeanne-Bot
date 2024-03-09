@@ -165,7 +165,7 @@ class levelling(Cog):
                 if level_data is None:
                     return
 
-                channel, update, levelup = level_data
+                channel, levelup, rankup = level_data
                 role_reward = message.guild.get_role(levelling_instance.get_role_reward)
 
                 parameters = OrderedDict(
@@ -191,7 +191,7 @@ class levelling(Cog):
                     await message.author.add_roles(role_reward)
 
                     try:
-                        json_data: dict = loads(replace_all(levelup, parameters))
+                        json_data: dict = loads(replace_all(rankup, parameters))
                         content: str = json_data.get("content")
                         embed = Embed.from_dict(json_data.get("embeds", [{}])[0])
                     except:
@@ -205,9 +205,9 @@ class levelling(Cog):
                     except:
                         content = f"CONGRATS {message.author}! You leveled up to level {levelling_instance.get_member_level}"
 
-                elif update is not None:
+                elif levelup is not None:
                     try:
-                        json_data = loads(replace_all(update, parameters))
+                        json_data = loads(replace_all(levelup, parameters))
                         content = json_data.get("content")
                         embed = Embed.from_dict(json_data.get("embeds", [{}])[0])
                     except:
