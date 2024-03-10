@@ -10,9 +10,7 @@ class ErrorsCog(Cog, name="Errors"):
         self.bot = bot
 
     @Cog.listener()
-    async def on_command_error(
-        self, ctx: Context, error: Jeanne.CommandError
-    ):
+    async def on_command_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.MissingPermissions):
             embed = Embed(description=str(error), color=Color.red())
             await ctx.send(embed=embed)

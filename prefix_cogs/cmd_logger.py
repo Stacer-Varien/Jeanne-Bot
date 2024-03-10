@@ -7,9 +7,7 @@ class CommandLog(Cog, name="cmdlogger"):
         self.bot = bot
 
     @Cog.listener()
-    async def on_command_completion(
-        self, ctx: Context
-    ):
+    async def on_command_completion(self, ctx: Context):
         logged = f"Date and Time = {datetime.now()}\nUser = {ctx.author} | {ctx.author.id}\nCommand used = {ctx.command.qualified_name}\n\n"
         with open("commandlog.txt", "a") as f:
             f.writelines(logged)

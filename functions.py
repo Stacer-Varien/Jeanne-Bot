@@ -4,6 +4,7 @@ from random import choice, randint, shuffle
 import aiohttp
 from humanfriendly import parse_timespan
 from discord import (
+    Color,
     Embed,
     Guild,
     Interaction,
@@ -14,7 +15,7 @@ from discord import (
     User,
     app_commands as Jeanne,
 )
-from discord.ext.commands import Bot, Context
+from discord.ext.commands import Bot, Context, CheckFailure, check
 from requests import get, post
 from config import db, BB_WEBHOOK, CATBOX_HASH
 from typing import Literal, Optional, List
@@ -443,24 +444,37 @@ class Levelling:
         db.commit()
         return int(level[0]) if level else 0
 
-    async def add_xp(self) -> tuple[int | None, str | None, str | None] | None:
+    async def add_xp(self):
         now_time = round(datetime.now().timestamp())
         next_time = round((datetime.now() + timedelta(minutes=2)).timestamp())
         xp = 10 if datetime.today().weekday() > 4 else 5
 
         cursor1 = db.execute(
             "INSERT OR IGNORE INTO serverxpData (guild_id, user_id, lvl, exp, cumulative_exp, next_time) VALUES (?,?,?,?,?,?)",
-            (self.server.id, self.member.id, 0, xp, xp, next_time),
+            (
+                self.server.id,
+                self.member.id,
+                0,
+                xp,
+                xp,
+                next_time,
+            ),
         )
         db.commit()
 
         cursor2 = db.execute(
             "INSERT OR IGNORE INTO globalxpData (user_id, lvl, exp, cumulative_exp, next_time) VALUES (?,?,?,?,?)",
-            (self.member.id, 0, xp, xp, next_time),
+            (
+                self.member.id,
+                0,
+                xp,
+                xp,
+                next_time,
+            ),
         )
         db.commit()
 
-        if cursor1.rowcount == 0 and now_time >= self.get_next_time_server:
+        if (cursor1.rowcount == 0) and (now_time >= self.get_next_time_server):
             server_exp = self.get_member_xp
             cumulated_exp = self.get_member_cumulated_xp
 
@@ -477,9 +491,10 @@ class Levelling:
                     self.member.id,
                 ),
             )
+
             db.commit()
 
-        if cursor2.rowcount == 0 and now_time >= self.get_next_time_global:
+        if (cursor2.rowcount == 0) and (now_time >= self.get_next_time_global):
             global_exp = self.get_user_xp
             global_cumulated_exp = self.get_user_cumulated_xp
 
@@ -487,7 +502,7 @@ class Levelling:
             global_updated_cumulated_exp = global_cumulated_exp + xp
 
             db.execute(
-                "UPDATE globalxpData SET exp = ?, cumulative_exp = ?, next_time = ? WHERE user_id = ?",
+                "UPDATE globalxpDATA SET exp = ?, cumulative_exp = ?, next_time = ? WHERE user_id = ?",
                 (
                     global_updated_exp,
                     global_updated_cumulated_exp,
@@ -495,11 +510,13 @@ class Levelling:
                     self.member.id,
                 ),
             )
+
             db.commit()
 
         global_cumulated_exp = self.get_user_cumulated_xp
         global_level = self.get_user_level
         global_next_lvl_exp = (global_level * 50) + ((global_level - 1) * 25) + 50
+
         if global_cumulated_exp >= global_next_lvl_exp:
             global_updated_exp = global_cumulated_exp - global_next_lvl_exp
             db.execute(
@@ -511,10 +528,11 @@ class Levelling:
                 ),
             )
             db.commit()
-            
+
         server_cumulated_exp = self.get_member_cumulated_xp
         server_level = self.get_member_level
         server_next_lvl_exp = (server_level * 50) + ((server_level - 1) * 25) + 50
+
         if server_cumulated_exp >= server_next_lvl_exp:
             server_updated_exp = server_cumulated_exp - server_next_lvl_exp
             db.execute(
@@ -1574,3 +1592,31 @@ class BetaTest:
             await ctx.send(
                 f"Member is not in {server}. This is required so they can be added in the Beta Programme"
             )
+
+
+async def is_beta_prefix(ctx: Context):
+    if not await BetaTest(ctx.bot).check(ctx.author):
+        await ctx.send(
+            embed=Embed(
+                description="Uh Oh!\n\nIt seems you are trying something that is meant for beta users.\nIf you wish to join the beta programme, join [Orleans](https://discord.gg/Vfa796yvNq) and ask the bot developer.",
+                color=Color.red(),
+            ),
+            ephemeral=True,
+        )
+        return
+    return True
+
+
+async def check_disabled_prefixed_command(ctx: Context):
+    if Command(ctx.guild).check_disabled(ctx.command.qualified_name):
+        await ctx.send(
+            "This command is disabled by the server's managers", ephemeral=True
+        )
+        return
+    return True
+
+
+def check_botbanned_prefix(ctx: Context):
+    if Botban(ctx.author).check_botbanned_user:
+        return
+    return True

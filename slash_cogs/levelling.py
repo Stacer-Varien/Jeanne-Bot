@@ -1,5 +1,6 @@
 from discord.ext.commands import Cog, Bot, GroupCog
 from discord import (
+    AllowedMentions,
     Color,
     Embed,
     File,
@@ -117,9 +118,9 @@ class levelling(Cog):
 
     async def generate_profile_card(self, ctx: Interaction, member: Member):
         try:
-            #voted = await self.topggpy.get_user_vote(member.id)
+            voted = await self.topggpy.get_user_vote(member.id)
             bg_image = Inventory(member).selected_wallpaper
-            image = await Profile(self.bot).generate_profile(member, bg_image, False)
+            image = await Profile(self.bot).generate_profile(member, bg_image, voted)
             file = File(fp=image, filename=f"{member.name}_profile_card.png")
             await ctx.followup.send(file=file)
 
@@ -154,69 +155,100 @@ class levelling(Cog):
 
     @Cog.listener()
     async def on_message(self, message: Message):
-        if Botban(message.author).check_botbanned_user or message.author.bot:
+        if Botban(message.author).check_botbanned_user:
             return
 
-        levelling_instance = Levelling(message.author, message.guild)
-        if not levelling_instance.check_xpblacklist_channel(message.channel):
-            try:
-                level_data = await levelling_instance.add_xp()
-
-                if level_data is None:
-                    return
-
-                channel, levelup, rankup = level_data
-                role_reward = message.guild.get_role(levelling_instance.get_role_reward)
-
-                parameters = OrderedDict(
-                    [
-                        ("%member%", str(message.author)),
-                        ("%pfp%", str(message.author.display_avatar)),
-                        ("%server%", str(message.guild.name)),
-                        ("%mention%", str(message.author.mention)),
-                        ("%name%", str(message.author.name)),
-                        ("%newlevel%", str(levelling_instance.get_member_level)),
-                        ("%role%", str(role_reward.name if role_reward else None)),
-                        (
-                            "%rolemention%",
-                            str(role_reward.mention if role_reward else None),
-                        ),
-                    ]
+        if not message.author.bot:
+            if (
+                Levelling(message.author, message.guild).check_xpblacklist_channel(
+                    message.channel
                 )
+                == False
+            ):
+                try:
+                    lvl = await Levelling(message.author, message.guild).add_xp()
 
-                content = ""
-                embed = None
+                    if lvl == None:
+                        return
 
-                if role_reward is not None:
-                    await message.author.add_roles(role_reward)
+                    channel, update, levelup = lvl
 
-                    if rankup is not None:
-                        json_data: dict = loads(replace_all(rankup, parameters))
-                        content: str = json_data.get("content")
-                        embed = Embed.from_dict(json_data.get("embeds", [{}])[0])
-                    else:
-                        content = f"CONGRATS {message.author}! You were role awarded {role_reward.name}"
-
-                elif levelup is not None:
+                    role_reward = message.guild.get_role(
+                        Levelling(message.author, message.guild).get_role_reward
+                    )
+                    parameters = OrderedDict(
+                        [
+                            ("%member%", str(message.author)),
+                            ("%pfp%", str(message.author.display_avatar)),
+                            ("%server%", str(message.guild.name)),
+                            ("%mention%", str(message.author.mention)),
+                            ("%name%", str(message.author.name)),
+                            (
+                                "%newlevel%",
+                                str(
+                                    Levelling(
+                                        message.author, message.guild
+                                    ).get_member_level
+                                ),
+                            ),
+                            (
+                                "%role%",
+                                str((role_reward.name if role_reward else None)),
+                            ),
+                            (
+                                "%rolemention%",
+                                str((role_reward.mention if role_reward else None)),
+                            ),
+                        ]
+                    )
                     try:
-                        json_data = loads(replace_all(levelup, parameters))
-                        content = json_data.get("content")
-                        embed = Embed.from_dict(json_data.get("embeds", [{}])[0])
+                        await message.author.add_roles(role_reward)
+                        if levelup == "0":
+                            msg = "CONGRATS {}! You were role awarded {}".format(
+                                message.author,
+                                (role_reward.name if role_reward else None),
+                            )
+                            lvlup = await message.guild.fetch_channel(channel)
+                            await lvlup.send(
+                                msg,
+                                allowed_mentions=AllowedMentions(
+                                    roles=False, everyone=False, users=True
+                                ),
+                            )
+                        elif levelup == None:
+                            pass
+                        else:
+                            json = loads(replace_all(levelup, parameters))
+                            msg = json["content"]
+                            embed = Embed.from_dict(json["embeds"][0])
+                            lvlup = await message.guild.fetch_channel(channel)
+                            await lvlup.send(content=msg, embed=embed)
                     except:
-                        content = f"CONGRATS {message.author}! You leveled up to level {levelling_instance.get_member_level}"
+                        if update == "0":
+                            msg = "{} has leveled up to `level {}`".format(
+                                message.author,
+                                Levelling(
+                                    message.author, message.guild
+                                ).get_member_level,
+                            )
+                            lvlup = await message.guild.fetch_channel(channel)
+                            await lvlup.send(
+                                msg,
+                                allowed_mentions=AllowedMentions(
+                                    roles=False, everyone=False, users=True
+                                ),
+                            )
+                        elif update == None:
+                            pass
+                        else:
+                            json = loads(replace_all(update, parameters))
+                            msg = json["content"]
+                            embed = Embed.from_dict(json["embeds"][0])
+                            lvlup = await message.guild.fetch_channel(channel)
+                            await lvlup.send(content=msg, embed=embed)
 
-                elif levelup is not None:
-                    try:
-                        json_data = loads(replace_all(levelup, parameters))
-                        content = json_data.get("content")
-                        embed = Embed.from_dict(json_data.get("embeds", [{}])[0])
-                    except:
-                        content = f"{message.author} has leveled up to `level {levelling_instance.get_member_level}`"
-
-                await self.send_level_message(channel, content, embed)
-
-            except AttributeError:
-                pass
+                except AttributeError:
+                    return
 
     async def send_level_message(
         self, channel_id: Optional[int], content: str, embed: Optional[Embed]
