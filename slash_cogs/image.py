@@ -1,7 +1,7 @@
 from functions import Botban, Command
 from discord import Color, Embed, Interaction, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
-from config import kitsune_nekoslife
+from config import kitsune
 from requests import get
 from assets.images import (
     get_jeanne_pic,
@@ -31,13 +31,13 @@ class images(Cog):
 
         await ctx.response.defer()
 
-        kistune_api = get(kitsune_nekoslife).json()
-        kitsune = Embed(color=Color.random())
-        kitsune.set_footer(
+        kistune_api = get(kitsune).json()
+        embed = Embed(color=Color.random())
+        embed.set_footer(
             text="Fetched from nekos.life • Credits must go to the artist"
         )
-        kitsune.set_image(url=kistune_api["url"])
-        await ctx.followup.send(embed=kitsune)
+        embed.set_image(url=kistune_api["url"])
+        await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Need a wallpaper for your PC or phone?")
     async def wallpaper(self, ctx: Interaction):

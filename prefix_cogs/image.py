@@ -9,7 +9,7 @@ from functions import (
 from discord import Color, Embed
 from discord.ext.commands import Cog, Bot, Context
 import discord.ext.commands as Jeanne
-from config import kitsune_nekoslife
+from config import kitsune
 from requests import get
 from assets.images import (
     get_jeanne_pic,
@@ -34,7 +34,7 @@ class images(Cog, name="Images"):
 
         await ctx.defer()
 
-        kistune_api = get(kitsune_nekoslife).json()
+        kistune_api = get(kitsune).json()
         kitsune = Embed(color=Color.random())
         kitsune.set_footer(
             text="Fetched from nekos.life • Credits must go to the artist"
