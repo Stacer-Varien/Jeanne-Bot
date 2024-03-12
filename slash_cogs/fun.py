@@ -7,7 +7,12 @@ from discord import (
     app_commands as Jeanne,
 )
 from discord.ext.commands import Cog, Bot
-from functions import Botban, Command
+from functions import (
+    Botban,
+    Command,
+    check_botbanned_app_command,
+    check_disabled_app_command,
+)
 from assets.images import get_animeme_pic
 from typing import Optional
 
@@ -20,15 +25,9 @@ class fun(Cog):
         name="8ball", description="Ask 8 ball anything and you will get your awnser"
     )
     @Jeanne.describe(question="Add your question")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def _8ball(self, ctx: Interaction, question: str):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-
-        if Command(ctx.guild).check_disabled(self._8ball.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
         eight_ball_answers = [
@@ -69,14 +68,10 @@ class fun(Cog):
 
     @Jeanne.command(description="Say something and I will say it in reversed text")
     @Jeanne.describe(text="What are you reversing?")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def reverse(self, ctx: Interaction, text: str):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.reverse.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
+
         await ctx.response.defer()
         filtered_words = ["riffak", "reggin", "aggin"]
         if any(word in text for word in filtered_words):
@@ -91,28 +86,20 @@ class fun(Cog):
         await ctx.followup.send(embed=msg)
 
     @Jeanne.command(description="Get a random animeme")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def animeme(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.reverse.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
+
         await ctx.response.defer()
         embed, file = get_animeme_pic()
         await ctx.followup.send(embed=embed, file=file)
 
     @Jeanne.command(description="Combine 2 words to get 2 combined words")
     @Jeanne.describe(first_word="Add first word", second_word="Add second word")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def combine(self, ctx: Interaction, first_word: str, second_word: str):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.combine.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
+
         await ctx.response.defer()
         option_name1letters = first_word[: round(len(first_word) / 2)]
         option_name2letters = second_word[round(len(second_word) / 2) :]
@@ -132,14 +119,10 @@ class fun(Cog):
 
     @Jeanne.command(description="Give me a lot of choices and I will pick one for you")
     @Jeanne.describe(choices="Add your choices here. Separate them with ','")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def choose(self, ctx: Interaction, choices: str):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.choose.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
+
         await ctx.response.defer()
 
         choices = choices.split(sep=",")
@@ -150,14 +133,10 @@ class fun(Cog):
 
     @Jeanne.command(description="Check how much of a simp you are")
     @Jeanne.describe(member="Which member?")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def simprate(self, ctx: Interaction, member: Optional[Member] = None):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.simprate.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
+
         await ctx.response.defer()
         perc = randint(0, 100)
 
@@ -178,14 +157,10 @@ class fun(Cog):
 
     @Jeanne.command(description="Check how gay you are")
     @Jeanne.describe(member="Which member?")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def gayrate(self, ctx: Interaction, member: Optional[Member] = None):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.gayrate.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
+
         await ctx.response.defer()
         perc = randint(0, 100)
 

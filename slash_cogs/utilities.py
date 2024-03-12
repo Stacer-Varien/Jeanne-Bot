@@ -17,7 +17,7 @@ from discord.ext.commands import Cog, Bot, GroupCog
 from discord.ext import tasks
 from assets.components import ReportModal
 from assets.dictionary import dictionary
-from functions import Botban, Command, Reminder
+from functions import Reminder, check_botbanned_app_command, check_disabled_app_command
 from config import WEATHER
 from discord.ui import View
 from py_expression_eval import Parser
@@ -77,6 +77,8 @@ class Embed_Group(GroupCog, name="embed"):
         jsonfile="Add a JSON file",
     )
     @Jeanne.checks.has_permissions(administrator=True)
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def generate(
         self,
         ctx: Interaction,
@@ -84,13 +86,7 @@ class Embed_Group(GroupCog, name="embed"):
         jsonscript: Optional[str] = None,
         jsonfile: Optional[Attachment] = None,
     ):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.generate.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
+
         await ctx.response.defer()
 
         if not (jsonscript or jsonfile):
@@ -140,6 +136,8 @@ class Embed_Group(GroupCog, name="embed"):
         jsonfile="Add a JSON file",
     )
     @Jeanne.checks.has_permissions(administrator=True)
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def edit(
         self,
         ctx: Interaction,
@@ -148,13 +146,7 @@ class Embed_Group(GroupCog, name="embed"):
         jsonscript: Optional[str] = None,
         jsonfile: Optional[Attachment] = None,
     ):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.edit.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
+
         await ctx.response.defer()
 
         try:
@@ -206,11 +198,7 @@ class Embed_Group(GroupCog, name="embed"):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (Forbidden, NotFound)
         ):
-            if Command(ctx.guild).check_disabled(self.edit.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
+
             embed = Embed(
                 description=error,
                 color=Color.red(),
@@ -253,9 +241,9 @@ class ReminderCog(GroupCog, name="reminder"):
         reason="Reason for the reminder",
         time="Time that you want to be reminded at? (1h, 30m, etc)",
     )
+    @Jeanne.check(check_botbanned_app_command)
     async def add(self, ctx: Interaction, reason: str, time: str):
-        if Botban(ctx.user).check_botbanned_user:
-            return
+
         await ctx.response.defer(ephemeral=True)
         embed = Embed()
         user_reminders = Reminder(ctx.user).get_all_user_reminders
@@ -304,9 +292,8 @@ class ReminderCog(GroupCog, name="reminder"):
             await ctx.followup.send(embed=embed, ephemeral=True)
 
     @Jeanne.command(name="list", description="List all the reminders you have")
+    @Jeanne.check(check_botbanned_app_command)
     async def _list(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user:
-            return
 
         await ctx.response.defer(ephemeral=True)
         reminders = Reminder(ctx.user).get_all_user_reminders
@@ -326,9 +313,9 @@ class ReminderCog(GroupCog, name="reminder"):
         await ctx.followup.send(embed=embed, ephemeral=True)
 
     @Jeanne.command(name="cancel", description="Cancel a reminder")
+    @Jeanne.check(check_botbanned_app_command)
     async def cancel(self, ctx: Interaction, reminder_id: int):
-        if Botban(ctx.user).check_botbanned_user:
-            return
+
         await ctx.response.defer(ephemeral=True)
         reminder = Reminder(ctx.user)
         embed = Embed()
@@ -352,19 +339,15 @@ class slashutilities(Cog):
     @Jeanne.command(description="Get weather information on a city")
     @Jeanne.checks.cooldown(3, 14400, key=lambda i: (i.user.id))
     @Jeanne.describe(city="Add a city", units="Metric or Imperial? (Default is metric)")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def weather(
         self,
         ctx: Interaction,
         city: Jeanne.Range[str, 1],
         units: Optional[Literal["Metric", "Imperial"]] = None,
     ):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.weather.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
+
         await ctx.response.defer()
         emoji_map = {
             "globe": "🌍",
@@ -460,11 +443,7 @@ class slashutilities(Cog):
     @weather.error
     async def weather_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if Command(ctx.guild).check_disabled(self.weather.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
+
             reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
             reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
@@ -477,13 +456,7 @@ class slashutilities(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (KeyError, TypeError)
         ):
-            if isinstance(error, Jeanne.CommandOnCooldown):
-                if Command(ctx.guild).check_disabled(self.weather.qualified_name):
-                    await ctx.followup.send(
-                        "This command is disabled by the server's managers",
-                        ephemeral=True,
-                    )
-                    return
+
             no_city = Embed(
                 description="Failed to get weather information on this city\nPlease note that ZIP/postal codes are only supported for Canada, the US, and the UK for this command.",
                 color=Color.red(),
@@ -493,14 +466,9 @@ class slashutilities(Cog):
     @Jeanne.command(description="Type something and I will say it")
     @Jeanne.describe(channel="Send to which channel?", message="What should I say?")
     @Jeanne.checks.has_permissions(administrator=True)
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def say(self, ctx: Interaction, channel: TextChannel, message: str):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.say.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer(ephemeral=True)
         await ctx.followup.send(content="Message sent to {}".format(channel.mention))
@@ -508,17 +476,12 @@ class slashutilities(Cog):
 
     @Jeanne.command(description="Do a calculation")
     @Jeanne.describe(calculate="Add a calculation")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def calculator(self, ctx: Interaction, calculate: str):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.calculator.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
+
         await ctx.response.defer()
 
-        numeric_parts = re.findall(r'\d+\.\d+|\d+', calculate)
         check = ''.join([str(float(part)) if part.isdigit() else part for part in re.split(r'(\d+\.\d+|\d+)', calculate)])
         self.parser.parse(check).evaluate({})
 
@@ -546,8 +509,6 @@ class slashutilities(Cog):
     @Jeanne.command(description="Invite me to your server or join the support server")
     async def invite(self, ctx: Interaction):
         await ctx.response.defer()
-        if Botban(ctx.user).check_botbanned_user:
-            return
 
         invite = Embed(
             title="Invite me!",
@@ -560,26 +521,19 @@ class slashutilities(Cog):
     @Jeanne.command(description="Submit a bot report if you found something wrong")
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     async def botreport(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user:
-            return
 
         await ctx.response.send_modal(ReportModal())
 
     @Jeanne.command(description="Check the meaning of a word")
-    @Jeanne.describe()
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def dictionary(
         self,
         ctx: Interaction,
         word: Jeanne.Range[str, 1],
         language: Optional[Languages] = None,
     ):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.dictionary.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
+
         lang = language.value if language else None
         await dictionary(ctx, word.lower(), lang)
 

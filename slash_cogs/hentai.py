@@ -1,7 +1,14 @@
 from random import randint
 from discord import Color, Embed, HTTPException, Interaction, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
-from functions import Botban, Command, Hentai, shorten_url
+from functions import (
+    Botban,
+    Command,
+    Hentai,
+    check_botbanned_app_command,
+    check_disabled_app_command,
+    shorten_url,
+)
 from typing import Literal, Optional
 from assets.components import ReportContent, ReportSelect
 
@@ -13,19 +20,13 @@ class nsfw(Cog):
     @Jeanne.command(description="Get a random hentai from Jeanne", nsfw=True)
     @Jeanne.checks.cooldown(1, 5, key=lambda i: (i.user.id))
     @Jeanne.describe(rating="Do you want questionable or explicit content?")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def hentai(
         self,
         ctx: Interaction,
         rating: Optional[Literal["questionable", "explicit"]] = None,
     ) -> None:
-        if Botban(ctx.user).check_botbanned_user:
-            return
-
-        if Command(ctx.guild).check_disabled(self.hentai.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
 
@@ -58,11 +59,7 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
-            if Command(ctx.guild).check_disabled(self.hentai.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
+
             slow = Embed(
                 description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
                 color=Color.red(),
@@ -76,6 +73,8 @@ class nsfw(Cog):
         tag="Add your tag",
         plus="Need more content? (up to 4)",
     )
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def gelbooru(
         self,
         ctx: Interaction,
@@ -83,13 +82,7 @@ class nsfw(Cog):
         tag: Optional[str] = None,
         plus: Optional[bool] = None,
     ) -> None:
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.gelbooru.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
+
         await ctx.response.defer()
         image = await Hentai(plus).gelbooru(rating, tag)
 
@@ -164,11 +157,7 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (IndexError, KeyError)
         ):
-            if Command(ctx.guild).check_disabled(self.gelbooru.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
+
             no_tag = Embed(
                 description="The hentai could not be found", color=Color.red()
             )
@@ -177,17 +166,12 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
-            if Command(ctx.guild).check_disabled(self.gelbooru.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
+
             slow = Embed(
                 description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
                 color=Color.red(),
             )
             await ctx.followup.send(embed=slow)
-            
 
     @Jeanne.command(description="Get a random hentai from Yande.re", nsfw=True)
     @Jeanne.checks.cooldown(1, 5, key=lambda i: (i.user.id))
@@ -196,6 +180,8 @@ class nsfw(Cog):
         tag="Add your tag",
         plus="Need more content? (up to 4)",
     )
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def yandere(
         self,
         ctx: Interaction,
@@ -203,13 +189,6 @@ class nsfw(Cog):
         tag: Optional[str] = None,
         plus: Optional[bool] = None,
     ) -> None:
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.yandere.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
 
@@ -270,11 +249,7 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (IndexError, KeyError, TypeError)
         ):
-            if Command(ctx.guild).check_disabled(self.yandere.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
+
             no_tag = Embed(
                 description="The hentai could not be found", color=Color.red()
             )
@@ -284,11 +259,7 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
-            if Command(ctx.guild).check_disabled(self.yandere.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
+
             slow = Embed(
                 description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
                 color=Color.red(),
@@ -302,6 +273,8 @@ class nsfw(Cog):
         tag="Add your tag",
         plus="Need more content (up to 4)",
     )
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def konachan(
         self,
         ctx: Interaction,
@@ -309,14 +282,7 @@ class nsfw(Cog):
         tag: Optional[str] = None,
         plus: Optional[bool] = None,
     ) -> None:
-        if Botban(ctx.user).check_botbanned_user:
-            return
 
-        if Command(ctx.guild).check_disabled(self.konachan.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
         await ctx.response.defer()
 
         image = await Hentai(plus).konachan(rating, tag)
@@ -380,11 +346,7 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (IndexError, KeyError, TypeError)
         ):
-            if Command(ctx.guild).check_disabled(self.konachan.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
+
             no_tag = Embed(
                 description="The hentai could not be found", color=Color.red()
             )
@@ -393,11 +355,7 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
-            if Command(ctx.guild).check_disabled(self.danbooru.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
+
             slow = Embed(
                 description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
                 color=Color.red(),
@@ -411,6 +369,8 @@ class nsfw(Cog):
         tag="Add your tag (up to 2 tags)",
         plus="Need more content? (up to 4)",
     )
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def danbooru(
         self,
         ctx: Interaction,
@@ -418,13 +378,7 @@ class nsfw(Cog):
         tag: Optional[str] = None,
         plus: Optional[bool] = None,
     ) -> None:
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.danbooru.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
+
         await ctx.response.defer()
         image = await Hentai(plus).danbooru(rating, tag)
 
@@ -490,11 +444,7 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (IndexError, KeyError, TypeError)
         ):
-            if Command(ctx.guild).check_disabled(self.danbooru.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
+
             no_tag = Embed(
                 description="The hentai could not be found", color=Color.red()
             )
@@ -504,11 +454,7 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
-            if Command(ctx.guild).check_disabled(self.danbooru.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
+
             slow = Embed(
                 description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
                 color=Color.red(),

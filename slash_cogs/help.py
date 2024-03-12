@@ -8,7 +8,7 @@ from discord import (
     app_commands as Jeanne,
 )
 from discord.ext.commands import GroupCog, Bot
-from functions import Botban, AutoCompleteChoices
+from functions import Botban, AutoCompleteChoices, check_botbanned_app_command
 from collections import OrderedDict
 from assets.help.modules import modules, Modules
 
@@ -46,13 +46,11 @@ class HelpGroup(GroupCog, name="help"):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-
     @Jeanne.command(description="Get help on a certain command")
     @Jeanne.autocomplete(command=AutoCompleteChoices.command_choices)
     @Jeanne.describe(command="Which command you need help with?")
+    @Jeanne.check(check_botbanned_app_command)
     async def command(self, ctx: Interaction, command: Jeanne.Range[str, 3]):
-        if Botban(ctx.user).check_botbanned_user:
-            return
 
         await ctx.response.defer()
         cmd = next(
@@ -65,13 +63,15 @@ class HelpGroup(GroupCog, name="help"):
         )
 
         if cmd:
-            bot_perms:dict = getattr(cmd, "bot_perms", None)
-            member_perms:dict = getattr(cmd, "member_perms", None)
+            bot_perms: dict = getattr(cmd, "bot_perms", None)
+            member_perms: dict = getattr(cmd, "member_perms", None)
 
             embed = Embed(title=f"{command.title()} Help", color=Color.random())
             embed.description = cmd.description
 
-            parms = [f"[{i.name}]" if i.required else f"<{i.name}>" for i in cmd.parameters]
+            parms = [
+                f"[{i.name}]" if i.required else f"<{i.name}>" for i in cmd.parameters
+            ]
             descs = [
                 f"`{parm}` - {i.description}" for i, parm in zip(cmd.parameters, parms)
             ]
@@ -81,7 +81,9 @@ class HelpGroup(GroupCog, name="help"):
 
             if bot_perms:
                 perms = [str(i).replace("_", " ").title() for i in bot_perms.keys()]
-                embed.add_field(name="Bot Permissions", value="\n".join(perms), inline=True)
+                embed.add_field(
+                    name="Bot Permissions", value="\n".join(perms), inline=True
+                )
 
             if member_perms:
                 perms = [str(i).replace("_", " ").title() for i in member_perms.keys()]
@@ -107,9 +109,9 @@ class HelpGroup(GroupCog, name="help"):
 
     @Jeanne.command(description="Get help of a certain module")
     @Jeanne.describe(module="Which module?")
+    @Jeanne.check(check_botbanned_app_command)
     async def module(self, ctx: Interaction, module: Modules):
-        if Botban(ctx.user).check_botbanned_user:
-            return
+
         await ctx.response.defer()
         module_data = dumps(modules[module.value])
 
@@ -126,9 +128,8 @@ class HelpGroup(GroupCog, name="help"):
     @Jeanne.command(
         description="Get help from the website or join the support server for further help"
     )
+    @Jeanne.check(check_botbanned_app_command)
     async def support(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user:
-            return
 
         view = help_button()
         help = Embed(

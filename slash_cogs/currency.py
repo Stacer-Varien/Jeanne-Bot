@@ -12,7 +12,14 @@ from discord import (
 from datetime import datetime, timedelta
 from discord.ext.commands import Cog, Bot, GroupCog
 from assets.components import Heads_or_Tails
-from functions import Botban, Command, Currency
+from functions import (
+    BetaTest,
+    Botban,
+    Command,
+    Currency,
+    check_botbanned_app_command,
+    check_disabled_app_command,
+)
 
 
 class Guess_Group(GroupCog, name="guess"):
@@ -146,15 +153,10 @@ class Dice_Group(GroupCog, name="dice"):
 
     @Jeanne.command(description="Roll a dice for free 20 QP")
     @Jeanne.describe(digit="Guess what will roll")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     async def free(self, ctx: Interaction, digit: Jeanne.Range[int, 1, 6]):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.free.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
         await ctx.response.defer()
         rolled = randint(1, 6)
         if digit == rolled:
@@ -173,6 +175,8 @@ class Dice_Group(GroupCog, name="dice"):
 
     @Jeanne.command(description="Roll a dice with betting")
     @Jeanne.describe(bet="How much are you betting?", digit="Guess what will roll")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def bet(
         self,
@@ -180,13 +184,6 @@ class Dice_Group(GroupCog, name="dice"):
         bet: Jeanne.Range[int, 5],
         digit: Jeanne.Range[int, 1, 6],
     ):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.bet.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
 
@@ -226,11 +223,7 @@ class Dice_Group(GroupCog, name="dice"):
     @free.error
     async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if Command(ctx.guild).check_disabled(self.free.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
+
             reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
             reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
@@ -242,11 +235,7 @@ class Dice_Group(GroupCog, name="dice"):
     @bet.error
     async def bet_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if Command(ctx.guild).check_disabled(self.bet.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
+
             cooldown = Embed(
                 description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.red(),
@@ -261,14 +250,10 @@ class Flip_Group(GroupCog, name="flip"):
 
     @Jeanne.command(description="Flip a coin and earn 20 QP for free")
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def free(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.free.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
+
         await ctx.response.defer()
         picks = ["Heads", "Tails"]
         jeannes_pick = choice(picks)
@@ -306,15 +291,9 @@ class Flip_Group(GroupCog, name="flip"):
     @Jeanne.command(name="bet", description="Flip a coin and earn with betting")
     @Jeanne.describe(bet="How much are you betting?")
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def bet(self, ctx: Interaction, bet: Jeanne.Range[int, 5]):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-
-        if Command(ctx.guild).check_disabled(self.bet.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
 
@@ -374,11 +353,7 @@ class Flip_Group(GroupCog, name="flip"):
     @free.error
     async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if Command(ctx.guild).check_disabled(self.free.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
+
             reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
             reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
@@ -390,11 +365,7 @@ class Flip_Group(GroupCog, name="flip"):
     @bet.error
     async def bet_error(self, ctx: Interaction, error: Jeanne.errors.AppCommandError):
         if isinstance(error, Jeanne.errors.CommandOnCooldown):
-            if Command(ctx.guild).check_disabled(self.bet.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
+
             cooldown = Embed(
                 description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.red(),
@@ -419,17 +390,14 @@ class currency(Cog):
         )
 
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def balance_callback(self, ctx: Interaction, member: Member):
         await self.get_balance(ctx, member)
 
-
     async def balance_callback_error(self, ctx: Interaction, error: Exception):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if Command(ctx.guild).check_disabled(self.balance.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
+
             cooldown = Embed(
                 description=f"WOAH! Calm down! Why keep checking again quickly?\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.red(),
@@ -452,12 +420,9 @@ class currency(Cog):
         await ctx.followup.send(embed=balance)
 
     @Jeanne.command(description="Claim your daily")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def daily(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user:
-         return
-         
-        if Command(ctx.guild).check_disabled(self.daily.qualified_name):
-            return await ctx.response.send_message("This command is disabled by the server's managers", ephemeral=True)
 
         await ctx.response.defer()
         bank = Currency(ctx.user)
@@ -472,30 +437,33 @@ class currency(Cog):
                 color=Color.random(),
             )
 
-            try:
-                server = await self.bot.fetch_guild(740584420645535775)
-                author = await server.fetch_member(ctx.user.id)
-                role = server.get_role(1130430961587335219)
+            check_beta = await BetaTest(self.bot).check(ctx.user)
 
-                is_weekend = datetime.today().weekday() >= 5
-                rewards_text = "Rewards (weekend):" if is_weekend else "Rewards:"
-                rewards_value = "You received 200 <:quantumpiece:1161010445205905418>" if is_weekend else "You received 100 <:quantumpiece:1161010445205905418>"
-                bonus_text = "Beta Bonus (weekend)" if is_weekend else "Beta Bonus"
-                bonus_value = "50 <:quantumpiece:1161010445205905418>" if is_weekend else "25 <:quantumpiece:1161010445205905418>"
+            is_weekend = datetime.today().weekday() >= 5
+            rewards_text = "Rewards (weekend):" if is_weekend else "Rewards:"
+            rewards_value = (
+                "You received 200 <:quantumpiece:1161010445205905418>"
+                if is_weekend
+                else "You received 100 <:quantumpiece:1161010445205905418>"
+            )
+            bonus_text = "Beta Bonus (weekend)" if is_weekend else "Beta Bonus"
+            bonus_value = (
+                "50 <:quantumpiece:1161010445205905418>"
+                if is_weekend
+                else "25 <:quantumpiece:1161010445205905418>"
+            )
 
+            daily.add_field(
+                name=rewards_text,
+                value=rewards_value,
+            )
+
+            if check_beta:
+                await bank.add_qp(50 if is_weekend else 25)
                 daily.add_field(
-                    name=rewards_text,
-                    value=rewards_value,
+                    name=bonus_text,
+                    value=bonus_value,
                 )
-
-                if role in author.roles:
-                    await bank.add_qp(50 if is_weekend else 25)
-                    daily.add_field(
-                        name=bonus_text,
-                        value=bonus_value,
-                    )
-            except:
-                pass
 
             daily.add_field(
                 name="Balance",
@@ -511,17 +479,12 @@ class currency(Cog):
             )
             await ctx.followup.send(embed=cooldown)
 
-
     @Jeanne.command(description="Check how much QP you have")
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def balance(self, ctx: Interaction, member: Optional[Member] = None):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.balance.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
+
         member = ctx.user if (member == None) else member
         await self.get_balance(ctx, member)
 
@@ -530,11 +493,7 @@ class currency(Cog):
         self, ctx: Interaction, error: Jeanne.errors.AppCommandError
     ):
         if isinstance(error, Jeanne.errors.CommandOnCooldown):
-            if Command(ctx.guild).check_disabled(self.balance.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
+
             cooldown = Embed(
                 description=f"WOAH! Calm down! Why keep checking again quickly?\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.red(),
@@ -543,22 +502,16 @@ class currency(Cog):
 
     @Jeanne.command(description="Vote for me in TopGG to get more QP!")
     async def vote(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.vote.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
+
         await ctx.response.send_message(
             embed=Embed(
                 color=Color.random(),
-                description="You can vote for me by [clicking here](https://top.gg/bot/831993597166747679/vote) to get more QP!!",
+                description="You can vote for me by clicking on the button below to get more QP!!",
             ),
             view=ui.View().add_item(
                 ui.Button(
                     style=ButtonStyle.url,
-                    label="Vote Here",
+                    label="Top.gg",
                     url="https://top.gg/bot/831993597166747679/vote",
                 )
             ),

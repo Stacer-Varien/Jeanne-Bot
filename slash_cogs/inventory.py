@@ -1,5 +1,13 @@
 from assets.components import Confirmation
-from functions import AutoCompleteChoices, Botban, Command, Currency, Inventory
+from functions import (
+    AutoCompleteChoices,
+    Botban,
+    Command,
+    Currency,
+    Inventory,
+    check_botbanned_app_command,
+    check_disabled_app_command,
+)
 from discord import Color, Embed, File, Interaction, app_commands as Jeanne
 from PIL import UnidentifiedImageError
 from discord.ext.commands import Bot, GroupCog
@@ -17,8 +25,7 @@ class Shop_Group(GroupCog, name="shop"):
 
     @Jeanne.command(description="Check all the wallpapers available")
     async def backgrounds(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user:
-            return
+
         if Command(ctx.guild).check_disabled(self.backgrounds.qualified_name):
             await ctx.response.send_message(
                 "This command is disabled by the server's managers", ephemeral=True
@@ -61,15 +68,10 @@ class Background_Group(GroupCog, name="background"):
     @Jeanne.command(description="Buy a background pic for your level card")
     @Jeanne.describe(name="Which background you are buying?")
     @Jeanne.autocomplete(name=AutoCompleteChoices.get_all_wallpapers)
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     async def buy(self, ctx: Interaction, name: str):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.buy.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
 
@@ -141,11 +143,7 @@ class Background_Group(GroupCog, name="background"):
     @buy.error
     async def buy_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if Command(ctx.guild).check_disabled(self.buy.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
+
             cooldown = Embed(
                 description=f"You have already tried to preview this background!\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.random(),
@@ -155,14 +153,9 @@ class Background_Group(GroupCog, name="background"):
     @Jeanne.command(description="Select a wallpaper")
     @Jeanne.autocomplete(name=AutoCompleteChoices.list_all_user_inventory)
     @Jeanne.describe(name="What is the name of the background?")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def use(self, ctx: Interaction, name: str):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.use.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
 
@@ -182,14 +175,9 @@ class Background_Group(GroupCog, name="background"):
     )
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     @Jeanne.describe(name="What will you name it?", link="Add an image link")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def buycustom(self, ctx: Interaction, name: str, link: str):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.buycustom.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
         balance = Currency(ctx.user).get_balance
@@ -247,11 +235,7 @@ class Background_Group(GroupCog, name="background"):
     @buycustom.error
     async def buycustom_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if Command(ctx.guild).check_disabled(self.buycustom.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
+
             cooldown = Embed(
                 description=f"You have already tried to preview this background!\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.random(),
@@ -271,14 +255,9 @@ class Background_Group(GroupCog, name="background"):
             await ctx.edit_original_response(content=None, embed=embed)
 
     @Jeanne.command(description="Check which backgrounds you have")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def list(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.list.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
         if Inventory(ctx.user).get_user_inventory == None:

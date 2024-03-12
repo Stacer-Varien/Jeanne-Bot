@@ -1,6 +1,6 @@
 import json
 import random
-from functions import Botban, Command
+from functions import Botban, Command, check_botbanned_app_command, check_disabled_app_command
 from discord import Color, Embed, Interaction, Member, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
 from requests import get
@@ -34,13 +34,6 @@ class SlashReactions(Cog):
         member: Optional[Member] = None,
         api_url: str = None,
     ) -> None:
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(getattr(self, action).qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         reaction_api = get(api_url)
         reaction_embed = Embed(color=Color.random())
@@ -64,7 +57,7 @@ class SlashReactions(Cog):
 
         reaction_embed.set_image(url=reaction_url)
 
-        other_actions = ["baka", "smug", "hug"]
+        other_actions = ["baka", "smug", "hug", "poke", "tickle", "dance"]
         if action == "baka":
             msg = (
                 f"*{ctx.user}*, you are a baka!"
@@ -79,6 +72,18 @@ class SlashReactions(Cog):
                 if member is None
                 else f"*{ctx.user} hugged {member.mention}*"
             )
+        elif action == "poke":
+            msg = (
+                f"*Poking {ctx.user}*"
+                if member is None
+                else f"*{ctx.user} is poking {member.mention}*"
+            )
+        elif action == "dance":
+            msg = (
+                f"*Dancing {ctx.user}*"
+                if member is None
+                else f"*{ctx.user} is dancing with {member.mention}*"
+            )
         elif action not in other_actions:
             msg = (
                 f"*{action.capitalize()}ing {ctx.user}*"
@@ -90,68 +95,96 @@ class SlashReactions(Cog):
 
     @Jeanne.command(description="Hug someone or yourself")
     @Jeanne.describe(member="Who are you hugging?")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def hug(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "hug", member, hug)
 
     @Jeanne.command(description="Slap someone or yourself")
     @Jeanne.describe(member="Who are you slapping?")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def slap(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "slap", member, slap)
 
     @Jeanne.command(description="Show a smuggy look")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def smug(self, ctx: Interaction):
         await self._send_reaction(ctx, "smug", api_url=smug)
 
     @Jeanne.command(description="Poke someone or yourself")
     @Jeanne.describe(member="Who are you poking?")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def poke(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "poke", member, poke)
 
     @Jeanne.command(description="Pat someone or yourself")
     @Jeanne.describe(member="Who are you patting?")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def pat(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "pat", member, pat)
 
     @Jeanne.command(description="Kiss someone or yourself")
     @Jeanne.describe(member="Who are you kissing?")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def kiss(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "kiss", member, kiss)
 
     @Jeanne.command(description="Tickle someone or yourself")
     @Jeanne.describe(member="Who are you tickling?")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def tickle(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "tickle", member, tickle)
 
     @Jeanne.command(description="Call someone or yourself a baka!")
     @Jeanne.describe(member="Who are you calling a baka?")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def baka(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "baka", member, baka)
 
     @Jeanne.command(description="Feed someone or yourself")
     @Jeanne.describe(member="Who are you feeding?")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def feed(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "feed", member, feed)
 
-    @Jeanne.command(description="Make yourself cry")
+    @Jeanne.command(description="Show a crying expression")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def cry(self, ctx: Interaction):
         await self._send_reaction(ctx, "cry", api_url=cry)
 
     @Jeanne.command(description="Bite someone or yourself")
     @Jeanne.describe(member="Who are you biting?")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def bite(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "bite", member, bite)
 
-    @Jeanne.command(description="Make yourself blush")
+    @Jeanne.command(description="Show a blushing expression")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def blush(self, ctx: Interaction):
         await self._send_reaction(ctx, "blush", api_url=blush)
 
     @Jeanne.command(description="Cuddle with someone or yourself")
-    @Jeanne.describe(member="Who are you cuddling?")
+    @Jeanne.describe(member="Who are you cuddling with?")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def cuddle(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "cuddle", member, cuddle)
 
     @Jeanne.command(description="Dance with someone or yourself")
     @Jeanne.describe(member="Who are you dancing with?")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def dance(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "dance", member, dance)
 

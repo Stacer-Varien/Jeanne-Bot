@@ -13,7 +13,14 @@ from discord.ext.commands import Cog, Bot, GroupCog
 from discord.utils import utcnow
 from datetime import datetime, timedelta
 from humanfriendly import InvalidTimespan, format_timespan, parse_timespan
-from functions import Botban, Command, Logger, Moderation
+from functions import (
+    Botban,
+    Command,
+    Logger,
+    Moderation,
+    check_botbanned_app_command,
+    check_disabled_app_command,
+)
 from assets.components import Confirmation
 from typing import Optional
 from discord.ext import tasks
@@ -28,19 +35,14 @@ class BanCog(GroupCog, name="ban"):
     @Jeanne.describe(user_id="What is the user ID?", reason="What did they do?")
     @Jeanne.checks.has_permissions(ban_members=True)
     @Jeanne.checks.bot_has_permissions(ban_members=True)
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def user(
         self,
         ctx: Interaction,
         user_id: str,
         reason: Optional[Jeanne.Range[str, None, 470]] = None,
     ) -> None:
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.user.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
         user = await self.bot.fetch_user(int(user_id))
@@ -117,6 +119,8 @@ class BanCog(GroupCog, name="ban"):
     )
     @Jeanne.checks.has_permissions(ban_members=True)
     @Jeanne.checks.bot_has_permissions(ban_members=True)
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def member(
         self,
         ctx: Interaction,
@@ -124,13 +128,6 @@ class BanCog(GroupCog, name="ban"):
         reason: Optional[Jeanne.Range[str, None, 470]] = None,
         time: Optional[str] = None,
     ) -> None:
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.member.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
         if member == ctx.user:
@@ -200,11 +197,6 @@ class BanCog(GroupCog, name="ban"):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (HTTPException, ValueError)
         ):
-            if Command(ctx.guild).check_disabled(self.user.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
 
             embed = Embed()
             embed.description = "Invalid user ID given\nPlease try again"
@@ -218,14 +210,9 @@ class ListWarns(GroupCog, name="list-warns"):
         super().__init__()
 
     @Jeanne.command(description="View warnings in the server or a member")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def server(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.server.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
         record = Moderation(ctx.guild).fetch_warnings_server()
@@ -245,14 +232,9 @@ class ListWarns(GroupCog, name="list-warns"):
 
     @Jeanne.command(description="View warnings that a member has")
     @Jeanne.describe(member="Which member are you checking the warns?")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def user(self, ctx: Interaction, member: Optional[Member]) -> None:
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.user.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
         member = ctx.user if member is None else member
@@ -323,19 +305,14 @@ class moderation(Cog):
     @Jeanne.command(description="Warn a member")
     @Jeanne.describe(member="Which member are you warning?", reason="What did they do?")
     @Jeanne.checks.has_permissions(kick_members=True)
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def warn(
         self,
         ctx: Interaction,
         member: Member,
         reason: Optional[Jeanne.Range[str, None, 512]] = None,
     ) -> None:
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.warn.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
         if ctx.user.top_role.position < member.top_role.position:
@@ -394,14 +371,9 @@ class moderation(Cog):
         warn_id="What is their warn ID you want to remove?",
     )
     @Jeanne.checks.has_permissions(kick_members=True)
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def clearwarn(self, ctx: Interaction, member: Member, warn_id: int):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.clearwarn.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
         mod = Moderation(ctx.guild)
@@ -437,19 +409,14 @@ class moderation(Cog):
     )
     @Jeanne.checks.has_permissions(kick_members=True)
     @Jeanne.checks.bot_has_permissions(kick_members=True)
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def kick(
         self,
         ctx: Interaction,
         member: Member,
         reason: Optional[Jeanne.Range[str, None, 470]] = None,
     ) -> None:
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.kick.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
         if member.id == ctx.user.id:
@@ -515,19 +482,14 @@ class moderation(Cog):
     )
     @Jeanne.checks.has_permissions(manage_messages=True)
     @Jeanne.checks.bot_has_permissions(manage_messages=True)
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def prune(
         self,
         ctx: Interaction,
         limit: Optional[Jeanne.Range[int, None, 100]] = None,
         member: Optional[Member] = None,
     ) -> None:
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.prune.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
         limit = (limit + 1) if limit else 101
@@ -546,19 +508,14 @@ class moderation(Cog):
     @Jeanne.describe(member="Which member?", nickname="What is their new nickname")
     @Jeanne.checks.has_permissions(manage_nicknames=True)
     @Jeanne.checks.bot_has_permissions(manage_nicknames=True)
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def changenickname(
         self,
         ctx: Interaction,
         member: Member,
         nickname: Optional[Jeanne.Range[str, 1, 32]],
     ):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.changenickname.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
 
@@ -600,13 +557,6 @@ class moderation(Cog):
         user_id: str,
         reason: Optional[Jeanne.Range[str, None, 470]] = None,
     ) -> None:
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.unban.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
 
@@ -642,6 +592,8 @@ class moderation(Cog):
         reason="Why are they on timeout?",
     )
     @Jeanne.checks.has_permissions(moderate_members=True)
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def timeout(
         self,
         ctx: Interaction,
@@ -649,13 +601,6 @@ class moderation(Cog):
         time: Optional[str] = None,
         reason: Optional[Jeanne.Range[str, None, 470]] = None,
     ) -> None:
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.timeout.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
 
@@ -701,11 +646,6 @@ class moderation(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, InvalidTimespan
         ):
-            if Command(ctx.guild).check_disabled(self.timeout.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
 
             embed = Embed()
             embed.description = "Invalid time added. Please try again"
@@ -716,19 +656,14 @@ class moderation(Cog):
     @Jeanne.describe(member="Which member?", reason="Why are they untimeouted?")
     @Jeanne.checks.has_permissions(moderate_members=True)
     @Jeanne.checks.bot_has_permissions(moderate_members=True)
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def untimeout(
         self,
         ctx: Interaction,
         member: Member,
         reason: Optional[Jeanne.Range[str, None, 470]] = None,
     ) -> None:
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.untimeout.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
         reason = reason if reason else "Unspecified"
@@ -770,14 +705,9 @@ class moderation(Cog):
     @Jeanne.checks.cooldown(1, 1800, key=lambda i: (i.guild.id))
     @Jeanne.checks.has_permissions(administrator=True)
     @Jeanne.checks.bot_has_permissions(ban_members=True)
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def massban(self, ctx: Interaction, user_ids: str, reason: str):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.massban.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
         ids = user_ids.split()[:25]
@@ -818,7 +748,7 @@ class moderation(Cog):
 
         if view.value == True:
             em = Embed(
-                description="Banning user IDs now <a:loading:1161038734620373062>",
+                description="Banning users now <a:loading:1161038734620373062>",
                 color=Color.red(),
             )
             await ctx.edit_original_response(embed=em, view=None)
@@ -867,20 +797,14 @@ class moderation(Cog):
             )
             await modlog.send(embed=embed)
 
-        elif view.value in [False, None]:
+        elif (view.value == False) or (view.value == None):
             cancelled = Embed(description="Massban cancelled", color=Color.red())
             await ctx.edit_original_response(embed=cancelled, view=None)
 
     @massban.error
     async def massban_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if Command(ctx.guild).check_disabled(self.massban.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
 
-            await ctx.response.defer()
             reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
             reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
@@ -897,14 +821,10 @@ class moderation(Cog):
     @Jeanne.checks.cooldown(1, 1800, key=lambda i: (i.guild.id))
     @Jeanne.checks.bot_has_permissions(ban_members=True)
     @Jeanne.checks.has_permissions(administrator=True)
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def massunban(self, ctx: Interaction, user_ids: str, reason: str):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.massunban.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
+
         await ctx.response.defer()
         ids = user_ids.split()[:25]
 
@@ -944,7 +864,7 @@ class moderation(Cog):
 
         if view.value == True:
             em = Embed(
-                description="Unbanning user IDs now <a:loading:1161038734620373062>",
+                description="Unbanning users now <a:loading:1161038734620373062>",
                 color=Color.red(),
             )
             await ctx.edit_original_response(embed=em, view=None)
@@ -993,18 +913,14 @@ class moderation(Cog):
             )
             await modlog.send(embed=embed)
 
-        elif view.value in [False, None]:
+        elif (view.value == False) or (view.value == None):
             cancelled = Embed(description="Massunban cancelled", color=Color.red())
             await ctx.edit_original_response(embed=cancelled, view=None)
 
     @massunban.error
     async def massunban_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if Command(ctx.guild).check_disabled(self.massunban.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
+
             reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
             reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(

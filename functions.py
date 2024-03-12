@@ -1620,3 +1620,30 @@ def check_botbanned_prefix(ctx: Context):
     if Botban(ctx.author).check_botbanned_user:
         return
     return True
+
+
+async def check_disabled_app_command(ctx: Interaction):
+    if Command(ctx.guild).check_disabled(ctx.command.qualified_name):
+        await ctx.response.send_message(
+            "This command is disabled by the server's managers", ephemeral=True
+        )
+        return
+    return True
+
+
+def check_botbanned_app_command(ctx: Interaction):
+    if Botban(ctx.user).check_botbanned_user:
+        return
+    return True
+
+async def is_beta_app_command(ctx: Interaction):
+    if not await BetaTest(ctx.client).check(ctx.user):
+        await ctx.response.send_message(
+            embed=Embed(
+                description="Uh Oh!\n\nIt seems you are trying something that is meant for beta users.\nIf you wish to join the beta programme, join [Orleans](https://discord.gg/Vfa796yvNq) and ask the bot developer.",
+                color=Color.red(),
+            ),
+            ephemeral=True,
+        )
+        return
+    return True

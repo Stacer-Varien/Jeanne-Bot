@@ -15,6 +15,8 @@ from functions import (
     Command,
     Inventory,
     Levelling,
+    check_botbanned_app_command,
+    check_disabled_app_command,
 )
 from typing import Optional
 from assets.generators.profile_card import Profile
@@ -38,14 +40,9 @@ class Rank_Group(GroupCog, name="rank"):
         name="global", description="Check the users with the most XP globally"
     )
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def _global(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self._global.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
         embed = Embed(color=Color.random())
@@ -69,14 +66,9 @@ class Rank_Group(GroupCog, name="rank"):
 
     @Jeanne.command(description="Check the users with the most XP in the server")
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def server(self, ctx: Interaction):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.server.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
         embed = Embed(color=Color.random())
@@ -129,24 +121,16 @@ class levelling(Cog):
             await ctx.followup.send(embed=no_exp)
 
     @Jeanne.checks.cooldown(1, 120, key=lambda i: (i.user.id))
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def profile_generate(self, ctx: Interaction, member: Member):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.profile.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
+
         await ctx.response.defer()
         await self.generate_profile_card(ctx, member)
 
     async def profile_generate_error(self, ctx: Interaction, error: Exception) -> None:
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if Command(ctx.guild).check_disabled(self.profile.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
+
             cooldown = Embed(
                 description=f"You have already used the profile command!\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.red(),
@@ -260,14 +244,9 @@ class levelling(Cog):
     @Jeanne.command(description="See your profile or someone else's profile")
     @Jeanne.describe(member="Which member?")
     @Jeanne.checks.cooldown(1, 120, key=lambda i: (i.user.id))
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def profile(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        if Botban(ctx.user).check_botbanned_user:
-            return
-        if Command(ctx.guild).check_disabled(self.profile.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         member = ctx.user if member == None else member
         await ctx.response.defer()
@@ -276,11 +255,7 @@ class levelling(Cog):
     @profile.error
     async def profile_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if Command(ctx.guild).check_disabled(self.profile.qualified_name) == True:
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
+
             cooldown = Embed(
                 description=f"You have already used the profile command!\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.red(),
