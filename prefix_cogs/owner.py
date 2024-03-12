@@ -147,7 +147,7 @@ class OwnerCog(Cog, name="Owner"):
     @command(aliases=["fuser"], description="Finds a user (Developer Only)")
     @is_owner()
     async def finduser(self, ctx: Context, user_id: int):
-        await ctx.defer()
+        
         if Botban(ctx.author).check_botbanned_user:
             return
 
@@ -176,7 +176,7 @@ class OwnerCog(Cog, name="Owner"):
     )
     @is_owner()
     async def update(self, ctx: Context):
-        await ctx.defer()
+        
         if Botban(ctx.author).check_botbanned_user:
             return
 

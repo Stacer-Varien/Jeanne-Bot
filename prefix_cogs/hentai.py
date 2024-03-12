@@ -13,7 +13,7 @@ from functions import (
 from assets.components import ReportContent, ReportSelect
 
 
-class nsfw(Cog, name="hentai"):
+class nsfw(Cog, name="Hentai"):
     def __init__(self, bot: Bot):
         self.bot = bot
 
@@ -55,7 +55,7 @@ class nsfw(Cog, name="hentai"):
         self, ctx: Context, *, words: str = None, parser=rating_parser
     ) -> None:
 
-        await ctx.defer()
+        
         try:
             parser = parser.parse_args(words.split())
             rating = parser.rating
@@ -126,7 +126,7 @@ class nsfw(Cog, name="hentai"):
         parser=hentai_api_parser,
     ) -> None:
 
-        await ctx.defer()
+        
 
         try:
             parsed_args, unknown = parser.parse_known_args(words)
@@ -241,7 +241,7 @@ class nsfw(Cog, name="hentai"):
     async def yandere(
         self, ctx: Context, *words: str, parser=hentai_api_parser
     ) -> None:
-        await ctx.defer()
+        
 
         try:
             parsed_args, unknown = parser.parse_known_args(words)
@@ -343,7 +343,7 @@ class nsfw(Cog, name="hentai"):
         self, ctx: Context, *words: str, parser=hentai_api_parser
     ) -> None:
 
-        await ctx.defer()
+        
 
         try:
             parsed_args, unknown = parser.parse_known_args(words)
@@ -450,7 +450,7 @@ class nsfw(Cog, name="hentai"):
         self, ctx: Context, *words: str, parser=hentai_api_parser
     ) -> None:
 
-        await ctx.defer()
+        
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             tags = parsed_args.tags + unknown

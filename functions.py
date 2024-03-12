@@ -413,7 +413,11 @@ class Levelling:
         ).fetchone()
         db.commit()
 
-        return int(next_time[0]) if next_time else round(datetime.now().timestamp())
+        return (
+            int(next_time[0])
+            if next_time
+            else round((datetime.now() + timedelta(minutes=2)).timestamp())
+        )
 
     @property
     def get_next_time_global(self) -> int:
@@ -422,7 +426,11 @@ class Levelling:
             (self.member.id,),
         ).fetchone()
         db.commit()
-        return int(next_time[0]) if next_time else round(datetime.now().timestamp())
+        return (
+            int(next_time[0])
+            if next_time
+            else round((datetime.now() + timedelta(minutes=2)).timestamp())
+        )
 
     @property
     def get_member_level(self) -> int:

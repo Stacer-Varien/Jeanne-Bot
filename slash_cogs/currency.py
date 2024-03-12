@@ -30,15 +30,9 @@ class Guess_Group(GroupCog, name="guess"):
     @Jeanne.command(description="Guess my number and you can win 20 QP")
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     @Jeanne.describe(number="Guess her number (between 1 and 10)")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def free(self, ctx: Interaction, number: Jeanne.Range[int, 1, 10]):
-        if Botban(ctx.user).check_botbanned_user:
-            return
-
-        if Command(ctx.guild).check_disabled(self.free.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
 
@@ -51,12 +45,12 @@ class Guess_Group(GroupCog, name="guess"):
                 description="YES! YOU GUESSED IT CORRECTLY!\nYou have been given 20 <:quantumpiece:1161010445205905418>!",
                 color=Color.random(),
             )
-            correct.set_image(url="https://i.imgur.com/ICndRZg.gif")
+            correct.set_image(url="https://files.catbox.moe/phqnb1.gif")
             await ctx.followup.send(embed=correct)
             return
 
         wrong = Embed(description=f"Wrong answer. It was {answer}", color=Color.red())
-        wrong.set_image(url="https://i.imgur.com/faD48C3.jpg")
+        wrong.set_image(url="https://files.catbox.moe/mbk0nm.jpg")
         await ctx.followup.send(embed=wrong)
 
     @Jeanne.command(description="Guess my number and you can win 20 QP with betting")
@@ -64,20 +58,15 @@ class Guess_Group(GroupCog, name="guess"):
         bet="How much are you betting?", number="Guess her number (between 1 and 10)"
     )
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def bet(
         self,
         ctx: Interaction,
         bet: Jeanne.Range[int, 5],
         number: Jeanne.Range[int, 1, 10],
     ):
-        if Botban(ctx.user).check_botbanned_user:
-            return
 
-        if Command(ctx.guild).check_disabled(self.bet.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
 
         await ctx.response.defer()
         balance = Currency(ctx.user).get_balance
@@ -104,7 +93,7 @@ class Guess_Group(GroupCog, name="guess"):
                 description=f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given {bet} <:quantumpiece:1161010445205905418>!",
                 color=Color.random(),
             )
-            correct.set_image(url="https://i.imgur.com/ICndRZg.gifv")
+            correct.set_image(url="https://files.catbox.moe/phqnb1.gif")
             return
 
         Currency(ctx.user).remove_qp(bet)
@@ -112,17 +101,13 @@ class Guess_Group(GroupCog, name="guess"):
             description=f"Wrong answer. It was {answer}\nAfraid I have to take {bet} <:quantumpiece:1161010445205905418> from you...",
             color=Color.red(),
         )
-        wrong.set_image(url="https://i.imgur.com/faD48C3.jpg")
+        wrong.set_image(url="https://files.catbox.moe/mbk0nm.jpg")
         await ctx.followup.send(embed=wrong)
 
     @free.error
     async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if Command(ctx.guild).check_disabled(self.free.qualified_name):
-                await ctx.response.send_message(
-                    "This command has been disabled", ephemeral=True
-                )
-                return
+
             reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
             reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
@@ -134,11 +119,7 @@ class Guess_Group(GroupCog, name="guess"):
     @bet.error
     async def bet_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if Command(ctx.guild).check_disabled(self.bet.qualified_name):
-                await ctx.response.send_message(
-                    "This command is disabled by the server's managers", ephemeral=True
-                )
-                return
+
             cooldown = Embed(
                 description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.red(),
@@ -428,7 +409,7 @@ class currency(Cog):
         bank = Currency(ctx.user)
         tomorrow = round((datetime.now() + timedelta(days=1)).timestamp())
 
-        if bank.check_daily:
+        if bank.check_daily==True:
             await bank.give_daily()
 
             daily = Embed(

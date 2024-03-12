@@ -32,7 +32,7 @@ class images(Cog, name="Images"):
     @Jeanne.check(check_botbanned_prefix)
     async def kitsune(self, ctx: Context):
 
-        await ctx.defer()
+        
 
         kistune_api = get(kitsune).json()
         kitsune = Embed(color=Color.random())
@@ -48,7 +48,7 @@ class images(Cog, name="Images"):
     @Jeanne.check(check_botbanned_prefix)
     async def wallpaper(self, ctx: Context):
 
-        await ctx.defer()
+        
         embed, file = get_wallpaper_pic()
         await ctx.send(embed=embed, file=file)
 
@@ -58,7 +58,7 @@ class images(Cog, name="Images"):
     @Jeanne.check(check_botbanned_prefix)
     async def jeanne(self, ctx: Context):
 
-        await ctx.defer()
+        
         embed, file = get_jeanne_pic()
         await ctx.send(embed=embed, file=file)
 
@@ -68,7 +68,7 @@ class images(Cog, name="Images"):
     @Jeanne.check(check_botbanned_prefix)
     async def saber(self, ctx: Context):
 
-        await ctx.defer()
+        
         file, embed = get_saber_pic()
         await ctx.send(file=file, embed=embed)
 
@@ -78,7 +78,7 @@ class images(Cog, name="Images"):
     @Jeanne.check(check_botbanned_prefix)
     async def neko(self, ctx: Context):
 
-        await ctx.defer()
+        
 
         embed, file = get_neko_pic()
         await ctx.send(file=file, embed=embed)
@@ -89,7 +89,7 @@ class images(Cog, name="Images"):
     @Jeanne.check(check_botbanned_prefix)
     async def morgan(self, ctx: Context):
 
-        await ctx.defer()
+        
         embed, file = get_morgan_pic()
         await ctx.send(file=file, embed=embed)
 
@@ -99,7 +99,7 @@ class images(Cog, name="Images"):
     @Jeanne.check(check_botbanned_prefix)
     async def medusa(self, ctx: Context):
 
-        await ctx.defer()
+        
         embed, file = get_medusa_pic()
         await ctx.send(embed=embed, file=file)
 
@@ -109,7 +109,7 @@ class images(Cog, name="Images"):
     @Jeanne.check(check_botbanned_prefix)
     async def safebooru(self, ctx: Context):
 
-        await ctx.defer()
+        
         embed = Embed(color=Color.random())
         embed.set_image(url=safebooru_pic())
         embed.set_footer(text="Fetched from Safebooru • Credits must go to the artist")

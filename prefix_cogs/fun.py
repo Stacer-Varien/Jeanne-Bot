@@ -28,7 +28,7 @@ class fun(Cog, name="Fun"):
     @Jeanne.check(check_botbanned_prefix)
     async def _8ball(self, ctx: Context, *, question: str):
 
-        await ctx.defer()
+        
         eight_ball_answers = [
             "It is certain.",
             "It is decidedly so.",
@@ -74,7 +74,7 @@ class fun(Cog, name="Fun"):
     @Jeanne.check(check_botbanned_prefix)
     async def reverse(self, ctx: Context, *, text: str):
 
-        await ctx.defer()
+        
         filtered_words = ["riffak", "reggin", "aggin"]
         if any(word in text for word in filtered_words):
             await Botban(ctx.author).add_botbanned_user(
@@ -93,7 +93,7 @@ class fun(Cog, name="Fun"):
     @Jeanne.check(check_botbanned_prefix)
     async def animeme(self, ctx: Context):
 
-        await ctx.defer()
+        
         embed, file = get_animeme_pic()
         await ctx.send(embed=embed, file=file)
 
@@ -169,7 +169,7 @@ class fun(Cog, name="Fun"):
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def simprate(self, ctx: Context, member: Optional[Member] = None):
-        await ctx.defer()
+        
         perc = randint(0, 100)
 
         member = member if member else ctx.author
@@ -193,7 +193,7 @@ class fun(Cog, name="Fun"):
     @Jeanne.check(check_botbanned_prefix)
     async def gayrate(self, ctx: Context, member: Optional[Member] = None):
 
-        await ctx.defer()
+        
         perc = randint(0, 100)
 
         member = member if member else ctx.author
