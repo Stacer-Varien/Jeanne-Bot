@@ -133,7 +133,7 @@ class nsfw(Cog, name="hentai"):
             tags = parsed_args.tags + unknown
             tags = " ".join(tags)
 
-            plus = parsed_args.plus
+            plus:bool = parsed_args.plus
             rating = parsed_args.rating
         except SystemExit:
             await ctx.send(
@@ -248,7 +248,7 @@ class nsfw(Cog, name="hentai"):
             tags = parsed_args.tags + unknown
             tag = " ".join(tags)
 
-            plus = parsed_args.plus
+            plus:bool = parsed_args.plus
             rating = parsed_args.rating
         except SystemExit:
             await ctx.send(
@@ -350,7 +350,7 @@ class nsfw(Cog, name="hentai"):
             tags = parsed_args.tags + unknown
             tag = " ".join(tags)
 
-            plus = parsed_args.plus
+            plus:bool = parsed_args.plus
             rating = parsed_args.rating
         except SystemExit:
             await ctx.send(
@@ -456,7 +456,7 @@ class nsfw(Cog, name="hentai"):
             tags = parsed_args.tags + unknown
             tag = " ".join(tags)
 
-            plus = parsed_args.plus
+            plus:bool = parsed_args.plus
             rating = parsed_args.rating
         except SystemExit:
             await ctx.send(
