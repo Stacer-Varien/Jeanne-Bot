@@ -64,7 +64,7 @@ class HelpGroupPrefix(Cog, name="Help"):
         excluded_cogs = ["Jishaku", "Owner"]
         for cog_name, cog in self.bot.cogs.items():
             if cog_name not in excluded_cogs:
-                cmds = [command.qualified_name for command in cog.walk_commands()]
+                cmds = [command.qualified_name for command in cog.walk_commands() if not command.description.startswith("Main")]
                 if cmds:
                     embed.add_field(name=cog_name, value="\n".join(cmds), inline=True)
         embed.set_footer(
@@ -78,7 +78,7 @@ class HelpGroupPrefix(Cog, name="Help"):
     @Jeanne.check(check_botbanned_prefix)
     async def command(self, ctx: Context, *, command: Range[str, 3]):
 
-        await ctx.defer()
+        
         cmd = next(
             (cmd for cmd in self.bot.walk_commands() if cmd.qualified_name == command),
             None,
@@ -134,9 +134,10 @@ class HelpGroupPrefix(Cog, name="Help"):
                 embed.add_field(
                     name="User Permissions", value="\n".join(perms), inline=True
                 )
-
-            cmd_usage = "j!" + cmd.qualified_name + " " + parms
-            embed.add_field(name="Command Usage", value=f"`{cmd_usage}`", inline=False)
+            if not cmd.description.startswith("Main"):
+                
+                cmd_usage = "j!" + cmd.qualified_name + " " + parms 
+                embed.add_field(name="Command Usage", value=f"`{cmd_usage}`", inline=False)
             embed.set_footer(
                 text="Legend:\n<> - Required\n[] - Optional\n\nIt is best to go to the website for detailed explanations and usages"
             )
@@ -152,7 +153,7 @@ class HelpGroupPrefix(Cog, name="Help"):
     @Jeanne.check(check_botbanned_prefix)
     async def module(self, ctx: Context, module: str):
 
-        await ctx.defer()
+        
 
         module_mapping = {
             "currency": Modules.currency,
