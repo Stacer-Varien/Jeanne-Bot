@@ -53,7 +53,7 @@ class Guess_Group(GroupCog, name="guess"):
         wrong.set_image(url="https://files.catbox.moe/mbk0nm.jpg")
         await ctx.followup.send(embed=wrong)
 
-    @Jeanne.command(description="Guess my number and you can win 20 QP with betting")
+    @Jeanne.command(description="Guess my number and you can win with betting")
     @Jeanne.describe(
         bet="How much are you betting?", number="Guess her number (between 1 and 10)"
     )
@@ -96,7 +96,7 @@ class Guess_Group(GroupCog, name="guess"):
             correct.set_image(url="https://files.catbox.moe/phqnb1.gif")
             return
 
-        Currency(ctx.user).remove_qp(bet)
+        await Currency(ctx.user).remove_qp(bet)
         wrong = Embed(
             description=f"Wrong answer. It was {answer}\nAfraid I have to take {bet} <:quantumpiece:1161010445205905418> from you...",
             color=Color.red(),

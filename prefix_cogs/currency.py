@@ -56,7 +56,7 @@ class CurrencyCog(Cog, name="Currency"):
         wrong.set_image(url="https://files.catbox.moe/mbk0nm.jpg")
         await ctx.send(embed=wrong)
 
-    @guess.command(name="bet", description="Guess my number and you can win 20 QP with betting")
+    @guess.command(name="bet", description="Guess my number and you can win with betting")
     @Jeanne.cooldown(1, 20, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
@@ -95,7 +95,7 @@ class CurrencyCog(Cog, name="Currency"):
             correct.set_image(url="https://files.catbox.moe/phqnb1.gif")
             return
 
-        Currency(ctx.author).remove_qp(bet)
+        await Currency(ctx.author).remove_qp(bet)
         wrong = Embed(
             description=f"Wrong answer. It was {answer}\nAfraid I have to take {bet} <:quantumpiece:1161010445205905418> from you...",
             color=Color.red(),
