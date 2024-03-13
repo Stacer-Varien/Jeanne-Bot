@@ -58,6 +58,9 @@ class CurrencyCog(Cog, name="Currency"):
 
     @guess.command(description="Guess my number and you can win 20 QP with betting")
     @Jeanne.cooldown(1, 20, type=Jeanne.BucketType.user)
+    @Jeanne.check(check_disabled_prefixed_command)
+    @Jeanne.check(check_botbanned_prefix)
+    @Jeanne.check(is_beta_prefix)
     async def bet(
         self,
         ctx: Context,
@@ -76,7 +79,7 @@ class CurrencyCog(Cog, name="Currency"):
 
         if balance == 0:
             zerobal = Embed(
-                description="Unfortunately, you have 0 <:quantumpiece:1161010445205905418>.\nPlease do a daily and/or wait for a free chance to do `/guess free`, `/flip free` and/or `/dice free`"
+                description="Unfortunately, you have 0 <:quantumpiece:1161010445205905418>."
             )
             await ctx.send(embed=zerobal)
             return
@@ -100,28 +103,6 @@ class CurrencyCog(Cog, name="Currency"):
         wrong.set_image(url="https://files.catbox.moe/mbk0nm.jpg")
         await ctx.send(embed=wrong)
 
-    @free.error
-    async def free_error(self, ctx: Context, error: Jeanne.CommandError):
-        if isinstance(error, Jeanne.CommandOnCooldown):
-
-            reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
-            reset_hour = round(reset_hour_time.timestamp())
-            cooldown = Embed(
-                description=f"You have already used your free chance\nTry again after <t:{reset_hour}:R>",
-                color=Color.red(),
-            )
-            await ctx.send(embed=cooldown)
-
-    @bet.error
-    async def bet_error(self, ctx: Context, error: Jeanne.CommandError):
-        if isinstance(error, Jeanne.CommandOnCooldown):
-
-            cooldown = Embed(
-                description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`",
-                color=Color.red(),
-            )
-            await ctx.send(embed=cooldown)
-
     @Jeanne.group(
         invoke_without_command=True,
         description="Main Dice command for `dice free` and `dice bet`",
@@ -129,8 +110,9 @@ class CurrencyCog(Cog, name="Currency"):
     async def dice(self, ctx: Context): ...
 
     @dice.command(description="Roll a dice for free 20 QP")
-    @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
+    @Jeanne.check(check_botbanned_prefix)
+    @Jeanne.check(is_beta_prefix)
     @Jeanne.cooldown(1, 3600, type=Jeanne.BucketType.user)
     async def free(self, ctx: Context, digit: Jeanne.Range[int, 1, 6]):
 
@@ -149,9 +131,10 @@ class CurrencyCog(Cog, name="Currency"):
         embed = Embed(description=f"Oh no. It rolled a **{rolled}**", color=Color.red())
         await ctx.send(embed=embed)
 
-    @Jeanne.command(description="Roll a dice with betting")
-    @Jeanne.check(check_botbanned_prefix)
+    @dice.command(description="Roll a dice with betting")
     @Jeanne.check(check_disabled_prefixed_command)
+    @Jeanne.check(check_botbanned_prefix)
+    @Jeanne.check(is_beta_prefix)
     @Jeanne.cooldown(1, 20, type=Jeanne.BucketType.user)
     async def bet(
         self,
@@ -172,7 +155,7 @@ class CurrencyCog(Cog, name="Currency"):
 
         if balance == 0:
             zerobal = Embed(
-                description="Unfortunately, you have 0 <:quantumpiece:1161010445205905418>.\nPlease do a daily and/or wait for a free chance to do `/guess free` and/or `/dice free`"
+                description="Unfortunately, you have 0 <:quantumpiece:1161010445205905418>."
             )
             await ctx.send(embed=zerobal)
             return
@@ -193,27 +176,6 @@ class CurrencyCog(Cog, name="Currency"):
         embed = Embed(description=f"Oh no. It rolled a **{rolled}**", color=Color.red())
         await ctx.send(embed=embed)
 
-    @free.error
-    async def free_error(self, ctx: Context, error: Jeanne.CommandError):
-        if isinstance(error, Jeanne.CommandOnCooldown):
-
-            reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
-            reset_hour = round(reset_hour_time.timestamp())
-            cooldown = Embed(
-                description=f"You have already used your free chance\nTry again after <t:{reset_hour}:R>",
-                color=Color.red(),
-            )
-            await ctx.send(embed=cooldown)
-
-    @bet.error
-    async def bet_error(self, ctx: Context, error: Jeanne.CommandError):
-        if isinstance(error, Jeanne.CommandOnCooldown):
-
-            cooldown = Embed(
-                description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`",
-                color=Color.red(),
-            )
-            await ctx.send(embed=cooldown)
 
     @Jeanne.group(
         invoke_without_command=True,
@@ -223,8 +185,9 @@ class CurrencyCog(Cog, name="Currency"):
 
     @flip.command(description="Flip a coin and earn 20 QP for free")
     @Jeanne.cooldown(1, 3600, type=Jeanne.BucketType.user)
-    @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
+    @Jeanne.check(check_botbanned_prefix)
+    @Jeanne.check(is_beta_prefix)
     async def free(self, ctx: Context):
 
         picks = ["Heads", "Tails"]
@@ -262,8 +225,9 @@ class CurrencyCog(Cog, name="Currency"):
 
     @flip.command(name="bet", description="Flip a coin and earn with betting")
     @Jeanne.cooldown(1, 20, type=Jeanne.BucketType.user)
-    @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
+    @Jeanne.check(check_botbanned_prefix)
+    @Jeanne.check(is_beta_prefix)
     async def bet(self, ctx: Context, bet: Jeanne.Range[int, 5]):
 
         picks = ["Heads", "Tails"]
@@ -279,7 +243,7 @@ class CurrencyCog(Cog, name="Currency"):
 
         if balance == 0:
             zerobal = Embed(
-                description="Unfortunately, you have 0 <:quantumpiece:1161010445205905418>.\nPlease do a daily and/or wait for a free chance to do `/guess free`, `/flip free` and/or `/dice free`"
+                description="Unfortunately, you have 0 <:quantumpiece:1161010445205905418>."
             )
             await ctx.send(embed=zerobal)
             return
@@ -354,8 +318,9 @@ class CurrencyCog(Cog, name="Currency"):
         await ctx.send(embed=balance)
 
     @Jeanne.command(description="Claim your daily")
-    @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
+    @Jeanne.check(check_botbanned_prefix)
+    @Jeanne.check(is_beta_prefix)
     async def daily(self, ctx: Context):
 
         bank = Currency(ctx.author)
@@ -414,8 +379,9 @@ class CurrencyCog(Cog, name="Currency"):
 
     @Jeanne.command(description="Check how much QP you have")
     @Jeanne.cooldown(1, 60, type=Jeanne.BucketType.user)
-    @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
+    @Jeanne.check(check_botbanned_prefix)
+    @Jeanne.check(is_beta_prefix)
     async def balance(self, ctx: Context, member: Optional[Member] = None):
 
         member = ctx.author if (member == None) else member
@@ -432,6 +398,9 @@ class CurrencyCog(Cog, name="Currency"):
             await ctx.send(embed=cooldown)
 
     @Jeanne.command(description="Vote for me in TopGG to get more QP!")
+    @Jeanne.check(check_disabled_prefixed_command)
+    @Jeanne.check(check_botbanned_prefix)
+    @Jeanne.check(is_beta_prefix)
     async def vote(self, ctx: Context):
 
         await ctx.send(
