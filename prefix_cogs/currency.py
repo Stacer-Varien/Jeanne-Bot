@@ -32,12 +32,12 @@ class CurrencyCog(Cog, name="Currency"):
     )
     async def guess(self, ctx: Context): ...
 
-    @guess.command(description="Guess my number and you can win 20 QP")
+    @guess.command(name="free", description="Guess my number and you can win 20 QP")
     @Jeanne.cooldown(1, 3600, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(is_beta_prefix)
-    async def free(self, ctx: Context, number: Jeanne.Range[int, 1, 10]):
+    async def guess_free(self, ctx: Context, number: Jeanne.Range[int, 1, 10]):
 
         answer = randint(1, 10)
 
@@ -56,12 +56,12 @@ class CurrencyCog(Cog, name="Currency"):
         wrong.set_image(url="https://files.catbox.moe/mbk0nm.jpg")
         await ctx.send(embed=wrong)
 
-    @guess.command(description="Guess my number and you can win 20 QP with betting")
+    @guess.command(name="bet", description="Guess my number and you can win 20 QP with betting")
     @Jeanne.cooldown(1, 20, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(is_beta_prefix)
-    async def bet(
+    async def guess_bet(
         self,
         ctx: Context,
         bet: Jeanne.Range[int, 5],
@@ -103,18 +103,38 @@ class CurrencyCog(Cog, name="Currency"):
         wrong.set_image(url="https://files.catbox.moe/mbk0nm.jpg")
         await ctx.send(embed=wrong)
 
+    @guess_free.error
+    async def guess_free_error(self, ctx: Context, error: Jeanne.CommandError):
+        if isinstance(error, Jeanne.CommandOnCooldown):
+            reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
+            reset_hour = round(reset_hour_time.timestamp())
+            cooldown = Embed(
+                description=f"You have already used your free chance\nTry again after <t:{reset_hour}:R>",
+                color=Color.red(),
+            )
+            await ctx.send(embed=cooldown)
+
+    @guess_bet.error
+    async def guess_bet_error(self, ctx: Context, error: Jeanne.CommandError):
+        if isinstance(error, Jeanne.CommandOnCooldown):
+            cooldown = Embed(
+                description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`",
+                color=Color.red(),
+            )
+            await ctx.send(embed=cooldown)
+
     @Jeanne.group(
         invoke_without_command=True,
         description="Main Dice command for `dice free` and `dice bet`",
     )
     async def dice(self, ctx: Context): ...
 
-    @dice.command(description="Roll a dice for free 20 QP")
+    @dice.command(name="free",description="Roll a dice for free 20 QP")
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(is_beta_prefix)
     @Jeanne.cooldown(1, 3600, type=Jeanne.BucketType.user)
-    async def free(self, ctx: Context, digit: Jeanne.Range[int, 1, 6]):
+    async def dice_free(self, ctx: Context, digit: Jeanne.Range[int, 1, 6]):
 
         rolled = randint(1, 6)
         if digit == rolled:
@@ -131,12 +151,12 @@ class CurrencyCog(Cog, name="Currency"):
         embed = Embed(description=f"Oh no. It rolled a **{rolled}**", color=Color.red())
         await ctx.send(embed=embed)
 
-    @dice.command(description="Roll a dice with betting")
+    @dice.command(name="bet", description="Roll a dice with betting")
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(is_beta_prefix)
     @Jeanne.cooldown(1, 20, type=Jeanne.BucketType.user)
-    async def bet(
+    async def dice_bet(
         self,
         ctx: Context,
         bet: Jeanne.Range[int, 5],
@@ -176,6 +196,25 @@ class CurrencyCog(Cog, name="Currency"):
         embed = Embed(description=f"Oh no. It rolled a **{rolled}**", color=Color.red())
         await ctx.send(embed=embed)
 
+    @dice_free.error
+    async def dice_free_error(self, ctx: Context, error: Jeanne.CommandError):
+        if isinstance(error, Jeanne.CommandOnCooldown):
+            reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
+            reset_hour = round(reset_hour_time.timestamp())
+            cooldown = Embed(
+                description=f"You have already used your free chance\nTry again after <t:{reset_hour}:R>",
+                color=Color.red(),
+            )
+            await ctx.send(embed=cooldown)
+
+    @dice_bet.error
+    async def dice_bet_error(self, ctx: Context, error: Jeanne.CommandError):
+        if isinstance(error, Jeanne.CommandOnCooldown):
+            cooldown = Embed(
+                description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`",
+                color=Color.red(),
+            )
+            await ctx.send(embed=cooldown)
 
     @Jeanne.group(
         invoke_without_command=True,
@@ -183,12 +222,12 @@ class CurrencyCog(Cog, name="Currency"):
     )
     async def flip(self, ctx: Context): ...
 
-    @flip.command(description="Flip a coin and earn 20 QP for free")
+    @flip.command(name="free",description="Flip a coin and earn 20 QP for free")
     @Jeanne.cooldown(1, 3600, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(is_beta_prefix)
-    async def free(self, ctx: Context):
+    async def flip_free(self, ctx: Context):
 
         picks = ["Heads", "Tails"]
         jeannes_pick = choice(picks)
@@ -228,7 +267,7 @@ class CurrencyCog(Cog, name="Currency"):
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(is_beta_prefix)
-    async def bet(self, ctx: Context, bet: Jeanne.Range[int, 5]):
+    async def flip_bet(self, ctx: Context, bet: Jeanne.Range[int, 5]):
 
         picks = ["Heads", "Tails"]
         jeannes_pick = choice(picks)
@@ -283,8 +322,8 @@ class CurrencyCog(Cog, name="Currency"):
         )
         await m.edit(embed=timeout, view=None)
 
-    @free.error
-    async def free_error(self, ctx: Context, error: Jeanne.CommandError):
+    @flip_free.error
+    async def flip_free_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
             reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
             reset_hour = round(reset_hour_time.timestamp())
@@ -294,8 +333,8 @@ class CurrencyCog(Cog, name="Currency"):
             )
             await ctx.send(embed=cooldown)
 
-    @bet.error
-    async def bet_error(self, ctx: Context, error: Jeanne.CommandError):
+    @flip_bet.error
+    async def flip_bet_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
             cooldown = Embed(
                 description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`",
