@@ -1,15 +1,13 @@
 from functions import (
-    Botban,
-    Command,
     check_botbanned_app_command,
     check_disabled_app_command,
 )
 from discord import Color, Embed, Interaction, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
-from config import kitsune
 from requests import get
 from assets.images import (
     get_jeanne_pic,
+    get_kistune_pic,
     get_medusa_pic,
     get_morgan_pic,
     get_neko_pic,
@@ -27,20 +25,14 @@ class images(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def kitsune(self, ctx: Interaction):
-
         await ctx.response.defer()
-
-        kistune_api = get(kitsune).json()
-        embed = Embed(color=Color.random())
-        embed.set_footer(text="Fetched from nekos.life • Credits must go to the artist")
-        embed.set_image(url=kistune_api["url"])
-        await ctx.followup.send(embed=embed)
+        embed, file = get_kistune_pic()
+        await ctx.followup.send(embed=embed, file=file)
 
     @Jeanne.command(description="Need a wallpaper for your PC or phone?")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def wallpaper(self, ctx: Interaction):
-
         await ctx.response.defer()
         embed, file = get_wallpaper_pic()
         await ctx.followup.send(embed=embed, file=file)
@@ -49,7 +41,6 @@ class images(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def jeanne(self, ctx: Interaction):
-
         await ctx.response.defer()
         embed, file = get_jeanne_pic()
         await ctx.followup.send(embed=embed, file=file)
@@ -58,7 +49,6 @@ class images(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def saber(self, ctx: Interaction):
-
         await ctx.response.defer()
         embed, file = get_saber_pic()
         await ctx.followup.send(embed=embed, file=file)
@@ -67,9 +57,7 @@ class images(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def neko(self, ctx: Interaction):
-
         await ctx.response.defer()
-
         embed, file = get_neko_pic()
         await ctx.followup.send(file=file, embed=embed)
 
@@ -77,9 +65,7 @@ class images(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def morgan(self, ctx: Interaction):
-
         await ctx.response.defer()
-
         embed, file = get_morgan_pic()
         await ctx.followup.send(file=file, embed=embed)
 
@@ -87,7 +73,6 @@ class images(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def medusa(self, ctx: Interaction):
-
         await ctx.response.defer()
         embed, file = get_medusa_pic()
         await ctx.followup.send(embed=embed, file=file)
@@ -96,7 +81,6 @@ class images(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def safebooru(self, ctx: Interaction):
-
         await ctx.response.defer()
         embed = Embed(color=Color.random())
         embed.set_image(url=safebooru_pic())

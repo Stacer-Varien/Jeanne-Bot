@@ -34,12 +34,10 @@ start_time = time()
 class stat_buttons(ui.View):
     def __init__(self):
         super().__init__()
-
         invite = "https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=1429553343542&scope=bot%20applications.commands"
         vote = "https://top.gg/bot/831993597166747679"
         orleans_url = "https://discord.gg/jh7jkuk2pp"
         website = "https://jeannebot.gitbook.io/jeannebot/"
-
         self.add_item(ui.Button(style=ButtonStyle.link, label="Invite me", url=invite))
         self.add_item(ui.Button(style=ButtonStyle.link, label="Vote for me", url=vote))
         self.add_item(
@@ -74,22 +72,17 @@ class InfoCog(Cog):
         await self.get_userinfo(ctx, member)
 
     async def get_userinfo(self, ctx: Interaction, member: Member):
-
         await ctx.response.defer()
         user = await self.bot.fetch_user(member.id)
         has_roles = [role.mention for role in member.roles][1:][::-1]
         bot_check = "Yes" if member.bot else "No"
-
         joined_date = round(member.joined_at.timestamp())
         create_date = round(member.created_at.timestamp())
-
         userinfo = Embed(title=f"{member.name}'s Info", color=member.color)
         userinfo.add_field(name="Name", value=member, inline=True)
         userinfo.add_field(name="Global Name", value=member.global_name, inline=True)
-
         if member.nick:
             userinfo.add_field(name="Nickname", value=member.nick, inline=True)
-
         userinfo.add_field(name="ID", value=member.id, inline=True)
         userinfo.add_field(name="Is Bot?", value=bot_check, inline=True)
         userinfo.add_field(
@@ -100,14 +93,11 @@ class InfoCog(Cog):
         )
         userinfo.add_field(name="Number of Roles", value=len(member.roles), inline=True)
         userinfo.set_thumbnail(url=member.display_avatar)
-
         if user.banner:
             userinfo.set_image(url=user.banner)
-
         view = RolesButton(member, userinfo, has_roles)
         await ctx.followup.send(embeds=[userinfo], view=view)
         await view.wait()
-
         if view.value is None:
             await ctx.edit_original_response(embeds=[userinfo], view=None)
 
@@ -115,7 +105,6 @@ class InfoCog(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def stats(self, ctx: Interaction):
-
         await ctx.response.defer()
         all_users = get_cached_users()
         true_users = get_true_members()
@@ -136,18 +125,15 @@ class InfoCog(Cog):
             value=f"• **Python Version:** {py_version.major}.{py_version.minor}.{py_version.micro}\n• **Discord.PY Version:** {discord_version}\n• **Bot:** {self.bot_version}",
             inline=True,
         )
-
         embed.add_field(
             name="Count",
             value=f"• **Server Count:** {len(self.bot.guilds)} servers\n• **User Count:** {len(set(self.bot.get_all_members()))}\n• **Cached Members:** {all_users}\n• **True Members:** {true_users}",
             inline=True,
         )
-
         current_time = time()
         difference = int(round(current_time - start_time))
         uptime = timedelta(seconds=difference).total_seconds()
         embed.add_field(name="Uptime", value=format_timespan(uptime), inline=True)
-
         embed.set_thumbnail(url=self.bot.user.avatar.url)
         await ctx.followup.send(embed=embed, view=stat_buttons())
 
@@ -163,12 +149,10 @@ class InfoCog(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def serverinfo(self, ctx: Interaction):
-
         await ctx.response.defer()
         emojis = [str(x) for x in ctx.guild.emojis]
         humans = len([member for member in ctx.guild.members if not member.bot])
         bots = len([bot for bot in ctx.guild.members if bot.bot == True])
-
         date = round(ctx.guild.created_at.timestamp())
         serverinfo = Embed(color=Color.random())
         serverinfo.add_field(name="ID", value=ctx.guild.id, inline=True)
@@ -207,7 +191,6 @@ class InfoCog(Cog):
         for i in ctx.guild.features:
             f.append(i.replace("_", " ").title())
         serverinfo.add_field(name="Features", value=" | ".join(f), inline=False)
-
         icon = ctx.guild.icon.url if ctx.guild.icon != None else None
         splash = (
             ctx.guild.splash.url
@@ -216,29 +199,23 @@ class InfoCog(Cog):
         )
         serverinfo.set_thumbnail(url=icon)
         serverinfo.set_image(url=splash)
-
         if len(emojis) == 0:
             await ctx.followup.send(embed=serverinfo)
             return
-
         emojie = Embed(
             title="Emojis", description="".join(emojis[:80]), color=Color.random()
         )
-
         e = [serverinfo, emojie]
-
         await ctx.followup.send(embeds=e)
 
     @Jeanne.command(description="Check how fast I respond to a command")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def ping(self, ctx: Interaction):
-
         await ctx.response.defer()
         start_time = time()
         test = Embed(description="Testing ping", color=Color.random())
         await ctx.followup.send(embed=test)
-
         ping = Embed(color=Color.random())
         ping.add_field(
             name="Bot Latency",
@@ -257,7 +234,6 @@ class InfoCog(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def serverbanner(self, ctx: Interaction):
-
         await ctx.response.defer()
         if ctx.guild.premium_subscription_count < 2:
             nobanner = Embed(
@@ -265,12 +241,10 @@ class InfoCog(Cog):
             )
             await ctx.followup.send(embed=nobanner)
             return
-
         if ctx.guild.banner == None:
             embed = Embed(description="Server has no banner", color=Color.red())
             await ctx.followup.send(embed=embed)
             return
-
         embed = Embed(colour=Color.random())
         embed.set_footer(text=f"{ctx.guild.name}'s banner")
         embed.set_image(url=ctx.guild.banner.url)
@@ -281,7 +255,6 @@ class InfoCog(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def avatar(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-
         await ctx.response.defer()
         member = ctx.user if member is None else member
         color = Color.random()
@@ -292,22 +265,18 @@ class InfoCog(Cog):
             type="image",
         )
         guildav = Embed(url="https://discordapp.com", color=color, type="image")
-
         if member.guild_avatar != None and member.avatar == None:
             guildav.set_image(url=member.avatar.url)
             await ctx.followup.send(embed=guildav)
             return
-
         if member.guild_avatar == None and member.display_avatar == None:
             normav.set_image(url=member.default_avatar.url)
             await ctx.followup.send(embed=normav)
             return
-
         if member.guild_avatar == None and member.display_avatar != None:
             normav.set_image(url=member.display_avatar.url)
             await ctx.followup.send(embed=normav)
             return
-
         normav.set_image(url=member.avatar.url)
         guildav.set_image(url=member.guild_avatar.url)
         await ctx.followup.send(embeds=[normav, guildav])
@@ -319,24 +288,20 @@ class InfoCog(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def sticker(self, ctx: Interaction, sticker: str):
-
         await ctx.response.defer()
         try:
             m: Message = await ctx.channel.fetch_message(int(sticker))
             s: StickerItem = m.stickers[0]
         except:
             s: StickerItem = utils.get(ctx.guild.stickers, name=sticker)
-
         q = await self.bot.fetch_sticker(s.id)
         embed = Embed()
         embed.colour = Color.random()
         embed.add_field(name="Sticker Name", value=q.name, inline=False)
         embed.add_field(name="Sticker ID", value=q.id, inline=False)
         embed.set_image(url=q.url)
-
         if "apng" in q.format:
             embed.add_field(name="Animated Sticker URL", value=q.url, inline=False)
-
         await ctx.followup.send(embed=embed)
 
     @sticker.error
@@ -353,7 +318,6 @@ class InfoCog(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, AttributeError
         ):
-
             embed = Embed(
                 description="This sticker doesn't exist in the server",
                 color=Color.red(),
@@ -366,16 +330,13 @@ class InfoCog(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def emoji(self, ctx: Interaction, emoji: Jeanne.Range[str, 1]):
-
         if Command(ctx.guild).check_disabled(self.emoji.qualified_name):
             await ctx.response.send_message(
                 "This command is disabled by the server's managers", ephemeral=True
             )
             return
-
         await ctx.response.defer()
         emote = PartialEmoji.from_str(emoji)
-
         embed = Embed()
         embed.color = Color.random()
         embed.add_field(name="Name", value=emote.name, inline=False)
@@ -388,7 +349,6 @@ class InfoCog(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, AttributeError
         ):
-
             embed = Embed(
                 description="Failed to get emoji",
                 color=Color.red(),

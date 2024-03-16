@@ -1,7 +1,4 @@
 from functions import (
-    BetaTest,
-    Botban,
-    Command,
     check_botbanned_prefix,
     check_disabled_prefixed_command,
     is_beta_prefix,
@@ -9,10 +6,9 @@ from functions import (
 from discord import Color, Embed
 from discord.ext.commands import Cog, Bot, Context
 import discord.ext.commands as Jeanne
-from config import kitsune
-from requests import get
 from assets.images import (
     get_jeanne_pic,
+    get_kistune_pic,
     get_medusa_pic,
     get_morgan_pic,
     get_neko_pic,
@@ -31,24 +27,14 @@ class images(Cog, name="Images"):
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def kitsune(self, ctx: Context):
-
-        
-
-        kistune_api = get(kitsune).json()
-        kitsune = Embed(color=Color.random())
-        kitsune.set_footer(
-            text="Fetched from nekos.life • Credits must go to the artist"
-        )
-        kitsune.set_image(url=kistune_api["url"])
-        await ctx.send(embed=kitsune)
+        embed, file = get_kistune_pic()
+        await ctx.send(embed=embed, file=file)
 
     @Jeanne.command(description="Need a wallpaper for your PC or phone?")
     @Jeanne.check(is_beta_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def wallpaper(self, ctx: Context):
-
-        
         embed, file = get_wallpaper_pic()
         await ctx.send(embed=embed, file=file)
 
@@ -57,8 +43,6 @@ class images(Cog, name="Images"):
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def jeanne(self, ctx: Context):
-
-        
         embed, file = get_jeanne_pic()
         await ctx.send(embed=embed, file=file)
 
@@ -67,8 +51,6 @@ class images(Cog, name="Images"):
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def saber(self, ctx: Context):
-
-        
         file, embed = get_saber_pic()
         await ctx.send(file=file, embed=embed)
 
@@ -77,9 +59,6 @@ class images(Cog, name="Images"):
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def neko(self, ctx: Context):
-
-        
-
         embed, file = get_neko_pic()
         await ctx.send(file=file, embed=embed)
 
@@ -88,8 +67,6 @@ class images(Cog, name="Images"):
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def morgan(self, ctx: Context):
-
-        
         embed, file = get_morgan_pic()
         await ctx.send(file=file, embed=embed)
 
@@ -98,8 +75,6 @@ class images(Cog, name="Images"):
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def medusa(self, ctx: Context):
-
-        
         embed, file = get_medusa_pic()
         await ctx.send(embed=embed, file=file)
 
@@ -108,8 +83,6 @@ class images(Cog, name="Images"):
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def safebooru(self, ctx: Context):
-
-        
         embed = Embed(color=Color.random())
         embed.set_image(url=safebooru_pic())
         embed.set_footer(text="Fetched from Safebooru • Credits must go to the artist")

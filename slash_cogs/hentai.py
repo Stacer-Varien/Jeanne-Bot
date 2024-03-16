@@ -27,12 +27,9 @@ class nsfw(Cog):
         ctx: Interaction,
         rating: Optional[Literal["questionable", "explicit"]] = None,
     ) -> None:
-
         await ctx.response.defer()
-
         hentai, source = await Hentai().hentai(rating)
         is_mp4 = hentai.endswith("mp4")
-
         if is_mp4:
             view = ReportContent(shorten_url(hentai))
             await ctx.followup.send(hentai, view=view)
@@ -48,9 +45,7 @@ class nsfw(Cog):
             )
             view = ReportContent(shorten_url(hentai))
             await ctx.followup.send(embed=embed, view=view)
-
         await view.wait()
-
         if view.value is None:
             await ctx.edit_original_response(view=None)
 
@@ -59,7 +54,6 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
-
             slow = Embed(
                 description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
                 color=Color.red(),
@@ -82,25 +76,19 @@ class nsfw(Cog):
         tag: Optional[str] = None,
         plus: Optional[bool] = None,
     ) -> None:
-
         await ctx.response.defer()
         image = await Hentai(plus).gelbooru(rating, tag)
-
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
             view = ReportSelect(*[img["file_url"] for img in images])
-
             vids = [i for i in images if "mp4" in i["file_url"]]
             media = [j["file_url"] for j in vids]
-
             if media:
                 await ctx.followup.send("\n".join(media), view=view)
                 await view.wait()
-
                 if view.value == None:
                     await ctx.edit_original_response(view=None)
                 return
-
             color = Color.random()
             embeds = [
                 Embed(color=color, url="https://gelbooru.com")
@@ -112,11 +100,9 @@ class nsfw(Cog):
             ]
             await ctx.followup.send(embeds=embeds, view=view)
             await view.wait()
-
             if view.value == None:
                 await ctx.edit_original_response(view=None)
             return
-
         try:
             view = ReportContent(image)
             if str(image).endswith("mp4"):
@@ -125,7 +111,6 @@ class nsfw(Cog):
                 if view.value == None:
                     await ctx.edit_original_response(view=None)
                 return
-
             embed = (
                 Embed(color=Color.purple())
                 .set_image(url=image)
@@ -135,14 +120,12 @@ class nsfw(Cog):
             )
             await ctx.followup.send(embed=embed, view=view)
             await view.wait()
-
             if view.value == None:
                 await ctx.edit_original_response(view=None)
         except:
             if str(image).endswith("mp4"):
                 await ctx.followup.send(image)
                 return
-
             embed = (
                 Embed(color=Color.purple())
                 .set_image(url=image)
@@ -157,7 +140,6 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (IndexError, KeyError)
         ):
-
             no_tag = Embed(
                 description="The hentai could not be found", color=Color.red()
             )
@@ -166,7 +148,6 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
-
             slow = Embed(
                 description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
                 color=Color.red(),
@@ -189,17 +170,13 @@ class nsfw(Cog):
         tag: Optional[str] = None,
         plus: Optional[bool] = None,
     ) -> None:
-
         await ctx.response.defer()
-
         if tag == "02":
             await ctx.followup.send(
                 "Tag has been blacklisted due to it returning extreme content"
             )
             return
-
         image = await Hentai(plus).yandere(rating, tag)
-
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
             shortened_urls = [shorten_url(img["file_url"]) for img in images]
@@ -219,7 +196,6 @@ class nsfw(Cog):
                 await view.wait()
                 if view.value == None:
                     await ctx.edit_original_response(view=None)
-
             except:
                 footer_text += "\nIf you see an illegal content, please use /botreport and attach the link when reporting"
                 for embed in embeds:
@@ -236,7 +212,6 @@ class nsfw(Cog):
             embed.set_footer(text=footer_text)
             await ctx.followup.send(embed=embed, view=view)
             await view.wait()
-
             if view.value == None:
                 await ctx.edit_original_response(view=None)
         except:
@@ -249,17 +224,14 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (IndexError, KeyError, TypeError)
         ):
-
             no_tag = Embed(
                 description="The hentai could not be found", color=Color.red()
             )
             await ctx.followup.send(embed=no_tag)
             return
-
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
-
             slow = Embed(
                 description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
                 color=Color.red(),
@@ -282,11 +254,8 @@ class nsfw(Cog):
         tag: Optional[str] = None,
         plus: Optional[bool] = None,
     ) -> None:
-
         await ctx.response.defer()
-
         image = await Hentai(plus).konachan(rating, tag)
-
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
             try:
@@ -302,12 +271,10 @@ class nsfw(Cog):
                     for url in shortened_urls
                 ]
                 footer_text = "Fetched from Konachan • Credits must go to the artist"
-
                 await ctx.followup.send(embeds=embeds, view=view)
                 await view.wait()
                 if view.value == None:
                     await ctx.edit_original_response(view=None)
-
             except:
                 color = Color.random()
                 embeds = [
@@ -323,7 +290,6 @@ class nsfw(Cog):
                     embed.set_footer(text=footer_text)
                 await ctx.followup.send(embeds=embeds)
             return
-
         color = Color.random()
         embed = Embed(color=color, url="https://konachan.com")
         embed.set_image(url=shorten_url(str(image)))
@@ -333,7 +299,6 @@ class nsfw(Cog):
             embed.set_footer(text=footer_text)
             await ctx.followup.send(embed=embed, view=view)
             await view.wait()
-
             if view.value == None:
                 await ctx.edit_original_response(view=None)
         except:
@@ -346,7 +311,6 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (IndexError, KeyError, TypeError)
         ):
-
             no_tag = Embed(
                 description="The hentai could not be found", color=Color.red()
             )
@@ -355,7 +319,6 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
-
             slow = Embed(
                 description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
                 color=Color.red(),
@@ -378,23 +341,19 @@ class nsfw(Cog):
         tag: Optional[str] = None,
         plus: Optional[bool] = None,
     ) -> None:
-
         await ctx.response.defer()
         image = await Hentai(plus).danbooru(rating, tag)
-
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
             view = ReportSelect(*[img["file_url"] for img in images])
             vids = [i for i in images if "mp4" in i["file_url"]]
             media = [j["file_url"] for j in vids]
-
             if media:
                 await ctx.followup.send("\n".join(media), view=view)
                 await view.wait()
                 if view.value == None:
                     await ctx.edit_original_response(view=None)
                 return
-
             color = Color.random()
             embeds = [
                 Embed(color=color, url="https://danbooru.donmai.us/")
@@ -406,13 +365,11 @@ class nsfw(Cog):
             ]
             await ctx.followup.send(embeds=embeds, view=view)
             return
-
         try:
             view = ReportContent(image)
             if str(image).endswith("mp4"):
                 await ctx.followup.send(image, view=view)
                 return
-
             embed = (
                 Embed(color=Color.purple())
                 .set_image(url=image)
@@ -422,14 +379,12 @@ class nsfw(Cog):
             )
             await ctx.followup.send(embed=embed, view=view)
             await view.wait()
-
             if view.value == None:
                 await ctx.edit_original_response(view=None)
         except:
             if str(image).endswith("mp4"):
                 await ctx.followup.send(image)
                 return
-
             embed = (
                 Embed(color=Color.purple())
                 .set_image(url=image)
@@ -444,17 +399,14 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (IndexError, KeyError, TypeError)
         ):
-
             no_tag = Embed(
                 description="The hentai could not be found", color=Color.red()
             )
             await ctx.followup.send(embed=no_tag)
             return
-
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
-
             slow = Embed(
                 description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
                 color=Color.red(),

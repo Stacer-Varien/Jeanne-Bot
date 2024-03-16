@@ -43,25 +43,20 @@ class Rank_Group(GroupCog, name="rank"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def _global(self, ctx: Interaction):
-
         await ctx.response.defer()
         embed = Embed(color=Color.random())
         embed.set_author(name="Global XP Leaderboard")
-
         leaderboard = Levelling().get_global_rank
-
         if leaderboard == None:
             embed.description = "No global leaderboard provided"
             await ctx.followup.send(embed=embed)
             return
-
         r = 0
         for i in leaderboard:
             p = await self.bot.fetch_user(i[0])
             exp = i[3]
             r += 1
             embed.add_field(name=f"`{r}.` {p}", value=f"`{exp}XP`", inline=True)
-
         await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Check the users with the most XP in the server")
@@ -69,25 +64,20 @@ class Rank_Group(GroupCog, name="rank"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def server(self, ctx: Interaction):
-
         await ctx.response.defer()
         embed = Embed(color=Color.random())
         embed.set_author(name="Server XP Leaderboard")
-
         leaderboard = Levelling(server=ctx.guild).get_server_rank
-
         if leaderboard == None:
             embed.description = "No server leaderboard provided"
             await ctx.followup.send(embed=embed)
             return
-
         r = 0
         for i in leaderboard:
             p = await self.bot.fetch_user(i[0])
             exp = i[4]
             r += 1
             embed.add_field(name=f"`{r}.` {p}", value=f"`{exp}XP`", inline=True)
-
         await ctx.followup.send(embed=embed)
 
 
@@ -115,7 +105,6 @@ class levelling(Cog):
             image = await Profile(self.bot).generate_profile(member, bg_image, voted)
             file = File(fp=image, filename=f"{member.name}_profile_card.png")
             await ctx.followup.send(file=file)
-
         except:
             no_exp = Embed(description=f"Failed to make profile card")
             await ctx.followup.send(embed=no_exp)
@@ -124,13 +113,11 @@ class levelling(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def profile_generate(self, ctx: Interaction, member: Member):
-
         await ctx.response.defer()
         await self.generate_profile_card(ctx, member)
 
     async def profile_generate_error(self, ctx: Interaction, error: Exception) -> None:
         if isinstance(error, Jeanne.CommandOnCooldown):
-
             cooldown = Embed(
                 description=f"You have already used the profile command!\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.red(),
@@ -141,7 +128,6 @@ class levelling(Cog):
     async def on_message(self, message: Message):
         if Botban(message.author).check_botbanned_user:
             return
-
         if not message.author.bot:
             if (
                 Levelling(message.author, message.guild).check_xpblacklist_channel(
@@ -151,12 +137,9 @@ class levelling(Cog):
             ):
                 try:
                     lvl = await Levelling(message.author, message.guild).add_xp()
-
                     if lvl == None:
                         return
-
                     channel, update, levelup = lvl
-
                     role_reward = message.guild.get_role(
                         Levelling(message.author, message.guild).get_role_reward
                     )
@@ -230,7 +213,6 @@ class levelling(Cog):
                             embed = Embed.from_dict(json["embeds"][0])
                             lvlup = await message.guild.fetch_channel(channel)
                             await lvlup.send(content=msg, embed=embed)
-
                 except AttributeError:
                     return
 
@@ -247,7 +229,6 @@ class levelling(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def profile(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-
         member = ctx.user if member == None else member
         await ctx.response.defer()
         await self.generate_profile_card(ctx, member)
@@ -255,7 +236,6 @@ class levelling(Cog):
     @profile.error
     async def profile_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-
             cooldown = Embed(
                 description=f"You have already used the profile command!\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.red(),

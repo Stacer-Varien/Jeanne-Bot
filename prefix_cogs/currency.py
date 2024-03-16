@@ -11,7 +11,7 @@ from discord import (
 from datetime import datetime, timedelta
 from discord.ext.commands import Cog, Bot, Context
 import discord.ext.commands as Jeanne
-from assets.components import Heads_or_Tails
+from assets.components import Guess_Buttons, Heads_or_Tails
 from functions import (
     BetaTest,
     Currency,
@@ -31,77 +31,82 @@ class CurrencyCog(Cog, name="Currency"):
         description="Main Guess command for `guess flip` and `guess bet`",
     )
     async def guess(self, ctx: Context): ...
-
     @guess.command(name="free", description="Guess my number and you can win 20 QP")
     @Jeanne.cooldown(1, 3600, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(is_beta_prefix)
-    async def guess_free(self, ctx: Context, number: Jeanne.Range[int, 1, 10]):
-
+    async def guess_free(self, ctx: Context):
+        view = Guess_Buttons(ctx.author)
+        m = await ctx.send(
+            embed=Embed(
+                description="Guess my number by clicking on one of the buttons below",
+                color=Color.random(),
+            ),
+            view=view,
+        )
+        await view.wait()
         answer = randint(1, 10)
-
-        if number == answer:
+        if view.value == answer:
             await Currency(ctx.author).add_qp(20)
-
             correct = Embed(
                 description="YES! YOU GUESSED IT CORRECTLY!\nYou have been given 20 <:quantumpiece:1161010445205905418>!",
                 color=Color.random(),
             )
             correct.set_image(url="https://files.catbox.moe/phqnb1.gif")
-            await ctx.send(embed=correct)
+            await m.edit(embed=correct, view=None)
             return
-
         wrong = Embed(description=f"Wrong answer. It was {answer}", color=Color.red())
         wrong.set_image(url="https://files.catbox.moe/mbk0nm.jpg")
-        await ctx.send(embed=wrong)
+        await m.edit(embed=wrong, view=None)
 
-    @guess.command(name="bet", description="Guess my number and you can win with betting")
+    @guess.command(
+        name="bet", description="Guess my number and you can win with betting"
+    )
     @Jeanne.cooldown(1, 20, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(is_beta_prefix)
-    async def guess_bet(
-        self,
-        ctx: Context,
-        bet: Jeanne.Range[int, 5],
-        number: Jeanne.Range[int, 1, 10],
-    ):
-
+    async def guess_bet(self, ctx: Context, bet: Jeanne.Range[int, 5]):
         balance = Currency(ctx.author).get_balance
-
         if bet > balance:
             betlower = Embed(
                 description=f"Your balance is too low!\nPlease bet lower than {balance} <:quantumpiece:1161010445205905418>"
             )
             await ctx.send(embed=betlower)
             return
-
         if balance == 0:
             zerobal = Embed(
                 description="Unfortunately, you have 0 <:quantumpiece:1161010445205905418>."
             )
             await ctx.send(embed=zerobal)
             return
-
+        view = Guess_Buttons(ctx.author)
+        m = await ctx.send(
+            embed=Embed(
+                description="Guess my number by clicking on one of the buttons below",
+                color=Color.random(),
+            ),
+            view=view,
+        )
+        await view.wait()
         answer = randint(1, 10)
-
-        if number == answer:
+        if view.value == answer:
             await Currency(ctx.author).add_qp(bet)
             correct = Embed(
                 description=f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given {bet} <:quantumpiece:1161010445205905418>!",
                 color=Color.random(),
             )
             correct.set_image(url="https://files.catbox.moe/phqnb1.gif")
+            await m.edit(embed=correct, view=None)
             return
-
         await Currency(ctx.author).remove_qp(bet)
         wrong = Embed(
             description=f"Wrong answer. It was {answer}\nAfraid I have to take {bet} <:quantumpiece:1161010445205905418> from you...",
             color=Color.red(),
         )
         wrong.set_image(url="https://files.catbox.moe/mbk0nm.jpg")
-        await ctx.send(embed=wrong)
+        await m.edit(embed=wrong, view=None)
 
     @guess_free.error
     async def guess_free_error(self, ctx: Context, error: Jeanne.CommandError):
@@ -128,14 +133,12 @@ class CurrencyCog(Cog, name="Currency"):
         description="Main Dice command for `dice free` and `dice bet`",
     )
     async def dice(self, ctx: Context): ...
-
-    @dice.command(name="free",description="Roll a dice for free 20 QP")
+    @dice.command(name="free", description="Roll a dice for free 20 QP")
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(is_beta_prefix)
     @Jeanne.cooldown(1, 3600, type=Jeanne.BucketType.user)
     async def dice_free(self, ctx: Context, digit: Jeanne.Range[int, 1, 6]):
-
         rolled = randint(1, 6)
         if digit == rolled:
             await Currency(ctx.author).add_qp(20)
@@ -147,7 +150,6 @@ class CurrencyCog(Cog, name="Currency"):
             )
             await ctx.send(embed=embed)
             return
-
         embed = Embed(description=f"Oh no. It rolled a **{rolled}**", color=Color.red())
         await ctx.send(embed=embed)
 
@@ -162,24 +164,20 @@ class CurrencyCog(Cog, name="Currency"):
         bet: Jeanne.Range[int, 5],
         digit: Jeanne.Range[int, 1, 6],
     ):
-
         rolled = randint(1, 6)
         balance = Currency(ctx.author).get_balance
-
         if bet > balance:
             betlower = Embed(
                 description=f"Your balance is too low!\nPlease bet lower than {balance} <:quantumpiece:1161010445205905418>"
             )
             await ctx.send(embed=betlower)
             return
-
         if balance == 0:
             zerobal = Embed(
                 description="Unfortunately, you have 0 <:quantumpiece:1161010445205905418>."
             )
             await ctx.send(embed=zerobal)
             return
-
         if rolled == digit:
             await Currency(ctx.author).add_qp(bet)
             embed = Embed(color=Color.random())
@@ -190,7 +188,6 @@ class CurrencyCog(Cog, name="Currency"):
             )
             await ctx.send(embed=embed)
             return
-
         await Currency(ctx.author).remove_qp(bet)
         embed = Embed(color=Color.red())
         embed = Embed(description=f"Oh no. It rolled a **{rolled}**", color=Color.red())
@@ -221,32 +218,26 @@ class CurrencyCog(Cog, name="Currency"):
         description="Main Flip command for `flip free` and `flip bet`",
     )
     async def flip(self, ctx: Context): ...
-
-    @flip.command(name="free",description="Flip a coin and earn 20 QP for free")
+    @flip.command(name="free", description="Flip a coin and earn 20 QP for free")
     @Jeanne.cooldown(1, 3600, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(is_beta_prefix)
     async def flip_free(self, ctx: Context):
-
         picks = ["Heads", "Tails"]
         jeannes_pick = choice(picks)
         view = Heads_or_Tails(ctx.author)
         ask = Embed(description="Heads or Tails?", color=Color.random())
         m: Message = await ctx.send(embed=ask, view=view)
         await view.wait()
-
         if view.value == jeannes_pick:
             await Currency(ctx.author).add_qp(20)
-
             embed = Embed(
                 description="YAY! You got it!\n20 <:quantumpiece:1161010445205905418> has been added",
                 color=Color.random(),
             )
-
             await m.edit(embed=embed, view=None)
             return
-
         if view.value != jeannes_pick:
             embed = Embed(color=Color.red())
             embed = Embed(
@@ -255,7 +246,6 @@ class CurrencyCog(Cog, name="Currency"):
             )
             await m.edit(embed=embed, view=None)
             return
-
         timeout = Embed(
             description=f"Sorry but you took too long. It was {jeannes_pick}",
             color=Color.red(),
@@ -268,42 +258,34 @@ class CurrencyCog(Cog, name="Currency"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(is_beta_prefix)
     async def flip_bet(self, ctx: Context, bet: Jeanne.Range[int, 5]):
-
         picks = ["Heads", "Tails"]
         jeannes_pick = choice(picks)
         balance = Currency(ctx.author).get_balance
-
         if balance < bet:
             betlower = Embed(
                 description=f"Your balance is too low!\nPlease bet lower than {balance} <:quantumpiece:1161010445205905418>"
             )
             await ctx.send(embed=betlower)
             return
-
         if balance == 0:
             zerobal = Embed(
                 description="Unfortunately, you have 0 <:quantumpiece:1161010445205905418>."
             )
             await ctx.send(embed=zerobal)
             return
-
         view = Heads_or_Tails(ctx.author)
         ask = Embed(description="Heads or Tails?")
         m: Message = await ctx.send(embed=ask, view=view)
         await view.wait()
-
         if view.value == jeannes_pick:
             await Currency(ctx.author).add_qp(bet)
-
             embed = Embed(
                 description="YAY! You got it!\n{} <:quantumpiece:1161010445205905418> has been added".format(
                     bet
                 )
             )
-
             await m.edit(embed=embed, view=None)
             return
-
         if view.value != jeannes_pick:
             await Currency(ctx.author).remove_qp(int(bet))
             embed = Embed(color=Color.red())
@@ -315,7 +297,6 @@ class CurrencyCog(Cog, name="Currency"):
             )
             await m.edit(embed=embed, view=None)
             return
-
         timeout = Embed(
             description=f"Sorry but you took too long. It was {jeannes_pick}",
             color=Color.red(),
@@ -344,7 +325,6 @@ class CurrencyCog(Cog, name="Currency"):
 
     async def get_balance(self, ctx: Context, member: Member):
         bal = Currency(member).get_balance
-
         balance = Embed(
             description=f"{'You' if (member == ctx.author) else member} have {bal} <:quantumpiece:1161010445205905418>",
             color=Color.blue(),
@@ -361,21 +341,16 @@ class CurrencyCog(Cog, name="Currency"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(is_beta_prefix)
     async def daily(self, ctx: Context):
-
         bank = Currency(ctx.author)
         tomorrow = round((datetime.now() + timedelta(days=1)).timestamp())
-
         if bank.check_daily == True:
             await bank.give_daily()
-
             daily = Embed(
                 title="Daily",
                 description=f"**{ctx.author}**, you claimed your daily reward.",
                 color=Color.random(),
             )
-
             check_beta = await BetaTest(self.bot).check(ctx.author)
-
             is_weekend = datetime.today().weekday() >= 5
             rewards_text = "Rewards (weekend):" if is_weekend else "Rewards:"
             rewards_value = (
@@ -389,25 +364,21 @@ class CurrencyCog(Cog, name="Currency"):
                 if is_weekend
                 else "25 <:quantumpiece:1161010445205905418>"
             )
-
             daily.add_field(
                 name=rewards_text,
                 value=rewards_value,
             )
-
             if check_beta:
                 await bank.add_qp(50 if is_weekend else 25)
                 daily.add_field(
                     name=bonus_text,
                     value=bonus_value,
                 )
-
             daily.add_field(
                 name="Balance",
                 value=f"{bank.get_balance} <:quantumpiece:1161010445205905418>",
             )
             daily.add_field(name="Next Daily:", value=f"<t:{tomorrow}:f>")
-
             await ctx.send(embed=daily)
         else:
             cooldown = Embed(
@@ -422,14 +393,12 @@ class CurrencyCog(Cog, name="Currency"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(is_beta_prefix)
     async def balance(self, ctx: Context, member: Optional[Member] = None):
-
         member = ctx.author if (member == None) else member
         await self.get_balance(ctx, member)
 
     @balance.error
     async def balance_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-
             cooldown = Embed(
                 description=f"WOAH! Calm down! Why keep checking again quickly?\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.red(),
@@ -441,7 +410,6 @@ class CurrencyCog(Cog, name="Currency"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(is_beta_prefix)
     async def vote(self, ctx: Context):
-
         await ctx.send(
             embed=Embed(
                 color=Color.random(),

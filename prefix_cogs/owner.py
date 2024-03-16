@@ -50,7 +50,6 @@ class OwnerCog(Cog, name="Owner"):
     async def add(self, ctx: Context, user: User):
         if Botban(ctx.author).check_botbanned_user:
             return
-
         await Partner().add(user)
         await ctx.send(f"{user} has been added as a partner")
 
@@ -59,7 +58,6 @@ class OwnerCog(Cog, name="Owner"):
     async def remove(self, ctx: Context, user: User):
         if Botban(ctx.author).check_botbanned_user:
             return
-
         await Partner().remove(user)
         await ctx.send(f"{user} has been removed as a partner")
 
@@ -88,7 +86,6 @@ class OwnerCog(Cog, name="Owner"):
     async def remove(self, ctx: Context, user: User):
         if Botban(ctx.author).check_botbanned_user:
             return
-
         await BetaTest(self.bot).remove(ctx, user)
 
     @group(
@@ -100,7 +97,6 @@ class OwnerCog(Cog, name="Owner"):
     async def activity(self, ctx: Context):
         if Botban(ctx.author).check_botbanned_user:
             return
-
         embed = Embed(
             title="This is a group command. However, the available commands for this are:",
             description="`activity play ACTIVITY`\n`activity listen ACTIVITY`\n`activity clear`",
@@ -114,7 +110,6 @@ class OwnerCog(Cog, name="Owner"):
     async def play(self, ctx: Context, *, activity: str):
         if Botban(ctx.author).check_botbanned_user:
             return
-
         await self.bot.change_presence(activity=Game(name=activity))
         await ctx.send(f"Jeanne is now playing `{activity}`")
 
@@ -126,7 +121,6 @@ class OwnerCog(Cog, name="Owner"):
     async def listen(self, ctx: Context, *, activity: str):
         if Botban(ctx.author).check_botbanned_user:
             return
-
         await self.bot.change_presence(
             activity=Activity(type=ActivityType.listening, name=activity)
         )
@@ -140,17 +134,14 @@ class OwnerCog(Cog, name="Owner"):
     async def clear(self, ctx: Context):
         if Botban(ctx.author).check_botbanned_user:
             return
-
         await self.bot.change_presence(activity=None)
         await ctx.send(f"Jeanne's activity has been removed")
 
     @command(aliases=["fuser"], description="Finds a user (Developer Only)")
     @is_owner()
     async def finduser(self, ctx: Context, user_id: int):
-        
         if Botban(ctx.author).check_botbanned_user:
             return
-
         user = await self.bot.fetch_user(user_id)
         botr = ":o:" if user.bot else ":x:"
         fuser = Embed(title="User Found", color=0xCCFF33)
@@ -168,7 +159,6 @@ class OwnerCog(Cog, name="Owner"):
             return
         userbanner = Embed(title="User Banner", color=0xCCFF33)
         userbanner.set_image(url=user.banner)
-
         await ctx.send(embeds=[fuser, userbanner])
 
     @command(
@@ -176,10 +166,8 @@ class OwnerCog(Cog, name="Owner"):
     )
     @is_owner()
     async def update(self, ctx: Context):
-        
         if Botban(ctx.author).check_botbanned_user:
             return
-
         await ctx.send("YAY! NEW UPDATE!")
         self.restart_bot()
 
@@ -194,16 +182,12 @@ class OwnerCog(Cog, name="Owner"):
         if not reason:
             await ctx.send("Reason missing for botban", ephemeral=True)
             return
-
         user = await self.bot.fetch_user(user_id)
         await Botban(user).add_botbanned_user(reason)
-
         await ctx.send("User botbanned", ephemeral=True)
-
         orleans = await self.bot.fetch_guild(740584420645535775)
         ha = await self.bot.fetch_guild(925790259160166460)
         vhf = await self.bot.fetch_guild(974028573893595146)
-
         for server in [orleans, ha, vhf]:
             await server.ban(user, reason=f"Botbanned - {reason}")
 
@@ -258,12 +242,10 @@ Make sure private messages between **me and you are opened** or check the host i
                 synced = []
             else:
                 synced = await self.bot.tree.sync()
-
             await ctx.send(
                 f"Synced {len(synced)} commands {'globally' if spec is None else 'to the current guild.'}"
             )
             return
-
         ret = 0
         for guild in guilds:
             try:
@@ -272,7 +254,6 @@ Make sure private messages between **me and you are opened** or check the host i
                 pass
             else:
                 ret += 1
-
         await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
 
 

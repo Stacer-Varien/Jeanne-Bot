@@ -1,6 +1,11 @@
 import json
 import random
-from functions import Botban, Command, check_botbanned_app_command, check_disabled_app_command
+from functions import (
+    Botban,
+    Command,
+    check_botbanned_app_command,
+    check_disabled_app_command,
+)
 from discord import Color, Embed, Interaction, Member, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
 from requests import get
@@ -34,35 +39,18 @@ class SlashReactions(Cog):
         member: Optional[Member] = None,
         api_url: str = None,
     ) -> None:
-
         reaction_api = get(api_url)
         reaction_embed = Embed(color=Color.random())
-        reaction_embed.set_footer(
-            text=(
-                "Fetched from otakugifs.xyz"
-                if "otakugifs.xyz" in api_url
-                else "Fetched from PurrBot.site" if "purrbot" in api_url else "Fetched from Tenor" if "tenor" in api_url else "Fetched from Nekos.life"
-            )
-        )
-        if "otakugifs.xyz" in api_url:
-            reaction_url = reaction_api.json()["url"]
-        elif "tenor" in api_url:
-            random_gif = random.choice(json.loads(reaction_api.content)["results"])
-            reaction_url = random_gif["media_formats"]["gif"]["url"]
-        else:
-            try:
-                reaction_url = reaction_api.json()["url"]
-            except:
-                reaction_url = reaction_api.json()["link"]
-
+        reaction_embed.set_footer(text="Fetched from Tenor")
+        random_gif = random.choice(json.loads(reaction_api.content)["results"])
+        reaction_url = random_gif["media_formats"]["gif"]["url"]
         reaction_embed.set_image(url=reaction_url)
-
         other_actions = ["baka", "smug", "hug", "poke", "tickle", "dance"]
         if action == "baka":
             msg = (
                 f"*{ctx.user}*, you are a baka!"
                 if member is None
-                else f"*{member.mention}*, *{ctx.user} called you a baka!"
+                else f"*{member.mention}, {ctx.user} called you a baka!*"
             )
         elif action == "smug":
             msg = f"*{ctx.user}* is smugging"
@@ -90,7 +78,6 @@ class SlashReactions(Cog):
                 if member is None
                 else f"*{ctx.user} {action}ed {member.mention}*"
             )
-
         await ctx.response.send_message(msg, embed=reaction_embed)
 
     @Jeanne.command(description="Hug someone or yourself")

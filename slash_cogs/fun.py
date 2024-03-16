@@ -28,7 +28,6 @@ class fun(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def _8ball(self, ctx: Interaction, question: str):
-
         await ctx.response.defer()
         eight_ball_answers = [
             "It is certain.",
@@ -58,7 +57,6 @@ class fun(Cog):
             "Yeah... I don't know",
             "Yes? No? I don't know!",
         ]
-
         embed = Embed(color=Color.random())
         embed.add_field(name="Question:", value=f"{question}", inline=False)
         embed.add_field(
@@ -71,7 +69,6 @@ class fun(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def reverse(self, ctx: Interaction, text: str):
-
         await ctx.response.defer()
         filtered_words = ["riffak", "reggin", "aggin"]
         if any(word in text for word in filtered_words):
@@ -79,7 +76,6 @@ class fun(Cog):
                 "Using the reversed version of a common racial slur"
             )
             return
-
         msg = Embed(description=text[::-1], color=Color.random()).set_footer(
             text="Author: {} | {}".format(ctx.user, ctx.user.id)
         )
@@ -89,7 +85,6 @@ class fun(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def animeme(self, ctx: Interaction):
-
         await ctx.response.defer()
         embed, file = get_animeme_pic()
         await ctx.followup.send(embed=embed, file=file)
@@ -99,17 +94,13 @@ class fun(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def combine(self, ctx: Interaction, first_word: str, second_word: str):
-
         await ctx.response.defer()
         option_name1letters = first_word[: round(len(first_word) / 2)]
         option_name2letters = second_word[round(len(second_word) / 2) :]
-
         option2_name1letters = first_word[round(len(first_word) / 2) :]
         option2_name2letters = second_word[: round(len(second_word) / 2)]
-
         combine1 = "".join([option_name1letters, option_name2letters])
         combine2 = "".join([option2_name1letters, option2_name2letters])
-
         combine = Embed(
             description=f"**1st combine word**: {combine1}\n**2nd combined word**:{combine2}",
             color=Color.random(),
@@ -122,9 +113,7 @@ class fun(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def choose(self, ctx: Interaction, choices: str):
-
         await ctx.response.defer()
-
         choices = choices.split(sep=",")
         choose = Embed(
             description=f"I chose **{choice(choices)}**", color=Color.random()
@@ -136,23 +125,17 @@ class fun(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def simprate(self, ctx: Interaction, member: Optional[Member] = None):
-
         await ctx.response.defer()
         perc = randint(0, 100)
-
         member = member if member else ctx.user
-
         simp = Embed(
             description="{}'s simp rate is {}%".format(member, perc),
             color=Color.random(),
         )
-
         if perc >= 60:
             simp.set_image(url="https://i.imgur.com/W4u4Igk.jpg")
-
         else:
             simp.set_image(url="https://i.imgur.com/Rs1IP2I.jpg")
-
         await ctx.followup.send(embed=simp)
 
     @Jeanne.command(description="Check how gay you are")
@@ -160,23 +143,17 @@ class fun(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def gayrate(self, ctx: Interaction, member: Optional[Member] = None):
-
         await ctx.response.defer()
         perc = randint(0, 100)
-
         member = member if member else ctx.user
-
         gay = Embed(
             description="{}'s gay rate is {}%".format(member, perc),
             color=Color.random(),
         )
-
         if perc >= 60:
             gay.set_image(url="https://i.imgur.com/itOD0Da.png?1")
-
         else:
             gay.set_image(url="https://i.imgur.com/tYAbWCl.jpg")
-
         await ctx.followup.send(embed=gay)
 
 

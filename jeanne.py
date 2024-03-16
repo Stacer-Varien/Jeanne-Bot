@@ -26,7 +26,6 @@ intents = Intents.all()
 intents.presences = False
 intents.voice_states = False
 intents.auto_moderation = False
-
 bot = Jeanne(
     command_prefix=when_mentioned_or("J!", "j!", "Jeanne", "jeanne"), intents=intents
 )

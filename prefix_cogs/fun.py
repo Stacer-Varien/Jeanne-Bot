@@ -28,7 +28,6 @@ class fun(Cog, name="Fun"):
     @Jeanne.check(check_botbanned_prefix)
     async def _8ball(self, ctx: Context, *, question: str):
 
-        
         eight_ball_answers = [
             "It is certain.",
             "It is decidedly so.",
@@ -57,7 +56,6 @@ class fun(Cog, name="Fun"):
             "Yeah... I don't know",
             "Yes? No? I don't know!",
         ]
-
         embed = Embed(color=Color.random())
         embed.add_field(name="Question:", value=f"{question}", inline=False)
         embed.add_field(
@@ -74,14 +72,12 @@ class fun(Cog, name="Fun"):
     @Jeanne.check(check_botbanned_prefix)
     async def reverse(self, ctx: Context, *, text: str):
 
-        
         filtered_words = ["riffak", "reggin", "aggin"]
         if any(word in text for word in filtered_words):
             await Botban(ctx.author).add_botbanned_user(
                 "Using the reversed version of a common racial slur"
             )
             return
-
         msg = Embed(description=text[::-1], color=Color.random()).set_footer(
             text="Author: {} | {}".format(ctx.author, ctx.author.id)
         )
@@ -93,7 +89,6 @@ class fun(Cog, name="Fun"):
     @Jeanne.check(check_botbanned_prefix)
     async def animeme(self, ctx: Context):
 
-        
         embed, file = get_animeme_pic()
         await ctx.send(embed=embed, file=file)
 
@@ -113,12 +108,10 @@ class fun(Cog, name="Fun"):
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def combine(self, ctx: Context, *words: str, parser=parser):
-
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             first = parsed_args.first + unknown
             first = " ".join(first)
-
             second = parsed_args.second + unknown
             second = " ".join(second)
         except SystemExit:
@@ -129,16 +122,12 @@ class fun(Cog, name="Fun"):
                 )
             )
             return
-
         option_name1letters = first[: round(len(first) / 2)]
         option_name2letters = second[round(len(second) / 2) :]
-
         option2_name1letters = first[round(len(" ".join(first)) / 2) :]
         option2_name2letters = second[: round(len(second) / 2)]
-
         combine1 = "".join([option_name1letters, option_name2letters])
         combine2 = "".join([option2_name1letters, option2_name2letters])
-
         combine = Embed(
             description=f"**1st combine word**: {combine1}\n**2nd combined word**:{combine2}",
             color=Color.random(),
@@ -155,7 +144,6 @@ class fun(Cog, name="Fun"):
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def choose(self, ctx: Context, *, choices: str):
-
         options = choices.split(sep=",")
         choose = Embed(
             description=f"I chose **{choice(options)}**", color=Color.random()
@@ -169,22 +157,17 @@ class fun(Cog, name="Fun"):
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def simprate(self, ctx: Context, member: Optional[Member] = None):
-        
+
         perc = randint(0, 100)
-
         member = member if member else ctx.author
-
         simp = Embed(
             description="{}'s simp rate is {}%".format(member, perc),
             color=Color.random(),
         )
-
         if perc >= 75:
             simp.set_image(url="https://i.imgur.com/W4u4Igk.jpg")
-
         elif perc >= 50:
             simp.set_image(url="https://i.imgur.com/Rs1IP2I.jpg")
-
         await ctx.send(embed=simp)
 
     @Jeanne.command(description="Check how gay you are")
@@ -193,22 +176,16 @@ class fun(Cog, name="Fun"):
     @Jeanne.check(check_botbanned_prefix)
     async def gayrate(self, ctx: Context, member: Optional[Member] = None):
 
-        
         perc = randint(0, 100)
-
         member = member if member else ctx.author
-
         gay = Embed(
             description="{}'s gay rate is {}%".format(member, perc),
             color=Color.random(),
         )
-
         if perc >= 75:
             gay.set_image(url="https://i.imgur.com/itOD0Da.png?1")
-
         elif perc >= 50:
             gay.set_image(url="https://i.imgur.com/tYAbWCl.jpg")
-
         await ctx.send(embed=gay)
 
 

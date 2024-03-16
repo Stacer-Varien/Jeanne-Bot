@@ -11,11 +11,9 @@ from discord import (
 )
 from datetime import datetime, timedelta
 from discord.ext.commands import Cog, Bot, GroupCog
-from assets.components import Heads_or_Tails
+from assets.components import Guess_Buttons, Heads_or_Tails
 from functions import (
     BetaTest,
-    Botban,
-    Command,
     Currency,
     check_botbanned_app_command,
     check_disabled_app_command,
@@ -29,34 +27,35 @@ class Guess_Group(GroupCog, name="guess"):
 
     @Jeanne.command(description="Guess my number and you can win 20 QP")
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
-    @Jeanne.describe(number="Guess her number (between 1 and 10)")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
-    async def free(self, ctx: Interaction, number: Jeanne.Range[int, 1, 10]):
-
+    async def free(self, ctx: Interaction):
+        view = Guess_Buttons(ctx.user)
         await ctx.response.defer()
-
+        await ctx.followup.send(
+            embed=Embed(
+                description="Guess my number by clicking on one of the buttons below",
+                color=Color.random(),
+            ),
+            view=view,
+        )
         answer = randint(1, 10)
-
-        if number == answer:
+        await view.wait()
+        if view.value == answer:
             await Currency(ctx.user).add_qp(20)
-
             correct = Embed(
                 description="YES! YOU GUESSED IT CORRECTLY!\nYou have been given 20 <:quantumpiece:1161010445205905418>!",
                 color=Color.random(),
             )
             correct.set_image(url="https://files.catbox.moe/phqnb1.gif")
-            await ctx.followup.send(embed=correct)
+            await ctx.edit_original_response(embed=correct, view=None)
             return
-
         wrong = Embed(description=f"Wrong answer. It was {answer}", color=Color.red())
         wrong.set_image(url="https://files.catbox.moe/mbk0nm.jpg")
-        await ctx.followup.send(embed=wrong)
+        await ctx.edit_original_response(embed=wrong, view=None)
 
     @Jeanne.command(description="Guess my number and you can win with betting")
-    @Jeanne.describe(
-        bet="How much are you betting?", number="Guess her number (between 1 and 10)"
-    )
+    @Jeanne.describe(bet="How much are you betting?")
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
@@ -64,38 +63,40 @@ class Guess_Group(GroupCog, name="guess"):
         self,
         ctx: Interaction,
         bet: Jeanne.Range[int, 5],
-        number: Jeanne.Range[int, 1, 10],
     ):
-
-
         await ctx.response.defer()
         balance = Currency(ctx.user).get_balance
-
         if bet > balance:
             betlower = Embed(
                 description=f"Your balance is too low!\nPlease bet lower than {balance} <:quantumpiece:1161010445205905418>"
             )
             await ctx.followup.send(embed=betlower)
             return
-
         if balance == 0:
             zerobal = Embed(
                 description="Unfortunately, you have 0 <:quantumpiece:1161010445205905418>.\nPlease do a daily and/or wait for a free chance to do `/guess free`, `/flip free` and/or `/dice free`"
             )
             await ctx.followup.send(embed=zerobal)
             return
-
+        view = Guess_Buttons(ctx.user)
+        await ctx.followup.send(
+            embed=Embed(
+                description="Guess my number by clicking on one of the buttons below",
+                color=Color.random(),
+            ),
+            view=view,
+        )
+        await view.wait()
         answer = randint(1, 10)
-
-        if number == answer:
+        if view.value == answer:
             await Currency(ctx.user).add_qp(bet)
             correct = Embed(
                 description=f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given {bet} <:quantumpiece:1161010445205905418>!",
                 color=Color.random(),
             )
             correct.set_image(url="https://files.catbox.moe/phqnb1.gif")
+            await ctx.followup.send(embed=wrong, view=view)
             return
-
         await Currency(ctx.user).remove_qp(bet)
         wrong = Embed(
             description=f"Wrong answer. It was {answer}\nAfraid I have to take {bet} <:quantumpiece:1161010445205905418> from you...",
@@ -107,7 +108,6 @@ class Guess_Group(GroupCog, name="guess"):
     @free.error
     async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-
             reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
             reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
@@ -119,7 +119,6 @@ class Guess_Group(GroupCog, name="guess"):
     @bet.error
     async def bet_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-
             cooldown = Embed(
                 description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.red(),
@@ -150,7 +149,6 @@ class Dice_Group(GroupCog, name="dice"):
             )
             await ctx.followup.send(embed=embed)
             return
-
         embed = Embed(description=f"Oh no. It rolled a **{rolled}**", color=Color.red())
         await ctx.followup.send(embed=embed)
 
@@ -165,26 +163,21 @@ class Dice_Group(GroupCog, name="dice"):
         bet: Jeanne.Range[int, 5],
         digit: Jeanne.Range[int, 1, 6],
     ):
-
         await ctx.response.defer()
-
         rolled = randint(1, 6)
         balance = Currency(ctx.user).get_balance
-
         if bet > balance:
             betlower = Embed(
                 description=f"Your balance is too low!\nPlease bet lower than {balance} <:quantumpiece:1161010445205905418>"
             )
             await ctx.followup.send(embed=betlower)
             return
-
         if balance == 0:
             zerobal = Embed(
                 description="Unfortunately, you have 0 <:quantumpiece:1161010445205905418>.\nPlease do a daily and/or wait for a free chance to do `/guess free` and/or `/dice free`"
             )
             await ctx.followup.send(embed=zerobal)
             return
-
         if rolled == digit:
             await Currency(ctx.user).add_qp(bet)
             embed = Embed(color=Color.random())
@@ -195,7 +188,6 @@ class Dice_Group(GroupCog, name="dice"):
             )
             await ctx.followup.send(embed=embed)
             return
-
         await Currency(ctx.user).remove_qp(bet)
         embed = Embed(color=Color.red())
         embed = Embed(description=f"Oh no. It rolled a **{rolled}**", color=Color.red())
@@ -204,7 +196,6 @@ class Dice_Group(GroupCog, name="dice"):
     @free.error
     async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-
             reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
             reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
@@ -216,7 +207,6 @@ class Dice_Group(GroupCog, name="dice"):
     @bet.error
     async def bet_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-
             cooldown = Embed(
                 description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.red(),
@@ -234,7 +224,6 @@ class Flip_Group(GroupCog, name="flip"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def free(self, ctx: Interaction):
-
         await ctx.response.defer()
         picks = ["Heads", "Tails"]
         jeannes_pick = choice(picks)
@@ -242,18 +231,14 @@ class Flip_Group(GroupCog, name="flip"):
         ask = Embed(description="Heads or Tails?", color=Color.random())
         await ctx.followup.send(embed=ask, view=view)
         await view.wait()
-
         if view.value == jeannes_pick:
             await Currency(ctx.user).add_qp(20)
-
             embed = Embed(
                 description="YAY! You got it!\n20 <:quantumpiece:1161010445205905418> has been added",
                 color=Color.random(),
             )
-
             await ctx.edit_original_response(embed=embed, view=None)
             return
-
         if view.value != jeannes_pick:
             embed = Embed(color=Color.red())
             embed = Embed(
@@ -262,7 +247,6 @@ class Flip_Group(GroupCog, name="flip"):
             )
             await ctx.edit_original_response(embed=embed, view=None)
             return
-
         timeout = Embed(
             description=f"Sorry but you took too long. It was {jeannes_pick}",
             color=Color.red(),
@@ -275,44 +259,35 @@ class Flip_Group(GroupCog, name="flip"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def bet(self, ctx: Interaction, bet: Jeanne.Range[int, 5]):
-
         await ctx.response.defer()
-
         picks = ["Heads", "Tails"]
         jeannes_pick = choice(picks)
         balance = Currency(ctx.user).get_balance
-
         if balance < bet:
             betlower = Embed(
                 description=f"Your balance is too low!\nPlease bet lower than {balance} <:quantumpiece:1161010445205905418>"
             )
             await ctx.followup.send(embed=betlower)
             return
-
         if balance == 0:
             zerobal = Embed(
                 description="Unfortunately, you have 0 <:quantumpiece:1161010445205905418>.\nPlease do a daily and/or wait for a free chance to do `/guess free`, `/flip free` and/or `/dice free`"
             )
             await ctx.followup.send(embed=zerobal)
             return
-
         view = Heads_or_Tails(ctx.user)
         ask = Embed(description="Heads or Tails?")
         await ctx.followup.send(embed=ask, view=view)
         await view.wait()
-
         if view.value == jeannes_pick:
             await Currency(ctx.user).add_qp(bet)
-
             embed = Embed(
                 description="YAY! You got it!\n{} <:quantumpiece:1161010445205905418> has been added".format(
                     bet
                 )
             )
-
             await ctx.edit_original_response(embed=embed, view=None)
             return
-
         if view.value != jeannes_pick:
             await Currency(ctx.user).remove_qp(int(bet))
             embed = Embed(color=Color.red())
@@ -324,7 +299,6 @@ class Flip_Group(GroupCog, name="flip"):
             )
             await ctx.edit_original_response(embed=embed, view=None)
             return
-
         timeout = Embed(
             description=f"Sorry but you took too long. It was {jeannes_pick}",
             color=Color.red(),
@@ -334,7 +308,6 @@ class Flip_Group(GroupCog, name="flip"):
     @free.error
     async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-
             reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
             reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
@@ -346,7 +319,6 @@ class Flip_Group(GroupCog, name="flip"):
     @bet.error
     async def bet_error(self, ctx: Interaction, error: Jeanne.errors.AppCommandError):
         if isinstance(error, Jeanne.errors.CommandOnCooldown):
-
             cooldown = Embed(
                 description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.red(),
@@ -378,7 +350,6 @@ class currency(Cog):
 
     async def balance_callback_error(self, ctx: Interaction, error: Exception):
         if isinstance(error, Jeanne.CommandOnCooldown):
-
             cooldown = Embed(
                 description=f"WOAH! Calm down! Why keep checking again quickly?\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.red(),
@@ -388,7 +359,6 @@ class currency(Cog):
     async def get_balance(self, ctx: Interaction, member: Member):
         await ctx.response.defer()
         bal = Currency(member).get_balance
-
         balance = Embed(
             description=f"{'You' if (member == ctx.user) else member} have {bal} <:quantumpiece:1161010445205905418>",
             color=Color.blue(),
@@ -404,22 +374,17 @@ class currency(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def daily(self, ctx: Interaction):
-
         await ctx.response.defer()
         bank = Currency(ctx.user)
         tomorrow = round((datetime.now() + timedelta(days=1)).timestamp())
-
-        if bank.check_daily==True:
+        if bank.check_daily == True:
             await bank.give_daily()
-
             daily = Embed(
                 title="Daily",
                 description=f"**{ctx.user}**, you claimed your daily reward.",
                 color=Color.random(),
             )
-
             check_beta = await BetaTest(self.bot).check(ctx.user)
-
             is_weekend = datetime.today().weekday() >= 5
             rewards_text = "Rewards (weekend):" if is_weekend else "Rewards:"
             rewards_value = (
@@ -433,25 +398,21 @@ class currency(Cog):
                 if is_weekend
                 else "25 <:quantumpiece:1161010445205905418>"
             )
-
             daily.add_field(
                 name=rewards_text,
                 value=rewards_value,
             )
-
             if check_beta:
                 await bank.add_qp(50 if is_weekend else 25)
                 daily.add_field(
                     name=bonus_text,
                     value=bonus_value,
                 )
-
             daily.add_field(
                 name="Balance",
                 value=f"{bank.get_balance} <:quantumpiece:1161010445205905418>",
             )
             daily.add_field(name="Next Daily:", value=f"<t:{tomorrow}:f>")
-
             await ctx.followup.send(embed=daily)
         else:
             cooldown = Embed(
@@ -465,7 +426,6 @@ class currency(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def balance(self, ctx: Interaction, member: Optional[Member] = None):
-
         member = ctx.user if (member == None) else member
         await self.get_balance(ctx, member)
 
@@ -474,7 +434,6 @@ class currency(Cog):
         self, ctx: Interaction, error: Jeanne.errors.AppCommandError
     ):
         if isinstance(error, Jeanne.errors.CommandOnCooldown):
-
             cooldown = Embed(
                 description=f"WOAH! Calm down! Why keep checking again quickly?\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.red(),
@@ -483,7 +442,6 @@ class currency(Cog):
 
     @Jeanne.command(description="Vote for me in TopGG to get more QP!")
     async def vote(self, ctx: Interaction):
-
         await ctx.response.send_message(
             embed=Embed(
                 color=Color.random(),

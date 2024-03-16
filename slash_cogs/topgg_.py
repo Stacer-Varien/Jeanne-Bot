@@ -34,17 +34,12 @@ class TopGG(Cog):
         if data["type"] == "upvote":
             voter_id = int(data["user"])
             voter = await self.bot.fetch_user(voter_id)
-
             if Botban(voter).check_botbanned_user:
                 return
-
             credits = 100 if await self.topggpy.get_weekend_status() else 50
-
             if await BetaTest(self.bot).check(voter):
                 credits = round(credits * 1.25)
-
             await Currency(voter).add_qp(credits)
-
             with open("voterdata.txt", "a") as f:
                 f.writelines(f"{data}\n")
 

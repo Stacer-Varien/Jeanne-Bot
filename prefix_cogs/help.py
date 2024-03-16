@@ -22,11 +22,9 @@ def replace_all(text: str, dic: dict):
 class help_button(ui.View):
     def __init__(self):
         super().__init__()
-
         wiki_url = "https://jeannebot.gitbook.io/jeannebot/help"
         orleans_url = "https://discord.gg/jh7jkuk2pp"
         tos_and_policy_url = "https://jeannebot.gitbook.io/jeannebot/tos-and-privacy"
-
         self.add_item(
             ui.Button(style=ButtonStyle.link, label="Jeanne Webiste", url=wiki_url)
         )
@@ -55,7 +53,6 @@ class HelpGroupPrefix(Cog, name="Help"):
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def help(self, ctx: Context):
-
         await ctx.typing()
         embed = Embed(
             color=Color.random(),
@@ -64,7 +61,11 @@ class HelpGroupPrefix(Cog, name="Help"):
         excluded_cogs = ["Jishaku", "Owner"]
         for cog_name, cog in self.bot.cogs.items():
             if cog_name not in excluded_cogs:
-                cmds = [command.qualified_name for command in cog.walk_commands() if not command.description.startswith("Main")]
+                cmds = [
+                    command.qualified_name
+                    for command in cog.walk_commands()
+                    if not command.description.startswith("Main")
+                ]
                 if cmds:
                     embed.add_field(name=cog_name, value="\n".join(cmds), inline=True)
         embed.set_footer(
@@ -78,19 +79,15 @@ class HelpGroupPrefix(Cog, name="Help"):
     @Jeanne.check(check_botbanned_prefix)
     async def command(self, ctx: Context, *, command: Range[str, 3]):
 
-        
         cmd = next(
             (cmd for cmd in self.bot.walk_commands() if cmd.qualified_name == command),
             None,
         )
-
         if cmd:
             bot_perms: dict = getattr(cmd, "bot_perms", None)
             member_perms: dict = getattr(cmd, "member_perms", None)
-
             embed = Embed(title=f"{command.title()} Help", color=Color.random())
             embed.description = cmd.description
-
             if len(cmd.aliases) >= 1:
                 embed.add_field(
                     name="Aliases", value=", ".join(cmd.aliases), inline=True
@@ -119,29 +116,27 @@ class HelpGroupPrefix(Cog, name="Help"):
             except:
                 parms = cmd.signature
                 value = f"`{parms}`"
-
             if parms:
                 embed.add_field(name="Parameters", value=value, inline=False)
-
             if bot_perms:
                 perms = [str(i).replace("_", " ").title() for i in bot_perms.keys()]
                 embed.add_field(
                     name="Bot Permissions", value="\n".join(perms), inline=True
                 )
-
             if member_perms:
                 perms = [str(i).replace("_", " ").title() for i in member_perms.keys()]
                 embed.add_field(
                     name="User Permissions", value="\n".join(perms), inline=True
                 )
             if not cmd.description.startswith("Main"):
-                
-                cmd_usage = "j!" + cmd.qualified_name + " " + parms 
-                embed.add_field(name="Command Usage", value=f"`{cmd_usage}`", inline=False)
+
+                cmd_usage = "j!" + cmd.qualified_name + " " + parms
+                embed.add_field(
+                    name="Command Usage", value=f"`{cmd_usage}`", inline=False
+                )
             embed.set_footer(
                 text="Legend:\n<> - Required\n[] - Optional\n\nIt is best to go to the website for detailed explanations and usages"
             )
-
             await ctx.send(embed=embed)
             return
         embed = Embed(description="I don't have this command", color=Color.red())
@@ -152,8 +147,6 @@ class HelpGroupPrefix(Cog, name="Help"):
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def module(self, ctx: Context, module: str):
-
-        
 
         module_mapping = {
             "currency": Modules.currency,
@@ -173,19 +166,13 @@ class HelpGroupPrefix(Cog, name="Help"):
             "reactions": Modules.reactions,
             "react": Modules.reactions,
         }
-
         module_instance = module_mapping.get(module.lower())
-
         module_data = dumps(modules[module_instance.value])
-
         if module_data:
             parms = OrderedDict([("%module%", str(module.capitalize()))])
-
             json_data: dict = loads(replace_all(module_data, parms))
-
             embed_data = json_data.get("embeds")
             embed = Embed.from_dict(embed_data[0])
-
         await ctx.send(embed=embed)
 
     @help.command(
@@ -195,7 +182,6 @@ class HelpGroupPrefix(Cog, name="Help"):
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def support(self, ctx: Context):
-
         view = help_button()
         help = Embed(
             description="Click on one of the buttons to open the documentation or get help in the support server",

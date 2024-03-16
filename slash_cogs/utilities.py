@@ -29,11 +29,8 @@ from humanfriendly import parse_timespan, InvalidTimespan
 from tabulate import tabulate
 
 bot_invite_url = "https://discord.com/oauth2/authorize?client_id=831993597166747679&scope=bot%20applications.commands&permissions=467480734774"
-
 topgg_invite = "https://top.gg/bot/831993597166747679"
-
 discordbots_url = "https://discord.bots.gg/bots/831993597166747679"
-
 orleans = "https://discord.gg/jh7jkuk2pp"
 
 
@@ -50,7 +47,6 @@ class Languages(Enum):
 class invite_button(View):
     def __init__(self):
         super().__init__()
-
         self.add_item(
             ui.Button(style=ButtonStyle.url, label="Bot Invite", url=bot_invite_url)
         )
@@ -86,9 +82,7 @@ class Embed_Group(GroupCog, name="embed"):
         jsonscript: Optional[str] = None,
         jsonfile: Optional[Attachment] = None,
     ):
-
         await ctx.response.defer()
-
         if not (jsonscript or jsonfile):
             embed = Embed(
                 description="You are missing the JSON script or JSON file\nPlease use [Discohook](https://discohook.org/)"
@@ -101,16 +95,13 @@ class Embed_Group(GroupCog, name="embed"):
             )
             await ctx.followup.send(embed=embed)
             return
-
         json: dict = (
             loads(jsonscript) if jsonscript else loads(get(jsonfile.url).content)
         )
-
         try:
             content = json.get("content", None)
         except:
             pass
-
         try:
             embeds = [Embed.from_dict(i) for i in json.get("embeds", [])]
             if len(embeds) > 10:
@@ -146,16 +137,13 @@ class Embed_Group(GroupCog, name="embed"):
         jsonscript: Optional[str] = None,
         jsonfile: Optional[Attachment] = None,
     ):
-
         await ctx.response.defer()
-
         try:
             message: Message = await channel.fetch_message(int(messageid))
         except Exception as e:
             embed = Embed(description=e)
             await ctx.followup.send(embed=embed)
             return
-
         if not (jsonscript or jsonfile):
             embed = Embed(
                 description="You are missing the JSON script or JSON file\nPlease use [Discohook](https://discohook.org/)"
@@ -168,16 +156,13 @@ class Embed_Group(GroupCog, name="embed"):
             )
             await ctx.followup.send(embed=embed)
             return
-
         json: dict = (
             loads(jsonscript) if jsonscript else loads(get(jsonfile.url).content)
         )
-
         try:
             content = json.get("content", None)
         except:
             pass
-
         try:
             embeds = [Embed.from_dict(i) for i in json.get("embeds", [])]
             if len(embeds) > 10:
@@ -198,7 +183,6 @@ class Embed_Group(GroupCog, name="embed"):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (Forbidden, NotFound)
         ):
-
             embed = Embed(
                 description=error,
                 color=Color.red(),
@@ -243,11 +227,9 @@ class ReminderCog(GroupCog, name="reminder"):
     )
     @Jeanne.check(check_botbanned_app_command)
     async def add(self, ctx: Interaction, reason: str, time: str):
-
         await ctx.response.defer(ephemeral=True)
         embed = Embed()
         user_reminders = Reminder(ctx.user).get_all_user_reminders
-
         try:
             if len(user_reminders) >= 10:
                 embed.description = (
@@ -262,7 +244,6 @@ class ReminderCog(GroupCog, name="reminder"):
                 embed.description = "Please add a time more than 1 minute."
                 await ctx.followup.send(embed=embed, ephemeral=True)
                 return
-
             date = datetime.now() + timedelta(seconds=parse_timespan(time))
             embed.title = "Reminder added"
             embed.description = f"On <t:{round(date.timestamp())}:F>, I will alert you about your reminder."
@@ -294,7 +275,6 @@ class ReminderCog(GroupCog, name="reminder"):
     @Jeanne.command(name="list", description="List all the reminders you have")
     @Jeanne.check(check_botbanned_app_command)
     async def _list(self, ctx: Interaction):
-
         await ctx.response.defer(ephemeral=True)
         reminders = Reminder(ctx.user).get_all_user_reminders
         try:
@@ -315,7 +295,6 @@ class ReminderCog(GroupCog, name="reminder"):
     @Jeanne.command(name="cancel", description="Cancel a reminder")
     @Jeanne.check(check_botbanned_app_command)
     async def cancel(self, ctx: Interaction, reminder_id: int):
-
         await ctx.response.defer(ephemeral=True)
         reminder = Reminder(ctx.user)
         embed = Embed()
@@ -324,7 +303,6 @@ class ReminderCog(GroupCog, name="reminder"):
             embed.description = "You don't have a reminder with that ID"
             await ctx.followup.send(embed=embed, ephemeral=True)
             return
-
         embed.color = Color.random()
         embed.description = "Reminder `{}` has been removed".format(reminder_id)
         reminder.remove(reminder_id)
@@ -347,7 +325,6 @@ class slashutilities(Cog):
         city: Jeanne.Range[str, 1],
         units: Optional[Literal["Metric", "Imperial"]] = None,
     ):
-
         await ctx.response.defer()
         emoji_map = {
             "globe": "🌍",
@@ -362,16 +339,11 @@ class slashutilities(Cog):
             "guste": "💨",
             "rain_chance": "💦",
         }
-
         url = f"http://api.weatherapi.com/v1/forecast.json?key={WEATHER}&q={city.lower()}&days=1&aqi=no&alerts=no"
-
         weather_data = get(url).json()
-
         location = weather_data["location"]
-
         current = weather_data["current"]
         forecast = weather_data["forecast"]["forecastday"][0]["day"]
-
         if units == "Imperial":
             min_temp = f"{forecast['mintemp_f']}°F"
             max_temp = f"{forecast['maxtemp_f']}°F"
@@ -384,7 +356,6 @@ class slashutilities(Cog):
             feels_like = f"{current['feelslike_c']}°C"
             gust = f"{current['gust_kph']}km/h"
             visibility = f"{current['vis_km']}km"
-
         embed = Embed(
             title=f"{emoji_map['globe']} Weather details of {location['name']}, {location['region']}/{location['country']}",
             color=Color.random(),
@@ -443,7 +414,6 @@ class slashutilities(Cog):
     @weather.error
     async def weather_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-
             reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
             reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
@@ -452,11 +422,9 @@ class slashutilities(Cog):
             )
             await ctx.response.send_message(embed=cooldown)
             return
-
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (KeyError, TypeError)
         ):
-
             no_city = Embed(
                 description="Failed to get weather information on this city\nPlease note that ZIP/postal codes are only supported for Canada, the US, and the UK for this command.",
                 color=Color.red(),
@@ -469,7 +437,6 @@ class slashutilities(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def say(self, ctx: Interaction, channel: TextChannel, message: str):
-
         await ctx.response.defer(ephemeral=True)
         await ctx.followup.send(content="Message sent to {}".format(channel.mention))
         await channel.send(message)
@@ -479,14 +446,15 @@ class slashutilities(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def calculator(self, ctx: Interaction, calculate: str):
-
         await ctx.response.defer()
-
-        check = ''.join([str(float(part)) if part.isdigit() else part for part in re.split(r'(\d+\.\d+|\d+)', calculate)])
+        check = "".join(
+            [
+                str(float(part)) if part.isdigit() else part
+                for part in re.split(r"(\d+\.\d+|\d+)", calculate)
+            ]
+        )
         self.parser.parse(check).evaluate({})
-
         answer = self.parser.parse(calculate).evaluate({})
-
         calculation = Embed(title="Result", color=Color.random())
         calculation.add_field(name=f"`{calculate}`", value=answer)
         await ctx.followup.send(embed=calculation)
@@ -509,19 +477,16 @@ class slashutilities(Cog):
     @Jeanne.command(description="Invite me to your server or join the support server")
     async def invite(self, ctx: Interaction):
         await ctx.response.defer()
-
         invite = Embed(
             title="Invite me!",
             description="Click on one of these buttons to invite me to you server or join my creator's server",
             color=Color.random(),
         )
-
         await ctx.followup.send(embed=invite, view=invite_button())
 
     @Jeanne.command(description="Submit a bot report if you found something wrong")
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     async def botreport(self, ctx: Interaction):
-
         await ctx.response.send_modal(ReportModal())
 
     @Jeanne.command(description="Check the meaning of a word")
@@ -533,7 +498,6 @@ class slashutilities(Cog):
         word: Jeanne.Range[str, 1],
         language: Optional[Languages] = None,
     ):
-
         lang = language.value if language else None
         await dictionary(ctx, word.lower(), lang)
 

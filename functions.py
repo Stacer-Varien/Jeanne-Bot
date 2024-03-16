@@ -43,14 +43,12 @@ class Botban:
                 reason,
             ),
         )
-
         db.execute("DELETE FROM serverxpData WHERE user_id = ?", (self.user.id,))
         db.execute("DELETE FROM globalxpData WHERE user_id = ?", (self.user.id,))
         db.execute(
             "DELETE FROM userWallpaperInventory WHERE user_id = ?", (self.user.id,)
         )
         db.execute("DELETE FROM bankData WHERE user_id = ?", (self.user.id,))
-
         db.commit()
         botbanned = Embed(
             title="User has been botbanned!",
@@ -80,7 +78,6 @@ class Currency:
         data = db.execute(
             "SELECT amount FROM bankData WHERE user_id = ?", (self.user.id,)
         ).fetchone()
-
         return int(data[0]) if data else 0
 
     async def add_qp(self, amount: int):
@@ -93,7 +90,6 @@ class Currency:
             ),
         )
         db.commit()
-
         if cur.rowcount == 0:
             db.execute(
                 "UPDATE bankData SET amount = amount + ? WHERE user_id = ?",
@@ -102,7 +98,6 @@ class Currency:
                     self.user.id,
                 ),
             )
-
             db.commit()
 
     async def remove_qp(self, amount: int):
@@ -113,14 +108,11 @@ class Currency:
                 self.user.id,
             ),
         )
-
         db.commit()
 
     async def give_daily(self):
         next_claim = round((datetime.now() + timedelta(days=1)).timestamp())
-
         qp = 200 if (datetime.today().weekday() >= 5) else 100
-
         cur = db.execute(
             "INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)",
             (
@@ -162,7 +154,6 @@ class Inventory:
         userhash = CATBOX_HASH
         data = {"reqtype": "urlupload", "userhash": userhash, "url": image_url}
         response = post(url, data=data)
-
         if response.status_code == 200:
             return response.text
         else:
@@ -171,7 +162,6 @@ class Inventory:
     @staticmethod
     def fetch_wallpapers() -> list:
         data = db.execute("SELECT * FROM wallpapers").fetchall()
-
         db.commit()
         return data
 
@@ -181,7 +171,6 @@ class Inventory:
             "SELECT * FROM wallpapers WHERE name = ?", (name,)
         ).fetchone()
         db.commit()
-
         return str(wallpaper[0]), str(wallpaper[1]), str(wallpaper[2])
 
     async def deselect_wallpaper(self) -> Literal[True] | None:
@@ -208,9 +197,7 @@ class Inventory:
 
     async def add_user_wallpaper(self, name: str):
         await self.deselect_wallpaper()
-
         wallpaper = self.get_wallpaper(name)
-
         db.execute(
             "INSERT OR IGNORE INTO userWallpaperInventory (user_id, wallpaper, link, brightness, selected) VALUES (?,?,?,?,?)",
             (
@@ -222,13 +209,11 @@ class Inventory:
             ),
         )
         db.commit()
-
         await Currency(self.user).remove_qp(1000)
 
     async def add_user_custom_wallpaper(self, name: str, url: str):
         await self.deselect_wallpaper()
         link = self.upload_to_catbox(url)
-
         db.execute(
             "INSERT OR IGNORE INTO userWallpaperInventory (user_id, wallpaper, link, brightness, selected) VALUES (?,?,?,?,?)",
             (
@@ -240,7 +225,6 @@ class Inventory:
             ),
         )
         db.commit()
-
         await Currency(self.user).remove_qp(1000)
 
     @property
@@ -272,7 +256,6 @@ class Inventory:
         wallpapers = db.execute(
             "SELECT * FROM userWallpaperInventory WHERE user_id = ?", (self.user.id,)
         ).fetchall()
-
         return wallpapers if wallpapers else None
 
     @property
@@ -322,7 +305,6 @@ class Inventory:
             "SELECT bio FROM userBio WHERE user_id = ?", (self.user.id,)
         ).fetchone()
         db.commit()
-
         return str(data[0]) if data else None
 
     async def set_color(self, color: str):
@@ -350,7 +332,6 @@ class Inventory:
             "SELECT color FROM userBio WHERE user_id = ?", (self.user.id,)
         ).fetchone()
         db.commit()
-
         return str(data[0]) if data else None
 
 
@@ -412,7 +393,6 @@ class Levelling:
             ),
         ).fetchone()
         db.commit()
-
         return (
             int(next_time[0])
             if next_time
@@ -456,7 +436,6 @@ class Levelling:
         now_time = round(datetime.now().timestamp())
         next_time = round((datetime.now() + timedelta(minutes=2)).timestamp())
         xp = 10 if datetime.today().weekday() > 4 else 5
-
         cursor1 = db.execute(
             "INSERT OR IGNORE INTO serverxpData (guild_id, user_id, lvl, exp, cumulative_exp, next_time) VALUES (?,?,?,?,?,?)",
             (
@@ -469,7 +448,6 @@ class Levelling:
             ),
         )
         db.commit()
-
         cursor2 = db.execute(
             "INSERT OR IGNORE INTO globalxpData (user_id, lvl, exp, cumulative_exp, next_time) VALUES (?,?,?,?,?)",
             (
@@ -481,14 +459,11 @@ class Levelling:
             ),
         )
         db.commit()
-
         if (cursor1.rowcount == 0) and (now_time >= self.get_next_time_server):
             server_exp = self.get_member_xp
             cumulated_exp = self.get_member_cumulated_xp
-
             server_updated_exp = server_exp + xp
             server_updated_cumulative_exp = cumulated_exp + xp
-
             db.execute(
                 "UPDATE serverxpData SET exp = ?, cumulative_exp = ?, next_time = ? WHERE guild_id = ? AND user_id = ?",
                 (
@@ -499,16 +474,12 @@ class Levelling:
                     self.member.id,
                 ),
             )
-
             db.commit()
-
         if (cursor2.rowcount == 0) and (now_time >= self.get_next_time_global):
             global_exp = self.get_user_xp
             global_cumulated_exp = self.get_user_cumulated_xp
-
             global_updated_exp = global_exp + xp
             global_updated_cumulated_exp = global_cumulated_exp + xp
-
             db.execute(
                 "UPDATE globalxpDATA SET exp = ?, cumulative_exp = ?, next_time = ? WHERE user_id = ?",
                 (
@@ -518,13 +489,10 @@ class Levelling:
                     self.member.id,
                 ),
             )
-
             db.commit()
-
         global_cumulated_exp = self.get_user_cumulated_xp
         global_level = self.get_user_level
         global_next_lvl_exp = (global_level * 50) + ((global_level - 1) * 25) + 50
-
         if global_cumulated_exp >= global_next_lvl_exp:
             global_updated_exp = global_cumulated_exp - global_next_lvl_exp
             db.execute(
@@ -536,11 +504,9 @@ class Levelling:
                 ),
             )
             db.commit()
-
         server_cumulated_exp = self.get_member_cumulated_xp
         server_level = self.get_member_level
         server_next_lvl_exp = (server_level * 50) + ((server_level - 1) * 25) + 50
-
         if server_cumulated_exp >= server_next_lvl_exp:
             server_updated_exp = server_cumulated_exp - server_next_lvl_exp
             db.execute(
@@ -562,11 +528,9 @@ class Levelling:
         ).fetchone()
         channel = None
         levelup = None
-
         if data:
             channel = int(data[3]) if isinstance(data[3], int) else None
             levelup = str(data[4]) if isinstance(data[4], str) else None
-
         return channel, levelup, self.get_rank_up_update
 
     @property
@@ -631,7 +595,6 @@ class Levelling:
             "SELECT user_id FROM globalxpData ORDER BY cumulative_exp DESC"
         ).fetchall()
         all_ids = [m_id[0] for m_id in result]
-
         try:
             rank = all_ids.index(self.member.id) + 1
             return rank
@@ -644,7 +607,6 @@ class Levelling:
             "SELECT channel FROM xpChannelData WHERE server = ?", (self.server.id,)
         ).fetchall()
         db.commit()
-
         return [int(i[0]) for i in data] if data else None
 
     @property
@@ -654,7 +616,6 @@ class Levelling:
             (self.server.id,),
         ).fetchall()
         db.commit()
-
         return [i for i in data] if data else None
 
 
@@ -676,7 +637,6 @@ class Manage:
         self, channel: TextChannel, message: Optional[str] = None
     ) -> None:
         message = message if message else "0"
-
         cur = db.execute(
             "INSERT OR IGNORE INTO serverData (server, levelup_channel, levelup_message) VALUES (?,?,?)",
             (
@@ -686,7 +646,6 @@ class Manage:
             ),
         )
         db.commit()
-
         if cur.rowcount == 0:
             if channel:
                 db.execute(
@@ -709,7 +668,6 @@ class Manage:
 
     async def add_rankup_rolereward(self, message: Optional[str] = None) -> None:
         message = message if message else "0"
-
         cur = db.execute(
             "INSERT OR IGNORE INTO serverData (server, rankup_message) VALUES (?,?)",
             (
@@ -718,7 +676,6 @@ class Manage:
             ),
         )
         db.commit()
-
         if cur.rowcount == 0:
             if message:
                 db.execute(
@@ -768,7 +725,6 @@ class Manage:
         db.commit()
         if data == None:
             return None
-
         db.execute(
             "DELETE FROM levelRewardData WHERE server = ? AND role = ?",
             (
@@ -789,7 +745,6 @@ class Manage:
             ),
         )
         db.commit()
-
         if cur.rowcount == 0:
             db.execute(
                 "UPDATE serverData SET welcoming_message = ? WHERE server = ?",
@@ -810,7 +765,6 @@ class Manage:
             ),
         )
         db.commit()
-
         if cur.rowcount == 0:
             db.execute(
                 "UPDATE serverData SET leaving_message = ? WHERE server = ?",
@@ -868,7 +822,6 @@ class Manage:
             ),
         )
         db.commit()
-
         if cursor.rowcount == 0:
             db.execute(
                 f"UPDATE serverData SET modlog = ? WHERE server = ?",
@@ -917,7 +870,6 @@ class Manage:
                 self.server.id,
             ),
         )
-
         db.commit()
 
     async def remove_levelup_msg(self):
@@ -928,7 +880,6 @@ class Manage:
                 self.server.id,
             ),
         )
-
         db.commit()
 
     async def remove_rolereward_msg(self):
@@ -939,7 +890,6 @@ class Manage:
                 self.server.id,
             ),
         )
-
         db.commit()
 
     async def remove_welcomemsg(self):
@@ -977,7 +927,6 @@ class Command:
                 ),
             ).fetchone()
             db.commit()
-
             return data is not None and command == data[0]
         except:
             pass
@@ -1031,7 +980,6 @@ class Moderation:
             ),
         )
         db.commit()
-
         cur = db.execute(
             "INSERT OR IGNORE INTO warnDatav2 (guild_id, user_id, warn_points) VALUES (?,?,?)",
             (
@@ -1041,7 +989,6 @@ class Moderation:
             ),
         )
         db.commit()
-
         if cur.rowcount == 0:
             db.execute(
                 "UPDATE warnDatav2 SET warn_points = warn_points + ? WHERE guild_id = ? and user_id = ?",
@@ -1060,7 +1007,6 @@ class Moderation:
         db.commit()
         if len(warnings) == 0 or warnings == None:
             return None
-
         return warnings
 
     def fetch_warnings_user(self, member: Member) -> list | None:
@@ -1073,10 +1019,8 @@ class Moderation:
             ),
         ).fetchall()
         db.commit()
-
         if len(warnings) == 0 or warnings == None:
             return None
-
         return warnings
 
     def check_warn_id(self, member: Member, warn_id: int) -> int | None:
@@ -1090,13 +1034,11 @@ class Moderation:
         )
         result = data.fetchone()
         db.commit()
-
         return int(result[0]) if result else None
 
     async def revoke_warn(self, member: Member, warn_id: int):
         db.execute("DELETE FROM warnData WHERE warn_id = ?", (warn_id,))
         db.commit()
-
         db.execute(
             "UPDATE warnDatav2 SET warn_points = warn_points - ? WHERE user_id = ? AND guild_id = ?",
             (
@@ -1106,7 +1048,6 @@ class Moderation:
             ),
         )
         db.commit()
-
         wp_query = db.execute(
             f"SELECT warn_points FROM warnDatav2 WHERE user_id = ? AND guild_id = ?",
             (
@@ -1116,7 +1057,6 @@ class Moderation:
         )
         warnpoints: int = wp_query.fetchone()[0]
         db.commit()
-
         if warnpoints == 0:
             db.execute(
                 f"DELETE FROM warnDatav2 WHERE user_id = ? AND guild_id = ?",
@@ -1125,7 +1065,6 @@ class Moderation:
                     self.server.id,
                 ),
             )
-
             db.commit()
 
     def get_softban_data(self):
@@ -1139,7 +1078,6 @@ class Moderation:
         else:
             seconds = parse_timespan(ends)
             ending = round((datetime.now() + timedelta(seconds=seconds)).timestamp())
-
         db.execute(
             "INSERT OR IGNORE INTO softbannedMembers (user_id, guild_id, ends) VALUES (?,?,?)",
             (
@@ -1148,7 +1086,6 @@ class Moderation:
                 ending,
             ),
         )
-
         db.commit()
 
     async def remove_softban(self, member: Member):
@@ -1172,7 +1109,6 @@ class Logger:
             "SELECT modlog FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
-
         return data[0] if data else None
 
 
@@ -1231,7 +1167,6 @@ def get_richest(member: Member) -> int:
             "SELECT user_id FROM bankData ORDER BY amount DESC"
         ).fetchall()
         all_ids = [m_id[0] for m_id in result]
-
         try:
             rank = all_ids.index(member.id) + 1
             return rank
@@ -1282,35 +1217,26 @@ class Hentai:
     ) -> list | None:
         bl = self.get_blacklisted_links()
         tags = tags.lower() if tags else None
-
         url = provider.value + rating + "+" + self.format_tags(tags)
-
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 nsfw_images: dict = await resp.json()
-
         if not nsfw_images:
             return None
-
         if provider.value == provider.GelbooruApi.value:
             nsfw_images_list = list(nsfw_images.get("post", []))
         else:
             nsfw_images_list = list(nsfw_images)
-
         shuffle(nsfw_images_list)
-
         if (not tags) or (tags == None):
             tags = ""
-
         tags_list = [
             tag.strip().replace(" ", "_")
             for tag in tags.split(",")
             if tag.strip().replace(" ", "_") not in self.blacklisted_tags
         ]
-
         if len(tags_list) == 0 or len(tags_list) > 3:
             return None
-
         filtered_images = []
         for image in nsfw_images_list:
             if provider.value == provider.DanbooruApi.value:
@@ -1343,84 +1269,61 @@ class Hentai:
         if not tag or tag is None:
             tag = None
         images = await self.get_nsfw_image(NsfwApis.GelbooruApi, rating, tag)
-
         if self.plus:
             return images
-
         return choice(images)["file_url"]
 
     async def yandere(self, rating: Optional[str] = None, tag: Optional[str] = None):
         if rating is None:
             rating = choice(["questionable", "explicit"])
-
         images = await self.get_nsfw_image(NsfwApis.YandereApi, rating, tag)
-
         if self.plus:
             return images
-
         return choice(images)["file_url"]
 
     async def konachan(self, rating: Optional[str] = None, tag: Optional[str] = None):
         if rating is None:
             rating = choice(["questionable", "explicit"])
-
         images = await self.get_nsfw_image(NsfwApis.KonachanApi, rating, tag)
-
         if self.plus:
             return images
-
         return choice(images)["file_url"]
 
     async def danbooru(self, rating: Optional[str] = None, tag: Optional[str] = None):
         if rating is None:
             rating = choice(["questionable", "explicit"])
-
         if not tag or tag is None:
             tag = None
         else:
             tag = ",".join(tag.split(",")[:2])
-
         images = await self.get_nsfw_image(NsfwApis.DanbooruApi, rating, tag)
         if self.plus:
             return images
-
         return choice(images)["file_url"]
 
     async def hentai(self, rating: Optional[str] = None):
         if rating == None:
             rating = ["questionable", "explicit"]
             rating = choice(rating)
-
         gelbooru_image = await self.gelbooru(rating)
-
         yandere_image = await self.yandere(rating)
-
         konachan_image = await self.konachan(rating)
-
         danbooru_image = await self.danbooru(rating)
-
         h = [gelbooru_image, yandere_image, konachan_image, danbooru_image]
-
         hentai: str = choice(h)
-
         if hentai == gelbooru_image:
             return hentai, "Gelbooru"
-
         if hentai == yandere_image:
             return hentai, "Yande.re"
-
         if hentai == konachan_image:
             return hentai, "Konachan"
-
         if hentai == danbooru_image:
             return hentai, "Danbooru"
 
 
 def shorten_url(url: str) -> str | None:
     api_url = "http://tinyurl.com/api-create.php"
-
     params = {"url": url}
-
     response = get(api_url, params=params)
     if response.status_code == 200:
         short_url = response.text
@@ -1468,10 +1371,8 @@ class Reminder:
             ),
         ).fetchone()
         db.commit()
-
         if data == None:
             return False
-
         db.execute(
             "DELETE FROM reminderData WHERE userid = ? AND id = ?",
             (
@@ -1554,7 +1455,6 @@ class Partner:
             "SELECT * FROM partnerData WHERE user_id = ?", (user,)
         ).fetchone()
         db.commit()
-
         return data[0] if data else None
 
     @staticmethod
@@ -1584,7 +1484,6 @@ class BetaTest:
         beta_role = server.get_role(1130430961587335219)
         try:
             member = await server.fetch_member(user.id)
-
             if beta_role in member.roles:
                 return True
         except:
@@ -1643,6 +1542,7 @@ def check_botbanned_app_command(ctx: Interaction):
     if Botban(ctx.user).check_botbanned_user:
         return
     return True
+
 
 async def is_beta_app_command(ctx: Interaction):
     if not await BetaTest(ctx.client).check(ctx.user):

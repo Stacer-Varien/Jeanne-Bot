@@ -42,5 +42,6 @@ class ErrorsCog(Cog):
         elif isinstance(error, Jeanne.CommandOnCooldown):
             pass
 
+
 async def setup(bot: Bot):
     await bot.add_cog(ErrorsCog(bot))

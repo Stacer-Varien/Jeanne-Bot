@@ -25,13 +25,11 @@ class Shop_Group(GroupCog, name="shop"):
 
     @Jeanne.command(description="Check all the wallpapers available")
     async def backgrounds(self, ctx: Interaction):
-
         if Command(ctx.guild).check_disabled(self.backgrounds.qualified_name):
             await ctx.response.send_message(
                 "This command is disabled by the server's managers", ephemeral=True
             )
             return
-
         await ctx.response.defer()
         wallpapers = Inventory().fetch_wallpapers()
         embed = Embed()
@@ -42,7 +40,6 @@ class Shop_Group(GroupCog, name="shop"):
             style="Page $/&",
         )
         embed.color = Color.random()
-
         for wallpaper in wallpapers:
             page_embed = Embed(title=f"Item ID: {wallpaper[0]}", color=embed.color)
             page_embed.add_field(name="Name", value=str(wallpaper[1]), inline=True)
@@ -51,12 +48,10 @@ class Shop_Group(GroupCog, name="shop"):
             )
             page_embed.set_image(url=str(wallpaper[2]))
             menu.add_page(embed=page_embed)
-
         menu.add_button(ViewButton.go_to_first_page())
         menu.add_button(ViewButton.back())
         menu.add_button(ViewButton.next())
         menu.add_button(ViewButton.go_to_last_page())
-
         await menu.start()
 
 
@@ -72,25 +67,20 @@ class Background_Group(GroupCog, name="background"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     async def buy(self, ctx: Interaction, name: str):
-
         await ctx.response.defer()
-
         balance = Currency(ctx.user).get_balance
-
         if balance == 0:
             nomoney = Embed(
                 description="You have no QP.\nPlease get QP by doing `/daily`, `/guess`, `/flip` and/or `/dice`"
             )
             await ctx.followup.send(embed=nomoney)
             return
-
         if balance < 1000:
             notenough = Embed(
                 description="You do not have enough QP.\nPlease get more QP by doing `/daily`, `/guess`, `/flip` and/or `/dice`"
             )
             await ctx.followup.send(embed=notenough)
             return
-
         try:
             Inventory.get_wallpaper(name)
         except:
@@ -98,15 +88,12 @@ class Background_Group(GroupCog, name="background"):
                 embed=Embed(description="Unable to find wallpaper", color=Color.red())
             )
             return
-
         image_url = Inventory().get_wallpaper(name)[1]
-
         await ctx.followup.send(
             "Creating preview... This will take some time <a:loading:1161038734620373062>"
         )
         image = await Profile(self.bot).generate_profile(ctx.user, image_url, True)
         file = File(fp=image, filename=f"preview_profile_card.png")
-
         preview = (
             Embed(
                 description="This is the preview of the profile card.",
@@ -120,13 +107,11 @@ class Background_Group(GroupCog, name="background"):
             content=None, attachments=[file], embed=preview, view=view
         )
         await view.wait()
-
         if view.value == None:
             await ctx.edit_original_response(
                 content="Timeout", view=None, embed=None, attachments=[]
             )
             return
-
         if view.value == True:
             await Inventory(ctx.user).add_user_wallpaper(name)
             embed1 = Embed(
@@ -134,7 +119,6 @@ class Background_Group(GroupCog, name="background"):
                 color=Color.random(),
             )
             await ctx.edit_original_response(embed=embed1, view=None)
-
         else:
             await ctx.edit_original_response(
                 content="Cancelled", view=None, embed=None, attachments=[]
@@ -143,7 +127,6 @@ class Background_Group(GroupCog, name="background"):
     @buy.error
     async def buy_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-
             cooldown = Embed(
                 description=f"You have already tried to preview this background!\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.random(),
@@ -156,9 +139,7 @@ class Background_Group(GroupCog, name="background"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def use(self, ctx: Interaction, name: str):
-
         await ctx.response.defer()
-
         try:
             await Inventory(ctx.user).use_wallpaper(name)
             embed = Embed(description=f"{name} has been selected", color=Color.random())
@@ -178,30 +159,23 @@ class Background_Group(GroupCog, name="background"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def buycustom(self, ctx: Interaction, name: str, link: str):
-
         await ctx.response.defer()
         balance = Currency(ctx.user).get_balance
-
         if balance is None or balance < 1000:
             nomoney = Embed(description="You do not have enough QP.")
             await ctx.followup.send(embed=nomoney)
             return
-
         await ctx.followup.send(
             "Creating preview... This will take some time <a:loading:1161038734620373062>"
         )
-
         image = await Profile(self.bot).generate_profile(ctx.user, link, True)
-
         if image == False:
             size_error = Embed(
                 description="The image is below the 900x500 size.\nPlease enlarge the image and try again"
             )
             await ctx.edit_original_response(content=None, embed=size_error)
             return
-
         file = File(fp=image, filename=f"preview_profile_card.png")
-
         preview = (
             Embed(
                 description="This is the preview of the profile card.",
@@ -213,13 +187,11 @@ class Background_Group(GroupCog, name="background"):
                 text="Please note that if the custom background violates ToS or is NSFW, it will be removed with NO REFUNDS!"
             )
         )
-
         view = Confirmation(ctx.user)
         await ctx.edit_original_response(
             content=None, embed=preview, attachments=[file], view=view
         )
         await view.wait()
-
         if view.value:
             await Inventory(ctx.user).add_user_custom_wallpaper(name, link)
             embed1 = Embed(
@@ -235,14 +207,12 @@ class Background_Group(GroupCog, name="background"):
     @buycustom.error
     async def buycustom_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-
             cooldown = Embed(
                 description=f"You have already tried to preview this background!\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.random(),
             )
             await ctx.response.send_message(embed=cooldown)
             return
-
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original,
             (
@@ -258,13 +228,11 @@ class Background_Group(GroupCog, name="background"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def list(self, ctx: Interaction):
-
         await ctx.response.defer()
         if Inventory(ctx.user).get_user_inventory == None:
             embed = Embed(description="Your inventory is empty", color=Color.red())
             await ctx.followup.send(embed=embed)
             return
-
         a = Inventory(ctx.user).get_user_inventory
         embed = Embed()
         menu = ViewMenu(
@@ -274,18 +242,15 @@ class Background_Group(GroupCog, name="background"):
             style="Page $/&",
         )
         embed.color = Color.random()
-
         for wallpaper in a:
             page_embed = Embed(color=embed.color)
             page_embed.add_field(name="Name", value=str(wallpaper[1]), inline=True)
             page_embed.set_image(url=str(wallpaper[2]))
             menu.add_page(embed=page_embed)
-
         menu.add_button(ViewButton.go_to_first_page())
         menu.add_button(ViewButton.back())
         menu.add_button(ViewButton.next())
         menu.add_button(ViewButton.go_to_last_page())
-
         await menu.start()
 
 

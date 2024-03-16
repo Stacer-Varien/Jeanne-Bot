@@ -1,6 +1,10 @@
 import json
 import random
-from functions import check_botbanned_prefix, check_disabled_prefixed_command, is_beta_prefix
+from functions import (
+    check_botbanned_prefix,
+    check_disabled_prefixed_command,
+    is_beta_prefix,
+)
 from discord import Color, Embed, Member
 from discord.ext.commands import Cog, Bot, Context
 import discord.ext.commands as Jeanne
@@ -35,29 +39,12 @@ class Reactions(Cog, name="Reactions"):
         member: Optional[Member] = None,
         api_url: str = None,
     ) -> None:
-
         reaction_api = get(api_url)
         reaction_embed = Embed(color=Color.random())
-        reaction_embed.set_footer(
-            text=(
-                "Fetched from otakugifs.xyz"
-                if "otakugifs.xyz" in api_url
-                else "Fetched from PurrBot.site" if "purrbot" in api_url else "Fetched from Tenor" if "tenor" in api_url else "Fetched from Nekos.life"
-            )
-        )
-        if "otakugifs.xyz" in api_url:
-            reaction_url = reaction_api.json()["url"]
-        elif "tenor" in api_url:
-            random_gif = random.choice(json.loads(reaction_api.content)["results"])
-            reaction_url = random_gif["media_formats"]["gif"]["url"]
-        else:
-            try:
-                reaction_url = reaction_api.json()["url"]
-            except:
-                reaction_url = reaction_api.json()["link"]
-
+        reaction_embed.set_footer(text="Fetched from Tenor")
+        random_gif = random.choice(json.loads(reaction_api.content)["results"])
+        reaction_url = random_gif["media_formats"]["gif"]["url"]
         reaction_embed.set_image(url=reaction_url)
-
         other_actions = ["baka", "smug", "hug", "poke", "tickle", "dance"]
         if action == "baka":
             msg = (
@@ -91,7 +78,6 @@ class Reactions(Cog, name="Reactions"):
                 if member is None
                 else f"*{ctx.author} {action}ed {member.mention}*"
             )
-
         await ctx.send(msg, embed=reaction_embed)
 
     @Jeanne.command(description="Hug someone or yourself")
@@ -191,6 +177,7 @@ class Reactions(Cog, name="Reactions"):
     @Jeanne.check(check_disabled_prefixed_command)
     async def dance(self, ctx: Context, *, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "dance", member, dance)
+
 
 async def setup(bot: Bot):
     await bot.add_cog(Reactions(bot))

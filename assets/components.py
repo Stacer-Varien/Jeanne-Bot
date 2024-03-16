@@ -1,3 +1,4 @@
+from functools import partial
 from discord import (
     CategoryChannel,
     ui,
@@ -110,18 +111,15 @@ class Welcomingmsg(ui.Modal, title="Welcoming Message"):
                 ("%icon%", str(ctx.guild.icon)),
             ]
         )
-
         try:
             json = loads(replace_all(self.jsonscript.value, parameters))
             content = json["content"]
             embed = Embed.from_dict(json["embeds"][0])
         except:
             content = replace_all(self.jsonscript.value, parameters)
-
         confirm = Embed(
             description="This is the preview of the welcoming message.\nAre you happy with it?"
         )
-
         view = Confirmation(ctx.user)
         try:
             embeds = [embed, confirm]
@@ -135,13 +133,10 @@ class Welcomingmsg(ui.Modal, title="Welcoming Message"):
             ephemeral=True,
         )
         await view.wait()
-
         if view.value == True:
             await Manage(ctx.guild).set_welcomer_msg(self.jsonscript.value)
-
             embed = Embed(description="Welcoming message set")
             await ctx.edit_original_response(content=None, embeds=[embed], view=None)
-
         elif view.value == False:
             embed = Embed(description="Action cancelled")
             await ctx.edit_original_response(content=None, embeds=[embed], view=None)
@@ -177,18 +172,15 @@ class Leavingmsg(ui.Modal, title="Leaving Message"):
                 ("%icon%", str(ctx.guild.icon)),
             ]
         )
-
         try:
             json = loads(replace_all(self.jsonscript.value, parameters))
             content = json["content"]
             embed = Embed.from_dict(json["embeds"][0])
         except:
             content = replace_all(self.jsonscript.value, parameters)
-
         confirm = Embed(
             description="This is the preview of the leaving message.\nAre you happy with it?"
         )
-
         view = Confirmation(ctx.user)
         try:
             embeds = [embed, confirm]
@@ -202,13 +194,10 @@ class Leavingmsg(ui.Modal, title="Leaving Message"):
             ephemeral=True,
         )
         await view.wait()
-
         if view.value == True:
             await Manage(ctx.guild).set_leaving_msg(self.jsonscript.value)
-
             embed = Embed(description="Leaving message set")
             await ctx.edit_original_response(content=None, embeds=[embed], view=None)
-
         elif view.value == False:
             embed = Embed(description="Action cancelled")
             await ctx.edit_original_response(content=None, embeds=[embed], view=None)
@@ -242,20 +231,17 @@ class Levelmsg(ui.Modal, title="Level Update Message"):
                 ("%newlevel%", str(Levelling(ctx.user, ctx.guild).get_member_level)),
             ]
         )
-
         try:
             json = loads(replace_all(self.jsonscript.value, parameters))
             content = json["content"]
             embed = Embed.from_dict(json["embeds"][0])
         except:
             content = replace_all(self.jsonscript.value, parameters)
-
         confirm = Embed(
             description="This is the preview of the level update message whenever someone levels up in the server and will be sent to {}.\nAre you happy with it?".format(
                 self.channel.mention
             )
         )
-
         view = Confirmation(ctx.user)
         try:
             embeds = [embed, confirm]
@@ -269,15 +255,12 @@ class Levelmsg(ui.Modal, title="Level Update Message"):
             ephemeral=True,
         )
         await view.wait()
-
         if view.value == True:
             await Manage(server=ctx.guild).add_level_channel(
                 self.channel, self.jsonscript.value
             )
-
             embed = Embed(description="Level update message set")
             await ctx.edit_original_response(content=None, embeds=[embed], view=None)
-
         elif view.value == False:
             embed = Embed(description="Action cancelled")
             await ctx.edit_original_response(content=None, embeds=[embed], view=None)
@@ -312,18 +295,15 @@ class RankUpmsg(ui.Modal, title="Role Reward Message"):
                 ("%rolemention%", str(ctx.user.top_role.mention)),
             ]
         )
-
         try:
             json = loads(replace_all(self.jsonscript.value, parameters))
             content = json["content"]
             embed = Embed.from_dict(json["embeds"][0])
         except:
             content = replace_all(self.jsonscript.value, parameters)
-
         confirm = Embed(
             description="This is the preview of the role reward message whenever someone recieves a role reward after levelling up in the server and will be sent to the current level update channel\nAre you happy with it?"
         )
-
         view = Confirmation(ctx.user)
         try:
             embeds = [embed, confirm]
@@ -337,13 +317,10 @@ class RankUpmsg(ui.Modal, title="Role Reward Message"):
             ephemeral=True,
         )
         await view.wait()
-
         if view.value == True:
             await Manage(server=ctx.guild).add_rankup_rolereward(self.jsonscript.value)
-
             embed = Embed(description="Level update message set")
             await ctx.edit_original_response(content=None, embeds=[embed], view=None)
-
         elif view.value == False:
             embed = Embed(description="Action cancelled")
             await ctx.edit_original_response(content=None, embeds=[embed], view=None)
@@ -372,7 +349,6 @@ class ReportModal(ui.Modal, title="Bot Report"):
         max_length=2000,
         style=TextStyle.paragraph,
     )
-
     steps = ui.TextInput(
         label="Steps of how you got this problem",
         placeholder="Type the steps here",
@@ -422,7 +398,6 @@ class ForumGuildlines(ui.Modal, title="Forum Guideline"):
             embed.add_field(
                 name="Added into category", value=self.category.name, inline=True
             )
-
         await ctx.response.send_message(embed=embed)
 
 
@@ -481,20 +456,19 @@ class ReportContentPlus(ui.Select):
         await ctx.response.send_modal(ReportContentM(self.values[0]))
 
 
-
 class ReportSelect(ui.View):
     def __init__(
         self,
         link1: Optional[str] = None,
         link2: Optional[str] = None,
         link3: Optional[str] = None,
-        link4: Optional[str] = None
+        link4: Optional[str] = None,
     ):
         self.link1 = link1
         self.link2 = link2
         self.link3 = link3
         self.link4 = link4
-        self.value=None
+        self.value = None
         super().__init__(timeout=60)
         self.add_item(ReportContentPlus(self.link1, self.link2, self.link3, self.link4))
 
@@ -527,7 +501,6 @@ class RemoveManage(ui.View):
             button.style = ButtonStyle.danger
             await ctx.response.edit_message(view=self)
             return
-
         button.style = ButtonStyle.green
         await Manage(ctx.guild).remove_welcomer()
         button.label = "Welcomer Channel Removed"
@@ -542,7 +515,6 @@ class RemoveManage(ui.View):
             button.label = "No welcoming message set"
             await ctx.response.edit_message(view=self)
             return
-
         button.style = ButtonStyle.green
         button.label = "Welcoming Message Removed"
         await Manage(ctx.guild).remove_welcomemsg()
@@ -571,7 +543,6 @@ class RemoveManage(ui.View):
             button.label = "No leaving message set"
             await ctx.response.edit_message(view=self)
             return
-
         button.style = ButtonStyle.green
         button.label = "Leaving Message Removed"
         await Manage(ctx.guild).remove_leavingmsg()
@@ -586,7 +557,6 @@ class RemoveManage(ui.View):
             button.label = "No level update channel found"
             await ctx.response.edit_message(view=self)
             return
-
         button.style = ButtonStyle.green
         button.label = "Level Update Channel Removed"
         await Manage(ctx.guild).remove_levelup()
@@ -601,7 +571,6 @@ class RemoveManage(ui.View):
             button.label = "No level update message set"
             await ctx.response.edit_message(view=self)
             return
-
         button.style = ButtonStyle.green
         button.label = "Level Update Message Removed"
         await Manage(ctx.guild).remove_levelup_msg()
@@ -616,7 +585,6 @@ class RemoveManage(ui.View):
             button.label = "No role reward message set"
             await ctx.response.edit_message(view=self)
             return
-
         button.style = ButtonStyle.green
         button.label = "Role Reward Message Removed"
         await Manage(ctx.guild).remove_rolereward_msg()
@@ -631,7 +599,6 @@ class RemoveManage(ui.View):
             button.label = "No modlog found"
             await ctx.response.edit_message(view=self)
             return
-
         button.style = ButtonStyle.green
         button.label = "Modlog Removed"
         await Manage(ctx.guild).remove_modloger()
@@ -657,7 +624,6 @@ class RolesButton(ui.View):
             description=" ".join(self.Roles) + " @everyone",
             color=self.member.color,
         )
-
         await ctx.response.edit_message(embeds=[self.Uinfo, roles], view=None)
         self.stop()
 
@@ -673,7 +639,6 @@ class BioModal(ui.Modal, title="Bio"):
         min_length=1,
         max_length=60,
     )
-
     line2 = ui.TextInput(
         label="Line 2",
         style=TextStyle.short,
@@ -688,3 +653,26 @@ class BioModal(ui.Modal, title="Bio"):
         await Inventory(ctx.user).set_bio(bio)
         embed.description = bio
         await ctx.response.send_message(embed=embed)
+
+
+class Guess_Buttons(ui.View):
+    def __init__(self, author: User):
+        super().__init__(timeout=60)
+        self.author = author
+        self.value = None
+
+        for i in range(1, 11):
+            button = ui.Button(label=str(i), style=ButtonStyle.grey)
+            button.callback = partial(
+                self.button_callback, number=i
+            )  # Dynamically assign button callbacks
+            self.add_item(button)
+
+    async def button_callback(self, ctx: Interaction, number: int):
+            self.value = number
+            for child in self.children:  # Disable all buttons to prevent further clicks
+                child.disabled = True
+            self.stop()
+
+    async def interaction_check(self, ctx: Interaction):
+            return ctx.user.id == self.author.id
