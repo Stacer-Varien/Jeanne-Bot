@@ -45,7 +45,7 @@ class Reactions(Cog, name="Reactions"):
         random_gif = random.choice(json.loads(reaction_api.content)["results"])
         reaction_url = random_gif["media_formats"]["gif"]["url"]
         reaction_embed.set_image(url=reaction_url)
-        other_actions = ["baka", "smug", "hug", "poke", "tickle", "dance"]
+        other_actions = ["baka", "smug", "hug", "poke", "tickle", "dance", "cuddle"]
         if action == "baka":
             msg = (
                 f"*{ctx.author}*, you are a baka!"
@@ -65,6 +65,12 @@ class Reactions(Cog, name="Reactions"):
                 f"*Poking {ctx.author}*"
                 if member is None
                 else f"*{ctx.author} is poking {member.mention}*"
+            )
+        elif action=="cuddle":
+            msg = (
+                f"*Cuddling {ctx.author}*"
+                if member is None
+                else f"*{ctx.author} is cuddling with {member.mention}*"
             )
         elif action == "dance":
             msg = (
