@@ -23,7 +23,7 @@ class WelcomerCog(Cog):
         if member.guild.id == int(welcomer[0]):
             channel = await self.bot.fetch_channel(int(welcomer[2]))
             welcomemsg = Welcomer(member.guild).get_welcoming_msg
-            if (welcomemsg == "None") or (welcomemsg is None):
+            if welcomemsg is None:
                 welcome = Embed(
                     description=f"Hi {member} and welcome to {member.guild.name}!",
                     color=Color.random(),
@@ -43,7 +43,7 @@ class WelcomerCog(Cog):
                     ("%icon%", str(member.guild.icon)),
                 ]
             )
-            json_data: dict = loads(replace_all(str(welcomemsg), parameters))
+            json_data: dict = loads(replace_all(welcomemsg, parameters))
             content: str = json_data.get("content")
             embed_data = json_data.get("embeds")
             if embed_data:
@@ -64,7 +64,7 @@ class WelcomerCog(Cog):
         if member.guild.id == int(leaver[0]):
             channel = await self.bot.fetch_channel(int(leaver[1]))
             leavingmsg = Welcomer(member.guild).get_leaving_msg
-            if (leavingmsg == "None") or (leavingmsg is None):
+            if leavingmsg is None:
                 leave = Embed(
                     description=f"{member} left the server", color=Color.random()
                 ).set_thumbnail(url=member.display_avatar.url)
@@ -83,7 +83,7 @@ class WelcomerCog(Cog):
                     ("%icon%", str(member.guild.icon)),
                 ]
             )
-            json_data: dict = loads(replace_all(str(leavingmsg), parameters))
+            json_data: dict = loads(replace_all(leavingmsg, parameters))
             content: str = json_data.get("content")
             try:
                 embed = Embed.from_dict(json_data["embeds"][0])

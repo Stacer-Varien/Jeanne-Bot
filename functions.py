@@ -1123,7 +1123,7 @@ class Welcomer:
             (self.server.id,),
         ).fetchone()
         db.commit()
-        return data if data else None
+        return None if data ==None else data
 
     @property
     def get_leaver(self):
@@ -1131,24 +1131,24 @@ class Welcomer:
             "SELECT * FROM serverData where server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
-        return data if data else None
+        return None if data == None else data
 
     @property
-    def get_welcoming_msg(self):
+    def get_welcoming_msg(self)->str|None:
         data = db.execute(
             "SELECT welcoming_message FROM serverData WHERE server = ?",
             (self.server.id,),
         ).fetchone()
         db.commit()
-        return data[0] if data else None
+        return str(data[0]) if data else None
 
     @property
-    def get_leaving_msg(self):
+    def get_leaving_msg(self) -> str | None:
         data = db.execute(
             "SELECT leaving_message FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
-        return data[0] if data else None
+        return str(data[0]) if data else None
 
 
 def get_cached_users() -> int:
