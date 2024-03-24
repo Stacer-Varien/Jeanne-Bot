@@ -1,3 +1,4 @@
+from discord import User
 from functions import BetaTest, Botban, Currency
 from config import TOPGG, TOPGG_AUTH
 from topgg import DBLClient, WebhookManager
@@ -5,11 +6,10 @@ from discord.ext import tasks
 from discord.ext.commands import Cog, Bot
 from datetime import datetime
 
-
-class TopGG(Cog):
+class DBL(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.topggpy = DBLClient(bot=self.bot, token=TOPGG, autopost=True)
+        self.topggpy = DBLClient(bot=self.bot, token=TOPGG, autopost=True, post_shard_count=True)
         self.topgg_webhook = WebhookManager(self.bot).dbl_webhook(
             route="/dblwebhook", auth_key=TOPGG_AUTH
         )
@@ -19,8 +19,13 @@ class TopGG(Cog):
     @tasks.loop(minutes=30, reconnect=True)
     async def update_stats(self):
         try:
+            servers = len(self.bot.guilds)
+            await self.topggpy.post_guild_count(guild_count=servers, shard_count=self.bot.shard_count)
             print(
-                f"Posted server count ({len(self.bot.guilds)}) at {datetime.now().strftime('%H:%M')}"
+                f"Posted server count ({servers}) at {datetime.now().strftime('%H:%M')}"
+            )
+            print(
+                f"Posted shard count ({self.bot.shard_count}) at {datetime.now().strftime('%H:%M')}"
             )
         except Exception as e:
             print(f"Failed to post server count\n{e.__class__.__name__}: {e}")
@@ -45,4 +50,4 @@ class TopGG(Cog):
 
 
 async def setup(bot: Bot):
-    await bot.add_cog(TopGG(bot))
+    await bot.add_cog(DBL(bot))
