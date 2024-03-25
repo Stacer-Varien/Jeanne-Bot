@@ -9,6 +9,8 @@ TOKEN = getenv("token")
 WEATHER = getenv("weather_api")
 TOPGG = getenv("topgg")
 TOPGG_AUTH = getenv("topgg_auth")
+DBL_AUTH = getenv("dbl_auth")
+DB_AUTH = getenv("db_auth")
 WEBHOOK = getenv("report_webhook")
 BB_WEBHOOK = getenv("botban_webhook")
 TENOR = getenv("tenor")
@@ -22,7 +24,9 @@ NEKO = str(getenv("neko_album"))
 MORGAN = str(getenv("morgan_album"))
 KITSUNE = str(getenv("kitsune_album"))
 CATBOX_HASH = str(getenv("catbox_hash"))
+
 db = connect("database.db", check_same_thread=False)
+
 hug = f"https://tenor.googleapis.com/v2/search?q=hug%20anime&key={TENOR}&client_key={CLIENTKEY}&limit=3"
 slap = f"https://tenor.googleapis.com/v2/search?q=slap%20anime&key={TENOR}&client_key={CLIENTKEY}&limit=3"
 smug = f"https://tenor.googleapis.com/v2/search?q=smug%20anime&key={TENOR}&client_key={CLIENTKEY}&limit=3"
