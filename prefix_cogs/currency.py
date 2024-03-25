@@ -19,7 +19,25 @@ from functions import (
     check_disabled_prefixed_command,
     is_beta_prefix,
 )
+class vote_button(ui.View):
+    def __init__(self):
+        super().__init__()
 
+        self.add_item(
+            ui.Button(
+                style=ButtonStyle.link,
+                label="Top.gg",
+                url="https://top.gg/bot/831993597166747679/vote",
+            )
+        )
+
+        self.add_item(
+            ui.Button(
+                style=ButtonStyle.link,
+                label="Discord Bot List (Beta)",
+                url="https://discordbotlist.com/bots/jeanne/upvote",
+            )
+        )
 
 class CurrencyCog(Cog, name="Currency"):
     def __init__(self, bot: Bot) -> None:
@@ -410,19 +428,13 @@ class CurrencyCog(Cog, name="Currency"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(is_beta_prefix)
     async def vote(self, ctx: Context):
+        
         await ctx.send(
             embed=Embed(
                 color=Color.random(),
-                description="You can vote for me by clicking on the button below to get more QP!!",
+                description="You can vote for me by clicking one of the buttons below to get more QP!!",
             ),
-            view=ui.View().add_item(
-                ui.Button(
-                    style=ButtonStyle.url,
-                    label="Top.gg",
-                    url="https://top.gg/bot/831993597166747679/vote",
-                )
-            ),
-        )
+            view=vote_button())
 
 
 async def setup(bot: Bot):

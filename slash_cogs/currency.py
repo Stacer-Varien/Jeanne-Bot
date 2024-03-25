@@ -20,6 +20,27 @@ from functions import (
 )
 
 
+class vote_button(ui.View):
+    def __init__(self):
+        super().__init__()
+
+        self.add_item(
+            ui.Button(
+                style=ButtonStyle.link,
+                label="Top.gg",
+                url="https://top.gg/bot/831993597166747679/vote",
+            )
+        )
+
+        self.add_item(
+            ui.Button(
+                style=ButtonStyle.link,
+                label="Discord Bot List (Beta)",
+                url="https://discordbotlist.com/bots/jeanne/upvote",
+            )
+        )
+
+
 class Guess_Group(GroupCog, name="guess"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
@@ -445,15 +466,9 @@ class currency(Cog):
         await ctx.response.send_message(
             embed=Embed(
                 color=Color.random(),
-                description="You can vote for me by clicking on the button below to get more QP!!",
+                description="You can vote for me by clicking one of the buttons below to get more QP!!",
             ),
-            view=ui.View().add_item(
-                ui.Button(
-                    style=ButtonStyle.url,
-                    label="Top.gg",
-                    url="https://top.gg/bot/831993597166747679/vote",
-                )
-            ),
+            view=vote_button(),
         )
 
 
