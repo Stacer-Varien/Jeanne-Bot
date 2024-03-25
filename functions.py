@@ -1555,3 +1555,25 @@ async def is_beta_app_command(ctx: Interaction):
         )
         return
     return True
+
+class DBLvoter:
+    def __init__(self, user:User) -> None:
+        self.user=user
+
+    @property
+    def get_next_time(self)->int:
+        data=db.execute("SELECT next_timestamp FROM DBLvotersData WHERE user = ?", (self.user.id,))
+        db.commit()
+        return round((datetime.now() + timedelta(hours=12)).timestamp()) if data ==None else int(data[0])
+
+    def add_voter(self):
+        current_time=round(datetime.now().timestamp())
+        next_time = round((datetime.now() + timedelta(hours=12)).timestamp())
+
+        cur=db.execute("INSERT OR IGNORE INTO DBLvotersData (user, next_timestamp, counts) VALUES (?,?,?)", (self.user.id, next_time, 1))
+        db.commit()
+
+        if (cur.rowcount == 0) and (current_time >= self.get_next_time):
+            ...
+
+
