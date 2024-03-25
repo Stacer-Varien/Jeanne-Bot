@@ -1561,19 +1561,40 @@ class DBLvoter:
         self.user=user
 
     @property
-    def get_next_time(self)->int:
-        data=db.execute("SELECT next_timestamp FROM DBLvotersData WHERE user = ?", (self.user.id,))
+    def get_next_time(self, voted_date:str)->int:
+        current_time = self.format_date(voted_date)
+        data=db.execute("SELECT next_timestamp FROM DBLvotersData WHERE user = ?", (self.user.id,)).fetchone()
         db.commit()
-        return round((datetime.now() + timedelta(hours=12)).timestamp()) if data ==None else int(data[0])
+        return round((current_time + timedelta(hours=12)).timestamp()) if data ==None else int(data[0])
 
-    def add_voter(self):
-        current_time=round(datetime.now().timestamp())
-        next_time = round((datetime.now() + timedelta(hours=12)).timestamp())
+    async def add_voter(self, voted_date:str):
+        current_time = round(self.format_date(voted_date).timestamp())
+        next_time = round(
+            (self.format_date(voted_date) + timedelta(hours=12)).timestamp()
+        )
 
-        cur=db.execute("INSERT OR IGNORE INTO DBLvotersData (user, next_timestamp, counts) VALUES (?,?,?)", (self.user.id, next_time, 1))
+        cur=db.execute("INSERT OR IGNORE INTO DBLvotersData (user, voted_time, next_timestamp, counts, voted) VALUES (?,?,?,?,?)", (self.user.id, current_time, next_time, 1,1,))
         db.commit()
 
         if (cur.rowcount == 0) and (current_time >= self.get_next_time):
-            ...
+            db.execute("UPDATE DBLvotersData SET voted_time = ?, next_timestamp = ?, counts = counts + ? WHERE user = ? and voted = ?", (current_time, next_time, 1, self.user.id,0,))
+            db.commit()
 
+    @property
+    def check_vote(self):
+        data=db.execute("SELECT voted FROM DBLvotersData WHERE user = ?", (self.user.id,)).fetchone()
+        db.commit()
+        return None if (data == None) else True if (int(data[0])==1) else False
 
+    async def change_to_false(self, voted_date:str):
+        current_time=round(self.format_date(voted_date).timestamp())
+        if (self.check_vote == 1) and (current_time >= self.get_next_time):
+            db.execute("UPDATE DBLvotersData SET voted = ? WHERE user = ?", (0, self.user.id,))
+            db.commit()
+        else:
+            pass
+
+    def format_date(self, date:str):
+        date_format = "%Y-%m-%dT%H:%M:%S.%fZ"
+        date_time = datetime.strptime(date, date_format)
+        return date_time
