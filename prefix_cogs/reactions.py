@@ -45,7 +45,6 @@ class Reactions(Cog, name="Reactions"):
         random_gif = random.choice(json.loads(reaction_api.content)["results"])
         reaction_url = random_gif["media_formats"]["gif"]["url"]
         reaction_embed.set_image(url=reaction_url)
-        other_actions = ["baka", "smug", "hug", "poke", "tickle", "dance", "cuddle"]
         if action == "baka":
             msg = (
                 f"*{ctx.author}*, you are a baka!"
@@ -78,11 +77,45 @@ class Reactions(Cog, name="Reactions"):
                 if member is None
                 else f"*{ctx.author} is dancing with {member.mention}*"
             )
-        elif action not in other_actions:
+        elif action == "pat":
             msg = (
-                f"*{action.capitalize()}ing {ctx.author}*"
+                f"*Patting {ctx.author}*"
                 if member is None
-                else f"*{ctx.author} {action}ed {member.mention}*"
+                else f"*{ctx.author} patted {member.mention}*"
+            )
+        elif action == "blush":
+            msg =    f"*{ctx.author} is blushing*"
+        elif action == "bite":
+            msg = (
+                f"*Biting {ctx.author}*"
+                if member is None
+                else f"*{ctx.author} bit {member.mention}*"
+            )
+        elif action == "feed":
+            msg = (
+                f"*Feeding {ctx.author}*"
+                if member is None
+                else f"*{ctx.author} is feeding {member.mention}. Eat up*"
+            )
+        elif action == "cry":
+            msg = f"*{ctx.author} is crying*"
+        elif action == "slap":
+            msg = (
+                f"*Slapping {ctx.author}*"
+                if member is None
+                else f"*{ctx.author} slapped {member.mention}*"
+            )
+        elif action == "kiss":
+            msg = (
+                f"*Kissing {ctx.author}*"
+                if member is None
+                else f"*{ctx.author} kissed {member.mention}*"
+            )
+        elif action == "tickle":
+            msg = (
+                f"*Tickling {ctx.author}*"
+                if member is None
+                else f"*{ctx.author} tickled {member.mention}*"
             )
         await ctx.send(msg, embed=reaction_embed)
 

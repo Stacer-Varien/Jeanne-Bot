@@ -45,12 +45,11 @@ class SlashReactions(Cog):
         random_gif = random.choice(json.loads(reaction_api.content)["results"])
         reaction_url = random_gif["media_formats"]["gif"]["url"]
         reaction_embed.set_image(url=reaction_url)
-        other_actions = ["baka", "smug", "hug", "poke", "tickle", "dance", "cuddle"]
         if action == "baka":
             msg = (
                 f"*{ctx.user}*, you are a baka!"
                 if member is None
-                else f"*{member.mention}, {ctx.user} called you a baka!*"
+                else f"*{member.mention}*, *{ctx.user} called you a baka!"
             )
         elif action == "smug":
             msg = f"*{ctx.user}* is smugging"
@@ -78,11 +77,45 @@ class SlashReactions(Cog):
                 if member is None
                 else f"*{ctx.user} is dancing with {member.mention}*"
             )
-        elif action not in other_actions:
+        elif action == "pat":
             msg = (
-                f"*{action.capitalize()}ing {ctx.user}*"
+                f"*Patting {ctx.user}*"
                 if member is None
-                else f"*{ctx.user} {action}ed {member.mention}*"
+                else f"*{ctx.user} patted {member.mention}*"
+            )
+        elif action == "blush":
+            msg = f"*{ctx.user} is blushing*"
+        elif action == "bite":
+            msg = (
+                f"*Biting {ctx.user}*"
+                if member is None
+                else f"*{ctx.user} bit {member.mention}*"
+            )
+        elif action == "feed":
+            msg = (
+                f"*Feeding {ctx.user}*"
+                if member is None
+                else f"*{ctx.user} is feeding {member.mention}. Eat up*"
+            )
+        elif action == "cry":
+            msg = f"*{ctx.user} is crying*"
+        elif action == "slap":
+            msg = (
+                f"*Slapping {ctx.user}*"
+                if member is None
+                else f"*{ctx.user} slapped {member.mention}*"
+            )
+        elif action == "kiss":
+            msg = (
+                f"*Kissing {ctx.user}*"
+                if member is None
+                else f"*{ctx.user} kissed {member.mention}*"
+            )
+        elif action == "tickle":
+            msg = (
+                f"*Tickling {ctx.user}*"
+                if member is None
+                else f"*{ctx.user} tickled {member.mention}*"
             )
         await ctx.response.send_message(msg, embed=reaction_embed)
 
