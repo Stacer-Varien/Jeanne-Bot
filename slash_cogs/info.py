@@ -1,8 +1,6 @@
 from humanfriendly import format_timespan
 from assets.components import RolesButton
 from functions import (
-    Botban,
-    Command,
     check_botbanned_app_command,
     check_disabled_app_command,
     get_cached_users,
@@ -35,11 +33,17 @@ class stat_buttons(ui.View):
     def __init__(self):
         super().__init__()
         invite = "https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=1429553343542&scope=bot%20applications.commands"
-        vote = "https://top.gg/bot/831993597166747679"
+        votetopgg = "https://top.gg/bot/831993597166747679"
+        votedbl = "https://discordbotlist.com/bots/jeanne/upvote"
         orleans_url = "https://discord.gg/jh7jkuk2pp"
         website = "https://jeannebot.gitbook.io/jeannebot/"
         self.add_item(ui.Button(style=ButtonStyle.link, label="Invite me", url=invite))
-        self.add_item(ui.Button(style=ButtonStyle.link, label="Vote for me", url=vote))
+        self.add_item(
+            ui.Button(style=ButtonStyle.link, label="Vote for me", url=votetopgg)
+        )
+        self.add_item(
+            ui.Button(style=ButtonStyle.link, label="Vote for me (DBL)", url=votedbl)
+        )
         self.add_item(
             ui.Button(style=ButtonStyle.link, label="Support Server", url=orleans_url)
         )
@@ -55,7 +59,7 @@ class stat_buttons(ui.View):
 class InfoCog(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.bot_version = "4.4.2 Beta4"
+        self.bot_version = "4.4.2 Beta5"
         self.userinfo_context = Jeanne.ContextMenu(
             name="Userinfo", callback=self.userinfo_callback
         )
@@ -330,14 +334,13 @@ class InfoCog(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def emoji(self, ctx: Interaction, emoji: Jeanne.Range[str, 1]):
-        if Command(ctx.guild).check_disabled(self.emoji.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
         await ctx.response.defer()
         emote = PartialEmoji.from_str(emoji)
         embed = Embed()
+        if emote.id == None:
+            embed.color = Color.red()
+            embed.description = "Failed to get emoji."
+            await ctx.followup.send(embed=embed)
         embed.color = Color.random()
         embed.add_field(name="Name", value=emote.name, inline=False)
         embed.add_field(name="ID", value=emote.id, inline=False)

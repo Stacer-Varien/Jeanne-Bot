@@ -1,16 +1,13 @@
-from discord.ext.commands import Cog, Bot, GroupCog, Context, BucketType
+from discord.ext.commands import Cog, Bot, Context, BucketType
 import discord.ext.commands as Jeanne
 from discord import (
-    AllowedMentions,
     Color,
     Embed,
     File,
     Member,
-    Message,
 )
 from config import TOPGG
 from functions import (
-    Botban,
     Inventory,
     Levelling,
     check_botbanned_prefix,
@@ -44,7 +41,6 @@ class levelling(Cog, name="Level"):
         invoke_without_command=True,
     )
     async def rank(self, ctx: Context): ...
-
     @rank.command(
         name="global", description="Check the users with the most XP globally"
     )

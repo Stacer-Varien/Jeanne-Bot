@@ -45,25 +45,21 @@ class DBL(Cog):
                 "Content-Type": "application/json",
                 "Authorization": DBL_AUTH,
             }
-
             dbheaders = {
                 "Content-Type": "application/json",
                 "Authorization": DB_AUTH,
             }
-
             servers = len(self.bot.guilds)
             async with aiohttp.ClientSession(headers=dblheaders) as session:
                 await session.post(
                     "https://discordbotlist.com/api/v1/bots/831993597166747679/stats",
                     json={"guilds": servers, "users": len(self.bot.users)},
                 )
-
             async with aiohttp.ClientSession(headers=dbheaders) as session:
                 await session.post(
                     " https://discord.bots.gg/api/v1/bots/831993597166747679/stats",
                     json={"guildCount": servers},
                 )
-
             await self.topggpy.post_guild_count(
                 guild_count=servers, shard_count=self.bot.shard_count
             )
@@ -107,13 +103,12 @@ class DBL(Cog):
             )
         try:
             json_data: dict = await r.json()
-
             for i in json_data["upvotes"]:
                 user = await self.bot.fetch_user(int(i["user_id"]))
                 dbl = DBLvoter(user)
                 if await BetaTest(self.bot).check(user):
                     await dbl.change_to_false(i["timestamp"])
-                    if (dbl.check_vote == False) or (dbl.check_vote==None):
+                    if (dbl.check_vote == False) or (dbl.check_vote == None):
                         await DBLvoter(user).add_voter(i["timestamp"])
                         credits = 100 if datetime.now().weekday() >= 5 else 50
                         credits = round(credits * 1.25)
