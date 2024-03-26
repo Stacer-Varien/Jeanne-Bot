@@ -19,6 +19,8 @@ from functions import (
     check_disabled_prefixed_command,
     is_beta_prefix,
 )
+
+
 class vote_button(ui.View):
     def __init__(self):
         super().__init__()
@@ -39,6 +41,7 @@ class vote_button(ui.View):
             )
         )
 
+
 class CurrencyCog(Cog, name="Currency"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
@@ -49,6 +52,7 @@ class CurrencyCog(Cog, name="Currency"):
         description="Main Guess command for `guess flip` and `guess bet`",
     )
     async def guess(self, ctx: Context): ...
+
     @guess.command(name="free", description="Guess my number and you can win 20 QP")
     @Jeanne.cooldown(1, 3600, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
@@ -405,7 +409,7 @@ class CurrencyCog(Cog, name="Currency"):
             )
             await ctx.send(embed=cooldown)
 
-    @Jeanne.command(description="Check how much QP you have")
+    @Jeanne.command(aliases=["bal", "qp"], description="Check how much QP you have")
     @Jeanne.cooldown(1, 60, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
@@ -428,13 +432,14 @@ class CurrencyCog(Cog, name="Currency"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(is_beta_prefix)
     async def vote(self, ctx: Context):
-        
+
         await ctx.send(
             embed=Embed(
                 color=Color.random(),
                 description="You can vote for me by clicking one of the buttons below to get more QP!!",
             ),
-            view=vote_button())
+            view=vote_button(),
+        )
 
 
 async def setup(bot: Bot):

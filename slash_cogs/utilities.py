@@ -28,9 +28,10 @@ from enum import Enum
 from humanfriendly import parse_timespan, InvalidTimespan
 from tabulate import tabulate
 
-bot_invite_url = "https://discord.com/oauth2/authorize?client_id=831993597166747679&scope=bot%20applications.commands&permissions=467480734774"
+bot_invite_url = "https://discord.com/oauth2/authorize?client_id=831993597166747679&permissions=1428479601718&scope=bot%20applications.commands"
 topgg_invite = "https://top.gg/bot/831993597166747679"
 discordbots_url = "https://discord.bots.gg/bots/831993597166747679"
+discordbotlist_url = "https://discordbotlist.com/bots/jeanne"
 orleans = "https://discord.gg/jh7jkuk2pp"
 
 
@@ -55,6 +56,9 @@ class invite_button(View):
         )
         self.add_item(
             ui.Button(style=ButtonStyle.url, label="DiscordBots", url=discordbots_url)
+        )
+        self.add_item(
+            ui.Button(style=ButtonStyle.url, label="Discord Bot List", url=discordbotlist_url)
         )
         self.add_item(ui.Button(style=ButtonStyle.url, label="Orleans", url=orleans))
 
@@ -305,7 +309,7 @@ class ReminderCog(GroupCog, name="reminder"):
             return
         embed.color = Color.random()
         embed.description = "Reminder `{}` has been removed".format(reminder_id)
-        reminder.remove(reminder_id)
+        await reminder.remove(reminder_id)
         await ctx.followup.send(embed=embed, ephemeral=True)
 
 
