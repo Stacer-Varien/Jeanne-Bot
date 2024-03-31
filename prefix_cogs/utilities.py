@@ -4,20 +4,27 @@ import re
 from discord import (
     Attachment,
     ButtonStyle,
+    Client,
     Color,
     Embed,
     Forbidden,
+    Interaction,
     Message,
     NotFound,
     TextChannel,
     ui,
 )
 import discord.ext.commands as Jeanne
-from discord.ext.commands import Cog, Bot, Context
+from discord.ext.commands import Cog, Bot, Context, BucketType
 from discord.ext import tasks
-from assets.components import ReportModal
+from assets.components import BotReportMenu, BotReportSelect, ReportModal
 from assets.dictionary import dictionary
-from functions import Reminder, check_botbanned_prefix, check_disabled_prefixed_command,is_beta_prefix
+from functions import (
+    Reminder,
+    check_botbanned_prefix,
+    check_disabled_prefixed_command,
+    is_beta_prefix,
+)
 from config import WEATHER
 from discord.ui import View
 from py_expression_eval import Parser
@@ -58,7 +65,9 @@ class invite_button(View):
             ui.Button(style=ButtonStyle.url, label="DiscordBots", url=discordbots_url)
         )
         self.add_item(
-            ui.Button(style=ButtonStyle.url, label="Discord Bot List", url=discordbotlist_url)
+            ui.Button(
+                style=ButtonStyle.url, label="Discord Bot List", url=discordbotlist_url
+            )
         )
         self.add_item(ui.Button(style=ButtonStyle.url, label="Orleans", url=orleans))
 
@@ -66,32 +75,7 @@ class invite_button(View):
 class utilitiesCog(Cog, name="utilities"):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.check_reminders.start()
         self.parser = Parser()
-
-    @tasks.loop(seconds=60, reconnect=True)
-    async def check_reminders(self):
-        data = Reminder().get_all_reminders
-        if data == None:
-            return
-        for reminder in data:
-            if int(round(datetime.now().timestamp())) > int(reminder[2]):
-                member = await self.bot.fetch_user(reminder[0])
-                id = reminder[1]
-                reason = reminder[3]
-                try:
-                    embed = Embed(title="Reminder ended", color=Color.random())
-                    embed.add_field(name="Reminder", value=reason, inline=False)
-                    await member.send(embed=embed)
-                except:
-                    pass
-                await Reminder(member).remove(id)
-            else:
-                continue
-
-    @check_reminders.before_loop
-    async def before_check_reminders(self):
-        await self.bot.wait_until_ready()
 
     @Jeanne.group(
         name="reminder",
@@ -307,19 +291,20 @@ class utilitiesCog(Cog, name="utilities"):
             await ctx.send(embed=embed)
 
     weather_parser = argparse.ArgumentParser(add_help=False)
-    weather_parser.add_argument(
-        "-city",
+    weather_parser.add_argument("-c",
+        "--city",
         type=str,
         help="City",
+        nargs="+",
         required=True,
     )
-    weather_parser.add_argument(
-        "-units",
+    weather_parser.add_argument("-u",
+        "--units",
         type=str,
-        choices=["metric", "imperial"],
+        choices=["metric", "imperial", "Metric", "Imperial"],
         help="Metric | Imperial",
         required=False,
-        default="Metric"
+        default=None,
     )
 
     @Jeanne.command(description="Get weather information on a city")
@@ -327,16 +312,13 @@ class utilitiesCog(Cog, name="utilities"):
     @Jeanne.check(is_beta_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def weather(
-        self,
-        ctx: Context,
-        *, words: str = None, parser=weather_parser
-    ):
+    async def weather(self, ctx: Context, *words: str, parser=weather_parser):
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             city = parsed_args.city + unknown
             city = " ".join(city)
-            units:str = parsed_args.units
+            
+            units:str|None = parsed_args.units
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -346,7 +328,7 @@ class utilitiesCog(Cog, name="utilities"):
             )
             return
         except AttributeError:
-            units=None
+            units = None
         async with ctx.typing():
             emoji_map = {
                 "globe": "🌍",
@@ -366,7 +348,7 @@ class utilitiesCog(Cog, name="utilities"):
             location = weather_data["location"]
             current = weather_data["current"]
             forecast = weather_data["forecast"]["forecastday"][0]["day"]
-            if units == "Imperial":
+            if units.lower() == "imperial":
                 min_temp = f"{forecast['mintemp_f']}°F"
                 max_temp = f"{forecast['maxtemp_f']}°F"
                 feels_like = f"{current['feelslike_f']}°F"
@@ -453,38 +435,26 @@ class utilitiesCog(Cog, name="utilities"):
             )
             await ctx.send(embed=no_city)
 
-    @Jeanne.command(description="Type something and I will say it")
-    @Jeanne.describe(channel="Send to which channel?", message="What should I say?")
-    @Jeanne.checks.has_permissions(administrator=True)
-    @Jeanne.check(is_beta_prefix)
-    @Jeanne.check(check_disabled_prefixed_command)
-    @Jeanne.check(check_botbanned_prefix)
-    async def say(self, ctx: Context, channel: TextChannel, message: str):
-        await ctx.defer(ephemeral=True)
-        await ctx.send(content="Message sent to {}".format(channel.mention))
-        await channel.send(message)
-
-    @Jeanne.command(description="Do a calculation")
-    @Jeanne.describe(calculate="Add a calculation")
+    @Jeanne.command(aliases=["calc"], description="Do a calculation")
     @Jeanne.check(is_beta_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def calculator(self, ctx: Context, calculate: str):
-        await ctx.defer()
-        check = "".join(
-            [
-                str(float(part)) if part.isdigit() else part
-                for part in re.split(r"(\d+\.\d+|\d+)", calculate)
-            ]
-        )
-        self.parser.parse(check).evaluate({})
-        answer = self.parser.parse(calculate).evaluate({})
-        calculation = Embed(title="Result", color=Color.random())
-        calculation.add_field(name=f"`{calculate}`", value=answer)
-        await ctx.send(embed=calculation)
+        async with ctx.typing():
+            check = "".join(
+                [
+                    str(float(part)) if part.isdigit() else part
+                    for part in re.split(r"(\d+\.\d+|\d+)", calculate)
+                ]
+            )
+            self.parser.parse(check).evaluate({})
+            answer = self.parser.parse(calculate).evaluate({})
+            calculation = Embed(title="Result", color=Color.random())
+            calculation.add_field(name=f"`{calculate}`", value=answer)
+            await ctx.send(embed=calculation)
 
     @calculator.error
-    async def calculator_error(self, ctx: Context, error: Jeanne.AppCommandError):
+    async def calculator_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, OverflowError
         ):
@@ -508,10 +478,14 @@ class utilitiesCog(Cog, name="utilities"):
         )
         await ctx.send(embed=invite, view=invite_button())
 
-    @Jeanne.command(description="Submit a bot report if you found something wrong")
-    @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
+    @Jeanne.command(
+        name="report", description="Submit a bot report if you found something wrong"
+    )
+    @Jeanne.cooldown(1, 3600, type=BucketType.user)
     async def botreport(self, ctx: Context):
-        await ctx.response.send_modal(ReportModal())
+
+        view = BotReportSelect()
+        await ctx.reply(view=view, ephemeral=True)
 
     @Jeanne.command(description="Check the meaning of a word")
     @Jeanne.check(is_beta_prefix)
