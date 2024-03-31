@@ -395,8 +395,8 @@ class Levelling:
         db.commit()
         return (
             int(next_time[0])
-            if next_time
-            else round((datetime.now() + timedelta(minutes=2)).timestamp())
+            if next_time is not None
+            else 0
         )
 
     @property
@@ -408,8 +408,8 @@ class Levelling:
         db.commit()
         return (
             int(next_time[0])
-            if next_time
-            else round((datetime.now() + timedelta(minutes=2)).timestamp())
+            if next_time is not None
+            else 0
         )
 
     @property
