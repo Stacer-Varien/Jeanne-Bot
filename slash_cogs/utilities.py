@@ -435,16 +435,6 @@ class slashutilities(Cog):
             )
             await ctx.followup.send(embed=no_city)
 
-    @Jeanne.command(description="Type something and I will say it")
-    @Jeanne.describe(channel="Send to which channel?", message="What should I say?")
-    @Jeanne.checks.has_permissions(administrator=True)
-    @Jeanne.check(check_botbanned_app_command)
-    @Jeanne.check(check_disabled_app_command)
-    async def say(self, ctx: Interaction, channel: TextChannel, message: str):
-        await ctx.response.defer(ephemeral=True)
-        await ctx.followup.send(content="Message sent to {}".format(channel.mention))
-        await channel.send(message)
-
     @Jeanne.command(description="Do a calculation")
     @Jeanne.describe(calculate="Add a calculation")
     @Jeanne.check(check_botbanned_app_command)
