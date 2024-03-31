@@ -1,6 +1,7 @@
 from functools import partial
 from discord import (
     CategoryChannel,
+    ComponentType,
     ui,
     ButtonStyle,
     Interaction,
@@ -13,9 +14,11 @@ from discord import (
     TextChannel,
     TextStyle,
 )
-from typing import Optional
+from typing import List, Optional
 from collections import OrderedDict
 from json import loads
+
+from discord.utils import MISSING
 from config import WEBHOOK
 from functions import Inventory, Levelling, Logger, Manage, Welcomer
 
@@ -329,18 +332,43 @@ class RankUpmsg(ui.Modal, title="Role Reward Message"):
             await ctx.edit_original_response(content=None, embeds=[embed], view=None)
 
 
-class ReportModal(ui.Modal, title="Bot Report"):
+class BotReportMenu(ui.Select):
+    def __init__(self) -> None:
+        options = [
+            SelectOption(label="ToS Violator", value="violator"),
+            SelectOption(label="Exploit", value="exploit"),
+            SelectOption(label="Bug and/or Fault", value="bugorfault"),
+            SelectOption(label="Illicit NSFW Content", value="illicit"),
+            SelectOption(label="Other", value="other"),
+        ]
+        super().__init__(
+            placeholder="Select type of the report",
+            max_values=1,
+            min_values=1,
+            options=options,
+        )
+
+    async def callback(self, ctx: Interaction):
+
+        await ctx.response.send_modal(ReportModal(self.options[0].label))
+        try:
+            await ctx.message.delete()
+        except:
+            pass
+
+
+class BotReportSelect(ui.View):
     def __init__(self):
+        self.value = None
+        super().__init__(timeout=60)
+        self.add_item(BotReportMenu())
+
+
+class ReportModal(ui.Modal, title="Bot Report"):
+    def __init__(self, type: str):
+        self.type = type
         super().__init__()
 
-    report_type = ui.TextInput(
-        label="Type of report",
-        placeholder="Example: bug, fault, violator",
-        required=True,
-        min_length=10,
-        max_length=30,
-        style=TextStyle.short,
-    )
     report = ui.TextInput(
         label="Problem",
         placeholder="Type the problem here",
@@ -359,16 +387,16 @@ class ReportModal(ui.Modal, title="Bot Report"):
     )
 
     async def on_submit(self, ctx: Interaction) -> None:
-        report = Embed(title=self.report_type.value, color=Color.brand_red())
+        report = Embed(title=self.type, color=Color.brand_red())
         report.description = self.report.value
         if self.steps.value != None or self.steps.value == "":
             report.add_field(name="Steps", value=self.steps.value, inline=False)
         report.set_footer(text="Reporter {}| `{}`".format(ctx.user, ctx.user.id))
         SyncWebhook.from_url(WEBHOOK).send(embed=report)
         embed = Embed(
-            description="Thank you for submitting your bot report. The developer will look into it but the will not tell you the results.\n\nPlease know that your user ID has been logged if you are trolling around."
+            description="Thank you for submitting your bot report. The developer will look into it but will not tell you the results.\n\nPlease know that your user ID has been logged if you are trolling around."
         )
-        await ctx.response.send_message(embed=embed)
+        await ctx.response.send_message(embed=embed, ephemeral=True)
 
 
 class ForumGuildlines(ui.Modal, title="Forum Guideline"):
@@ -669,10 +697,10 @@ class Guess_Buttons(ui.View):
             self.add_item(button)
 
     async def button_callback(self, ctx: Interaction, number: int):
-            self.value = number
-            for child in self.children:  # Disable all buttons to prevent further clicks
-                child.disabled = True
-            self.stop()
+        self.value = number
+        for child in self.children:  # Disable all buttons to prevent further clicks
+            child.disabled = True
+        self.stop()
 
     async def interaction_check(self, ctx: Interaction):
-            return ctx.user.id == self.author.id
+        return ctx.user.id == self.author.id
