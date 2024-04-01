@@ -2,8 +2,6 @@ from random import randint
 from discord import Color, Embed, HTTPException, Interaction, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
 from functions import (
-    Botban,
-    Command,
     Hentai,
     check_botbanned_app_command,
     check_disabled_app_command,

@@ -9,7 +9,6 @@ from discord import (
 from discord.ext.commands import Cog, Bot
 from functions import (
     Botban,
-    Command,
     check_botbanned_app_command,
     check_disabled_app_command,
 )

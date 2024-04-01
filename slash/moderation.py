@@ -14,8 +14,6 @@ from discord.utils import utcnow
 from datetime import datetime, timedelta
 from humanfriendly import InvalidTimespan, format_timespan, parse_timespan
 from functions import (
-    Botban,
-    Command,
     Logger,
     Moderation,
     check_botbanned_app_command,
@@ -23,11 +21,13 @@ from functions import (
 )
 from assets.components import Confirmation
 from typing import Optional
-from discord.ext import tasks
+
+
 class BanCog(GroupCog, name="ban"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()
+
     @Jeanne.command(description="Ban someone outside the server")
     @Jeanne.describe(user_id="What is the user ID?", reason="What did they do?")
     @Jeanne.checks.has_permissions(ban_members=True)
@@ -96,6 +96,7 @@ class BanCog(GroupCog, name="ban"):
             elif view.value == False:
                 cancelled = Embed(description="Ban cancelled", color=Color.red())
                 await ctx.edit_original_response(embed=cancelled, view=None)
+
     @Jeanne.command(description="Ban someone in this server")
     @Jeanne.describe(
         member="Which member are you banning?",
@@ -166,6 +167,7 @@ class BanCog(GroupCog, name="ban"):
         )
         await ctx.followup.send(embed=banned)
         await modlog.send(embed=ban)
+
     @user.error
     async def ban_user_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
@@ -175,10 +177,13 @@ class BanCog(GroupCog, name="ban"):
             embed.description = "Invalid user ID given\nPlease try again"
             embed.color = Color.red()
             await ctx.followup.send(embed=embed)
+
+
 class ListWarns(GroupCog, name="list-warns"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()
+
     @Jeanne.command(description="View warnings in the server or a member")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
@@ -197,6 +202,7 @@ class ListWarns(GroupCog, name="list-warns"):
                 f"**{warned_member}**\n**Warn points**: {warn_points}\n\n"
             )
         await ctx.followup.send(embed=embed)
+
     @Jeanne.command(description="View warnings that a member has")
     @Jeanne.describe(member="Which member are you checking the warns?")
     @Jeanne.check(check_botbanned_app_command)
@@ -225,34 +231,13 @@ class ListWarns(GroupCog, name="list-warns"):
             inline=False,
         )
         await ctx.followup.send(embed=embed)
+
+
 class moderation(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.check_db.start()
-    @tasks.loop(seconds=60, reconnect=True)
-    async def check_db(self):
-        for bans in Moderation().get_softban_data():
-            if int(round(datetime.now().timestamp())) > int(bans[2]):
-                guild = await self.bot.fetch_guild(bans[1])
-                member = await self.bot.fetch_user(bans[0])
-                await guild.unban(member, reason="Softban expired")
-                await Moderation(guild, member).remove_softban()
-                mod_channel = Logger(guild).get_modlog_channel
-                if mod_channel != None:
-                    unmute = Embed(title="Member unbanned", color=0xFF0000)
-                    unmute.add_field(name="Member", value=member, inline=True)
-                    unmute.add_field(name="ID", value=member.id, inline=True)
-                    unmute.add_field(
-                        name="Reason", value="Softban expired", inline=True
-                    )
-                    unmute.set_thumbnail(url=member.display_avatar)
-                    modlog = await guild.fetch_channel(mod_channel)
-                    await modlog.send(embed=unmute)
-                else:
-                    continue
-    @check_db.before_loop
-    async def before_check_db(self):
-        await self.bot.wait_until_ready()
+
+
     @Jeanne.command(description="Warn a member")
     @Jeanne.describe(member="Which member are you warning?", reason="What did they do?")
     @Jeanne.checks.has_permissions(kick_members=True)
@@ -308,6 +293,7 @@ class moderation(Cog):
         )
         await ctx.followup.send(embed=warned)
         await modlog.send(embed=warn)
+
     @Jeanne.command(name="clear-warn", description="Revoke a warn by warn ID")
     @Jeanne.describe(
         member="Which member got warned?",
@@ -338,6 +324,7 @@ class moderation(Cog):
         )
         await modlog.send(embed=revoke)
         await ctx.followup.send(embed=revoked_warn)
+
     @Jeanne.command(description="Kick a member out of the server")
     @Jeanne.describe(
         member="Which member are you kicking?", reason="Why are they being kicked?"
@@ -402,6 +389,7 @@ class moderation(Cog):
         )
         await modlog.send(embed=kick)
         await ctx.followup.send(embed=kicked)
+
     @Jeanne.command(description="Bulk delete messages")
     @Jeanne.describe(
         limit="How many messages? (max is 100)",
@@ -420,11 +408,14 @@ class moderation(Cog):
         await ctx.response.defer()
         limit = (limit + 1) if limit else 101
         if member:
+
             def is_member(m: Message):
                 return m.author == member
+
             await ctx.channel.purge(limit=limit, check=is_member)
             return
         await ctx.channel.purge(limit=limit)
+
     @Jeanne.command(name="change-nickname", description="Change someone's nickname")
     @Jeanne.describe(member="Which member?", nickname="What is their new nickname")
     @Jeanne.checks.has_permissions(manage_nicknames=True)
@@ -461,6 +452,7 @@ class moderation(Cog):
             inline=False,
         )
         await ctx.followup.send(embed=setnick)
+
     @Jeanne.command(description="Unbans a user")
     @Jeanne.describe(
         user_id="What is the user ID you want to unban?",
@@ -494,6 +486,7 @@ class moderation(Cog):
         )
         await ctx.followup.send(embed=unbanned)
         await modlog.send(embed=unban)
+
     @Jeanne.command(description="Timeout a member")
     @Jeanne.describe(
         member="Which member?",
@@ -541,6 +534,7 @@ class moderation(Cog):
         )
         await ctx.followup.send(embed=muted)
         await modlog.send(embed=mute)
+
     @timeout.error
     async def timeout_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
@@ -550,6 +544,7 @@ class moderation(Cog):
             embed.description = "Invalid time added. Please try again"
             embed.color = Color.red()
             await ctx.followup.send(embed=embed)
+
     @Jeanne.command(description="Untimeouts a member")
     @Jeanne.describe(member="Which member?", reason="Why are they untimeouted?")
     @Jeanne.checks.has_permissions(moderate_members=True)
@@ -588,6 +583,7 @@ class moderation(Cog):
         )
         await ctx.followup.send(embed=unmuted)
         await modlog.send(embed=unmute)
+
     @Jeanne.command(description="Ban multiple members at once")
     @Jeanne.describe(
         user_ids="How many user IDs? Leave a space after each ID (min is 5 and max is 25)",
@@ -677,6 +673,7 @@ class moderation(Cog):
         elif (view.value == False) or (view.value == None):
             cancelled = Embed(description="Massban cancelled", color=Color.red())
             await ctx.edit_original_response(embed=cancelled, view=None)
+
     @massban.error
     async def massban_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
@@ -687,6 +684,7 @@ class moderation(Cog):
                 color=0xFF0000,
             )
             await ctx.response.send_message(embed=cooldown)
+
     @Jeanne.command(description="Unban multiple members at once")
     @Jeanne.describe(
         user_ids="How many user IDs? Leave a space after each ID (min is 5 and max is 25)",
@@ -776,6 +774,7 @@ class moderation(Cog):
         elif (view.value == False) or (view.value == None):
             cancelled = Embed(description="Massunban cancelled", color=Color.red())
             await ctx.edit_original_response(embed=cancelled, view=None)
+
     @massunban.error
     async def massunban_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
@@ -786,6 +785,8 @@ class moderation(Cog):
                 color=0xFF0000,
             )
             await ctx.response.send_message(embed=cooldown)
+
+
 async def setup(bot: Bot):
     await bot.add_cog(BanCog(bot))
     await bot.add_cog(ListWarns(bot))

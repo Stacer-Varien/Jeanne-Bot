@@ -3,8 +3,6 @@ from discord import ButtonStyle, Color, Embed, ui
 from discord.ext.commands import Bot, Cog, group, Context, Range
 import discord.ext.commands as Jeanne
 from functions import (
-    BetaTest,
-    Botban,
     check_botbanned_prefix,
     check_disabled_prefixed_command,
     is_beta_prefix,
@@ -13,10 +11,7 @@ from collections import OrderedDict
 from assets.help.modules import modules, Modules
 
 
-def replace_all(text: str, dic: dict):
-    for i, j in dic.items():
-        text = text.replace(i, j)
-    return text
+
 
 
 class help_button(ui.View):
@@ -43,6 +38,11 @@ class help_button(ui.View):
 class HelpGroupPrefix(Cog, name="Help"):
     def __init__(self, bot: Bot):
         self.bot = bot
+
+    def replace_all(text: str, dic: dict):
+        for i, j in dic.items():
+            text = text.replace(i, j)
+        return text
 
     @group(
         aliases=["h"],
@@ -170,7 +170,7 @@ class HelpGroupPrefix(Cog, name="Help"):
         module_data = dumps(modules[module_instance.value])
         if module_data:
             parms = OrderedDict([("%module%", str(module.capitalize()))])
-            json_data: dict = loads(replace_all(module_data, parms))
+            json_data: dict = loads(self.replace_all(module_data, parms))
             embed_data = json_data.get("embeds")
             embed = Embed.from_dict(embed_data[0])
         await ctx.send(embed=embed)

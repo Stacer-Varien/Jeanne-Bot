@@ -6,7 +6,6 @@ from discord.ext import commands as Jeanne
 from assets.images import get_animeme_pic
 from functions import (
     Botban,
-    Command,
     check_botbanned_prefix,
     check_disabled_prefixed_command,
     is_beta_prefix,

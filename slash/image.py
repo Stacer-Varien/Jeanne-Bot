@@ -4,7 +4,6 @@ from functions import (
 )
 from discord import Color, Embed, Interaction, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
-from requests import get
 from assets.images import (
     get_jeanne_pic,
     get_kistune_pic,

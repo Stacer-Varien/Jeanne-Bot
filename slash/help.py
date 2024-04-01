@@ -8,7 +8,7 @@ from discord import (
     app_commands as Jeanne,
 )
 from discord.ext.commands import GroupCog, Bot
-from functions import Botban, AutoCompleteChoices, check_botbanned_app_command
+from functions import AutoCompleteChoices, check_botbanned_app_command
 from collections import OrderedDict
 from assets.help.modules import modules, Modules
 

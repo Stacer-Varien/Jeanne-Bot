@@ -1,7 +1,6 @@
 from assets.components import Confirmation
 from functions import (
     AutoCompleteChoices,
-    Botban,
     Command,
     Currency,
     Inventory,
@@ -12,8 +11,6 @@ from discord import Color, Embed, File, Interaction, app_commands as Jeanne
 from PIL import UnidentifiedImageError
 from discord.ext.commands import Bot, GroupCog
 from assets.generators.profile_card import Profile
-from asyncio import get_event_loop
-from functools import partial
 from requests import exceptions
 from reactionmenu import ViewButton, ViewMenu
 

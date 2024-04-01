@@ -1,8 +1,6 @@
 import json
 import random
 from functions import (
-    Botban,
-    Command,
     check_botbanned_app_command,
     check_disabled_app_command,
 )

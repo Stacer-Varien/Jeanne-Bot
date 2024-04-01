@@ -47,11 +47,6 @@ from requests import get
 from io import BytesIO
 
 
-def replace_all(text: str, dic: dict):
-    for i, j in dic.items():
-        text = text.replace(i, j)
-    return text
-
 
 class Create_Group(GroupCog, name="create"):
     def __init__(self, bot: Bot) -> None:
@@ -845,6 +840,12 @@ class Set_Group(GroupCog, name="set"):
         self.bot = bot
         super().__init__()
 
+    @staticmethod
+    def replace_all(text: str, dic: dict):
+        for i, j in dic.items():
+            text = text.replace(i, j)
+        return text
+
     @Jeanne.command(description="Set a welcomer and/or leaver channel")
     @Jeanne.describe(
         welcoming_channel="Which channel should alert members when someone join",
@@ -927,7 +928,7 @@ class Set_Group(GroupCog, name="set"):
                 ]
             )
             json_request = str(get(jsonfile.url).content)
-            json_content = replace_all(json_request, parameters)
+            json_content = self.replace_all(json_request, parameters)
             json = loads(json_content)
             try:
                 content = json["content"]
@@ -995,7 +996,7 @@ class Set_Group(GroupCog, name="set"):
                 ]
             )
             json_request = str(get(jsonfile.url).content)
-            json_content = replace_all(json_request, parameters)
+            json_content = self.replace_all(json_request, parameters)
             json = loads(json_content)
             try:
                 content = json["content"]

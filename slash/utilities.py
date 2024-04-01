@@ -24,7 +24,6 @@ from py_expression_eval import Parser
 from typing import Literal, Optional
 from json import loads
 from requests import get
-from enum import Enum
 from humanfriendly import parse_timespan, InvalidTimespan
 from tabulate import tabulate
 
@@ -33,16 +32,6 @@ topgg_invite = "https://top.gg/bot/831993597166747679"
 discordbots_url = "https://discord.bots.gg/bots/831993597166747679"
 discordbotlist_url = "https://discordbotlist.com/bots/jeanne"
 orleans = "https://discord.gg/jh7jkuk2pp"
-
-
-class Languages(Enum):
-    English = "en"
-    Spanish = "es"
-    French = "fr"
-    Japanese = "jp"
-    Hindi = "hi"
-    Dutch = "nl"
-    German = "de"
 
 
 class invite_button(View):
@@ -197,32 +186,7 @@ class Embed_Group(GroupCog, name="embed"):
 class ReminderCog(GroupCog, name="reminder"):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.check_reminders.start()
         super().__init__()
-
-    @tasks.loop(seconds=60, reconnect=True)
-    async def check_reminders(self):
-        data = Reminder().get_all_reminders
-        if data == None:
-            return
-        for reminder in data:
-            if int(round(datetime.now().timestamp())) > int(reminder[2]):
-                member = await self.bot.fetch_user(reminder[0])
-                id = reminder[1]
-                reason = reminder[3]
-                try:
-                    embed = Embed(title="Reminder ended", color=Color.random())
-                    embed.add_field(name="Reminder", value=reason, inline=False)
-                    await member.send(embed=embed)
-                except:
-                    pass
-                await Reminder(member).remove(id)
-            else:
-                continue
-
-    @check_reminders.before_loop
-    async def before_check_reminders(self):
-        await self.bot.wait_until_ready()
 
     @Jeanne.command(description="Add a reminder")
     @Jeanne.describe(
@@ -490,10 +454,8 @@ class slashutilities(Cog):
         self,
         ctx: Interaction,
         word: Jeanne.Range[str, 1],
-        language: Optional[Languages] = None,
     ):
-        lang = language.value if language else None
-        await dictionary(ctx, word.lower(), lang)
+        await dictionary(ctx, word.lower())
 
 
 async def setup(bot: Bot):
