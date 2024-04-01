@@ -6,18 +6,15 @@ from config import TOKEN
 
 class Jeanne(Bot):
     async def setup_hook(self):
-        for filename in listdir("./slash_cogs"):
-            if filename.endswith(".py"):
-                await self.load_extension(f"slash_cogs.{filename[:-3]}")
-                print(f"{filename} loaded")
-            else:
-                print(f"Unable to load {filename[:-3]}")
-        for filename in listdir("./prefix_cogs"):
-            if filename.endswith(".py"):
-                await self.load_extension(f"prefix_cogs.{filename[:-3]}")
-                print(f"{filename} loaded")
-            else:
-                print(f"Unable to load {filename[:-3]}")
+        dirs=["./events", "./prefix", "./slash"]
+        for i in dirs:
+            for filename in listdir(i):
+                if filename.endswith(".py"):
+                    await self.load_extension(f"{i[2:]}.{filename[:-3]}")
+                    print(f"{i}.{filename} loaded")
+                else:
+                    print(f"Unable to load {i}.{filename[:-3]}")
+
         await self.load_extension("jishaku")
         await self.tree.sync()
 
@@ -39,6 +36,7 @@ bot.remove_command("help")
 async def on_ready():
     print("Connected to bot: {}".format(bot.user.name))
     print("Bot ID: {}".format(bot.user.id))
-
+    print("Connected to {} servers".format(len(bot.guilds)))
+    print("Connected to {} shards".format(bot.shard_count))
 
 bot.run(TOKEN)
