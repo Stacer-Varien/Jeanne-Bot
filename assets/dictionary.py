@@ -4,12 +4,11 @@ from typing import Optional
 from reactionmenu import ViewMenu, ViewButton
 
 
-async def dictionary(ctx: Interaction, word: str, language: Optional[str] = None):
-    language = language if language else "en"
+async def dictionary(ctx: Interaction, word: str):
 
     embed = Embed()
     response = requests.get(
-        f"https://api.dictionaryapi.dev/api/v2/entries/{language}/{word}"
+        f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
     )
     data = response.json()
 
