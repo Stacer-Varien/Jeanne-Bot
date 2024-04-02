@@ -57,7 +57,7 @@ class invite_button(View):
         self.add_item(ui.Button(style=ButtonStyle.url, label="Orleans", url=orleans))
 
 
-class utilitiesCog(Cog, name="utilities"):
+class utilitiesCog(Cog, name="Utilities"):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.parser = Parser()

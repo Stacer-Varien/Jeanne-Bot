@@ -6,6 +6,7 @@ from discord import (
     Color,
     Embed,
     Forbidden,
+    HTTPException,
     Interaction,
     Message,
     NotFound,
@@ -133,12 +134,9 @@ class Embed_Group(GroupCog, name="embed"):
         jsonfile: Optional[Attachment] = None,
     ):
         await ctx.response.defer()
-        try:
-            message: Message = await channel.fetch_message(int(messageid))
-        except Exception as e:
-            embed = Embed(description=e)
-            await ctx.followup.send(embed=embed)
-            return
+        
+        message: Message = await channel.fetch_message(int(messageid))
+
         if not (jsonscript or jsonfile):
             embed = Embed(
                 description="You are missing the JSON script or JSON file\nPlease use [Discohook](https://discohook.org/)"
@@ -176,7 +174,7 @@ class Embed_Group(GroupCog, name="embed"):
     @edit.error
     async def edit_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, (Forbidden, NotFound)
+            error.original, (Forbidden, NotFound, HTTPException)
         ):
             embed = Embed(
                 description=error,

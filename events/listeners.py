@@ -20,7 +20,7 @@ class listenersCog(Cog):
     async def on_message(self, message: Message):
         if Botban(message.author).check_botbanned_user:
             return
-        if not message.author.bot:
+        if not message.author.bot and not message.author.dm_channel:
             level_instance=Levelling(message.author, message.guild)
             if (
                 level_instance.check_xpblacklist_channel(

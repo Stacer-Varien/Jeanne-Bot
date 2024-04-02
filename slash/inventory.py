@@ -1,7 +1,6 @@
 from assets.components import Confirmation
 from functions import (
     AutoCompleteChoices,
-    Command,
     Currency,
     Inventory,
     check_botbanned_app_command,
@@ -21,12 +20,9 @@ class Shop_Group(GroupCog, name="shop"):
         super().__init__()
 
     @Jeanne.command(description="Check all the wallpapers available")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def backgrounds(self, ctx: Interaction):
-        if Command(ctx.guild).check_disabled(self.backgrounds.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
         await ctx.response.defer()
         wallpapers = Inventory().fetch_wallpapers()
         embed = Embed()
