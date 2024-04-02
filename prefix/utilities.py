@@ -2,11 +2,11 @@ import argparse
 from datetime import timedelta, datetime
 import re
 from discord import (
-    Attachment,
     ButtonStyle,
     Color,
     Embed,
     Forbidden,
+    HTTPException,
     Message,
     NotFound,
     TextChannel,
@@ -29,7 +29,6 @@ from typing import Optional
 from json import loads
 from requests import get
 from humanfriendly import parse_timespan, InvalidTimespan
-from tabulate import tabulate
 
 bot_invite_url = "https://discord.com/oauth2/authorize?client_id=831993597166747679&permissions=1428479601718&scope=bot%20applications.commands"
 topgg_invite = "https://top.gg/bot/831993597166747679"
@@ -158,22 +157,19 @@ class utilitiesCog(Cog, name="utilities"):
     async def _list(self, ctx: Context):
         reminders = Reminder(ctx.author).get_all_user_reminders
         embed = Embed()
-        try:
-            reminds = []
+        if reminders == None:
+            embed.description = "No reminders"
+        else:
             for i in reminders:
                 ids = i[1]
                 reminder = i[3]
                 time = f"<t:{i[2]}:F>"
-                reminds.append([str(ids), str(reminder), str(time)])
 
                 embed.add_field(
                     name=f"ID: {ids}",
                     value=f"*Reminder:* {reminder}\n*Time:* {time}",
                     inline=True,
                 )
-
-        except:
-            embed.description = "No reminders"
         embed.color = Color.random()
         await ctx.send(embed=embed, delete_after=30)
 
@@ -210,7 +206,7 @@ class utilitiesCog(Cog, name="utilities"):
         self,
         ctx: Context,
         channel: TextChannel,
-        jsonscript:Optional[str]=None,
+        jsonscript: Optional[str] = None,
     ):
         async with ctx.typing():
             if jsonscript and ctx.message.attachments:
@@ -220,7 +216,9 @@ class utilitiesCog(Cog, name="utilities"):
                 await ctx.send(embed=embed)
                 return
             json: dict = (
-                loads(jsonscript) if jsonscript else loads(get(ctx.message.attachments[0].url).content)
+                loads(jsonscript)
+                if jsonscript
+                else loads(get(ctx.message.attachments[0].url).content)
             )
             try:
                 content = json.get("content", None)
@@ -251,31 +249,21 @@ class utilitiesCog(Cog, name="utilities"):
         ctx: Context,
         channel: TextChannel,
         messageid: str,
-        *,
         jsonscript: Optional[str] = None,
-        jsonfile: Optional[Attachment] = None,
     ):
         async with ctx.typing():
-            try:
-                message: Message = await channel.fetch_message(int(messageid))
-            except Exception as e:
-                embed = Embed(description=e)
-                await ctx.send(embed=embed)
-                return
-            if not (jsonscript or jsonfile):
-                embed = Embed(
-                    description="You are missing the JSON script or JSON file\nPlease use [Discohook](https://discohook.org/)"
-                )
-                await ctx.send(embed=embed)
-                return
-            if jsonscript and jsonfile:
+            message: Message = await channel.fetch_message(int(messageid))
+
+            if jsonscript and ctx.message.attachments:
                 embed = Embed(
                     description="You are using both the JSON script and JSON file\nPlease use one"
                 )
                 await ctx.send(embed=embed)
                 return
             json: dict = (
-                loads(jsonscript) if jsonscript else loads(get(jsonfile.url).content)
+                loads(jsonscript)
+                if jsonscript
+                else loads(get(ctx.message.attachments[0].url).content)
             )
             try:
                 content = json.get("content", None)
@@ -299,7 +287,7 @@ class utilitiesCog(Cog, name="utilities"):
     @edit.error
     async def edit_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, (Forbidden, NotFound)
+            error.original, (Forbidden, NotFound, HTTPException)
         ):
             embed = Embed(
                 description=error,

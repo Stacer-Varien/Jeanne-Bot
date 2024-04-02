@@ -47,7 +47,9 @@ class invite_button(View):
             ui.Button(style=ButtonStyle.url, label="DiscordBots", url=discordbots_url)
         )
         self.add_item(
-            ui.Button(style=ButtonStyle.url, label="Discord Bot List", url=discordbotlist_url)
+            ui.Button(
+                style=ButtonStyle.url, label="Discord Bot List", url=discordbotlist_url
+            )
         )
         self.add_item(ui.Button(style=ButtonStyle.url, label="Orleans", url=orleans))
 
@@ -198,20 +200,8 @@ class ReminderCog(GroupCog, name="reminder"):
         await ctx.response.defer(ephemeral=True)
         embed = Embed()
         user_reminders = Reminder(ctx.user).get_all_user_reminders
-        try:
-            if len(user_reminders) >= 10:
-                embed.description = (
-                    "You have too many reminders! Wait for one to be due or cancel one."
-                )
-                embed.color = Color.red()
-                await ctx.followup.send(embed=embed)
-                return
-        except:
-            if parse_timespan(time) < parse_timespan("1 minute"):
-                embed.color = Color.red()
-                embed.description = "Please add a time more than 1 minute."
-                await ctx.followup.send(embed=embed, ephemeral=True)
-                return
+
+        if user_reminders == None or len(user_reminders) < 10:
             date = datetime.now() + timedelta(seconds=parse_timespan(time))
             embed.title = "Reminder added"
             embed.description = f"On <t:{round(date.timestamp())}:F>, I will alert you about your reminder."
@@ -222,6 +212,20 @@ class ReminderCog(GroupCog, name="reminder"):
             )
             await Reminder(ctx.user).add(reason, round(date.timestamp()))
             await ctx.followup.send(embed=embed, ephemeral=True)
+            return
+        if len(user_reminders) == 10:
+            embed.description = (
+                "You have too many reminders! Wait for one to be due or cancel one."
+            )
+            embed.color = Color.red()
+            await ctx.followup.send(embed=embed, ephemeral=True)
+            return
+
+        if parse_timespan(time) < parse_timespan("1 minute"):
+            embed.color = Color.red()
+            embed.description = "Please add a time more than 1 minute."
+            await ctx.followup.send(embed=embed, ephemeral=True)
+            return
 
     @add.error
     async def add_error(self, ctx: Interaction, error: Jeanne.errors.AppCommandError):
@@ -244,19 +248,21 @@ class ReminderCog(GroupCog, name="reminder"):
     @Jeanne.check(check_botbanned_app_command)
     async def _list(self, ctx: Interaction):
         await ctx.response.defer(ephemeral=True)
+        embed = Embed()
         reminders = Reminder(ctx.user).get_all_user_reminders
-        try:
-            reminds = []
+        if reminders == None:
+            embed.description = "No reminders"
+        else:
             for i in reminders:
                 ids = i[1]
                 reminder = i[3]
                 time = f"<t:{i[2]}:F>"
-                reminds.append([str(ids), str(reminder), str(time)])
-            col_names = ["ID", "Reminders", "Time"]
-            embed = Embed()
-            embed.description = tabulate(reminds, headers=col_names, tablefmt="pretty")
-        except:
-            embed.description = "No reminders"
+
+                embed.add_field(
+                    name=f"ID: {ids}",
+                    value=f"*Reminder:* {reminder}\n*Time:* {time}",
+                    inline=True,
+                )
         embed.color = Color.random()
         await ctx.followup.send(embed=embed, ephemeral=True)
 
