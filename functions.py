@@ -435,8 +435,53 @@ class Levelling:
     async def add_xp(self):
         now_time = round(datetime.now().timestamp())
         next_time = round((datetime.now() + timedelta(minutes=2)).timestamp())
-        xp = 10 if datetime.today().weekday() > 4 else 5
-        cursor1 = db.execute(
+        xp = 10 if (datetime.today().weekday() >= 5) else 5
+        global_cursor = db.execute(
+            "INSERT OR IGNORE INTO globalxpData (user_id, lvl, exp, cumulative_exp, next_time) VALUES (?,?,?,?,?)",
+            (
+                self.member.id,
+                0,
+                xp,
+                xp,
+                next_time,
+            ),
+        )
+        db.commit()
+        if global_cursor.rowcount == 0:
+            if now_time >= self.get_next_time_global:
+                global_exp = self.get_user_xp
+                global_cumulated_exp = self.get_user_cumulated_xp
+                global_updated_exp = global_exp + xp
+                global_updated_cumulated_exp = global_cumulated_exp + xp
+                db.execute(
+                    "UPDATE globalxpDATA SET exp = ?, cumulative_exp = ?, next_time = ? WHERE user_id = ?",
+                    (
+                        global_updated_exp,
+                        global_updated_cumulated_exp,
+                        next_time,
+                        self.member.id,
+                    ),
+                )
+                db.commit()
+
+                global_cumulated_exp = self.get_user_cumulated_xp
+                global_level = self.get_user_level
+                global_next_lvl_exp = (
+                    (global_level * 50) + ((global_level - 1) * 25) + 50
+                )
+                if global_cumulated_exp >= global_next_lvl_exp:
+                    global_updated_exp = global_cumulated_exp - global_next_lvl_exp
+                    db.execute(
+                        "UPDATE globalxpData SET lvl = lvl + ?, exp = ? WHERE user_id = ?",
+                        (
+                            1,
+                            global_updated_exp,
+                            self.member.id,
+                        ),
+                    )
+                    db.commit()
+
+        server_cursor = db.execute(
             "INSERT OR IGNORE INTO serverxpData (guild_id, user_id, lvl, exp, cumulative_exp, next_time) VALUES (?,?,?,?,?,?)",
             (
                 self.server.id,
@@ -448,78 +493,40 @@ class Levelling:
             ),
         )
         db.commit()
-        cursor2 = db.execute(
-            "INSERT OR IGNORE INTO globalxpData (user_id, lvl, exp, cumulative_exp, next_time) VALUES (?,?,?,?,?)",
-            (
-                self.member.id,
-                0,
-                xp,
-                xp,
-                next_time,
-            ),
-        )
-        db.commit()
-        if (cursor1.rowcount == 0) and (now_time >= self.get_next_time_server):
-            server_exp = self.get_member_xp
-            cumulated_exp = self.get_member_cumulated_xp
-            server_updated_exp = server_exp + xp
-            server_updated_cumulative_exp = cumulated_exp + xp
-            db.execute(
-                "UPDATE serverxpData SET exp = ?, cumulative_exp = ?, next_time = ? WHERE guild_id = ? AND user_id = ?",
-                (
-                    server_updated_exp,
-                    server_updated_cumulative_exp,
-                    next_time,
-                    self.server.id,
-                    self.member.id,
-                ),
-            )
-            db.commit()
-        if (cursor2.rowcount == 0) and (now_time >= self.get_next_time_global):
-            global_exp = self.get_user_xp
-            global_cumulated_exp = self.get_user_cumulated_xp
-            global_updated_exp = global_exp + xp
-            global_updated_cumulated_exp = global_cumulated_exp + xp
-            db.execute(
-                "UPDATE globalxpDATA SET exp = ?, cumulative_exp = ?, next_time = ? WHERE user_id = ?",
-                (
-                    global_updated_exp,
-                    global_updated_cumulated_exp,
-                    next_time,
-                    self.member.id,
-                ),
-            )
-            db.commit()
-        global_cumulated_exp = self.get_user_cumulated_xp
-        global_level = self.get_user_level
-        global_next_lvl_exp = (global_level * 50) + ((global_level - 1) * 25) + 50
-        if global_cumulated_exp >= global_next_lvl_exp:
-            global_updated_exp = global_cumulated_exp - global_next_lvl_exp
-            db.execute(
-                "UPDATE globalxpData SET lvl = lvl + ?, exp = ? WHERE user_id = ?",
-                (
-                    1,
-                    global_updated_exp,
-                    self.member.id,
-                ),
-            )
-            db.commit()
-        server_cumulated_exp = self.get_member_cumulated_xp
-        server_level = self.get_member_level
-        server_next_lvl_exp = (server_level * 50) + ((server_level - 1) * 25) + 50
-        if server_cumulated_exp >= server_next_lvl_exp:
-            server_updated_exp = server_cumulated_exp - server_next_lvl_exp
-            db.execute(
-                "UPDATE serverxpData SET lvl = lvl + ?, exp = ? WHERE guild_id = ? AND user_id = ?",
-                (
-                    1,
-                    server_updated_exp,
-                    self.server.id,
-                    self.member.id,
-                ),
-            )
-            db.commit()
-            return self.get_level_channel
+        if (server_cursor.rowcount == 0):
+            if now_time > self.get_next_time_server:
+                server_exp = self.get_member_xp
+                cumulated_exp = self.get_member_cumulated_xp
+                server_updated_exp = server_exp + xp
+                server_updated_cumulative_exp = cumulated_exp + xp
+                db.execute(
+                    "UPDATE serverxpData SET exp = ?, cumulative_exp = ?, next_time = ? WHERE guild_id = ? AND user_id = ?",
+                    (
+                        server_updated_exp,
+                        server_updated_cumulative_exp,
+                        next_time,
+                        self.server.id,
+                        self.member.id,
+                    ),
+                )
+                db.commit()
+
+                server_cumulated_exp = self.get_member_cumulated_xp
+                server_level = self.get_member_level
+                server_next_lvl_exp = (server_level * 50) + ((server_level - 1) * 25) + 50
+                if server_cumulated_exp >= server_next_lvl_exp:
+                    server_updated_exp = server_cumulated_exp - server_next_lvl_exp
+                    db.execute(
+                        "UPDATE serverxpData SET lvl = lvl + ?, exp = ? WHERE guild_id = ? AND user_id = ?",
+                        (
+                            1,
+                            server_updated_exp,
+                            self.server.id,
+                            self.member.id,
+                        ),
+                    )
+                    db.commit()
+                    return self.get_level_channel
 
     @property
     def get_level_channel(self) -> tuple[int | None, str | None, str | None]:
