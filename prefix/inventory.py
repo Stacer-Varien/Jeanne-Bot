@@ -7,7 +7,7 @@ from functions import (
     check_disabled_prefixed_command,
     is_beta_prefix,
 )
-from discord import Color, Embed, File
+from discord import Color, Embed, File, Message
 from PIL import UnidentifiedImageError
 from discord.ext.commands import Bot, Context, BucketType, Cog
 import discord.ext.commands as Jeanne
@@ -187,7 +187,7 @@ class Shop_Group(Cog, name="Shop"):
             )
             return
            
-        await ctx.send(
+        m=await ctx.send(
             "Creating preview... This will take some time <a:loading:1161038734620373062>"
         )
         image = await Profile(self.bot).generate_profile(ctx.author, link, True)
@@ -195,7 +195,7 @@ class Shop_Group(Cog, name="Shop"):
             size_error = Embed(
                 description="The image is below the 900x500 size.\nPlease enlarge the image and try again"
             )
-            await ctx.send(content=None, embed=size_error)
+            await m.edit(content=None, embed=size_error)
             return
         file = File(fp=image, filename=f"preview_profile_card.png")
         preview = (
@@ -210,7 +210,7 @@ class Shop_Group(Cog, name="Shop"):
             )
         )
         view = Confirmation(ctx.author)
-        await ctx.edit_original_response(
+        m=await m.edit(
             content=None, embed=preview, attachments=[file], view=view
         )
         await view.wait()
@@ -220,14 +220,14 @@ class Shop_Group(Cog, name="Shop"):
                 description="Background wallpaper bought and selected",
                 color=Color.random(),
             )
-            await ctx.edit_original_response(embed=embed1, view=None, attachments=[])
+            await m.edit(embed=embed1, view=None, attachments=[])
         else:
-            await ctx.edit_original_response(
+            await m.edit(
                 content="Cancelled", embed=None, view=None, attachments=[]
             )
 
     @buycustom.error
-    async def buycustom_error(self, ctx: Context, error: Jeanne.AppCommandError):
+    async def buycustom_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
             cooldown = Embed(
                 description=f"You have already tried to preview this background!\nTry again after `{round(error.retry_after, 2)} seconds`",
@@ -244,7 +244,7 @@ class Shop_Group(Cog, name="Shop"):
             ),
         ):
             embed = Embed(description="Invalid image URL", color=Color.red())
-            await ctx.edit_original_response(content=None, embed=embed)
+            await Message.edit(content=None, embed=embed)
 
     @Jeanne.command(description="Check which backgrounds you have")
     @Jeanne.check(is_beta_prefix)
