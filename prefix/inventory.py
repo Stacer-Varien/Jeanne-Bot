@@ -57,12 +57,21 @@ class Shop_Group(Cog, name="Shop"):
     )
     async def background(self, ctx: Context): ...
 
+    buyanduse_parser = argparse.ArgumentParser(add_help=False)
+    buyanduse_parser.add_argument(
+        "--name",
+        type=str,
+        help="NAME",
+        nargs="+",
+        required=True,
+    )
+
     @background.command(description="Buy a background pic for your level card")
     @Jeanne.check(is_beta_prefix)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.cooldown(1, 60, type=BucketType.user)
-    async def buy(self, ctx: Context, *, name: str):
+    async def buy(self, ctx: Context, *words:str, parser=buyanduse_parser):
         balance = Currency(ctx.author).get_balance
         if balance == 0:
             nomoney = Embed(
@@ -75,6 +84,18 @@ class Shop_Group(Cog, name="Shop"):
                 description="You do not have enough QP.\nPlease get more QP by doing `/daily`, `/guess`, `/flip` and/or `/dice`"
             )
             await ctx.send(embed=notenough)
+            return
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            name = parsed_args.name + unknown
+            name = " ".join(name) 
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
             return
         try:
             Inventory.get_wallpaper(name)
@@ -132,8 +153,19 @@ class Shop_Group(Cog, name="Shop"):
     @Jeanne.check(is_beta_prefix)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def use(self, ctx: Context, *, name: str):
-
+    async def use(self, ctx: Context, *words:str, parser=buyanduse_parser):
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            name = parsed_args.name + unknown
+            name = " ".join(name)  
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
         try:
             await Inventory(ctx.author).use_wallpaper(name)
             embed = Embed(description=f"{name} has been selected", color=Color.random())
@@ -163,7 +195,7 @@ class Shop_Group(Cog, name="Shop"):
     @background.command(
         name="buy-custom", description="Buy a custom background pic for your level card"
     )
-    @Jeanne.checks.cooldown(1, 60, type=BucketType.user)
+    @Jeanne.cooldown(1, 60, type=BucketType.user)
     @Jeanne.check(is_beta_prefix)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
@@ -244,9 +276,9 @@ class Shop_Group(Cog, name="Shop"):
             ),
         ):
             embed = Embed(description="Invalid image URL", color=Color.red())
-            await Message.edit(content=None, embed=embed)
+            await ctx.message.edit(content=None, embed=embed)
 
-    @Jeanne.command(description="Check which backgrounds you have")
+    @background.command(description="Check which backgrounds you have")
     @Jeanne.check(is_beta_prefix)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
