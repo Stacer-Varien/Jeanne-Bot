@@ -59,7 +59,7 @@ class stat_buttons(ui.View):
 class InfoCog(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.bot_version = "4.4.2 Beta5"
+        self.bot_version = "5"
         self.userinfo_context = Jeanne.ContextMenu(
             name="Userinfo", callback=self.userinfo_callback
         )

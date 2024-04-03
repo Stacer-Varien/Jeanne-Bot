@@ -59,7 +59,7 @@ class stat_buttons(ui.View):
 class InfoCog(Cog, name="Info"):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.bot_version = "4.4.2 Beta5"
+        self.bot_version = "5"
 
     async def get_userinfo(self, ctx: Context, member: Member):
         user = await self.bot.fetch_user(member.id)
