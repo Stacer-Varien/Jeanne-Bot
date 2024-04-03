@@ -1,3 +1,4 @@
+import argparse
 from assets.components import Confirmation
 from functions import (
     Currency,
@@ -144,6 +145,21 @@ class Shop_Group(Cog, name="Shop"):
             )
             await ctx.send(embed=embed)
 
+    buycustom = argparse.ArgumentParser(add_help=False)
+    buycustom.add_argument(
+        "--name",
+        type=str,
+        help="NAME",
+        nargs="+",
+        required=True,
+    )
+    buycustom.add_argument(
+        "--link",
+        type=str,
+        help="LINK",
+        required=True,
+    )
+
     @background.command(
         name="buy-custom", description="Buy a custom background pic for your level card"
     )
@@ -151,13 +167,26 @@ class Shop_Group(Cog, name="Shop"):
     @Jeanne.check(is_beta_prefix)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def buycustom(self, ctx: Context, *, name: str, link: str):
-
+    async def buycustom(self, ctx: Context, *words:str, parser=buycustom):
         balance = Currency(ctx.author).get_balance
         if balance is None or balance < 1000:
             nomoney = Embed(description="You do not have enough QP.")
             await ctx.send(embed=nomoney)
             return
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            name = parsed_args.name + unknown
+            name = " ".join(name)
+            link:str = parsed_args.link    
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
+           
         await ctx.send(
             "Creating preview... This will take some time <a:loading:1161038734620373062>"
         )
@@ -166,7 +195,7 @@ class Shop_Group(Cog, name="Shop"):
             size_error = Embed(
                 description="The image is below the 900x500 size.\nPlease enlarge the image and try again"
             )
-            await ctx.edit_original_response(content=None, embed=size_error)
+            await ctx.send(content=None, embed=size_error)
             return
         file = File(fp=image, filename=f"preview_profile_card.png")
         preview = (
