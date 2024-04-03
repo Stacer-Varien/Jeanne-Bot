@@ -30,7 +30,7 @@ To invite Jeanne to your server, click the link below:
 
 🔗 [Invite Jeanne](https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=2550197270&redirect_uri=https%3A%2F%2Fdiscord.com%2Foauth2%2Fauthorize%3Fclient_id%3D831993597166747679%26scope%3Dbot&scope=bot%20applications.commands)
 
-[![Jeanne Discord Bot](https://top.gg/api/widget/831993597166747679.svg)](https://top.gg/bot/831993597166747679) <a href="https://discordbotlist.com/bots/jeanne"><img src="https://discordbotlist.com/api/v1/bots/831993597166747679/widget"></a>
+<a href="https://top.gg/bot/831993597166747679"><img src="https://top.gg/api/widget/831993597166747679.svg"></a> <a href="https://discordbotlist.com/bots/jeanne"><img src="https://discordbotlist.com/api/v1/bots/831993597166747679/widget"></a>
 
 ## Support and Feedback
 
