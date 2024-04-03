@@ -393,11 +393,7 @@ class Levelling:
             ),
         ).fetchone()
         db.commit()
-        return (
-            int(next_time[0])
-            if next_time is not None
-            else 0
-        )
+        return int(next_time[0]) if next_time is not None else 0
 
     @property
     def get_next_time_global(self) -> int:
@@ -406,11 +402,7 @@ class Levelling:
             (self.member.id,),
         ).fetchone()
         db.commit()
-        return (
-            int(next_time[0])
-            if next_time is not None
-            else 0
-        )
+        return int(next_time[0]) if next_time is not None else 0
 
     @property
     def get_member_level(self) -> int:
@@ -493,7 +485,7 @@ class Levelling:
             ),
         )
         db.commit()
-        if (server_cursor.rowcount == 0):
+        if server_cursor.rowcount == 0:
             if now_time > self.get_next_time_server:
                 server_exp = self.get_member_xp
                 cumulated_exp = self.get_member_cumulated_xp
@@ -513,7 +505,9 @@ class Levelling:
 
                 server_cumulated_exp = self.get_member_cumulated_xp
                 server_level = self.get_member_level
-                server_next_lvl_exp = (server_level * 50) + ((server_level - 1) * 25) + 50
+                server_next_lvl_exp = (
+                    (server_level * 50) + ((server_level - 1) * 25) + 50
+                )
                 if server_cumulated_exp >= server_next_lvl_exp:
                     server_updated_exp = server_cumulated_exp - server_next_lvl_exp
                     db.execute(
@@ -530,22 +524,28 @@ class Levelling:
 
     @property
     def get_level_channel(self) -> tuple[int | None, str | None, str | None]:
+        return self.get_levelup_channel, self.get_levelup_msg, self.get_rank_up_update
+
+    @property
+    def get_levelup_msg(self) -> str | None:
         data = db.execute(
-            "SELECT * FROM serverData WHERE server = ?", (self.server.id,)
+            "SELECT levelup_message FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
-        channel = None
-        levelup = None
-        if data:
-            channel = int(data[3]) if isinstance(data[3], int) else None
-            levelup = str(data[4]) if isinstance(data[4], str) else None
-        return channel, levelup, self.get_rank_up_update
+        return None if data == None else data[0]
+
+    @property
+    def get_levelup_channel(self) -> int | None:
+        data = db.execute(
+            "SELECT levelup_channel FROM serverData WHERE server = ?", (self.server.id,)
+        ).fetchone()
+        return None if data == None else data[0]
 
     @property
     def get_rank_up_update(self) -> str | None:
         data = db.execute(
             "SELECT rankup_message FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
-        return None if data == None else str(data[0])
+        return None if data == None else data[0]
 
     @property
     def get_role_reward(self) -> int | None:
@@ -1124,21 +1124,21 @@ class Welcomer:
         self.server = server
 
     @property
-    def get_welcomer(self):
+    def get_welcomer(self)->int|None:
         data = db.execute(
-            "SELECT * FROM serverData where server = ?",
+            "SELECT welcoming_channel FROM serverData where server = ?",
             (self.server.id,),
         ).fetchone()
         db.commit()
-        return None if data == None else data
+        return data[0] if data is not None else None 
 
     @property
-    def get_leaver(self):
+    def get_leaver(self)->int|None:
         data = db.execute(
-            "SELECT * FROM serverData where server = ?", (self.server.id,)
+            "SELECT leaving_channel FROM serverData where server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
-        return None if data == None else data
+        return data[0] if data is not None else None 
 
     @property
     def get_welcoming_msg(self) -> str | None:
@@ -1147,7 +1147,7 @@ class Welcomer:
             (self.server.id,),
         ).fetchone()
         db.commit()
-        return str(data[0]) if data else None
+        return data[0] if data is not None else None 
 
     @property
     def get_leaving_msg(self) -> str | None:
@@ -1155,7 +1155,7 @@ class Welcomer:
             "SELECT leaving_message FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
-        return str(data[0]) if data else None
+        return data[0] if data is not None else None 
 
 
 def get_cached_users() -> int:

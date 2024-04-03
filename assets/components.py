@@ -579,7 +579,7 @@ class RemoveManage(ui.View):
     @ui.button(label="Level Update Channel", style=ButtonStyle.gray)
     async def level(self, ctx: Interaction, button: ui.Button):
         self.value = "levelup"
-        check = Levelling(server=ctx.guild).get_level_channel[0]
+        check = Levelling(server=ctx.guild).get_levelup_channel
         if check == None:
             button.style = ButtonStyle.danger
             button.label = "No level update channel found"
@@ -593,7 +593,7 @@ class RemoveManage(ui.View):
     @ui.button(label="Level Update Message", style=ButtonStyle.gray)
     async def levelupdate(self, ctx: Interaction, button: ui.Button):
         self.value = "levelnotif"
-        check = Levelling(server=ctx.guild).get_level_channel[1]
+        check = Levelling(server=ctx.guild).get_levelup_msg
         if check == None:
             button.style = ButtonStyle.danger
             button.label = "No level update message set"
@@ -607,7 +607,7 @@ class RemoveManage(ui.View):
     @ui.button(label="Role Reward Message", style=ButtonStyle.gray)
     async def rolereward(self, ctx: Interaction, button: ui.Button):
         self.value = "rolereward"
-        check = Levelling(ctx.guild).get_level_channel[2]
+        check = Levelling(server=ctx.guild).get_rank_up_update
         if check == None:
             button.style = ButtonStyle.danger
             button.label = "No role reward message set"
