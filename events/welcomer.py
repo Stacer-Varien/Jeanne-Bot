@@ -21,7 +21,7 @@ class WelcomerCog(Cog):
         welcomer = Welcomer(member.guild).get_welcomer
         if welcomer is None:
             return
-        if member.guild.id == int(welcomer[0]):
+        if member.guild.id == self.bot.get_channel(welcome).guild.id:
             channel = await self.bot.fetch_channel(int(welcomer[2]))
             welcomemsg = Welcomer(member.guild).get_welcoming_msg
             if welcomemsg is None:
