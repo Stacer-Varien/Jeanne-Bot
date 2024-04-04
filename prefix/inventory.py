@@ -1,5 +1,5 @@
 import argparse
-from assets.components import Confirmation
+from assets.components import Confirmation, InvButtons, buy_function
 from functions import (
     Currency,
     Inventory,
@@ -7,7 +7,7 @@ from functions import (
     check_disabled_prefixed_command,
     is_beta_prefix,
 )
-from discord import Color, Embed, File, Message
+from discord import ButtonStyle, Color, Embed, File, Message
 from PIL import UnidentifiedImageError
 from discord.ext.commands import Bot, Context, BucketType, Cog
 import discord.ext.commands as Jeanne
@@ -29,6 +29,10 @@ class Shop_Group(Cog, name="Shop"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def backgrounds(self, ctx: Context):
+        disabled=False
+        balance=Currency(ctx.author).get_balance
+        if balance<1000:
+            disabled=True
         wallpapers = Inventory().fetch_wallpapers()
         embed = Embed()
         menu = ViewMenu(
@@ -39,15 +43,23 @@ class Shop_Group(Cog, name="Shop"):
         )
         embed.color = Color.random()
         for wallpaper in wallpapers:
+            name=str(wallpaper[1])
             page_embed = Embed(title=f"Item ID: {wallpaper[0]}", color=embed.color)
-            page_embed.add_field(name="Name", value=str(wallpaper[1]), inline=True)
+            page_embed.add_field(name="Name", value=name, inline=True)
             page_embed.add_field(
                 name="Price", value="1000 <:quantumpiece:1161010445205905418>"
             )
             page_embed.set_image(url=str(wallpaper[2]))
             menu.add_page(embed=page_embed)
+
+        async def buy_callback():
+            await buy_function(self.bot, ctx, name, menu.message)
+
+        call_followup = ViewButton.Followup(details=ViewButton.Followup.set_caller_details(buy_callback))
+
         menu.add_button(ViewButton.go_to_first_page())
         menu.add_button(ViewButton.back())
+        menu.add_button(ViewButton(label='Buy', custom_id=ViewButton.ID_CALLER, followup=call_followup, disabled=disabled))
         menu.add_button(ViewButton.next())
         menu.add_button(ViewButton.go_to_last_page())
         await menu.start()

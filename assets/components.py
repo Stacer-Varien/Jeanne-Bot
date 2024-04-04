@@ -2,6 +2,8 @@ from functools import partial
 from discord import (
     CategoryChannel,
     ComponentType,
+    File,
+    Message,
     ui,
     ButtonStyle,
     Interaction,
@@ -17,8 +19,9 @@ from discord import (
 from typing import List, Optional
 from collections import OrderedDict
 from json import loads
-
+from discord.ext.commands import Context, Bot
 from discord.utils import MISSING
+from assets.generators.profile_card import Profile
 from config import WEBHOOK
 from functions import Inventory, Levelling, Logger, Manage, Welcomer
 
@@ -693,14 +696,49 @@ class Guess_Buttons(ui.View):
             button = ui.Button(label=str(i), style=ButtonStyle.grey)
             button.callback = partial(
                 self.button_callback, number=i
-            )  # Dynamically assign button callbacks
+            )
             self.add_item(button)
 
     async def button_callback(self, ctx: Interaction, number: int):
         self.value = number
-        for child in self.children:  # Disable all buttons to prevent further clicks
+        for child in self.children:
             child.disabled = True
         self.stop()
 
     async def interaction_check(self, ctx: Interaction):
         return ctx.user.id == self.author.id
+
+class InvButtons():
+    def __init__(self, bot:Bot) -> None:
+        self.bot=bot
+
+async def buy_function(bot:Bot, ctx:Context, name:str, m:Message):
+        image_url = Inventory().get_wallpaper(name)[2]
+        m = await ctx.send(
+            "Creating preview... This will take some time <a:loading:1161038734620373062>"
+        )
+        image = await Profile(bot).generate_profile(ctx.author, image_url, True)
+        file = File(fp=image, filename=f"preview_profile_card.png")
+        preview = (
+            Embed(
+                description="This is the preview of the profile card.",
+                color=Color.random(),
+            )
+            .add_field(name="Cost", value="1000 <:quantumpiece:1161010445205905418>")
+            .set_footer(text="Is this the background you wanted?")
+        )
+        view = Confirmation(ctx.author)
+        m = await m.edit(content=None, attachments=[file], embed=preview, view=view)
+        await view.wait()
+        if view.value == None:
+            await m.edit(content="Timeout", view=None, embed=None, attachments=[])
+            return
+        if view.value == True:
+            await Inventory(ctx.author).add_user_wallpaper(name)
+            embed1 = Embed(
+                description=f"Background wallpaper bought and selected",
+                color=Color.random(),
+            )
+            await m.edit(embed=embed1, view=None)
+        else:
+            await m.edit(content="Cancelled", view=None, embed=None, attachments=[])
