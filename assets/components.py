@@ -708,15 +708,11 @@ class Guess_Buttons(ui.View):
     async def interaction_check(self, ctx: Interaction):
         return ctx.user.id == self.author.id
 
-class InvButtons():
-    def __init__(self, bot:Bot) -> None:
-        self.bot=bot
-
-async def buy_function(bot:Bot, ctx:Context, name:str, m:Message):
+async def buy_function(bot:Bot, ctx:Context, name:str, message:Message):
         image_url = Inventory().get_wallpaper(name)[2]
-        m = await ctx.send(
+        m = await message.edit(embed=Embed(description=
             "Creating preview... This will take some time <a:loading:1161038734620373062>"
-        )
+        ), view=None)
         image = await Profile(bot).generate_profile(ctx.author, image_url, True)
         file = File(fp=image, filename=f"preview_profile_card.png")
         preview = (
@@ -728,10 +724,10 @@ async def buy_function(bot:Bot, ctx:Context, name:str, m:Message):
             .set_footer(text="Is this the background you wanted?")
         )
         view = Confirmation(ctx.author)
-        m = await m.edit(content=None, attachments=[file], embed=preview, view=view)
+        m = await m.edit(attachments=[file], embed=preview, view=view)
         await view.wait()
         if view.value == None:
-            await m.edit(content="Timeout", view=None, embed=None, attachments=[])
+            await m.edit(embed=Embed(description="Timeout"), view=None, attachments=[])
             return
         if view.value == True:
             await Inventory(ctx.author).add_user_wallpaper(name)
@@ -741,4 +737,9 @@ async def buy_function(bot:Bot, ctx:Context, name:str, m:Message):
             )
             await m.edit(embed=embed1, view=None)
         else:
-            await m.edit(content="Cancelled", view=None, embed=None, attachments=[])
+            await m.edit(embed=Embed(description="Cancel"), view=None, attachments=[])
+
+async def use_function(bot:Bot, ctx:Context, name:str, message:Message):
+    await Inventory(ctx.author).use_wallpaper(name)
+    embed = Embed(description=f"{name} has been selected", color=Color.random())
+    await message.edit(embed=embed)
