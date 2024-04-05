@@ -1,5 +1,5 @@
 import argparse
-from assets.components import Confirmation, buy_function, use_function
+from assets.components import Confirmation, buy_function_context, use_function_context
 from functions import (
     Currency,
     Inventory,
@@ -7,7 +7,7 @@ from functions import (
     check_disabled_prefixed_command,
     is_beta_prefix,
 )
-from discord import ButtonStyle, Color, Embed, File, Message
+from discord import ButtonStyle, Color, Embed, File
 from PIL import UnidentifiedImageError
 from discord.ext.commands import Bot, Context, BucketType, Cog
 import discord.ext.commands as Jeanne
@@ -28,6 +28,7 @@ class Shop_Group(Cog, name="Shop"):
     @Jeanne.check(is_beta_prefix)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
+    @Jeanne.cooldown(1, 60, type=BucketType.user)
     async def backgrounds(self, ctx: Context):
         disabled=False
         balance=Currency(ctx.author).get_balance
@@ -53,7 +54,7 @@ class Shop_Group(Cog, name="Shop"):
             menu.add_page(embed=page_embed)
 
         async def buy_callback():
-                await buy_function(self.bot, ctx, menu.last_viewed.embed.title, menu.message)
+                await buy_function_context(self.bot, ctx, menu.last_viewed.embed.title, menu.message)
                 menu.remove_all_buttons()
 
         call_followup = ViewButton.Followup(details=ViewButton.Followup.set_caller_details(buy_callback))
@@ -71,41 +72,13 @@ class Shop_Group(Cog, name="Shop"):
     async def background(self, ctx: Context): ...
 
     @backgrounds.error
-    async def buy_error(self, ctx: Context, error: Jeanne.CommandError):
+    async def backgrounds_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
             cooldown = Embed(
                 description=f"You have already previewed this background!\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.random(),
             )
             await ctx.send(embed=cooldown)
-
-    @background.command(aliases=["select"],description="Select a wallpaper")
-    @Jeanne.check(is_beta_prefix)
-    @Jeanne.check(check_botbanned_prefix)
-    @Jeanne.check(check_disabled_prefixed_command)
-    async def use(self, ctx: Context, *words:str, parser):
-        try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            name = parsed_args.name + unknown
-            name = " ".join(name)  
-        except SystemExit:
-            await ctx.send(
-                embed=Embed(
-                    description=f"You are missing some arguments or using incorrect arguments for this command",
-                    color=Color.red(),
-                )
-            )
-            return
-        try:
-            await Inventory(ctx.author).use_wallpaper(name)
-            embed = Embed(description=f"{name} has been selected", color=Color.random())
-            await ctx.send(embed=embed)
-        except:
-            embed = Embed(
-                description="This background image is not in your inventory",
-                color=Color.red(),
-            )
-            await ctx.send(embed=embed)
 
     buycustom = argparse.ArgumentParser(add_help=False)
     buycustom.add_argument(
@@ -233,7 +206,7 @@ class Shop_Group(Cog, name="Shop"):
             menu.add_page(embed=page_embed)
 
         async def use_callback():
-            await use_function(self.bot, ctx, menu.last_viewed.embed.title, menu.message)
+            await use_function_context(ctx, menu.last_viewed.embed.title, menu.message)
             menu.remove_all_buttons()
 
         call_followup = ViewButton.Followup(details=ViewButton.Followup.set_caller_details(use_callback))
