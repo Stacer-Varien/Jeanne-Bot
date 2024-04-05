@@ -20,20 +20,24 @@ class Shop_Group(Cog, name="Shop"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()
-    
-    @Jeanne.group(name="shop", description="Main shop command", invoke_without_command=True)
-    async def shop(self, ctx:Context):...
 
-    @shop.command(aliases=["bgs", "bg"],description="Check all the wallpapers available")
+    @Jeanne.group(
+        name="shop", description="Main shop command", invoke_without_command=True
+    )
+    async def shop(self, ctx: Context): ...
+
+    @shop.command(
+        aliases=["bgs", "bg"], description="Check all the wallpapers available"
+    )
     @Jeanne.check(is_beta_prefix)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.cooldown(1, 60, type=BucketType.user)
     async def backgrounds(self, ctx: Context):
-        disabled=False
-        balance=Currency(ctx.author).get_balance
-        if balance<1000:
-            disabled=True
+        disabled = False
+        balance = Currency(ctx.author).get_balance
+        if balance < 1000:
+            disabled = True
         wallpapers = Inventory().fetch_wallpapers()
         embed = Embed()
         menu = ViewMenu(
@@ -44,7 +48,7 @@ class Shop_Group(Cog, name="Shop"):
         )
         embed.color = Color.random()
         for wallpaper in wallpapers:
-            name=str(wallpaper[1])
+            name = str(wallpaper[1])
             page_embed = Embed(title=name, color=embed.color)
 
             page_embed.add_field(
@@ -54,20 +58,35 @@ class Shop_Group(Cog, name="Shop"):
             menu.add_page(embed=page_embed)
 
         async def buy_callback():
-                await buy_function_context(self.bot, ctx, menu.last_viewed.embed.title, menu.message)
-                menu.remove_all_buttons()
+            await buy_function_context(
+                self.bot, ctx, menu.last_viewed.embed.title, menu.message
+            )
+            menu.remove_all_buttons()
 
-        call_followup = ViewButton.Followup(details=ViewButton.Followup.set_caller_details(buy_callback))
+        call_followup = ViewButton.Followup(
+            details=ViewButton.Followup.set_caller_details(buy_callback)
+        )
 
         menu.add_button(ViewButton.go_to_first_page())
         menu.add_button(ViewButton.back())
-        menu.add_button(ViewButton(label='Buy', style=ButtonStyle.green, custom_id=ViewButton.ID_CALLER, followup=call_followup, disabled=disabled))
+        menu.add_button(
+            ViewButton(
+                label="Buy",
+                style=ButtonStyle.green,
+                custom_id=ViewButton.ID_CALLER,
+                followup=call_followup,
+                disabled=disabled,
+            )
+        )
         menu.add_button(ViewButton.next())
         menu.add_button(ViewButton.go_to_last_page())
         await menu.start()
 
-    @Jeanne.group(aliases=["bg"],
-        name="background", description="Main background command", invoke_without_command=True
+    @Jeanne.group(
+        aliases=["bg"],
+        name="background",
+        description="Main background command",
+        invoke_without_command=True,
     )
     async def background(self, ctx: Context): ...
 
@@ -96,13 +115,15 @@ class Shop_Group(Cog, name="Shop"):
     )
 
     @background.command(
-        name="buy-custom", description="Buy a custom background pic for your level card"
+        aliases=["custom"],
+        name="buy-custom",
+        description="Buy a custom background pic for your level card",
     )
     @Jeanne.cooldown(1, 60, type=BucketType.user)
     @Jeanne.check(is_beta_prefix)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def buycustom(self, ctx: Context, *words:str, parser=buycustom):
+    async def buycustom(self, ctx: Context, *words: str, parser=buycustom):
         balance = Currency(ctx.author).get_balance
         if balance is None or balance < 1000:
             nomoney = Embed(description="You do not have enough QP.")
@@ -112,7 +133,7 @@ class Shop_Group(Cog, name="Shop"):
             parsed_args, unknown = parser.parse_known_args(words)
             name = parsed_args.name + unknown
             name = " ".join(name)
-            link:str = parsed_args.link    
+            link: str = parsed_args.link
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -121,8 +142,8 @@ class Shop_Group(Cog, name="Shop"):
                 )
             )
             return
-           
-        m=await ctx.send(
+
+        m = await ctx.send(
             "Creating preview... This will take some time <a:loading:1161038734620373062>"
         )
         image = await Profile(self.bot).generate_profile(ctx.author, link, True)
@@ -145,9 +166,7 @@ class Shop_Group(Cog, name="Shop"):
             )
         )
         view = Confirmation(ctx.author)
-        m=await m.edit(
-            content=None, embed=preview, attachments=[file], view=view
-        )
+        m = await m.edit(content=None, embed=preview, attachments=[file], view=view)
         await view.wait()
         if view.value:
             await Inventory(ctx.author).add_user_custom_wallpaper(name, link)
@@ -156,10 +175,9 @@ class Shop_Group(Cog, name="Shop"):
                 color=Color.random(),
             )
             await m.edit(embed=embed1, view=None, attachments=[])
-        else:
-            await m.edit(
-                content="Cancelled", embed=None, view=None, attachments=[]
-            )
+            return
+
+        await m.edit(embed=Embed(description="Cancel"), view=None, attachments=[])
 
     @buycustom.error
     async def buycustom_error(self, ctx: Context, error: Jeanne.CommandError):
@@ -201,7 +219,7 @@ class Shop_Group(Cog, name="Shop"):
         )
         embed.color = Color.random()
         for wallpaper in a:
-            page_embed = Embed(title=str(wallpaper[1]),color=embed.color)
+            page_embed = Embed(title=str(wallpaper[1]), color=embed.color)
             page_embed.set_image(url=str(wallpaper[2]))
             menu.add_page(embed=page_embed)
 
@@ -209,10 +227,19 @@ class Shop_Group(Cog, name="Shop"):
             await use_function_context(ctx, menu.last_viewed.embed.title, menu.message)
             menu.remove_all_buttons()
 
-        call_followup = ViewButton.Followup(details=ViewButton.Followup.set_caller_details(use_callback))
+        call_followup = ViewButton.Followup(
+            details=ViewButton.Followup.set_caller_details(use_callback)
+        )
         menu.add_button(ViewButton.go_to_first_page())
         menu.add_button(ViewButton.back())
-        menu.add_button(ViewButton(label='Use', style=ButtonStyle.green, custom_id=ViewButton.ID_CALLER, followup=call_followup))
+        menu.add_button(
+            ViewButton(
+                label="Use",
+                style=ButtonStyle.green,
+                custom_id=ViewButton.ID_CALLER,
+                followup=call_followup,
+            )
+        )
         menu.add_button(ViewButton.next())
         menu.add_button(ViewButton.go_to_last_page())
         await menu.start()
