@@ -23,7 +23,7 @@ class images(Cog, name="Images"):
         self.bot = bot
 
     @Jeanne.command(description="Get a kitsune image")
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def kitsune(self, ctx: Context):
@@ -31,7 +31,7 @@ class images(Cog, name="Images"):
         await ctx.send(embed=embed, file=file)
 
     @Jeanne.command(description="Need a wallpaper for your PC or phone?")
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def wallpaper(self, ctx: Context):
@@ -39,7 +39,7 @@ class images(Cog, name="Images"):
         await ctx.send(embed=embed, file=file)
 
     @Jeanne.command(description="Get a Jeanne d'Arc image")
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def jeanne(self, ctx: Context):
@@ -47,7 +47,7 @@ class images(Cog, name="Images"):
         await ctx.send(embed=embed, file=file)
 
     @Jeanne.command(description="Get a Saber image")
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def saber(self, ctx: Context):
@@ -55,7 +55,7 @@ class images(Cog, name="Images"):
         await ctx.send(file=file, embed=embed)
 
     @Jeanne.command(description="Get a neko image")
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def neko(self, ctx: Context):
@@ -63,7 +63,7 @@ class images(Cog, name="Images"):
         await ctx.send(file=file, embed=embed)
 
     @Jeanne.command(description="Get a Morgan le Fay (Fate) image")
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def morgan(self, ctx: Context):
@@ -71,7 +71,7 @@ class images(Cog, name="Images"):
         await ctx.send(file=file, embed=embed)
 
     @Jeanne.command(description="Get a Medusa (Fate) image")
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def medusa(self, ctx: Context):
@@ -79,7 +79,7 @@ class images(Cog, name="Images"):
         await ctx.send(embed=embed, file=file)
 
     @Jeanne.command(description="Get an image from Safebooru")
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def safebooru(self, ctx: Context):

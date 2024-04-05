@@ -93,7 +93,7 @@ class InfoCog(Cog, name="Info"):
     @Jeanne.command(
         aliases=["botstats"], description="See the bot's status from development to now"
     )
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def stats(self, ctx: Context):
@@ -132,7 +132,7 @@ class InfoCog(Cog, name="Info"):
         aliases=["uinfo", "minfo"],
         description="See the information of a member or yourself",
     )
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def userinfo(self, ctx: Context, *, member: Optional[Member] = None) -> None:
@@ -142,7 +142,7 @@ class InfoCog(Cog, name="Info"):
     @Jeanne.command(
         aliases=["sinfo", "ginfo"], description="Get information about this server"
     )
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def serverinfo(self, ctx: Context):
@@ -205,7 +205,7 @@ class InfoCog(Cog, name="Info"):
         await ctx.send(embeds=e)
 
     @Jeanne.command(description="Check how fast I respond to a command")
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def ping(self, ctx: Context):
@@ -227,7 +227,7 @@ class InfoCog(Cog, name="Info"):
         await m.edit(embed=ping)
 
     @Jeanne.command(aliases=["sbanner"], description="See the server's banner")
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def serverbanner(self, ctx: Context):
@@ -249,7 +249,7 @@ class InfoCog(Cog, name="Info"):
     @Jeanne.command(
         aliases=["av", "pfp"], description="See your avatar or another member's avatar"
     )
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def avatar(self, ctx: Context, *, member: Optional[Member] = None) -> None:
@@ -279,7 +279,7 @@ class InfoCog(Cog, name="Info"):
         await ctx.send(embeds=[normav, guildav])
 
     @Jeanne.command(description="View a sticker via message ID or sticker name")
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def sticker(self, ctx: Context, *, sticker: str):
@@ -320,7 +320,7 @@ class InfoCog(Cog, name="Info"):
             return
 
     @Jeanne.command(description="View an emoji")
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def emoji(self, ctx: Context, *, emoji: Jeanne.Range[str, 1]):

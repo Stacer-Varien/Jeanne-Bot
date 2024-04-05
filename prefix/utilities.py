@@ -88,7 +88,7 @@ class utilitiesCog(Cog, name="Utilities"):
     async def reminder(self, ctx: Context): ...
 
     @reminder.command(description="Add a reminder")
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_botbanned_prefix)
     async def add(self, ctx: Context, *words: str, parser=reminder_parser):
         try:
@@ -152,7 +152,7 @@ class utilitiesCog(Cog, name="Utilities"):
             await ctx.send(embed=embed, delete_after=10)
 
     @reminder.command(name="list", description="List all the reminders you have")
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_botbanned_prefix)
     async def _list(self, ctx: Context):
         reminders = Reminder(ctx.author).get_all_user_reminders
@@ -174,7 +174,7 @@ class utilitiesCog(Cog, name="Utilities"):
         await ctx.send(embed=embed, delete_after=30)
 
     @reminder.command(aliases=["remove"], description="Cancel a reminder")
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_botbanned_prefix)
     async def cancel(self, ctx: Context, reminder_id: int):
         reminder = Reminder(ctx.author)
@@ -199,7 +199,7 @@ class utilitiesCog(Cog, name="Utilities"):
         description="Generates an embed message. This needs the Discohook.org embed generator. You can use a JSON script or text file with the script",
     )
     @Jeanne.has_permissions(administrator=True)
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def generate(
@@ -241,7 +241,7 @@ class utilitiesCog(Cog, name="Utilities"):
         description="Edits an embed message. This needs the Discohook.org embed generator. You can use JSON script or a text file with the script"
     )
     @Jeanne.has_permissions(administrator=True)
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def edit(
@@ -316,7 +316,7 @@ class utilitiesCog(Cog, name="Utilities"):
 
     @Jeanne.command(description="Get weather information on a city")
     @Jeanne.cooldown(3, 14400, type=Jeanne.BucketType.user)
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def weather(self, ctx: Context, *words: str, parser=weather_parser):
@@ -443,7 +443,7 @@ class utilitiesCog(Cog, name="Utilities"):
             await ctx.send(embed=no_city)
 
     @Jeanne.command(aliases=["calc"], description="Do a calculation")
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def calculator(self, ctx: Context, calculate: str):
@@ -496,7 +496,7 @@ class utilitiesCog(Cog, name="Utilities"):
         await ctx.reply(view=view, ephemeral=True)
 
     @Jeanne.command(description="Check the meaning of a word")
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def dictionary(

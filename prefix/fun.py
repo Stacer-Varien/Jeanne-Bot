@@ -22,7 +22,7 @@ class fun(Cog, name="Fun"):
         description="Ask 8 ball anything and you will get your awnser",
         name="8ball",
     )
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def _8ball(self, ctx: Context, *, question: str):
@@ -66,7 +66,7 @@ class fun(Cog, name="Fun"):
         aliases=["backwards"],
         description="Say something and I will say it in reversed text",
     )
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def reverse(self, ctx: Context, *, text: str):
@@ -83,7 +83,7 @@ class fun(Cog, name="Fun"):
         await ctx.send(embed=msg)
 
     @Jeanne.command(description="Get a random animeme")
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def animeme(self, ctx: Context):
@@ -103,7 +103,7 @@ class fun(Cog, name="Fun"):
         aliases=["join"],
         description="Combine 2 words to get 2 combined words",
     )
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def combine(self, ctx: Context, *words: str, parser=parser):
@@ -139,7 +139,7 @@ class fun(Cog, name="Fun"):
         aliases=["pick", "choice"],
         description="Give me a lot of choices and I will pick one for you. Separate them with ','",
     )
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def choose(self, ctx: Context, *, choices: str):
@@ -152,7 +152,7 @@ class fun(Cog, name="Fun"):
     @Jeanne.command(
         aliases=["simp"], description="Check how much of a simp you or a member are"
     )
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def simprate(self, ctx: Context, member: Optional[Member] = None):
@@ -170,7 +170,7 @@ class fun(Cog, name="Fun"):
         await ctx.send(embed=simp)
 
     @Jeanne.command(description="Check how gay you are")
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def gayrate(self, ctx: Context, member: Optional[Member] = None):

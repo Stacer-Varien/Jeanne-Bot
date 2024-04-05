@@ -57,7 +57,7 @@ class CurrencyCog(Cog, name="Currency"):
     @Jeanne.cooldown(1, 3600, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    @Jeanne.check(is_beta_prefix)
+
     async def guess_free(self, ctx: Context):
         view = Guess_Buttons(ctx.author)
         m = await ctx.send(
@@ -88,7 +88,7 @@ class CurrencyCog(Cog, name="Currency"):
     @Jeanne.cooldown(1, 20, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    @Jeanne.check(is_beta_prefix)
+
     async def guess_bet(self, ctx: Context, bet: Jeanne.Range[int, 5]):
         balance = Currency(ctx.author).get_balance
         if bet > balance:
@@ -158,7 +158,7 @@ class CurrencyCog(Cog, name="Currency"):
     @dice.command(name="free", description="Roll a dice for free 20 QP")
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.cooldown(1, 3600, type=Jeanne.BucketType.user)
     async def dice_free(self, ctx: Context, digit: Jeanne.Range[int, 1, 6]):
         rolled = randint(1, 6)
@@ -178,7 +178,7 @@ class CurrencyCog(Cog, name="Currency"):
     @dice.command(name="bet", description="Roll a dice with betting")
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.cooldown(1, 20, type=Jeanne.BucketType.user)
     async def dice_bet(
         self,
@@ -244,7 +244,7 @@ class CurrencyCog(Cog, name="Currency"):
     @Jeanne.cooldown(1, 3600, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    @Jeanne.check(is_beta_prefix)
+
     async def flip_free(self, ctx: Context):
         picks = ["Heads", "Tails"]
         jeannes_pick = choice(picks)
@@ -278,7 +278,7 @@ class CurrencyCog(Cog, name="Currency"):
     @Jeanne.cooldown(1, 20, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    @Jeanne.check(is_beta_prefix)
+
     async def flip_bet(self, ctx: Context, bet: Jeanne.Range[int, 5]):
         picks = ["Heads", "Tails"]
         jeannes_pick = choice(picks)
@@ -361,7 +361,7 @@ class CurrencyCog(Cog, name="Currency"):
     @Jeanne.command(description="Claim your daily")
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    @Jeanne.check(is_beta_prefix)
+
     async def daily(self, ctx: Context):
         bank = Currency(ctx.author)
         tomorrow = round((datetime.now() + timedelta(days=1)).timestamp())
@@ -413,7 +413,7 @@ class CurrencyCog(Cog, name="Currency"):
     @Jeanne.cooldown(1, 60, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    @Jeanne.check(is_beta_prefix)
+
     async def balance(self, ctx: Context, member: Optional[Member] = None):
         member = ctx.author if (member == None) else member
         await self.get_balance(ctx, member)
@@ -430,7 +430,7 @@ class CurrencyCog(Cog, name="Currency"):
     @Jeanne.command(description="Vote for me in TopGG to get more QP!")
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    @Jeanne.check(is_beta_prefix)
+
     async def vote(self, ctx: Context):
 
         await ctx.send(

@@ -29,7 +29,7 @@ class Shop_Group(Cog, name="Shop"):
     @shop.command(
         aliases=["bgs", "bg"], description="Check all the wallpapers available"
     )
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.cooldown(1, 60, type=BucketType.user)
@@ -120,7 +120,7 @@ class Shop_Group(Cog, name="Shop"):
         description="Buy a custom background pic for your level card",
     )
     @Jeanne.cooldown(1, 60, type=BucketType.user)
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def buycustom(self, ctx: Context, *words: str, parser=buycustom):
@@ -200,7 +200,7 @@ class Shop_Group(Cog, name="Shop"):
             await ctx.message.edit(content=None, embed=embed)
 
     @background.command(description="Check which backgrounds you have")
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def list(self, ctx: Context):

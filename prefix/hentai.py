@@ -46,7 +46,7 @@ class nsfw(Cog, name="Hentai"):
 
     @Jeanne.command(description="Get a random hentai from Jeanne")
     @Jeanne.is_nsfw()
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.cooldown(1, 5, type=BucketType.member)
@@ -108,7 +108,7 @@ class nsfw(Cog, name="Hentai"):
 
     @Jeanne.command(description="Get a random media content from Gelbooru")
     @Jeanne.is_nsfw()
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.cooldown(1, 5, type=BucketType.member)
@@ -212,7 +212,7 @@ class nsfw(Cog, name="Hentai"):
 
     @Jeanne.command(description="Get a random hentai from Yande.re")
     @Jeanne.is_nsfw()
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.cooldown(1, 5, type=BucketType.member)
@@ -303,7 +303,7 @@ class nsfw(Cog, name="Hentai"):
 
     @Jeanne.command(description="Get a random hentai from Konachan")
     @Jeanne.is_nsfw()
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.cooldown(1, 5, type=BucketType.member)
@@ -398,7 +398,7 @@ class nsfw(Cog, name="Hentai"):
 
     @Jeanne.command(description="Get a random media content from Danbooru")
     @Jeanne.is_nsfw()
-    @Jeanne.check(is_beta_prefix)
+
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.cooldown(1, 5, type=BucketType.member)
