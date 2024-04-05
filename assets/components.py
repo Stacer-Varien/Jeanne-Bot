@@ -1,7 +1,6 @@
 from functools import partial
 from discord import (
     CategoryChannel,
-    ComponentType,
     File,
     Message,
     ui,
@@ -16,11 +15,10 @@ from discord import (
     TextChannel,
     TextStyle,
 )
-from typing import List, Optional
+from typing import Optional
 from collections import OrderedDict
 from json import loads
 from discord.ext.commands import Context, Bot
-from discord.utils import MISSING
 from assets.generators.profile_card import Profile
 from config import WEBHOOK
 from functions import Inventory, Levelling, Logger, Manage, Welcomer
@@ -708,7 +706,7 @@ class Guess_Buttons(ui.View):
     async def interaction_check(self, ctx: Interaction):
         return ctx.user.id == self.author.id
 
-async def buy_function(bot:Bot, ctx:Context, name:str, message:Message):
+async def buy_function_context(bot:Bot, ctx:Context, name:str, message:Message):
         image_url = Inventory().get_wallpaper(name)[2]
         m = await message.edit(embed=Embed(description=
             "Creating preview... This will take some time <a:loading:1161038734620373062>"
@@ -739,7 +737,52 @@ async def buy_function(bot:Bot, ctx:Context, name:str, message:Message):
         else:
             await m.edit(embed=Embed(description="Cancel"), view=None, attachments=[])
 
-async def use_function(bot:Bot, ctx:Context, name:str, message:Message):
+async def use_function_context(ctx:Context, name:str, message:Message):
     await Inventory(ctx.author).use_wallpaper(name)
     embed = Embed(description=f"{name} has been selected", color=Color.random())
-    await message.edit(embed=embed)
+    await message.edit(embed=embed, view=None)
+
+
+async def buy_function_app(bot: Bot, ctx: Interaction, name: str):
+        image_url = Inventory().get_wallpaper(name)[2]
+        await ctx.edit_original_response(
+            "Creating preview... This will take some time <a:loading:1161038734620373062>"
+        )
+        image = await Profile(bot).generate_profile(ctx.user, image_url, True)
+        file = File(fp=image, filename=f"preview_profile_card.png")
+        preview = (
+            Embed(
+                description="This is the preview of the profile card.",
+                color=Color.random(),
+            )
+            .add_field(name="Cost", value="1000 <:quantumpiece:1161010445205905418>")
+            .set_footer(text="Is this the background you wanted?")
+        )
+        view = Confirmation(ctx.user)
+        await ctx.edit_original_response(
+            content=None, attachments=[file], embed=preview, view=view
+        )
+        await view.wait()
+        if view.value == None:
+            await ctx.edit_original_response(
+                content="Timeout", view=None, embed=None, attachments=[]
+            )
+            return
+        if view.value == True:
+            await Inventory(ctx.user).add_user_wallpaper(name)
+            embed1 = Embed(
+                description=f"Background wallpaper bought and selected",
+                color=Color.random(),
+            )
+            await ctx.edit_original_response(embed=embed1, view=None)
+        else:
+            await ctx.edit_original_response(
+                content="Cancelled", view=None, embed=None, attachments=[]
+            )
+
+
+
+async def use_function_context(ctx: Context, name: str, message: Message):
+    await Inventory(ctx.author).use_wallpaper(name)
+    embed = Embed(description=f"{name} has been selected", color=Color.random())
+    await message.edit(embed=embed, view=None)
