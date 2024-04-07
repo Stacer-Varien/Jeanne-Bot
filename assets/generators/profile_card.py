@@ -42,8 +42,7 @@ class Profile:
     )->BytesIO|Literal[False]:
         inventory_instance = Inventory(user)
         
-        background = BytesIO(
-            requests.get(bg_image).content if (bg_image != None) else self.default_bg
+        background = self.default_bg if bg_image ==None else BytesIO(requests.get(bg_image).content
         )
         
         currency_instance = Currency(user)
@@ -145,18 +144,18 @@ class Profile:
             levelling_instance.get_member_server_rank,
             get_richest(user),
         )
-
-        if grank <= 100:
-            if grank == 1:
-                ranked = _1st
-            elif grank == 2:
-                ranked = _2nd
-            elif grank == 3:
-                ranked = _3rd
-            elif grank <= 30:
-                ranked = top30
-            else:
-                ranked = top100
+        if grank!= None:
+            if grank <= 100:
+                if grank == 1:
+                    ranked = _1st
+                elif grank == 2:
+                    ranked = _2nd
+                elif grank == 3:
+                    ranked = _3rd
+                elif grank <= 30:
+                    ranked = top30
+                else:
+                    ranked = top100
 
             ranked = ImageEnhance.Brightness(ranked).enhance(1.1)
             card.paste(ranked, (780, 430), ranked)
