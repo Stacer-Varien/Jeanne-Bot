@@ -199,7 +199,6 @@ class utilitiesCog(Cog, name="Utilities"):
         description="Generates an embed message. This needs the Discohook.org embed generator. You can use a JSON script or text file with the script",
     )
     @Jeanne.has_permissions(administrator=True)
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def generate(
