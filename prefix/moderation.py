@@ -1,6 +1,7 @@
 import argparse
 from random import randint
 from discord import (
+    ButtonStyle,
     Color,
     Embed,
     HTTPException,
@@ -22,6 +23,7 @@ from functions import (
 )
 from assets.components import Confirmation
 from typing import Optional
+from reactionmenu import ViewButton, ViewMenu, ViewSelect
 
 
 class moderation(Cog, name="modcog"):
@@ -181,7 +183,16 @@ class moderation(Cog, name="modcog"):
                 )
             )
             return
-        member = get(ctx.guild.members, mention=member) if member.startswith("<@") else get(ctx.guild.members, id=int(member)) if member.isdigit() else get(ctx.guild.members, name=member); get(ctx.guild.members, nick=member);get(ctx.guild.members, global_name=member)
+        member = (
+            get(ctx.guild.members, mention=member)
+            if member.startswith("<@")
+            else (
+                get(ctx.guild.members, id=int(member))
+                if member.isdigit()
+                else get(ctx.guild.members, name=member)
+            )
+        )
+        get(ctx.guild.members, global_name=member)
         if member == ctx.author:
             failed = Embed(description="You can't ban yourself")
             await ctx.send(embed=failed)
@@ -225,7 +236,7 @@ class moderation(Cog, name="modcog"):
             if time:
                 try:
                     a = parse_timespan(time)
-                    Moderation(ctx.guild, member).softban_member(time)
+                    await Moderation(ctx.guild, member).softban_member(time)
                     time = format_timespan(a)
                 except:
                     time = "Invalid time added. User is banned permanently!"
@@ -271,45 +282,72 @@ class moderation(Cog, name="modcog"):
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def listwarns(self, ctx: Context, *, member: Optional[Member] = None):
-        record = (
-            Moderation(ctx.guild, member).fetch_warnings_user()
-            if member
-            else Moderation(ctx.guild).fetch_warnings_server()
-        )
-        if record == None:
-            await ctx.send(
-                f"{member or 'No one'} has no warn IDs"
-                if member
-                else "No warnings up to date"
+        async with ctx.typing():
+            record = (
+                Moderation(ctx.guild).fetch_warnings_user(member)
+                if member is not None
+                else Moderation(ctx.guild).fetch_warnings_server()
             )
-            return
+            if record == None:
+                await ctx.send(
+                    f"{member or 'No one'} has no warn IDs"
+                    if member
+                    else "No warnings up to date"
+                )
+                return
 
-        embed_title = f"{member}'s warnings" if member else "Currently warned members"
-        embed_color = 0xFF0000 if member else Color.red()
-
-        embed = Embed(title=embed_title, colour=embed_color)
-        embed.set_thumbnail(url=member.display_avatar if member else ctx.guild.icon)
-
-        for i in record:
-            moderator = (
-                await self.bot.fetch_user(i[2])
-                if member
-                else await self.bot.fetch_user(i[0])
+            menu = ViewMenu(
+                ctx,
+                menu_type=ViewMenu.TypeEmbed,
+                disable_items_on_timeout=True,
+                style="Page $/&",
             )
-            reason = i[3]
-            warn_id = i[4]
-            try:
-                date = f"<t:{i[5]}:F>"
-            except:
-                date = "None due to new update"
+            for i in range(0, len(record), 6):
+                embed_title = (
+                    f"{member}'s warnings"
+                    if member is not None
+                    else "Currently warned members"
+                )
+                embed_color = 0xFF0000 if member else Color.red()
 
-            embed.add_field(
-                name=f"`{warn_id}`",
-                value=f"**Moderator:** {moderator}\n**Reason:** {reason}\n**Date:** {date}",
-                inline=False,
-            )
+                embed = Embed(title=embed_title, colour=embed_color)
 
-        await ctx.send(embed=embed)
+                embed.set_thumbnail(url=member.display_avatar if member else ctx.guild.icon)
+                for j in record[i : i + 6]:
+                    disabled=True
+                    if ctx.author.guild_permissions.kick_members==True:
+                        disabled==False                  
+
+                    mod = await self.bot.fetch_user(j[2])
+                    user = await self.bot.fetch_user(j[0])
+                    reason = j[3]
+                    warn_id = j[4]
+                    points = Moderation(ctx.guild).warnpoints(user)
+                    date = f"<t:{j[5]}:F>"
+
+                    if member == None:
+                        embed.add_field(
+                            name=f"{user} | {user.id}",
+                            value=f"**Warn ID:** {warn_id}\n**Reason:** {reason}\n**Date:** {date}\n**Points:** {points}",
+                            inline=False,
+                        )
+                    else:
+                        embed.add_field(
+                            name=f"**Warn ID:** {warn_id}",
+                            value=f"**Moderator:** {mod}\n**Reason:** {reason}\n**Date:** {date}",
+                            inline=False,
+                        )
+                        embed.set_footer(text=f"Total warn points: {points}")
+                menu.add_page(embed=embed)
+            if len(record) < 6:
+                await ctx.send(embed=embed)
+                return
+
+            menu.add_button(ViewButton.go_to_first_page())
+            menu.add_button(ViewButton.back())
+            menu.add_button(ViewButton.next())
+            menu.add_button(ViewButton.go_to_last_page())
+            await menu.start()
 
     @listwarns.error
     async def listwarns_error(self, ctx: Context, error: Jeanne.CommandError):
@@ -351,7 +389,6 @@ class moderation(Cog, name="modcog"):
                 else get(ctx.guild.members, name=member)
             )
         )
-        get(ctx.guild.members, nick=member)
         get(ctx.guild.members, global_name=member)
         if ctx.author.top_role.position < member.top_role.position:
             failed = Embed(
