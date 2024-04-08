@@ -1009,7 +1009,7 @@ class Moderation:
 
     def fetch_warnings_server(self) -> list | None:
         warnings = db.execute(
-            "SELECT * FROM warnDATAv2 WHERE guild_id = ?", (self.server.id,)
+            "SELECT * FROM warnDATA WHERE guild_id = ?", (self.server.id,)
         ).fetchall()
         db.commit()
         if len(warnings) == 0 or warnings == None:
@@ -1042,6 +1042,17 @@ class Moderation:
         result = data.fetchone()
         db.commit()
         return int(result[0]) if result else None
+
+    def warnpoints(self, member:Member)-> int:
+        wp_query = db.execute(
+            "SELECT * FROM warnData WHERE user_id = ? AND guild_id = ?",
+            (
+                member.id,
+                self.server.id,
+            ),
+        ).fetchall()
+
+        return 0 if wp_query is None else len(wp_query)
 
     async def revoke_warn(self, member: Member, warn_id: int):
         db.execute("DELETE FROM warnData WHERE warn_id = ?", (warn_id,))
