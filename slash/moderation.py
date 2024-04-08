@@ -13,6 +13,7 @@ from discord.ext.commands import Cog, Bot, GroupCog
 from discord.utils import utcnow
 from datetime import datetime, timedelta
 from humanfriendly import InvalidTimespan, format_timespan, parse_timespan
+from reactionmenu import ViewButton, ViewMenu
 from functions import (
     Logger,
     Moderation,
@@ -150,7 +151,7 @@ class BanCog(GroupCog, name="ban"):
         if time:
             try:
                 a = parse_timespan(time)
-                Moderation(ctx.guild, member).softban_member(time)
+                await Moderation(ctx.guild, member).softban_member(time)
                 time = format_timespan(a)
             except:
                 time = "Invalid time added. User is banned permanently!"
@@ -178,65 +179,9 @@ class BanCog(GroupCog, name="ban"):
             embed.color = Color.red()
             await ctx.followup.send(embed=embed)
 
-
-class ListWarns(GroupCog, name="list-warns"):
-    def __init__(self, bot: Bot) -> None:
-        self.bot = bot
-        super().__init__()
-
-    @Jeanne.command(description="View warnings in the server or a member")
-    @Jeanne.check(check_botbanned_app_command)
-    @Jeanne.check(check_disabled_app_command)
-    async def server(self, ctx: Interaction):
-        await ctx.response.defer()
-        record = Moderation(ctx.guild).fetch_warnings_server()
-        if record == None:
-            await ctx.followup.send("No warnings up to date")
-            return
-        embed = Embed(title=f"Currently warned members", colour=Color.red())
-        embed.description = ""
-        for i in record:
-            warned_member = await self.bot.fetch_user(i[0])
-            warn_points = i[2]
-            embed.description += (
-                f"**{warned_member}**\n**Warn points**: {warn_points}\n\n"
-            )
-        await ctx.followup.send(embed=embed)
-
-    @Jeanne.command(description="View warnings that a member has")
-    @Jeanne.describe(member="Which member are you checking the warns?")
-    @Jeanne.check(check_botbanned_app_command)
-    @Jeanne.check(check_disabled_app_command)
-    async def user(self, ctx: Interaction, member: Optional[Member]) -> None:
-        await ctx.response.defer()
-        member = ctx.user if member is None else member
-        record = Moderation(ctx.guild, member).fetch_warnings_user()
-        if record == None:
-            await ctx.followup.send(f"{member} has no warn IDs")
-            return
-        embed = Embed(title=f"{member}'s warnings", colour=0xFF0000)
-        embed.description = ""
-        embed.set_thumbnail(url=member.display_avatar)
-        for i in record:
-            moderator = await self.bot.fetch_user(i[2])
-            reason = i[3]
-            warn_id = i[4]
-            try:
-                date = f"<t:{i[5]}:F>"
-            except:
-                date = "None due to new update"
-        embed.add_field(
-            name=f"`{warn_id}`",
-            value=f"**Moderator:** {moderator}\n**Reason:** {reason}\n**Date:** {date}",
-            inline=False,
-        )
-        await ctx.followup.send(embed=embed)
-
-
 class moderation(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
-
 
     @Jeanne.command(description="Warn a member")
     @Jeanne.describe(member="Which member are you warning?", reason="What did they do?")
@@ -293,6 +238,73 @@ class moderation(Cog):
         )
         await ctx.followup.send(embed=warned)
         await modlog.send(embed=warn)
+
+    @Jeanne.command(name="list-warns", description="View warnings in the server or a member")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
+    async def listwarns(self, ctx: Interaction, member:Optional[Member]):
+        await ctx.response.defer()
+        record = (
+            Moderation(ctx.guild).fetch_warnings_user(member)
+            if member
+            else Moderation(ctx.guild).fetch_warnings_server()
+        )
+        if record == None:
+            await ctx.followup.send(
+                f"{member or 'No one'} has no warn IDs"
+                if member
+                else "No warnings up to date"
+            )
+            return
+
+        embed_title = (
+            f"{member}'s warnings" if member is not None else "Currently warned members"
+        )
+        embed_color = 0xFF0000 if member else Color.red()
+
+        embed = Embed(title=embed_title, colour=embed_color)
+        embed.set_thumbnail(url=member.display_avatar if member else ctx.guild.icon)
+        menu = ViewMenu(
+                ctx,
+                menu_type=ViewMenu.TypeEmbed,
+                disable_items_on_timeout=True,
+                style="Page $/&",
+            )
+        for j in [record[i : i + 25] for i in range(0, len(record), 25)]:
+            for k in j:
+                mod=await self.bot.fetch_user(k[2])
+                user=await self.bot.fetch_user(k[0])
+                reason = k[3]
+                warn_id = k[4]
+                points = Moderation(ctx.guild).warnpoints(user)
+                date = f"<t:{j[5]}:F>"
+                mod_or_user = (mod   
+                    if member is not None
+                    else user
+                )
+
+                if member == None:
+                    embed.add_field(
+                        name=f"{mod_or_user} | {mod_or_user.id}",
+                        value=f"### Warn ID: {warn_id}\n**Reason:** {reason}\n**Date:** {date}\n**Points:** {points}",
+                        inline=False,
+                    )
+                else:
+                    embed.add_field(
+                        name=f"**Warn ID:** {warn_id}",
+                        value=f"**Moderator:** {mod_or_user}\n**Reason:** {reason}\n**Date:** {date}",
+                    )
+                    embed.set_footer(text=f"Total warn points: {points}")
+            menu.add_page(embed=embed)
+        if len(record) < 25:
+            await ctx.followup.send(embed=embed)
+            return
+
+        menu.add_button(ViewButton.go_to_first_page())
+        menu.add_button(ViewButton.back())
+        menu.add_button(ViewButton.next())
+        menu.add_button(ViewButton.go_to_last_page())
+        await menu.start()
 
     @Jeanne.command(name="clear-warn", description="Revoke a warn by warn ID")
     @Jeanne.describe(
@@ -789,5 +801,4 @@ class moderation(Cog):
 
 async def setup(bot: Bot):
     await bot.add_cog(BanCog(bot))
-    await bot.add_cog(ListWarns(bot))
     await bot.add_cog(moderation(bot))
