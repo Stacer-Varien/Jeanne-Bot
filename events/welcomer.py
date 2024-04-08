@@ -5,11 +5,10 @@ from collections import OrderedDict
 from json import loads
 
 
-
 class WelcomerCog(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
-    
+
     @staticmethod
     def replace_all(text: str, dic: dict):
         for i, j in dic.items():
@@ -21,8 +20,9 @@ class WelcomerCog(Cog):
         welcomer = Welcomer(member.guild).get_welcomer
         if welcomer is None:
             return
-        if member.guild.id == self.bot.get_channel(welcome).guild.id:
-            channel = await self.bot.fetch_channel(int(welcomer[2]))
+        server = Welcomer(member.guild).server
+        if member.guild.id == server.id:
+            channel = await server.fetch_channel(welcomer)
             welcomemsg = Welcomer(member.guild).get_welcoming_msg
             if welcomemsg is None:
                 welcome = Embed(
@@ -62,8 +62,9 @@ class WelcomerCog(Cog):
         leaver = Welcomer(member.guild).get_leaver
         if leaver is None:
             return
-        if member.guild.id == int(leaver[0]):
-            channel = await self.bot.fetch_channel(int(leaver[1]))
+        server = Welcomer(member.guild).server
+        if member.guild.id == server.id:
+            channel = await server.fetch_channel(leaver)
             leavingmsg = Welcomer(member.guild).get_leaving_msg
             if leavingmsg is None:
                 leave = Embed(
