@@ -1,14 +1,12 @@
 import argparse
 from random import randint
 from discord import (
-    ButtonStyle,
     Color,
     Embed,
     HTTPException,
     Member,
     Message,
     NotFound,
-    User,
 )
 from discord.ext.commands import Cog, Bot, Context, BucketType
 import discord.ext.commands as Jeanne
@@ -16,22 +14,21 @@ from discord.utils import utcnow, get
 from datetime import datetime, timedelta
 from humanfriendly import InvalidTimespan, format_timespan, parse_timespan
 from functions import (
-    Logger,
     Moderation,
     check_botbanned_prefix,
     check_disabled_prefixed_command,
 )
 from assets.components import Confirmation
 from typing import Optional
-from reactionmenu import ViewButton, ViewMenu, ViewSelect
+from reactionmenu import ViewButton, ViewMenu
 
 
 class moderation(Cog, name="modcog"):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    ban_user_and_warn_parser = argparse.ArgumentParser(add_help=False)
-    ban_user_and_warn_parser.add_argument(
+    mod_parser = argparse.ArgumentParser(add_help=False)
+    mod_parser.add_argument(
         "-u",
         "--user",
         "-m",
@@ -41,7 +38,7 @@ class moderation(Cog, name="modcog"):
         nargs="+",
         required=True,
     )
-    ban_user_and_warn_parser.add_argument(
+    mod_parser.add_argument(
         "-r",
         "--reason",
         type=str,
@@ -62,7 +59,7 @@ class moderation(Cog, name="modcog"):
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def user(
-        self, ctx: Context, *words: str, parser=ban_user_and_warn_parser
+        self, ctx: Context, *words: str, parser=mod_parser
     ) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
@@ -107,6 +104,7 @@ class moderation(Cog, name="modcog"):
             ).set_thumbnail(url=user.display_avatar)
             m = await ctx.send(embed=confirm, view=view)
             await view.wait()
+            reason = reason[:470] if reason else "Unspecified"
             if view.value == None:
                 cancelled = Embed(description="Ban cancelled", color=Color.red())
                 await m.edit(embed=cancelled, view=None)
@@ -116,9 +114,9 @@ class moderation(Cog, name="modcog"):
                 ban.add_field(name="Name", value=user, inline=True)
                 ban.add_field(name="ID", value=user.id, inline=True)
                 ban.add_field(name="Moderator", value=ctx.author, inline=True)
-                ban.add_field(name="Reason", value=reason[:512], inline=False)
+                ban.add_field(name="Reason", value=reason, inline=False)
                 ban.set_thumbnail(url=user.display_avatar)
-                modlog_id = Logger(ctx.guild).get_modlog_channel
+                modlog_id = Moderation(ctx.guild).get_modlog_channel
                 if modlog_id == None:
                     await m.edit(embed=ban, view=None)
                     return
@@ -138,7 +136,7 @@ class moderation(Cog, name="modcog"):
         "-u",
         "--user",
         type=Member,
-        help="MEMBER",
+        help="USER ID | MEMBER NAME | MEMBER GLOBAL NAME",
         nargs="+",
         required=True,
     )
@@ -226,7 +224,7 @@ class moderation(Cog, name="modcog"):
                 await member.send(embed=banmsg)
             except:
                 pass
-            reason = reason if reason else "Unspecified"
+            reason = reason[:470] if reason else "Unspecified"
             await member.ban(reason="{} | {}".format(reason, ctx.author))
             ban = Embed(title="Member Banned", color=0xFF0000)
             ban.add_field(name="Name", value=member, inline=True)
@@ -242,7 +240,7 @@ class moderation(Cog, name="modcog"):
                     time = "Invalid time added. User is banned permanently!"
                 ban.add_field(name="Duration", value=time, inline=True)
             ban.set_thumbnail(url=member.display_avatar)
-            modlog_id = Logger(ctx.guild).get_modlog_channel
+            modlog_id = Moderation(ctx.guild).get_modlog_channel
             if modlog_id == None:
                 await ctx.send(embed=ban)
                 return
@@ -302,7 +300,7 @@ class moderation(Cog, name="modcog"):
                 disable_items_on_timeout=True,
                 style="Page $/&",
             )
-            for i in range(0, len(record), 6):
+            for i in range(0, len(record), 5):
                 embed_title = (
                     f"{member}'s warnings"
                     if member is not None
@@ -313,7 +311,7 @@ class moderation(Cog, name="modcog"):
                 embed = Embed(title=embed_title, colour=embed_color)
 
                 embed.set_thumbnail(url=member.display_avatar if member else ctx.guild.icon)
-                for j in record[i : i + 6]:
+                for j in record[i : i + 5]:
                     disabled=True
                     if ctx.author.guild_permissions.kick_members==True:
                         disabled==False                  
@@ -338,8 +336,9 @@ class moderation(Cog, name="modcog"):
                             inline=False,
                         )
                         embed.set_footer(text=f"Total warn points: {points}")
+
                 menu.add_page(embed=embed)
-            if len(record) < 6:
+            if len(record) < 5:
                 await ctx.send(embed=embed)
                 return
 
@@ -364,7 +363,7 @@ class moderation(Cog, name="modcog"):
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def warn(
-        self, ctx: Context, *words: str, parser=ban_user_and_warn_parser
+        self, ctx: Context, *words: str, parser=mod_parser
     ) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
@@ -386,7 +385,7 @@ class moderation(Cog, name="modcog"):
             else (
                 get(ctx.guild.members, id=int(member))
                 if member.isdigit()
-                else get(ctx.guild.members, name=member)
+                else (get(ctx.guild.members, name=member), )
             )
         )
         get(ctx.guild.members, global_name=member)
@@ -408,7 +407,7 @@ class moderation(Cog, name="modcog"):
             failed = Embed(description="You can't warn yourself")
             await ctx.send(embed=failed)
             return
-        reason = reason if reason else "Unspecified"
+        reason = reason[:470] if reason else "Unspecified"
         warn_id = randint(0, 100000)
         date = round(datetime.now().timestamp())
         await Moderation(ctx.guild).warn_user(
@@ -422,7 +421,7 @@ class moderation(Cog, name="modcog"):
         warn.add_field(name="Warn ID", value=warn_id, inline=True)
         warn.add_field(name="Date", value="<t:{}:F>".format(date), inline=True)
         warn.set_thumbnail(url=member.display_avatar)
-        modlog_id = Logger(ctx.guild).get_modlog_channel
+        modlog_id = Moderation(ctx.guild).get_modlog_channel
         if modlog_id == None:
             await ctx.send(embed=warn)
             return
@@ -460,7 +459,7 @@ class moderation(Cog, name="modcog"):
             title="Warn removed",
             description=f"{ctx.author} has revoked warn ID ({warn_id})",
         )
-        modlog_id = Logger(ctx.guild).get_modlog_channel
+        modlog_id = Moderation(ctx.guild).get_modlog_channel
         if modlog_id == None:
             await ctx.send(embed=revoked_warn)
             return
@@ -489,10 +488,32 @@ class moderation(Cog, name="modcog"):
     async def kick(
         self,
         ctx: Context,
-        member: Member,
-        reason: Optional[Jeanne.Range[str, None, 470]] = None,
+        *words:str, parser=mod_parser
     ) -> None:
-
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            user = parsed_args.user + unknown
+            member = " ".join(user)
+            reason: str = parsed_args.reason + unknown
+            reason = " ".join(reason)
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
+        member = (
+            get(ctx.guild.members, mention=member)
+            if member.startswith("<@")
+            else (
+                get(ctx.guild.members, id=int(member))
+                if member.isdigit()
+                else (get(ctx.guild.members, name=member), )
+            )
+        )
+        get(ctx.guild.members, global_name=member)
         if member.id == ctx.author.id:
             failed = Embed(description="You can't kick yourself out")
             await ctx.send(embed=failed)
@@ -515,7 +536,7 @@ class moderation(Cog, name="modcog"):
             failed = Embed(description="You can't kick yourself out")
             await ctx.send(embed=failed)
             return
-        reason = reason if reason else "Unspecified"
+        reason = reason[:470] if reason else "Unspecified"
         try:
             kickmsg = Embed(
                 description=f"You are kicked from **{ctx.guild.name}** for **{reason}**"
@@ -523,15 +544,14 @@ class moderation(Cog, name="modcog"):
             await member.send(embed=kickmsg)
         except:
             pass
-        # await member.kick(reason="{} | {}".format(reason, ctx.author))
-        await ctx.guild.kick(member, reason="{} | {}".format(reason, ctx.author))
+        await member.kick(reason="{} | {}".format(reason, ctx.author))
         kick = Embed(title="Member Kicked", color=0xFF0000)
         kick.add_field(name="Member", value=member, inline=True)
         kick.add_field(name="ID", value=member.id, inline=True)
         kick.add_field(name="Moderator", value=ctx.author, inline=True)
         kick.add_field(name="Reason", value=reason, inline=True)
         kick.set_thumbnail(url=member.display_avatar)
-        modlog_id = Logger(ctx.guild).get_modlog_channel
+        modlog_id = Moderation(ctx.guild).get_modlog_channel
         if modlog_id == None:
             await ctx.send(embed=kick)
             return
@@ -553,6 +573,24 @@ class moderation(Cog, name="modcog"):
             embed.color = Color.red()
             await ctx.send(embed=embed)
 
+    prune_parser = argparse.ArgumentParser(add_help=False)
+    prune_parser.add_argument(
+        "-u",
+        "--user",
+        type=Member,
+        help="USER ID | MEMBER NAME | MEMBER GLOBAL NAME",
+        nargs="+",
+        required=False,
+    )
+    prune_parser.add_argument(
+        "-l",
+        "--limit",
+        type=int,
+        help="LIMIT",
+        required=False,
+        default=100
+    )
+
     @Jeanne.command(description="Bulk delete messages")
     @Jeanne.has_permissions(manage_messages=True)
     @Jeanne.bot_has_permissions(manage_messages=True)
@@ -561,11 +599,34 @@ class moderation(Cog, name="modcog"):
     async def prune(
         self,
         ctx: Context,
-        limit: Optional[Jeanne.Range[int, None, 100]] = None,
-        member: Optional[Member] = None,
+        *words:str,
+        parser=prune_parser
     ) -> None:
-
-        limit = (limit + 1) if limit else 101
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            user = parsed_args.user + unknown
+            member = " ".join(user)
+            limit: int = parsed_args.limit
+            reason = " ".join(reason)
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
+        member = (
+            get(ctx.guild.members, mention=member)
+            if member.startswith("<@")
+            else (
+                get(ctx.guild.members, id=int(member))
+                if member.isdigit()
+                else (get(ctx.guild.members, name=member), )
+            )
+        )
+        get(ctx.guild.members, global_name=member)
+        limit = (limit + 1)
         if member:
 
             def is_member(m: Message):
@@ -575,7 +636,27 @@ class moderation(Cog, name="modcog"):
             return
         await ctx.channel.purge(limit=limit)
 
-    @Jeanne.command(name="change-nickname", description="Change someone's nickname")
+    nick_parser = argparse.ArgumentParser(add_help=False)
+    nick_parser.add_argument(
+        "-u",
+        "--user",
+        type=Member,
+        help="USER ID | MEMBER NAME | MEMBER GLOBAL NAME",
+        nargs="+",
+        required=True,
+    )
+    nick_parser.add_argument(
+        "-n",
+        "--nick",
+        "--nickname",
+        type=str,
+        nargs="+",
+        help="NICKNAME",
+        required=False,
+        default=None
+    )
+
+    @Jeanne.command(name="change-nickname", aliases=["nick"], description="Change someone's nickname")
     @Jeanne.has_permissions(manage_nicknames=True)
     @Jeanne.bot_has_permissions(manage_nicknames=True)
     @Jeanne.check(check_disabled_prefixed_command)
@@ -583,10 +664,32 @@ class moderation(Cog, name="modcog"):
     async def changenickname(
         self,
         ctx: Context,
-        member: Member,
-        nickname: Optional[Jeanne.Range[str, 1, 32]],
+        *words:str, parser=nick_parser
     ):
-
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            user = parsed_args.user + unknown
+            member = " ".join(user)
+            nick = parsed_args.nick + unknown
+            nickname = " ".join(nick)
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
+        member = (
+            get(ctx.guild.members, mention=member)
+            if member.startswith("<@")
+            else (
+                get(ctx.guild.members, id=int(member))
+                if member.isdigit()
+                else (get(ctx.guild.members, name=member), )
+            )
+        )
+        get(ctx.guild.members, global_name=member)
         if (not nickname) or (nickname == None):
             await member.edit(nick=None)
             setnick = Embed(color=0x00FF68)
@@ -616,30 +719,79 @@ class moderation(Cog, name="modcog"):
     async def unban(
         self,
         ctx: Context,
-        user_id: str,
-        reason: Optional[Jeanne.Range[str, None, 470]] = None,
+        *words:str,
+        parser=mod_parser
     ) -> None:
-
-        reason = reason if reason else "Unspecified"
-        user = await self.bot.fetch_user(int(user_id))
-        await ctx.guild.unban(user, reason="{} | {}".format(reason, ctx.author))
-        unban = Embed(title="User Unbanned", color=0xFF0000)
-        unban.add_field(name="Name", value=user, inline=True)
-        unban.add_field(name="ID", value=user.id, inline=True)
-        unban.add_field(name="Moderator", value=ctx.author, inline=True)
-        unban.add_field(name="Reason", value=reason, inline=False)
-        unban.set_thumbnail(url=user.display_avatar)
-        modlog_id = Logger(ctx.guild).get_modlog_channel
-        if modlog_id == None:
-            await ctx.send(embed=unban)
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            user = parsed_args.user + unknown
+            user_id = " ".join(user)
+            reason: str = parsed_args.reason
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
             return
-        modlog = ctx.guild.get_channel(modlog_id)
-        unbanned = Embed(
-            description=f"{user} has been unbanned. Check {modlog.mention}",
-            color=0xFF0000,
-        )
-        await ctx.send(embed=unbanned)
-        await modlog.send(embed=unban)
+
+        reason = reason[:470] if reason else "Unspecified"
+        user = await self.bot.fetch_user(int(user_id))
+        banned = await ctx.guild.fetch_ban(user)
+        if banned:
+            await ctx.guild.unban(user, reason="{} | {}".format(reason, ctx.author))
+            unban = Embed(title="User Unbanned", color=0xFF0000)
+            unban.add_field(name="Name", value=user, inline=True)
+            unban.add_field(name="ID", value=user.id, inline=True)
+            unban.add_field(name="Moderator", value=ctx.author, inline=True)
+            unban.add_field(name="Reason", value=reason, inline=False)
+            unban.set_thumbnail(url=user.display_avatar)
+            modlog_id = Moderation(ctx.guild).get_modlog_channel
+            if modlog_id == None:
+                await ctx.send(embed=unban)
+                return
+            modlog = ctx.guild.get_channel(modlog_id)
+            unbanned = Embed(
+                description=f"{user} has been unbanned. Check {modlog.mention}",
+                color=0xFF0000,
+            )
+            await ctx.send(embed=unbanned)
+            await modlog.send(embed=unban)
+    
+    @unban.error
+    async def unban_error(self, ctx:Context, error:Jeanne.CommandError):
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(error.original, (HTTPException, NotFound)):
+            embed=Embed(description="This user is not banned")
+            await ctx.send(embed=embed)
+
+    timeout_parser = argparse.ArgumentParser(add_help=False)
+    timeout_parser.add_argument(
+        "-u",
+        "--user",
+        type=Member,
+        help="USER ID | MEMBER NAME | MEMBER GLOBAL NAME",
+        nargs="+",
+        required=True,
+    )
+    timeout_parser.add_argument(
+        "-t",
+        "--time",
+        type=str,
+        nargs="+",
+        help="TIME",
+        required=False,
+        default="28d"
+    )
+    timeout_parser.add_argument(
+        "-r",
+        "--reason",
+        type=str,
+        nargs="+",
+        help="REASON",
+        required=False,
+        default="Unspecified"
+    )
 
     @Jeanne.command(description="Timeout a member")
     @Jeanne.has_permissions(moderate_members=True)
@@ -648,17 +800,41 @@ class moderation(Cog, name="modcog"):
     async def timeout(
         self,
         ctx: Context,
-        member: Member,
-        time: Optional[str] = None,
-        reason: Optional[Jeanne.Range[str, None, 470]] = None,
+        *words:str,
+        parser=timeout_parser
     ) -> None:
-
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            user = parsed_args.user + unknown
+            member = " ".join(user)
+            time = parsed_args.time + unknown
+            time = " ".join(time)
+            reason = parsed_args.reason + unknown
+            reason = " ".join(reason)
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
+        member = (
+            get(ctx.guild.members, mention=member)
+            if member.startswith("<@")
+            else (
+                get(ctx.guild.members, id=int(member))
+                if member.isdigit()
+                else (get(ctx.guild.members, name=member), )
+            )
+        )
+        get(ctx.guild.members, global_name=member)
         if member == ctx.author:
             failed = Embed(description="You can't time yourself out")
             await ctx.send(embed=failed)
             return
-        reason = reason if reason else "Unspecified"
-        if not time or (parse_timespan(time) > 2505600.0):
+        reason = reason[:470] if reason else "Unspecified"
+        if (parse_timespan(time) > 2505600.0):
             time = "28d"
         timed = parse_timespan(time)
         await member.edit(
@@ -672,7 +848,7 @@ class moderation(Cog, name="modcog"):
         mute.add_field(name="Duration", value=time, inline=True)
         mute.add_field(name="Reason", value=reason, inline=False)
         mute.set_thumbnail(url=member.display_avatar)
-        modlog_id = Logger(ctx.guild).get_modlog_channel
+        modlog_id = Moderation(ctx.guild).get_modlog_channel
         if modlog_id == None:
             await ctx.send(embed=mute)
             return
@@ -706,7 +882,7 @@ class moderation(Cog, name="modcog"):
         reason: Optional[Jeanne.Range[str, None, 470]] = None,
     ) -> None:
 
-        reason = reason if reason else "Unspecified"
+        reason = reason[:470] if reason else "Unspecified"
         if member == ctx.author:
             failed = Embed(description="You can't untime yourself out")
             await ctx.send(embed=failed)
@@ -720,7 +896,7 @@ class moderation(Cog, name="modcog"):
         unmute.add_field(name="Moderator", value=ctx.author, inline=True)
         unmute.add_field(name="Reason", value=reason, inline=False)
         unmute.set_thumbnail(url=member.display_avatar)
-        modlog_id = Logger(ctx.guild).get_modlog_channel
+        modlog_id = Moderation(ctx.guild).get_modlog_channel
         if modlog_id == None:
             await ctx.send(embed=unmute)
             return
@@ -802,7 +978,7 @@ class moderation(Cog, name="modcog"):
                     )
             else:
                 embed = Embed(description="No users were banned.", color=Color.red())
-            modlog_id = Logger(ctx.guild).get_modlog_channel
+            modlog_id = Moderation(ctx.guild).get_modlog_channel
             if modlog_id == None:
                 await m.edit(embed=embed)
                 return
@@ -899,7 +1075,7 @@ class moderation(Cog, name="modcog"):
                     )
             else:
                 embed = Embed(description="No users were unbanned.", color=Color.red())
-            modlog_id = Logger(ctx.guild).get_modlog_channel
+            modlog_id = Moderation(ctx.guild).get_modlog_channel
             if modlog_id == None:
                 await m.edit(embed=embed)
                 return
