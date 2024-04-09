@@ -1116,11 +1116,6 @@ class Moderation:
         )
         db.commit()
 
-
-class Logger:
-    def __init__(self, server: Optional[Guild] = None) -> None:
-        self.server = server
-
     @property
     def get_modlog_channel(self) -> int | None:
         data = db.execute(
