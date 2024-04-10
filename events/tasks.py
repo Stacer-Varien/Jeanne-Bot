@@ -1,5 +1,5 @@
 from discord import Color, Embed
-from functions import Logger, Moderation, Reminder
+from functions import Moderation, Reminder
 from discord.ext import tasks
 from discord.ext.commands import Cog, Bot
 from datetime import datetime
@@ -19,7 +19,7 @@ class tasksCog(Cog):
                 member = await self.bot.fetch_user(bans[0])
                 await guild.unban(member, reason="Softban expired")
                 await Moderation(guild, member).remove_softban()
-                mod_channel = Logger(guild).get_modlog_channel
+                mod_channel = Moderation(guild).get_modlog_channel
                 if mod_channel != None:
                     unmute = Embed(title="Member unbanned", color=0xFF0000)
                     unmute.add_field(name="Member", value=member, inline=True)

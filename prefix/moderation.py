@@ -1173,6 +1173,5 @@ class moderation(Cog, name="modcog"):
             )
             await ctx.send(embed=cooldown)
 
-
 async def setup(bot: Bot):
     await bot.add_cog(moderation(bot))

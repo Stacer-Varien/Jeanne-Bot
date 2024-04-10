@@ -21,7 +21,7 @@ from json import loads
 from discord.ext.commands import Context, Bot
 from assets.generators.profile_card import Profile
 from config import WEBHOOK
-from functions import Inventory, Levelling, Logger, Manage, Welcomer
+from functions import Inventory, Levelling, Manage, Moderation, Welcomer
 
 
 def replace_all(text: str, dic: dict):
@@ -622,7 +622,7 @@ class RemoveManage(ui.View):
     @ui.button(label="Modlog", style=ButtonStyle.gray)
     async def modlog(self, ctx: Interaction, button: ui.Button):
         self.value = "modlog"
-        check = Logger(ctx.guild).get_modlog_channel
+        check = Moderation(ctx.guild).get_modlog_channel
         if check == None:
             button.style = ButtonStyle.danger
             button.label = "No modlog found"
