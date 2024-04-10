@@ -1,4 +1,5 @@
 import argparse
+import asyncio
 from random import randint
 from discord import (
     Color,
@@ -58,14 +59,12 @@ class moderation(Cog, name="modcog"):
     @Jeanne.bot_has_permissions(ban_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def user(
-        self, ctx: Context, *words: str, parser=mod_parser
-    ) -> None:
+    async def user(self, ctx: Context, *words: str, parser=mod_parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.user + unknown
             user_id = " ".join(user)
-            reason: str = parsed_args.reason
+            reason = parsed_args.reason
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -104,12 +103,12 @@ class moderation(Cog, name="modcog"):
             ).set_thumbnail(url=user.display_avatar)
             m = await ctx.send(embed=confirm, view=view)
             await view.wait()
-            reason = reason[:470] if reason else "Unspecified"
+            reason = reason[:470]
             if view.value == None:
                 cancelled = Embed(description="Ban cancelled", color=Color.red())
                 await m.edit(embed=cancelled, view=None)
             elif view.value == True:
-                await ctx.guild.ban(user, reason="{} | {}".format(ctx.author, reason))
+                await ctx.guild.ban(user, reason="{} | {}".format(reason, ctx.author))
                 ban = Embed(title="User Banned", color=0xFF0000)
                 ban.add_field(name="Name", value=user, inline=True)
                 ban.add_field(name="ID", value=user.id, inline=True)
@@ -156,7 +155,7 @@ class moderation(Cog, name="modcog"):
         help="TIME",
         nargs="+",
         required=False,
-        default="Unspecified",
+        default=None,
     )
 
     @ban.command(description="Ban someone in this server")
@@ -168,10 +167,10 @@ class moderation(Cog, name="modcog"):
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.user + unknown
-            member = " ".join(map(str, user))
-            reason: str = parsed_args.reason + unknown
+            member = " ".join(user)
+            reason = parsed_args.reason + unknown
             reason = " ".join(reason)
-            time: str = parsed_args.time + unknown
+            time = parsed_args.time + unknown
             time = " ".join(time)
         except SystemExit:
             await ctx.send(
@@ -224,7 +223,7 @@ class moderation(Cog, name="modcog"):
                 await member.send(embed=banmsg)
             except:
                 pass
-            reason = reason[:470] if reason else "Unspecified"
+            reason = reason[:470]
             await member.ban(reason="{} | {}".format(reason, ctx.author))
             ban = Embed(title="Member Banned", color=0xFF0000)
             ban.add_field(name="Name", value=member, inline=True)
@@ -310,12 +309,10 @@ class moderation(Cog, name="modcog"):
 
                 embed = Embed(title=embed_title, colour=embed_color)
 
-                embed.set_thumbnail(url=member.display_avatar if member else ctx.guild.icon)
+                embed.set_thumbnail(
+                    url=member.display_avatar if member else ctx.guild.icon
+                )
                 for j in record[i : i + 5]:
-                    disabled=True
-                    if ctx.author.guild_permissions.kick_members==True:
-                        disabled==False                  
-
                     mod = await self.bot.fetch_user(j[2])
                     user = await self.bot.fetch_user(j[0])
                     reason = j[3]
@@ -362,14 +359,12 @@ class moderation(Cog, name="modcog"):
     @Jeanne.has_permissions(kick_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def warn(
-        self, ctx: Context, *words: str, parser=mod_parser
-    ) -> None:
+    async def warn(self, ctx: Context, *words: str, parser=mod_parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.user + unknown
             member = " ".join(user)
-            reason: str = parsed_args.reason + unknown
+            reason = parsed_args.reason + unknown
             reason = " ".join(reason)
         except SystemExit:
             await ctx.send(
@@ -385,7 +380,7 @@ class moderation(Cog, name="modcog"):
             else (
                 get(ctx.guild.members, id=int(member))
                 if member.isdigit()
-                else (get(ctx.guild.members, name=member), )
+                else (get(ctx.guild.members, name=member),)
             )
         )
         get(ctx.guild.members, global_name=member)
@@ -407,7 +402,7 @@ class moderation(Cog, name="modcog"):
             failed = Embed(description="You can't warn yourself")
             await ctx.send(embed=failed)
             return
-        reason = reason[:470] if reason else "Unspecified"
+        reason = reason[:470]
         warn_id = randint(0, 100000)
         date = round(datetime.now().timestamp())
         await Moderation(ctx.guild).warn_user(
@@ -443,12 +438,51 @@ class moderation(Cog, name="modcog"):
             embed.color = Color.red()
             await ctx.send(embed=embed)
 
+    clearwarn_parser = argparse.ArgumentParser(add_help=False)
+    clearwarn_parser.add_argument(
+        "-u",
+        "--user",
+        type=str,
+        help="USER ID | MEMBER NAME | MEMBER GLOBAL NAME",
+        nargs="+",
+        required=True,
+    )
+    clearwarn_parser.add_argument(
+        "-wid",
+        "--warnid",
+        type=int,
+        help="WARN ID",
+        required=True
+    )
+
     @Jeanne.command(name="clear-warn", description="Revoke a warn by warn ID")
     @Jeanne.has_permissions(kick_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def clearwarn(self, ctx: Context, member: Member, warn_id: int):
-
+    async def clearwarn(self, ctx: Context, *words: str, parser=clearwarn_parser) -> None:
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            user = parsed_args.user + unknown
+            member = " ".join(user)
+            warn_id:int = parsed_args.warnid
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
+        member = (
+            get(ctx.guild.members, mention=member)
+            if member.startswith("<@")
+            else (
+                get(ctx.guild.members, id=int(member))
+                if member.isdigit()
+                else get(ctx.guild.members, name=member)
+            )
+        )
+        get(ctx.guild.members, global_name=member)
         mod = Moderation(ctx.guild)
         result = mod.check_warn_id(member, warn_id)
         if result == None:
@@ -485,16 +519,12 @@ class moderation(Cog, name="modcog"):
     @Jeanne.bot_has_permissions(kick_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def kick(
-        self,
-        ctx: Context,
-        *words:str, parser=mod_parser
-    ) -> None:
+    async def kick(self, ctx: Context, *words: str, parser=mod_parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.user + unknown
             member = " ".join(user)
-            reason: str = parsed_args.reason + unknown
+            reason = parsed_args.reason + unknown
             reason = " ".join(reason)
         except SystemExit:
             await ctx.send(
@@ -510,7 +540,7 @@ class moderation(Cog, name="modcog"):
             else (
                 get(ctx.guild.members, id=int(member))
                 if member.isdigit()
-                else (get(ctx.guild.members, name=member), )
+                else (get(ctx.guild.members, name=member),)
             )
         )
         get(ctx.guild.members, global_name=member)
@@ -536,7 +566,7 @@ class moderation(Cog, name="modcog"):
             failed = Embed(description="You can't kick yourself out")
             await ctx.send(embed=failed)
             return
-        reason = reason[:470] if reason else "Unspecified"
+        reason = reason[:470]
         try:
             kickmsg = Embed(
                 description=f"You are kicked from **{ctx.guild.name}** for **{reason}**"
@@ -544,7 +574,7 @@ class moderation(Cog, name="modcog"):
             await member.send(embed=kickmsg)
         except:
             pass
-        await member.kick(reason="{} | {}".format(reason, ctx.author))
+        await ctx.guild.kick(member, reason="{} | {}".format(reason, ctx.author))
         kick = Embed(title="Member Kicked", color=0xFF0000)
         kick.add_field(name="Member", value=member, inline=True)
         kick.add_field(name="ID", value=member.id, inline=True)
@@ -583,12 +613,7 @@ class moderation(Cog, name="modcog"):
         required=False,
     )
     prune_parser.add_argument(
-        "-l",
-        "--limit",
-        type=int,
-        help="LIMIT",
-        required=False,
-        default=100
+        "-l", "--limit", type=int, help="LIMIT", required=False, default=100
     )
 
     @Jeanne.command(description="Bulk delete messages")
@@ -596,12 +621,7 @@ class moderation(Cog, name="modcog"):
     @Jeanne.bot_has_permissions(manage_messages=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def prune(
-        self,
-        ctx: Context,
-        *words:str,
-        parser=prune_parser
-    ) -> None:
+    async def prune(self, ctx: Context, *words: str, parser=prune_parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.user + unknown
@@ -622,11 +642,11 @@ class moderation(Cog, name="modcog"):
             else (
                 get(ctx.guild.members, id=int(member))
                 if member.isdigit()
-                else (get(ctx.guild.members, name=member), )
+                else (get(ctx.guild.members, name=member),)
             )
         )
         get(ctx.guild.members, global_name=member)
-        limit = (limit + 1)
+        limit = limit + 1
         if member:
 
             def is_member(m: Message):
@@ -638,8 +658,8 @@ class moderation(Cog, name="modcog"):
 
     nick_parser = argparse.ArgumentParser(add_help=False)
     nick_parser.add_argument(
-        "-u",
-        "--user",
+        "-m",
+        "--member",
         type=str,
         help="USER ID | MEMBER NAME | MEMBER GLOBAL NAME",
         nargs="+",
@@ -653,19 +673,19 @@ class moderation(Cog, name="modcog"):
         nargs="+",
         help="NICKNAME",
         required=False,
-        default=None
+        default=None,
     )
 
-    @Jeanne.command(name="change-nickname", aliases=["nick"], description="Change someone's nickname")
+    @Jeanne.command(
+        name="change-nickname",
+        aliases=["nick"],
+        description="Change someone's nickname",
+    )
     @Jeanne.has_permissions(manage_nicknames=True)
     @Jeanne.bot_has_permissions(manage_nicknames=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def changenickname(
-        self,
-        ctx: Context,
-        *words:str, parser=nick_parser
-    ):
+    async def changenickname(self, ctx: Context, *words: str, parser=nick_parser):
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.user + unknown
@@ -686,7 +706,7 @@ class moderation(Cog, name="modcog"):
             else (
                 get(ctx.guild.members, id=int(member))
                 if member.isdigit()
-                else (get(ctx.guild.members, name=member), )
+                else (get(ctx.guild.members, name=member),)
             )
         )
         get(ctx.guild.members, global_name=member)
@@ -716,17 +736,12 @@ class moderation(Cog, name="modcog"):
 
     @Jeanne.command(description="Unbans a user")
     @Jeanne.has_permissions(ban_members=True)
-    async def unban(
-        self,
-        ctx: Context,
-        *words:str,
-        parser=mod_parser
-    ) -> None:
+    async def unban(self, ctx: Context, *words: str, parser=mod_parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.user + unknown
             user_id = " ".join(user)
-            reason: str = parsed_args.reason
+            reason = parsed_args.reason
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -736,7 +751,7 @@ class moderation(Cog, name="modcog"):
             )
             return
 
-        reason = reason[:470] if reason else "Unspecified"
+        reason = reason[:470]
         user = await self.bot.fetch_user(int(user_id))
         banned = await ctx.guild.fetch_ban(user)
         if banned:
@@ -758,11 +773,13 @@ class moderation(Cog, name="modcog"):
             )
             await ctx.send(embed=unbanned)
             await modlog.send(embed=unban)
-    
+
     @unban.error
-    async def unban_error(self, ctx:Context, error:Jeanne.CommandError):
-        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(error.original, (HTTPException, NotFound)):
-            embed=Embed(description="This user is not banned")
+    async def unban_error(self, ctx: Context, error: Jeanne.CommandError):
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, (HTTPException, NotFound)
+        ):
+            embed = Embed(description="This user is not banned")
             await ctx.send(embed=embed)
 
     timeout_parser = argparse.ArgumentParser(add_help=False)
@@ -775,13 +792,7 @@ class moderation(Cog, name="modcog"):
         required=True,
     )
     timeout_parser.add_argument(
-        "-t",
-        "--time",
-        type=str,
-        nargs="+",
-        help="TIME",
-        required=False,
-        default="28d"
+        "-t", "--time", type=str, nargs="+", help="TIME", required=False, default="28d"
     )
     timeout_parser.add_argument(
         "-r",
@@ -790,19 +801,14 @@ class moderation(Cog, name="modcog"):
         nargs="+",
         help="REASON",
         required=False,
-        default="Unspecified"
+        default="Unspecified",
     )
 
     @Jeanne.command(description="Timeout a member")
     @Jeanne.has_permissions(moderate_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def timeout(
-        self,
-        ctx: Context,
-        *words:str,
-        parser=timeout_parser
-    ) -> None:
+    async def timeout(self, ctx: Context, *words: str, parser=timeout_parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.user + unknown
@@ -825,7 +831,7 @@ class moderation(Cog, name="modcog"):
             else (
                 get(ctx.guild.members, id=int(member))
                 if member.isdigit()
-                else (get(ctx.guild.members, name=member), )
+                else (get(ctx.guild.members, name=member),)
             )
         )
         get(ctx.guild.members, global_name=member)
@@ -833,8 +839,8 @@ class moderation(Cog, name="modcog"):
             failed = Embed(description="You can't time yourself out")
             await ctx.send(embed=failed)
             return
-        reason = reason[:470] if reason else "Unspecified"
-        if (parse_timespan(time) > 2505600.0):
+        reason = reason[:470]
+        if parse_timespan(time) > 2505600.0:
             time = "28d"
         timed = parse_timespan(time)
         await member.edit(
@@ -875,12 +881,7 @@ class moderation(Cog, name="modcog"):
     @Jeanne.bot_has_permissions(moderate_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def untimeout(
-        self,
-        ctx: Context,
-        *words:str,
-        parser=mod_parser
-    ) -> None:
+    async def untimeout(self, ctx: Context, *words: str, parser=mod_parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.user + unknown
@@ -901,11 +902,11 @@ class moderation(Cog, name="modcog"):
             else (
                 get(ctx.guild.members, id=int(member))
                 if member.isdigit()
-                else (get(ctx.guild.members, name=member), )
+                else (get(ctx.guild.members, name=member),)
             )
         )
         get(ctx.guild.members, global_name=member)
-        reason = reason[:470] if reason else "Unspecified"
+        reason = reason[:470]
         if member == ctx.author:
             failed = Embed(description="You can't untime yourself out")
             await ctx.send(embed=failed)
@@ -913,23 +914,23 @@ class moderation(Cog, name="modcog"):
         await member.edit(
             timed_out_until=None, reason="{} | {}".format(reason, ctx.author)
         )
-        unmute = Embed(title="Member Untimeout", color=0xFF0000)
-        unmute.add_field(name="Member", value=member, inline=True)
-        unmute.add_field(name="ID", value=member.id, inline=True)
-        unmute.add_field(name="Moderator", value=ctx.author, inline=True)
-        unmute.add_field(name="Reason", value=reason, inline=False)
-        unmute.set_thumbnail(url=member.display_avatar)
+        untimeout = Embed(title="Member Untimeout", color=0xFF0000)
+        untimeout.add_field(name="Member", value=member, inline=True)
+        untimeout.add_field(name="ID", value=member.id, inline=True)
+        untimeout.add_field(name="Moderator", value=ctx.author, inline=True)
+        untimeout.add_field(name="Reason", value=reason, inline=False)
+        untimeout.set_thumbnail(url=member.display_avatar)
         modlog_id = Moderation(ctx.guild).get_modlog_channel
         if modlog_id == None:
-            await ctx.send(embed=unmute)
+            await ctx.send(embed=untimeout)
             return
         modlog = ctx.guild.get_channel(modlog_id)
-        unmuted = Embed(
+        untimeouted = Embed(
             description=f"{member} has been untimeouted. Check {modlog.mention}",
             color=0xFF0000,
         )
-        await ctx.send(embed=unmuted)
-        await modlog.send(embed=unmute)
+        await ctx.send(embed=untimeouted)
+        await modlog.send(embed=untimeout)
 
     massban_unban_parser = argparse.ArgumentParser(add_help=False)
     massban_unban_parser.add_argument(
@@ -950,13 +951,13 @@ class moderation(Cog, name="modcog"):
         required=True,
     )
 
-    @Jeanne.command(description="Ban multiple members at once")
+    @Jeanne.command(aliases=["massb", "mb"], description="Ban multiple members at once")
     @Jeanne.cooldown(1, 1800, type=BucketType.guild)
     @Jeanne.has_permissions(administrator=True)
     @Jeanne.bot_has_permissions(ban_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def massban(self, ctx: Context, *words:str, parser=massban_unban_parser):
+    async def massban(self, ctx: Context, *words: str, parser=massban_unban_parser):
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.users + unknown
@@ -1014,6 +1015,7 @@ class moderation(Cog, name="modcog"):
                     user = await self.bot.fetch_user(int(user_id))
                     await ctx.guild.ban(user, reason=reason)
                     banned.append(f"{user} | `{user.id}`")
+                    await asyncio.sleep(0.5)
                     ban_count += 1
                 except Exception:
                     failed_ids.append(user_id)
@@ -1060,13 +1062,13 @@ class moderation(Cog, name="modcog"):
             )
             await ctx.send(embed=cooldown)
 
-    @Jeanne.command(description="Unban multiple members at once")
+    @Jeanne.command(aliases=["massub", "mub"],description="Unban multiple members at once")
     @Jeanne.cooldown(1, 1800, type=BucketType.guild)
     @Jeanne.bot_has_permissions(ban_members=True)
     @Jeanne.has_permissions(administrator=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def massunban(self, ctx: Context, *words:str, parser=massban_unban_parser):
+    async def massunban(self, ctx: Context, *words: str, parser=massban_unban_parser):
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.users + unknown
@@ -1124,6 +1126,7 @@ class moderation(Cog, name="modcog"):
                     user = await self.bot.fetch_user(int(user_id))
                     await ctx.guild.unban(user, reason=reason)
                     unbanned.append(f"{user} | `{user.id}`")
+                    await asyncio.sleep(0.5)
                     unban_count += 1
                 except Exception:
                     failed_ids.append(user_id)
