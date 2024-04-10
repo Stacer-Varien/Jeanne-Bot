@@ -135,7 +135,7 @@ class moderation(Cog, name="modcog"):
     ban_member_parser.add_argument(
         "-u",
         "--user",
-        type=Member,
+        type=str,
         help="USER ID | MEMBER NAME | MEMBER GLOBAL NAME",
         nargs="+",
         required=True,
@@ -577,7 +577,7 @@ class moderation(Cog, name="modcog"):
     prune_parser.add_argument(
         "-u",
         "--user",
-        type=Member,
+        type=str,
         help="USER ID | MEMBER NAME | MEMBER GLOBAL NAME",
         nargs="+",
         required=False,
@@ -640,7 +640,7 @@ class moderation(Cog, name="modcog"):
     nick_parser.add_argument(
         "-u",
         "--user",
-        type=Member,
+        type=str,
         help="USER ID | MEMBER NAME | MEMBER GLOBAL NAME",
         nargs="+",
         required=True,
@@ -769,7 +769,7 @@ class moderation(Cog, name="modcog"):
     timeout_parser.add_argument(
         "-u",
         "--user",
-        type=Member,
+        type=str,
         help="USER ID | MEMBER NAME | MEMBER GLOBAL NAME",
         nargs="+",
         required=True,
@@ -878,10 +878,33 @@ class moderation(Cog, name="modcog"):
     async def untimeout(
         self,
         ctx: Context,
-        member: Member,
-        reason: Optional[Jeanne.Range[str, None, 470]] = None,
+        *words:str,
+        parser=mod_parser
     ) -> None:
-
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            user = parsed_args.user + unknown
+            member = " ".join(user)
+            reason = parsed_args.reason + unknown
+            reason = " ".join(reason)
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
+        member = (
+            get(ctx.guild.members, mention=member)
+            if member.startswith("<@")
+            else (
+                get(ctx.guild.members, id=int(member))
+                if member.isdigit()
+                else (get(ctx.guild.members, name=member), )
+            )
+        )
+        get(ctx.guild.members, global_name=member)
         reason = reason[:470] if reason else "Unspecified"
         if member == ctx.author:
             failed = Embed(description="You can't untime yourself out")
@@ -908,14 +931,46 @@ class moderation(Cog, name="modcog"):
         await ctx.send(embed=unmuted)
         await modlog.send(embed=unmute)
 
+    massban_unban_parser = argparse.ArgumentParser(add_help=False)
+    massban_unban_parser.add_argument(
+        "-uids",
+        "--users",
+        "-ids",
+        type=str,
+        help="USER IDS",
+        nargs="+",
+        required=True,
+    )
+    massban_unban_parser.add_argument(
+        "-r",
+        "--reason",
+        type=str,
+        nargs="+",
+        help="REASON",
+        required=True,
+    )
+
     @Jeanne.command(description="Ban multiple members at once")
     @Jeanne.cooldown(1, 1800, type=BucketType.guild)
     @Jeanne.has_permissions(administrator=True)
     @Jeanne.bot_has_permissions(ban_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def massban(self, ctx: Context, user_ids: str, reason: str):
-
+    async def massban(self, ctx: Context, *words:str, parser=massban_unban_parser):
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            user = parsed_args.users + unknown
+            user_ids = " ".join(user)
+            reason = parsed_args.reason + unknown
+            reason = " ".join(reason)
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
         ids = user_ids.split()[:25]
         if len(ids) < 5:
             embed = Embed(
@@ -1011,8 +1066,21 @@ class moderation(Cog, name="modcog"):
     @Jeanne.has_permissions(administrator=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def massunban(self, ctx: Context, user_ids: str, reason: str):
-
+    async def massunban(self, ctx: Context, *words:str, parser=massban_unban_parser):
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            user = parsed_args.users + unknown
+            user_ids = " ".join(user)
+            reason = parsed_args.reason + unknown
+            reason = " ".join(reason)
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
         ids = user_ids.split()[:25]
         if len(ids) < 5:
             embed = Embed(
@@ -1023,14 +1091,14 @@ class moderation(Cog, name="modcog"):
         banned_ids = {entry.user.id async for entry in ctx.guild.bans()}
         author_id = ctx.author.id
         guild_owner_id = ctx.guild.owner.id
-        to_ban_ids = [
+        to_unban_ids = [
             user_id
             for user_id in ids
             if user_id not in banned_ids
             and user_id != str(author_id)
             and user_id != str(guild_owner_id)
         ]
-        if not to_ban_ids:
+        if not to_unban_ids:
             embed = Embed(description="No users can be unbanned.", color=Color.red())
             await ctx.send(embed=embed)
             return
@@ -1051,7 +1119,7 @@ class moderation(Cog, name="modcog"):
             unban_count = 0
             failed_ids = []
             unbanned = []
-            for user_id in to_ban_ids:
+            for user_id in to_unban_ids:
                 try:
                     user = await self.bot.fetch_user(int(user_id))
                     await ctx.guild.unban(user, reason=reason)
