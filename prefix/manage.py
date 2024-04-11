@@ -2,6 +2,8 @@ import argparse
 from typing import Optional
 from json import loads
 from discord import (
+    Interaction,
+    ui,
     AllowedMentions,
     Attachment,
     CategoryChannel,
@@ -45,6 +47,18 @@ from assets.components import (
 from requests import get
 from io import BytesIO
 
+
+class TopicButton(ui.View):
+    def __init__(self, name:str, category:CategoryChannel):
+        self.value=None
+        self.name=name
+        self.category=category
+        super().__init__(timeout=180)
+
+    @ui.button(label="Add Guidelines")
+    async def guidelines(self, button:ui.Button, ctx:Interaction):
+        self.value="guidelines"
+        await ctx.response.send_modal(ForumGuildlines(self.name, self.category))
 
 class Create_Group(Cog, name="create"):
     def __init__(self, bot: Bot) -> None:
@@ -92,12 +106,12 @@ class Create_Group(Cog, name="create"):
         action="store_true", help="Enable NSFW. Just type '-nsfw"
     )
 
-    @Jeanne.command(description="Creates a text channel")
+    @Jeanne.command(aliases=["ctc"],description="Creates a text channel")
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def textchannel(
+    async def createtextchannel(
         self,
         ctx:Context,
         *words:str, parser=textchannel_parser
@@ -153,85 +167,165 @@ class Create_Group(Cog, name="create"):
             await channel.edit(nsfw=True)
         await ctx.send(embed=embed)
 
-    @Jeanne.command(description="Create a voice channel")
-    @Jeanne.describe(
-        name="What will you name it?",
-        category="Place in which category?",
-        users="How many users are allowed in the channel",
+    voicechannel_parser = argparse.ArgumentParser(add_help=False)
+    voicechannel_parser.add_argument(
+        "-n",
+        "--name",
+        type=str,
+        help="name",
+        nargs="+",
+        required=True,
     )
-    @Jeanne.checks.has_permissions(manage_channels=True)
-    @Jeanne.checks.bot_has_permissions(manage_channels=True)
+    voicechannel_parser.add_argument(
+        "-cat",
+        "--category",
+        type=str,
+        help="category",
+        nargs="+",
+        required=False,
+        default=None,
+    )
+    voicechannel_parser.add_argument(
+        "-u",
+        "--users",
+        type=int,
+        help="users",
+        required=False,
+        default=99,
+    )
+
+    @Jeanne.command(aliases=["cvc"],description="Create a voice channel")
+    @Jeanne.has_permissions(manage_channels=True)
+    @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def voicechannel(
+    async def createvoicechannel(
         self,
         ctx:Context,
-        name: Jeanne.Range[str, 1, 100],
-        category: Optional[CategoryChannel] = None,
-        users: Optional[Jeanne.Range[int, None, 99]] = None,
+        *words:str,
+        parser=voicechannel_parser
     ) -> None:
-
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            name = parsed_args.name + unknown
+            name = " ".join(name)
+            category = parsed_args.category + unknown
+            category = " ".join(category)
+            users:int = parsed_args.users
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
         channel = await ctx.guild.create_voice_channel(name=name)
         embed = Embed()
         embed.description = "{} has been created".format(channel.jump_url)
         embed.color = Color.random()
         if category:
+            category = (
+                utils.get(ctx.guild.categories, id=category)
+                if category.isdigit()
+                else utils.get(ctx.guild.categories, name=category)
+            )
             await channel.edit(category=category)
             embed.add_field(
                 name="Added into category", value=category.name, inline=True
             )
         if users:
+            if users >99:
+                users=99
             await channel.edit(user_limit=users)
             embed.add_field(name="User Limit", value=users, inline=True)
         await ctx.send(embed=embed)
 
     @Jeanne.command(description="Create a category")
-    @Jeanne.describe(name="What will you name it?")
-    @Jeanne.checks.has_permissions(manage_channels=True)
-    @Jeanne.checks.bot_has_permissions(manage_channels=True)
+    @Jeanne.has_permissions(manage_channels=True)
+    @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def category(self, ctx:Context, name: Jeanne.Range[str, 1, 100]):
-
+    async def category(self, ctx:Context, *, name: Jeanne.Range[str, 1, 100]):
         cat = await ctx.guild.create_category(name=name)
         embed = Embed()
         embed.description = "{} has been created".format(cat.mention)
         embed.color = Color.random()
         await ctx.send(embed=embed)
 
-    @Jeanne.command(description="Create a stage channel")
-    @Jeanne.describe(
-        name="What will you name it?",
-        category="Place in which category?",
+    stagechannel_parser = argparse.ArgumentParser(add_help=False)
+    stagechannel_parser.add_argument(
+        "-n",
+        "--name",
+        type=str,
+        help="name",
+        nargs="+",
+        required=True,
     )
-    @Jeanne.checks.has_permissions(manage_channels=True)
-    @Jeanne.checks.bot_has_permissions(manage_channels=True)
+    stagechannel_parser.add_argument(
+        "-cat",
+        "--category",
+        type=str,
+        help="category",
+        nargs="+",
+        required=False,
+        default=None,
+    )
+    stagechannel_parser.add_argument(
+        "-u",
+        "--users",
+        type=int,
+        help="users",
+        required=False,
+        default=1000,
+    )
+
+    @Jeanne.command(description="Create a stage channel")
+    @Jeanne.has_permissions(manage_channels=True)
+    @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def stagechannel(
-        self,
-        ctx:Context,
-        name: Jeanne.Range[str, 1, 100],
-        category: Optional[CategoryChannel] = None,
-        users: Optional[Jeanne.Range[int, None, 10000]] = None,
-    ):
-
+        self, ctx: Context, *words: str, parser=stagechannel_parser
+    ) -> None:
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            name = parsed_args.name + unknown
+            name = " ".join(name)
+            category = parsed_args.category + unknown
+            category = " ".join(category)
+            users: int = parsed_args.users
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
         embed = Embed()
         channel: StageChannel = await ctx.guild.create_stage_channel(name=name)
         embed.description = "{} has been created".format(channel.jump_url)
         if category:
+            category = (
+                utils.get(ctx.guild.categories, id=category)
+                if category.isdigit()
+                else utils.get(ctx.guild.categories, name=category)
+            )
             await channel.edit(category=category)
             embed.add_field(
                 name="Moved to category", value=category.mention, inline=True
             )
         if users:
+            if users > 1000:
+                users=1000
             await channel.edit(user_limit=users)
             embed.add_field(name="Users", value=users, inline=True)
         embed.color = Color.random()
         await ctx.send(embed=embed)
 
     @stagechannel.error
-    async def stagechannel_error(self, ctx:Context, error: Jeanne.AppCommandError):
+    async def stagechannel_error(self, ctx:Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
@@ -240,40 +334,69 @@ class Create_Group(Cog, name="create"):
             embed.color = Color.red()
             await ctx.send(embed=embed)
 
-    @Jeanne.command(description="Create a forum")
-    @Jeanne.describe(
-        name="What will you name it?",
-        topic="What is the topic",
-        category="Place in which category?",
+    forum_parser = argparse.ArgumentParser(add_help=False)
+    forum_parser.add_argument(
+        "-n",
+        "--name",
+        type=str,
+        help="name",
+        nargs="+",
+        required=True,
     )
-    @Jeanne.checks.has_permissions(manage_channels=True)
-    @Jeanne.checks.bot_has_permissions(manage_channels=True)
+    forum_parser.add_argument(
+        "-cat",
+        "--category",
+        type=str,
+        help="category",
+        nargs="+",
+        required=False,
+        default=None,
+    )
+
+    @Jeanne.command(description="Create a forum")
+    @Jeanne.has_permissions(manage_channels=True)
+    @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def forum(
-        self,
-        ctx:Context,
-        name: Jeanne.Range[str, 1, 100],
-        category: Optional[CategoryChannel] = None,
-        topic: Optional[bool] = None,
-    ):
-        if topic:
-            await ctx.response.send_modal(ForumGuildlines(name, category))
+        self, ctx: Context, *words: str, parser=forum_parser
+    ) -> None:
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            name = parsed_args.name + unknown
+            name = " ".join(name)
+            category = parsed_args.category + unknown
+            category = " ".join(category)
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
             return
-
         embed = Embed()
-        forum = await ctx.guild.create_forum(name=name, topic=topic)
+        forum = await ctx.guild.create_forum(name=name, topic="None")
         embed.description = "{} has been created".format(forum.jump_url)
         embed.color = Color.random()
         if category:
+            category = (
+                utils.get(ctx.guild.categories, id=category)
+                if category.isdigit()
+                else utils.get(ctx.guild.categories, name=category)
+            )
             await forum.edit(category=category)
             embed.add_field(
                 name="Added into category", value=category.name, inline=True
             )
-        await ctx.send(embed=embed)
+        view=TopicButton(name, category)
+        m=await ctx.send(embed=embed, view=view)
+
+        if view==None:
+            await m.edit(view=None)
 
     @forum.error
-    async def forum_error(self, ctx:Context, error: Jeanne.AppCommandError):
+    async def forum_error(self, ctx:Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
@@ -283,26 +406,63 @@ class Create_Group(Cog, name="create"):
             embed.color = Color.red()
             await ctx.send(embed=embed)
 
-    @Jeanne.command(description="Create a role")
-    @Jeanne.describe(
-        name="What will you name it?",
-        color="What color will it be? (use HEX codes)",
-        hoisted="Should it be shown in member list?",
-        mentionable="Should it be mentioned?",
+    role_parser = argparse.ArgumentParser(add_help=False)
+    role_parser.add_argument(
+        "-n",
+        "--name",
+        type=str,
+        help="name",
+        nargs="+",
+        required=True,
     )
-    @Jeanne.checks.has_permissions(manage_roles=True)
-    @Jeanne.checks.bot_has_permissions(manage_roles=True)
+    role_parser.add_argument(
+        "-c",
+        "--color",
+        type=str,
+        help="color",
+        nargs="+",
+        required=False,
+        default=None,
+    )
+
+    role_parser.add_argument(
+        "-h",
+        "--hoisted",
+        help="Make it hoisted. Just type -h",
+        action="store_true",
+        required=False,
+    )
+
+    role_parser.add_argument(
+        "-m",
+        "--mentioned",
+        help="Make it mentionable. Just type -m",
+        action="store_true",
+        required=False,
+    )
+
+    @Jeanne.command(description="Create a role")
+    @Jeanne.has_permissions(manage_roles=True)
+    @Jeanne.bot_has_permissions(manage_roles=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def role(
-        self,
-        ctx:Context,
-        name: Jeanne.Range[str, None, 100],
-        color: Optional[Jeanne.Range[str, None, 6]] = None,
-        hoisted: Optional[bool] = None,
-        mentionable: Optional[bool] = None,
-    ) -> None:
-
+    async def role(self, ctx: Context, *words: str, parser=stagechannel_parser) -> None:
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            name = parsed_args.name + unknown
+            name = " ".join(name)
+            color = parsed_args.color + unknown
+            color = " ".join(color)
+            hoisted:bool=parsed_args.hoisted
+            mentionable:bool=parsed_args.mentioned
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
         role = await ctx.guild.create_role(name=name)
         embed = Embed()
         embed.description = "Role `{}` has been created".format(name)
@@ -329,19 +489,21 @@ class Create_Group(Cog, name="create"):
                 embed.add_field(name="Mentionable", value="No", inline=True)
         await ctx.send(embed=embed)
 
-    thread_group = Jeanne.Group(name="thread", description="...")
 
-    @thread_group.command(description="Make a public thread")
+    @Jeanne.group(aliases=["ct"],description="Main create thread command", invoke_without_command=True)
+    async def createthread(self, ctx:Context):...
+
+    @createthread.command(description="Make a public thread")
     @Jeanne.describe(
         name="What will you name it?",
         channel="Which channel is the message in?",
         message_id="What is the message ID? You can leave it blank for a private thread",
         slowmode="What is the slowmode (1h, 30m, etc) (Max is 6 hours)",
     )
-    @Jeanne.checks.has_permissions(
+    @Jeanne.has_permissions(
         create_public_threads=True, create_private_threads=True
     )
-    @Jeanne.checks.bot_has_permissions(
+    @Jeanne.bot_has_permissions(
         create_public_threads=True, create_private_threads=True, manage_threads=True
     )
     @Jeanne.check(check_botbanned_prefix)
@@ -377,7 +539,7 @@ class Create_Group(Cog, name="create"):
 
     @public.error
     async def public_thread_error(
-        self, ctx:Context, error: Jeanne.AppCommandError
+        self, ctx:Context, error: Jeanne.CommandError
     ):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, NotFound
@@ -387,14 +549,14 @@ class Create_Group(Cog, name="create"):
             embed.color = Color.red()
             await ctx.send(embed=embed)
 
-    @thread_group.command(description="Make a private thread")
+    @createthread.command(description="Make a private thread")
     @Jeanne.describe(
         name="What will you name it?",
         channel="Which channel is the message in?",
         slowmode="What is the slowmode (1h, 30m, etc) (Max is 6 hours)",
     )
-    @Jeanne.checks.has_permissions(create_private_threads=True)
-    @Jeanne.checks.bot_has_permissions(create_private_threads=True, manage_threads=True)
+    @Jeanne.has_permissions(create_private_threads=True)
+    @Jeanne.bot_has_permissions(create_private_threads=True, manage_threads=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def private(
@@ -425,7 +587,7 @@ class Create_Group(Cog, name="create"):
 
     @private.error
     async def private_thread_error(
-        self, ctx:Context, error: Jeanne.AppCommandError
+        self, ctx:Context, error: Jeanne.CommandError
     ):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, NotFound
@@ -441,8 +603,8 @@ class Create_Group(Cog, name="create"):
         emoji_link="Insert emoji URL here",
         emoji_image="Insert emoji image here",
     )
-    @Jeanne.checks.has_permissions(manage_emojis_and_stickers=True)
-    @Jeanne.checks.bot_has_permissions(manage_emojis_and_stickers=True)
+    @Jeanne.has_permissions(manage_emojis_and_stickers=True)
+    @Jeanne.bot_has_permissions(manage_emojis_and_stickers=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def emoji(
@@ -472,7 +634,7 @@ class Create_Group(Cog, name="create"):
         await ctx.send(embed=embed)
 
     @emoji.error
-    async def emoji_error(self, ctx:Context, error: Jeanne.errors.AppCommandError):
+    async def emoji_error(self, ctx:Context, error: Jeanne.errors.CommandError):
         if isinstance(error, Jeanne.errors.CommandInvokeError):
             a_emojis = len(
                 [emote for emote in ctx.guild.emojis if emote.animated == True]
@@ -496,8 +658,8 @@ class Create_Group(Cog, name="create"):
         sticker_link="Insert sticker URL here",
         sticker_image="Insert sticker image here",
     )
-    @Jeanne.checks.has_permissions(manage_emojis_and_stickers=True)
-    @Jeanne.checks.bot_has_permissions(manage_emojis_and_stickers=True)
+    @Jeanne.has_permissions(manage_emojis_and_stickers=True)
+    @Jeanne.bot_has_permissions(manage_emojis_and_stickers=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def sticker(
@@ -534,7 +696,7 @@ class Create_Group(Cog, name="create"):
 
     @sticker.error
     async def sticker_error(
-        self, ctx:Context, error: Jeanne.errors.AppCommandError
+        self, ctx:Context, error: Jeanne.errors.CommandError
     ):
         if isinstance(error, Jeanne.errors.CommandInvokeError) and isinstance(
             error.original, HTTPException
@@ -554,8 +716,8 @@ class Delete_Group(Cog, name="delete"):
 
     @Jeanne.command(description="Deletes a channel")
     @Jeanne.describe(channel="Which channel are you deleting?")
-    @Jeanne.checks.has_permissions(manage_channels=True)
-    @Jeanne.checks.bot_has_permissions(manage_channels=True)
+    @Jeanne.has_permissions(manage_channels=True)
+    @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def channel(self, ctx:Context, channel: abc.GuildChannel):
@@ -568,8 +730,8 @@ class Delete_Group(Cog, name="delete"):
 
     @Jeanne.command(description="Deletes a role")
     @Jeanne.describe(role="Which role are you deleting?")
-    @Jeanne.checks.has_permissions(manage_channels=True)
-    @Jeanne.checks.bot_has_permissions(manage_channels=True)
+    @Jeanne.has_permissions(manage_channels=True)
+    @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def role(self, ctx:Context, role: Role):
@@ -582,8 +744,8 @@ class Delete_Group(Cog, name="delete"):
 
     @Jeanne.command(description="Deletes an emoji")
     @Jeanne.describe(emoji="Which emoji are you deleting?")
-    @Jeanne.checks.has_permissions(manage_expressions=True)
-    @Jeanne.checks.bot_has_permissions(manage_expressions=True)
+    @Jeanne.has_permissions(manage_expressions=True)
+    @Jeanne.bot_has_permissions(manage_expressions=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def emoji(self, ctx:Context, emoji: str):
@@ -600,7 +762,7 @@ class Delete_Group(Cog, name="delete"):
         await ctx.send(embed=embed)
 
     @emoji.error
-    async def emoji_error(self, ctx:Context, error: Jeanne.AppCommandError):
+    async def emoji_error(self, ctx:Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, AttributeError
         ):
@@ -612,8 +774,8 @@ class Delete_Group(Cog, name="delete"):
 
     @Jeanne.command(description="Deletes a sticker")
     @Jeanne.describe(sticker="Which sticker are you deleting?")
-    @Jeanne.checks.has_permissions(manage_expressions=True)
-    @Jeanne.checks.bot_has_permissions(manage_expressions=True)
+    @Jeanne.has_permissions(manage_expressions=True)
+    @Jeanne.bot_has_permissions(manage_expressions=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def sticker(self, ctx:Context, sticker: str):
@@ -626,7 +788,7 @@ class Delete_Group(Cog, name="delete"):
         await ctx.send(embed=embed)
 
     @sticker.error
-    async def sticker_error(self, ctx:Context, error: Jeanne.AppCommandError):
+    async def sticker_error(self, ctx:Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, AttributeError
         ):
@@ -651,8 +813,8 @@ class Edit_Group(Cog, name="edit"):
         category="Place in which category?",
         nsfw_enabled="Should it be an NSFW channel?",
     )
-    @Jeanne.checks.has_permissions(manage_channels=True)
-    @Jeanne.checks.bot_has_permissions(manage_channels=True)
+    @Jeanne.has_permissions(manage_channels=True)
+    @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def textchannel(
@@ -705,7 +867,7 @@ class Edit_Group(Cog, name="edit"):
         hoisted="Should it be shown in member list?",
         mentionable="Should it be mentioned?",
     )
-    @Jeanne.checks.has_permissions(manage_roles=True)
+    @Jeanne.has_permissions(manage_roles=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def role(
@@ -757,8 +919,8 @@ class Edit_Group(Cog, name="edit"):
         banner="What will be the new banner?",
         verification_level="How high should the verification level be?",
     )
-    @Jeanne.checks.has_permissions(manage_guild=True)
-    @Jeanne.checks.bot_has_permissions(manage_guild=True)
+    @Jeanne.has_permissions(manage_guild=True)
+    @Jeanne.bot_has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def server(
@@ -902,7 +1064,7 @@ class Set_Group(Cog, name="set"):
         welcoming_channel="Which channel should alert members when someone join",
         leaving_channel="Which channel should members when someone leaves?",
     )
-    @Jeanne.checks.has_permissions(manage_guild=True)
+    @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def welcomer(
@@ -940,7 +1102,7 @@ class Set_Group(Cog, name="set"):
     @Jeanne.describe(
         channel="Which channel should log warns, timeouts, kicks and bans?"
     )
-    @Jeanne.checks.has_permissions(manage_guild=True)
+    @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def modlog(self, ctx:Context, channel: TextChannel):
@@ -952,7 +1114,7 @@ class Set_Group(Cog, name="set"):
 
     @Jeanne.command(description="Set a welcoming message when someone joins the server")
     @Jeanne.describe(jsonfile="Upload JSON file with the welcoming message")
-    @Jeanne.checks.has_permissions(manage_guild=True)
+    @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def welcomingmsg(
@@ -1020,7 +1182,7 @@ class Set_Group(Cog, name="set"):
 
     @Jeanne.command(description="Set a leaving message when someone leaves the server")
     @Jeanne.describe(jsonfile="Upload JSON file with the welcoming message")
-    @Jeanne.checks.has_permissions(manage_guild=True)
+    @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def leavingmsg(
@@ -1089,7 +1251,7 @@ class Set_Group(Cog, name="set"):
     @Jeanne.command(
         description="Set a role reward message. This will be posted in the levelup channel"
     )
-    @Jeanne.checks.has_permissions(manage_guild=True)
+    @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def rolereward_message(
@@ -1110,7 +1272,7 @@ class Set_Group(Cog, name="set"):
         channel="Which channel will update when a member levels up?",
         levelmsg="Add your level message here. Use Discohooks to generate the embed",
     )
-    @Jeanne.checks.has_permissions(manage_guild=True)
+    @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def levelupdate(
@@ -1187,8 +1349,8 @@ class manage(Cog):
 
     @Jeanne.command(name="add-role", description="Add a role to a member")
     @Jeanne.describe(member="Which member?", role="Which role are you adding?")
-    @Jeanne.checks.has_permissions(manage_roles=True)
-    @Jeanne.checks.bot_has_permissions(manage_roles=True)
+    @Jeanne.has_permissions(manage_roles=True)
+    @Jeanne.bot_has_permissions(manage_roles=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def addrole(self, ctx:Context, member: Member, role: Role):
@@ -1202,8 +1364,8 @@ class manage(Cog):
 
     @Jeanne.command(name="remove-role", description="Remove a role from a member")
     @Jeanne.describe(member="Which member?", role="Which role are you removing?")
-    @Jeanne.checks.has_permissions(manage_roles=True)
-    @Jeanne.checks.bot_has_permissions(manage_roles=True)
+    @Jeanne.has_permissions(manage_roles=True)
+    @Jeanne.bot_has_permissions(manage_roles=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def removerole(self, ctx:Context, member: Member, role: Role):
@@ -1218,7 +1380,7 @@ class manage(Cog):
         await ctx.send(embed=embed)
 
     @Jeanne.command(description="Remove something for the server.")
-    @Jeanne.checks.has_permissions(manage_guild=True)
+    @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def remove(self, ctx:Context) -> None:
@@ -1237,8 +1399,8 @@ class manage(Cog):
     @Jeanne.describe(
         channel="Which channel are you cloning?", name="What is the new name?"
     )
-    @Jeanne.checks.has_permissions(manage_channels=True)
-    @Jeanne.checks.bot_has_permissions(manage_channels=True)
+    @Jeanne.has_permissions(manage_channels=True)
+    @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def clone(
@@ -1273,8 +1435,8 @@ class Rename_Group(Cog, name="rename"):
 
     @Jeanne.command(description="Renames an emoji")
     @Jeanne.describe(emoji="What emoji are you renaming?", name="What is the new name?")
-    @Jeanne.checks.has_permissions(manage_emojis_and_stickers=True)
-    @Jeanne.checks.bot_has_permissions(manage_emojis_and_stickers=True)
+    @Jeanne.has_permissions(manage_emojis_and_stickers=True)
+    @Jeanne.bot_has_permissions(manage_emojis_and_stickers=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def emoji(self, ctx:Context, emoji: str, name: Jeanne.Range[str, 2, 30]):
@@ -1292,7 +1454,7 @@ class Rename_Group(Cog, name="rename"):
         await ctx.send(embed=embed)
 
     @emoji.error
-    async def emoji_error(self, ctx:Context, error: Jeanne.AppCommandError):
+    async def emoji_error(self, ctx:Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, AttributeError
         ):
@@ -1306,7 +1468,7 @@ class Rename_Group(Cog, name="rename"):
     @Jeanne.describe(
         category="Which category are you renaming?", name="What is the new name?"
     )
-    @Jeanne.checks.has_permissions(manage_channels=True)
+    @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def category(
@@ -1325,8 +1487,8 @@ class Rename_Group(Cog, name="rename"):
     @Jeanne.describe(
         sticker="What sticker are you renaming?", name="What is the new name?"
     )
-    @Jeanne.checks.has_permissions(manage_emojis_and_stickers=True)
-    @Jeanne.checks.bot_has_permissions(manage_emojis_and_stickers=True)
+    @Jeanne.has_permissions(manage_emojis_and_stickers=True)
+    @Jeanne.bot_has_permissions(manage_emojis_and_stickers=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def sticker(
@@ -1342,7 +1504,7 @@ class Rename_Group(Cog, name="rename"):
         await ctx.send(embed=embed)
 
     @sticker.error
-    async def sticker_error(self, ctx:Context, error: Jeanne.AppCommandError):
+    async def sticker_error(self, ctx:Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, AttributeError
         ):
@@ -1360,9 +1522,7 @@ class Command_Group(Cog, name="command"):
         super().__init__()
 
     @Jeanne.command(name="disable", description="Disable a command")
-    @Jeanne.autocomplete(command=AutoCompleteChoices.command_choices)
-    @Jeanne.describe(command="Which command are you disabling?")
-    @Jeanne.checks.has_permissions(manage_guild=True)
+    @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     async def _disable(
         self,
@@ -1393,8 +1553,7 @@ class Command_Group(Cog, name="command"):
         await ctx.send(embed=embed)
 
     @Jeanne.command(name="enable", description="Enable a command")
-    @Jeanne.autocomplete(command=AutoCompleteChoices.disabled_commands)
-    @Jeanne.checks.has_permissions(manage_guild=True)
+    @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.describe(command="Which command are you enabling?")
     @Jeanne.check(check_botbanned_prefix)
     async def _enable(
@@ -1448,7 +1607,7 @@ class Level_Group(Cog, name="level"):
     @role.command(
         name="add", description="Add a level role reward when a user levels up"
     )
-    @Jeanne.checks.has_permissions(manage_guild=True)
+    @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.describe(
         role="Which role should be given when a user levels up?",
         level="Which level should they be to get that role?",
@@ -1473,7 +1632,7 @@ class Level_Group(Cog, name="level"):
         await ctx.send(embed=embed)
 
     @role.command(name="remove", description="Removes a level role reward")
-    @Jeanne.checks.has_permissions(manage_guild=True)
+    @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.describe(
         role="Which role should be removed?",
     )
@@ -1510,7 +1669,7 @@ class Level_Group(Cog, name="level"):
 
     @channel_blacklist.command(description="Blacklists a channel for gaining XP")
     @Jeanne.describe(channel="Which channel?")
-    @Jeanne.checks.has_permissions(manage_guild=True)
+    @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def add(self, ctx:Context, channel: TextChannel) -> None:
@@ -1531,7 +1690,7 @@ class Level_Group(Cog, name="level"):
 
     @channel_blacklist.command(description="Unblacklists a channel for gaining XP")
     @Jeanne.describe(channel="Which channel?")
-    @Jeanne.checks.has_permissions(manage_guild=True)
+    @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def remove(self, ctx:Context, channel: TextChannel) -> None:
