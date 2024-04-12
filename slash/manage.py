@@ -464,11 +464,6 @@ class Create_Group(GroupCog, name="create"):
         sticker_link: Optional[str] = None,
         sticker_image: Optional[Attachment] = None,
     ):
-        if Command(ctx.guild).check_disabled(self.sticker.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
         embed = Embed()
         if sticker_link is None and sticker_image is None:
             embed.description = "Please add either an sticker URL or sticker image"
