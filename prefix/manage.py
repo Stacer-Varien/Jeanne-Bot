@@ -489,17 +489,44 @@ class Create_Group(Cog, name="create"):
                 embed.add_field(name="Mentionable", value="No", inline=True)
         await ctx.send(embed=embed)
 
+    public_thread_parser = argparse.ArgumentParser(add_help=False)
+    public_thread_parser.add_argument(
+        "-n",
+        "--name",
+        type=str,
+        help="NAME",
+        nargs="+",
+        required=True,
+    )
+    public_thread_parser.add_argument(
+        "-ch",
+        "--channel",
+        type=str,
+        help="CHANNEL",
+        nargs="+",
+        required=True,
+    )
+    public_thread_parser.add_argument(
+        "-msg",
+        "--message",
+        type=int,
+        help="MESSAGE ID",
+        required=True,
+    )
+    public_thread_parser.add_argument(
+        "-s",
+        "--slowmode",
+        type=str,
+        help="SLOWMODE",
+        nargs="+",
+        required=False,
+        default=None
+    )
 
     @Jeanne.group(aliases=["ct"],description="Main create thread command", invoke_without_command=True)
-    async def createthread(self, ctx:Context):...
+    async def createthread(self, ctx: Context): ...
 
     @createthread.command(description="Make a public thread")
-    @Jeanne.describe(
-        name="What will you name it?",
-        channel="Which channel is the message in?",
-        message_id="What is the message ID? You can leave it blank for a private thread",
-        slowmode="What is the slowmode (1h, 30m, etc) (Max is 6 hours)",
-    )
     @Jeanne.has_permissions(
         create_public_threads=True, create_private_threads=True
     )
@@ -511,18 +538,35 @@ class Create_Group(Cog, name="create"):
     async def public(
         self,
         ctx:Context,
-        name: Jeanne.Range[str, 1, 100],
-        channel: TextChannel,
-        message_id: str,
-        slowmode: Optional[str] = None,
-    ):
-
+        *words: str, parser=public_thread_parser) -> None:
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            name = parsed_args.name + unknown
+            name = " ".join(name)
+            channel = parsed_args.channel + unknown
+            channel = " ".join(channel)
+            message_id:int = parsed_args.message
+            slowmode = parsed_args.slowmode + unknown
+            slowmode = " ".join(slowmode)
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
+        channel = (
+                utils.get(ctx.guild.text_channels, id=channel)
+                if channel.isdigit() else utils.get(ctx.guild.text_channels, mention=channel) if channel.startswith("<#")
+                else utils.get(ctx.guild.text_channels, name=channel)
+            )
         embed = Embed()
         embed.add_field(name="Channel", value=channel.jump_url, inline=True)
-        message = await channel.fetch_message(int(message_id))
+        message = await channel.fetch_message(message_id)
         thread = await channel.create_thread(name=name, message=message)
         embed.add_field(name="Found in message", value=message.jump_url, inline=True)
-        await thread.add_user(ctx.user)
+        await thread.add_user(ctx.author)
         embed.description = "{} has been created".format(thread.jump_url)
         embed.color = Color.random()
         if slowmode:
@@ -548,13 +592,43 @@ class Create_Group(Cog, name="create"):
             embed.description = "Message could not be found. Please make sure you have added the correct message ID"
             embed.color = Color.red()
             await ctx.send(embed=embed)
+            return
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, HTTPException
+        ):
+            embed = Embed()
+            embed.description = "Failed to create public thread. Please try again"
+            embed.color = Color.red()
+            await ctx.send(embed=embed)            
+
+    private_thread_parser = argparse.ArgumentParser(add_help=False)
+    private_thread_parser.add_argument(
+        "-n",
+        "--name",
+        type=str,
+        help="NAME",
+        nargs="+",
+        required=True,
+    )
+    private_thread_parser.add_argument(
+        "-ch",
+        "--channel",
+        type=str,
+        help="CHANNEL",
+        nargs="+",
+        required=True,
+    )
+    private_thread_parser.add_argument(
+        "-s",
+        "--slowmode",
+        type=str,
+        help="SLOWMODE",
+        nargs="+",
+        required=False,
+        default=None
+    )
 
     @createthread.command(description="Make a private thread")
-    @Jeanne.describe(
-        name="What will you name it?",
-        channel="Which channel is the message in?",
-        slowmode="What is the slowmode (1h, 30m, etc) (Max is 6 hours)",
-    )
     @Jeanne.has_permissions(create_private_threads=True)
     @Jeanne.bot_has_permissions(create_private_threads=True, manage_threads=True)
     @Jeanne.check(check_botbanned_prefix)
@@ -562,15 +636,32 @@ class Create_Group(Cog, name="create"):
     async def private(
         self,
         ctx:Context,
-        name: Jeanne.Range[str, 1, 100],
-        channel: TextChannel,
-        slowmode: Optional[str] = None,
-    ):
-
+                *words: str, parser=public_thread_parser) -> None:
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            name = parsed_args.name + unknown
+            name = " ".join(name)
+            channel = parsed_args.channel + unknown
+            channel = " ".join(channel)
+            slowmode = parsed_args.slowmode + unknown
+            slowmode = " ".join(slowmode)
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
+        channel = (
+                utils.get(ctx.guild.text_channels, id=channel)
+                if channel.isdigit() else utils.get(ctx.guild.text_channels, mention=channel) if channel.startswith("<#")
+                else utils.get(ctx.guild.text_channels, name=channel)
+            )
         embed = Embed()
         embed.add_field(name="Channel", value=channel.jump_url, inline=True)
         thread = await channel.create_thread(name=name)
-        await thread.add_user(ctx.user)
+        await thread.add_user(ctx.author)
         embed.description = "{} has been created".format(thread.jump_url)
         embed.color = Color.random()
         if slowmode:
@@ -590,40 +681,33 @@ class Create_Group(Cog, name="create"):
         self, ctx:Context, error: Jeanne.CommandError
     ):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, NotFound
+            error.original, HTTPException
         ):
             embed = Embed()
-            embed.description = "Message could not be found. Please make sure you have added the correct message ID"
+            embed.description = "Failed to create private thread. Please try again"
             embed.color = Color.red()
-            await ctx.send(embed=embed)
+            await ctx.send(embed=embed) 
 
-    @Jeanne.command(description="Make a new emoji")
-    @Jeanne.describe(
-        name="What will you name it?",
-        emoji_link="Insert emoji URL here",
-        emoji_image="Insert emoji image here",
-    )
+    @Jeanne.command(aliases=["makeemote", "cemote"],description="Make a new emoji")
     @Jeanne.has_permissions(manage_emojis_and_stickers=True)
     @Jeanne.bot_has_permissions(manage_emojis_and_stickers=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def emoji(
+    async def createemoji(
         self,
         ctx:Context,
         name: Jeanne.Range[str, 2, 30],
         emoji_link: Optional[str] = None,
-        emoji_image: Optional[Attachment] = None,
     ):
-
         embed = Embed()
-        if emoji_link == None and emoji_image == None:
+        if emoji_link == None and ctx.message.attachments[0] == None:
             embed.description = "Please add either an emoji URL or emoji image"
             embed.color = Color.red()
-        elif emoji_link and emoji_image:
+        elif emoji_link and ctx.message.attachments[0]:
             embed.description = "Please use either an emoji URL or emoji image"
             embed.color = Color.red()
         else:
-            emojibytes = get(emoji_link if emoji_link else emoji_image.url).content
+            emojibytes = get(emoji_link if emoji_link else ctx.message.attachments[0].url).content
             emote = await ctx.guild.create_custom_emoji(
                 name=name.replace(" ", "_"), image=emojibytes
             )
@@ -633,8 +717,8 @@ class Create_Group(Cog, name="create"):
             embed.color = Color.random()
         await ctx.send(embed=embed)
 
-    @emoji.error
-    async def emoji_error(self, ctx:Context, error: Jeanne.errors.CommandError):
+    @createemoji.error
+    async def createemoji_error(self, ctx:Context, error: Jeanne.errors.CommandError):
         if isinstance(error, Jeanne.errors.CommandInvokeError):
             a_emojis = len(
                 [emote for emote in ctx.guild.emojis if emote.animated == True]
@@ -651,39 +735,27 @@ class Create_Group(Cog, name="create"):
                     embed.description = "There was a problem making the emoji. Please check that the emoji you are making is a PNG, JPEG or GIF"
                 await ctx.send(embed=embed)
 
-    @Jeanne.command(description="Make a new sticker")
-    @Jeanne.describe(
-        name="What will you name it?",
-        emoji="Emoji that will repesent the sticker",
-        sticker_link="Insert sticker URL here",
-        sticker_image="Insert sticker image here",
-    )
+    @Jeanne.command(aliases=["makesticker", "csticker"],description="Make a new sticker")
     @Jeanne.has_permissions(manage_emojis_and_stickers=True)
     @Jeanne.bot_has_permissions(manage_emojis_and_stickers=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def sticker(
+    async def createsticker(
         self,
         ctx:Context,
         name: Jeanne.Range[str, 2, 30],
         emoji: str,
         sticker_link: Optional[str] = None,
-        sticker_image: Optional[Attachment] = None,
     ):
-        if Command(ctx.guild).check_disabled(self.sticker.qualified_name):
-            await ctx.response.send_message(
-                "This command is disabled by the server's managers", ephemeral=True
-            )
-            return
         embed = Embed()
-        if sticker_link is None and sticker_image is None:
+        if sticker_link is None and ctx.message.attachments[0] is None:
             embed.description = "Please add either an sticker URL or sticker image"
             embed.color = Color.red()
-        elif sticker_link and sticker_image:
+        elif sticker_link and ctx.message.attachments[0]:
             embed.description = "Please use either an sticker URL or sticker image"
             embed.color = Color.red()
         else:
-            url = sticker_link if sticker_link else sticker_image.url
+            url = sticker_link if sticker_link else ctx.message.attachments[0].url
             stickerbytes = BytesIO(get(url).content)
             stickerfile = File(fp=stickerbytes, filename="sticker.png")
             sticker = await ctx.guild.create_sticker(
@@ -694,7 +766,7 @@ class Create_Group(Cog, name="create"):
             embed.set_image(url=url)
         await ctx.send(embed=embed)
 
-    @sticker.error
+    @createsticker.error
     async def sticker_error(
         self, ctx:Context, error: Jeanne.errors.CommandError
     ):
@@ -709,18 +781,12 @@ class Create_Group(Cog, name="create"):
             await ctx.send(embed=embed)
 
 
-class Delete_Group(Cog, name="delete"):
-    def __init__(self, bot: Bot) -> None:
-        self.bot = bot
-        super().__init__()
-
-    @Jeanne.command(description="Deletes a channel")
-    @Jeanne.describe(channel="Which channel are you deleting?")
+    @Jeanne.command(aliases=["dtc"],description="Deletes a channel")
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def channel(self, ctx:Context, channel: abc.GuildChannel):
+    async def deletechannel(self, ctx:Context, *,channel: abc.GuildChannel):
 
         embed = Embed(
             description="{} has been deleted".format(channel.name), color=Color.random()
@@ -728,13 +794,12 @@ class Delete_Group(Cog, name="delete"):
         await channel.delete()
         await ctx.send(embed=embed)
 
-    @Jeanne.command(description="Deletes a role")
-    @Jeanne.describe(role="Which role are you deleting?")
+    @Jeanne.command(aliases=["dr", "drole"],description="Deletes a role")
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def role(self, ctx:Context, role: Role):
+    async def deleterole(self, ctx:Context, *,role: Role):
 
         embed = Embed(
             description="{} has been deleted".format(role.name), color=Color.random()
@@ -742,13 +807,12 @@ class Delete_Group(Cog, name="delete"):
         await role.delete()
         await ctx.send(embed=embed)
 
-    @Jeanne.command(description="Deletes an emoji")
-    @Jeanne.describe(emoji="Which emoji are you deleting?")
+    @Jeanne.command(aliases=["demoji", "delemote"],description="Deletes an emoji")
     @Jeanne.has_permissions(manage_expressions=True)
     @Jeanne.bot_has_permissions(manage_expressions=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def emoji(self, ctx:Context, emoji: str):
+    async def deleteemoji(self, ctx:Context, *,emoji: str):
 
         try:
             e = emoji.strip().split(":")[-1].rstrip(">")
@@ -761,10 +825,10 @@ class Delete_Group(Cog, name="delete"):
         await emote.delete()
         await ctx.send(embed=embed)
 
-    @emoji.error
+    @deleteemoji.error
     async def emoji_error(self, ctx:Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, AttributeError
+            error.original, (AttributeError, HTTPException)
         ):
             embed = Embed(
                 description="This emoji doesn't exist in the server",
@@ -772,14 +836,15 @@ class Delete_Group(Cog, name="delete"):
             )
             await ctx.send(embed=embed)
 
-    @Jeanne.command(description="Deletes a sticker")
+    @Jeanne.command(aliases=["delsticker"],description="Deletes a sticker")
     @Jeanne.describe(sticker="Which sticker are you deleting?")
     @Jeanne.has_permissions(manage_expressions=True)
     @Jeanne.bot_has_permissions(manage_expressions=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def sticker(self, ctx:Context, sticker: str):
-
+    async def deletesticker(self, ctx:Context, *, sticker: Optional[str]=None):
+        if sticker==None:
+            sticker=ctx.message.stickers[0].name
         stick = utils.get(ctx.guild.stickers, name=sticker)
         embed = Embed(
             description="`{}` has been deleted".format(str(stick.name)), color=0x00FF68
@@ -787,10 +852,10 @@ class Delete_Group(Cog, name="delete"):
         await stick.delete()
         await ctx.send(embed=embed)
 
-    @sticker.error
+    @deletesticker.error
     async def sticker_error(self, ctx:Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, AttributeError
+            error.original, (AttributeError, HTTPException)
         ):
             embed = Embed(
                 description="This sticker doesn't exist in the server",
@@ -820,14 +885,14 @@ class Edit_Group(Cog, name="edit"):
     async def textchannel(
         self,
         ctx:Context,
-        channel: TextChannel,
+        channel: Optional[TextChannel]=None,
         name: Optional[Jeanne.Range[str, 1, 100]] = None,
         topic: Optional[Jeanne.Range[str, 1, 1024]] = None,
         slowmode: Optional[str] = None,
         category: Optional[CategoryChannel] = None,
         nsfw_enabled: Optional[bool] = None,
     ) -> None:
-
+        channel=ctx.channel if channel ==None else channel
         embed = Embed()
         embed.description = "Channel `{}` has been edited".format(channel.name)
         embed.color = Color.green()
@@ -1737,7 +1802,6 @@ async def setup(bot: Bot):
     await bot.add_cog(manage(bot))
     await bot.add_cog(Create_Group(bot))
     await bot.add_cog(Edit_Group(bot))
-    await bot.add_cog(Delete_Group(bot))
     await bot.add_cog(Set_Group(bot))
     await bot.add_cog(Rename_Group(bot))
     await bot.add_cog(Command_Group(bot))
