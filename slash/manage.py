@@ -47,7 +47,6 @@ from requests import get
 from io import BytesIO
 
 
-
 class Create_Group(GroupCog, name="create"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
@@ -335,6 +334,14 @@ class Create_Group(GroupCog, name="create"):
             embed.description = "Message could not be found. Please make sure you have added the correct message ID"
             embed.color = Color.red()
             await ctx.followup.send(embed=embed)
+            return
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, HTTPException
+        ):
+            embed = Embed()
+            embed.description = "Failed to create public thread. Please try again"
+            embed.color = Color.red()
+            await ctx.followup.send(embed=embed)
 
     @thread_group.command(description="Make a private thread")
     @Jeanne.describe(
@@ -377,10 +384,10 @@ class Create_Group(GroupCog, name="create"):
         self, ctx: Interaction, error: Jeanne.AppCommandError
     ):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, NotFound
+            error.original, HTTPException
         ):
             embed = Embed()
-            embed.description = "Message could not be found. Please make sure you have added the correct message ID"
+            embed.description = "Failed to create private thread. Please try again"
             embed.color = Color.red()
             await ctx.followup.send(embed=embed)
 
