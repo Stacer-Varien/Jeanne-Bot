@@ -17,7 +17,6 @@ from functions import (
     Currency,
     check_botbanned_prefix,
     check_disabled_prefixed_command,
-    is_beta_prefix,
 )
 
 

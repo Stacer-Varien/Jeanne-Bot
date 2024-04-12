@@ -1,11 +1,9 @@
-import argparse
 from assets.components import Confirmation, buy_function_context, use_function_context
 from functions import (
     Currency,
     Inventory,
     check_botbanned_prefix,
     check_disabled_prefixed_command,
-    is_beta_prefix,
 )
 from discord import ButtonStyle, Color, Embed, File
 from PIL import UnidentifiedImageError
@@ -14,7 +12,7 @@ import discord.ext.commands as Jeanne
 from assets.generators.profile_card import Profile
 from requests import exceptions
 from reactionmenu import ViewButton, ViewMenu
-
+from assets.argparsers import buycustom
 
 class Shop_Group(Cog, name="Shop"):
     def __init__(self, bot: Bot) -> None:
@@ -99,20 +97,7 @@ class Shop_Group(Cog, name="Shop"):
             )
             await ctx.send(embed=cooldown)
 
-    buycustom = argparse.ArgumentParser(add_help=False)
-    buycustom.add_argument(
-        "--name",
-        type=str,
-        help="NAME",
-        nargs="+",
-        required=True,
-    )
-    buycustom.add_argument(
-        "--link",
-        type=str,
-        help="LINK",
-        required=True,
-    )
+
 
     @background.command(
         aliases=["custom"],

@@ -9,7 +9,7 @@ from functions import (
     check_botbanned_prefix,
     check_disabled_prefixed_command,
 )
-import argparse
+from assets.argparsers import combine_parser
 
 
 class fun(Cog, name="Fun"):
@@ -90,14 +90,6 @@ class fun(Cog, name="Fun"):
         embed, file = get_animeme_pic()
         await ctx.send(embed=embed, file=file)
 
-    parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument(
-        "--first", "-f", type=str, help="First Word", required=True, nargs="+"
-    )
-    parser.add_argument(
-        "--second", "-s", type=str, help="Second Word", required=True, nargs="+"
-    )
-
     @Jeanne.command(
         aliases=["join"],
         description="Combine 2 words to get 2 combined words",
@@ -105,7 +97,7 @@ class fun(Cog, name="Fun"):
 
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def combine(self, ctx: Context, *words: str, parser=parser):
+    async def combine(self, ctx: Context, *words: str, parser=combine_parser):
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             first = parsed_args.first + unknown

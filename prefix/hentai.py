@@ -1,4 +1,3 @@
-import argparse
 from random import randint
 from discord import Color, Embed, HTTPException, Message
 from discord.ext.commands import Bot, Cog, Context, BucketType
@@ -6,43 +5,18 @@ import discord.ext.commands as Jeanne
 from functions import (
     Hentai,
     check_botbanned_prefix,
-    is_beta_prefix,
     shorten_url,
     check_disabled_prefixed_command,
 )
 from assets.components import ReportContent, ReportSelect
+from assets.argparsers import rating_parser, hentai_api_parser
 
 
 class nsfw(Cog, name="Hentai"):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    rating_parser = argparse.ArgumentParser(add_help=False)
-    rating_parser.add_argument(
-        "--rating",
-        "-r",
-        type=str,
-        choices=["questionable", "explicit", "e", "q"],
-        help="questionable | explicit | q | e",
-        required=False,
-        default=None,
-    )
-    hentai_api_parser = argparse.ArgumentParser(add_help=False)
-    hentai_api_parser.add_argument(
-        "--rating",
-        "-r",
-        type=str,
-        choices=["questionable", "explicit", "e", "q"],
-        help="questionable | explicit | q | e",
-        required=False,
-        default=None,
-    )
-    hentai_api_parser.add_argument(
-        "--tags", "-t", type=str, nargs="+", required=False, default=[], help="tags"
-    )
-    hentai_api_parser.add_argument(
-        "--plus", "-p", action="store_true", help="Enable plus mode. Just type '-p'"
-    )
+
 
     @Jeanne.command(description="Get a random hentai from Jeanne")
     @Jeanne.is_nsfw()
