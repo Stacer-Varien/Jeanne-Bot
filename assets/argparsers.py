@@ -1,56 +1,191 @@
 import argparse
+import random
 
-# Fun module
-combine_parser = argparse.ArgumentParser(add_help=False)
-combine_parser.add_argument(
-    "--first", "-f", type=str, help="First Word", required=True, nargs="+"
+parser=argparse.ArgumentParser(add_help=False)
+
+# fun
+parser.add_argument(
+    "--first",
+    "-f",
+    type=str,
+    help="First Word",
+    required=False,
+    nargs="+",
+    default=None,
 )
-combine_parser.add_argument(
-    "--second", "-s", type=str, help="Second Word", required=True, nargs="+"
+parser.add_argument(
+    "--second",
+    "-s",
+    type=str,
+    help="Second Word",
+    required=False,
+    nargs="+",
+    default=None,
 )
 
 # Hentai module
-rating_parser = argparse.ArgumentParser(add_help=False)
-rating_parser.add_argument(
+parser.add_argument(
     "--rating",
     "-r",
     type=str,
     choices=["questionable", "explicit", "e", "q"],
     help="questionable | explicit | q | e",
     required=False,
-    default=None,
+    default=random.choice(["questionable", "explicit"]),
 )
-hentai_api_parser = argparse.ArgumentParser(add_help=False)
-hentai_api_parser.add_argument(
-    "--rating",
-    "-r",
-    type=str,
-    choices=["questionable", "explicit", "e", "q"],
-    help="questionable | explicit | q | e",
-    required=False,
-    default=None,
+parser.add_argument(
+"--tags", "-t", type=str, nargs="+", required=False, default=[], help="tags"
 )
-hentai_api_parser.add_argument(
-    "--tags", "-t", type=str, nargs="+", required=False, default=[], help="tags"
-)
-hentai_api_parser.add_argument(
-    "--plus", "-p", action="store_true", help="Enable plus mode. Just type '-p'"
+parser.add_argument(
+"--plus", "-p", action="store_true", help="Enable plus mode. Just type '-p'"
 )
 
-# inventory module
-buycustom = argparse.ArgumentParser(add_help=False)
-buycustom.add_argument(
-    "--name",
+# inventory
+parser.add_argument(
+"--name",
+type=str,
+help="NAME",
+nargs="+",
+required=False,
+default=None
+)
+parser.add_argument("--link", type=str, help="LINK", required=False, default=None)
+
+# manage module
+parser.add_argument(
+"-t",
+"--topic",
+type=str,
+help="topic",
+nargs="+",
+required=False,
+default=None,
+)
+parser.add_argument(
+"-cat",
+"--category",
+type=str,
+help="category",
+nargs="+",
+required=False,
+default=None,
+)
+parser.add_argument(
+"-slow",
+"--slowmode",
+type=str,
+help="slowmode",
+nargs="+",
+required=False,
+default=None,
+)
+parser.add_argument(
+"-nsfw", action="store_true", help="Enable NSFW. Just type '-nsfw"
+)
+
+parser.add_argument(
+"-u",
+"--users",
+type=int,
+help="USERS",
+required=False,
+default=None,
+)
+
+
+parser.add_argument(
+"-u",
+"--users",
+type=int,
+help="users",
+required=False,
+default=None,
+)
+parser.add_argument(
+"-c",
+"--color",
+type=str,
+help="color",
+nargs="+",
+required=False,
+default=None,
+)
+parser.add_argument(
+"-h",
+"--hoisted",
+help="Make it hoisted. Just type -h",
+action="store_true",
+required=False,
+)
+
+parser.add_argument(
+"-m",
+"--mentioned",
+help="Make it mentionable. Just type -m",
+action="store_true",
+required=False,
+)
+
+parser.add_argument(
+    "-ch",
+    "--channel",
     type=str,
-    help="NAME",
+    help="CHANNEL",
     nargs="+",
-    required=True,
+    required=False,
 )
-buycustom.add_argument(
-    "--link",
+parser.add_argument(
+    "-msg",
+    "--message",
+    type=int,
+    help="MESSAGE ID",
+    required=False,
+)
+parser.add_argument(
+    "-s",
+    "--slowmode",
     type=str,
-    help="LINK",
-    required=True,
+    help="SLOWMODE",
+    nargs="+",
+    required=False,
+    default=None,
+)
+parser.add_argument(
+    "-d",
+    "-desc",
+    "--description",
+    type=str,
+    help="DESCRIPTION",
+    nargs="+",
+    required=False,
+    default=None,
+)
+parser.add_argument(
+    "-v",
+    "--verification",
+    type=str,
+    help="VERIFICATION LEVEL",
+    choices=["none", "low", "medium", "high", "highest"],
+    required=False,
+    default=None,
 )
 
-#manage module
+parser.add_argument(
+    "-w",
+    "--welcomer",
+    type=str,
+    help="WELCOMER",
+    nargs="+",
+    required=False,
+    default=None,
+)
+
+parser.add_argument(
+    "-l",
+    "--leaving",
+    type=str,
+    help="LEAVING",
+    nargs="+",
+    required=False,
+    default=None,
+)
