@@ -46,76 +46,35 @@ from assets.components import (
 )
 from requests import get
 from io import BytesIO
+from assets.argparsers import parser
 
 
 class TopicButton(ui.View):
-    def __init__(self, name:str, category:CategoryChannel):
-        self.value=None
-        self.name=name
-        self.category=category
+    def __init__(self, name: str, category: CategoryChannel):
+        self.value = None
+        self.name = name
+        self.category = category
         super().__init__(timeout=180)
 
     @ui.button(label="Add Guidelines")
-    async def guidelines(self, button:ui.Button, ctx:Interaction):
-        self.value="guidelines"
+    async def guidelines(self, button: ui.Button, ctx: Interaction):
+        self.value = "guidelines"
         await ctx.response.send_modal(ForumGuildlines(self.name, self.category))
 
-class Create_Group(Cog, name="create"):
+
+class CreateGroup(Cog, name="CreatePrefix"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
-        super().__init__()
 
-    textchannel_parser = argparse.ArgumentParser(add_help=False)
-    textchannel_parser.add_argument(
-        "-n",
-        "--name",
-        type=str,
-        help="name",
-        nargs="+",
-        required=True,
-    )
-    textchannel_parser.add_argument(
-        "-t",
-        "--topic",
-        type=str,
-        help="topic",
-        nargs="+",
-        required=False,
-        default=None,
-    )
-    textchannel_parser.add_argument(
-        "-cat",
-        "--category",
-        type=str,
-        help="category",
-        nargs="+",
-        required=False,
-        default=None,
-    )
-    textchannel_parser.add_argument(
-        "-slow",
-        "--slowmode",
-        type=str,
-        help="slowmode",
-        nargs="+",
-        required=False,
-        default=None,
-    )
-    textchannel_parser.add_argument(
-        "-nsfw",
-        action="store_true", help="Enable NSFW. Just type '-nsfw"
-    )
+    @Jeanne.group(aliases=["c"], description="Main create command")
+    async def create(self, ctx: Context): ...
 
-    @Jeanne.command(aliases=["ctc"],description="Creates a text channel")
+    @create.command(aliases=["tc"], description="Creates a text channel")
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def createtextchannel(
-        self,
-        ctx:Context,
-        *words:str, parser=textchannel_parser
-    ) -> None:
+    async def textchannel(self, ctx: Context, *words: str, parser=parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             name = parsed_args.name + unknown
@@ -126,7 +85,7 @@ class Create_Group(Cog, name="create"):
             category = " ".join(category)
             slowmode = parsed_args.slowmode + unknown
             slowmode = " ".join(slowmode)
-            nsfw_enabled:bool=parsed_args.nsfw
+            nsfw_enabled: bool = parsed_args.nsfw
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -135,7 +94,9 @@ class Create_Group(Cog, name="create"):
                 )
             )
             return
-        channel = await ctx.guild.create_text_channel(name=name)
+        channel = await ctx.guild.create_text_channel(
+            name=("new channel" if name == None else name)
+        )
         embed = Embed()
         embed.color = Color.random()
         embed.description = "{} has been created".format(channel.jump_url)
@@ -167,51 +128,19 @@ class Create_Group(Cog, name="create"):
             await channel.edit(nsfw=True)
         await ctx.send(embed=embed)
 
-    voicechannel_parser = argparse.ArgumentParser(add_help=False)
-    voicechannel_parser.add_argument(
-        "-n",
-        "--name",
-        type=str,
-        help="name",
-        nargs="+",
-        required=True,
-    )
-    voicechannel_parser.add_argument(
-        "-cat",
-        "--category",
-        type=str,
-        help="category",
-        nargs="+",
-        required=False,
-        default=None,
-    )
-    voicechannel_parser.add_argument(
-        "-u",
-        "--users",
-        type=int,
-        help="users",
-        required=False,
-        default=99,
-    )
-
-    @Jeanne.command(aliases=["cvc"],description="Create a voice channel")
+    @create.command(aliases=["vc"], description="Create a voice channel")
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def createvoicechannel(
-        self,
-        ctx:Context,
-        *words:str,
-        parser=voicechannel_parser
-    ) -> None:
+    async def voicechannel(self, ctx: Context, *words: str, parser=parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             name = parsed_args.name + unknown
             name = " ".join(name)
             category = parsed_args.category + unknown
             category = " ".join(category)
-            users:int = parsed_args.users
+            users: int = parsed_args.users
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -220,7 +149,9 @@ class Create_Group(Cog, name="create"):
                 )
             )
             return
-        channel = await ctx.guild.create_voice_channel(name=name)
+        channel = await ctx.guild.create_voice_channel(
+            name=("new channel" if name == None else name)
+        )
         embed = Embed()
         embed.description = "{} has been created".format(channel.jump_url)
         embed.color = Color.random()
@@ -235,59 +166,34 @@ class Create_Group(Cog, name="create"):
                 name="Added into category", value=category.name, inline=True
             )
         if users:
-            if users >99:
-                users=99
+            if users > 99:
+                users = 99
             await channel.edit(user_limit=users)
             embed.add_field(name="User Limit", value=users, inline=True)
         await ctx.send(embed=embed)
 
-    @Jeanne.command(description="Create a category")
+    @create.command(aliases=["cat"], description="Create a category")
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def category(self, ctx:Context, *, name: Jeanne.Range[str, 1, 100]):
-        cat = await ctx.guild.create_category(name=name)
+    async def category(
+        self, ctx: Context, *, name: Optional[Jeanne.Range[str, 1, 100]] = None
+    ):
+        cat = await ctx.guild.create_category(
+            name=("New Category" if name == None else name)
+        )
         embed = Embed()
         embed.description = "{} has been created".format(cat.mention)
         embed.color = Color.random()
         await ctx.send(embed=embed)
 
-    stagechannel_parser = argparse.ArgumentParser(add_help=False)
-    stagechannel_parser.add_argument(
-        "-n",
-        "--name",
-        type=str,
-        help="name",
-        nargs="+",
-        required=True,
-    )
-    stagechannel_parser.add_argument(
-        "-cat",
-        "--category",
-        type=str,
-        help="category",
-        nargs="+",
-        required=False,
-        default=None,
-    )
-    stagechannel_parser.add_argument(
-        "-u",
-        "--users",
-        type=int,
-        help="users",
-        required=False,
-        default=1000,
-    )
-
-    @Jeanne.command(description="Create a stage channel")
+    @create.command(aliases=["stage"], description="Create a stage channel")
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def stagechannel(
-        self, ctx: Context, *words: str, parser=stagechannel_parser
-    ) -> None:
+    async def stagechannel(self, ctx: Context, *words: str, parser=parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             name = parsed_args.name + unknown
@@ -304,7 +210,9 @@ class Create_Group(Cog, name="create"):
             )
             return
         embed = Embed()
-        channel: StageChannel = await ctx.guild.create_stage_channel(name=name)
+        channel: StageChannel = await ctx.guild.create_stage_channel(
+            name=("New Channel" if name == None else name)
+        )
         embed.description = "{} has been created".format(channel.jump_url)
         if category:
             category = (
@@ -318,14 +226,14 @@ class Create_Group(Cog, name="create"):
             )
         if users:
             if users > 1000:
-                users=1000
+                users = 1000
             await channel.edit(user_limit=users)
             embed.add_field(name="Users", value=users, inline=True)
         embed.color = Color.random()
         await ctx.send(embed=embed)
 
     @stagechannel.error
-    async def stagechannel_error(self, ctx:Context, error: Jeanne.CommandError):
+    async def stagechannel_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
@@ -334,33 +242,12 @@ class Create_Group(Cog, name="create"):
             embed.color = Color.red()
             await ctx.send(embed=embed)
 
-    forum_parser = argparse.ArgumentParser(add_help=False)
-    forum_parser.add_argument(
-        "-n",
-        "--name",
-        type=str,
-        help="name",
-        nargs="+",
-        required=True,
-    )
-    forum_parser.add_argument(
-        "-cat",
-        "--category",
-        type=str,
-        help="category",
-        nargs="+",
-        required=False,
-        default=None,
-    )
-
-    @Jeanne.command(description="Create a forum")
+    @create.command(description="Create a forum")
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def forum(
-        self, ctx: Context, *words: str, parser=forum_parser
-    ) -> None:
+    async def forum(self, ctx: Context, *words: str, parser=parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             name = parsed_args.name + unknown
@@ -376,7 +263,9 @@ class Create_Group(Cog, name="create"):
             )
             return
         embed = Embed()
-        forum = await ctx.guild.create_forum(name=name, topic="None")
+        forum = await ctx.guild.create_forum(
+            name=("Forum Discussion" if name == None else name), topic="None"
+        )
         embed.description = "{} has been created".format(forum.jump_url)
         embed.color = Color.random()
         if category:
@@ -389,14 +278,14 @@ class Create_Group(Cog, name="create"):
             embed.add_field(
                 name="Added into category", value=category.name, inline=True
             )
-        view=TopicButton(name, category)
-        m=await ctx.send(embed=embed, view=view)
+        view = TopicButton(name, category)
+        m = await ctx.send(embed=embed, view=view)
 
-        if view==None:
+        if view == None:
             await m.edit(view=None)
 
     @forum.error
-    async def forum_error(self, ctx:Context, error: Jeanne.CommandError):
+    async def forum_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
@@ -406,55 +295,20 @@ class Create_Group(Cog, name="create"):
             embed.color = Color.red()
             await ctx.send(embed=embed)
 
-    role_parser = argparse.ArgumentParser(add_help=False)
-    role_parser.add_argument(
-        "-n",
-        "--name",
-        type=str,
-        help="name",
-        nargs="+",
-        required=True,
-    )
-    role_parser.add_argument(
-        "-c",
-        "--color",
-        type=str,
-        help="color",
-        nargs="+",
-        required=False,
-        default=None,
-    )
-
-    role_parser.add_argument(
-        "-h",
-        "--hoisted",
-        help="Make it hoisted. Just type -h",
-        action="store_true",
-        required=False,
-    )
-
-    role_parser.add_argument(
-        "-m",
-        "--mentioned",
-        help="Make it mentionable. Just type -m",
-        action="store_true",
-        required=False,
-    )
-
-    @Jeanne.command(description="Create a role")
+    @create.command(aliases=["r"], description="Create a role")
     @Jeanne.has_permissions(manage_roles=True)
     @Jeanne.bot_has_permissions(manage_roles=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def role(self, ctx: Context, *words: str, parser=stagechannel_parser) -> None:
+    async def role(self, ctx: Context, *words: str, parser=parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             name = parsed_args.name + unknown
             name = " ".join(name)
             color = parsed_args.color + unknown
             color = " ".join(color)
-            hoisted:bool=parsed_args.hoisted
-            mentionable:bool=parsed_args.mentioned
+            hoisted: bool = parsed_args.hoisted
+            mentionable: bool = parsed_args.mentioned
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -489,63 +343,27 @@ class Create_Group(Cog, name="create"):
                 embed.add_field(name="Mentionable", value="No", inline=True)
         await ctx.send(embed=embed)
 
-    public_thread_parser = argparse.ArgumentParser(add_help=False)
-    public_thread_parser.add_argument(
-        "-n",
-        "--name",
-        type=str,
-        help="NAME",
-        nargs="+",
-        required=True,
+    @create.group(
+        description="Main create thread command",
+        invoke_without_command=True,
     )
-    public_thread_parser.add_argument(
-        "-ch",
-        "--channel",
-        type=str,
-        help="CHANNEL",
-        nargs="+",
-        required=True,
-    )
-    public_thread_parser.add_argument(
-        "-msg",
-        "--message",
-        type=int,
-        help="MESSAGE ID",
-        required=True,
-    )
-    public_thread_parser.add_argument(
-        "-s",
-        "--slowmode",
-        type=str,
-        help="SLOWMODE",
-        nargs="+",
-        required=False,
-        default=None
-    )
+    async def thread(self, ctx: Context): ...
 
-    @Jeanne.group(aliases=["ct"],description="Main create thread command", invoke_without_command=True)
-    async def createthread(self, ctx: Context): ...
-
-    @createthread.command(description="Make a public thread")
-    @Jeanne.has_permissions(
-        create_public_threads=True, create_private_threads=True
-    )
+    @thread.command(description="Make a public thread")
+    @Jeanne.has_permissions(create_public_threads=True, create_private_threads=True)
     @Jeanne.bot_has_permissions(
         create_public_threads=True, create_private_threads=True, manage_threads=True
     )
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def public(
-        self,
-        ctx:Context,
-        *words: str, parser=public_thread_parser) -> None:
+    async def public(self, ctx: Context, *words: str, parser=parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             name = parsed_args.name + unknown
             name = " ".join(name)
             channel = parsed_args.channel + unknown
             channel = " ".join(channel)
-            message_id:int = parsed_args.message
+            message_id: int = parsed_args.message
             slowmode = parsed_args.slowmode + unknown
             slowmode = " ".join(slowmode)
         except SystemExit:
@@ -557,10 +375,14 @@ class Create_Group(Cog, name="create"):
             )
             return
         channel = (
-                utils.get(ctx.guild.text_channels, id=channel)
-                if channel.isdigit() else utils.get(ctx.guild.text_channels, mention=channel) if channel.startswith("<#")
+            utils.get(ctx.guild.text_channels, id=channel)
+            if channel.isdigit()
+            else (
+                utils.get(ctx.guild.text_channels, mention=channel)
+                if channel.startswith("<#")
                 else utils.get(ctx.guild.text_channels, name=channel)
             )
+        )
         embed = Embed()
         embed.add_field(name="Channel", value=channel.jump_url, inline=True)
         message = await channel.fetch_message(message_id)
@@ -582,9 +404,7 @@ class Create_Group(Cog, name="create"):
         await ctx.send(embed=embed)
 
     @public.error
-    async def public_thread_error(
-        self, ctx:Context, error: Jeanne.CommandError
-    ):
+    async def public_thread_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, NotFound
         ):
@@ -599,7 +419,7 @@ class Create_Group(Cog, name="create"):
             embed = Embed()
             embed.description = "Failed to create public thread. Please try again"
             embed.color = Color.red()
-            await ctx.send(embed=embed)            
+            await ctx.send(embed=embed)
 
     private_thread_parser = argparse.ArgumentParser(add_help=False)
     private_thread_parser.add_argument(
@@ -625,18 +445,15 @@ class Create_Group(Cog, name="create"):
         help="SLOWMODE",
         nargs="+",
         required=False,
-        default=None
+        default=None,
     )
 
-    @createthread.command(description="Make a private thread")
+    @thread.command(description="Make a private thread")
     @Jeanne.has_permissions(create_private_threads=True)
     @Jeanne.bot_has_permissions(create_private_threads=True, manage_threads=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def private(
-        self,
-        ctx:Context,
-                *words: str, parser=public_thread_parser) -> None:
+    async def private(self, ctx: Context, *words: str, parser=parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             name = parsed_args.name + unknown
@@ -654,10 +471,14 @@ class Create_Group(Cog, name="create"):
             )
             return
         channel = (
-                utils.get(ctx.guild.text_channels, id=channel)
-                if channel.isdigit() else utils.get(ctx.guild.text_channels, mention=channel) if channel.startswith("<#")
+            utils.get(ctx.guild.text_channels, id=channel)
+            if channel.isdigit()
+            else (
+                utils.get(ctx.guild.text_channels, mention=channel)
+                if channel.startswith("<#")
                 else utils.get(ctx.guild.text_channels, name=channel)
             )
+        )
         embed = Embed()
         embed.add_field(name="Channel", value=channel.jump_url, inline=True)
         thread = await channel.create_thread(name=name)
@@ -677,25 +498,24 @@ class Create_Group(Cog, name="create"):
         await ctx.send(embed=embed)
 
     @private.error
-    async def private_thread_error(
-        self, ctx:Context, error: Jeanne.CommandError
-    ):
+    async def private_thread_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
             embed = Embed()
             embed.description = "Failed to create private thread. Please try again"
             embed.color = Color.red()
-            await ctx.send(embed=embed) 
+            await ctx.send(embed=embed)
 
-    @Jeanne.command(aliases=["makeemote", "cemote"],description="Make a new emoji")
+    @create.command(aliases=["emote"], description="Make a new emoji")
     @Jeanne.has_permissions(manage_emojis_and_stickers=True)
     @Jeanne.bot_has_permissions(manage_emojis_and_stickers=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def createemoji(
+    async def emoji(
         self,
-        ctx:Context,
+        ctx: Context,
+        *,
         name: Jeanne.Range[str, 2, 30],
         emoji_link: Optional[str] = None,
     ):
@@ -707,7 +527,9 @@ class Create_Group(Cog, name="create"):
             embed.description = "Please use either an emoji URL or emoji image"
             embed.color = Color.red()
         else:
-            emojibytes = get(emoji_link if emoji_link else ctx.message.attachments[0].url).content
+            emojibytes = get(
+                emoji_link if emoji_link else ctx.message.attachments[0].url
+            ).content
             emote = await ctx.guild.create_custom_emoji(
                 name=name.replace(" ", "_"), image=emojibytes
             )
@@ -717,8 +539,8 @@ class Create_Group(Cog, name="create"):
             embed.color = Color.random()
         await ctx.send(embed=embed)
 
-    @createemoji.error
-    async def createemoji_error(self, ctx:Context, error: Jeanne.errors.CommandError):
+    @emoji.error
+    async def createemoji_error(self, ctx: Context, error: Jeanne.errors.CommandError):
         if isinstance(error, Jeanne.errors.CommandInvokeError):
             a_emojis = len(
                 [emote for emote in ctx.guild.emojis if emote.animated == True]
@@ -735,14 +557,17 @@ class Create_Group(Cog, name="create"):
                     embed.description = "There was a problem making the emoji. Please check that the emoji you are making is a PNG, JPEG or GIF"
                 await ctx.send(embed=embed)
 
-    @Jeanne.command(aliases=["makesticker", "csticker"],description="Make a new sticker")
+    @Jeanne.command(
+        aliases=["makesticker", "csticker"], description="Make a new sticker"
+    )
     @Jeanne.has_permissions(manage_emojis_and_stickers=True)
     @Jeanne.bot_has_permissions(manage_emojis_and_stickers=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def createsticker(
         self,
-        ctx:Context,
+        ctx: Context,
+        *,
         name: Jeanne.Range[str, 2, 30],
         emoji: str,
         sticker_link: Optional[str] = None,
@@ -767,9 +592,7 @@ class Create_Group(Cog, name="create"):
         await ctx.send(embed=embed)
 
     @createsticker.error
-    async def sticker_error(
-        self, ctx:Context, error: Jeanne.errors.CommandError
-    ):
+    async def sticker_error(self, ctx: Context, error: Jeanne.errors.CommandError):
         if isinstance(error, Jeanne.errors.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
@@ -781,12 +604,19 @@ class Create_Group(Cog, name="create"):
             await ctx.send(embed=embed)
 
 
-    @Jeanne.command(aliases=["dtc"],description="Deletes a channel")
+class DeleteGroup(Cog, name="DeletePrefix"):
+    def __init__(self, bot: Bot) -> None:
+        self.bot = bot
+
+    @Jeanne.group(aliases=["d"], description="Main delete command")
+    async def delete(self, ctx: Context): ...
+
+    @Jeanne.command(aliases=["c"], description="Deletes a channel")
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def deletechannel(self, ctx:Context, *,channel: abc.GuildChannel):
+    async def deletechannel(self, ctx: Context, *, channel: abc.GuildChannel):
 
         embed = Embed(
             description="{} has been deleted".format(channel.name), color=Color.random()
@@ -794,12 +624,12 @@ class Create_Group(Cog, name="create"):
         await channel.delete()
         await ctx.send(embed=embed)
 
-    @Jeanne.command(aliases=["dr", "drole"],description="Deletes a role")
+    @Jeanne.command(aliases=["r"], description="Deletes a role")
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def deleterole(self, ctx:Context, *,role: Role):
+    async def role(self, ctx: Context, *, role: Role):
 
         embed = Embed(
             description="{} has been deleted".format(role.name), color=Color.random()
@@ -807,12 +637,12 @@ class Create_Group(Cog, name="create"):
         await role.delete()
         await ctx.send(embed=embed)
 
-    @Jeanne.command(aliases=["demoji", "delemote"],description="Deletes an emoji")
+    @Jeanne.command(aliases=["emote"], description="Deletes an emoji")
     @Jeanne.has_permissions(manage_expressions=True)
     @Jeanne.bot_has_permissions(manage_expressions=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def deleteemoji(self, ctx:Context, *,emoji: str):
+    async def emoji(self, ctx: Context, *, emoji: str):
 
         try:
             e = emoji.strip().split(":")[-1].rstrip(">")
@@ -825,8 +655,8 @@ class Create_Group(Cog, name="create"):
         await emote.delete()
         await ctx.send(embed=embed)
 
-    @deleteemoji.error
-    async def emoji_error(self, ctx:Context, error: Jeanne.CommandError):
+    @emoji.error
+    async def emoji_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (AttributeError, HTTPException)
         ):
@@ -836,15 +666,15 @@ class Create_Group(Cog, name="create"):
             )
             await ctx.send(embed=embed)
 
-    @Jeanne.command(aliases=["delsticker"],description="Deletes a sticker")
+    @Jeanne.command(description="Deletes a sticker")
     @Jeanne.describe(sticker="Which sticker are you deleting?")
     @Jeanne.has_permissions(manage_expressions=True)
     @Jeanne.bot_has_permissions(manage_expressions=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def deletesticker(self, ctx:Context, *, sticker: Optional[str]=None):
-        if sticker==None:
-            sticker=ctx.message.stickers[0].name
+    async def sticker(self, ctx: Context, *, sticker: Optional[str] = None):
+        if sticker == None:
+            sticker = ctx.message.stickers[0].name
         stick = utils.get(ctx.guild.stickers, name=sticker)
         embed = Embed(
             description="`{}` has been deleted".format(str(stick.name)), color=0x00FF68
@@ -852,8 +682,8 @@ class Create_Group(Cog, name="create"):
         await stick.delete()
         await ctx.send(embed=embed)
 
-    @deletesticker.error
-    async def sticker_error(self, ctx:Context, error: Jeanne.CommandError):
+    @sticker.error
+    async def sticker_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (AttributeError, HTTPException)
         ):
@@ -864,35 +694,47 @@ class Create_Group(Cog, name="create"):
             await ctx.send(embed=embed)
 
 
-class Edit_Group(Cog, name="edit"):
+class EditGroup(Cog, name="EditPrefix"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
-        super().__init__()
 
-    @Jeanne.command(description="Edits a text/news channel")
-    @Jeanne.describe(
-        channel="Which channel are you editing?",
-        name="What will be the new name?",
-        topic="What should be the new topic?",
-        slowmode="What is the slowmode (1hr, 30m, etc) (Max is 6 hours)",
-        category="Place in which category?",
-        nsfw_enabled="Should it be an NSFW channel?",
-    )
+    @Jeanne.group(description="Main edit command", invoke_without_command=True)
+    async def edit(self, ctx: Context): ...
+
+    @edit.command(aliases=["tc", "text"], description="Edits a text/news channel")
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def textchannel(
         self,
-        ctx:Context,
-        channel: Optional[TextChannel]=None,
-        name: Optional[Jeanne.Range[str, 1, 100]] = None,
-        topic: Optional[Jeanne.Range[str, 1, 1024]] = None,
-        slowmode: Optional[str] = None,
-        category: Optional[CategoryChannel] = None,
-        nsfw_enabled: Optional[bool] = None,
+        ctx: Context,
+        *,
+        channel: Optional[TextChannel] = None,
+        words: tuple[str, ...],
+        parser=parser,
     ) -> None:
-        channel=ctx.channel if channel ==None else channel
+        channel = ctx.channel if channel == None else channel
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            name = parsed_args.name + unknown
+            name = " ".join(name)
+            topic = parsed_args.topic + unknown
+            topic = " ".join(topic)
+            category = parsed_args.category + unknown
+            category = " ".join(category)
+            slowmode = parsed_args.slowmode + unknown
+            slowmode = " ".join(slowmode)
+            nsfw_enabled: bool = parsed_args.nsfw
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
+
         embed = Embed()
         embed.description = "Channel `{}` has been edited".format(channel.name)
         embed.color = Color.green()
@@ -924,7 +766,7 @@ class Edit_Group(Cog, name="edit"):
                 embed.add_field(name="NSFW enabled", value="No", inline=True)
         await ctx.send(embed=embed)
 
-    @Jeanne.command(description="Edit a role")
+    @edit.command(description="Edit a role")
     @Jeanne.describe(
         role="Which role are you editing?",
         name="What is the new name?",
@@ -936,15 +778,24 @@ class Edit_Group(Cog, name="edit"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def role(
-        self,
-        ctx:Context,
-        role: Role,
-        name: Optional[Jeanne.Range[str, 1, 100]] = None,
-        color: Optional[Jeanne.Range[str, None, 6]] = None,
-        hoisted: Optional[bool] = None,
-        mentionable: Optional[bool] = None,
+        self, ctx: Context, *, role: Role, words: tuple[str, ...], parser=parser
     ) -> None:
-
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            name = parsed_args.name + unknown
+            name = " ".join(name)
+            color = parsed_args.color + unknown
+            color = " ".join(color)
+            hoisted: bool = parsed_args.hoisted
+            mentionable: bool = parsed_args.mentioned
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
         embed = Embed()
         embed.description = "Role `{}` has been edited".format(role.name)
         if name:
@@ -975,29 +826,29 @@ class Edit_Group(Cog, name="edit"):
                 embed.add_field(name="Mentionable", value="No", inline=True)
         await ctx.send(embed=embed)
 
-    @Jeanne.command(description="Edits the server")
-    @Jeanne.describe(
-        name="What is the new name?",
-        description="What is the new description (only for public servers)",
-        avatar="What is the new server avatar?",
-        splash="What will be the new invite splash screen?",
-        banner="What will be the new banner?",
-        verification_level="How high should the verification level be?",
+    @edit.command(
+        description="Edits the server's name, description and verification level"
     )
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.bot_has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def server(
-        self,
-        ctx:Context,
-        name: Optional[Jeanne.Range[str, 2, 100]] = None,
-        description: Optional[Jeanne.Range[str, None, 120]] = None,
-        avatar: Optional[Attachment] = None,
-        splash: Optional[Attachment] = None,
-        banner: Optional[Attachment] = None,
-        verification_level: Optional[VerificationLevel] = None,
-    ) -> None:
+    async def server(self, ctx: Context, *words: str, parser=parser) -> None:
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            name = parsed_args.name + unknown
+            name = " ".join(name)
+            description = parsed_args.description + unknown
+            description = " ".join(description)
+            verification_level: str = parsed_args.verification_level
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
 
         embed = Embed()
         embed.description = "{} has been edited".format(ctx.guild.name)
@@ -1015,108 +866,145 @@ class Edit_Group(Cog, name="edit"):
                     value="Your server is not public to have a description edited",
                     inline=True,
                 )
-        if avatar:
-            try:
-                avatar_url = avatar.url
-                embed.set_thumbnail(url=avatar_url)
-                avatarbytes = get(avatar_url).content
-                await ctx.guild.edit(icon=avatarbytes)
-            except:
-                embed.add_field(
-                    name="Icon not added",
-                    value="There has been a problem adding the avatar",
-                    inline=True,
-                )
-        if splash:
-            if ctx.guild.premium_tier == 0:
-                embed.add_field(
-                    name="Splash not added",
-                    value="This server is not boosted to Tier 1",
-                    inline=True,
-                )
-            else:
-                try:
-                    splash_url = splash.url
-                    splash_bytes = get(splash_url).content
-                    await ctx.guild.edit(splash=splash_bytes)
-                    embed.add_field(
-                        name="Server's New Splash Screen",
-                        value=ctx.guild.splash.url,
-                        inline=True,
-                    )
-                except:
-                    pass
-        if banner:
-            if ctx.guild.premium_tier <= 1:
-                embed.add_field(
-                    name="Banner not added",
-                    value="This server is not boosted to Tier 2",
-                    inline=True,
-                )
-            else:
-                try:
-                    bannerbytes = get(banner.url).content
-                    await ctx.guild.edit(banner=bannerbytes)
-                    embed.add_field(
-                        name="Server's New Banner",
-                        value=ctx.guild.banner.url,
-                        inline=True,
-                    )
-                except:
-                    pass
+
         if verification_level:
-            if verification_level.name == "none":
+            if verification_level == "none":
                 await ctx.guild.edit(verification_level=VerificationLevel.none)
                 embed.add_field(
                     name="Verification Level",
                     value="**{}**\nNo verification required".format(
-                        verification_level.name.title()
+                        verification_level.title()
                     ),
                     inline=True,
                 )
-            elif verification_level.name == "low":
+            elif verification_level == "low":
                 await ctx.guild.edit(verification_level=VerificationLevel.low)
                 embed.add_field(
                     name="Verification Level",
                     value="**{}**\nMembers must have a verified email".format(
-                        verification_level.name.title()
+                        verification_level.title()
                     ),
                     inline=True,
                 )
-            elif verification_level.name == "medium":
+            elif verification_level == "medium":
                 await ctx.guild.edit(verification_level=VerificationLevel.medium)
                 embed.add_field(
                     name="Verification Level",
                     value="**{}**\nMembers must have a verified email and be registered on Discord for more than 5 minutes".format(
-                        verification_level.name.title()
+                        verification_level.title()
                     ),
                     inline=True,
                 )
-            elif verification_level.name == "high":
+            elif verification_level == "high":
                 await ctx.guild.edit(verification_level=VerificationLevel.high)
                 embed.add_field(
                     name="Verification Level",
                     value="**{}**\nMembers must have a verified email, be registered on Discord for more than 5 minutes and stay in the server for more than 10 minutes".format(
-                        verification_level.name.title()
+                        verification_level.title()
                     ),
                     inline=True,
                 )
-            elif verification_level.name == "highest":
+            elif verification_level == "highest":
                 await ctx.guild.edit(verification_level=VerificationLevel.highest)
                 embed.add_field(
                     name="Verification Level",
                     value="**{}**\nMembers must have a verified phone number".format(
-                        verification_level.name.title()
+                        verification_level.title()
                     ),
                     inline=True,
                 )
         await ctx.send(embed=embed)
 
+    @edit.command(aliases=["pfp"], description="Change the server's avatar")
+    @Jeanne.has_permissions(manage_guild=True)
+    @Jeanne.bot_has_permissions(manage_guild=True)
+    @Jeanne.check(check_botbanned_prefix)
+    @Jeanne.check(check_disabled_prefixed_command)
+    async def icon(self, ctx: Context):
+        embed = Embed()
+        try:
+            embed.description = f"{ctx.guild.name}'s icon has been changed"
+            avatar = ctx.message.attachments[0]
+            avatar_url = avatar.url
+            embed.set_thumbnail(url=avatar_url)
+            avatarbytes = get(avatar_url).content
+            await ctx.guild.edit(icon=avatarbytes)
+        except:
+            embed.add_field(
+                name="Icon not added",
+                value="There has been a problem adding the avatar",
+                inline=True,
+            )
+        await ctx.send(embed=embed)
 
-class Set_Group(Cog, name="set"):
+    @edit.command(description="Change the server's banner")
+    @Jeanne.has_permissions(manage_guild=True)
+    @Jeanne.bot_has_permissions(manage_guild=True)
+    @Jeanne.check(check_botbanned_prefix)
+    @Jeanne.check(check_disabled_prefixed_command)
+    async def banner(self, ctx: Context):
+        embed = Embed()
+        if ctx.guild.premium_tier <= 1:
+            embed.add_field(
+                name="Banner not added",
+                value="This server is not boosted to Tier 2",
+                inline=True,
+            )
+        else:
+            try:
+                banner = ctx.message.attachments[0]
+                bannerbytes = get(banner.url).content
+                await ctx.guild.edit(banner=bannerbytes)
+                embed.add_field(
+                    name="Server's New Banner",
+                    value=ctx.guild.banner.url,
+                    inline=True,
+                )
+            except:
+                embed.add_field(
+                    name="Banner not added",
+                    value="There has been a problem adding the banner",
+                    inline=True,
+                )
+        await ctx.send(embed=embed)
+
+    @edit.command(description="Change the server's splash screen")
+    @Jeanne.has_permissions(manage_guild=True)
+    @Jeanne.bot_has_permissions(manage_guild=True)
+    @Jeanne.check(check_botbanned_prefix)
+    @Jeanne.check(check_disabled_prefixed_command)
+    async def splash(self, ctx: Context):
+        embed = Embed()
+        if ctx.guild.premium_tier == 0:
+            embed.add_field(
+                name="Splash not added",
+                value="This server is not boosted to Tier 1",
+                inline=True,
+            )
+        else:
+            try:
+                splash = ctx.message.attachments[0]
+                splash_url = splash.url
+                splash_bytes = get(splash_url).content
+                await ctx.guild.edit(splash=splash_bytes)
+                embed.add_field(
+                    name="Server's New Splash Screen",
+                    value=ctx.guild.splash.url,
+                    inline=True,
+                )
+            except:
+                embed.add_field(
+                    name="Splash screen not added",
+                    value="There has been a problem adding the splash screen",
+                    inline=True,
+                )
+        await ctx.send(embed=embed)
+
+
+class SetGroup(Cog, name="SetPrefix"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
-        super().__init__()
+
 
     @staticmethod
     def replace_all(text: str, dic: dict):
@@ -1124,21 +1012,32 @@ class Set_Group(Cog, name="set"):
             text = text.replace(i, j)
         return text
 
-    @Jeanne.command(description="Set a welcomer and/or leaver channel")
-    @Jeanne.describe(
-        welcoming_channel="Which channel should alert members when someone join",
-        leaving_channel="Which channel should members when someone leaves?",
-    )
+    @Jeanne.group(name="set",description="Main set command", invoke_without_command=True)
+    async def _set(self, ctx:Context):...
+
+    @_set.command(description="Set a welcomer and/or leaver channel")
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def welcomer(
         self,
-        ctx:Context,
-        welcoming_channel: Optional[TextChannel] = None,
-        leaving_channel: Optional[TextChannel] = None,
+        ctx: Context,
+        *words:str
     ) -> None:
-
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            welcomer = parsed_args.welcomer + unknown
+            welcoming_channel = " ".join(welcomer)
+            leaving = parsed_args.leaving + unknown
+            leaving_channel = " ".join(leaving)
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
         if (welcoming_channel == None) and (leaving_channel == None):
             error = Embed(
                 description="Both options are empty. Please set at least a welcomer or leaving channel",
@@ -1148,6 +1047,15 @@ class Set_Group(Cog, name="set"):
             return
         setup = Embed(description="Welcomer channels set", color=Color.random())
         if welcoming_channel:
+            welcoming_channel = (
+            utils.get(ctx.guild.text_channels, id=welcoming_channel)
+            if welcoming_channel.isdigit()
+            else (
+                utils.get(ctx.guild.text_channels, mention=welcoming_channel)
+                if welcoming_channel.startswith("<#")
+                else utils.get(ctx.guild.text_channels, name=welcoming_channel)
+            )
+            )
             await Manage(ctx.guild).set_welcomer(welcoming_channel)
             setup.add_field(
                 name="Channel welcoming users",
@@ -1155,6 +1063,15 @@ class Set_Group(Cog, name="set"):
                 inline=True,
             )
         if leaving_channel:
+            leaving_channel = (
+            utils.get(ctx.guild.text_channels, id=leaving_channel)
+            if leaving_channel.isdigit()
+            else (
+                utils.get(ctx.guild.text_channels, mention=leaving_channel)
+                if leaving_channel.startswith("<#")
+                else utils.get(ctx.guild.text_channels, name=leaving_channel)
+            )
+            )
             await Manage(ctx.guild).set_leaver(leaving_channel)
             setup.add_field(
                 name="Channel showing users that left",
@@ -1163,43 +1080,41 @@ class Set_Group(Cog, name="set"):
             )
         await ctx.send(embed=setup)
 
-    @Jeanne.command(description="Set a modlog channel")
+    @_set.command(description="Set a modlog channel")
     @Jeanne.describe(
         channel="Which channel should log warns, timeouts, kicks and bans?"
     )
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def modlog(self, ctx:Context, channel: TextChannel):
+    async def modlog(self, ctx: Context, *, channel: TextChannel):
 
         await Manage(ctx.guild).set_modloger(channel)
         embed = Embed(description="Modlog channel set", color=Color.red())
         embed.add_field(name="Channel selected", value=channel.mention, inline=True)
         await ctx.send(embed=embed)
 
-    @Jeanne.command(description="Set a welcoming message when someone joins the server")
+    @_set.command(aliases=["greet"], description="Set a welcoming message when someone joins the server")
     @Jeanne.describe(jsonfile="Upload JSON file with the welcoming message")
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def welcomingmsg(
-        self, ctx:Context, jsonfile: Optional[Attachment] = None
+        self, ctx: Context
     ) -> None:
-        if jsonfile == None:
-            await ctx.response.send_modal(Welcomingmsg())
-            return
+        jsonfile=ctx.message.attachments[0] if len(ctx.message.attachments) ==1 else None
         if jsonfile != None:
-    
+
             humans = str(
                 len([member for member in ctx.guild.members if not member.bot])
             )
             parameters = OrderedDict(
                 [
-                    ("%member%", str(ctx.user)),
-                    ("%pfp%", str(ctx.user.display_avatar)),
+                    ("%member%", str(ctx.author)),
+                    ("%pfp%", str(ctx.author.display_avatar)),
                     ("%server%", str(ctx.guild.name)),
-                    ("%mention%", str(ctx.user.mention)),
-                    ("%name%", str(ctx.user.name)),
+                    ("%mention%", str(ctx.author.mention)),
+                    ("%name%", str(ctx.author.name)),
                     ("%members%", str(ctx.guild.member_count)),
                     ("%humans%", str(humans)),
                     ("%icon%", str(ctx.guild.icon)),
@@ -1217,8 +1132,8 @@ class Set_Group(Cog, name="set"):
                 description="This is the preview of the welcoming message.\nAre you happy with it?"
             )
             embed = Embed.from_dict(json["embeds"][0])
-            view = Confirmation(ctx.user)
-            await ctx.send(
+            view = Confirmation(ctx.author)
+            m=await ctx.send(
                 content=content,
                 embeds=[embed, confirm],
                 view=view,
@@ -1231,43 +1146,40 @@ class Set_Group(Cog, name="set"):
             if view.value == True:
                 await Manage(ctx.guild).set_welcomer_msg(str(json_request))
                 embed = Embed(description="Welcoming message set")
-                await ctx.edit_original_response(
+                await m.edit(
                     content=None, embeds=[embed], view=None
                 )
             elif view.value == False:
                 embed = Embed(description="Action cancelled")
-                await ctx.edit_original_response(
+                await m.edit(
                     content=None, embeds=[embed], view=None
                 )
             else:
                 embed = Embed(description="Timeout")
-                await ctx.edit_original_response(
+                await m.edit(
                     content=None, embeds=[embed], view=None
                 )
 
-    @Jeanne.command(description="Set a leaving message when someone leaves the server")
+    @_set.command(aliases=["buy"],description="Set a leaving message when someone leaves the server")
     @Jeanne.describe(jsonfile="Upload JSON file with the welcoming message")
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def leavingmsg(
-        self, ctx:Context, jsonfile: Optional[Attachment] = None
-    ) -> None:
-        if jsonfile == None:
-            await ctx.response.send_modal(Leavingmsg())
-            return
+        self, ctx: Context) -> None:
+        jsonfile=ctx.message.attachments[0] if len(ctx.message.attachments) ==1 else None
         if jsonfile != None:
-    
+
             humans = str(
                 len([member for member in ctx.guild.members if not member.bot])
             )
             parameters = OrderedDict(
                 [
-                    ("%member%", str(ctx.user)),
-                    ("%pfp%", str(ctx.user.display_avatar)),
+                    ("%member%", str(ctx.author)),
+                    ("%pfp%", str(ctx.author.display_avatar)),
                     ("%server%", str(ctx.guild.name)),
-                    ("%mention%", str(ctx.user.mention)),
-                    ("%name%", str(ctx.user.name)),
+                    ("%mention%", str(ctx.author.mention)),
+                    ("%name%", str(ctx.author.name)),
                     ("%members%", str(ctx.guild.member_count)),
                     ("%humans%", str(humans)),
                     ("%icon%", str(ctx.guild.icon)),
@@ -1285,8 +1197,8 @@ class Set_Group(Cog, name="set"):
                 description="This is the preview of the leaving message.\nAre you happy with it?"
             )
             embed = Embed.from_dict(json["embeds"][0])
-            view = Confirmation(ctx.user)
-            await ctx.send(
+            view = Confirmation(ctx.author)
+            m=await ctx.send(
                 content=content,
                 embeds=[embed, confirm],
                 view=view,
@@ -1299,28 +1211,28 @@ class Set_Group(Cog, name="set"):
             if view.value == True:
                 await Manage(ctx.guild).set_leaving_msg(str(json_request))
                 embed = Embed(description="Leaving message set")
-                await ctx.edit_original_response(
+                await m.edit(
                     content=None, embeds=[embed], view=None
                 )
             elif view.value == False:
                 embed = Embed(description="Action cancelled")
-                await ctx.edit_original_response(
+                await m.edit(
                     content=None, embeds=[embed], view=None
                 )
             else:
                 embed = Embed(description="Timeout")
-                await ctx.edit_original_response(
+                await m.edit(
                     content=None, embeds=[embed], view=None
                 )
 
-    @Jeanne.command(
+    @_set.command(aliases=["rrm"],
         description="Set a role reward message. This will be posted in the levelup channel"
     )
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def rolereward_message(
-        self, ctx:Context, message: Optional[bool] = None
+        self, ctx: Context, *, message: Optional[str] = None
     ) -> None:
         if message == True:
             await ctx.response.send_modal(RankUpmsg())
@@ -1341,7 +1253,7 @@ class Set_Group(Cog, name="set"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def levelupdate(
-        self, ctx:Context, channel: TextChannel, levelmsg: Optional[bool] = None
+        self, ctx: Context, channel: TextChannel, levelmsg: Optional[bool] = None
     ) -> None:
         if levelmsg == True:
             await ctx.response.send_modal(Levelmsg(channel))
@@ -1364,9 +1276,7 @@ class Set_Group(Cog, name="set"):
     )
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def brightness(
-        self, ctx:Context, brightness: Jeanne.Range[int, 10, 150]
-    ):
+    async def brightness(self, ctx: Context, brightness: Jeanne.Range[int, 10, 150]):
 
         embed = Embed()
         if Inventory(ctx.user).set_brightness(brightness) == False:
@@ -1382,7 +1292,7 @@ class Set_Group(Cog, name="set"):
     @Jeanne.command(name="profile-bio", description="Change your profile bio")
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def bio(self, ctx:Context):
+    async def bio(self, ctx: Context):
         await ctx.response.send_modal(BioModal())
 
     @Jeanne.command(
@@ -1392,7 +1302,7 @@ class Set_Group(Cog, name="set"):
     @Jeanne.describe(color="Add your color")
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def color(self, ctx:Context, color: Jeanne.Range[str, 1]):
+    async def color(self, ctx: Context, color: Jeanne.Range[str, 1]):
 
         embed = Embed()
         try:
@@ -1418,7 +1328,7 @@ class manage(Cog):
     @Jeanne.bot_has_permissions(manage_roles=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def addrole(self, ctx:Context, member: Member, role: Role):
+    async def addrole(self, ctx: Context, member: Member, role: Role):
 
         await member.add_roles(role)
         embed = Embed(color=Color.random())
@@ -1433,7 +1343,7 @@ class manage(Cog):
     @Jeanne.bot_has_permissions(manage_roles=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def removerole(self, ctx:Context, member: Member, role: Role):
+    async def removerole(self, ctx: Context, member: Member, role: Role):
 
         await member.remove_roles(role)
         embed = Embed(color=Color.random())
@@ -1448,7 +1358,7 @@ class manage(Cog):
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def remove(self, ctx:Context) -> None:
+    async def remove(self, ctx: Context) -> None:
 
         embed = Embed(
             description="Click on one of the buttons to remove", color=Color.random()
@@ -1470,7 +1380,7 @@ class manage(Cog):
     @Jeanne.check(check_disabled_prefixed_command)
     async def clone(
         self,
-        ctx:Context,
+        ctx: Context,
         channel: abc.GuildChannel,
         name: Optional[Jeanne.Range[str, 1, 100]] = None,
         category: Optional[CategoryChannel] = None,
@@ -1504,7 +1414,7 @@ class Rename_Group(Cog, name="rename"):
     @Jeanne.bot_has_permissions(manage_emojis_and_stickers=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def emoji(self, ctx:Context, emoji: str, name: Jeanne.Range[str, 2, 30]):
+    async def emoji(self, ctx: Context, emoji: str, name: Jeanne.Range[str, 2, 30]):
 
         try:
             e: int = emoji.strip().split(":")[-1].rstrip(">")
@@ -1519,7 +1429,7 @@ class Rename_Group(Cog, name="rename"):
         await ctx.send(embed=embed)
 
     @emoji.error
-    async def emoji_error(self, ctx:Context, error: Jeanne.CommandError):
+    async def emoji_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, AttributeError
         ):
@@ -1538,7 +1448,7 @@ class Rename_Group(Cog, name="rename"):
     @Jeanne.check(check_disabled_prefixed_command)
     async def category(
         self,
-        ctx:Context,
+        ctx: Context,
         category: CategoryChannel,
         name: Jeanne.Range[str, 1, 100],
     ):
@@ -1556,9 +1466,7 @@ class Rename_Group(Cog, name="rename"):
     @Jeanne.bot_has_permissions(manage_emojis_and_stickers=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def sticker(
-        self, ctx:Context, sticker: str, name: Jeanne.Range[str, 2, 30]
-    ):
+    async def sticker(self, ctx: Context, sticker: str, name: Jeanne.Range[str, 2, 30]):
 
         sticker: GuildSticker = utils.get(ctx.guild.stickers, name=sticker)
         embed = Embed(
@@ -1569,7 +1477,7 @@ class Rename_Group(Cog, name="rename"):
         await ctx.send(embed=embed)
 
     @sticker.error
-    async def sticker_error(self, ctx:Context, error: Jeanne.CommandError):
+    async def sticker_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, AttributeError
         ):
@@ -1591,7 +1499,7 @@ class Command_Group(Cog, name="command"):
     @Jeanne.check(check_botbanned_prefix)
     async def _disable(
         self,
-        ctx:Context,
+        ctx: Context,
         command: Jeanne.Range[str, 3],
     ):
 
@@ -1623,7 +1531,7 @@ class Command_Group(Cog, name="command"):
     @Jeanne.check(check_botbanned_prefix)
     async def _enable(
         self,
-        ctx:Context,
+        ctx: Context,
         command: Jeanne.Range[str, 3],
     ):
 
@@ -1648,7 +1556,7 @@ class Command_Group(Cog, name="command"):
 
     @Jeanne.command(name="list-disabled", description="List all disabled commands")
     @Jeanne.check(check_botbanned_prefix)
-    async def listdisabled(self, ctx:Context):
+    async def listdisabled(self, ctx: Context):
 
         cmd = Command(ctx.guild)
         embed = Embed()
@@ -1679,7 +1587,7 @@ class Level_Group(Cog, name="level"):
     )
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def _add(self, ctx:Context, role: Role, level: Jeanne.Range[int, 1]):
+    async def _add(self, ctx: Context, role: Role, level: Jeanne.Range[int, 1]):
 
         botmember = await ctx.guild.fetch_member(self.bot.user.id)
         if role.position >= botmember.top_role.position:
@@ -1703,7 +1611,7 @@ class Level_Group(Cog, name="level"):
     )
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def _remove(self, ctx:Context, role: Role):
+    async def _remove(self, ctx: Context, role: Role):
 
         await Manage(server=ctx.guild).remove_role_reward(role)
         embed = Embed(color=Color.random())
@@ -1717,7 +1625,7 @@ class Level_Group(Cog, name="level"):
     )
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def _list(self, ctx:Context):
+    async def _list(self, ctx: Context):
 
         roles = Levelling(server=ctx.guild).list_all_roles
         data = []
@@ -1737,7 +1645,7 @@ class Level_Group(Cog, name="level"):
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def add(self, ctx:Context, channel: TextChannel) -> None:
+    async def add(self, ctx: Context, channel: TextChannel) -> None:
 
         if Levelling(server=ctx.guild).check_xpblacklist_channel(channel) == False:
             await Manage(server=ctx.guild).add_xpblacklist(channel)
@@ -1758,7 +1666,7 @@ class Level_Group(Cog, name="level"):
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def remove(self, ctx:Context, channel: TextChannel) -> None:
+    async def remove(self, ctx: Context, channel: TextChannel) -> None:
 
         if Levelling(server=ctx.guild).check_xpblacklist_channel(channel) == False:
             embed = Embed(color=Color.red())
@@ -1780,7 +1688,7 @@ class Level_Group(Cog, name="level"):
     )
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def _list(self, ctx:Context) -> None:
+    async def _list(self, ctx: Context) -> None:
 
         embed = Embed()
         channels = Levelling(server=ctx.guild).get_blacklisted_channels
@@ -1800,9 +1708,10 @@ class Level_Group(Cog, name="level"):
 
 async def setup(bot: Bot):
     await bot.add_cog(manage(bot))
-    await bot.add_cog(Create_Group(bot))
-    await bot.add_cog(Edit_Group(bot))
-    await bot.add_cog(Set_Group(bot))
+    await bot.add_cog(CreateGroup(bot))
+    await bot.add_cog(DeleteGroup(bot))
+    await bot.add_cog(EditGroup(bot))
+    await bot.add_cog(SetGroup(bot))
     await bot.add_cog(Rename_Group(bot))
     await bot.add_cog(Command_Group(bot))
     await bot.add_cog(Level_Group(bot))
