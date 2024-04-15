@@ -2,6 +2,7 @@ from functools import partial
 from discord import (
     CategoryChannel,
     File,
+    Member,
     Message,
     ui,
     ButtonStyle,
@@ -657,33 +658,6 @@ class RolesButton(ui.View):
         self.stop()
 
 
-class BioModal(ui.Modal, title="Bio"):
-    def __init__(self):
-        super().__init__()
-
-    line1 = ui.TextInput(
-        label="Line 1",
-        style=TextStyle.short,
-        required=True,
-        min_length=1,
-        max_length=60,
-    )
-    line2 = ui.TextInput(
-        label="Line 2",
-        style=TextStyle.short,
-        required=False,
-        min_length=1,
-        max_length=60,
-    )
-
-    async def on_submit(self, ctx: Interaction) -> None:
-        bio = self.line1.value + "\n" + (self.line2.value if self.line2.value else "")
-        embed = Embed(title="New bio has been set to:", color=Color.random())
-        await Inventory(ctx.user).set_bio(bio)
-        embed.description = bio
-        await ctx.response.send_message(embed=embed)
-
-
 class Guess_Buttons(ui.View):
     def __init__(self, author: User):
         super().__init__(timeout=60)
@@ -786,3 +760,73 @@ async def use_function_app(ctx: Interaction, name: str):
     await Inventory(ctx.user).use_wallpaper(name)
     embed = Embed(description=f"{name} has been selected", color=Color.random())
     await ctx.edit_original_response(embed=embed, view=None)
+
+
+class TopicButton(ui.View):
+    def __init__(self, author: Member, name: str, category: CategoryChannel):
+        self.value = None
+        self.author = author
+        self.name = name
+        self.category = category
+        super().__init__(timeout=180)
+
+    @ui.button(label="Add Guidelines")
+    async def guidelines(self, button: ui.Button, ctx: Interaction):
+        self.value = "guidelines"
+        await ctx.response.send_modal(ForumGuildlines(self.name, self.category))
+
+    async def interaction_check(self, ctx: Interaction):
+        return ctx.user.id == self.author.id
+
+
+class WelcomerSetButtons(ui.View):
+    def __init__(self, author: Member, message:Message):
+        self.value = None
+        self.author = author
+        self.message=message
+        super().__init__(timeout=180)
+
+    @ui.button(label="Set Welcoming Message")
+    async def setwelcomemsg(self, button: ui.Button, ctx: Interaction):
+        self.value = "welcomemsg"
+        await self.message.edit(view=self)
+        await ctx.response.send_modal(Welcomingmsg())
+
+    @ui.button(label="Set Leaving Message")
+    async def setleavingmsg(self, button: ui.Button, ctx: Interaction):
+        self.value = "leavingmsg"
+        await self.message.edit(view=self)
+        await ctx.response.send_modal(Leavingmsg())
+
+    async def interaction_check(self, ctx: Interaction):
+        return ctx.user.id == self.author.id
+
+
+class LevelSetButtons(ui.View):
+    def __init__(self, author: Member, message:Message, channel:TextChannel):
+        self.value = None
+        self.author = author
+        self.message=message
+        self.channel=channel
+        super().__init__(timeout=180)
+
+    @ui.button(label="Set Level Update Message")
+    async def setwelcomemsg(self, button: ui.Button, ctx: Interaction):
+        self.value = "levelmsg"
+        await self.message.edit(view=self)
+        await ctx.response.send_modal(Levelmsg())
+
+    @ui.button(label="Set Default Role Reward Message")
+    async def setdefaultleavingmsg(self, button: ui.Button, ctx: Interaction):
+        self.value = "defaultrolerewardmsg"
+        await Manage(ctx.guild).add_rankup_rolereward(None)
+        await self.message.edit(view=self)
+
+    @ui.button(label="Set Custom Role Reward Message")
+    async def setleavingmsg(self, button: ui.Button, ctx: Interaction):
+        self.value = "customrolerewardmsg"
+        await self.message.edit(view=self)
+        await ctx.response.send_modal(RankUpmsg())
+
+    async def interaction_check(self, ctx: Interaction):
+        return ctx.user.id == self.author.id
