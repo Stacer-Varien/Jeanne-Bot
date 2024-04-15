@@ -22,32 +22,14 @@ from functions import (
 from assets.components import Confirmation
 from typing import Optional
 from reactionmenu import ViewButton, ViewMenu
+from assets.argparsers import parser
 
 
 class moderation(Cog, name="modcog"):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    mod_parser = argparse.ArgumentParser(add_help=False)
-    mod_parser.add_argument(
-        "-u",
-        "--user",
-        "-m",
-        "--member",
-        type=str,
-        help="USER ID | MEMBER NAME | MEMBER GLOBAL NAME",
-        nargs="+",
-        required=True,
-    )
-    mod_parser.add_argument(
-        "-r",
-        "--reason",
-        type=str,
-        help="REASON",
-        nargs="+",
-        required=False,
-        default="Unspecified",
-    )
+
 
     @Jeanne.group(
         name="ban", description="Main ban command", invoke_without_command=True
@@ -59,7 +41,7 @@ class moderation(Cog, name="modcog"):
     @Jeanne.bot_has_permissions(ban_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def user(self, ctx: Context, *words: str, parser=mod_parser) -> None:
+    async def user(self, ctx: Context, *words: str, parser=parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.user + unknown
@@ -130,40 +112,14 @@ class moderation(Cog, name="modcog"):
                 cancelled = Embed(description="Ban cancelled", color=Color.red())
                 await m.edit(embed=cancelled, view=None)
 
-    ban_member_parser = argparse.ArgumentParser(add_help=False)
-    ban_member_parser.add_argument(
-        "-u",
-        "--user",
-        type=str,
-        help="USER ID | MEMBER NAME | MEMBER GLOBAL NAME",
-        nargs="+",
-        required=True,
-    )
-    ban_member_parser.add_argument(
-        "-r",
-        "--reason",
-        type=str,
-        help="REASON",
-        nargs="+",
-        required=False,
-        default="Unspecified",
-    )
-    ban_member_parser.add_argument(
-        "-t",
-        "--time",
-        type=str,
-        help="TIME",
-        nargs="+",
-        required=False,
-        default=None,
-    )
+
 
     @ban.command(description="Ban someone in this server")
     @Jeanne.has_permissions(ban_members=True)
     @Jeanne.bot_has_permissions(ban_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def member(self, ctx: Context, *words: str, parser=ban_member_parser) -> None:
+    async def member(self, ctx: Context, *words: str, parser=parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.user + unknown
@@ -359,7 +315,7 @@ class moderation(Cog, name="modcog"):
     @Jeanne.has_permissions(kick_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def warn(self, ctx: Context, *words: str, parser=mod_parser) -> None:
+    async def warn(self, ctx: Context, *words: str, parser=parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.user + unknown
@@ -519,7 +475,7 @@ class moderation(Cog, name="modcog"):
     @Jeanne.bot_has_permissions(kick_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def kick(self, ctx: Context, *words: str, parser=mod_parser) -> None:
+    async def kick(self, ctx: Context, *words: str, parser=parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.user + unknown
@@ -736,7 +692,7 @@ class moderation(Cog, name="modcog"):
 
     @Jeanne.command(description="Unbans a user")
     @Jeanne.has_permissions(ban_members=True)
-    async def unban(self, ctx: Context, *words: str, parser=mod_parser) -> None:
+    async def unban(self, ctx: Context, *words: str, parser=parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.user + unknown
@@ -881,7 +837,7 @@ class moderation(Cog, name="modcog"):
     @Jeanne.bot_has_permissions(moderate_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def untimeout(self, ctx: Context, *words: str, parser=mod_parser) -> None:
+    async def untimeout(self, ctx: Context, *words: str, parser=parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.user + unknown
@@ -932,24 +888,7 @@ class moderation(Cog, name="modcog"):
         await ctx.send(embed=untimeouted)
         await modlog.send(embed=untimeout)
 
-    massban_unban_parser = argparse.ArgumentParser(add_help=False)
-    massban_unban_parser.add_argument(
-        "-uids",
-        "--users",
-        "-ids",
-        type=str,
-        help="USER IDS",
-        nargs="+",
-        required=True,
-    )
-    massban_unban_parser.add_argument(
-        "-r",
-        "--reason",
-        type=str,
-        nargs="+",
-        help="REASON",
-        required=True,
-    )
+
 
     @Jeanne.command(aliases=["massb", "mb"], description="Ban multiple members at once")
     @Jeanne.cooldown(1, 1800, type=BucketType.guild)
@@ -957,7 +896,7 @@ class moderation(Cog, name="modcog"):
     @Jeanne.bot_has_permissions(ban_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def massban(self, ctx: Context, *words: str, parser=massban_unban_parser):
+    async def massban(self, ctx: Context, *words: str, parser=parser):
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.users + unknown
@@ -967,10 +906,19 @@ class moderation(Cog, name="modcog"):
         except SystemExit:
             await ctx.send(
                 embed=Embed(
-                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    description="You are missing some arguments or using incorrect arguments for this command",
                     color=Color.red(),
                 )
             )
+            return
+        if reason=="Unspecified":
+            await ctx.send(
+                embed=Embed(
+                    description="You didn't add the reason for the massban. Please try again later",
+                    color=Color.red(),
+                )
+            )
+            await ctx.send(embed=embed)
             return
         ids = user_ids.split()[:25]
         if len(ids) < 5:
@@ -1068,7 +1016,7 @@ class moderation(Cog, name="modcog"):
     @Jeanne.has_permissions(administrator=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def massunban(self, ctx: Context, *words: str, parser=massban_unban_parser):
+    async def massunban(self, ctx: Context, *words: str, parser=parser):
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.users + unknown
@@ -1082,6 +1030,15 @@ class moderation(Cog, name="modcog"):
                     color=Color.red(),
                 )
             )
+            return
+        if reason=="Unspecified":
+            await ctx.send(
+                embed=Embed(
+                    description="You didn't add the reason for the massunban. Please try again later",
+                    color=Color.red(),
+                )
+            )
+            await ctx.send(embed=embed)
             return
         ids = user_ids.split()[:25]
         if len(ids) < 5:

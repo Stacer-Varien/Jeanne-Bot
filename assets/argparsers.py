@@ -5,33 +5,33 @@ parser=argparse.ArgumentParser(add_help=False)
 
 # fun
 parser.add_argument(
-    "--first",
-    "-f",
-    type=str,
-    help="First Word",
-    required=False,
-    nargs="+",
-    default=None,
+"--first",
+"-f",
+type=str,
+help="First Word",
+required=False,
+nargs="+",
+default=None,
 )
 parser.add_argument(
-    "--second",
-    "-s",
-    type=str,
-    help="Second Word",
-    required=False,
-    nargs="+",
-    default=None,
+"--second",
+"-s",
+type=str,
+help="Second Word",
+required=False,
+nargs="+",
+default=None,
 )
 
 # Hentai module
 parser.add_argument(
-    "--rating",
-    "-r",
-    type=str,
-    choices=["questionable", "explicit", "e", "q"],
-    help="questionable | explicit | q | e",
-    required=False,
-    default=random.choice(["questionable", "explicit"]),
+"--rating",
+"-r",
+type=str,
+choices=["questionable", "explicit", "e", "q"],
+help="questionable | explicit | q | e",
+required=False,
+default=random.choice(["questionable", "explicit"]),
 )
 parser.add_argument(
 "--tags", "-t", type=str, nargs="+", required=False, default=[], help="tags"
@@ -127,64 +127,108 @@ required=False,
 )
 
 parser.add_argument(
-    "-ch",
-    "--channel",
-    type=str,
-    help="CHANNEL",
-    nargs="+",
-    required=False,
+"-ch",
+"--channel",
+type=str,
+help="CHANNEL",
+nargs="+",
+required=False,
 )
 parser.add_argument(
-    "-msg",
-    "--message",
-    type=int,
-    help="MESSAGE ID",
-    required=False,
+"-msg",
+"--message",
+type=int,
+help="MESSAGE ID",
+required=False,
 )
 parser.add_argument(
-    "-s",
-    "--slowmode",
+"-s",
+"--slowmode",
+type=str,
+help="SLOWMODE",
+nargs="+",
+required=False,
+default=None,
+)
+parser.add_argument(
+"-d",
+"-desc",
+"--description",
+type=str,
+help="DESCRIPTION",
+nargs="+",
+required=False,
+default=None,
+)
+parser.add_argument(
+"-v",
+"--verification",
+type=str,
+help="VERIFICATION LEVEL",
+choices=["none", "low", "medium", "high", "highest"],
+required=False,
+default=None,
+)
+
+parser.add_argument(
+"-w",
+"--welcomer",
+type=str,
+help="WELCOMER",
+nargs="+",
+required=False,
+default=None,
+)
+
+parser.add_argument(
+"-l",
+"--leaving",
+type=str,
+help="LEAVING",
+nargs="+",
+required=False,
+default=None,
+)
+
+#moderation
+parser.add_argument(
+    "-u",
+    "--user",
+    "-m",
+    "--member",
     type=str,
-    help="SLOWMODE",
+    help="USER ID | MEMBER NAME | MEMBER GLOBAL NAME",
     nargs="+",
     required=False,
     default=None,
 )
 parser.add_argument(
-    "-d",
-    "-desc",
-    "--description",
+    "-r",
+    "--reason",
     type=str,
-    help="DESCRIPTION",
+    help="REASON",
     nargs="+",
     required=False,
-    default=None,
+    default="Unspecified",
 )
+
+
 parser.add_argument(
-    "-v",
-    "--verification",
+    "-t",
+    "--time",
     type=str,
-    help="VERIFICATION LEVEL",
-    choices=["none", "low", "medium", "high", "highest"],
+    help="TIME",
+    nargs="+",
     required=False,
     default=None,
 )
 
 parser.add_argument(
-    "-w",
-    "--welcomer",
+    "-uids",
+    "--users",
+    "-ids",
     type=str,
-    help="WELCOMER",
-    nargs="+",
-    required=False,
-    default=None,
-)
-
-parser.add_argument(
-    "-l",
-    "--leaving",
-    type=str,
-    help="LEAVING",
+    help="USER IDS",
     nargs="+",
     required=False,
     default=None,
