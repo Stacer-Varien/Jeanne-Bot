@@ -1,11 +1,6 @@
 import argparse
 from typing import Optional
-from json import loads
 from discord import (
-    Interaction,
-    ui,
-    AllowedMentions,
-    Attachment,
     CategoryChannel,
     Color,
     Embed,
@@ -25,7 +20,6 @@ from PIL import ImageColor
 import discord.ext.commands as Jeanne
 from discord.ext.commands import Bot, Cog, Context
 from humanfriendly import format_timespan, parse_timespan, InvalidTimespan
-from collections import OrderedDict
 from functions import (
     Command,
     Inventory,
@@ -35,31 +29,17 @@ from functions import (
     check_disabled_prefixed_command,
 )
 from assets.components import (
-    BioModal,
-    Confirmation,
-    Levelmsg,
+    LevelSetButtons,
     RemoveManage,
-    Welcomingmsg,
-    Leavingmsg,
-    ForumGuildlines,
-    RankUpmsg,
+    TopicButton,
+    WelcomerSetButtons,
 )
 from requests import get
 from io import BytesIO
 from assets.argparsers import parser
 
 
-class TopicButton(ui.View):
-    def __init__(self, name: str, category: CategoryChannel):
-        self.value = None
-        self.name = name
-        self.category = category
-        super().__init__(timeout=180)
 
-    @ui.button(label="Add Guidelines")
-    async def guidelines(self, button: ui.Button, ctx: Interaction):
-        self.value = "guidelines"
-        await ctx.response.send_modal(ForumGuildlines(self.name, self.category))
 
 
 class CreateGroup(Cog, name="CreatePrefix"):
@@ -278,7 +258,7 @@ class CreateGroup(Cog, name="CreatePrefix"):
             embed.add_field(
                 name="Added into category", value=category.name, inline=True
             )
-        view = TopicButton(name, category)
+        view = TopicButton(ctx.author, name, category)
         m = await ctx.send(embed=embed, view=view)
 
         if view == None:
@@ -1078,12 +1058,17 @@ class SetGroup(Cog, name="SetPrefix"):
                 value=leaving_channel.mention,
                 inline=True,
             )
-        await ctx.send(embed=setup)
+        
+        
+        m=await ctx.send(embed=setup)
+        view=WelcomerSetButtons(ctx.author, m)
+        m=await m.edit(embed=setup, view=view)
+        await view.wait()
+
+        if view.value==None:
+            await m.edit(view=None)
 
     @_set.command(description="Set a modlog channel")
-    @Jeanne.describe(
-        channel="Which channel should log warns, timeouts, kicks and bans?"
-    )
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
@@ -1094,212 +1079,62 @@ class SetGroup(Cog, name="SetPrefix"):
         embed.add_field(name="Channel selected", value=channel.mention, inline=True)
         await ctx.send(embed=embed)
 
-    @_set.command(aliases=["greet"], description="Set a welcoming message when someone joins the server")
-    @Jeanne.describe(jsonfile="Upload JSON file with the welcoming message")
-    @Jeanne.has_permissions(manage_guild=True)
-    @Jeanne.check(check_botbanned_prefix)
-    @Jeanne.check(check_disabled_prefixed_command)
-    async def welcomingmsg(
-        self, ctx: Context
-    ) -> None:
-        jsonfile=ctx.message.attachments[0] if len(ctx.message.attachments) ==1 else None
-        if jsonfile != None:
 
-            humans = str(
-                len([member for member in ctx.guild.members if not member.bot])
-            )
-            parameters = OrderedDict(
-                [
-                    ("%member%", str(ctx.author)),
-                    ("%pfp%", str(ctx.author.display_avatar)),
-                    ("%server%", str(ctx.guild.name)),
-                    ("%mention%", str(ctx.author.mention)),
-                    ("%name%", str(ctx.author.name)),
-                    ("%members%", str(ctx.guild.member_count)),
-                    ("%humans%", str(humans)),
-                    ("%icon%", str(ctx.guild.icon)),
-                ]
-            )
-            json_request = str(get(jsonfile.url).content)
-            json_content = self.replace_all(json_request, parameters)
-            json = loads(json_content)
-            try:
-                content = json["content"]
-                embed = Embed.from_dict(json["embeds"][0])
-            except:
-                content = json_content
-            confirm = Embed(
-                description="This is the preview of the welcoming message.\nAre you happy with it?"
-            )
-            embed = Embed.from_dict(json["embeds"][0])
-            view = Confirmation(ctx.author)
-            m=await ctx.send(
-                content=content,
-                embeds=[embed, confirm],
-                view=view,
-                allowed_mentions=AllowedMentions(
-                    everyone=False, roles=False, users=False
-                ),
-                ephemeral=True,
-            )
-            await view.wait()
-            if view.value == True:
-                await Manage(ctx.guild).set_welcomer_msg(str(json_request))
-                embed = Embed(description="Welcoming message set")
-                await m.edit(
-                    content=None, embeds=[embed], view=None
-                )
-            elif view.value == False:
-                embed = Embed(description="Action cancelled")
-                await m.edit(
-                    content=None, embeds=[embed], view=None
-                )
-            else:
-                embed = Embed(description="Timeout")
-                await m.edit(
-                    content=None, embeds=[embed], view=None
-                )
-
-    @_set.command(aliases=["buy"],description="Set a leaving message when someone leaves the server")
-    @Jeanne.describe(jsonfile="Upload JSON file with the welcoming message")
-    @Jeanne.has_permissions(manage_guild=True)
-    @Jeanne.check(check_botbanned_prefix)
-    @Jeanne.check(check_disabled_prefixed_command)
-    async def leavingmsg(
-        self, ctx: Context) -> None:
-        jsonfile=ctx.message.attachments[0] if len(ctx.message.attachments) ==1 else None
-        if jsonfile != None:
-
-            humans = str(
-                len([member for member in ctx.guild.members if not member.bot])
-            )
-            parameters = OrderedDict(
-                [
-                    ("%member%", str(ctx.author)),
-                    ("%pfp%", str(ctx.author.display_avatar)),
-                    ("%server%", str(ctx.guild.name)),
-                    ("%mention%", str(ctx.author.mention)),
-                    ("%name%", str(ctx.author.name)),
-                    ("%members%", str(ctx.guild.member_count)),
-                    ("%humans%", str(humans)),
-                    ("%icon%", str(ctx.guild.icon)),
-                ]
-            )
-            json_request = str(get(jsonfile.url).content)
-            json_content = self.replace_all(json_request, parameters)
-            json = loads(json_content)
-            try:
-                content = json["content"]
-                embed = Embed.from_dict(json["embeds"][0])
-            except:
-                content = json_content
-            confirm = Embed(
-                description="This is the preview of the leaving message.\nAre you happy with it?"
-            )
-            embed = Embed.from_dict(json["embeds"][0])
-            view = Confirmation(ctx.author)
-            m=await ctx.send(
-                content=content,
-                embeds=[embed, confirm],
-                view=view,
-                allowed_mentions=AllowedMentions(
-                    everyone=False, roles=False, users=False
-                ),
-                ephemeral=True,
-            )
-            await view.wait()
-            if view.value == True:
-                await Manage(ctx.guild).set_leaving_msg(str(json_request))
-                embed = Embed(description="Leaving message set")
-                await m.edit(
-                    content=None, embeds=[embed], view=None
-                )
-            elif view.value == False:
-                embed = Embed(description="Action cancelled")
-                await m.edit(
-                    content=None, embeds=[embed], view=None
-                )
-            else:
-                embed = Embed(description="Timeout")
-                await m.edit(
-                    content=None, embeds=[embed], view=None
-                )
-
-    @_set.command(aliases=["rrm"],
-        description="Set a role reward message. This will be posted in the levelup channel"
-    )
-    @Jeanne.has_permissions(manage_guild=True)
-    @Jeanne.check(check_botbanned_prefix)
-    @Jeanne.check(check_disabled_prefixed_command)
-    async def rolereward_message(
-        self, ctx: Context, *, message: Optional[str] = None
-    ) -> None:
-        if message == True:
-            await ctx.response.send_modal(RankUpmsg())
-            return
-
-        await Manage(ctx.guild).add_rankup_rolereward(message)
-        embed = Embed()
-        embed.description = "Default Role Reward message set"
-        embed.color = Color.random()
-        await ctx.send(embed=embed)
-
-    @Jeanne.command(description="Set a level up notification channel")
-    @Jeanne.describe(
-        channel="Which channel will update when a member levels up?",
-        levelmsg="Add your level message here. Use Discohooks to generate the embed",
-    )
+    @_set.command(description="Set a level up notification channel")
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def levelupdate(
-        self, ctx: Context, channel: TextChannel, levelmsg: Optional[bool] = None
-    ) -> None:
-        if levelmsg == True:
-            await ctx.response.send_modal(Levelmsg(channel))
-            return
+        self, ctx: Context, channel: TextChannel) -> None:
 
-        await Manage(server=ctx.guild).add_level_channel(channel)
+        await Manage(ctx.guild).add_level_channel(channel)
         embed = Embed()
         embed.description = "{} will post level updates when someone levels up".format(
             channel.mention
         )
         embed.color = Color.random()
-        await ctx.send(embed=embed)
+        m=await ctx.send(embed=embed)
+        view=LevelSetButtons(ctx.author, m, channel)
+        m=await m.edit(view=view)
+        await view.wait()
 
-    @Jeanne.command(
-        name="profile-brightness",
+        if view.value==None:
+            await m.edit(view=None)
+
+    @_set.command(
+        aliases=["profile-brightness", "pbright"],
         description="Change the brightness of your level and profile card background",
-    )
-    @Jeanne.describe(
-        brightness="Set the level of brightness between 10 - 150. Default is 100"
     )
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def brightness(self, ctx: Context, brightness: Jeanne.Range[int, 10, 150]):
 
         embed = Embed()
-        if Inventory(ctx.user).set_brightness(brightness) == False:
+        if Inventory(ctx.author).set_brightness(brightness) == False:
             embed.description = "You have no background wallpaper"
             embed.color = Color.red()
             await ctx.send(embed=embed)
             return
-        await Inventory(ctx.user).set_brightness(brightness)
+        await Inventory(ctx.author).set_brightness(brightness)
         embed.description = "Brightness has been changed to {}".format(brightness)
         embed.color = Color.random()
         await ctx.send(embed=embed)
 
-    @Jeanne.command(name="profile-bio", description="Change your profile bio")
+    @_set.command(aliases=["profile-bio", "pbio"], description="Change your profile bio")
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def bio(self, ctx: Context):
-        await ctx.response.send_modal(BioModal())
+    async def bio(self, ctx: Context, *, bio:Jeanne.Range[str, 1, 120]):
+        if len(bio)> 60 <=120:
+            bio = bio[:60]  + "\n" + bio[60:120]
+        embed = Embed(title="New bio has been set to:", color=Color.random())
+        await Inventory(ctx.author).set_bio(bio)
+        embed.description = bio
+        await ctx.send(embed=embed)
 
-    @Jeanne.command(
-        name="profile-color",
+    @_set.command(
+        aliases=["profile-color", "pcolor"],
         description="Change your level and profile card font and bar color",
     )
-    @Jeanne.describe(color="Add your color")
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def color(self, ctx: Context, color: Jeanne.Range[str, 1]):
@@ -1307,7 +1142,7 @@ class SetGroup(Cog, name="SetPrefix"):
         embed = Embed()
         try:
             c = ImageColor.getcolor(color, "RGB")
-            await Inventory(ctx.user).set_color(color)
+            await Inventory(ctx.author).set_color(color)
             embed.description = "Profile card font and bar color changed to {} as showing in the embed color".format(
                 color
             )
@@ -1318,12 +1153,11 @@ class SetGroup(Cog, name="SetPrefix"):
         await ctx.send(embed=embed)
 
 
-class manage(Cog):
+class manage(Cog, name="ManagePrefix"):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @Jeanne.command(name="add-role", description="Add a role to a member")
-    @Jeanne.describe(member="Which member?", role="Which role are you adding?")
+    @Jeanne.command(aliases=["ar"], description="Add a role to a member")
     @Jeanne.has_permissions(manage_roles=True)
     @Jeanne.bot_has_permissions(manage_roles=True)
     @Jeanne.check(check_botbanned_prefix)
