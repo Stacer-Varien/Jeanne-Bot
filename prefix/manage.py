@@ -39,9 +39,6 @@ from io import BytesIO
 from assets.argparsers import parser
 
 
-
-
-
 class CreateGroup(Cog, name="CreatePrefix"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
@@ -91,6 +88,8 @@ class CreateGroup(Cog, name="CreatePrefix"):
                 name="Added into category", value=category.name, inline=True
             )
         if topic:
+            if len(topic)>1024:
+                topic=topic[:1024]
             await channel.edit(topic=topic)
             embed.add_field(name="Topic", value=topic, inline=True)
         if slowmode:
@@ -725,6 +724,8 @@ class EditGroup(Cog, name="EditPrefix"):
             await channel.edit(category=category)
             embed.add_field(name="Category", value=category, inline=True)
         if topic:
+            if len(topic)>1024:
+                topic=topic[:1024]
             await channel.edit(topic=topic)
             embed.add_field(name="Topic", value=topic, inline=True)
         if slowmode:
@@ -1162,8 +1163,21 @@ class manage(Cog, name="ManagePrefix"):
     @Jeanne.bot_has_permissions(manage_roles=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def addrole(self, ctx: Context, member: Member, role: Role):
+    async def addrole(self, ctx: Context,*, member: Member, words:tuple[str,...], parser=parser):
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            role = parsed_args.role + unknown
+            role = " ".join(role)
 
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
+        role=utils.get(ctx.guild.roles, mention=role) if role.startswith("<@&") else utils.get(ctx.guild.roles, id=int(role)) if role.isdigit() else utils.get(ctx.guild.roles, name=role)
         await member.add_roles(role)
         embed = Embed(color=Color.random())
         embed.add_field(
@@ -1171,14 +1185,40 @@ class manage(Cog, name="ManagePrefix"):
         )
         await ctx.send(embed=embed)
 
-    @Jeanne.command(name="remove-role", description="Remove a role from a member")
-    @Jeanne.describe(member="Which member?", role="Which role are you removing?")
+    @addrole.error
+    async def addrole_error(self, ctx:Context, error:Jeanne.CommandError):
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(error.original, HTTPException):
+            embed=Embed(description="Role is missing or could not be found", color=Color.red())
+            await ctx.send(embed=embed)
+
+    @Jeanne.command(aliases=["remove-role", "rr"], description="Remove a role from a member")
     @Jeanne.has_permissions(manage_roles=True)
     @Jeanne.bot_has_permissions(manage_roles=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def removerole(self, ctx: Context, member: Member, role: Role):
+    async def removerole(self, ctx: Context, *, member: Member, words:tuple[str,...], parser=parser):
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            role = parsed_args.role + unknown
+            role = " ".join(role)
 
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
+        role = (
+            utils.get(ctx.guild.roles, mention=role)
+            if role.startswith("<@&")
+            else (
+                utils.get(ctx.guild.roles, id=int(role))
+                if role.isdigit()
+                else utils.get(ctx.guild.roles, name=role)
+            )
+        )
         await member.remove_roles(role)
         embed = Embed(color=Color.random())
         embed.add_field(
@@ -1187,6 +1227,12 @@ class manage(Cog, name="ManagePrefix"):
             inline=False,
         )
         await ctx.send(embed=embed)
+
+    @removerole.error
+    async def removerole_error(self, ctx:Context, error:Jeanne.CommandError):
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(error.original, HTTPException):
+            embed=Embed(description="Role is missing or could not be found", color=Color.red())
+            await ctx.send(embed=embed)
 
     @Jeanne.command(description="Remove something for the server.")
     @Jeanne.has_permissions(manage_guild=True)
@@ -1197,12 +1243,12 @@ class manage(Cog, name="ManagePrefix"):
         embed = Embed(
             description="Click on one of the buttons to remove", color=Color.random()
         )
-        view = RemoveManage(ctx.user)
-        await ctx.send(embed=embed, view=view)
+        view = RemoveManage(ctx.author)
+        m=await ctx.send(embed=embed, view=view)
         await view.wait()
         if view.value == None:
             embed.description = "All buttons removed due to timeout"
-            await ctx.edit_original_response(embed=embed, view=None)
+            await m.edit(embed=embed, view=None)
 
     @Jeanne.command(description="Clone a channel")
     @Jeanne.describe(
@@ -1215,11 +1261,31 @@ class manage(Cog, name="ManagePrefix"):
     async def clone(
         self,
         ctx: Context,
-        channel: abc.GuildChannel,
-        name: Optional[Jeanne.Range[str, 1, 100]] = None,
-        category: Optional[CategoryChannel] = None,
-        nsfw_enabled: Optional[bool] = None,
+        *,
+        channel: Optional[TextChannel] = None,
+        words: tuple[str, ...],
+        parser=parser,
     ) -> None:
+        channel = ctx.channel if channel == None else channel
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            name = parsed_args.name + unknown
+            name = " ".join(name)
+            topic = parsed_args.topic + unknown
+            topic = " ".join(topic)
+            category = parsed_args.category + unknown
+            category = " ".join(category)
+            slowmode = parsed_args.slowmode + unknown
+            slowmode = " ".join(slowmode)
+            nsfw_enabled: bool = parsed_args.nsfw
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
 
         name = channel.name if (name == None) else name
         c = await channel.clone(name=name)
@@ -1228,12 +1294,32 @@ class manage(Cog, name="ManagePrefix"):
         )
         cloned_channel = await ctx.guild.fetch_channel(c.id)
         if category:
+            category =utils.get(ctx.guild.categories, id=int(category)) if category.isdigit() else utils.get(ctx.guild.categories, name=category)
             cloned_channel.edit(category=category)
             cloned.add_field(name="Category", value=category.name, inline=True)
+
+        if topic:
+            if len(topic)>1024:
+                topic=topic[:1024]
+            await cloned_channel.edit(topic=topic)
+            cloned.add_field(name="Topic", value=topic, inline=True)
+        if slowmode:
+            try:
+                delay = int(parse_timespan(slowmode))
+                if delay > 21600:
+                    delay = 21600
+                await cloned_channel.edit(slowmode_delay=delay)
+                added_slowmode = format_timespan(delay)
+            except InvalidTimespan as e:
+                added_slowmode = e
+            cloned.add_field(name="Slowmode", value=added_slowmode, inline=True)
         if nsfw_enabled:
-            cloned_channel.edit(nsfw=nsfw_enabled)
-            cloned.add_field(name="NSFW Enabled", value=nsfw_enabled, inline=True)
-        cloned.color = Color.random()
+            if nsfw_enabled == True:
+                await cloned_channel.edit(nsfw=True)
+                cloned.add_field(name="NSFW enabled", value="Yes", inline=True)
+            elif nsfw_enabled == False:
+                await cloned_channel.edit(nsfw=False)
+                cloned.add_field(name="NSFW enabled", value="No", inline=True)
         await ctx.send(embed=cloned)
 
 

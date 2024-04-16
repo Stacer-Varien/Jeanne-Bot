@@ -190,7 +190,7 @@ required=False,
 default=None,
 )
 
-#moderation
+# moderation
 parser.add_argument(
     "-u",
     "--user",
@@ -229,6 +229,16 @@ parser.add_argument(
     "-ids",
     type=str,
     help="USER IDS",
+    nargs="+",
+    required=False,
+    default=None,
+)
+
+parser.add_argument(
+    "-r",
+    "--role",
+    type=str,
+    help="Role",
     nargs="+",
     required=False,
     default=None,
