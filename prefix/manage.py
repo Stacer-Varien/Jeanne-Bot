@@ -1452,17 +1452,16 @@ class Rename_Group(Cog, name="RenamePrefix"):
             await ctx.send(embed=embed)
 
 
-class Command_Group(Cog, name="command"):
+class Command_Group(Cog, name="CommandPrefix"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
-        super().__init__()
 
     @Jeanne.command(name="disable", description="Disable a command")
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     async def _disable(
         self,
-        ctx: Context,
+        ctx: Context,*,
         command: Jeanne.Range[str, 3],
     ):
 
@@ -1473,7 +1472,7 @@ class Command_Group(Cog, name="command"):
             embed.description = "WOAH! Don't disable that command!"
         elif command not in [
             cmd.qualified_name
-            for cmd in self.bot.tree.walk_commands()
+            for cmd in self.bot.walk_commands()
             if not isinstance(cmd, Jeanne.Group)
         ]:
             embed.color = Color.red()
@@ -1502,7 +1501,7 @@ class Command_Group(Cog, name="command"):
         cmd = Command(ctx.guild)
         if command not in [
             cmd.qualified_name
-            for cmd in self.bot.tree.walk_commands()
+            for cmd in self.bot.walk_commands()
             if not isinstance(cmd, Jeanne.Group)
         ]:
             embed.color = Color.red()
@@ -1517,7 +1516,7 @@ class Command_Group(Cog, name="command"):
             await cmd.enable(command)
         await ctx.send(embed=embed)
 
-    @Jeanne.command(name="list-disabled", description="List all disabled commands")
+    @Jeanne.command(aliases=["list-disabled"], description="List all disabled commands")
     @Jeanne.check(check_botbanned_prefix)
     async def listdisabled(self, ctx: Context):
 
