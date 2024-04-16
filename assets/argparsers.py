@@ -6,7 +6,7 @@ parser=argparse.ArgumentParser(add_help=False)
 # fun
 parser.add_argument(
 "--first",
-"-f",
+"-1st",
 type=str,
 help="First Word",
 required=False,
@@ -15,7 +15,7 @@ default=None,
 )
 parser.add_argument(
 "--second",
-"-s",
+"-2nd",
 type=str,
 help="Second Word",
 required=False,
@@ -26,7 +26,7 @@ default=None,
 # Hentai module
 parser.add_argument(
 "--rating",
-"-r",
+"-rate",
 type=str,
 choices=["questionable", "explicit", "e", "q"],
 help="questionable | explicit | q | e",
@@ -34,7 +34,7 @@ required=False,
 default=random.choice(["questionable", "explicit"]),
 )
 parser.add_argument(
-"--tags", "-t", type=str, nargs="+", required=False, default=[], help="tags"
+"--tags", type=str, nargs="+", required=False, default=[], help="tags"
 )
 parser.add_argument(
 "--plus", "-p", action="store_true", help="Enable plus mode. Just type '-p'"
@@ -70,37 +70,12 @@ nargs="+",
 required=False,
 default=None,
 )
-parser.add_argument(
-"-slow",
-"--slowmode",
-type=str,
-help="slowmode",
-nargs="+",
-required=False,
-default=None,
-)
+
 parser.add_argument(
 "-nsfw", action="store_true", help="Enable NSFW. Just type '-nsfw"
 )
 
-parser.add_argument(
-"-u",
-"--users",
-type=int,
-help="USERS",
-required=False,
-default=None,
-)
 
-
-parser.add_argument(
-"-u",
-"--users",
-type=int,
-help="users",
-required=False,
-default=None,
-)
 parser.add_argument(
 "-c",
 "--color",
@@ -119,9 +94,8 @@ required=False,
 )
 
 parser.add_argument(
-"-m",
 "--mentioned",
-help="Make it mentionable. Just type -m",
+help="Make it mentionable. Just type --mentioned",
 action="store_true",
 required=False,
 )
@@ -143,6 +117,7 @@ required=False,
 )
 parser.add_argument(
 "-s",
+"-slow",
 "--slowmode",
 type=str,
 help="SLOWMODE",
@@ -192,8 +167,8 @@ default=None,
 
 # moderation
 parser.add_argument(
-    "-u",
-    "--user",
+    "-uid",
+    "--userid",
     "-m",
     "--member",
     type=str,
@@ -214,7 +189,6 @@ parser.add_argument(
 
 
 parser.add_argument(
-    "-t",
     "--time",
     type=str,
     help="TIME",
@@ -235,7 +209,6 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "-r",
     "--role",
     type=str,
     help="Role",

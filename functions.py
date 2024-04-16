@@ -572,7 +572,7 @@ class Levelling:
         db.commit()
         return leaders_query.fetchall()
 
-    def check_xpblacklist_channel(self, channel: TextChannel) -> int | Literal[False]:
+    def check_xpblacklist_channel(self, channel: TextChannel)->int|Literal[False]|None:
         data = db.execute(
             "SELECT channel FROM xpChannelData WHERE server = ? AND channel = ?",
             (
@@ -581,6 +581,8 @@ class Levelling:
             ),
         ).fetchone()
         db.commit()
+        if data==None:
+            return
         return int(data[0]) if data else False
 
     @property

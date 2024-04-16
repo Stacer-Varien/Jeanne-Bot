@@ -43,7 +43,7 @@ class CreateGroup(Cog, name="CreatePrefix"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
-    @Jeanne.group(aliases=["c"], description="Main create command")
+    @Jeanne.group(description="Main create command")
     async def create(self, ctx: Context): ...
 
     @create.command(aliases=["tc"], description="Creates a text channel")
@@ -590,7 +590,7 @@ class DeleteGroup(Cog, name="DeletePrefix"):
     @Jeanne.group(aliases=["d"], description="Main delete command")
     async def delete(self, ctx: Context): ...
 
-    @Jeanne.command(aliases=["c"], description="Deletes a channel")
+    @Jeanne.command(aliases=["ch"], description="Deletes a channel")
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
@@ -603,12 +603,12 @@ class DeleteGroup(Cog, name="DeletePrefix"):
         await channel.delete()
         await ctx.send(embed=embed)
 
-    @Jeanne.command(aliases=["r"], description="Deletes a role")
+    @Jeanne.command(aliases=["dr"], description="Deletes a role")
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def role(self, ctx: Context, *, role: Role):
+    async def deleterole(self, ctx: Context, *, role: Role):
 
         embed = Embed(
             description="{} has been deleted".format(role.name), color=Color.random()
@@ -616,12 +616,12 @@ class DeleteGroup(Cog, name="DeletePrefix"):
         await role.delete()
         await ctx.send(embed=embed)
 
-    @Jeanne.command(aliases=["emote"], description="Deletes an emoji")
+    @Jeanne.command(aliases=["delemote", "delemoji"], description="Deletes an emoji")
     @Jeanne.has_permissions(manage_expressions=True)
     @Jeanne.bot_has_permissions(manage_expressions=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def emoji(self, ctx: Context, *, emoji: str):
+    async def deleteemoji(self, ctx: Context, *, emoji: str):
 
         try:
             e = emoji.strip().split(":")[-1].rstrip(">")
@@ -634,7 +634,7 @@ class DeleteGroup(Cog, name="DeletePrefix"):
         await emote.delete()
         await ctx.send(embed=embed)
 
-    @emoji.error
+    @deleteemoji.error
     async def emoji_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (AttributeError, HTTPException)
@@ -645,13 +645,12 @@ class DeleteGroup(Cog, name="DeletePrefix"):
             )
             await ctx.send(embed=embed)
 
-    @Jeanne.command(description="Deletes a sticker")
-    @Jeanne.describe(sticker="Which sticker are you deleting?")
+    @Jeanne.command(aliases=["delsticker"],description="Deletes a sticker")
     @Jeanne.has_permissions(manage_expressions=True)
     @Jeanne.bot_has_permissions(manage_expressions=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def sticker(self, ctx: Context, *, sticker: Optional[str] = None):
+    async def deletesticker(self, ctx: Context, *, sticker: Optional[str] = None):
         if sticker == None:
             sticker = ctx.message.stickers[0].name
         stick = utils.get(ctx.guild.stickers, name=sticker)
@@ -661,7 +660,7 @@ class DeleteGroup(Cog, name="DeletePrefix"):
         await stick.delete()
         await ctx.send(embed=embed)
 
-    @sticker.error
+    @deletesticker.error
     async def sticker_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (AttributeError, HTTPException)
@@ -748,13 +747,6 @@ class EditGroup(Cog, name="EditPrefix"):
         await ctx.send(embed=embed)
 
     @edit.command(description="Edit a role")
-    @Jeanne.describe(
-        role="Which role are you editing?",
-        name="What is the new name?",
-        color="What is the new color? (use HEX codes)",
-        hoisted="Should it be shown in member list?",
-        mentionable="Should it be mentioned?",
-    )
     @Jeanne.has_permissions(manage_roles=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
@@ -1251,9 +1243,6 @@ class manage(Cog, name="ManagePrefix"):
             await m.edit(embed=embed, view=None)
 
     @Jeanne.command(description="Clone a channel")
-    @Jeanne.describe(
-        channel="Which channel are you cloning?", name="What is the new name?"
-    )
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
@@ -1540,10 +1529,6 @@ class Level_Group(Cog, name="LevelPrefix"):
         name="add", description="Add a level role reward when a user levels up"
     )
     @Jeanne.has_permissions(manage_guild=True)
-    @Jeanne.describe(
-        role="Which role should be given when a user levels up?",
-        level="Which level should they be to get that role?",
-    )
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def _add(self, ctx: Context, *, role: Role, level: Jeanne.Range[int, 1]):
@@ -1598,7 +1583,6 @@ class Level_Group(Cog, name="LevelPrefix"):
     async def channel_blacklist(self,ctx:Context):...
 
     @channel_blacklist.command(description="Blacklists a channel for gaining XP")
-    @Jeanne.describe(channel="Which channel?")
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)

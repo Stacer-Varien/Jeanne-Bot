@@ -9,7 +9,7 @@ from functions import (
     check_disabled_prefixed_command,
 )
 from assets.components import ReportContent, ReportSelect
-from assets.argparsers import rating_parser, hentai_api_parser
+from assets.argparsers import parser
 
 
 class nsfw(Cog, name="Hentai"):
@@ -25,7 +25,7 @@ class nsfw(Cog, name="Hentai"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.cooldown(1, 5, type=BucketType.member)
     async def hentai(
-        self, ctx: Context, *, words: str = None, parser=rating_parser
+        self, ctx: Context, *, words: str = None, parser=parser
     ) -> None:
 
         try:
@@ -90,7 +90,7 @@ class nsfw(Cog, name="Hentai"):
         self,
         ctx: Context,
         *words: str,
-        parser=hentai_api_parser,
+        parser=parser,
     ) -> None:
 
         try:
@@ -191,7 +191,7 @@ class nsfw(Cog, name="Hentai"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.cooldown(1, 5, type=BucketType.member)
     async def yandere(
-        self, ctx: Context, *words: str, parser=hentai_api_parser
+        self, ctx: Context, *words: str, parser=parser
     ) -> None:
 
         try:
@@ -282,7 +282,7 @@ class nsfw(Cog, name="Hentai"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.cooldown(1, 5, type=BucketType.member)
     async def konachan(
-        self, ctx: Context, *words: str, parser=hentai_api_parser
+        self, ctx: Context, *words: str, parser=parser
     ) -> None:
 
         try:
@@ -377,7 +377,7 @@ class nsfw(Cog, name="Hentai"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.cooldown(1, 5, type=BucketType.member)
     async def danbooru(
-        self, ctx: Context, *words: str, parser=hentai_api_parser
+        self, ctx: Context, *words: str, parser=parser
     ) -> None:
 
         try:

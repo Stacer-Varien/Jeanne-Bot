@@ -157,8 +157,8 @@ class Profile:
                 else:
                     ranked = top100
 
-            ranked = ImageEnhance.Brightness(ranked).enhance(1.1)
-            card.paste(ranked, (780, 430), ranked)
+                ranked = ImageEnhance.Brightness(ranked).enhance(1.1)
+                card.paste(ranked, (780, 430), ranked)
 
         if rrank < 15:
             richest = ImageEnhance.Brightness(richest).enhance(1.1)

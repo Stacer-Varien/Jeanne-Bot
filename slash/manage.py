@@ -34,7 +34,6 @@ from functions import (
     check_disabled_app_command,
 )
 from assets.components import (
-    BioModal,
     Confirmation,
     Levelmsg,
     RemoveManage,
@@ -1106,8 +1105,14 @@ class Set_Group(GroupCog, name="set"):
     @Jeanne.command(name="profile-bio", description="Change your profile bio")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
-    async def bio(self, ctx: Interaction):
-        await ctx.response.send_modal(BioModal())
+    async def bio(self, ctx: Interaction, bio: Jeanne.Range[str, 1, 120]):
+        await ctx.response.defer()
+        if len(bio) > 60 <= 120:
+            bio = bio[:60] + "\n" + bio[60:120]
+        embed = Embed(title="New bio has been set to:", color=Color.random())
+        await Inventory(ctx.user).set_bio(bio)
+        embed.description = bio
+        await ctx.followup.send(embed=embed)
 
     @Jeanne.command(
         name="profile-color",
