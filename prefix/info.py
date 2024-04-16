@@ -15,6 +15,7 @@ import discord.ext.commands as Jeanne
 from discord import (
     ButtonStyle,
     Color,
+    DMChannel,
     Embed,
     Member,
     Message,
@@ -255,28 +256,50 @@ class InfoCog(Cog, name="Info"):
     async def avatar(self, ctx: Context, *, member: Optional[Member] = None) -> None:
         member = ctx.author if member is None else member
         color = Color.random()
+        globalav = member.avatar
+        defaultav = member.default_avatar
+        serverav = None if DMChannel else member.guild_avatar
+        color = Color.random()
+        embeds = []
         normav = Embed(
             description=f"**{member}'s Avatar**",
             url="https://discordapp.com",
             color=color,
             type="image",
         )
-        guildav = Embed(url="https://discordapp.com", color=color, type="image")
-        if member.guild_avatar != None and member.avatar == None:
-            guildav.set_image(url=member.avatar.url)
-            await ctx.send(embed=guildav)
+        if DMChannel:
+            normav.set_image(url=member.display_avatar)
+            await ctx   .send(embed=normav)
             return
-        if member.guild_avatar == None and member.display_avatar == None:
-            normav.set_image(url=member.default_avatar.url)
-            await ctx.send(embed=normav)
-            return
-        if member.guild_avatar == None and member.display_avatar != None:
-            normav.set_image(url=member.display_avatar.url)
-            await ctx.send(embed=normav)
-            return
-        normav.set_image(url=member.avatar.url)
-        guildav.set_image(url=member.guild_avatar.url)
-        await ctx.send(embeds=[normav, guildav])
+
+        if globalav == None and serverav:
+            guildav = Embed(
+                url="https://discordapp.com",
+                color=color,
+                type="image",
+            )
+            normav.set_image(url=defaultav)
+            guildav.set_image(url=serverav)
+            embeds.append(normav)
+            embeds.append(guildav)
+
+        elif globalav and serverav == None:
+
+            normav.set_image(url=globalav)
+
+            embeds.append(normav)
+
+        elif globalav and serverav:
+            guildav = Embed(
+                url="https://discordapp.com",
+                color=color,
+                type="image",
+            )
+            normav.set_image(url=globalav)
+            guildav.set_image(url=serverav)
+            embeds.append(normav)
+            embeds.append(guildav)
+        await ctx.send(embeds=embeds)
 
     @Jeanne.command(description="View a sticker via message ID or sticker name")
 
