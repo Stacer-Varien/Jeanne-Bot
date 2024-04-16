@@ -1374,9 +1374,6 @@ class Rename_Group(Cog, name="RenamePrefix"):
             await ctx.send(embed=embed)
 
     @Jeanne.command(aliases=["rncat"],description="Renames a category")
-    @Jeanne.describe(
-        category="Which category are you renaming?", name="What is the new name?"
-    )
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
@@ -1406,9 +1403,6 @@ class Rename_Group(Cog, name="RenamePrefix"):
         await ctx.send(embed=embed)
 
     @Jeanne.command(aliases=["rnstick"],description="Renames a sticker")
-    @Jeanne.describe(
-        sticker="What sticker are you renaming?", name="What is the new name?"
-    )
     @Jeanne.has_permissions(manage_emojis_and_stickers=True)
     @Jeanne.bot_has_permissions(manage_emojis_and_stickers=True)
     @Jeanne.check(check_botbanned_prefix)
@@ -1489,7 +1483,6 @@ class Command_Group(Cog, name="CommandPrefix"):
 
     @Jeanne.command(name="enable", description="Enable a command")
     @Jeanne.has_permissions(manage_guild=True)
-    @Jeanne.describe(command="Which command are you enabling?")
     @Jeanne.check(check_botbanned_prefix)
     async def _enable(
         self,
@@ -1532,12 +1525,16 @@ class Command_Group(Cog, name="CommandPrefix"):
         await ctx.send(embed=embed)
 
 
-class Level_Group(Cog, name="level"):
+class Level_Group(Cog, name="LevelPrefix"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
-        super().__init__()
 
-    role = Jeanne.Group(name="role-reward", description="...")
+
+    @Jeanne.group(aliases=["lvl"], description="Main level command", invoke_without_command=True)
+    async def level(self, ctx:Context):...
+
+    @level.group(aliases=["r"],description="Main role command", invoke_without_command=True)
+    async def role(self, ctx:Context):...
 
     @role.command(
         name="add", description="Add a level role reward when a user levels up"
@@ -1549,7 +1546,7 @@ class Level_Group(Cog, name="level"):
     )
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def _add(self, ctx: Context, role: Role, level: Jeanne.Range[int, 1]):
+    async def _add(self, ctx: Context, *, role: Role, level: Jeanne.Range[int, 1]):
 
         botmember = await ctx.guild.fetch_member(self.bot.user.id)
         if role.position >= botmember.top_role.position:
@@ -1568,12 +1565,9 @@ class Level_Group(Cog, name="level"):
 
     @role.command(name="remove", description="Removes a level role reward")
     @Jeanne.has_permissions(manage_guild=True)
-    @Jeanne.describe(
-        role="Which role should be removed?",
-    )
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def _remove(self, ctx: Context, role: Role):
+    async def _remove(self, ctx: Context, *,role: Role):
 
         await Manage(server=ctx.guild).remove_role_reward(role)
         embed = Embed(color=Color.random())
@@ -1583,8 +1577,7 @@ class Level_Group(Cog, name="level"):
         await ctx.send(embed=embed)
 
     @role.command(
-        name="list", description="Add a level role reward when a user levels up"
-    )
+        name="list")
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def _list(self, ctx: Context):
@@ -1600,14 +1593,16 @@ class Level_Group(Cog, name="level"):
         embed.title = "Level Rewards"
         await ctx.send(embed=embed)
 
-    channel_blacklist = Jeanne.Group(name="blacklist-channel", description="...")
+
+    @level.group(aliases=["blchannel", "blacklist-channel"], description="Main blacklist channel command")
+    async def channel_blacklist(self,ctx:Context):...
 
     @channel_blacklist.command(description="Blacklists a channel for gaining XP")
     @Jeanne.describe(channel="Which channel?")
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def add(self, ctx: Context, channel: TextChannel) -> None:
+    async def add(self, ctx: Context, *,channel: TextChannel) -> None:
 
         if Levelling(server=ctx.guild).check_xpblacklist_channel(channel) == False:
             await Manage(server=ctx.guild).add_xpblacklist(channel)
@@ -1624,11 +1619,10 @@ class Level_Group(Cog, name="level"):
         await ctx.send(embed=embed)
 
     @channel_blacklist.command(description="Unblacklists a channel for gaining XP")
-    @Jeanne.describe(channel="Which channel?")
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def remove(self, ctx: Context, channel: TextChannel) -> None:
+    async def remove(self, ctx: Context, *, channel: TextChannel) -> None:
 
         if Levelling(server=ctx.guild).check_xpblacklist_channel(channel) == False:
             embed = Embed(color=Color.red())
