@@ -14,7 +14,7 @@ from discord import (
     TextChannel,
     VerificationLevel,
     abc,
-    utils,
+    utils
 )
 from PIL import ImageColor
 import discord.ext.commands as Jeanne
@@ -1323,19 +1323,31 @@ class manage(Cog, name="ManagePrefix"):
         await ctx.send(embed=cloned)
 
 
-class Rename_Group(Cog, name="rename"):
+class Rename_Group(Cog, name="RenamePrefix"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
-        super().__init__()
 
-    @Jeanne.command(description="Renames an emoji")
-    @Jeanne.describe(emoji="What emoji are you renaming?", name="What is the new name?")
+
+
+    @Jeanne.command(aliases=["rnemote", "rnemoji"],description="Renames an emoji")
     @Jeanne.has_permissions(manage_emojis_and_stickers=True)
     @Jeanne.bot_has_permissions(manage_emojis_and_stickers=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def emoji(self, ctx: Context, emoji: str, name: Jeanne.Range[str, 2, 30]):
+    async def renameemoji(self, ctx: Context, *, emoji: str, words:tuple[str,...], parser=parser):
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            name = parsed_args.name + unknown
+            name = " ".join(name)
 
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
         try:
             e: int = emoji.strip().split(":")[-1].rstrip(">")
             emote = await ctx.guild.fetch_emoji(e)
@@ -1345,13 +1357,15 @@ class Rename_Group(Cog, name="rename"):
             description="{} has been renamed to {}".format(str(emote), name),
             color=0x00FF68,
         )
+        if len(name)>32:
+            name=name[:32]
         await emote.edit(name=name.replace(" ", "_"))
         await ctx.send(embed=embed)
 
-    @emoji.error
+    @renameemoji.error
     async def emoji_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, AttributeError
+            error.original, (AttributeError, NotFound, HTTPException)
         ):
             embed = Embed(
                 description="This emoji doesn't exist in the server",
@@ -1359,26 +1373,39 @@ class Rename_Group(Cog, name="rename"):
             )
             await ctx.send(embed=embed)
 
-    @Jeanne.command(description="Renames a category")
+    @Jeanne.command(aliases=["rncat"],description="Renames a category")
     @Jeanne.describe(
         category="Which category are you renaming?", name="What is the new name?"
     )
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def category(
+    async def renamecategory(
         self,
-        ctx: Context,
+        ctx: Context,*,
         category: CategoryChannel,
-        name: Jeanne.Range[str, 1, 100],
-    ):
+        words:tuple[str,...], parser=parser):
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            name = parsed_args.name + unknown
+            name = " ".join(name)
 
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
         embed = Embed(colour=Color.random())
+        if len(name)>100:
+            name=name[:100]
         embed.description = f"`{category.name}` has been renamed as `{name}`"
         await category.edit(name=name)
         await ctx.send(embed=embed)
 
-    @Jeanne.command(description="Renames a sticker")
+    @Jeanne.command(aliases=["rnstick"],description="Renames a sticker")
     @Jeanne.describe(
         sticker="What sticker are you renaming?", name="What is the new name?"
     )
@@ -1386,9 +1413,25 @@ class Rename_Group(Cog, name="rename"):
     @Jeanne.bot_has_permissions(manage_emojis_and_stickers=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def sticker(self, ctx: Context, sticker: str, name: Jeanne.Range[str, 2, 30]):
+    async def renamesticker(self, ctx: Context, *, sticker: Optional[str], words:tuple[str,...], parser=parser):
+        try:
+            parsed_args, unknown = parser.parse_known_args(words)
+            name = parsed_args.name + unknown
+            name = " ".join(name)
 
+        except SystemExit:
+            await ctx.send(
+                embed=Embed(
+                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    color=Color.red(),
+                )
+            )
+            return
+        if sticker == None:
+            sticker=ctx.message.stickers[0].name
         sticker: GuildSticker = utils.get(ctx.guild.stickers, name=sticker)
+        if len(name)>32:
+            name=name[:32]
         embed = Embed(
             description="`{}` has been renamed to `{}`".format(str(sticker.name), name),
             color=Color.random(),
@@ -1396,10 +1439,10 @@ class Rename_Group(Cog, name="rename"):
         await sticker.edit(name=name)
         await ctx.send(embed=embed)
 
-    @sticker.error
+    @renamesticker.error
     async def sticker_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, AttributeError
+            error.original, (AttributeError, HTTPException)
         ):
 
             embed = Embed(
