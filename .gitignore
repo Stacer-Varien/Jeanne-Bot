@@ -138,3 +138,5 @@ logging.db
 cmd-invoke-errors.txt
 voter_data.json
 assets/Images/
+commandlog.txt
+errors.txt
