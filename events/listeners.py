@@ -1,7 +1,7 @@
 from collections import OrderedDict
 from json import loads
 from typing import Optional
-from discord import AllowedMentions, Embed, Message
+from discord import AllowedMentions, DMChannel, Embed, Message
 from discord.ext.commands import Bot, Cog
 
 from functions import Botban, Levelling
@@ -20,13 +20,13 @@ class listenersCog(Cog):
     async def on_message(self, message: Message):
         if Botban(message.author).check_botbanned_user:
             return
-        if not message.author.bot and not message.author.dm_channel:
+        if not message.author.bot and not DMChannel:
             level_instance=Levelling(message.author, message.guild)
             if (
                 level_instance.check_xpblacklist_channel(
                     message.channel
                 )
-                == False
+                == (False | None)
             ):
                 try:
                     lvl = await level_instance.add_xp()

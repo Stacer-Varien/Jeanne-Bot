@@ -20,7 +20,6 @@ from functions import (
     Reminder,
     check_botbanned_prefix,
     check_disabled_prefixed_command,
-    is_beta_prefix,
 )
 from config import WEATHER
 from discord.ui import View

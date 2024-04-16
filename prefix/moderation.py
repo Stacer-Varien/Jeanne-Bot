@@ -22,7 +22,7 @@ from functions import (
 from assets.components import Confirmation
 from typing import Optional
 from reactionmenu import ViewButton, ViewMenu
-from assets.argparsers import parser
+from assets.argparsers import mod_parser
 
 
 class moderation(Cog, name="modcog"):
@@ -41,7 +41,7 @@ class moderation(Cog, name="modcog"):
     @Jeanne.bot_has_permissions(ban_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def user(self, ctx: Context, *words: str, parser=parser) -> None:
+    async def user(self, ctx: Context, *words: str, parser=mod_parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.user + unknown
@@ -119,7 +119,7 @@ class moderation(Cog, name="modcog"):
     @Jeanne.bot_has_permissions(ban_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def member(self, ctx: Context, *words: str, parser=parser) -> None:
+    async def member(self, ctx: Context, *words: str, parser=mod_parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.user + unknown
@@ -315,7 +315,7 @@ class moderation(Cog, name="modcog"):
     @Jeanne.has_permissions(kick_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def warn(self, ctx: Context, *words: str, parser=parser) -> None:
+    async def warn(self, ctx: Context, *words: str, parser=mod_parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.user + unknown
@@ -475,7 +475,7 @@ class moderation(Cog, name="modcog"):
     @Jeanne.bot_has_permissions(kick_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def kick(self, ctx: Context, *words: str, parser=parser) -> None:
+    async def kick(self, ctx: Context, *words: str, parser=mod_parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.user + unknown
@@ -692,7 +692,7 @@ class moderation(Cog, name="modcog"):
 
     @Jeanne.command(description="Unbans a user")
     @Jeanne.has_permissions(ban_members=True)
-    async def unban(self, ctx: Context, *words: str, parser=parser) -> None:
+    async def unban(self, ctx: Context, *words: str, parser=mod_parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.user + unknown
@@ -837,7 +837,7 @@ class moderation(Cog, name="modcog"):
     @Jeanne.bot_has_permissions(moderate_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def untimeout(self, ctx: Context, *words: str, parser=parser) -> None:
+    async def untimeout(self, ctx: Context, *words: str, parser=mod_parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.user + unknown
@@ -896,7 +896,7 @@ class moderation(Cog, name="modcog"):
     @Jeanne.bot_has_permissions(ban_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def massban(self, ctx: Context, *words: str, parser=parser):
+    async def massban(self, ctx: Context, *words: str, parser=mod_parser):
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.users + unknown
@@ -1016,7 +1016,7 @@ class moderation(Cog, name="modcog"):
     @Jeanne.has_permissions(administrator=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def massunban(self, ctx: Context, *words: str, parser=parser):
+    async def massunban(self, ctx: Context, *words: str, parser=mod_parser):
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             user = parsed_args.users + unknown

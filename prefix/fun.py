@@ -9,7 +9,7 @@ from functions import (
     check_botbanned_prefix,
     check_disabled_prefixed_command,
 )
-from assets.argparsers import parser
+from assets.argparsers import combined_parser
 
 class fun(Cog, name="Fun"):
     def __init__(self, bot: Bot):
@@ -96,7 +96,7 @@ class fun(Cog, name="Fun"):
 
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def combine(self, ctx: Context, *words: str, parser=parser):
+    async def combine(self, ctx: Context, *words: str, parser=combined_parser):
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             first = parsed_args.first + unknown

@@ -12,7 +12,7 @@ import discord.ext.commands as Jeanne
 from assets.generators.profile_card import Profile
 from requests import exceptions
 from reactionmenu import ViewButton, ViewMenu
-from assets.argparsers import parser
+from assets.argparsers import inv_parser
 
 class Shop_Group(Cog, name="Shop"):
     def __init__(self, bot: Bot) -> None:
@@ -108,7 +108,7 @@ class Shop_Group(Cog, name="Shop"):
 
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def buycustom(self, ctx: Context, *words: str, parser=parser):
+    async def buycustom(self, ctx: Context, *words: str, parser=inv_parser):
         balance = Currency(ctx.author).get_balance
         if balance is None or balance < 1000:
             nomoney = Embed(description="You do not have enough QP.")

@@ -15,7 +15,6 @@ from discord import (
     ui,
 )
 from discord.ext.commands import Cog, Bot, GroupCog
-from discord.ext import tasks
 from assets.components import ReportModal
 from assets.dictionary import dictionary
 from functions import Reminder, check_botbanned_app_command, check_disabled_app_command
@@ -26,7 +25,6 @@ from typing import Literal, Optional
 from json import loads
 from requests import get
 from humanfriendly import parse_timespan, InvalidTimespan
-from tabulate import tabulate
 
 bot_invite_url = "https://discord.com/oauth2/authorize?client_id=831993597166747679&permissions=1428479601718&scope=bot%20applications.commands"
 topgg_invite = "https://top.gg/bot/831993597166747679"

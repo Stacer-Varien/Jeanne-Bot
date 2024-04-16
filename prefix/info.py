@@ -3,7 +3,6 @@ from assets.components import RolesButton
 from functions import (
     check_botbanned_prefix,
     check_disabled_prefixed_command,
-    is_beta_prefix,
     get_cached_users,
     get_true_members,
 )
