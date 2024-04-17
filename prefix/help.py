@@ -10,9 +10,6 @@ from collections import OrderedDict
 from assets.help.modules import modules, Modules
 
 
-
-
-
 class help_button(ui.View):
     def __init__(self):
         super().__init__()
@@ -48,7 +45,6 @@ class HelpGroupPrefix(Cog, name="Help"):
         invoke_without_command=True,
         description="Main Help command for the help subcommands and shows all the commands and modules available",
     )
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def help(self, ctx: Context):
@@ -73,7 +69,6 @@ class HelpGroupPrefix(Cog, name="Help"):
         await ctx.send(embed=embed)
 
     @help.command(aliases=["cmd"], description="Get help on a certain command")
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def command(self, ctx: Context, *, command: Range[str, 3]):
@@ -142,7 +137,6 @@ class HelpGroupPrefix(Cog, name="Help"):
         await ctx.send(embed=embed)
 
     @help.command(description="Get help of a certain module")
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def module(self, ctx: Context, module: str):
@@ -177,7 +171,6 @@ class HelpGroupPrefix(Cog, name="Help"):
     @help.command(
         description="Get help from the website or join the support server for further help"
     )
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def support(self, ctx: Context):
