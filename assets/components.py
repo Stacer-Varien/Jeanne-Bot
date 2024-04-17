@@ -456,37 +456,8 @@ class ReportContentM(ui.Modal, title="Illicit Content Report"):
         )
         await ctx.response.send_message(embed=embed, ephemeral=True)
 
+class ReportContentPlus(ui.View):
 
-class ReportContentPlus(ui.Select):
-    def __init__(
-        self,
-        link1: Optional[str] = None,
-        link2: Optional[str] = None,
-        link3: Optional[str] = None,
-        link4: Optional[str] = None,
-    ):
-        self.link1 = link1
-        self.link2 = link2
-        self.link3 = link3
-        self.link4 = link4
-        options = [
-            SelectOption(label="Report 1st Media", value=self.link1),
-            SelectOption(label="Report 2nd Media", value=self.link2),
-            SelectOption(label="Report 3rd Media", value=self.link3),
-            SelectOption(label="Report 4th Media", value=self.link4),
-        ]
-        super().__init__(
-            placeholder="Saw something illegal? Report it here",
-            max_values=1,
-            min_values=1,
-            options=options,
-        )
-
-    async def callback(self, ctx: Interaction):
-        await ctx.response.send_modal(ReportContentM(self.values[0]))
-
-
-class ReportSelect(ui.View):
     def __init__(
         self,
         link1: Optional[str] = None,
@@ -500,7 +471,30 @@ class ReportSelect(ui.View):
         self.link4 = link4
         self.value = None
         super().__init__(timeout=60)
-        self.add_item(ReportContentPlus(self.link1, self.link2, self.link3, self.link4))
+
+    @ui.button(label="Report 1st Content", style=ButtonStyle.grey, row=1)
+    async def report1(self, ctx: Interaction, button: ui.Button):
+        self.value = "report1"
+        await ctx.response.send_modal(ReportContentM(self.link1))
+        await ctx.edit_original_response(view=self)
+
+    @ui.button(label="Report 2nd Content", style=ButtonStyle.grey, row=1)
+    async def report2(self, ctx: Interaction, button: ui.Button):
+        self.value = "report2"
+        await ctx.response.send_modal(ReportContentM(self.link2))
+        await ctx.edit_original_response(view=self)
+
+    @ui.button(label="Report 3rd Content", style=ButtonStyle.grey, row=2)
+    async def report3(self, ctx: Interaction, button: ui.Button):
+        self.value = "report3"
+        await ctx.response.send_modal(ReportContentM(self.link3))
+        await ctx.edit_original_response(view=self)
+
+    @ui.button(label="Report 4th Content", style=ButtonStyle.grey, row=2)
+    async def report4(self, ctx: Interaction, button: ui.Button):
+        self.value = "report4"
+        await ctx.response.send_modal(ReportContentM(self.link4))
+        await ctx.edit_original_response(view=self)
 
 
 class ReportContent(ui.View):
