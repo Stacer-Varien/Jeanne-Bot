@@ -8,7 +8,7 @@ from functions import (
     shorten_url,
 )
 from typing import Literal, Optional
-from assets.components import ReportContent, ReportSelect
+from assets.components import ReportContent, ReportContentPlus
 
 
 class nsfw(Cog):
@@ -78,7 +78,7 @@ class nsfw(Cog):
         image = await Hentai(plus).gelbooru(rating, tag)
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
-            view = ReportSelect(*[img["file_url"] for img in images])
+            view = ReportContentPlus(*[img["file_url"] for img in images])
             vids = [i for i in images if "mp4" in i["file_url"]]
             media = [j["file_url"] for j in vids]
             if media:
@@ -178,7 +178,7 @@ class nsfw(Cog):
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
             shortened_urls = [shorten_url(img["file_url"]) for img in images]
-            view = ReportSelect(*shortened_urls)
+            view = ReportContentPlus(*shortened_urls)
             color = Color.random()
             embeds = [
                 Embed(color=color, url="https://yande.re")
@@ -258,7 +258,7 @@ class nsfw(Cog):
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
             try:
                 shortened_urls = [shorten_url(img["file_url"]) for img in images]
-                view = ReportSelect(*shortened_urls)
+                view = ReportContentPlus(*shortened_urls)
                 color = Color.random()
                 embeds = [
                     Embed(color=color, url="https://konachan.com")
@@ -343,7 +343,7 @@ class nsfw(Cog):
         image = await Hentai(plus).danbooru(rating, tag)
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
-            view = ReportSelect(*[img["file_url"] for img in images])
+            view = ReportContentPlus(*[img["file_url"] for img in images])
             vids = [i for i in images if "mp4" in i["file_url"]]
             media = [j["file_url"] for j in vids]
             if media:

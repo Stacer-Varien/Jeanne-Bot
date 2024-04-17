@@ -8,11 +8,11 @@ from functions import (
     shorten_url,
     check_disabled_prefixed_command,
 )
-from assets.components import ReportContent, ReportSelect
+from assets.components import ReportContent, ReportContentPlus
 from assets.argparsers import hentai_parser
 
 
-class nsfw(Cog, name="Hentai"):
+class nsfw(Cog, name="HentaiPrefix"):
     def __init__(self, bot: Bot):
         self.bot = bot
 
@@ -23,14 +23,14 @@ class nsfw(Cog, name="Hentai"):
 
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    @Jeanne.cooldown(1, 5, type=BucketType.member)
+    @Jeanne.cooldown(1, 5, type=BucketType.user)
     async def hentai(
-        self, ctx: Context, *, words: str = None, parser=hentai_parser
+        self, ctx: Context, *words: str, parser=hentai_parser
     ) -> None:
 
         try:
-            parser = parser.parse_args(words.split())
-            rating = parser.rating
+            parser= parser.parse_known_args(words)[0]
+            rating =parser.rating
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -39,8 +39,6 @@ class nsfw(Cog, name="Hentai"):
                 )
             )
             return
-        except AttributeError:
-            rating = None
         hentai, source = await Hentai().hentai(rating)
         is_mp4 = hentai.endswith("mp4")
         if is_mp4:
@@ -82,7 +80,6 @@ class nsfw(Cog, name="Hentai"):
 
     @Jeanne.command(description="Get a random media content from Gelbooru")
     @Jeanne.is_nsfw()
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.cooldown(1, 5, type=BucketType.member)
@@ -110,11 +107,11 @@ class nsfw(Cog, name="Hentai"):
         image = await Hentai(plus).gelbooru(rating, tags)
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
-            view = ReportSelect(*[img["file_url"] for img in images])
+            view = ReportContentPlus(*[img["file_url"] for img in images])
             vids = [i for i in images if "mp4" in i["file_url"]]
             media = [j["file_url"] for j in vids]
             if media:
-                m: Message = await ctx.send("\n".join(media), view=view)
+                m: Message = await ctx.send("\n".join(img["file_url"] for img in images), view=view)
                 await view.wait()
                 if view.value is None:
                     await m.edit(view=None)
@@ -217,7 +214,7 @@ class nsfw(Cog, name="Hentai"):
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
             shortened_urls = [shorten_url(img["file_url"]) for img in images]
-            view = ReportSelect(*shortened_urls)
+            view = ReportContentPlus(*shortened_urls)
             color = Color.random()
             embeds = [
                 Embed(color=color, url="https://yande.re")
@@ -304,7 +301,7 @@ class nsfw(Cog, name="Hentai"):
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
             try:
                 shortened_urls = [shorten_url(img["file_url"]) for img in images]
-                view = ReportSelect(*shortened_urls)
+                view = ReportContentPlus(*shortened_urls)
                 color = Color.random()
                 embeds = [
                     Embed(color=color, url="https://konachan.com")
@@ -397,7 +394,7 @@ class nsfw(Cog, name="Hentai"):
         image = await Hentai(plus).danbooru(rating, tag)
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
-            view = ReportSelect(*[img["file_url"] for img in images])
+            view = ReportContentPlus(*[img["file_url"] for img in images])
             vids = [i for i in images if "mp4" in i["file_url"]]
             media = [j["file_url"] for j in vids]
             if media:
