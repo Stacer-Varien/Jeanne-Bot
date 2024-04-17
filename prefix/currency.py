@@ -35,7 +35,7 @@ class vote_button(ui.View):
         self.add_item(
             ui.Button(
                 style=ButtonStyle.link,
-                label="Discord Bot List (Beta)",
+                label="Discord Bot List",
                 url="https://discordbotlist.com/bots/jeanne/upvote",
             )
         )
@@ -44,11 +44,10 @@ class vote_button(ui.View):
 class CurrencyCog(Cog, name="Currency"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
-        super().__init__()
 
     @Jeanne.group(
         invoke_without_command=True,
-        description="Main Guess command for `guess flip` and `guess bet`",
+        description="Main Guess command",
     )
     async def guess(self, ctx: Context): ...
 
@@ -151,7 +150,7 @@ class CurrencyCog(Cog, name="Currency"):
 
     @Jeanne.group(
         invoke_without_command=True,
-        description="Main Dice command for `dice free` and `dice bet`",
+        description="Main Dice command",
     )
     async def dice(self, ctx: Context): ...
     @dice.command(name="free", description="Roll a dice for free 20 QP")
@@ -236,7 +235,7 @@ class CurrencyCog(Cog, name="Currency"):
 
     @Jeanne.group(
         invoke_without_command=True,
-        description="Main Flip command for `flip free` and `flip bet`",
+        description="Main Flip command",
     )
     async def flip(self, ctx: Context): ...
     @flip.command(name="free", description="Flip a coin and earn 20 QP for free")
@@ -347,15 +346,15 @@ class CurrencyCog(Cog, name="Currency"):
     async def get_balance(self, ctx: Context, member: Member):
         bal = Currency(member).get_balance
         balance = Embed(
-            description=f"{'You' if (member == ctx.author) else member} have {bal} <:quantumpiece:1161010445205905418>",
+            description=f"{'You have' if (member == ctx.author) else (str(member) + '\thas')} {bal} <:quantumpiece:1161010445205905418>",
             color=Color.blue(),
         )
         balance.add_field(
             name=f"If you want more <:quantumpiece:1161010445205905418>:",
-            value="[Vote for me in TopGG](https://top.gg/bot/831993597166747679/vote)",
+            value="Vote for me by clicking the buttons below",
             inline=True,
         )
-        await ctx.send(embed=balance)
+        await ctx.send(embed=balance, view=vote_button())
 
     @Jeanne.command(description="Claim your daily")
     @Jeanne.check(check_disabled_prefixed_command)

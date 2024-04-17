@@ -31,8 +31,8 @@ class ErrorsCog(Cog, name="ErrorsPrefix"):
                 }
 
                 writer = csv.DictWriter(f, fieldnames=fields)
-                writer.writeheader()
-                writer.writerows(traceback_dict)
+                
+                writer.writerow(traceback_dict)
 
         elif isinstance(error, Jeanne.errors.NoPrivateMessage):
             embed = Embed(description=str(error), color=Color.red())

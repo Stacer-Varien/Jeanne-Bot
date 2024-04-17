@@ -37,7 +37,7 @@ type=str,
 choices=["questionable", "explicit", "e", "q"],
 help="questionable | explicit | q | e",
 required=False,
-default=random.choice(["questionable", "explicit"]),
+default=random.choice(["questionable", "explicit", "q", "e"]),
 )
 hentai_parser.add_argument(
 "--tags", "-t", type=str, nargs="+", required=False, default=[], help="tags"

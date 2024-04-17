@@ -19,8 +19,8 @@ class CommandLog(Cog, name="cmdlogger"):
             }
 
             writer = csv.DictWriter(f, fieldnames=fields)
-            writer.writeheader()
-            writer.writerows(command_dict)
+            
+            writer.writerow(command_dict)
 
 
 async def setup(bot: Bot):

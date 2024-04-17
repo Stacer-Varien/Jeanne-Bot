@@ -572,7 +572,9 @@ class Levelling:
         db.commit()
         return leaders_query.fetchall()
 
-    def check_xpblacklist_channel(self, channel: TextChannel)->int|Literal[False]|None:
+    def check_xpblacklist_channel(
+        self, channel: TextChannel
+    ) -> int | Literal[False] | None:
         data = db.execute(
             "SELECT channel FROM xpChannelData WHERE server = ? AND channel = ?",
             (
@@ -581,7 +583,7 @@ class Levelling:
             ),
         ).fetchone()
         db.commit()
-        if data==None:
+        if data == None:
             return
         return int(data[0]) if data else False
 
@@ -1045,7 +1047,7 @@ class Moderation:
         db.commit()
         return int(result[0]) if result else None
 
-    def warnpoints(self, member:Member)-> int:
+    def warnpoints(self, member: Member) -> int:
         wp_query = db.execute(
             "SELECT * FROM warnData WHERE user_id = ? AND guild_id = ?",
             (
@@ -1132,21 +1134,21 @@ class Welcomer:
         self.server = server
 
     @property
-    def get_welcomer(self)->int|None:
+    def get_welcomer(self) -> int | None:
         data = db.execute(
             "SELECT welcoming_channel FROM serverData where server = ?",
             (self.server.id,),
         ).fetchone()
         db.commit()
-        return data[0] if data is not None else None 
+        return data[0] if data is not None else None
 
     @property
-    def get_leaver(self)->int|None:
+    def get_leaver(self) -> int | None:
         data = db.execute(
             "SELECT leaving_channel FROM serverData where server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
-        return data[0] if data is not None else None 
+        return data[0] if data is not None else None
 
     @property
     def get_welcoming_msg(self) -> str | None:
@@ -1155,7 +1157,7 @@ class Welcomer:
             (self.server.id,),
         ).fetchone()
         db.commit()
-        return data[0] if data is not None else None 
+        return data[0] if data is not None else None
 
     @property
     def get_leaving_msg(self) -> str | None:
@@ -1163,7 +1165,7 @@ class Welcomer:
             "SELECT leaving_message FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
-        return data[0] if data is not None else None 
+        return data[0] if data is not None else None
 
 
 def get_cached_users() -> int:
@@ -1264,7 +1266,7 @@ class Hentai:
                 continue
             if any(tag in self.blacklisted_tags for tag in img_tags):
                 continue
-            if any(url in set(bl) for url in urls):
+            if any(url in bl for url in urls):
                 continue
             filtered_images.append(image)
         return filtered_images
@@ -1273,7 +1275,7 @@ class Hentai:
         db.execute("INSERT OR IGNORE INTO hentaiBlacklist (links) VALUES (?)", (link,))
         db.commit()
 
-    def get_blacklisted_links(self) -> List[str] | None:
+    def get_blacklisted_links(self) ->list[str]|None:
         data = db.execute("SELECT links FROM hentaiBlacklist").fetchall()
         db.commit()
         return [str(link[0]) for link in data] if data else None

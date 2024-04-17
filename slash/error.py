@@ -41,7 +41,6 @@ class ErrorsCog(Cog, name="ErrorsSlash"):
             }
             with open("errors.csv", "a", newline="") as f:
                 writer = csv.DictWriter(f, fieldnames=fields)
-                writer.writeheader()
                 writer.writerows(traceback_dict)
                 
         elif isinstance(error, Jeanne.errors.NoPrivateMessage):
