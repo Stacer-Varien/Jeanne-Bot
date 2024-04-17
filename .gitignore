@@ -140,3 +140,5 @@ voter_data.json
 assets/Images/
 commandlog.txt
 errors.txt
+commandlog.csv
+errors.csv

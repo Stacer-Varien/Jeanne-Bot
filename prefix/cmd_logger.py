@@ -1,5 +1,6 @@
 from discord.ext.commands import Bot, Cog, Context
 from datetime import datetime
+import csv
 
 
 class CommandLog(Cog, name="cmdlogger"):
@@ -8,9 +9,18 @@ class CommandLog(Cog, name="cmdlogger"):
 
     @Cog.listener()
     async def on_command_completion(self, ctx: Context):
-        logged = f"Date and Time = {datetime.now()}\nUser = {ctx.author} | {ctx.author.id}\nCommand used = {ctx.command.qualified_name}\n\n"
-        with open("commandlog.txt", "a") as f:
-            f.writelines(logged)
+        fields = ["Date and Time", "User", "Command Used", "Command Usage"]
+        with open("commandlog.csv", "a", newline="") as f:
+            command_dict = {
+                "Date and Time": datetime.now(),
+                "User": f"{ctx.author} | {ctx.author.id}",
+                "Command Used": ctx.command.qualified_name,
+                "Command Usage": ctx.message.content,
+            }
+
+            writer = csv.DictWriter(f, fieldnames=fields)
+            writer.writeheader()
+            writer.writerows(command_dict)
 
 
 async def setup(bot: Bot):

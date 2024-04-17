@@ -3,9 +3,10 @@ from discord import Color, Embed
 from discord.ext import commands as Jeanne
 from discord.ext.commands import Bot, Cog, Context, NotOwner, CommandNotFound
 import traceback
+import csv
 
 
-class ErrorsCog(Cog, name="Errors"):
+class ErrorsCog(Cog, name="ErrorsPrefix"):
     def __init__(self, bot: Bot):
         self.bot = bot
 
@@ -21,10 +22,18 @@ class ErrorsCog(Cog, name="Errors"):
             traceback_error = traceback.format_exception(
                 error, error, error.__traceback__
             )
-            with open("errors.txt", "a") as f:
-                f.writelines(
-                    f"Date = {datetime.now()}\nComamnd = {ctx.command.qualified_name}\nError:\n{''.join(traceback_error)}\n"
-                )
+            fields = ["Date", "Command", "Error"]
+            with open("errors.csv", "a", newline="") as f:
+                traceback_dict = {
+                    "Date": datetime.now(),
+                    "Command": ctx.command.qualified_name,
+                    "Error": "".join(traceback_error),
+                }
+
+                writer = csv.DictWriter(f, fieldnames=fields)
+                writer.writeheader()
+                writer.writerows(traceback_dict)
+
         elif isinstance(error, Jeanne.errors.NoPrivateMessage):
             embed = Embed(description=str(error), color=Color.red())
             await ctx.send(embed=embed)
