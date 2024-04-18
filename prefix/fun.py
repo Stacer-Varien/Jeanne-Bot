@@ -106,24 +106,26 @@ class fun(Cog, name="Fun"):
         except SystemExit:
             await ctx.send(
                 embed=Embed(
-                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    description=f"You are using incorrect arguments for this command",
                     color=Color.red(),
                 )
             )
             return
-        option_name1letters = first[: round(len(first) / 2)]
-        option_name2letters = second[round(len(second) / 2) :]
-        option2_name1letters = first[round(len(" ".join(first)) / 2) :]
-        option2_name2letters = second[: round(len(second) / 2)]
-        combine1 = "".join([option_name1letters, option_name2letters])
-        combine2 = "".join([option2_name1letters, option2_name2letters])
-        combine = Embed(
-            description=f"**1st combine word**: {combine1}\n**2nd combined word**:{combine2}",
-            color=Color.random(),
-        )
-        combine.set_author(name=f"""{first} + {second}""")
-        await ctx.send(embed=combine)
-        return
+        if first and second:
+            option_name1letters = first[: round(len(first) / 2)]
+            option_name2letters = second[round(len(second) / 2) :]
+            option2_name1letters = first[round(len(" ".join(first)) / 2) :]
+            option2_name2letters = second[: round(len(second) / 2)]
+            combine1 = "".join([option_name1letters, option_name2letters])
+            combine2 = "".join([option2_name1letters, option2_name2letters])
+            combine = Embed(
+                description=f"**1st combine word**: {combine1}\n**2nd combined word**:{combine2}",
+                color=Color.random(),
+            )
+            combine.set_author(name=f"""{first} + {second}""")
+            await ctx.send(embed=combine)
+            return
+        await ctx.send(embed=Embed(description="You are missing some arguments for this command", color=Color.red()))
 
     @Jeanne.command(
         aliases=["pick", "choice"],
@@ -145,7 +147,7 @@ class fun(Cog, name="Fun"):
 
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def simprate(self, ctx: Context, member: Optional[Member] = None):
+    async def simprate(self, ctx: Context, *,member: Optional[Member] = None):
 
         perc = randint(0, 100)
         member = member if member else ctx.author
@@ -159,11 +161,11 @@ class fun(Cog, name="Fun"):
             simp.set_image(url="https://i.imgur.com/Rs1IP2I.jpg")
         await ctx.send(embed=simp)
 
-    @Jeanne.command(description="Check how gay you are")
+    @Jeanne.command(aliases=["gay"],description="Check how gay you are")
 
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def gayrate(self, ctx: Context, member: Optional[Member] = None):
+    async def gayrate(self, ctx: Context, *, member: Optional[Member] = None):
 
         perc = randint(0, 100)
         member = member if member else ctx.author
