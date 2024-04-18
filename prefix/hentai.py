@@ -16,8 +16,6 @@ class nsfw(Cog, name="HentaiPrefix"):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-
-
     @Jeanne.command(description="Get a random hentai from Jeanne")
     @Jeanne.is_nsfw()
 
@@ -34,7 +32,7 @@ class nsfw(Cog, name="HentaiPrefix"):
         except SystemExit:
             await ctx.send(
                 embed=Embed(
-                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    description=f"You are using incorrect arguments for this command",
                     color=Color.red(),
                 )
             )
@@ -99,7 +97,7 @@ class nsfw(Cog, name="HentaiPrefix"):
         except SystemExit:
             await ctx.send(
                 embed=Embed(
-                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    description=f"You are using incorrect arguments for this command",
                     color=Color.red(),
                 )
             )
@@ -110,8 +108,9 @@ class nsfw(Cog, name="HentaiPrefix"):
             view = ReportContentPlus(*[img["file_url"] for img in images])
             vids = [i for i in images if "mp4" in i["file_url"]]
             media = [j["file_url"] for j in vids]
+            imgs=[img["file_url"] for img in images]
             if media:
-                m: Message = await ctx.send("\n".join(img["file_url"] for img in images), view=view)
+                m: Message = await ctx.send("\n".join(imgs), view=view)
                 await view.wait()
                 if view.value is None:
                     await m.edit(view=None)
@@ -200,7 +199,7 @@ class nsfw(Cog, name="HentaiPrefix"):
         except SystemExit:
             await ctx.send(
                 embed=Embed(
-                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    description=f"You are using incorrect arguments for this command",
                     color=Color.red(),
                 )
             )
@@ -213,12 +212,12 @@ class nsfw(Cog, name="HentaiPrefix"):
         image = await Hentai(plus).yandere(rating, tag)
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
-            shortened_urls = [shorten_url(img["file_url"]) for img in images]
+            shortened_urls = [shorten_url(img["sample_url"]) for img in images]
             view = ReportContentPlus(*shortened_urls)
             color = Color.random()
             embeds = [
-                Embed(color=color, url="https://yande.re")
-                .set_image(url=(str(url)))
+                Embed(color=color, url="https://files.yande.re")
+                .set_image(url=url)
                 .set_footer(
                     text="Fetched from Yande.re • Credits must go to the artist"
                 )
@@ -238,7 +237,7 @@ class nsfw(Cog, name="HentaiPrefix"):
             return
         color = Color.random()
         shortened_url = shorten_url(str(image))
-        embed = Embed(color=color, url="https://yande.re")
+        embed = Embed(color=color, url="https://files.yande.re")
         embed.set_image(url=shortened_url)
         footer_text = "Fetched from Yande.re • Credits must go to the artist"
         try:
@@ -291,7 +290,7 @@ class nsfw(Cog, name="HentaiPrefix"):
         except SystemExit:
             await ctx.send(
                 embed=Embed(
-                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    description=f"You are using incorrect arguments for this command",
                     color=Color.red(),
                 )
             )
@@ -397,8 +396,9 @@ class nsfw(Cog, name="HentaiPrefix"):
             view = ReportContentPlus(*[img["file_url"] for img in images])
             vids = [i for i in images if "mp4" in i["file_url"]]
             media = [j["file_url"] for j in vids]
+            imgs = [img["file_url"] for img in images]
             if media:
-                m: Message = await ctx.send("\n".join(media), view=view)
+                m: Message = await ctx.send("\n".join(imgs), view=view)
                 await view.wait()
                 if view.value == None:
                     await m.edit(view=None)
