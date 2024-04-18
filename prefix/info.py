@@ -59,7 +59,7 @@ class stat_buttons(ui.View):
 class InfoCog(Cog, name="Info"):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.bot_version = "5"
+        self.bot_version = "v5.0"
 
     async def get_userinfo(self, ctx: Context, member: Member):
         user = await self.bot.fetch_user(member.id)
@@ -146,11 +146,12 @@ class InfoCog(Cog, name="Info"):
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def serverinfo(self, ctx: Context):
+        embeds=[]
         emojis = [str(x) for x in ctx.guild.emojis]
         humans = len([member for member in ctx.guild.members if not member.bot])
         bots = len([bot for bot in ctx.guild.members if bot.bot == True])
         date = round(ctx.guild.created_at.timestamp())
-        serverinfo = Embed(color=Color.random())
+        serverinfo = Embed(description=f"{ctx.guild.name}'s info",color=Color.random())
         serverinfo.add_field(name="ID", value=ctx.guild.id, inline=True)
         serverinfo.add_field(
             name="Owner",
@@ -187,7 +188,7 @@ class InfoCog(Cog, name="Info"):
         for i in ctx.guild.features:
             f.append(i.replace("_", " ").title())
         serverinfo.add_field(name="Features", value=" | ".join(f), inline=False)
-        icon = ctx.guild.icon.url if ctx.guild.icon != None else None
+        icon = ctx.guild.icon
         splash = (
             ctx.guild.splash.url
             if ctx.guild.splash != None and ctx.guild.premium_tier == 1
@@ -195,14 +196,13 @@ class InfoCog(Cog, name="Info"):
         )
         serverinfo.set_thumbnail(url=icon)
         serverinfo.set_image(url=splash)
-        if len(emojis) == 0:
-            await ctx.send(embed=serverinfo)
-            return
-        emojie = Embed(
-            title="Emojis", description="".join(emojis[:80]), color=Color.random()
-        )
-        e = [serverinfo, emojie]
-        await ctx.send(embeds=e)
+        embeds.append(serverinfo)
+        if len(emojis) > 0:
+            emojie = Embed(
+                title="Emojis", description="".join(emojis[:80]), color=Color.random()
+            )
+            embeds.append(emojie)
+        await ctx.send(embeds=embeds)
 
     @Jeanne.command(description="Check how fast I respond to a command")
 
@@ -264,41 +264,41 @@ class InfoCog(Cog, name="Info"):
             description=f"**{member}'s Avatar**",
             url="https://discordapp.com",
             color=color,
-            type="image",
         )
-        if DMChannel:
-            normav.set_image(url=member.display_avatar)
-            await ctx   .send(embed=normav)
-            return
+        try:
+            if ctx.channel.me:
+                normav.set_image(url=member.display_avatar)
+                await ctx.send(embed=normav)
+                return
+        except:
+            if globalav == None and serverav:
+                guildav = Embed(
+                    url="https://discordapp.com",
+                    color=color,
+                    type="image",
+                )
+                normav.set_image(url=defaultav)
+                guildav.set_image(url=serverav)
+                embeds.append(normav)
+                embeds.append(guildav)
 
-        if globalav == None and serverav:
-            guildav = Embed(
-                url="https://discordapp.com",
-                color=color,
-                type="image",
-            )
-            normav.set_image(url=defaultav)
-            guildav.set_image(url=serverav)
-            embeds.append(normav)
-            embeds.append(guildav)
+            elif globalav and serverav == None:
 
-        elif globalav and serverav == None:
+                normav.set_image(url=globalav)
 
-            normav.set_image(url=globalav)
+                embeds.append(normav)
 
-            embeds.append(normav)
-
-        elif globalav and serverav:
-            guildav = Embed(
-                url="https://discordapp.com",
-                color=color,
-                type="image",
-            )
-            normav.set_image(url=globalav)
-            guildav.set_image(url=serverav)
-            embeds.append(normav)
-            embeds.append(guildav)
-        await ctx.send(embeds=embeds)
+            elif globalav and serverav:
+                guildav = Embed(
+                    url="https://discordapp.com",
+                    color=color,
+                    type="image",
+                )
+                normav.set_image(url=globalav)
+                guildav.set_image(url=serverav)
+                embeds.append(normav)
+                embeds.append(guildav)
+            await ctx.send(embeds=embeds)
 
     @Jeanne.command(description="View a sticker via message ID or sticker name")
 

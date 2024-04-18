@@ -274,41 +274,41 @@ class InfoCog(Cog):
             type="image",
         )
 
-        if DMChannel:
-            normav.set_image(url=member.display_avatar)
-            await ctx.followup.send(embed=normav)
-            return
+        try:
+            if ctx.channel.me:
+                normav.set_image(url=member.display_avatar)
+                await ctx.followup.send(embed=normav)
+        except:
+            if globalav==None and serverav:
+                guildav = Embed(
+                url="https://discordapp.com",
+                color=color,
+                type="image",
+                )
+                normav.set_image(url=defaultav)
+                guildav.set_image(url=serverav)
+                embeds.append(normav)
+                embeds.append(guildav)
 
-        if globalav==None and serverav:
-            guildav = Embed(
-            url="https://discordapp.com",
-            color=color,
-            type="image",
-            )
-            normav.set_image(url=defaultav)
-            guildav.set_image(url=serverav)
-            embeds.append(normav)
-            embeds.append(guildav)
+            elif globalav and serverav==None:
 
-        elif globalav and serverav==None:
+                normav.set_image(url=globalav)
 
-            normav.set_image(url=globalav)
-
-            embeds.append(normav)
+                embeds.append(normav)
 
 
-        elif globalav and serverav:
-            guildav = Embed(
-            url="https://discordapp.com",
-            color=color,
-            type="image",
-            )
-            normav.set_image(url=globalav)
-            guildav.set_image(url=serverav)
-            embeds.append(normav)
-            embeds.append(guildav)
+            elif globalav and serverav:
+                guildav = Embed(
+                url="https://discordapp.com",
+                color=color,
+                type="image",
+                )
+                normav.set_image(url=globalav)
+                guildav.set_image(url=serverav)
+                embeds.append(normav)
+                embeds.append(guildav)
 
-        await ctx.followup.send(embeds=embeds)
+            await ctx.followup.send(embeds=embeds)
 
     @Jeanne.command(description="View a sticker")
     @Jeanne.describe(
