@@ -1,7 +1,6 @@
 from functions import (
     check_botbanned_prefix,
     check_disabled_prefixed_command,
-    is_beta_prefix,
 )
 from discord import Color, Embed
 from discord.ext.commands import Cog, Bot, Context
