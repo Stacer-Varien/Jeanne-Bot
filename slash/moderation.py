@@ -8,6 +8,7 @@ from discord import (
     Member,
     Message,
     NotFound,
+    User,
     app_commands as Jeanne,
 )
 from discord.ext.commands import Cog, Bot, GroupCog
@@ -21,129 +22,22 @@ from functions import (
     check_disabled_app_command,
 )
 from assets.components import Confirmation
-from typing import Optional
+from typing import Optional, Union
 
 
-class BanCog(GroupCog, name="ban"):
-    def __init__(self, bot: Bot) -> None:
+class moderation(Cog):
+    def __init__(self, bot: Bot):
         self.bot = bot
-        super().__init__()
 
-    @Jeanne.command(description="Ban someone outside the server")
-    @Jeanne.describe(user_id="What is the user ID?", reason="What did they do?")
-    @Jeanne.checks.has_permissions(ban_members=True)
-    @Jeanne.checks.bot_has_permissions(ban_members=True)
-    @Jeanne.check(check_botbanned_app_command)
-    @Jeanne.check(check_disabled_app_command)
-    async def user(
+    async def commit_ban(
         self,
         ctx: Interaction,
-        user_id: str,
-        reason: Optional[Jeanne.Range[str, None, 470]] = None,
-    ) -> None:
-        await ctx.response.defer()
-        user = await self.bot.fetch_user(int(user_id))
-        reason = reason if reason else "Unspecified"
-        if int(user_id) == ctx.guild.owner.id:
-            failed = Embed(
-                description="You can't ban the owner of the server...",
-                color=Color.red(),
-            )
-            await ctx.followup.send(embed=failed)
-            return
-        if int(user_id) == ctx.user.id:
-            failed = Embed(description="You cannot ban yourself...", color=Color.red())
-            await ctx.followup.send(embed=failed)
-            return
-        try:
-            banned = await ctx.guild.fetch_ban(user)
-            if banned:
-                already_banned = Embed(
-                    description=f"{user} is already banned here", color=Color.red()
-                )
-                await ctx.followup.send(embed=already_banned)
-        except NotFound:
-            view = Confirmation(ctx.user)
-            confirm = Embed(
-                description="Is {} the one you want to ban from your server?".format(
-                    user
-                ),
-                color=Color.dark_red(),
-            ).set_thumbnail(url=user.display_avatar)
-            await ctx.followup.send(embed=confirm, view=view)
-            await view.wait()
-            if view.value == None:
-                cancelled = Embed(description="Ban cancelled", color=Color.red())
-                await ctx.edit_original_response(embed=cancelled, view=None)
-            elif view.value == True:
-                await ctx.guild.ban(user, reason="{} | {}".format(reason, ctx.user))
-                ban = Embed(title="User Banned", color=0xFF0000)
-                ban.add_field(name="Name", value=user, inline=True)
-                ban.add_field(name="ID", value=user.id, inline=True)
-                ban.add_field(name="Moderator", value=ctx.user, inline=True)
-                ban.add_field(name="Reason", value=reason, inline=False)
-                ban.set_thumbnail(url=user.display_avatar)
-                modlog_id = Moderation(ctx.guild).get_modlog_channel
-                if modlog_id == None:
-                    await ctx.edit_original_response(embed=ban, view=None)
-                    return
-                modlog = ctx.guild.get_channel(modlog_id)
-                banned = Embed(
-                    description=f"{user} has been banned. Check {modlog.mention}",
-                    color=0xFF0000,
-                )
-                await ctx.edit_original_response(embed=banned, view=None)
-                await modlog.send(embed=ban)
-            elif view.value == False:
-                cancelled = Embed(description="Ban cancelled", color=Color.red())
-                await ctx.edit_original_response(embed=cancelled, view=None)
-
-    @Jeanne.command(description="Ban someone in this server")
-    @Jeanne.describe(
-        member="Which member are you banning?",
-        reason="What did they do?",
-        time="How long should they be tempbanned? (1m, 1h30m, etc)",
-    )
-    @Jeanne.checks.has_permissions(ban_members=True)
-    @Jeanne.checks.bot_has_permissions(ban_members=True)
-    @Jeanne.check(check_botbanned_app_command)
-    @Jeanne.check(check_disabled_app_command)
-    async def member(
-        self,
-        ctx: Interaction,
-        member: Member,
-        reason: Optional[Jeanne.Range[str, None, 470]] = None,
+        member: Union[Member | User],
+        reason: str,
         time: Optional[str] = None,
-    ) -> None:
-        await ctx.response.defer()
-        if member == ctx.user:
-            failed = Embed(description="You can't ban yourself")
-            await ctx.followup.send(embed=failed)
-            return
-        if member.id == ctx.guild.owner.id:
-            failed = Embed(
-                description="You can't ban the owner of the server...",
-                color=Color.red(),
-            )
-            await ctx.followup.send(embed=failed)
-            return
-        if ctx.user.top_role.position < member.top_role.position:
-            failed = Embed(
-                description="{}'s position is higher than you...".format(member),
-                color=Color.red(),
-            )
-            await ctx.followup.send(embed=failed)
-            return
-        try:
-            banmsg = Embed(
-                description=f"You are banned from **{ctx.guild.name}** for **{reason}**"
-            )
-            await member.send(embed=banmsg)
-        except:
-            pass
-        reason = reason if reason else "Unspecified"
-        await member.ban(reason="{} | {}".format(reason, ctx.user))
-        ban = Embed(title="Member Banned", color=0xFF0000)
+    ):
+        await ctx.guild.ban(member, reason="{} | {}".format(reason, ctx.user))
+        ban = Embed(title="User Banned", color=0xFF0000)
         ban.add_field(name="Name", value=member, inline=True)
         ban.add_field(name="ID", value=member.id, inline=True)
         ban.add_field(name="Moderator", value=ctx.user, inline=True)
@@ -159,17 +53,91 @@ class BanCog(GroupCog, name="ban"):
         ban.set_thumbnail(url=member.display_avatar)
         modlog_id = Moderation(ctx.guild).get_modlog_channel
         if modlog_id == None:
-            await ctx.followup.send(embed=ban)
+            await ctx.edit_original_response(embed=ban, view=None)
             return
         modlog = ctx.guild.get_channel(modlog_id)
         banned = Embed(
             description=f"{member} has been banned. Check {modlog.mention}",
             color=0xFF0000,
         )
-        await ctx.followup.send(embed=banned)
+        await ctx.edit_original_response(embed=banned, view=None)
         await modlog.send(embed=ban)
 
-    @user.error
+    async def check_banned(self, ctx: Interaction, member: User):
+        try:
+            banned = await ctx.guild.fetch_ban(member)
+            if banned:
+                already_banned = Embed(
+                    description=f"{member} is already banned here",
+                    color=Color.red(),
+                )
+                await ctx.followup.send(embed=already_banned)
+                return
+        except NotFound:
+            return False
+
+    @Jeanne.command(description="Ban someone from or outside the server")
+    @Jeanne.describe(
+        member="What is the member or user ID?",
+        reason="What did they do?",
+        time="How long should they be tempbanned? (1m, 1h30m, etc)",
+    )
+    @Jeanne.checks.has_permissions(ban_members=True)
+    @Jeanne.checks.bot_has_permissions(ban_members=True)
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
+    async def ban(
+        self,
+        ctx: Interaction,
+        member: Union[Member | User],
+        reason: Optional[Jeanne.Range[str, None, 470]] = "Unspecified",
+        time: Optional[str] = None,
+    ) -> None:
+        await ctx.response.defer()
+        if member.id == ctx.guild.owner.id:
+            failed = Embed(
+                description="You can't ban the owner of the server...",
+                color=Color.red(),
+            )
+            await ctx.followup.send(embed=failed)
+            return
+        if member.id == ctx.user.id:
+            failed = Embed(description="You cannot ban yourself...", color=Color.red())
+            await ctx.followup.send(embed=failed)
+            return
+
+        if await self.check_banned() == False:
+            view = Confirmation(ctx.user)
+            confirm = Embed(
+                description="Is {} the one you want to ban from your server?".format(
+                    member
+                ),
+                color=Color.dark_red(),
+            ).set_thumbnail(url=member.display_avatar)
+            await ctx.followup.send(embed=confirm, view=view)
+            await view.wait()
+            if view.value == None:
+                cancelled = Embed(description="Ban cancelled", color=Color.red())
+                await ctx.edit_original_response(embed=cancelled, view=None)
+                return
+            if view.value == True:
+                await self.commit_ban(ctx, member, reason)
+                return
+
+            if view.value == False:
+                cancelled = Embed(description="Ban cancelled", color=Color.red())
+                await ctx.edit_original_response(embed=cancelled, view=None)
+                return
+        if ctx.user.top_role.position < member.top_role.position:
+            failed = Embed(
+                description="{}'s position is higher than you...".format(member),
+                color=Color.red(),
+            )
+            await ctx.followup.send(embed=failed)
+            return
+        await self.commit_ban(ctx, member, reason, time)
+
+    @ban.error
     async def ban_user_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (HTTPException, ValueError)
@@ -178,11 +146,6 @@ class BanCog(GroupCog, name="ban"):
             embed.description = "Invalid user ID given\nPlease try again"
             embed.color = Color.red()
             await ctx.followup.send(embed=embed)
-
-
-class moderation(Cog):
-    def __init__(self, bot: Bot):
-        self.bot = bot
 
     @Jeanne.command(description="Warn a member")
     @Jeanne.describe(member="Which member are you warning?", reason="What did they do?")
@@ -806,5 +769,4 @@ class moderation(Cog):
 
 
 async def setup(bot: Bot):
-    await bot.add_cog(BanCog(bot))
     await bot.add_cog(moderation(bot))
