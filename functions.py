@@ -15,7 +15,7 @@ from discord import (
     User,
     app_commands as Jeanne,
 )
-from discord.ext.commands import Bot, Context, CheckFailure, check
+from discord.ext.commands import Bot, Context
 from requests import get, post
 from config import db, BB_WEBHOOK, CATBOX_HASH
 from typing import Literal, Optional, List
@@ -424,7 +424,7 @@ class Levelling:
         db.commit()
         return int(level[0]) if level else 0
 
-    async def add_xp(self):
+    async def add_xp(self, xp: int):
         now_time = round(datetime.now().timestamp())
         next_time = round((datetime.now() + timedelta(minutes=2)).timestamp())
         xp = 10 if (datetime.today().weekday() >= 5) else 5
@@ -1275,7 +1275,7 @@ class Hentai:
         db.execute("INSERT OR IGNORE INTO hentaiBlacklist (links) VALUES (?)", (link,))
         db.commit()
 
-    def get_blacklisted_links(self) ->list[str]|None:
+    def get_blacklisted_links(self) -> list[str] | None:
         data = db.execute("SELECT links FROM hentaiBlacklist").fetchall()
         db.commit()
         return [str(link[0]) for link in data] if data else None
@@ -1575,34 +1575,34 @@ async def is_beta_app_command(ctx: Interaction):
 
 
 class DBLvoter:
-    def __init__(self, bot:Bot, auth:str) -> None:
-        self.bot=bot
-        self.auth=auth
-        self.url=f"https://discordbotlist.com/api/v1/bots/{self.bot.user.id}/"
+    def __init__(self, bot: Bot, auth: str) -> None:
+        self.bot = bot
+        self.auth = auth
+        self.url = f"https://discordbotlist.com/api/v1/bots/831993597166747679/"
         self.headers = {
-                "Content-Type": "application/json",
-                "Authorization": self.auth,
-            }
-        
-    async def connect(self, endpoint:Optional[str]=None):
+            "Content-Type": "application/json",
+            "Authorization": self.auth,
+        }
+
+    async def connect(self, endpoint: Optional[str] = None):
         async with aiohttp.ClientSession(headers=self.headers) as session:
-                response= await session.get(self.url + endpoint)
-                if response.status==200:
-                    return response
-                return None
+            response = await session.get(self.url + endpoint)
+            if response.status == 200:
+                return response
+            return None
+
     @property
     async def votes(self):
-        response=await self.connect("upvotes")
-        if response==None:
+        response = await self.connect("upvotes")
+        if response == None:
             return
         return await response.json()
-    
-    async def get_user_vote(self, user:User):
-        data=await self.votes
 
-        if data==None:
+    async def get_user_vote(self, user: User) -> bool | None:
+        data = await self.votes
+
+        if data == None:
             return
-        
-        uservote=bool(data["upvotes"][0][str(user.id)])
 
-
+        if str(user.id) in str(data["upvotes"]):
+            return True

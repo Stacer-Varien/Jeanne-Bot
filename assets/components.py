@@ -456,6 +456,7 @@ class ReportContentM(ui.Modal, title="Illicit Content Report"):
         )
         await ctx.response.send_message(embed=embed, ephemeral=True)
 
+
 class ReportContentPlus(ui.View):
 
     def __init__(
@@ -774,10 +775,10 @@ class TopicButton(ui.View):
 
 
 class WelcomerSetButtons(ui.View):
-    def __init__(self, author: Member, message:Message):
+    def __init__(self, author: Member, message: Message):
         self.value = None
         self.author = author
-        self.message=message
+        self.message = message
         super().__init__(timeout=180)
 
     @ui.button(label="Set Welcoming Message")
@@ -797,11 +798,11 @@ class WelcomerSetButtons(ui.View):
 
 
 class LevelSetButtons(ui.View):
-    def __init__(self, author: Member, message:Message, channel:TextChannel):
+    def __init__(self, author: Member, message: Message, channel: TextChannel):
         self.value = None
         self.author = author
-        self.message=message
-        self.channel=channel
+        self.message = message
+        self.channel = channel
         super().__init__(timeout=180)
 
     @ui.button(label="Set Level Update Message")

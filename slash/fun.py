@@ -16,7 +16,7 @@ from assets.images import get_animeme_pic
 from typing import Optional
 
 
-class fun(Cog):
+class fun(Cog, name="FunSlash"):
     def __init__(self, bot: Bot):
         self.bot = bot
 

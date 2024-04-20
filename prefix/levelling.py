@@ -45,7 +45,6 @@ class levelling(Cog, name="Level"):
         name="global", description="Check the users with the most XP globally"
     )
     @Jeanne.cooldown(1, 60, type=BucketType.user)
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def _global(self, ctx: Context):
@@ -66,7 +65,6 @@ class levelling(Cog, name="Level"):
 
     @rank.command(description="Check the users with the most XP in the server")
     @Jeanne.cooldown(1, 60, type=BucketType.member)
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def server(self, ctx: Context):
@@ -87,7 +85,6 @@ class levelling(Cog, name="Level"):
 
     @Jeanne.command(description="See your profile or someone else's profile")
     @Jeanne.cooldown(1, 120, type=BucketType.user)
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def profile(self, ctx: Context, member: Optional[Member] = None) -> None:

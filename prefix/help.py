@@ -72,7 +72,6 @@ class HelpGroupPrefix(Cog, name="Help"):
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def command(self, ctx: Context, *, command: Range[str, 3]):
-
         cmd = next(
             (cmd for cmd in self.bot.walk_commands() if cmd.qualified_name == command),
             None,
@@ -123,7 +122,6 @@ class HelpGroupPrefix(Cog, name="Help"):
                     name="User Permissions", value="\n".join(perms), inline=True
                 )
             if not cmd.description.startswith("Main"):
-
                 cmd_usage = "j!" + cmd.qualified_name + " " + parms
                 embed.add_field(
                     name="Command Usage", value=f"`{cmd_usage}`", inline=False
@@ -140,7 +138,6 @@ class HelpGroupPrefix(Cog, name="Help"):
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def module(self, ctx: Context, module: str):
-
         module_mapping = {
             "currency": Modules.currency,
             "fun": Modules.fun,

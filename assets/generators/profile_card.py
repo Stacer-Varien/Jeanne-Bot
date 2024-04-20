@@ -37,14 +37,17 @@ class Profile:
     async def generate_profile(
         self,
         user: User | Member,
-        bg_image:str=None,
+        bg_image: str = None,
         voted: bool = False,
-    )->BytesIO|Literal[False]:
+    ) -> BytesIO | Literal[False]:
         inventory_instance = Inventory(user)
-        
-        background = self.default_bg if bg_image ==None else BytesIO(requests.get(bg_image).content
+
+        background = (
+            self.default_bg
+            if bg_image == None
+            else BytesIO(requests.get(bg_image).content)
         )
-        
+
         currency_instance = Currency(user)
         levelling_instance = Levelling(user, user.guild)
         card = Image.open(background).convert("RGBA")
@@ -73,7 +76,7 @@ class Profile:
 
         else:
             return False
-        
+
         # profile
         profile_bytes = BytesIO(requests.get(user.display_avatar.url).content)
         profile = Image.open(profile_bytes)
@@ -144,7 +147,7 @@ class Profile:
             levelling_instance.get_member_server_rank,
             get_richest(user),
         )
-        if grank!= None:
+        if grank != None:
             if grank <= 100:
                 if grank == 1:
                     ranked = _1st

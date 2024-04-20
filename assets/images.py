@@ -133,9 +133,7 @@ def get_kistune_pic() -> tuple[Embed, File]:
     File(path.join(folder_path, random_image), filename="image.png")
     embed = Embed(color=Color.random())
     embed.set_image(url=f"attachment://{random_image}")
-    embed.set_footer(
-        text="Fetched from Kitsune_1936 • Credits must go to the artist"
-    )
+    embed.set_footer(text="Fetched from Kitsune_1936 • Credits must go to the artist")
     file = File(path.join(folder_path, random_image), random_image)
     return embed, file
 

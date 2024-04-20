@@ -45,7 +45,6 @@ class ManageCog(Cog, name="ManagePrefix"):
 
     @Jeanne.group(description="Main create command")
     async def create(self, ctx: Context): ...
-
     @create.command(aliases=["tc"], description="Creates a text channel")
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
@@ -80,7 +79,9 @@ class ManageCog(Cog, name="ManagePrefix"):
         embed.color = Color.random()
         embed.description = "{} has been created".format(channel.jump_url)
         if category:
-            category = utils.find(lambda r: (r.name or r.id) == category, ctx.guild.categories)
+            category = utils.find(
+                lambda r: (r.name or r.id) == category, ctx.guild.categories
+            )
             await channel.edit(category=category)
             embed.add_field(
                 name="Added into category", value=category.name, inline=True
@@ -135,7 +136,9 @@ class ManageCog(Cog, name="ManagePrefix"):
         embed.description = "{} has been created".format(channel.jump_url)
         embed.color = Color.random()
         if category:
-            category = utils.find(lambda r: (r.name or r.id) == category, ctx.guild.categories)
+            category = utils.find(
+                lambda r: (r.name or r.id) == category, ctx.guild.categories
+            )
             await channel.edit(category=category)
             embed.add_field(
                 name="Added into category", value=category.name, inline=True
@@ -192,7 +195,9 @@ class ManageCog(Cog, name="ManagePrefix"):
         )
         embed.description = "{} has been created".format(channel.jump_url)
         if category:
-            category = utils.find(lambda r: (r.name or r.id) == category, ctx.guild.categories)
+            category = utils.find(
+                lambda r: (r.name or r.id) == category, ctx.guild.categories
+            )
             await channel.edit(category=category)
             embed.add_field(
                 name="Moved to category", value=category.mention, inline=True
@@ -242,14 +247,15 @@ class ManageCog(Cog, name="ManagePrefix"):
         embed.description = "{} has been created".format(forum.jump_url)
         embed.color = Color.random()
         if category:
-            category = utils.find(lambda r: (r.name or r.id) == category, ctx.guild.categories)
+            category = utils.find(
+                lambda r: (r.name or r.id) == category, ctx.guild.categories
+            )
             await forum.edit(category=category)
             embed.add_field(
                 name="Added into category", value=category.name, inline=True
             )
         view = TopicButton(ctx.author, name, category)
         m = await ctx.send(embed=embed, view=view)
-
         if view == None:
             await m.edit(view=None)
 
@@ -258,7 +264,6 @@ class ManageCog(Cog, name="ManagePrefix"):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
-
             embed = Embed()
             embed.description = "Couldn't make a new forum. Please make sure the server is community enabled"
             embed.color = Color.red()
@@ -317,7 +322,6 @@ class ManageCog(Cog, name="ManagePrefix"):
         invoke_without_command=True,
     )
     async def thread(self, ctx: Context): ...
-
     @thread.command(description="Make a public thread")
     @Jeanne.has_permissions(create_public_threads=True, create_private_threads=True)
     @Jeanne.bot_has_permissions(
@@ -574,14 +578,12 @@ class ManageCog(Cog, name="ManagePrefix"):
 
     @Jeanne.group(aliases=["d"], description="Main delete command")
     async def delete(self, ctx: Context): ...
-
     @Jeanne.command(aliases=["ch"], description="Deletes a channel")
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def deletechannel(self, ctx: Context, *, channel: abc.GuildChannel):
-
         embed = Embed(
             description="{} has been deleted".format(channel.name), color=Color.random()
         )
@@ -594,7 +596,6 @@ class ManageCog(Cog, name="ManagePrefix"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def deleterole(self, ctx: Context, *, role: Role):
-
         embed = Embed(
             description="{} has been deleted".format(role.name), color=Color.random()
         )
@@ -607,7 +608,6 @@ class ManageCog(Cog, name="ManagePrefix"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def deleteemoji(self, ctx: Context, *, emoji: str):
-
         try:
             e = emoji.strip().split(":")[-1].rstrip(">")
             emote = await ctx.guild.fetch_emoji(int(e))
@@ -658,7 +658,6 @@ class ManageCog(Cog, name="ManagePrefix"):
 
     @Jeanne.group(description="Main edit command", invoke_without_command=True)
     async def edit(self, ctx: Context): ...
-
     @edit.command(aliases=["tc", "text"], description="Edits a text/news channel")
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
@@ -692,7 +691,6 @@ class ManageCog(Cog, name="ManagePrefix"):
                 )
             )
             return
-
         embed = Embed()
         embed.description = "Channel `{}` has been edited".format(channel.name)
         embed.color = Color.green()
@@ -802,7 +800,6 @@ class ManageCog(Cog, name="ManagePrefix"):
                 )
             )
             return
-
         embed = Embed()
         embed.description = "{} has been edited".format(ctx.guild.name)
         embed.color = Color.green()
@@ -819,7 +816,6 @@ class ManageCog(Cog, name="ManagePrefix"):
                     value="Your server is not public to have a description edited",
                     inline=True,
                 )
-
         if verification_level:
             if verification_level == "none":
                 await ctx.guild.edit(verification_level=VerificationLevel.none)
@@ -963,7 +959,6 @@ class ManageCog(Cog, name="ManagePrefix"):
         name="set", description="Main set command", invoke_without_command=True
     )
     async def _set(self, ctx: Context): ...
-
     @_set.command(description="Set a welcomer and/or leaver channel")
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
@@ -1023,12 +1018,10 @@ class ManageCog(Cog, name="ManagePrefix"):
                 value=leaving_channel.mention,
                 inline=True,
             )
-
         m = await ctx.send(embed=setup)
         view = WelcomerSetButtons(ctx.author, m)
         m = await m.edit(embed=setup, view=view)
         await view.wait()
-
         if view.value == None:
             await m.edit(view=None)
 
@@ -1037,7 +1030,6 @@ class ManageCog(Cog, name="ManagePrefix"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def modlog(self, ctx: Context, *, channel: TextChannel):
-
         await Manage(ctx.guild).set_modloger(channel)
         embed = Embed(description="Modlog channel set", color=Color.red())
         embed.add_field(name="Channel selected", value=channel.mention, inline=True)
@@ -1048,7 +1040,6 @@ class ManageCog(Cog, name="ManagePrefix"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def levelupdate(self, ctx: Context, channel: TextChannel) -> None:
-
         await Manage(ctx.guild).add_level_channel(channel)
         embed = Embed()
         embed.description = "{} will post level updates when someone levels up".format(
@@ -1059,7 +1050,6 @@ class ManageCog(Cog, name="ManagePrefix"):
         view = LevelSetButtons(ctx.author, m, channel)
         m = await m.edit(view=view)
         await view.wait()
-
         if view.value == None:
             await m.edit(view=None)
 
@@ -1070,7 +1060,6 @@ class ManageCog(Cog, name="ManagePrefix"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def brightness(self, ctx: Context, brightness: Jeanne.Range[int, 10, 150]):
-
         embed = Embed()
         if Inventory(ctx.author).set_brightness(brightness) == False:
             embed.description = "You have no background wallpaper"
@@ -1102,7 +1091,6 @@ class ManageCog(Cog, name="ManagePrefix"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def color(self, ctx: Context, color: Jeanne.Range[str, 1]):
-
         embed = Embed()
         try:
             c = ImageColor.getcolor(color, "RGB")
@@ -1129,7 +1117,6 @@ class ManageCog(Cog, name="ManagePrefix"):
             parsed_args, unknown = parser.parse_known_args(words)
             role = parsed_args.role + unknown
             role = " ".join(role)
-
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -1138,8 +1125,9 @@ class ManageCog(Cog, name="ManagePrefix"):
                 )
             )
             return
-        role = utils.find(lambda r: (r.name or r.id or r.mention) == role, ctx.guild.roles)
-
+        role = utils.find(
+            lambda r: (r.name or r.id or r.mention) == role, ctx.guild.roles
+        )
         await member.add_roles(role)
         embed = Embed(color=Color.random())
         embed.add_field(
@@ -1168,14 +1156,13 @@ class ManageCog(Cog, name="ManagePrefix"):
         self,
         ctx: Context,
         member: Member,
-        *words:str,
+        *words: str,
         parser=manage_parser,
     ):
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             role = parsed_args.role + unknown
             role = " ".join(role)
-
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -1184,7 +1171,9 @@ class ManageCog(Cog, name="ManagePrefix"):
                 )
             )
             return
-        role = utils.find(lambda r: (r.name or r.id or r.mention) == role, ctx.guild.roles)
+        role = utils.find(
+            lambda r: (r.name or r.id or r.mention) == role, ctx.guild.roles
+        )
         await member.remove_roles(role)
         embed = Embed(color=Color.random())
         embed.add_field(
@@ -1209,7 +1198,6 @@ class ManageCog(Cog, name="ManagePrefix"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def remove(self, ctx: Context) -> None:
-
         embed = Embed(
             description="Click on one of the buttons to remove", color=Color.random()
         )
@@ -1253,7 +1241,6 @@ class ManageCog(Cog, name="ManagePrefix"):
                 )
             )
             return
-
         name = channel.name if (name == None) else name
         c = await channel.clone(name=name)
         cloned = Embed(
@@ -1261,10 +1248,11 @@ class ManageCog(Cog, name="ManagePrefix"):
         )
         cloned_channel = await ctx.guild.fetch_channel(c.id)
         if category:
-            category = utils.find(lambda r: (r.name or r.id) == category, ctx.guild.categories)
+            category = utils.find(
+                lambda r: (r.name or r.id) == category, ctx.guild.categories
+            )
             cloned_channel.edit(category=category)
             cloned.add_field(name="Category", value=category.name, inline=True)
-
         if topic:
             if len(topic) > 1024:
                 topic = topic[:1024]
@@ -1301,7 +1289,6 @@ class ManageCog(Cog, name="ManagePrefix"):
             parsed_args, unknown = parser.parse_known_args(words)
             name = parsed_args.name + unknown
             name = " ".join(name)
-
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -1351,7 +1338,6 @@ class ManageCog(Cog, name="ManagePrefix"):
             parsed_args, unknown = parser.parse_known_args(words)
             name = parsed_args.name + unknown
             name = " ".join(name)
-
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -1384,7 +1370,6 @@ class ManageCog(Cog, name="ManagePrefix"):
             parsed_args, unknown = parser.parse_known_args(words)
             name = parsed_args.name + unknown
             name = " ".join(name)
-
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -1410,7 +1395,6 @@ class ManageCog(Cog, name="ManagePrefix"):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (AttributeError, HTTPException)
         ):
-
             embed = Embed(
                 description="This sticker doesn't exist in the server",
                 color=Color.red(),
@@ -1426,7 +1410,6 @@ class ManageCog(Cog, name="ManagePrefix"):
         *,
         command: Jeanne.Range[str, 3],
     ):
-
         cmd = Command(ctx.guild)
         embed = Embed()
         if command.startswith(("help", "command")):
@@ -1457,7 +1440,6 @@ class ManageCog(Cog, name="ManagePrefix"):
         ctx: Context,
         command: Jeanne.Range[str, 3],
     ):
-
         embed = Embed()
         cmd = Command(ctx.guild)
         if command not in [
@@ -1480,7 +1462,6 @@ class ManageCog(Cog, name="ManagePrefix"):
     @Jeanne.command(aliases=["list-disabled"], description="List all disabled commands")
     @Jeanne.check(check_botbanned_prefix)
     async def listdisabled(self, ctx: Context):
-
         cmd = Command(ctx.guild)
         embed = Embed()
         if cmd.list_all_disabled() == None:
@@ -1496,12 +1477,10 @@ class ManageCog(Cog, name="ManagePrefix"):
         aliases=["lvl"], description="Main level command", invoke_without_command=True
     )
     async def level(self, ctx: Context): ...
-
     @level.group(
         aliases=["r"], description="Main role command", invoke_without_command=True
     )
     async def role(self, ctx: Context): ...
-
     @role.command(
         name="add", description="Add a level role reward when a user levels up"
     )
@@ -1509,7 +1488,6 @@ class ManageCog(Cog, name="ManagePrefix"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def _add(self, ctx: Context, *, role: Role, level: Jeanne.Range[int, 1]):
-
         botmember = await ctx.guild.fetch_member(self.bot.user.id)
         if role.position >= botmember.top_role.position:
             embed = Embed(color=Color.red())
@@ -1530,7 +1508,6 @@ class ManageCog(Cog, name="ManagePrefix"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def _remove(self, ctx: Context, *, role: Role):
-
         await Manage(server=ctx.guild).remove_role_reward(role)
         embed = Embed(color=Color.random())
         embed.description = "{} has been removed for level role reward".format(
@@ -1542,7 +1519,6 @@ class ManageCog(Cog, name="ManagePrefix"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def _list(self, ctx: Context):
-
         roles = Levelling(server=ctx.guild).list_all_roles
         data = []
         for i in roles:
@@ -1559,13 +1535,11 @@ class ManageCog(Cog, name="ManagePrefix"):
         description="Main blacklist channel command",
     )
     async def channel_blacklist(self, ctx: Context): ...
-
     @channel_blacklist.command(description="Blacklists a channel for gaining XP")
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def add(self, ctx: Context, *, channel: TextChannel) -> None:
-
         if Levelling(server=ctx.guild).check_xpblacklist_channel(channel) == False:
             await Manage(server=ctx.guild).add_xpblacklist(channel)
             embed = Embed(color=Color.random())
@@ -1585,7 +1559,6 @@ class ManageCog(Cog, name="ManagePrefix"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def remove(self, ctx: Context, *, channel: TextChannel) -> None:
-
         if Levelling(server=ctx.guild).check_xpblacklist_channel(channel) == False:
             embed = Embed(color=Color.red())
             embed.description = f"{channel.jump_url} is not in the XP blacklisted"
@@ -1607,7 +1580,6 @@ class ManageCog(Cog, name="ManagePrefix"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def _list(self, ctx: Context) -> None:
-
         embed = Embed()
         channels = Levelling(server=ctx.guild).get_blacklisted_channels
         if channels == None:

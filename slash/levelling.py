@@ -19,8 +19,6 @@ from assets.generators.profile_card import Profile
 from topgg import DBLClient
 
 
-
-
 class Rank_Group(GroupCog, name="rank"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot

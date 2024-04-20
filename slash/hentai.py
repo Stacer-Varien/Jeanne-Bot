@@ -82,7 +82,7 @@ class nsfw(Cog):
             vids = [i for i in images if "mp4" in i["file_url"]]
             media = [j["file_url"] for j in vids]
             if media:
-                await ctx.followup.send("\n".join(media), view=view)
+                await ctx.followup.send("\n".join(images), view=view)
                 await view.wait()
                 if view.value == None:
                     await ctx.edit_original_response(view=None)
@@ -177,7 +177,7 @@ class nsfw(Cog):
         image = await Hentai(plus).yandere(rating, tag)
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
-            shortened_urls = [shorten_url(img["file_url"]) for img in images]
+            shortened_urls = [shorten_url(img["sample_url"]) for img in images]
             view = ReportContentPlus(*shortened_urls)
             color = Color.random()
             embeds = [
@@ -347,7 +347,7 @@ class nsfw(Cog):
             vids = [i for i in images if "mp4" in i["file_url"]]
             media = [j["file_url"] for j in vids]
             if media:
-                await ctx.followup.send("\n".join(media), view=view)
+                await ctx.followup.send("\n".join(images), view=view)
                 await view.wait()
                 if view.value == None:
                     await ctx.edit_original_response(view=None)

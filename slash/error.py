@@ -42,7 +42,7 @@ class ErrorsCog(Cog, name="ErrorsSlash"):
             with open("errors.csv", "a", newline="") as f:
                 writer = csv.DictWriter(f, fieldnames=fields)
                 writer.writerows(traceback_dict)
-                
+
         elif isinstance(error, Jeanne.errors.NoPrivateMessage):
             embed = Embed(description=str(error), color=Color.red())
             await ctx.response.send_message(embed=embed)

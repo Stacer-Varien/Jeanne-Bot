@@ -93,7 +93,6 @@ class InfoCog(Cog, name="Info"):
     @Jeanne.command(
         aliases=["botstats"], description="See the bot's status from development to now"
     )
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def stats(self, ctx: Context):
@@ -132,7 +131,6 @@ class InfoCog(Cog, name="Info"):
         aliases=["uinfo", "minfo"],
         description="See the information of a member or yourself",
     )
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def userinfo(self, ctx: Context, *, member: Optional[Member] = None) -> None:
@@ -142,16 +140,15 @@ class InfoCog(Cog, name="Info"):
     @Jeanne.command(
         aliases=["sinfo", "ginfo"], description="Get information about this server"
     )
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def serverinfo(self, ctx: Context):
-        embeds=[]
+        embeds = []
         emojis = [str(x) for x in ctx.guild.emojis]
         humans = len([member for member in ctx.guild.members if not member.bot])
         bots = len([bot for bot in ctx.guild.members if bot.bot == True])
         date = round(ctx.guild.created_at.timestamp())
-        serverinfo = Embed(description=f"{ctx.guild.name}'s info",color=Color.random())
+        serverinfo = Embed(description=f"{ctx.guild.name}'s info", color=Color.random())
         serverinfo.add_field(name="ID", value=ctx.guild.id, inline=True)
         serverinfo.add_field(
             name="Owner",
@@ -205,7 +202,6 @@ class InfoCog(Cog, name="Info"):
         await ctx.send(embeds=embeds)
 
     @Jeanne.command(description="Check how fast I respond to a command")
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def ping(self, ctx: Context):
@@ -227,7 +223,6 @@ class InfoCog(Cog, name="Info"):
         await m.edit(embed=ping)
 
     @Jeanne.command(aliases=["sbanner"], description="See the server's banner")
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def serverbanner(self, ctx: Context):
@@ -249,7 +244,6 @@ class InfoCog(Cog, name="Info"):
     @Jeanne.command(
         aliases=["av", "pfp"], description="See your avatar or another member's avatar"
     )
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def avatar(self, ctx: Context, *, member: Optional[Member] = None) -> None:
@@ -281,13 +275,9 @@ class InfoCog(Cog, name="Info"):
                 guildav.set_image(url=serverav)
                 embeds.append(normav)
                 embeds.append(guildav)
-
             elif globalav and serverav == None:
-
                 normav.set_image(url=globalav)
-
                 embeds.append(normav)
-
             elif globalav and serverav:
                 guildav = Embed(
                     url="https://discordapp.com",
@@ -301,7 +291,6 @@ class InfoCog(Cog, name="Info"):
             await ctx.send(embeds=embeds)
 
     @Jeanne.command(description="View a sticker via message ID or sticker name")
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def sticker(self, ctx: Context, *, sticker: str):
@@ -342,7 +331,6 @@ class InfoCog(Cog, name="Info"):
             return
 
     @Jeanne.command(description="View an emoji")
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def emoji(self, ctx: Context, *, emoji: Jeanne.Range[str, 1]):

@@ -132,7 +132,7 @@ class Embed_Group(GroupCog, name="embed"):
         jsonfile: Optional[Attachment] = None,
     ):
         await ctx.response.defer()
-        
+
         message: Message = await channel.fetch_message(int(messageid))
 
         if not (jsonscript or jsonfile):

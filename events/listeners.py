@@ -1,14 +1,16 @@
 from collections import OrderedDict
+from datetime import datetime
 from json import loads
 from typing import Optional
-from discord import AllowedMentions, DMChannel, Embed, Message
+from discord import AllowedMentions, Embed, Message
 from discord.ext.commands import Bot, Cog
+from functions import Botban, DBLvoter, Levelling
+from config import DBL_AUTH
 
-from functions import Botban, Levelling
 
 class listenersCog(Cog):
-    def __init__(self, bot:Bot) -> None:
-        self.bot=bot
+    def __init__(self, bot: Bot) -> None:
+        self.bot = bot
 
     @staticmethod
     def replace_all(text: str, dic: dict):
@@ -22,15 +24,16 @@ class listenersCog(Cog):
             return
         try:
             if not message.author.bot and not message.channel.me:
-                level_instance=Levelling(message.author, message.guild)
-                if (
-                    level_instance.check_xpblacklist_channel(
-                        message.channel
-                    )
-                    == (False | None)
+                level_instance = Levelling(message.author, message.guild)
+                if level_instance.check_xpblacklist_channel(message.channel) == (
+                    False | None
                 ):
                     try:
-                        lvl = await level_instance.add_xp()
+                        if DBLvoter(self.bot, DBL_AUTH).get_user_vote(message.author)==True:
+                            xp = 15 if (datetime.today().weekday() >= 5) else 10
+                        else:
+                            xp = 10 if (datetime.today().weekday() >= 5) else 5
+                        lvl = await level_instance.add_xp(xp)
                         if lvl == None:
                             return
                         channel, update, levelup = lvl
@@ -119,5 +122,6 @@ class listenersCog(Cog):
             lvlup_channel = await self.bot.fetch_channel(channel_id)
             await lvlup_channel.send(content=content, embed=embed)
 
-async def setup(bot:Bot):
+
+async def setup(bot: Bot):
     await bot.add_cog(listenersCog(bot))

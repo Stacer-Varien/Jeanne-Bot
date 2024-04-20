@@ -5,7 +5,7 @@ from discord.ext.commands import Bot, Cog
 from datetime import datetime
 
 
-class CommandLog(Cog):
+class CommandLog(Cog, name="CommandLogSlash"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
@@ -15,12 +15,12 @@ class CommandLog(Cog):
     ):
         fields = ["Date and Time", "User", "Command Used", "Command Usage"]
         command_dict = {
-                "Date and Time": datetime.now(),
-                "User": f"{ctx.user} | {ctx.user.id}",
-                "Command Used": command.qualified_name,
-                "Command Usage": str(ctx.data),
-            }
-        
+            "Date and Time": datetime.now(),
+            "User": f"{ctx.user} | {ctx.user.id}",
+            "Command Used": command.qualified_name,
+            "Command Usage": str(ctx.data),
+        }
+
         with open("commandlog.csv", "a", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=fields)
             writer.writerow(command_dict)

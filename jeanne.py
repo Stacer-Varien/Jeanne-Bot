@@ -41,7 +41,7 @@ async def on_ready():
     with open("commandlog.csv", "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=cfields)
         writer.writeheader()
-        
+
     with open("errors.csv", "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=efields)
         writer.writeheader()

@@ -14,6 +14,7 @@ from requests import exceptions
 from reactionmenu import ViewButton, ViewMenu
 from assets.argparsers import inv_parser
 
+
 class Shop_Group(Cog, name="Shop"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
@@ -23,11 +24,9 @@ class Shop_Group(Cog, name="Shop"):
         name="shop", description="Main shop command", invoke_without_command=True
     )
     async def shop(self, ctx: Context): ...
-
     @shop.command(
         aliases=["bgs", "bg"], description="Check all the wallpapers available"
     )
-
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.cooldown(1, 60, type=BucketType.user)
@@ -48,7 +47,6 @@ class Shop_Group(Cog, name="Shop"):
         for wallpaper in wallpapers:
             name = str(wallpaper[1])
             page_embed = Embed(title=name, color=embed.color)
-
             page_embed.add_field(
                 name="Price", value="1000 <:quantumpiece:1161010445205905418>"
             )
@@ -64,7 +62,6 @@ class Shop_Group(Cog, name="Shop"):
         call_followup = ViewButton.Followup(
             details=ViewButton.Followup.set_caller_details(buy_callback)
         )
-
         menu.add_button(ViewButton.go_to_first_page())
         menu.add_button(ViewButton.back())
         menu.add_button(
@@ -87,7 +84,6 @@ class Shop_Group(Cog, name="Shop"):
         invoke_without_command=True,
     )
     async def background(self, ctx: Context): ...
-
     @backgrounds.error
     async def backgrounds_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
@@ -97,15 +93,12 @@ class Shop_Group(Cog, name="Shop"):
             )
             await ctx.send(embed=cooldown)
 
-
-
     @background.command(
         aliases=["custom"],
         name="buy-custom",
         description="Buy a custom background pic for your level card",
     )
     @Jeanne.cooldown(1, 60, type=BucketType.user)
-
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def buycustom(self, ctx: Context, *words: str, parser=inv_parser):
@@ -127,7 +120,6 @@ class Shop_Group(Cog, name="Shop"):
                 )
             )
             return
-
         m = await ctx.send(
             "Creating preview... This will take some time <a:loading:1161038734620373062>"
         )
@@ -161,7 +153,6 @@ class Shop_Group(Cog, name="Shop"):
             )
             await m.edit(embed=embed1, view=None, attachments=[])
             return
-
         await m.edit(embed=Embed(description="Cancel"), view=None, attachments=[])
 
     @buycustom.error
@@ -185,11 +176,9 @@ class Shop_Group(Cog, name="Shop"):
             await ctx.message.edit(content=None, embed=embed)
 
     @background.command(description="Check which backgrounds you have")
-
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def list(self, ctx: Context):
-
         if Inventory(ctx.author).get_user_inventory == None:
             embed = Embed(description="Your inventory is empty", color=Color.red())
             await ctx.send(embed=embed)

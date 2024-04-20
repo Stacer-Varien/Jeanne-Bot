@@ -11,6 +11,7 @@ from functions import (
 )
 from assets.argparsers import combined_parser
 
+
 class fun(Cog, name="Fun"):
     def __init__(self, bot: Bot):
         self.bot = bot
@@ -20,11 +21,9 @@ class fun(Cog, name="Fun"):
         description="Ask 8 ball anything and you will get your awnser",
         name="8ball",
     )
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def _8ball(self, ctx: Context, *, question: str):
-
         eight_ball_answers = [
             "It is certain.",
             "It is decidedly so.",
@@ -64,11 +63,9 @@ class fun(Cog, name="Fun"):
         aliases=["backwards"],
         description="Say something and I will say it in reversed text",
     )
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def reverse(self, ctx: Context, *, text: str):
-
         filtered_words = ["riffak", "reggin", "aggin"]
         if any(word in text for word in filtered_words):
             await Botban(ctx.author).add_botbanned_user(
@@ -81,11 +78,9 @@ class fun(Cog, name="Fun"):
         await ctx.send(embed=msg)
 
     @Jeanne.command(description="Get a random animeme")
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def animeme(self, ctx: Context):
-
         embed, file = get_animeme_pic()
         await ctx.send(embed=embed, file=file)
 
@@ -93,7 +88,6 @@ class fun(Cog, name="Fun"):
         aliases=["join"],
         description="Combine 2 words to get 2 combined words",
     )
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def combine(self, ctx: Context, *words: str, parser=combined_parser):
@@ -125,13 +119,17 @@ class fun(Cog, name="Fun"):
             combine.set_author(name=f"""{first} + {second}""")
             await ctx.send(embed=combine)
             return
-        await ctx.send(embed=Embed(description="You are missing some arguments for this command", color=Color.red()))
+        await ctx.send(
+            embed=Embed(
+                description="You are missing some arguments for this command",
+                color=Color.red(),
+            )
+        )
 
     @Jeanne.command(
         aliases=["pick", "choice"],
         description="Give me a lot of choices and I will pick one for you. Separate them with ','",
     )
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def choose(self, ctx: Context, *, choices: str):
@@ -144,11 +142,9 @@ class fun(Cog, name="Fun"):
     @Jeanne.command(
         aliases=["simp"], description="Check how much of a simp you or a member are"
     )
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def simprate(self, ctx: Context, *,member: Optional[Member] = None):
-
+    async def simprate(self, ctx: Context, *, member: Optional[Member] = None):
         perc = randint(0, 100)
         member = member if member else ctx.author
         simp = Embed(
@@ -161,12 +157,10 @@ class fun(Cog, name="Fun"):
             simp.set_image(url="https://i.imgur.com/Rs1IP2I.jpg")
         await ctx.send(embed=simp)
 
-    @Jeanne.command(aliases=["gay"],description="Check how gay you are")
-
+    @Jeanne.command(aliases=["gay"], description="Check how gay you are")
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def gayrate(self, ctx: Context, *, member: Optional[Member] = None):
-
         perc = randint(0, 100)
         member = member if member else ctx.author
         gay = Embed(

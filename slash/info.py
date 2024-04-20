@@ -57,7 +57,7 @@ class stat_buttons(ui.View):
         )
 
 
-class InfoCog(Cog):
+class InfoCog(Cog, name="InfoSlash"):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.bot_version = "v5.0"
@@ -262,11 +262,11 @@ class InfoCog(Cog):
     async def avatar(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await ctx.response.defer()
         member = ctx.user if member is None else member
-        globalav=member.avatar
-        defaultav=member.default_avatar
-        serverav=None if DMChannel else member.guild_avatar
+        globalav = member.avatar
+        defaultav = member.default_avatar
+        serverav = None if DMChannel else member.guild_avatar
         color = Color.random()
-        embeds=[]
+        embeds = []
         normav = Embed(
             description=f"**{member}'s Avatar**",
             url="https://discordapp.com",
@@ -279,29 +279,27 @@ class InfoCog(Cog):
                 normav.set_image(url=member.display_avatar)
                 await ctx.followup.send(embed=normav)
         except:
-            if globalav==None and serverav:
+            if globalav == None and serverav:
                 guildav = Embed(
-                url="https://discordapp.com",
-                color=color,
-                type="image",
+                    url="https://discordapp.com",
+                    color=color,
+                    type="image",
                 )
                 normav.set_image(url=defaultav)
                 guildav.set_image(url=serverav)
                 embeds.append(normav)
                 embeds.append(guildav)
 
-            elif globalav and serverav==None:
+            elif globalav and serverav == None:
 
                 normav.set_image(url=globalav)
 
                 embeds.append(normav)
-
-
             elif globalav and serverav:
                 guildav = Embed(
-                url="https://discordapp.com",
-                color=color,
-                type="image",
+                    url="https://discordapp.com",
+                    color=color,
+                    type="image",
                 )
                 normav.set_image(url=globalav)
                 guildav.set_image(url=serverav)

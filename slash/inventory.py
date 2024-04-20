@@ -1,6 +1,5 @@
 from assets.components import Confirmation, buy_function_app, use_function_app
 from functions import (
-    AutoCompleteChoices,
     Currency,
     Inventory,
     check_botbanned_app_command,

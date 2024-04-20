@@ -7,9 +7,7 @@ from reactionmenu import ViewMenu, ViewButton
 async def dictionary(ctx: Interaction, word: str):
 
     embed = Embed()
-    response = requests.get(
-        f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
-    )
+    response = requests.get(f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}")
     data = response.json()
 
     if response.status_code == 404:

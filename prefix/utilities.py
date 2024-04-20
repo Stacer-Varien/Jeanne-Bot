@@ -85,9 +85,7 @@ class utilitiesCog(Cog, name="Utilities"):
         invoke_without_command=True,
     )
     async def reminder(self, ctx: Context): ...
-
     @reminder.command(description="Add a reminder")
-
     @Jeanne.check(check_botbanned_prefix)
     async def add(self, ctx: Context, *words: str, parser=reminder_parser):
         try:
@@ -106,7 +104,6 @@ class utilitiesCog(Cog, name="Utilities"):
             return
         embed = Embed()
         user_reminders = Reminder(ctx.author).get_all_user_reminders
-
         if user_reminders == None or len(user_reminders) < 10:
             date = datetime.now() + timedelta(seconds=parse_timespan(time))
             embed.title = "Reminder added"
@@ -126,7 +123,6 @@ class utilitiesCog(Cog, name="Utilities"):
             embed.color = Color.red()
             await ctx.send(embed=embed, delete_after=10)
             return
-
         if parse_timespan(time) < parse_timespan("1 minute"):
             embed.color = Color.red()
             embed.description = "Please add a time more than 1 minute."
@@ -151,7 +147,6 @@ class utilitiesCog(Cog, name="Utilities"):
             await ctx.send(embed=embed, delete_after=10)
 
     @reminder.command(name="list", description="List all the reminders you have")
-
     @Jeanne.check(check_botbanned_prefix)
     async def _list(self, ctx: Context):
         reminders = Reminder(ctx.author).get_all_user_reminders
@@ -163,7 +158,6 @@ class utilitiesCog(Cog, name="Utilities"):
                 ids = i[1]
                 reminder = i[3]
                 time = f"<t:{i[2]}:F>"
-
                 embed.add_field(
                     name=f"ID: {ids}",
                     value=f"*Reminder:* {reminder}\n*Time:* {time}",
@@ -173,7 +167,6 @@ class utilitiesCog(Cog, name="Utilities"):
         await ctx.send(embed=embed, delete_after=30)
 
     @reminder.command(aliases=["remove"], description="Cancel a reminder")
-
     @Jeanne.check(check_botbanned_prefix)
     async def cancel(self, ctx: Context, reminder_id: int):
         reminder = Reminder(ctx.author)
@@ -192,7 +185,6 @@ class utilitiesCog(Cog, name="Utilities"):
         name="embed", description="Main embed command", invoke_without_command=True
     )
     async def _embed(self, ctx: Context): ...
-
     @_embed.command(
         aliases=["gen"],
         description="Generates an embed message. This needs the Discohook.org embed generator. You can use a JSON script or text file with the script",
@@ -239,7 +231,6 @@ class utilitiesCog(Cog, name="Utilities"):
         description="Edits an embed message. This needs the Discohook.org embed generator. You can use JSON script or a text file with the script"
     )
     @Jeanne.has_permissions(administrator=True)
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def edit(
@@ -251,7 +242,6 @@ class utilitiesCog(Cog, name="Utilities"):
     ):
         async with ctx.typing():
             message: Message = await channel.fetch_message(int(messageid))
-
             if jsonscript and ctx.message.attachments:
                 embed = Embed(
                     description="You are using both the JSON script and JSON file\nPlease use one"
@@ -314,7 +304,6 @@ class utilitiesCog(Cog, name="Utilities"):
 
     @Jeanne.command(description="Get weather information on a city")
     @Jeanne.cooldown(3, 14400, type=Jeanne.BucketType.user)
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def weather(self, ctx: Context, *words: str, parser=weather_parser):
@@ -322,7 +311,6 @@ class utilitiesCog(Cog, name="Utilities"):
             parsed_args, unknown = parser.parse_known_args(words)
             city = parsed_args.city + unknown
             city = " ".join(city)
-
             units: str | None = parsed_args.units
         except SystemExit:
             await ctx.send(
@@ -441,7 +429,6 @@ class utilitiesCog(Cog, name="Utilities"):
             await ctx.send(embed=no_city)
 
     @Jeanne.command(aliases=["calc"], description="Do a calculation")
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def calculator(self, ctx: Context, calculate: str):
@@ -489,12 +476,10 @@ class utilitiesCog(Cog, name="Utilities"):
     )
     @Jeanne.cooldown(1, 3600, type=BucketType.user)
     async def botreport(self, ctx: Context):
-
         view = BotReportSelect()
         await ctx.reply(view=view, ephemeral=True)
 
     @Jeanne.command(description="Check the meaning of a word")
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def dictionary(

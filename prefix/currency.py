@@ -15,15 +15,15 @@ from assets.components import Guess_Buttons, Heads_or_Tails
 from functions import (
     BetaTest,
     Currency,
+    DBLvoter,
     check_botbanned_prefix,
     check_disabled_prefixed_command,
 )
-
+from config import DBL_AUTH
 
 class vote_button(ui.View):
     def __init__(self):
         super().__init__()
-
         self.add_item(
             ui.Button(
                 style=ButtonStyle.link,
@@ -31,7 +31,6 @@ class vote_button(ui.View):
                 url="https://top.gg/bot/831993597166747679/vote",
             )
         )
-
         self.add_item(
             ui.Button(
                 style=ButtonStyle.link,
@@ -44,18 +43,17 @@ class vote_button(ui.View):
 class CurrencyCog(Cog, name="Currency"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
+        self.dbl=DBLvoter(self.bot, DBL_AUTH)
 
     @Jeanne.group(
         invoke_without_command=True,
         description="Main Guess command",
     )
     async def guess(self, ctx: Context): ...
-
     @guess.command(name="free", description="Guess my number and you can win 20 QP")
     @Jeanne.cooldown(1, 3600, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-
     async def guess_free(self, ctx: Context):
         view = Guess_Buttons(ctx.author)
         m = await ctx.send(
@@ -73,6 +71,12 @@ class CurrencyCog(Cog, name="Currency"):
                 description="YES! YOU GUESSED IT CORRECTLY!\nYou have been given 20 <:quantumpiece:1161010445205905418>!",
                 color=Color.random(),
             )
+            if self.dbl.get_user_vote(ctx.author)==True:
+                await Currency(ctx.author).add_qp(round((20 * 1.25),2))
+                correct.add_field(name="DiscordBotList Bonus", value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>")
+                if BetaTest(self.bot).check(ctx.author)==True:
+                    await Currency(ctx.author).add_qp(round((20 * 1.25),2))
+                    correct.add_field(name="Beta User Bonus", value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>")
             correct.set_image(url="https://files.catbox.moe/phqnb1.gif")
             await m.edit(embed=correct, view=None)
             return
@@ -86,7 +90,6 @@ class CurrencyCog(Cog, name="Currency"):
     @Jeanne.cooldown(1, 20, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-
     async def guess_bet(self, ctx: Context, bet: Jeanne.Range[int, 5]):
         balance = Currency(ctx.author).get_balance
         if bet > balance:
@@ -117,6 +120,12 @@ class CurrencyCog(Cog, name="Currency"):
                 description=f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given {bet} <:quantumpiece:1161010445205905418>!",
                 color=Color.random(),
             )
+            if self.dbl.get_user_vote(ctx.author)==True:
+                await Currency(ctx.author).add_qp(round((bet * 1.25),2))
+                correct.add_field(name="DiscordBotList Bonus", value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>")
+                if BetaTest(self.bot).check(ctx.author)==True:
+                    await Currency(ctx.author).add_qp(round((bet * 1.25),2))
+                    correct.add_field(name="Beta User Bonus", value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>")
             correct.set_image(url="https://files.catbox.moe/phqnb1.gif")
             await m.edit(embed=correct, view=None)
             return
@@ -156,7 +165,6 @@ class CurrencyCog(Cog, name="Currency"):
     @dice.command(name="free", description="Roll a dice for free 20 QP")
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-
     @Jeanne.cooldown(1, 3600, type=Jeanne.BucketType.user)
     async def dice_free(self, ctx: Context, digit: Jeanne.Range[int, 1, 6]):
         rolled = randint(1, 6)
@@ -168,6 +176,12 @@ class CurrencyCog(Cog, name="Currency"):
                 value=f"Dice rolled: **{rolled}**\nYou guessed: **{digit}**!",
                 inline=False,
             )
+            if self.dbl.get_user_vote(ctx.author)==True:
+                await Currency(ctx.author).add_qp(round((20 * 1.25),2))
+                embed.add_field(name="DiscordBotList Bonus", value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>")
+                if BetaTest(self.bot).check(ctx.author)==True:
+                    await Currency(ctx.author).add_qp(round((20 * 1.25),2))
+                    embed.add_field(name="Beta User Bonus", value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>")
             await ctx.send(embed=embed)
             return
         embed = Embed(description=f"Oh no. It rolled a **{rolled}**", color=Color.red())
@@ -176,7 +190,6 @@ class CurrencyCog(Cog, name="Currency"):
     @dice.command(name="bet", description="Roll a dice with betting")
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-
     @Jeanne.cooldown(1, 20, type=Jeanne.BucketType.user)
     async def dice_bet(
         self,
@@ -202,10 +215,16 @@ class CurrencyCog(Cog, name="Currency"):
             await Currency(ctx.author).add_qp(bet)
             embed = Embed(color=Color.random())
             embed.add_field(
-                name="YAY! You got it!\n20 <:quantumpiece:1161010445205905418> has been added",
+                name=f"YAY! You got it!\n{bet} <:quantumpiece:1161010445205905418> has been added",
                 value=f"Dice rolled: **{rolled}**\nYou guessed: **{digit}**!",
                 inline=False,
             )
+            if self.dbl.get_user_vote(ctx.author)==True:
+                await Currency(ctx.author).add_qp(round((bet * 1.25),2))
+                embed.add_field(name="DiscordBotList Bonus", value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>")
+                if BetaTest(self.bot).check(ctx.author)==True:
+                    await Currency(ctx.author).add_qp(round((bet * 1.25),2))
+                    embed.add_field(name="Beta User Bonus", value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>")
             await ctx.send(embed=embed)
             return
         await Currency(ctx.author).remove_qp(bet)
@@ -242,7 +261,6 @@ class CurrencyCog(Cog, name="Currency"):
     @Jeanne.cooldown(1, 3600, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-
     async def flip_free(self, ctx: Context):
         picks = ["Heads", "Tails"]
         jeannes_pick = choice(picks)
@@ -256,6 +274,12 @@ class CurrencyCog(Cog, name="Currency"):
                 description="YAY! You got it!\n20 <:quantumpiece:1161010445205905418> has been added",
                 color=Color.random(),
             )
+            if self.dbl.get_user_vote(ctx.author)==True:
+                await Currency(ctx.author).add_qp(round((20 * 1.25),2))
+                embed.add_field(name="DiscordBotList Bonus", value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>")
+                if BetaTest(self.bot).check(ctx.author)==True:
+                    await Currency(ctx.author).add_qp(round((20 * 1.25),2))
+                    embed.add_field(name="Beta User Bonus", value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>")
             await m.edit(embed=embed, view=None)
             return
         if view.value != jeannes_pick:
@@ -276,7 +300,6 @@ class CurrencyCog(Cog, name="Currency"):
     @Jeanne.cooldown(1, 20, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-
     async def flip_bet(self, ctx: Context, bet: Jeanne.Range[int, 5]):
         picks = ["Heads", "Tails"]
         jeannes_pick = choice(picks)
@@ -304,6 +327,12 @@ class CurrencyCog(Cog, name="Currency"):
                     bet
                 )
             )
+            if self.dbl.get_user_vote(ctx.author)==True:
+                await Currency(ctx.author).add_qp(round((bet * 1.25),2))
+                embed.add_field(name="DiscordBotList Bonus", value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>")
+                if BetaTest(self.bot).check(ctx.author)==True:
+                    await Currency(ctx.author).add_qp(round((bet * 1.25),2))
+                    embed.add_field(name="Beta User Bonus", value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>")
             await m.edit(embed=embed, view=None)
             return
         if view.value != jeannes_pick:
@@ -359,7 +388,6 @@ class CurrencyCog(Cog, name="Currency"):
     @Jeanne.command(description="Claim your daily")
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-
     async def daily(self, ctx: Context):
         bank = Currency(ctx.author)
         tomorrow = round((datetime.now() + timedelta(days=1)).timestamp())
@@ -411,7 +439,6 @@ class CurrencyCog(Cog, name="Currency"):
     @Jeanne.cooldown(1, 60, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-
     async def balance(self, ctx: Context, member: Optional[Member] = None):
         member = ctx.author if (member == None) else member
         await self.get_balance(ctx, member)
@@ -428,9 +455,7 @@ class CurrencyCog(Cog, name="Currency"):
     @Jeanne.command(description="Vote for me in TopGG to get more QP!")
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-
     async def vote(self, ctx: Context):
-
         await ctx.send(
             embed=Embed(
                 color=Color.random(),

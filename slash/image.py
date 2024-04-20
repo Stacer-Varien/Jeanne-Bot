@@ -16,7 +16,7 @@ from assets.images import (
 )
 
 
-class images(Cog):
+class images(Cog, name="ImagesSlash"):
     def __init__(self, bot):
         self.bot = bot
 

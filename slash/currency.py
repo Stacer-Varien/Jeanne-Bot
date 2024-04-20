@@ -12,9 +12,11 @@ from discord import (
 from datetime import datetime, timedelta
 from discord.ext.commands import Cog, Bot, GroupCog
 from assets.components import Guess_Buttons, Heads_or_Tails
+from config import DBL_AUTH
 from functions import (
     BetaTest,
     Currency,
+    DBLvoter,
     check_botbanned_app_command,
     check_disabled_app_command,
 )
@@ -44,6 +46,7 @@ class vote_button(ui.View):
 class Guess_Group(GroupCog, name="guess"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
+        self.dbl = DBLvoter(self.bot, DBL_AUTH)
         super().__init__()
 
     @Jeanne.command(description="Guess my number and you can win 20 QP")
@@ -68,6 +71,18 @@ class Guess_Group(GroupCog, name="guess"):
                 description="YES! YOU GUESSED IT CORRECTLY!\nYou have been given 20 <:quantumpiece:1161010445205905418>!",
                 color=Color.random(),
             )
+            if self.dbl.get_user_vote(ctx.user) == True:
+                await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
+                correct.add_field(
+                    name="DiscordBotList Bonus",
+                    value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>",
+                )
+                if BetaTest(self.bot).check(ctx.user) == True:
+                    await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
+                    correct.add_field(
+                        name="Beta User Bonus",
+                        value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>",
+                    )
             correct.set_image(url="https://files.catbox.moe/phqnb1.gif")
             await ctx.edit_original_response(embed=correct, view=None)
             return
@@ -95,7 +110,7 @@ class Guess_Group(GroupCog, name="guess"):
             return
         if balance == 0:
             zerobal = Embed(
-                description="Unfortunately, you have 0 <:quantumpiece:1161010445205905418>.\nPlease do a daily and/or wait for a free chance to do `/guess free`, `/flip free` and/or `/dice free`"
+                description="Unfortunately, you have 0 <:quantumpiece:1161010445205905418>."
             )
             await ctx.followup.send(embed=zerobal)
             return
@@ -115,6 +130,18 @@ class Guess_Group(GroupCog, name="guess"):
                 description=f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given {bet} <:quantumpiece:1161010445205905418>!",
                 color=Color.random(),
             )
+            if self.dbl.get_user_vote(ctx.user) == True:
+                await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
+                correct.add_field(
+                    name="DiscordBotList Bonus",
+                    value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
+                )
+                if BetaTest(self.bot).check(ctx.user) == True:
+                    await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
+                    correct.add_field(
+                        name="Beta User Bonus",
+                        value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
+                    )
             correct.set_image(url="https://files.catbox.moe/phqnb1.gif")
             await ctx.followup.send(embed=wrong, view=view)
             return
@@ -150,6 +177,7 @@ class Guess_Group(GroupCog, name="guess"):
 class Dice_Group(GroupCog, name="dice"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
+        self.dbl = DBLvoter(self.bot, DBL_AUTH)
         super().__init__()
 
     @Jeanne.command(description="Roll a dice for free 20 QP")
@@ -195,7 +223,7 @@ class Dice_Group(GroupCog, name="dice"):
             return
         if balance == 0:
             zerobal = Embed(
-                description="Unfortunately, you have 0 <:quantumpiece:1161010445205905418>.\nPlease do a daily and/or wait for a free chance to do `/guess free` and/or `/dice free`"
+                description="Unfortunately, you have 0 <:quantumpiece:1161010445205905418>."
             )
             await ctx.followup.send(embed=zerobal)
             return
@@ -203,10 +231,22 @@ class Dice_Group(GroupCog, name="dice"):
             await Currency(ctx.user).add_qp(bet)
             embed = Embed(color=Color.random())
             embed.add_field(
-                name="YAY! You got it!\n20 <:quantumpiece:1161010445205905418> has been added",
+                name=f"YAY! You got it!\n{bet} <:quantumpiece:1161010445205905418> has been added",
                 value=f"Dice rolled: **{rolled}**\nYou guessed: **{digit}**!",
                 inline=False,
             )
+            if self.dbl.get_user_vote(ctx.user) == True:
+                await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
+                embed.add_field(
+                    name="DiscordBotList Bonus",
+                    value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
+                )
+                if BetaTest(self.bot).check(ctx.user) == True:
+                    await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
+                    embed.add_field(
+                        name="Beta User Bonus",
+                        value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
+                    )
             await ctx.followup.send(embed=embed)
             return
         await Currency(ctx.user).remove_qp(bet)
@@ -238,6 +278,7 @@ class Dice_Group(GroupCog, name="dice"):
 class Flip_Group(GroupCog, name="flip"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
+        self.dbl = DBLvoter(self.bot, DBL_AUTH)
         super().__init__()
 
     @Jeanne.command(description="Flip a coin and earn 20 QP for free")
@@ -258,6 +299,18 @@ class Flip_Group(GroupCog, name="flip"):
                 description="YAY! You got it!\n20 <:quantumpiece:1161010445205905418> has been added",
                 color=Color.random(),
             )
+            if self.dbl.get_user_vote(ctx.user) == True:
+                await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
+                embed.add_field(
+                    name="DiscordBotList Bonus",
+                    value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>",
+                )
+                if BetaTest(self.bot).check(ctx.user) == True:
+                    await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
+                    embed.add_field(
+                        name="Beta User Bonus",
+                        value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>",
+                    )
             await ctx.edit_original_response(embed=embed, view=None)
             return
         if view.value != jeannes_pick:
@@ -292,7 +345,7 @@ class Flip_Group(GroupCog, name="flip"):
             return
         if balance == 0:
             zerobal = Embed(
-                description="Unfortunately, you have 0 <:quantumpiece:1161010445205905418>.\nPlease do a daily and/or wait for a free chance to do `/guess free`, `/flip free` and/or `/dice free`"
+                description="Unfortunately, you have 0 <:quantumpiece:1161010445205905418>."
             )
             await ctx.followup.send(embed=zerobal)
             return
@@ -307,6 +360,18 @@ class Flip_Group(GroupCog, name="flip"):
                     bet
                 )
             )
+            if self.dbl.get_user_vote(ctx.user) == True:
+                await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
+                embed.add_field(
+                    name="DiscordBotList Bonus",
+                    value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
+                )
+                if BetaTest(self.bot).check(ctx.user) == True:
+                    await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
+                    embed.add_field(
+                        name="Beta User Bonus",
+                        value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
+                    )
             await ctx.edit_original_response(embed=embed, view=None)
             return
         if view.value != jeannes_pick:
@@ -347,7 +412,7 @@ class Flip_Group(GroupCog, name="flip"):
             await ctx.response.send_message(embed=cooldown)
 
 
-class currency(Cog):
+class currency(Cog, name="CurrencySlash"):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.balance_context = Jeanne.ContextMenu(

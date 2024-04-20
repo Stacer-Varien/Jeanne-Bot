@@ -18,17 +18,13 @@ class nsfw(Cog, name="HentaiPrefix"):
 
     @Jeanne.command(description="Get a random hentai from Jeanne")
     @Jeanne.is_nsfw()
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.cooldown(1, 5, type=BucketType.user)
-    async def hentai(
-        self, ctx: Context, *words: str, parser=hentai_parser
-    ) -> None:
-
+    async def hentai(self, ctx: Context, *words: str, parser=hentai_parser) -> None:
         try:
-            parser= parser.parse_known_args(words)[0]
-            rating =parser.rating
+            parser = parser.parse_known_args(words)[0]
+            rating = parser.rating
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -87,7 +83,6 @@ class nsfw(Cog, name="HentaiPrefix"):
         *words: str,
         parser=hentai_parser,
     ) -> None:
-
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             tags = parsed_args.tags + unknown
@@ -108,7 +103,7 @@ class nsfw(Cog, name="HentaiPrefix"):
             view = ReportContentPlus(*[img["file_url"] for img in images])
             vids = [i for i in images if "mp4" in i["file_url"]]
             media = [j["file_url"] for j in vids]
-            imgs=[img["file_url"] for img in images]
+            imgs = [img["file_url"] for img in images]
             if media:
                 m: Message = await ctx.send("\n".join(imgs), view=view)
                 await view.wait()
@@ -182,14 +177,10 @@ class nsfw(Cog, name="HentaiPrefix"):
 
     @Jeanne.command(description="Get a random hentai from Yande.re")
     @Jeanne.is_nsfw()
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.cooldown(1, 5, type=BucketType.member)
-    async def yandere(
-        self, ctx: Context, *words: str, parser=hentai_parser
-    ) -> None:
-
+    async def yandere(self, ctx: Context, *words: str, parser=hentai_parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             tags = parsed_args.tags + unknown
@@ -273,14 +264,10 @@ class nsfw(Cog, name="HentaiPrefix"):
 
     @Jeanne.command(description="Get a random hentai from Konachan")
     @Jeanne.is_nsfw()
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.cooldown(1, 5, type=BucketType.member)
-    async def konachan(
-        self, ctx: Context, *words: str, parser=hentai_parser
-    ) -> None:
-
+    async def konachan(self, ctx: Context, *words: str, parser=hentai_parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             tags = parsed_args.tags + unknown
@@ -368,14 +355,10 @@ class nsfw(Cog, name="HentaiPrefix"):
 
     @Jeanne.command(description="Get a random media content from Danbooru")
     @Jeanne.is_nsfw()
-
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.cooldown(1, 5, type=BucketType.member)
-    async def danbooru(
-        self, ctx: Context, *words: str, parser=hentai_parser
-    ) -> None:
-
+    async def danbooru(self, ctx: Context, *words: str, parser=hentai_parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             tags = parsed_args.tags + unknown

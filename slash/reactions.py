@@ -26,7 +26,7 @@ from config import (
 from typing import Optional
 
 
-class SlashReactions(Cog):
+class SlashReactions(Cog, name="ReactionsSlash"):
     def __init__(self, bot: Bot):
         self.bot = bot
 

@@ -17,9 +17,7 @@ class CommandLog(Cog, name="cmdlogger"):
                 "Command Used": ctx.command.qualified_name,
                 "Command Usage": ctx.message.content,
             }
-
             writer = csv.DictWriter(f, fieldnames=fields)
-            
             writer.writerow(command_dict)
 
 
