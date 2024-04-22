@@ -1,7 +1,7 @@
 from discord import Color, Enum
 
 
-class Modules(Enum):
+class SlashModules(Enum):
     currency = 0
     fun = 1
     hentai = 2
