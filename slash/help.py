@@ -10,7 +10,7 @@ from discord import (
 from discord.ext.commands import GroupCog, Bot
 from functions import AutoCompleteChoices, check_botbanned_app_command
 from collections import OrderedDict
-from assets.help.modules import modules, Modules
+from assets.help.slash.modules import SlashModules, modules
 
 
 def replace_all(text: str, dic: dict):
@@ -99,7 +99,7 @@ class HelpGroup(GroupCog, name="help"):
     @Jeanne.command(description="Get help of a certain module")
     @Jeanne.describe(module="Which module?")
     @Jeanne.check(check_botbanned_app_command)
-    async def module(self, ctx: Interaction, module: Modules):
+    async def module(self, ctx: Interaction, module: SlashModules):
         await ctx.response.defer()
         module_data = dumps(modules[module.value])
         if module_data:
