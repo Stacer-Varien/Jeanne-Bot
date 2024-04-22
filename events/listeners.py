@@ -2,9 +2,9 @@ from collections import OrderedDict
 from datetime import datetime
 from json import loads
 from typing import Optional
-from discord import AllowedMentions, Embed, Message
+from discord import AllowedMentions, Embed, Message, TextChannel
 from discord.ext.commands import Bot, Cog
-from functions import Botban, DBLvoter, Levelling
+from functions import BetaTest, Botban, DBLvoter, Levelling
 from config import DBL_AUTH
 
 
@@ -29,10 +29,17 @@ class listenersCog(Cog):
                     False | None
                 ):
                     try:
-                        if DBLvoter(self.bot, DBL_AUTH).get_user_vote(message.author)==True:
+                        if (
+                            DBLvoter(self.bot, DBL_AUTH).get_user_vote(message.author)
+                            == True
+                        ):
                             xp = 15 if (datetime.today().weekday() >= 5) else 10
+                            if BetaTest(self.bot).check(message.author):
+                                xp = xp + 5
                         else:
                             xp = 10 if (datetime.today().weekday() >= 5) else 5
+                            if BetaTest(self.bot).check(message.author):
+                                xp = xp + 5
                         lvl = await level_instance.add_xp(xp)
                         if lvl == None:
                             return
@@ -72,8 +79,8 @@ class listenersCog(Cog):
                                     message.author,
                                     (role_reward.name if role_reward else None),
                                 )
-                                lvlup = await message.guild.fetch_channel(channel)
-                                await lvlup.send(
+
+                                await channel.send(
                                     msg,
                                     allowed_mentions=AllowedMentions(
                                         roles=False, everyone=False, users=True
@@ -85,8 +92,8 @@ class listenersCog(Cog):
                                 json = loads(self.replace_all(levelup, parameters))
                                 msg = json["content"]
                                 embed = Embed.from_dict(json["embeds"][0])
-                                lvlup = await message.guild.fetch_channel(channel)
-                                await lvlup.send(content=msg, embed=embed)
+
+                                await channel.send(content=msg, embed=embed)
                         except:
                             if update == "0":
                                 msg = "{} has leveled up to `level {}`".format(
@@ -95,8 +102,8 @@ class listenersCog(Cog):
                                         message.author, message.guild
                                     ).get_member_level,
                                 )
-                                lvlup = await message.guild.fetch_channel(channel)
-                                await lvlup.send(
+
+                                await channel.send(
                                     msg,
                                     allowed_mentions=AllowedMentions(
                                         roles=False, everyone=False, users=True
@@ -108,19 +115,19 @@ class listenersCog(Cog):
                                 json = loads(self.replace_all(update, parameters))
                                 msg = json["content"]
                                 embed = Embed.from_dict(json["embeds"][0])
-                                lvlup = await message.guild.fetch_channel(channel)
-                                await lvlup.send(content=msg, embed=embed)
+
+                                await channel.send(content=msg, embed=embed)
                     except AttributeError:
                         return
         except:
             pass
 
     async def send_level_message(
-        self, channel_id: Optional[int], content: str, embed: Optional[Embed]
+        self, channel: Optional[TextChannel], content: str, embed: Optional[Embed]
     ):
-        if channel_id is not None:
-            lvlup_channel = await self.bot.fetch_channel(channel_id)
-            await lvlup_channel.send(content=content, embed=embed)
+        if channel is not None:
+
+            await channel.send(content=content, embed=embed)
 
 
 async def setup(bot: Bot):

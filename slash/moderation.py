@@ -51,11 +51,10 @@ class moderation(Cog):
                 time = "Invalid time added. User is banned permanently!"
             ban.add_field(name="Duration", value=time, inline=True)
         ban.set_thumbnail(url=member.display_avatar)
-        modlog_id = Moderation(ctx.guild).get_modlog_channel
-        if modlog_id == None:
+        modlog = Moderation(ctx.guild).get_modlog_channel
+        if modlog == None:
             await ctx.edit_original_response(embed=ban, view=None)
             return
-        modlog = ctx.guild.get_channel(modlog_id)
         banned = Embed(
             description=f"{member} has been banned. Check {modlog.mention}",
             color=0xFF0000,
@@ -191,11 +190,11 @@ class moderation(Cog):
         warn.add_field(name="Warn ID", value=warn_id, inline=True)
         warn.add_field(name="Date", value="<t:{}:F>".format(date), inline=True)
         warn.set_thumbnail(url=member.display_avatar)
-        modlog_id = Moderation(ctx.guild).get_modlog_channel
-        if modlog_id == None:
+        modlog = Moderation(ctx.guild).get_modlog_channel
+        if modlog == None:
             await ctx.followup.send(embed=warn)
             return
-        modlog = ctx.guild.get_channel(modlog_id)
+        
         warned = Embed(
             description=f"{member} has been warned. Check {modlog.mention}",
             color=0xFF0000,
@@ -293,11 +292,11 @@ class moderation(Cog):
             title="Warn removed",
             description=f"{ctx.user} has revoked warn ID ({warn_id})",
         )
-        modlog_id = Moderation(ctx.guild).get_modlog_channel
-        if modlog_id == None:
+        modlog = Moderation(ctx.guild).get_modlog_channel
+        if modlog == None:
             await ctx.followup.send(embed=revoked_warn)
             return
-        modlog = ctx.guild.get_channel(modlog_id)
+        
         revoke = Embed(
             description=f"Warn revoked. Check {modlog.mention}", color=0xFF0000
         )
@@ -357,11 +356,11 @@ class moderation(Cog):
         kick.add_field(name="Moderator", value=ctx.user, inline=True)
         kick.add_field(name="Reason", value=reason, inline=True)
         kick.set_thumbnail(url=member.display_avatar)
-        modlog_id = Moderation(ctx.guild).get_modlog_channel
-        if modlog_id == None:
+        modlog = Moderation(ctx.guild).get_modlog_channel
+        if modlog == None:
             await ctx.followup.send(embed=kick)
             return
-        modlog = ctx.guild.get_channel(modlog_id)
+        
         kicked = Embed(
             description=f"{member} has been kicked. Check {modlog.mention}",
             color=0xFF0000,
@@ -454,11 +453,11 @@ class moderation(Cog):
         unban.add_field(name="Moderator", value=ctx.user, inline=True)
         unban.add_field(name="Reason", value=reason, inline=False)
         unban.set_thumbnail(url=user.display_avatar)
-        modlog_id = Moderation(ctx.guild).get_modlog_channel
-        if modlog_id == None:
+        modlog = Moderation(ctx.guild).get_modlog_channel
+        if modlog == None:
             await ctx.followup.send(embed=unban)
             return
-        modlog = ctx.guild.get_channel(modlog_id)
+        
         unbanned = Embed(
             description=f"{user} has been unbanned. Check {modlog.mention}",
             color=0xFF0000,
@@ -502,11 +501,11 @@ class moderation(Cog):
         mute.add_field(name="Duration", value=time, inline=True)
         mute.add_field(name="Reason", value=reason, inline=False)
         mute.set_thumbnail(url=member.display_avatar)
-        modlog_id = Moderation(ctx.guild).get_modlog_channel
-        if modlog_id == None:
+        modlog = Moderation(ctx.guild).get_modlog_channel
+        if modlog == None:
             await ctx.followup.send(embed=mute)
             return
-        modlog = ctx.guild.get_channel(modlog_id)
+        
         muted = Embed(
             description=f"{member} has been put on timeout. Check {modlog.mention}",
             color=0xFF0000,
@@ -551,11 +550,11 @@ class moderation(Cog):
         unmute.add_field(name="Moderator", value=ctx.user, inline=True)
         unmute.add_field(name="Reason", value=reason, inline=False)
         unmute.set_thumbnail(url=member.display_avatar)
-        modlog_id = Moderation(ctx.guild).get_modlog_channel
-        if modlog_id == None:
+        modlog = Moderation(ctx.guild).get_modlog_channel
+        if modlog == None:
             await ctx.followup.send(embed=unmute)
             return
-        modlog = ctx.guild.get_channel(modlog_id)
+        
         unmuted = Embed(
             description=f"{member} has been untimeouted. Check {modlog.mention}",
             color=0xFF0000,
@@ -638,11 +637,11 @@ class moderation(Cog):
                     )
             else:
                 embed = Embed(description="No users were banned.", color=Color.red())
-            modlog_id = Moderation(ctx.guild).get_modlog_channel
-            if modlog_id == None:
+            modlog = Moderation(ctx.guild).get_modlog_channel
+            if modlog == None:
                 await ctx.edit_original_response(embed=embed)
                 return
-            modlog = ctx.guild.get_channel(modlog_id)
+            
             await ctx.edit_original_response(
                 embed=Embed(
                     description=f"Successfully banned {ban_count} user(s). Check {modlog.mention}",
@@ -740,11 +739,11 @@ class moderation(Cog):
                     )
             else:
                 embed = Embed(description="No users were unbanned.", color=Color.red())
-            modlog_id = Moderation(ctx.guild).get_modlog_channel
-            if modlog_id == None:
+            modlog = Moderation(ctx.guild).get_modlog_channel
+            if modlog == None:
                 await ctx.edit_original_response(embed=embed)
                 return
-            modlog = ctx.guild.get_channel(modlog_id)
+            
             await ctx.edit_original_response(
                 embed=Embed(
                     description=f"Successfully unbanned {unban_count} user(s). Check {modlog.mention}",

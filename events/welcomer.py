@@ -22,14 +22,14 @@ class WelcomerCog(Cog):
             return
         server = Welcomer(member.guild).server
         if member.guild.id == server.id:
-            channel = await server.fetch_channel(welcomer)
+            
             welcomemsg = Welcomer(member.guild).get_welcoming_msg
             if welcomemsg is None:
                 welcome = Embed(
                     description=f"Hi {member} and welcome to {member.guild.name}!",
                     color=Color.random(),
                 ).set_thumbnail(url=member.display_avatar.url)
-                await channel.send(embed=welcome)
+                await welcomer.send(embed=welcome)
                 return
             humans = sum(not member.bot for member in member.guild.members)
             parameters = OrderedDict(
@@ -49,13 +49,13 @@ class WelcomerCog(Cog):
             embed_data = json_data.get("embeds")
             if embed_data:
                 embed = Embed.from_dict(embed_data[0])
-                await channel.send(
+                await welcomer.send(
                     content=content,
                     embed=embed,
                     allowed_mentions=AllowedMentions(everyone=False, users=True),
                 )
                 return
-            await channel.send(content=content)
+            await welcomer.send(content=content)
 
     @Cog.listener()
     async def on_member_remove(self, member: Member):
@@ -64,13 +64,12 @@ class WelcomerCog(Cog):
             return
         server = Welcomer(member.guild).server
         if member.guild.id == server.id:
-            channel = await server.fetch_channel(leaver)
             leavingmsg = Welcomer(member.guild).get_leaving_msg
             if leavingmsg is None:
                 leave = Embed(
                     description=f"{member} left the server", color=Color.random()
                 ).set_thumbnail(url=member.display_avatar.url)
-                await channel.send(embed=leave)
+                await leaver.send(embed=leave)
                 return
             humans = len([member for member in member.guild.members if not member.bot])
             parameters = OrderedDict(
@@ -89,13 +88,13 @@ class WelcomerCog(Cog):
             content: str = json_data.get("content")
             try:
                 embed = Embed.from_dict(json_data["embeds"][0])
-                await channel.send(
+                await leaver.send(
                     content=content,
                     embed=embed,
                     allowed_mentions=AllowedMentions(everyone=False, users=True),
                 )
             except:
-                await channel.send(content=content)
+                await leaver.send(content=content)
 
 
 async def setup(bot: Bot):

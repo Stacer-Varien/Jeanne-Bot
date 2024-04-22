@@ -15,6 +15,7 @@ from discord import (
     User,
     app_commands as Jeanne,
 )
+
 from discord.ext.commands import Bot, Context
 from requests import get, post
 from config import db, BB_WEBHOOK, CATBOX_HASH
@@ -422,7 +423,7 @@ class Levelling:
             "SELECT lvl FROM globalxpData WHERE user_id = ?", (self.member.id,)
         ).fetchone()
         db.commit()
-        return int(level[0]) if level else 0
+        return int(level[0]) if level!=None else 0
 
     async def add_xp(self, xp: int):
         now_time = round(datetime.now().timestamp())
@@ -523,22 +524,22 @@ class Levelling:
                     return self.get_level_channel
 
     @property
-    def get_level_channel(self) -> tuple[int | None, str | None, str | None]:
+    def get_level_channel(self) -> tuple[TextChannel | None, str | None, str | None]:
         return self.get_levelup_channel, self.get_levelup_msg, self.get_rank_up_update
 
     @property
-    def get_levelup_msg(self) -> str | None:
+    def get_levelup_msg(self)->str|None:
         data = db.execute(
             "SELECT levelup_message FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
         return None if data == None else data[0]
 
     @property
-    def get_levelup_channel(self) -> int | None:
+    def get_levelup_channel(self) -> TextChannel | None:
         data = db.execute(
             "SELECT levelup_channel FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
-        return None if data == None else data[0]
+        return None if data == None else self.server.get_channel(data[0])
 
     @property
     def get_rank_up_update(self) -> str | None:
@@ -548,12 +549,12 @@ class Levelling:
         return None if data == None else data[0]
 
     @property
-    def get_role_reward(self) -> int | None:
+    def get_role_reward(self) -> Role | None:
         data = db.execute(
             "SELECT role FROM levelRewardData WHERE server = ? AND level = ?",
             (self.server.id, self.get_member_level),
         ).fetchone()
-        return data[0] if data else None
+        return  None if data==None else self.server.get_role(data[0])
 
     @property
     def get_server_rank(self) -> list | None:
@@ -574,7 +575,7 @@ class Levelling:
 
     def check_xpblacklist_channel(
         self, channel: TextChannel
-    ) -> int | Literal[False] | None:
+    ) -> TextChannel | Literal[False] | None:
         data = db.execute(
             "SELECT channel FROM xpChannelData WHERE server = ? AND channel = ?",
             (
@@ -585,7 +586,7 @@ class Levelling:
         db.commit()
         if data == None:
             return
-        return int(data[0]) if data else False
+        return self.server.get_channel(data[0]) if data!=None else False
 
     @property
     def get_member_server_rank(self) -> int | None:
@@ -609,16 +610,16 @@ class Levelling:
         try:
             rank = all_ids.index(self.member.id) + 1
             return rank
-        except ValueError:
+        except:
             return None
 
     @property
-    def get_blacklisted_channels(self) -> list[int] | None:
+    def get_blacklisted_channels(self) -> list[TextChannel] | None:
         data = db.execute(
             "SELECT channel FROM xpChannelData WHERE server = ?", (self.server.id,)
         ).fetchall()
         db.commit()
-        return [int(i[0]) for i in data] if data else None
+        return [self.server.get_channel(i[0]) for i in data] if data else None
 
     @property
     def list_all_roles(self) -> list | None:
@@ -991,25 +992,7 @@ class Moderation:
             ),
         )
         db.commit()
-        cur = db.execute(
-            "INSERT OR IGNORE INTO warnDatav2 (guild_id, user_id, warn_points) VALUES (?,?,?)",
-            (
-                self.server.id,
-                member.id,
-                1,
-            ),
-        )
-        db.commit()
-        if cur.rowcount == 0:
-            db.execute(
-                "UPDATE warnDatav2 SET warn_points = warn_points + ? WHERE guild_id = ? and user_id = ?",
-                (
-                    1,
-                    self.server.id,
-                    member.id,
-                ),
-            )
-            db.commit()
+
 
     def fetch_warnings_server(self) -> list | None:
         warnings = db.execute(
@@ -1061,33 +1044,9 @@ class Moderation:
     async def revoke_warn(self, member: Member, warn_id: int):
         db.execute("DELETE FROM warnData WHERE warn_id = ?", (warn_id,))
         db.commit()
-        db.execute(
-            "UPDATE warnDatav2 SET warn_points = warn_points - ? WHERE user_id = ? AND guild_id = ?",
-            (
-                1,
-                member.id,
-                self.server.id,
-            ),
-        )
-        db.commit()
-        wp_query = db.execute(
-            f"SELECT warn_points FROM warnDatav2 WHERE user_id = ? AND guild_id = ?",
-            (
-                member.id,
-                self.server.id,
-            ),
-        )
-        warnpoints: int = wp_query.fetchone()[0]
-        db.commit()
-        if warnpoints == 0:
-            db.execute(
-                f"DELETE FROM warnDatav2 WHERE user_id = ? AND guild_id = ?",
-                (
-                    member.id,
-                    self.server.id,
-                ),
-            )
-            db.commit()
+
+
+
 
     def get_softban_data(self):
         data = db.execute("SELECT * FROM softbannedMembers").fetchall()
@@ -1121,12 +1080,12 @@ class Moderation:
         db.commit()
 
     @property
-    def get_modlog_channel(self) -> int | None:
+    def get_modlog_channel(self) -> TextChannel | None:
         data = db.execute(
             "SELECT modlog FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
-        return data[0] if data else None
+        return self.server.get_channel(data[0]) if data!=None else None
 
 
 class Welcomer:
@@ -1134,21 +1093,21 @@ class Welcomer:
         self.server = server
 
     @property
-    def get_welcomer(self) -> int | None:
+    def get_welcomer(self) -> TextChannel | None:
         data = db.execute(
             "SELECT welcoming_channel FROM serverData where server = ?",
             (self.server.id,),
         ).fetchone()
         db.commit()
-        return data[0] if data is not None else None
+        return self.server.get_channel(data[0]) if data is not None else None
 
     @property
-    def get_leaver(self) -> int | None:
+    def get_leaver(self) -> TextChannel | None:
         data = db.execute(
             "SELECT leaving_channel FROM serverData where server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
-        return data[0] if data is not None else None
+        return self.server.get_channel(data[0]) if data is not None else None
 
     @property
     def get_welcoming_msg(self) -> str | None:
@@ -1211,10 +1170,6 @@ class Hentai:
             "cub",
             "gore",
             "vore",
-            "underage",
-            "minor",
-            "oppai_loli",
-            "child",
         ]
 
     def format_tags(self, tags: str = None) -> str:
@@ -1296,7 +1251,7 @@ class Hentai:
         images = await self.get_nsfw_image(NsfwApis.YandereApi, rating, tag)
         if self.plus:
             return images
-        return choice(images)["file_url"]
+        return choice(images)["sample_url"]
 
     async def konachan(self, rating: Optional[str] = None, tag: Optional[str] = None):
         if rating is None:

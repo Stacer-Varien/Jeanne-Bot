@@ -19,8 +19,8 @@ class tasksCog(Cog):
                 member = await self.bot.fetch_user(bans[0])
                 await guild.unban(member, reason="Softban expired")
                 await Moderation(guild, member).remove_softban()
-                mod_channel = Moderation(guild).get_modlog_channel
-                if mod_channel != None:
+                modlog = Moderation(guild).get_modlog_channel
+                if modlog != None:
                     unmute = Embed(title="Member unbanned", color=0xFF0000)
                     unmute.add_field(name="Member", value=member, inline=True)
                     unmute.add_field(name="ID", value=member.id, inline=True)
@@ -28,7 +28,7 @@ class tasksCog(Cog):
                         name="Reason", value="Softban expired", inline=True
                     )
                     unmute.set_thumbnail(url=member.display_avatar)
-                    modlog = await guild.fetch_channel(mod_channel)
+                    
                     await modlog.send(embed=unmute)
                 else:
                     continue

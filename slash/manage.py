@@ -490,10 +490,7 @@ class Create_Group(GroupCog, name="create"):
             error.original, HTTPException
         ):
             embed = Embed(color=Color.red())
-            if len(ctx.guild.stickers) == ctx.guild.sticker_limit:
-                embed.description = "You have reached the maximum sticker limit"
-            else:
-                embed.description = "There was a problem making the sticker. Please check that the sticker you are making is:\n\n1. 512kb or less\n2. The file is in a PNG or APNG format\n3. The correct emoji was added"
+            embed.description = "There was a problem making the sticker. Please check that the sticker you are making is:\n\n1. 512kb or less\n2. The file is in a PNG or APNG format\n3. The correct emoji was added\n\nIf all meet the conditions but still fail, that means you have reached the limit of sticker slots"
             await ctx.followup.send(embed=embed)
 
 

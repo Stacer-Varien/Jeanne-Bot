@@ -28,6 +28,7 @@ from typing import Optional
 from json import loads
 from requests import get
 from humanfriendly import parse_timespan, InvalidTimespan
+from assets.argparsers import utility_parser
 
 bot_invite_url = "https://discord.com/oauth2/authorize?client_id=831993597166747679&permissions=1428479601718&scope=bot%20applications.commands"
 topgg_invite = "https://top.gg/bot/831993597166747679"
@@ -61,24 +62,6 @@ class utilitiesCog(Cog, name="Utilities"):
         self.bot = bot
         self.parser = Parser()
 
-    reminder_parser = argparse.ArgumentParser(add_help=False)
-    reminder_parser.add_argument(
-        "-r",
-        "--reason",
-        type=str,
-        help="REASON",
-        nargs="+",
-        required=True,
-    )
-    reminder_parser.add_argument(
-        "-t",
-        "--time",
-        type=str,
-        nargs="+",
-        help="TIME",
-        required=True,
-    )
-
     @Jeanne.group(
         name="reminder",
         description="Main reminder command",
@@ -87,12 +70,12 @@ class utilitiesCog(Cog, name="Utilities"):
     async def reminder(self, ctx: Context): ...
     @reminder.command(description="Add a reminder")
     @Jeanne.check(check_botbanned_prefix)
-    async def add(self, ctx: Context, *words: str, parser=reminder_parser):
+    async def add(self, ctx: Context, *words: str, parser=utility_parser):
         try:
             parsed_args, unknown = parser.parse_known_args(words)
-            reason = parsed_args.reason + unknown
+            reason = parsed_args.reason + (unknown if len(unknown) > 0 else "")
             reason = " ".join(reason)
-            time = parsed_args.time + unknown
+            time = parsed_args.time + (unknown if len(unknown) > 0 else "")
             time = " ".join(time)
         except SystemExit:
             await ctx.send(
@@ -102,6 +85,15 @@ class utilitiesCog(Cog, name="Utilities"):
                 )
             )
             return
+        if reason==None and time==None:
+            await ctx.send(embed=Embed(description="You didn't add `reason` and `time`. Please try again later"))
+            return
+        if reason==None and time:
+            await ctx.send(embed=Embed(description="You didn't add `reason`. Please try again later"))
+            return
+        if reason and time==None:
+            await ctx.send(embed=Embed(description="You didn't add `time`. Please try again later"))
+            return              
         embed = Embed()
         user_reminders = Reminder(ctx.author).get_all_user_reminders
         if user_reminders == None or len(user_reminders) < 10:
@@ -194,7 +186,7 @@ class utilitiesCog(Cog, name="Utilities"):
     @Jeanne.check(check_botbanned_prefix)
     async def generate(
         self,
-        ctx: Context,
+        ctx: Context,*,
         channel: TextChannel,
         jsonscript: Optional[str] = None,
     ):
@@ -235,7 +227,7 @@ class utilitiesCog(Cog, name="Utilities"):
     @Jeanne.check(check_botbanned_prefix)
     async def edit(
         self,
-        ctx: Context,
+        ctx: Context,*,
         channel: TextChannel,
         messageid: str,
         jsonscript: Optional[str] = None,
@@ -283,35 +275,18 @@ class utilitiesCog(Cog, name="Utilities"):
             )
             await ctx.send(embed=embed)
 
-    weather_parser = argparse.ArgumentParser(add_help=False)
-    weather_parser.add_argument(
-        "-c",
-        "--city",
-        type=str,
-        help="City",
-        nargs="+",
-        required=True,
-    )
-    weather_parser.add_argument(
-        "-u",
-        "--units",
-        type=str,
-        choices=["metric", "imperial", "Metric", "Imperial"],
-        help="Metric | Imperial",
-        required=False,
-        default=None,
-    )
+
 
     @Jeanne.command(description="Get weather information on a city")
     @Jeanne.cooldown(3, 14400, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def weather(self, ctx: Context, *words: str, parser=weather_parser):
+    async def weather(self, ctx: Context, *words: str, parser=utility_parser):
         try:
             parsed_args, unknown = parser.parse_known_args(words)
-            city = parsed_args.city + unknown
+            city = parsed_args.city + (unknown if len(unknown) > 0 else "")
             city = " ".join(city)
-            units: str | None = parsed_args.units
+            units: str = parsed_args.units
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -320,8 +295,8 @@ class utilitiesCog(Cog, name="Utilities"):
                 )
             )
             return
-        except AttributeError:
-            units = None
+        if city ==None:
+            await ctx.send(embed=Embed(description="You didn't include the city. Please try again later", color=Color.red()))
         async with ctx.typing():
             emoji_map = {
                 "globe": "🌍",
@@ -431,7 +406,7 @@ class utilitiesCog(Cog, name="Utilities"):
     @Jeanne.command(aliases=["calc"], description="Do a calculation")
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def calculator(self, ctx: Context, calculate: str):
+    async def calculator(self, ctx: Context, *,calculate: str):
         async with ctx.typing():
             check = "".join(
                 [
@@ -484,7 +459,7 @@ class utilitiesCog(Cog, name="Utilities"):
     @Jeanne.check(check_botbanned_prefix)
     async def dictionary(
         self,
-        ctx: Context,
+        ctx: Context,*,
         word: Jeanne.Range[str, 1],
     ):
         await dictionary(ctx, word.lower())

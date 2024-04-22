@@ -12,7 +12,6 @@ from functions import (
     Levelling,
     check_botbanned_prefix,
     check_disabled_prefixed_command,
-    is_beta_prefix,
 )
 from typing import Optional
 from assets.generators.profile_card import Profile

@@ -1,3 +1,4 @@
+from types import ModuleType
 from discord.ext.commands import (
     Cog,
     Bot,
@@ -76,14 +77,14 @@ class OwnerCog(Cog, name="Owner"):
 
     @beta.command(description="Add a user to the Beta Programme (Developer Only)")
     @is_owner()
-    async def add(self, ctx: Context, user: User):
+    async def add(self, ctx: Context, *,user: User):
         if Botban(ctx.author).check_botbanned_user:
             return
         await BetaTest(self.bot).add(ctx, user)
 
     @beta.command(description="Removes a user from the Beta Programme (Developer Only)")
     @is_owner()
-    async def remove(self, ctx: Context, user: User):
+    async def remove(self, ctx: Context, *,user: User):
         if Botban(ctx.author).check_botbanned_user:
             return
         await BetaTest(self.bot).remove(ctx, user)
@@ -111,7 +112,7 @@ class OwnerCog(Cog, name="Owner"):
         if Botban(ctx.author).check_botbanned_user:
             return
         await self.bot.change_presence(activity=Game(name=activity))
-        await ctx.send(f"Jeanne is now playing `{activity}`")
+        await ctx.send(f"I'm now playing `{activity}`")
 
     @activity.command(
         aliases=["listening"],
@@ -124,7 +125,7 @@ class OwnerCog(Cog, name="Owner"):
         await self.bot.change_presence(
             activity=Activity(type=ActivityType.listening, name=activity)
         )
-        await ctx.send(f"Jeanne is now listening to `{activity}`")
+        await ctx.send(f"I'm now listening to `{activity}`")
 
     @activity.command(
         aliases=["remove", "clean", "stop"],
@@ -135,7 +136,7 @@ class OwnerCog(Cog, name="Owner"):
         if Botban(ctx.author).check_botbanned_user:
             return
         await self.bot.change_presence(activity=None)
-        await ctx.send(f"Jeanne's activity has been removed")
+        await ctx.send(f"I have removed my activity")
 
     @command(aliases=["fuser"], description="Finds a user (Developer Only)")
     @is_owner()

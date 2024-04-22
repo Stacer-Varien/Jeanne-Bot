@@ -8,6 +8,7 @@ hentai_parser = argparse.ArgumentParser(add_help=False)
 inv_parser = argparse.ArgumentParser(add_help=False)
 manage_parser = argparse.ArgumentParser(add_help=False)
 mod_parser = argparse.ArgumentParser(add_help=False)
+utility_parser = argparse.ArgumentParser(add_help=False)
 
 # fun
 combined_parser.add_argument(
@@ -174,17 +175,6 @@ manage_parser.add_argument(
 
 # moderation
 mod_parser.add_argument(
-    "-uid",
-    "--userid",
-    "-m",
-    "--member",
-    type=str,
-    help="USER ID | MEMBER NAME | MEMBER GLOBAL NAME",
-    nargs="+",
-    required=False,
-    default=None,
-)
-mod_parser.add_argument(
     "-r",
     "--reason",
     type=str,
@@ -199,7 +189,7 @@ mod_parser.add_argument(
     help="TIME",
     nargs="+",
     required=False,
-    default="",
+    default=None,
 )
 
 mod_parser.add_argument(
@@ -211,4 +201,54 @@ mod_parser.add_argument(
     nargs="+",
     required=False,
     default=None,
+)
+mod_parser.add_argument("-wid", "--warnid", type=int, help="WARN ID", required=True)
+mod_parser.add_argument(
+    "-l", "--limit", type=int, help="LIMIT", required=False, default=100
+)
+mod_parser.add_argument(
+    "-n",
+    "--nick",
+    "--nickname",
+    type=str,
+    nargs="+",
+    help="NICKNAME",
+    required=False,
+    default=None,
+)
+
+utility_parser = argparse.ArgumentParser(add_help=False)
+utility_parser.add_argument(
+    "-c",
+    "--city",
+    type=str,
+    help="City",
+    nargs="+",
+    required=False,
+)
+utility_parser.add_argument(
+    "-u",
+    "--units",
+    type=str,
+    choices=["metric", "imperial", "Metric", "Imperial"],
+    help="Metric | Imperial",
+    required=False,
+    default="metric",
+)
+
+utility_parser.add_argument(
+    "-r",
+    "--reason",
+    type=str,
+    help="REASON",
+    nargs="+",
+    required=False,
+)
+utility_parser.add_argument(
+    "-t",
+    "--time",
+    type=str,
+    nargs="+",
+    help="TIME",
+    required=False,
 )
