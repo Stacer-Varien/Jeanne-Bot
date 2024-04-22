@@ -55,6 +55,15 @@ inv_parser.add_argument("--link", type=str, help="LINK", required=False, default
 
 # manage module
 manage_parser.add_argument(
+    "-n",
+    "--name",
+    type=str,
+    help="Name",
+    nargs="+",
+    required=False,
+    default=None,
+)
+manage_parser.add_argument(
     "-t",
     "--topic",
     type=str,
@@ -94,6 +103,7 @@ manage_parser.add_argument(
 )
 
 manage_parser.add_argument(
+    "-m",
     "--mentioned",
     help="Make it mentionable. Just type --mentioned",
     action="store_true",
@@ -110,7 +120,8 @@ manage_parser.add_argument(
 )
 manage_parser.add_argument(
     "-msg",
-    "--message",
+    "-msgid",
+    "--messageid",
     type=int,
     help="MESSAGE ID",
     required=False,
