@@ -40,7 +40,7 @@ class vote_button(ui.View):
         )
 
 
-class CurrencyCog(Cog, name="Currency"):
+class CurrencyPrefix(Cog, name="Currency"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         self.dbl=DBLvoter(self.bot, DBL_AUTH)
@@ -466,4 +466,4 @@ class CurrencyCog(Cog, name="Currency"):
 
 
 async def setup(bot: Bot):
-    await bot.add_cog(CurrencyCog(bot))
+    await bot.add_cog(CurrencyPrefix(bot))

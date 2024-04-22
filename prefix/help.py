@@ -1,8 +1,8 @@
 from json import dumps, loads
-from discord import ButtonStyle, Color, Embed, ui
+from discord import ButtonStyle, Color, Embed, SelectOption, ui
 from discord.ext.commands import Bot, Cog, group, Context, Range
 import discord.ext.commands as Jeanne
-from reactionmenu import ViewButton, ViewMenu, ViewSelect
+from reactionmenu import Page, ViewButton, ViewMenu, ViewSelect
 from functions import (
     check_botbanned_prefix,
     check_disabled_prefixed_command,
@@ -88,15 +88,13 @@ class HelpGroupPrefix(Cog, name="Help"):
                 "slashutilities",
                 "reminder",
             ]
-            embed=Embed()
-            embeds=[]
+
             menu = ViewMenu(
                 ctx,
                 menu_type=ViewMenu.TypeEmbed,
                 disable_items_on_timeout=True,
                 style="Page $/& | If you need help on a specific command, please use `help command COMMAND`. COMMAND must be the full command name",
             )
-
             for i in self.bot.cogs.items():
                 cog_name = i[0]
                 cog = i[1]
@@ -115,14 +113,13 @@ class HelpGroupPrefix(Cog, name="Help"):
                         name=f"**{cog.qualified_name.title()}**",
                         value="\n".join(cmds),
                     )
-                    embeds.append(embed)
                     menu.add_page(embed=embed)
-
+            
             menu.add_button(ViewButton.go_to_first_page())
             menu.add_button(ViewButton.back())
             menu.add_button(ViewButton.next())
             menu.add_button(ViewButton.go_to_last_page())
-            menu.add_go_to_select(ViewSelect.GoTo(title="Go to", page_numbers=...))
+            menu.add_go_to_select(ViewSelect.GoTo(title="Go to page", page_numbers=...))
             await menu.start()
 
     @help.command(aliases=["cmd"], description="Get help on a certain command")

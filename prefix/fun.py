@@ -12,7 +12,7 @@ from functions import (
 from assets.argparsers import combined_parser
 
 
-class fun(Cog, name="Fun"):
+class FunPrefix(Cog, name="Fun"):
     def __init__(self, bot: Bot):
         self.bot = bot
 
@@ -175,4 +175,4 @@ class fun(Cog, name="Fun"):
 
 
 async def setup(bot: Bot):
-    await bot.add_cog(fun(bot))
+    await bot.add_cog(FunPrefix(bot))

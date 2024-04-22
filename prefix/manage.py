@@ -43,7 +43,7 @@ class ManageCog(Cog, name="ManagePrefix"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
-    @Jeanne.group(description="Main create command")
+    @Jeanne.group(description="Main create command", invoke_without_command=True)
     async def create(self, ctx: Context): ...
     @create.command(aliases=["tc"], description="Creates a text channel")
     @Jeanne.has_permissions(manage_channels=True)
@@ -269,12 +269,12 @@ class ManageCog(Cog, name="ManagePrefix"):
             embed.color = Color.red()
             await ctx.send(embed=embed)
 
-    @create.command(aliases=["r"], description="Create a role")
+    @create.command(aliases=["r"], name="role", description="Create a role")
     @Jeanne.has_permissions(manage_roles=True)
     @Jeanne.bot_has_permissions(manage_roles=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def role(self, ctx: Context, *words: str, parser=manage_parser) -> None:
+    async def createrole(self, ctx: Context, *words: str, parser=manage_parser) -> None:
         try:
             parsed_args, unknown = parser.parse_known_args(words)
             name = parsed_args.name + unknown
