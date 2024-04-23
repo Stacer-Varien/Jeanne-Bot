@@ -1,5 +1,5 @@
 from discord import app_commands as Jeanne
-from functions import BetaTest, Botban, Currency, DBLvoter
+from functions import BetaTest, Botban, Currency, Levelling
 from config import DB_AUTH, TOPGG, TOPGG_AUTH, DBL_AUTH
 from topgg import DBLClient, WebhookManager
 from discord.ext import tasks
@@ -19,7 +19,6 @@ class DBL(Cog):
         )
         self.topgg_webhook.run(5000)
         self.update_stats.start()
-        self.check_dbl_votes.start()
 
     async def post_cmds(self):
         cmds = [
@@ -85,43 +84,16 @@ class DBL(Cog):
             if Botban(voter).check_botbanned_user:
                 return
             credits = 100 if await self.topggpy.get_weekend_status() else 50
+            xp = (
+                (10 * Levelling(voter).get_user_level)
+                if await self.topggpy.get_weekend_status()
+                else (5 * Levelling(voter).get_user_level)
+            )
             if await BetaTest(self.bot).check(voter):
                 credits = round(credits * 1.25)
+                await Levelling(voter).add_xp((5 * round(xp / 5)))
             await Currency(voter).add_qp(credits)
-            with open("voterdata.txt", "a") as f:
-                f.writelines(f"{data}\n")
-
-    @tasks.loop(minutes=1, reconnect=True)
-    async def check_dbl_votes(self):
-        dblheaders = {
-            "Content-Type": "application/json",
-            "Authorization": DBL_AUTH,
-        }
-        async with aiohttp.ClientSession(headers=dblheaders) as session:
-            r = await session.get(
-                "https://discordbotlist.com/api/v1/bots/831993597166747679/upvotes"
-            )
-        try:
-            json_data: dict = await r.json()
-            for i in json_data["upvotes"]:
-                user = await self.bot.fetch_user(int(i["user_id"]))
-                dbl = DBLvoter(user)
-                if await BetaTest(self.bot).check(user):
-                    await dbl.change_to_false(i["timestamp"])
-                    if (dbl.check_vote == False) or (dbl.check_vote == None):
-                        await DBLvoter(user).add_voter(i["timestamp"])
-                        credits = 100 if datetime.now().weekday() >= 5 else 50
-                        credits = round(credits * 1.25)
-                        await Currency(user).add_qp(credits)
-                with open("voterdata.txt", "a") as f:
-                    f.writelines(f"{i}\n")
-                
-        except:
-            pass
-
-    @check_dbl_votes.before_loop
-    async def before_check_dbl_votes(self):
-        await self.bot.wait_until_ready()
+            await Levelling(voter).add_xp(xp)
 
 
 async def setup(bot: Bot):
