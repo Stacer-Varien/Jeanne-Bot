@@ -37,15 +37,19 @@ class stat_buttons(ui.View):
         votedbl = "https://discordbotlist.com/bots/jeanne/upvote"
         orleans_url = "https://discord.gg/jh7jkuk2pp"
         website = "https://jeannebot.gitbook.io/jeannebot/"
-        self.add_item(ui.Button(style=ButtonStyle.link, label="Invite me", url=invite))
+        self.add_item(ui.Button(style=ButtonStyle.link,
+                      label="Invite me", url=invite))
         self.add_item(
-            ui.Button(style=ButtonStyle.link, label="Vote for me", url=votetopgg)
+            ui.Button(style=ButtonStyle.link,
+                      label="Vote for me", url=votetopgg)
         )
         self.add_item(
-            ui.Button(style=ButtonStyle.link, label="Vote for me (DBL)", url=votedbl)
+            ui.Button(style=ButtonStyle.link,
+                      label="Vote for me (DBL)", url=votedbl)
         )
         self.add_item(
-            ui.Button(style=ButtonStyle.link, label="Support Server", url=orleans_url)
+            ui.Button(style=ButtonStyle.link,
+                      label="Support Server", url=orleans_url)
         )
         self.add_item(
             ui.Button(
@@ -69,7 +73,8 @@ class InfoPrefix(Cog, name="Info"):
         create_date = round(member.created_at.timestamp())
         userinfo = Embed(title=f"{member.name}'s Info", color=member.color)
         userinfo.add_field(name="Name", value=member, inline=True)
-        userinfo.add_field(name="Global Name", value=member.global_name, inline=True)
+        userinfo.add_field(name="Global Name",
+                           value=member.global_name, inline=True)
         if member.nick:
             userinfo.add_field(name="Nickname", value=member.nick, inline=True)
         userinfo.add_field(name="ID", value=member.id, inline=True)
@@ -80,7 +85,8 @@ class InfoPrefix(Cog, name="Info"):
         userinfo.add_field(
             name="Joined Server", value=f"<t:{joined_date}:F>", inline=True
         )
-        userinfo.add_field(name="Number of Roles", value=len(member.roles), inline=True)
+        userinfo.add_field(name="Number of Roles",
+                           value=len(member.roles), inline=True)
         userinfo.set_thumbnail(url=member.display_avatar)
         if user.banner:
             userinfo.set_image(url=user.banner)
@@ -101,29 +107,34 @@ class InfoPrefix(Cog, name="Info"):
         embed = Embed(title="Bot stats", color=Color.random())
         embed.add_field(
             name="Developer",
-            value=f"• **Name:** {self.bot.application.owner}\n• **ID:** {self.bot.application.owner.id}",
+            value=f"• **Name:** {self.bot.application.owner}\n• **ID:** {
+                self.bot.application.owner.id}",
             inline=True,
         )
         embed.add_field(name="Bot ID", value=self.bot.user.id, inline=True)
         embed.add_field(
             name="Creation Date",
-            value="<t:{}:F>".format(round(self.bot.user.created_at.timestamp())),
+            value="<t:{}:F>".format(
+                round(self.bot.user.created_at.timestamp())),
             inline=True,
         )
         embed.add_field(
             name="Version",
-            value=f"• **Python Version:** {py_version.major}.{py_version.minor}.{py_version.micro}\n• **Discord.PY Version:** {discord_version}\n• **Bot:** {self.bot_version}",
+            value=f"• **Python Version:** {py_version.major}.{py_version.minor}.{
+                py_version.micro}\n• **Discord.PY Version:** {discord_version}\n• **Bot:** {self.bot_version}",
             inline=True,
         )
         embed.add_field(
             name="Count",
-            value=f"• **Server Count:** {len(self.bot.guilds)} servers\n• **User Count:** {len(set(self.bot.get_all_members()))}\n• **Cached Members:** {all_users}\n• **True Members:** {true_users}",
+            value=f"• **Server Count:** {len(self.bot.guilds)} servers\n• **User Count:** {len(set(
+                self.bot.get_all_members()))}\n• **Cached Members:** {all_users}\n• **True Members:** {true_users}",
             inline=True,
         )
         current_time = time()
         difference = int(round(current_time - start_time))
         uptime = timedelta(seconds=difference).total_seconds()
-        embed.add_field(name="Uptime", value=format_timespan(uptime), inline=True)
+        embed.add_field(
+            name="Uptime", value=format_timespan(uptime), inline=True)
         embed.set_thumbnail(url=self.bot.user.avatar.url)
         await ctx.send(embed=embed, view=stat_buttons())
 
@@ -145,17 +156,20 @@ class InfoPrefix(Cog, name="Info"):
     async def serverinfo(self, ctx: Context):
         embeds = []
         emojis = [str(x) for x in ctx.guild.emojis]
-        humans = len([member for member in ctx.guild.members if not member.bot])
+        humans = len(
+            [member for member in ctx.guild.members if not member.bot])
         bots = len([bot for bot in ctx.guild.members if bot.bot == True])
         date = round(ctx.guild.created_at.timestamp())
-        serverinfo = Embed(description=f"{ctx.guild.name}'s info", color=Color.random())
+        serverinfo = Embed(
+            description=f"{ctx.guild.name}'s info", color=Color.random())
         serverinfo.add_field(name="ID", value=ctx.guild.id, inline=True)
         serverinfo.add_field(
             name="Owner",
             value=f"• **Name: ** {ctx.guild.owner}\n• ** ID: ** {ctx.guild.owner.id}",
             inline=True,
         )
-        serverinfo.add_field(name="Creation Date", value=f"<t:{date}:F>", inline=True)
+        serverinfo.add_field(name="Creation Date", value=f"<t:{
+                             date}:F>", inline=True)
         serverinfo.add_field(
             name="Members",
             value=f"• **Humans:** {humans}\n• **Bots:** {bots}\n• **Total Members:** {ctx.guild.member_count}",
@@ -178,13 +192,15 @@ class InfoPrefix(Cog, name="Info"):
         )
         serverinfo.add_field(
             name="Count",
-            value=f"**All channels:** {len(ctx.guild.channels)} | **Text Channels:** {len(ctx.guild.text_channels)} |  **Voice Channels:** {len(ctx.guild.voice_channels)} |  **Stage Channels:** {len(ctx.guild.stage_channels)} |  **Categories:** {len(ctx.guild.categories)} |  **Forums:** {len(ctx.guild.forums)} |  **Roles:** {len(ctx.guild.roles)} | **Emojis:** {len(emojis)} | **Stickers:** {len(ctx.guild.stickers)}",
+            value=f"**All channels:** {len(ctx.guild.channels)} | **Text Channels:** {len(ctx.guild.text_channels)} |  **Voice Channels:** {len(ctx.guild.voice_channels)} |  **Stage Channels:** {len(
+                ctx.guild.stage_channels)} |  **Categories:** {len(ctx.guild.categories)} |  **Forums:** {len(ctx.guild.forums)} |  **Roles:** {len(ctx.guild.roles)} | **Emojis:** {len(emojis)} | **Stickers:** {len(ctx.guild.stickers)}",
             inline=False,
         )
         f = []
         for i in ctx.guild.features:
             f.append(i.replace("_", " ").title())
-        serverinfo.add_field(name="Features", value=" | ".join(f), inline=False)
+        serverinfo.add_field(
+            name="Features", value=" | ".join(f), inline=False)
         icon = ctx.guild.icon
         splash = (
             ctx.guild.splash.url
@@ -233,7 +249,8 @@ class InfoPrefix(Cog, name="Info"):
             await ctx.send(embed=nobanner)
             return
         if ctx.guild.banner == None:
-            embed = Embed(description="Server has no banner", color=Color.red())
+            embed = Embed(description="Server has no banner",
+                          color=Color.red())
             await ctx.send(embed=embed)
             return
         embed = Embed(colour=Color.random())
@@ -306,7 +323,8 @@ class InfoPrefix(Cog, name="Info"):
         embed.add_field(name="Sticker ID", value=q.id, inline=False)
         embed.set_image(url=q.url)
         if "apng" in q.format:
-            embed.add_field(name="Animated Sticker URL", value=q.url, inline=False)
+            embed.add_field(name="Animated Sticker URL",
+                            value=q.url, inline=False)
         await ctx.send(embed=embed)
 
     @sticker.error

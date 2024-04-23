@@ -40,6 +40,7 @@ class LevelPrefix(Cog, name="Level"):
         invoke_without_command=True,
     )
     async def rank(self, ctx: Context): ...
+
     @rank.command(
         name="global", description="Check the users with the most XP globally"
     )
@@ -59,7 +60,8 @@ class LevelPrefix(Cog, name="Level"):
             p = await self.bot.fetch_user(i[0])
             exp = i[3]
             r += 1
-            embed.add_field(name=f"`{r}.` {p}", value=f"`{exp}XP`", inline=True)
+            embed.add_field(name=f"`{r}.` {p}", value=f"`{
+                            exp}XP`", inline=True)
         await ctx.send(embed=embed)
 
     @rank.command(description="Check the users with the most XP in the server")
@@ -79,7 +81,8 @@ class LevelPrefix(Cog, name="Level"):
             p = await self.bot.fetch_user(i[0])
             exp = i[4]
             r += 1
-            embed.add_field(name=f"`{r}.` {p}", value=f"`{exp}XP`", inline=True)
+            embed.add_field(name=f"`{r}.` {p}", value=f"`{
+                            exp}XP`", inline=True)
         await ctx.send(embed=embed)
 
     @Jeanne.command(description="See your profile or someone else's profile")
@@ -95,7 +98,8 @@ class LevelPrefix(Cog, name="Level"):
     async def _global_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
             cooldown = Embed(
-                description=f"You have already used this command!\nTry again after `{round(error.retry_after, 2)} seconds`",
+                description=f"You have already used this command!\nTry again after `{
+                    round(error.retry_after, 2)} seconds`",
                 color=Color.red(),
             )
             await ctx.send(embed=cooldown)
@@ -104,7 +108,8 @@ class LevelPrefix(Cog, name="Level"):
     async def server_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
             cooldown = Embed(
-                description=f"You have already used this command!\nTry again after `{round(error.retry_after, 2)} seconds`",
+                description=f"You have already used this command!\nTry again after `{
+                    round(error.retry_after, 2)} seconds`",
                 color=Color.red(),
             )
             await ctx.send(embed=cooldown)
@@ -113,7 +118,8 @@ class LevelPrefix(Cog, name="Level"):
     async def profile_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
             cooldown = Embed(
-                description=f"You have already used the profile command!\nTry again after `{round(error.retry_after, 2)} seconds`",
+                description=f"You have already used the profile command!\nTry again after `{
+                    round(error.retry_after, 2)} seconds`",
                 color=Color.red(),
             )
             await ctx.send(embed=cooldown)

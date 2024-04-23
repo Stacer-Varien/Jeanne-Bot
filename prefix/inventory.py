@@ -23,6 +23,7 @@ class InvPrefix(Cog, name="Inventory"):
         name="shop", description="Main shop command", invoke_without_command=True
     )
     async def shop(self, ctx: Context): ...
+
     @shop.command(
         aliases=["bgs", "bg"], description="Check all the wallpapers available"
     )
@@ -83,11 +84,13 @@ class InvPrefix(Cog, name="Inventory"):
         invoke_without_command=True,
     )
     async def background(self, ctx: Context): ...
+
     @backgrounds.error
     async def backgrounds_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
             cooldown = Embed(
-                description=f"You have already previewed this background!\nTry again after `{round(error.retry_after, 2)} seconds`",
+                description=f"You have already previewed this background!\nTry again after `{
+                    round(error.retry_after, 2)} seconds`",
                 color=Color.random(),
             )
             await ctx.send(embed=cooldown)
@@ -108,8 +111,9 @@ class InvPrefix(Cog, name="Inventory"):
             return
         try:
             parsed_args,  = parser.parse_known_args(words)[0]
-            name = None if parsed_args.name==None else  " ".join(parsed_args.name)
-            link: str = None if parsed_args.link== None else parsed_args.link
+            name = None if parsed_args.name == None else " ".join(
+                parsed_args.name)
+            link: str = None if parsed_args.link == None else parsed_args.link
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -118,11 +122,10 @@ class InvPrefix(Cog, name="Inventory"):
                 )
             )
             return
-        if link ==None:
+        if link == None:
             await ctx.send(embed=Embed(description="You didn't add a link. Please try again later", color=Color.red()))
-        m = await ctx.send(embed=Embed(description=
-            "Creating preview... This will take some time <a:loading:1161038734620373062>")
-        )
+        m = await ctx.send(embed=Embed(description="Creating preview... This will take some time <a:loading:1161038734620373062>")
+                           )
         image = await Profile(self.bot).generate_profile(ctx.author, link, True)
         if image == False:
             size_error = Embed(
@@ -159,7 +162,8 @@ class InvPrefix(Cog, name="Inventory"):
     async def buycustom_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
             cooldown = Embed(
-                description=f"You have already tried to preview this background!\nTry again after `{round(error.retry_after, 2)} seconds`",
+                description=f"You have already tried to preview this background!\nTry again after `{
+                    round(error.retry_after, 2)} seconds`",
                 color=Color.random(),
             )
             await ctx.send(embed=cooldown)
@@ -180,7 +184,8 @@ class InvPrefix(Cog, name="Inventory"):
     @Jeanne.check(check_disabled_prefixed_command)
     async def list(self, ctx: Context):
         if Inventory(ctx.author).get_user_inventory == None:
-            embed = Embed(description="Your inventory is empty", color=Color.red())
+            embed = Embed(description="Your inventory is empty",
+                          color=Color.red())
             await ctx.send(embed=embed)
             return
         a = Inventory(ctx.author).get_user_inventory

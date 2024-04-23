@@ -21,6 +21,7 @@ from functions import (
 )
 from config import DBL_AUTH
 
+
 class vote_button(ui.View):
     def __init__(self):
         super().__init__()
@@ -43,13 +44,14 @@ class vote_button(ui.View):
 class CurrencyPrefix(Cog, name="Currency"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
-        self.dbl=DBLvoter(self.bot, DBL_AUTH)
+        self.dbl = DBLvoter(self.bot, DBL_AUTH)
 
     @Jeanne.group(
         invoke_without_command=True,
         description="Main Guess command",
     )
     async def guess(self, ctx: Context): ...
+
     @guess.command(name="free", description="Guess my number and you can win 20 QP")
     @Jeanne.cooldown(1, 3600, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
@@ -71,12 +73,13 @@ class CurrencyPrefix(Cog, name="Currency"):
                 description="YES! YOU GUESSED IT CORRECTLY!\nYou have been given 20 <:quantumpiece:1161010445205905418>!",
                 color=Color.random(),
             )
-            if self.dbl.get_user_vote(ctx.author)==True:
-                await Currency(ctx.author).add_qp(round((20 * 1.25),2))
-                correct.add_field(name="DiscordBotList Bonus", value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>")
-                if BetaTest(self.bot).check(ctx.author)==True:
-                    await Currency(ctx.author).add_qp(round((20 * 1.25),2))
-                    correct.add_field(name="Beta User Bonus", value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>")
+            if self.dbl.get_user_vote(ctx.author) == True:
+                await Currency(ctx.author).add_qp(round((20 * 1.25), 2))
+                correct.add_field(name="DiscordBotList Bonus", value=f"{round((20 * 1.25), 2)} <:quantumpiece:1161010445205905418>")
+                if BetaTest(self.bot).check(ctx.author) == True:
+                    await Currency(ctx.author).add_qp(round((20 * 1.25), 2))
+                    correct.add_field(name="Beta User Bonus", value=f"{round(
+                        (20 * 1.25), 2)} <:quantumpiece:1161010445205905418>")
             correct.set_image(url="https://files.catbox.moe/phqnb1.gif")
             await m.edit(embed=correct, view=None)
             return
@@ -120,12 +123,13 @@ class CurrencyPrefix(Cog, name="Currency"):
                 description=f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given {bet} <:quantumpiece:1161010445205905418>!",
                 color=Color.random(),
             )
-            if self.dbl.get_user_vote(ctx.author)==True:
-                await Currency(ctx.author).add_qp(round((bet * 1.25),2))
-                correct.add_field(name="DiscordBotList Bonus", value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>")
-                if BetaTest(self.bot).check(ctx.author)==True:
-                    await Currency(ctx.author).add_qp(round((bet * 1.25),2))
-                    correct.add_field(name="Beta User Bonus", value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>")
+            if self.dbl.get_user_vote(ctx.author) == True:
+                await Currency(ctx.author).add_qp(round((bet * 1.25), 2))
+                correct.add_field(name="DiscordBotList Bonus", value=f"{round((bet * 1.25), 2)} <:quantumpiece:1161010445205905418>")
+                if BetaTest(self.bot).check(ctx.author) == True:
+                    await Currency(ctx.author).add_qp(round((bet * 1.25), 2))
+                    correct.add_field(name="Beta User Bonus", value=f"{round(
+                        (bet * 1.25), 2)} <:quantumpiece:1161010445205905418>")
             correct.set_image(url="https://files.catbox.moe/phqnb1.gif")
             await m.edit(embed=correct, view=None)
             return
@@ -162,6 +166,7 @@ class CurrencyPrefix(Cog, name="Currency"):
         description="Main Dice command",
     )
     async def dice(self, ctx: Context): ...
+
     @dice.command(name="free", description="Roll a dice for free 20 QP")
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
@@ -176,15 +181,17 @@ class CurrencyPrefix(Cog, name="Currency"):
                 value=f"Dice rolled: **{rolled}**\nYou guessed: **{digit}**!",
                 inline=False,
             )
-            if self.dbl.get_user_vote(ctx.author)==True:
-                await Currency(ctx.author).add_qp(round((20 * 1.25),2))
-                embed.add_field(name="DiscordBotList Bonus", value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>")
-                if BetaTest(self.bot).check(ctx.author)==True:
-                    await Currency(ctx.author).add_qp(round((20 * 1.25),2))
-                    embed.add_field(name="Beta User Bonus", value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>")
+            if self.dbl.get_user_vote(ctx.author) == True:
+                await Currency(ctx.author).add_qp(round((20 * 1.25), 2))
+                embed.add_field(name="DiscordBotList Bonus", value=f"{round((20 * 1.25), 2)} <:quantumpiece:1161010445205905418>")
+                if BetaTest(self.bot).check(ctx.author) == True:
+                    await Currency(ctx.author).add_qp(round((20 * 1.25), 2))
+                    embed.add_field(name="Beta User Bonus", value=f"{round(
+                        (20 * 1.25), 2)} <:quantumpiece:1161010445205905418>")
             await ctx.send(embed=embed)
             return
-        embed = Embed(description=f"Oh no. It rolled a **{rolled}**", color=Color.red())
+        embed = Embed(
+            description=f"Oh no. It rolled a **{rolled}**", color=Color.red())
         await ctx.send(embed=embed)
 
     @dice.command(name="bet", description="Roll a dice with betting")
@@ -219,17 +226,19 @@ class CurrencyPrefix(Cog, name="Currency"):
                 value=f"Dice rolled: **{rolled}**\nYou guessed: **{digit}**!",
                 inline=False,
             )
-            if self.dbl.get_user_vote(ctx.author)==True:
-                await Currency(ctx.author).add_qp(round((bet * 1.25),2))
-                embed.add_field(name="DiscordBotList Bonus", value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>")
-                if BetaTest(self.bot).check(ctx.author)==True:
-                    await Currency(ctx.author).add_qp(round((bet * 1.25),2))
-                    embed.add_field(name="Beta User Bonus", value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>")
+            if self.dbl.get_user_vote(ctx.author) == True:
+                await Currency(ctx.author).add_qp(round((bet * 1.25), 2))
+                embed.add_field(name="DiscordBotList Bonus", value=f"{round(
+                    (bet * 1.25), 2)} <:quantumpiece:1161010445205905418>")
+                if BetaTest(self.bot).check(ctx.author) == True:
+                    await Currency(ctx.author).add_qp(round((bet * 1.25), 2))
+                    embed.add_field(name="Beta User Bonus", value=f"{round((bet * 1.25), 2)} <:quantumpiece:1161010445205905418>")
             await ctx.send(embed=embed)
             return
         await Currency(ctx.author).remove_qp(bet)
         embed = Embed(color=Color.red())
-        embed = Embed(description=f"Oh no. It rolled a **{rolled}**", color=Color.red())
+        embed = Embed(
+            description=f"Oh no. It rolled a **{rolled}**", color=Color.red())
         await ctx.send(embed=embed)
 
     @dice_free.error
@@ -257,6 +266,7 @@ class CurrencyPrefix(Cog, name="Currency"):
         description="Main Flip command",
     )
     async def flip(self, ctx: Context): ...
+
     @flip.command(name="free", description="Flip a coin and earn 20 QP for free")
     @Jeanne.cooldown(1, 3600, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
@@ -274,12 +284,13 @@ class CurrencyPrefix(Cog, name="Currency"):
                 description="YAY! You got it!\n20 <:quantumpiece:1161010445205905418> has been added",
                 color=Color.random(),
             )
-            if self.dbl.get_user_vote(ctx.author)==True:
-                await Currency(ctx.author).add_qp(round((20 * 1.25),2))
-                embed.add_field(name="DiscordBotList Bonus", value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>")
-                if BetaTest(self.bot).check(ctx.author)==True:
-                    await Currency(ctx.author).add_qp(round((20 * 1.25),2))
-                    embed.add_field(name="Beta User Bonus", value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>")
+            if self.dbl.get_user_vote(ctx.author) == True:
+                await Currency(ctx.author).add_qp(round((20 * 1.25), 2))
+                embed.add_field(name="DiscordBotList Bonus", value=f"{round((20 * 1.25), 2)} <:quantumpiece:1161010445205905418>")
+                if BetaTest(self.bot).check(ctx.author) == True:
+                    await Currency(ctx.author).add_qp(round((20 * 1.25), 2))
+                    embed.add_field(name="Beta User Bonus", value=f"{round(
+                        (20 * 1.25), 2)} <:quantumpiece:1161010445205905418>")
             await m.edit(embed=embed, view=None)
             return
         if view.value != jeannes_pick:
@@ -327,12 +338,12 @@ class CurrencyPrefix(Cog, name="Currency"):
                     bet
                 )
             )
-            if self.dbl.get_user_vote(ctx.author)==True:
-                await Currency(ctx.author).add_qp(round((bet * 1.25),2))
-                embed.add_field(name="DiscordBotList Bonus", value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>")
-                if BetaTest(self.bot).check(ctx.author)==True:
-                    await Currency(ctx.author).add_qp(round((bet * 1.25),2))
-                    embed.add_field(name="Beta User Bonus", value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>")
+            if self.dbl.get_user_vote(ctx.author) == True:
+                await Currency(ctx.author).add_qp(round((bet * 1.25), 2))
+                embed.add_field(name="DiscordBotList Bonus", value=f"{round((bet * 1.25), 2)} <:quantumpiece:1161010445205905418>")
+                if BetaTest(self.bot).check(ctx.author) == True:
+                    await Currency(ctx.author).add_qp(round((bet * 1.25), 2))
+                    embed.add_field(name="Beta User Bonus", value=f"{round((bet * 1.25), 2)} <:quantumpiece:1161010445205905418>")
             await m.edit(embed=embed, view=None)
             return
         if view.value != jeannes_pick:

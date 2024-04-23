@@ -41,20 +41,23 @@ class invite_button(View):
     def __init__(self):
         super().__init__()
         self.add_item(
-            ui.Button(style=ButtonStyle.url, label="Bot Invite", url=bot_invite_url)
+            ui.Button(style=ButtonStyle.url,
+                      label="Bot Invite", url=bot_invite_url)
         )
         self.add_item(
             ui.Button(style=ButtonStyle.url, label="Top.gg", url=topgg_invite)
         )
         self.add_item(
-            ui.Button(style=ButtonStyle.url, label="DiscordBots", url=discordbots_url)
+            ui.Button(style=ButtonStyle.url,
+                      label="DiscordBots", url=discordbots_url)
         )
         self.add_item(
             ui.Button(
                 style=ButtonStyle.url, label="Discord Bot List", url=discordbotlist_url
             )
         )
-        self.add_item(ui.Button(style=ButtonStyle.url, label="Orleans", url=orleans))
+        self.add_item(ui.Button(style=ButtonStyle.url,
+                      label="Orleans", url=orleans))
 
 
 class UtilitiesPrefix(Cog, name="Utilities"):
@@ -68,15 +71,16 @@ class UtilitiesPrefix(Cog, name="Utilities"):
         invoke_without_command=True,
     )
     async def reminder(self, ctx: Context): ...
+
     @reminder.command(description="Add a reminder")
     @Jeanne.check(check_botbanned_prefix)
     async def add(self, ctx: Context, *words: str, parser=utility_parser):
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            reason = parsed_args.reason + (unknown if len(unknown) > 0 else "")
-            reason = " ".join(reason)
-            time = parsed_args.time + (unknown if len(unknown) > 0 else "")
-            time = " ".join(time)
+            parsed_args = parser.parse_known_args(words)
+            reason = None if parsed_args.reason == None else " ".join(
+                parsed_args.reason)
+            time = None if parsed_args.time == None else " ".join(
+                parsed_args.time)
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -85,15 +89,15 @@ class UtilitiesPrefix(Cog, name="Utilities"):
                 )
             )
             return
-        if reason==None and time==None:
+        if reason == None and time == None:
             await ctx.send(embed=Embed(description="You didn't add `reason` and `time`. Please try again later"))
             return
-        if reason==None and time:
+        if reason == None and time:
             await ctx.send(embed=Embed(description="You didn't add `reason`. Please try again later"))
             return
-        if reason and time==None:
+        if reason and time == None:
             await ctx.send(embed=Embed(description="You didn't add `time`. Please try again later"))
-            return              
+            return
         embed = Embed()
         user_reminders = Reminder(ctx.author).get_all_user_reminders
         if user_reminders == None or len(user_reminders) < 10:
@@ -169,7 +173,8 @@ class UtilitiesPrefix(Cog, name="Utilities"):
             await ctx.send(embed=embed, ephemeral=True)
             return
         embed.color = Color.random()
-        embed.description = "Reminder `{}` has been removed".format(reminder_id)
+        embed.description = "Reminder `{}` has been removed".format(
+            reminder_id)
         await reminder.remove(reminder_id)
         await ctx.send(embed=embed, delete_after=10)
 
@@ -177,6 +182,7 @@ class UtilitiesPrefix(Cog, name="Utilities"):
         name="embed", description="Main embed command", invoke_without_command=True
     )
     async def _embed(self, ctx: Context): ...
+
     @_embed.command(
         aliases=["gen"],
         description="Generates an embed message. This needs the Discohook.org embed generator. You can use a JSON script or text file with the script",
@@ -186,7 +192,7 @@ class UtilitiesPrefix(Cog, name="Utilities"):
     @Jeanne.check(check_botbanned_prefix)
     async def generate(
         self,
-        ctx: Context,*,
+        ctx: Context, *,
         channel: TextChannel,
         jsonscript: Optional[str] = None,
     ):
@@ -227,7 +233,7 @@ class UtilitiesPrefix(Cog, name="Utilities"):
     @Jeanne.check(check_botbanned_prefix)
     async def edit(
         self,
-        ctx: Context,*,
+        ctx: Context, *,
         channel: TextChannel,
         messageid: str,
         jsonscript: Optional[str] = None,
@@ -261,7 +267,8 @@ class UtilitiesPrefix(Cog, name="Utilities"):
             except:
                 await message.edit(content=content)
             await ctx.send(
-                content="{} edited in {}".format(message.jump_url, channel.jump_url)
+                content="{} edited in {}".format(
+                    message.jump_url, channel.jump_url)
             )
 
     @edit.error
@@ -275,17 +282,14 @@ class UtilitiesPrefix(Cog, name="Utilities"):
             )
             await ctx.send(embed=embed)
 
-
-
     @Jeanne.command(description="Get weather information on a city")
     @Jeanne.cooldown(3, 14400, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def weather(self, ctx: Context, *words: str, parser=utility_parser):
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            city = parsed_args.city + (unknown if len(unknown) > 0 else "")
-            city = " ".join(city)
+            parsed_args = parser.parse_known_args(words)[0]
+            city = " ".join(parsed_args.city)
             units: str = parsed_args.units
         except SystemExit:
             await ctx.send(
@@ -295,7 +299,7 @@ class UtilitiesPrefix(Cog, name="Utilities"):
                 )
             )
             return
-        if city ==None:
+        if city == None:
             await ctx.send(embed=Embed(description="You didn't include the city. Please try again later", color=Color.red()))
         async with ctx.typing():
             emoji_map = {
@@ -329,11 +333,13 @@ class UtilitiesPrefix(Cog, name="Utilities"):
                 gust = f"{current['gust_kph']}km/h"
                 visibility = f"{current['vis_km']}km"
             embed = Embed(
-                title=f"{emoji_map['globe']} Weather details of {location['name']}, {location['region']}/{location['country']}",
+                title=f"{emoji_map['globe']} Weather details of {
+                    location['name']}, {location['region']}/{location['country']}",
                 color=Color.random(),
             )
             embed.description = (
-                f"{emoji_map['newspaper']} Condition: {forecast['condition']['text']}"
+                f"{emoji_map['newspaper']} Condition: {
+                    forecast['condition']['text']}"
             )
             embed.add_field(
                 name=f"{emoji_map['min_tempe']} Minimum Temperature",
@@ -406,7 +412,7 @@ class UtilitiesPrefix(Cog, name="Utilities"):
     @Jeanne.command(aliases=["calc"], description="Do a calculation")
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def calculator(self, ctx: Context, *,calculate: str):
+    async def calculator(self, ctx: Context, *, calculate: str):
         async with ctx.typing():
             check = "".join(
                 [
@@ -431,8 +437,7 @@ class UtilitiesPrefix(Cog, name="Utilities"):
             error.original, Exception
         ):
             failed = Embed(
-                description=f"{error}\nPlease refer to [Python Operators](https://www.geeksforgeeks.org/python-operators/?ref=lbp) if you don't know how to use the command"
-            )
+                description=f"{error}\nPlease refer to [Python Operators](https://www.geeksforgeeks.org/python-operators/?ref=lbp) if you don't know how to use the command")
             await ctx.send(embed=failed)
 
     @Jeanne.command(description="Invite me to your server or join the support server")
@@ -459,7 +464,7 @@ class UtilitiesPrefix(Cog, name="Utilities"):
     @Jeanne.check(check_botbanned_prefix)
     async def dictionary(
         self,
-        ctx: Context,*,
+        ctx: Context, *,
         word: Jeanne.Range[str, 1],
     ):
         await dictionary(ctx, word.lower())

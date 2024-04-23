@@ -77,14 +77,14 @@ class OwnerCog(Cog, name="Owner"):
 
     @beta.command(description="Add a user to the Beta Programme (Developer Only)")
     @is_owner()
-    async def add(self, ctx: Context, *,user: User):
+    async def add(self, ctx: Context, *, user: User):
         if Botban(ctx.author).check_botbanned_user:
             return
         await BetaTest(self.bot).add(ctx, user)
 
     @beta.command(description="Removes a user from the Beta Programme (Developer Only)")
     @is_owner()
-    async def remove(self, ctx: Context, *,user: User):
+    async def remove(self, ctx: Context, *, user: User):
         if Botban(ctx.author).check_botbanned_user:
             return
         await BetaTest(self.bot).remove(ctx, user)
@@ -152,7 +152,8 @@ class OwnerCog(Cog, name="Owner"):
             value=f"<t:{int(user.created_at.timestamp())}:F>",
             inline=True,
         )
-        fuser.add_field(name="Mutuals", value=len(user.mutual_guilds), inline=True)
+        fuser.add_field(name="Mutuals", value=len(
+            user.mutual_guilds), inline=True)
         fuser.add_field(name="Bot?", value=botr, inline=True)
         fuser.set_image(url=user.display_avatar)
         if user.banner == None:
@@ -243,7 +244,8 @@ Make sure private messages between **me and you are opened** or check the host i
             else:
                 synced = await self.bot.tree.sync()
             await ctx.send(
-                f"Synced {len(synced)} commands {'globally' if spec is None else 'to the current guild.'}"
+                f"Synced {len(synced)} commands {
+                    'globally' if spec is None else 'to the current guild.'}"
             )
             return
         ret = 0

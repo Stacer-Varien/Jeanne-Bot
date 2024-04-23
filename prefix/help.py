@@ -114,7 +114,7 @@ class HelpGroupPrefix(Cog, name="Help"):
                         value="\n".join(cmds),
                     )
                     menu.add_page(embed=embed)
-            
+
             menu.add_button(ViewButton.go_to_first_page())
             menu.add_button(ViewButton.back())
             menu.add_button(ViewButton.next())

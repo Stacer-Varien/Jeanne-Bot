@@ -86,7 +86,7 @@ class HentaiPrefix(Cog, name="Hentai"):
         try:
             parsed_args = parser.parse_known_args(words)[0]
             tags = "" if parsed_args.tags == None else " ".join(parsed_args.tags)
-            rating:str = parsed_args.rating
+            rating: str = parsed_args.rating
             plus: bool = parsed_args.plus
         except SystemExit:
             await ctx.send(
@@ -183,7 +183,7 @@ class HentaiPrefix(Cog, name="Hentai"):
         try:
             parsed_args = parser.parse_known_args(words)[0]
             tags = "" if parsed_args.tags == None else " ".join(parsed_args.tags)
-            rating:str = parsed_args.rating
+            rating: str = parsed_args.rating
             plus: bool = parsed_args.plus
         except SystemExit:
             await ctx.send(
@@ -269,7 +269,7 @@ class HentaiPrefix(Cog, name="Hentai"):
         try:
             parsed_args = parser.parse_known_args(words)[0]
             tags = "" if parsed_args.tags == None else " ".join(parsed_args.tags)
-            rating:str = parsed_args.rating
+            rating: str = parsed_args.rating
             plus: bool = parsed_args.plus
         except SystemExit:
             await ctx.send(

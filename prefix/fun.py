@@ -92,11 +92,9 @@ class FunPrefix(Cog, name="Fun"):
     @Jeanne.check(check_botbanned_prefix)
     async def combine(self, ctx: Context, *words: str, parser=combined_parser):
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            first = parsed_args.first + unknown
-            first = " ".join(first)
-            second = parsed_args.second + unknown
-            second = " ".join(second)
+            parsed_args = parser.parse_known_args(words)[0]
+            first = " ".join(parsed_args.first)
+            second = " ".join(parsed_args.second)
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -107,8 +105,8 @@ class FunPrefix(Cog, name="Fun"):
             return
         if first and second:
             option_name1letters = first[: round(len(first) / 2)]
-            option_name2letters = second[round(len(second) / 2) :]
-            option2_name1letters = first[round(len(" ".join(first)) / 2) :]
+            option_name2letters = second[round(len(second) / 2):]
+            option2_name1letters = first[round(len(" ".join(first)) / 2):]
             option2_name2letters = second[: round(len(second) / 2)]
             combine1 = "".join([option_name1letters, option_name2letters])
             combine2 = "".join([option2_name1letters, option2_name2letters])

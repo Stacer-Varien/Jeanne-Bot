@@ -44,7 +44,7 @@ class ModPrefix(Cog, name="Moderation"):
         ban.add_field(name="Moderator", value=ctx.author, inline=True)
         ban.add_field(name="Reason", value=reason, inline=False)
         if time:
-            if time!="":           
+            if time != "":
                 try:
                     a = parse_timespan(time)
                     await Moderation(ctx.guild, member).softban_member(time)
@@ -76,7 +76,6 @@ class ModPrefix(Cog, name="Moderation"):
                     color=Color.red(),
                 )
                 await ctx.send(embed=already_banned)
-                return
         except NotFound:
             return False
 
@@ -89,11 +88,10 @@ class ModPrefix(Cog, name="Moderation"):
         self, ctx: Context, member: Union[Member | User], *words: str, parser=mod_parser
     ) -> None:
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            reason = parsed_args.reason + (unknown if len(unknown) > 0 else "")
-            reason = " ".join(reason)
-            time = parsed_args.time + (unknown if len(unknown) > 0 else "")
-            time = " ".join(time)
+            parsed_args = parser.parse_known_args(words)[0]
+            reason = " ".join(parsed_args.reason)
+            time = None if parsed_args.time == None else " ".join(
+                parsed_args.time)
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -110,7 +108,8 @@ class ModPrefix(Cog, name="Moderation"):
             await ctx.send(embed=failed)
             return
         if member.id == ctx.author.id:
-            failed = Embed(description="You cannot ban yourself...", color=Color.red())
+            failed = Embed(
+                description="You cannot ban yourself...", color=Color.red())
             await ctx.send(embed=failed)
             return
 
@@ -124,23 +123,22 @@ class ModPrefix(Cog, name="Moderation"):
             ).set_thumbnail(url=member.display_avatar)
             m = await ctx.send(embed=confirm, view=view)
             await view.wait()
-            if view.value == None:
-                cancelled = Embed(description="Ban cancelled", color=Color.red())
-                await m.edit(embed=cancelled, view=None)
-                return
+
             if view.value == True:
                 await self.commit_ban(ctx, member, reason, m)
                 return
 
-            if view.value == False:
-                cancelled = Embed(description="Ban cancelled", color=Color.red())
+            if view.value == (False or None):
+                cancelled = Embed(
+                    description="Ban cancelled", color=Color.red())
                 await m.edit(embed=cancelled, view=None)
                 return
-        if await self.check_banned(ctx, member)==None:
-            await self.check_banned(ctx,member)
-        if ctx.author.top_role.position < member.top_role.position:
+        if await self.check_banned(ctx, member) == None:
+            await self.check_banned(ctx, member)
+        if ctx.author.top_role.position <= member.top_role.position:
             failed = Embed(
-                description="{}'s position is higher than you...".format(member),
+                description="{}'s position is higher than or same as you...".format(
+                    member),
                 color=Color.red(),
             )
             await ctx.send(embed=failed)
@@ -180,11 +178,10 @@ class ModPrefix(Cog, name="Moderation"):
                 else Moderation(ctx.guild).fetch_warnings_server()
             )
             if record == None:
-                await ctx.send(
-                    f"{member or 'No one'} has no warn IDs"
-                    if member
-                    else "No warnings up to date"
-                )
+                await ctx.send(embed=Embed(description=f"{member or 'No one'} has no warn IDs"
+                                           if member
+                                           else "No warnings up to date"
+                                           ))
                 return
             menu = ViewMenu(
                 ctx,
@@ -203,7 +200,7 @@ class ModPrefix(Cog, name="Moderation"):
                 embed.set_thumbnail(
                     url=member.display_avatar if member else ctx.guild.icon
                 )
-                for j in record[i : i + 5]:
+                for j in record[i: i + 5]:
                     mod = await self.bot.fetch_user(j[2])
                     user = await self.bot.fetch_user(j[0])
                     reason = j[3]
@@ -213,13 +210,15 @@ class ModPrefix(Cog, name="Moderation"):
                     if member == None:
                         embed.add_field(
                             name=f"{user} | {user.id}",
-                            value=f"**Warn ID:** {warn_id}\n**Reason:** {reason}\n**Date:** {date}\n**Points:** {points}",
+                            value=f"**Warn ID:** {warn_id}\n**Reason:** {
+                                reason}\n**Date:** {date}\n**Points:** {points}",
                             inline=False,
                         )
                     else:
                         embed.add_field(
                             name=f"**Warn ID:** {warn_id}",
-                            value=f"**Moderator:** {mod}\n**Reason:** {reason}\n**Date:** {date}",
+                            value=f"**Moderator:** {mod}\n**Reason:** {
+                                reason}\n**Date:** {date}",
                             inline=False,
                         )
                         embed.set_footer(text=f"Total warn points: {points}")
@@ -236,7 +235,7 @@ class ModPrefix(Cog, name="Moderation"):
     @listwarns.error
     async def listwarns_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, (HTTPException, ValueError, NotFound)
+            error.original, (HTTPException, ValueError, MemberNotFound)
         ):
             embed = Embed()
             embed.description = "Member is not in this server\nPlease try again"
@@ -247,22 +246,22 @@ class ModPrefix(Cog, name="Moderation"):
     @Jeanne.has_permissions(kick_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def warn(self, ctx: Context, member:Member, *words: str, parser=mod_parser) -> None:
+    async def warn(self, ctx: Context, member: Member, *words: str, parser=mod_parser) -> None:
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            reason = parsed_args.reason + (unknown if len(unknown) >0 else "")
-            reason = " ".join(reason)
+            parsed_args = parser.parse_known_args(words)[0]
+            reason = " ".join(parsed_args.reason)
         except SystemExit:
             await ctx.send(
                 embed=Embed(
-                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    description=f"You are using incorrect arguments for this command",
                     color=Color.red(),
                 )
             )
             return
         if ctx.author.top_role.position < member.top_role.position:
             failed = Embed(
-                description="{}'s position is higher than you...".format(member),
+                description="{}'s position is higher than you...".format(
+                    member),
                 color=Color.red(),
             )
             await ctx.send(embed=failed)
@@ -275,7 +274,8 @@ class ModPrefix(Cog, name="Moderation"):
             await ctx.send(embed=failed)
             return
         if member == ctx.author:
-            failed = Embed(description="You can't warn yourself")
+            failed = Embed(description="You can't warn yourself",
+                           color=Color.red())
             await ctx.send(embed=failed)
             return
         reason = reason[:470]
@@ -318,20 +318,8 @@ class ModPrefix(Cog, name="Moderation"):
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def clearwarn(
-        self, ctx: Context, member:Member,*words: str, parser=mod_parser
+        self, ctx: Context, member: Member, warn_id: int
     ) -> None:
-        try:
-            parsed_args = parser.parse_known_args(words)[0]
-            warn_id: int = parsed_args.warnid
-        except SystemExit:
-            await ctx.send(
-                embed=Embed(
-                    description=f"You are missing some arguments or using incorrect arguments for this command",
-                    color=Color.red(),
-                )
-            )
-            return
-
         mod = Moderation(ctx.guild)
         result = mod.check_warn_id(member, warn_id)
         if result == None:
@@ -367,11 +355,10 @@ class ModPrefix(Cog, name="Moderation"):
     @Jeanne.bot_has_permissions(kick_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def kick(self, ctx: Context, member:Member, *words: str, parser=mod_parser) -> None:
+    async def kick(self, ctx: Context, member: Member, *words: str, parser=mod_parser) -> None:
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            reason = parsed_args.reason + (unknown if len(unknown) > 0 else "")
-            reason = " ".join(reason)
+            parsed_args = parser.parse_known_args(words)[0]
+            reason = " ".join(parsed_args.reason)
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -386,7 +373,8 @@ class ModPrefix(Cog, name="Moderation"):
             return
         if ctx.author.top_role.position < member.top_role.position:
             failed = Embed(
-                description="{}'s position is higher than you...".format(member),
+                description="{}'s position is higher than you...".format(
+                    member),
                 color=Color.red(),
             )
             await ctx.send(embed=failed)
@@ -405,7 +393,8 @@ class ModPrefix(Cog, name="Moderation"):
         reason = reason[:470]
         try:
             kickmsg = Embed(
-                description=f"You are kicked from **{ctx.guild.name}** for **{reason}**"
+                description=f"You are kicked from **{
+                    ctx.guild.name}** for **{reason}**"
             )
             await member.send(embed=kickmsg)
         except:
@@ -443,18 +432,7 @@ class ModPrefix(Cog, name="Moderation"):
     @Jeanne.bot_has_permissions(manage_messages=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def prune(self, ctx: Context, member:Optional[Member]=None, *words: str, parser=mod_parser) -> None:
-        try:
-            parsed_args = parser.parse_known_args(words)[0]
-            limit: int = parsed_args.limit
-        except SystemExit:
-            await ctx.send(
-                embed=Embed(
-                    description=f"You are missing some arguments or using incorrect arguments for this command",
-                    color=Color.red(),
-                )
-            )
-            return
+    async def prune(self, ctx: Context, *, member: Optional[Member] = None, limit: Optional[Jeanne.Range[int, None, 100]] = 100) -> None:
 
         limit = limit + 1
         if member:
@@ -474,20 +452,7 @@ class ModPrefix(Cog, name="Moderation"):
     @Jeanne.bot_has_permissions(manage_nicknames=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def changenickname(self, ctx: Context, member:Member, *words: str, parser=mod_parser):
-        try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            nick = parsed_args.nick + (unknown if len(unknown) > 0 else "")
-            nickname = " ".join(nick)
-        except SystemExit:
-            await ctx.send(
-                embed=Embed(
-                    description=f"You are missing some arguments or using incorrect arguments for this command",
-                    color=Color.red(),
-                )
-            )
-            return
-
+    async def changenickname(self, ctx: Context, *, member: Member, nickname: Optional[Jeanne.Range[str, 1, 32]] = None):
         if (not nickname) or (nickname == None):
             await member.edit(nick=None)
             setnick = Embed(color=0x00FF68)
@@ -514,10 +479,11 @@ class ModPrefix(Cog, name="Moderation"):
 
     @Jeanne.command(description="Unbans a user")
     @Jeanne.has_permissions(ban_members=True)
-    async def unban(self, ctx: Context, user:User, *words: str, parser=mod_parser) -> None:
+    async def unban(self, ctx: Context, user: User, *words: str, parser=mod_parser) -> None:
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            reason = parsed_args.reason + (unknown if len(unknown) > 0 else "")
+            parsed_args = parser.parse_known_args(words)[0]
+            reason = " ".join(
+                parsed_args.reason)
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -528,7 +494,7 @@ class ModPrefix(Cog, name="Moderation"):
             return
         reason = reason[:470]
         banned = await self.check_banned(ctx, user)
-        if banned==None:
+        if banned == None:
             await ctx.guild.unban(user, reason="{} | {}".format(reason, ctx.author))
             unban = Embed(title="User Unbanned", color=0xFF0000)
             unban.add_field(name="Name", value=user, inline=True)
@@ -542,7 +508,8 @@ class ModPrefix(Cog, name="Moderation"):
                 return
 
             unbanned = Embed(
-                description=f"{user} has been unbanned. Check {modlog.mention}",
+                description=f"{user} has been unbanned. Check {
+                    modlog.mention}",
                 color=0xFF0000,
             )
             await ctx.send(embed=unbanned)
@@ -551,22 +518,25 @@ class ModPrefix(Cog, name="Moderation"):
     @unban.error
     async def unban_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, (HTTPException, UserNotFound)
+            error.original, (HTTPException, ValueError, UserNotFound)
         ):
-            embed = Embed(description="This user is not banned")
+            embed = Embed()
+            embed.description = "Invalid user ID given\nPlease try again"
+            embed.color = Color.red()
             await ctx.send(embed=embed)
 
     @Jeanne.command(description="Timeout a member")
     @Jeanne.has_permissions(moderate_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def timeout(self, ctx: Context, member:Member, *words: str, parser=mod_parser) -> None:
+    async def timeout(self, ctx: Context, member: Member, *words: str, parser=mod_parser) -> None:
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            time = parsed_args.time + (unknown if len(unknown) > 0 else "")
-            time = " ".join(time)
-            reason = parsed_args.reason + (unknown if len(unknown) > 0 else "")
-            reason = " ".join(reason)
+            parsed_args = parser.parse_known_args(words)[0]
+            time = "28d" if parsed_args.time == None else " ".join(
+                parsed_args.time)
+            reason = " ".join(
+                parsed_args.reason)
+
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -581,7 +551,7 @@ class ModPrefix(Cog, name="Moderation"):
             await ctx.send(embed=failed)
             return
         reason = reason[:470]
-        if parse_timespan(time) > 2505600.0 or time==None:
+        if parse_timespan(time) > 2505600.0 or time == None:
             time = "28d"
         timed = parse_timespan(time)
         await member.edit(
@@ -601,7 +571,8 @@ class ModPrefix(Cog, name="Moderation"):
             return
 
         muted = Embed(
-            description=f"{member} has been put on timeout. Check {modlog.mention}",
+            description=f"{member} has been put on timeout. Check {
+                modlog.mention}",
             color=0xFF0000,
         )
         await ctx.send(embed=muted)
@@ -616,17 +587,24 @@ class ModPrefix(Cog, name="Moderation"):
             embed.description = "Invalid time added. Please try again"
             embed.color = Color.red()
             await ctx.send(embed=embed)
+            return
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, (HTTPException, ValueError, MemberNotFound)
+        ):
+            embed = Embed()
+            embed.description = "Member is not in this server\nPlease try again"
+            embed.color = Color.red()
+            await ctx.send(embed=embed)
 
     @Jeanne.command(description="Untimeouts a member")
     @Jeanne.has_permissions(moderate_members=True)
     @Jeanne.bot_has_permissions(moderate_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
-    async def untimeout(self, ctx: Context, member:Member, *words: str, parser=mod_parser) -> None:
+    async def untimeout(self, ctx: Context, member: Member, *words: str, parser=mod_parser) -> None:
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            reason = parsed_args.reason + (unknown if len(unknown) > 0 else "")
-            reason = " ".join(reason)
+            parsed_args = parser.parse_known_args(words)[0]
+            reason = " ".join(parsed_args.reason)
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -635,7 +613,6 @@ class ModPrefix(Cog, name="Moderation"):
                 )
             )
             return
-
 
         reason = reason[:470]
         if member == ctx.author:
@@ -657,7 +634,8 @@ class ModPrefix(Cog, name="Moderation"):
             return
 
         untimeouted = Embed(
-            description=f"{member} has been untimeouted. Check {modlog.mention}",
+            description=f"{member} has been untimeouted. Check {
+                modlog.mention}",
             color=0xFF0000,
         )
         await ctx.send(embed=untimeouted)
@@ -671,11 +649,10 @@ class ModPrefix(Cog, name="Moderation"):
     @Jeanne.check(check_botbanned_prefix)
     async def massban(self, ctx: Context, *words: str, parser=mod_parser):
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            user = parsed_args.users + (unknown if len(unknown) > 0 else "")
-            user_ids = " ".join(user)
-            reason = parsed_args.reason + (unknown if len(unknown) > 0 else "")
-            reason = " ".join(reason)
+            parsed_args = parser.parse_known_args(words)[0]
+            user_ids = None if parsed_args.users == None else " ".join(
+                parsed_args.users)
+            reason = " ".join(parsed_args.reason)
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -693,6 +670,8 @@ class ModPrefix(Cog, name="Moderation"):
             )
             await ctx.send(embed=embed)
             return
+        if user_ids == None:
+            await ctx.send(embed=Embed(description="You didn't add any User IDs\nPlease try again later", color=Color.red()))
         ids = user_ids.split()[:25]
         if len(ids) < 5:
             embed = Embed(
@@ -711,12 +690,13 @@ class ModPrefix(Cog, name="Moderation"):
             and user_id != str(guild_owner_id)
         ]
         if not to_ban_ids:
-            embed = Embed(description="No users can be banned.", color=Color.red())
+            embed = Embed(description="No users can be banned.",
+                          color=Color.red())
             await ctx.send(embed=embed)
             return
         view = Confirmation(ctx.author)
         alert = Embed(
-            title="BEWARE",
+            title="Disclaimer",
             description="The developer is **NOT** responsible in any way or form if you mess up, even if it was misused.\n\nDo you want to proceed?",
             color=Color.red(),
         )
@@ -760,20 +740,23 @@ class ModPrefix(Cog, name="Moderation"):
                         inline=False,
                     )
             else:
-                embed = Embed(description="No users were banned.", color=Color.red())
+                embed = Embed(description="No users were banned.",
+                              color=Color.red())
             modlog = Moderation(ctx.guild).get_modlog_channel
             if modlog == None:
                 await m.edit(embed=embed)
                 return
             await m.edit(
                 embed=Embed(
-                    description=f"Successfully banned {ban_count} user(s). Check {modlog.mention}",
+                    description=f"Successfully banned {ban_count} user(s). Check {
+                        modlog.mention}",
                     color=Color.red(),
                 )
             )
             await modlog.send(embed=embed)
         elif (view.value == False) or (view.value == None):
-            cancelled = Embed(description="Massban cancelled", color=Color.red())
+            cancelled = Embed(
+                description="Massban cancelled", color=Color.red())
             await m.edit(embed=cancelled, view=None)
 
     @massban.error
@@ -797,11 +780,10 @@ class ModPrefix(Cog, name="Moderation"):
     @Jeanne.check(check_botbanned_prefix)
     async def massunban(self, ctx: Context, *words: str, parser=mod_parser):
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            user = parsed_args.users + (unknown if len(unknown) > 0 else "")
-            user_ids = " ".join(user)
-            reason = parsed_args.reason + (unknown if len(unknown) > 0 else "")
-            reason = " ".join(reason)
+            parsed_args = parser.parse_known_args(words)[0]
+            user_ids = None if parsed_args.users == None else " ".join(
+                parsed_args.users)
+            reason = " ".join(parsed_args.reason)
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -809,6 +791,9 @@ class ModPrefix(Cog, name="Moderation"):
                     color=Color.red(),
                 )
             )
+            return
+        if user_ids == None:
+            await ctx.send(embed=Embed(description="You didn't add any User IDs\nPlease try again later", color=Color.red()))
             return
         if reason == "Unspecified":
             await ctx.send(
@@ -837,7 +822,8 @@ class ModPrefix(Cog, name="Moderation"):
             and user_id != str(guild_owner_id)
         ]
         if not to_unban_ids:
-            embed = Embed(description="No users can be unbanned.", color=Color.red())
+            embed = Embed(description="No users can be unbanned.",
+                          color=Color.red())
             await ctx.send(embed=embed)
             return
         view = Confirmation(ctx.author)
@@ -881,20 +867,23 @@ class ModPrefix(Cog, name="Moderation"):
                         inline=False,
                     )
             else:
-                embed = Embed(description="No users were unbanned.", color=Color.red())
+                embed = Embed(
+                    description="No users were unbanned.", color=Color.red())
             modlog = Moderation(ctx.guild).get_modlog_channel
             if modlog == None:
                 await m.edit(embed=embed)
                 return
             await m.edit(
                 embed=Embed(
-                    description=f"Successfully unbanned {unban_count} user(s). Check {modlog.mention}",
+                    description=f"Successfully unbanned {unban_count} user(s). Check {
+                        modlog.mention}",
                     color=Color.red(),
                 )
             )
             await modlog.send(embed=embed)
         elif (view.value == False) or (view.value == None):
-            cancelled = Embed(description="Massunban cancelled", color=Color.red())
+            cancelled = Embed(
+                description="Massunban cancelled", color=Color.red())
             await m.edit(embed=cancelled, view=None)
 
     @massunban.error
