@@ -12,7 +12,7 @@ from assets.components import ReportContent, ReportContentPlus
 from assets.argparsers import hentai_parser
 
 
-class nsfw(Cog, name="HentaiPrefix"):
+class HentaiPrefix(Cog, name="Hentai"):
     def __init__(self, bot: Bot):
         self.bot = bot
 
@@ -443,4 +443,4 @@ class nsfw(Cog, name="HentaiPrefix"):
 
 
 async def setup(bot: Bot):
-    await bot.add_cog(nsfw(bot))
+    await bot.add_cog(HentaiPrefix(bot))

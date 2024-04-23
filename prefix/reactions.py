@@ -27,7 +27,7 @@ from config import (
 from typing import Optional
 
 
-class Reactions(Cog, name="Reactions"):
+class ReactionsPrefix(Cog, name="Reactions"):
     def __init__(self, bot: Bot):
         self.bot = bot
 
@@ -204,4 +204,4 @@ class Reactions(Cog, name="Reactions"):
 
 
 async def setup(bot: Bot):
-    await bot.add_cog(Reactions(bot))
+    await bot.add_cog(ReactionsPrefix(bot))

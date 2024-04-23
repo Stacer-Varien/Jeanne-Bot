@@ -39,7 +39,7 @@ from io import BytesIO
 from assets.argparsers import manage_parser
 
 
-class ManageCog(Cog, name="ManagePrefix"):
+class ManagePrefix(Cog, name="Manage"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
@@ -1444,4 +1444,4 @@ class ManageCog(Cog, name="ManagePrefix"):
 
 
 async def setup(bot: Bot):
-    await bot.add_cog(ManageCog(bot))
+    await bot.add_cog(ManagePrefix(bot))

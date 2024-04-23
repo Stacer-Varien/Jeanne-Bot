@@ -17,7 +17,7 @@ from assets.images import (
 )
 
 
-class images(Cog, name="Images"):
+class ImagePrefix(Cog, name="Images"):
     def __init__(self, bot):
         self.bot = bot
 
@@ -81,4 +81,4 @@ class images(Cog, name="Images"):
 
 
 async def setup(bot: Bot):
-    await bot.add_cog(images(bot))
+    await bot.add_cog(ImagePrefix(bot))

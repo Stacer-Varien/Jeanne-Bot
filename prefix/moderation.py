@@ -25,7 +25,7 @@ from reactionmenu import ViewButton, ViewMenu
 from assets.argparsers import mod_parser
 
 
-class moderation(Cog, name="ModPrefix"):
+class ModPrefix(Cog, name="Moderation"):
     def __init__(self, bot: Bot):
         self.bot = bot
 
@@ -910,4 +910,4 @@ class moderation(Cog, name="ModPrefix"):
 
 
 async def setup(bot: Bot):
-    await bot.add_cog(moderation(bot))
+    await bot.add_cog(ModPrefix(bot))

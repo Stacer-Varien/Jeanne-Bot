@@ -8,7 +8,7 @@ from datetime import datetime
 import aiohttp
 
 
-class DBL(Cog):
+class DBL(Cog, name="DBL"):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.topggpy = DBLClient(

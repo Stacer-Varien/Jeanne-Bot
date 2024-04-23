@@ -18,7 +18,7 @@ from assets.generators.profile_card import Profile
 from topgg import DBLClient
 
 
-class levelling(Cog, name="Level"):
+class LevelPrefix(Cog, name="Level"):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.topggpy = DBLClient(bot=self.bot, token=TOPGG)
@@ -120,4 +120,4 @@ class levelling(Cog, name="Level"):
 
 
 async def setup(bot: Bot):
-    await bot.add_cog(levelling(bot))
+    await bot.add_cog(LevelPrefix(bot))

@@ -56,7 +56,7 @@ class stat_buttons(ui.View):
         )
 
 
-class InfoCog(Cog, name="Info"):
+class InfoPrefix(Cog, name="Info"):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.bot_version = "v5.0"
@@ -360,4 +360,4 @@ class InfoCog(Cog, name="Info"):
 
 
 async def setup(bot: Bot):
-    await bot.add_cog(InfoCog(bot))
+    await bot.add_cog(InfoPrefix(bot))

@@ -15,10 +15,9 @@ from reactionmenu import ViewButton, ViewMenu
 from assets.argparsers import inv_parser
 
 
-class Shop_Group(Cog, name="Shop"):
+class InvPrefix(Cog, name="Inventory"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
-        super().__init__()
 
     @Jeanne.group(
         name="shop", description="Main shop command", invoke_without_command=True
@@ -221,4 +220,4 @@ class Shop_Group(Cog, name="Shop"):
 
 
 async def setup(bot: Bot):
-    await bot.add_cog(Shop_Group(bot))
+    await bot.add_cog(InvPrefix(bot))
