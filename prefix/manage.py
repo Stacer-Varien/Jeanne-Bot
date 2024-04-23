@@ -14,7 +14,7 @@ from discord import (
     TextChannel,
     VerificationLevel,
     abc,
-    utils,
+    utils
 )
 from PIL import ImageColor
 import discord.ext.commands as Jeanne
@@ -54,15 +54,11 @@ class ManageCog(Cog, name="ManagePrefix"):
         self, ctx: Context, *words: str, parser=manage_parser
     ) -> None:
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            name = parsed_args.name + unknown
-            name = " ".join(name)
-            topic = parsed_args.topic + unknown
-            topic = " ".join(topic)
-            category = parsed_args.category + unknown
-            category = " ".join(category)
-            slowmode = parsed_args.slowmode + unknown
-            slowmode = " ".join(slowmode)
+            parsed_args  = parser.parse_known_args(words)[0]
+            name = "new-channel" if parsed_args.name==None else" ".join(parsed_args.name)
+            topic = None if parsed_args.topic==None else " ".join(parsed_args.topic)
+            category = None if parsed_args.category==None else " ".join(parsed_args.category)
+            slowmode = None if parsed_args.slowmode == None else " ".join(parsed_args.slowmode)
             nsfw_enabled: bool = parsed_args.nsfw
         except SystemExit:
             await ctx.send(
@@ -72,15 +68,14 @@ class ManageCog(Cog, name="ManagePrefix"):
                 )
             )
             return
-        channel = await ctx.guild.create_text_channel(
-            name=("new channel" if name == None else name)
-        )
+        channel = await ctx.guild.create_text_channel(name=name)
+        
         embed = Embed()
         embed.color = Color.random()
         embed.description = "{} has been created".format(channel.jump_url)
         if category:
             category = utils.find(
-                lambda r: (r.name or r.id) == category, ctx.guild.categories
+                lambda cat: (cat.name or cat.id or cat.mention) == category, ctx.guild.categories
             )
             await channel.edit(category=category)
             embed.add_field(
@@ -115,12 +110,10 @@ class ManageCog(Cog, name="ManagePrefix"):
         self, ctx: Context, *words: str, parser=manage_parser
     ) -> None:
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            name = parsed_args.name + unknown
-            name = " ".join(name)
-            category = parsed_args.category + unknown
-            category = " ".join(category)
-            users: int = parsed_args.users
+            parsed_args,  = parser.parse_known_args(words)[0]
+            name = "new-channel" if parsed_args.name==None else" ".join(parsed_args.name)
+            category = None if parsed_args.category==None else " ".join(parsed_args.category)
+            users: int = 99 if parsed_args.users == None else parsed_args.users
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -130,8 +123,7 @@ class ManageCog(Cog, name="ManagePrefix"):
             )
             return
         channel = await ctx.guild.create_voice_channel(
-            name=("new channel" if name == None else name)
-        )
+            name=name)
         embed = Embed()
         embed.description = "{} has been created".format(channel.jump_url)
         embed.color = Color.random()
@@ -156,10 +148,10 @@ class ManageCog(Cog, name="ManagePrefix"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def category(
-        self, ctx: Context, *, name: Optional[Jeanne.Range[str, 1, 100]] = None
+        self, ctx: Context, *, name: Optional[Jeanne.Range[str, 1, 100]] = "New Category"
     ):
         cat = await ctx.guild.create_category(
-            name=("New Category" if name == None else name)
+            name=name
         )
         embed = Embed()
         embed.description = "{} has been created".format(cat.mention)
@@ -175,12 +167,10 @@ class ManageCog(Cog, name="ManagePrefix"):
         self, ctx: Context, *words: str, parser=manage_parser
     ) -> None:
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            name = parsed_args.name + unknown
-            name = " ".join(name)
-            category = parsed_args.category + unknown
-            category = " ".join(category)
-            users: int = parsed_args.users
+            parsed_args  = parser.parse_known_args(words)[0]
+            name = "new-channel" if parsed_args.name==None else" ".join(parsed_args.name)
+            category = None if parsed_args.category==None else " ".join(parsed_args.category)
+            users: int = 1000 if parsed_args.users==None  else parsed_args.users
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -191,7 +181,7 @@ class ManageCog(Cog, name="ManagePrefix"):
             return
         embed = Embed()
         channel: StageChannel = await ctx.guild.create_stage_channel(
-            name=("New Channel" if name == None else name)
+            name=name
         )
         embed.description = "{} has been created".format(channel.jump_url)
         if category:
@@ -227,11 +217,9 @@ class ManageCog(Cog, name="ManagePrefix"):
     @Jeanne.check(check_disabled_prefixed_command)
     async def forum(self, ctx: Context, *words: str, parser=manage_parser) -> None:
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            name = parsed_args.name + unknown
-            name = " ".join(name)
-            category = parsed_args.category + unknown
-            category = " ".join(category)
+            parsed_args  = parser.parse_known_args(words)[0]
+            name = "new-channel" if parsed_args.name==None else" ".join(parsed_args.name)
+            category = None if parsed_args.category==None else " ".join(parsed_args.category)
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -276,11 +264,9 @@ class ManageCog(Cog, name="ManagePrefix"):
     @Jeanne.check(check_disabled_prefixed_command)
     async def createrole(self, ctx: Context, *words: str, parser=manage_parser) -> None:
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            name = parsed_args.name + unknown
-            name = " ".join(name)
-            color = parsed_args.color + unknown
-            color = " ".join(color)
+            parsed_args = parser.parse_known_args(words)[0]
+            name = "New Role" if parsed_args.name== None else  " ".join(parsed_args.name)
+            color = None if parsed_args.color == None else " ".join(parsed_args.color)
             hoisted: bool = parsed_args.hoisted
             mentionable: bool = parsed_args.mentioned
         except SystemExit:
@@ -291,6 +277,8 @@ class ManageCog(Cog, name="ManagePrefix"):
                 )
             )
             return
+        if name==None:
+            name="New Role"
         role = await ctx.guild.create_role(name=name)
         embed = Embed()
         embed.description = "Role `{}` has been created".format(name)
@@ -298,7 +286,7 @@ class ManageCog(Cog, name="ManagePrefix"):
             try:
                 await role.edit(color=int(color, 16))
                 embed.add_field(name="Color", value=color, inline=True)
-                embed.color = role.color
+                embed.color = int(color,16)
             except:
                 embed.add_field(name="Color", value="Invalid color code", inline=True)
         else:
@@ -331,14 +319,11 @@ class ManageCog(Cog, name="ManagePrefix"):
     @Jeanne.check(check_disabled_prefixed_command)
     async def public(self, ctx: Context, *words: str, parser=manage_parser) -> None:
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            name = parsed_args.name + unknown
-            name = " ".join(name)
-            channel = parsed_args.channel + unknown
-            channel = " ".join(channel)
+            parsed_args= parser.parse_known_args(words)[0]
+            name = "New Thread" if parsed_args.name== None else  " ".join(parsed_args.name)
+            channel = None if parsed_args.channel ==None else " ".join(parsed_args.channel)
             message_id: int = parsed_args.message
-            slowmode = parsed_args.slowmode + unknown
-            slowmode = " ".join(slowmode)
+            slowmode = None if parsed_args.slowmode == None else " ".join(parsed_args.slowmode)
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -347,15 +332,10 @@ class ManageCog(Cog, name="ManagePrefix"):
                 )
             )
             return
-        channel = (
-            utils.get(ctx.guild.text_channels, id=channel)
-            if channel.isdigit()
-            else (
-                utils.get(ctx.guild.text_channels, mention=channel)
-                if channel.startswith("<#")
-                else utils.get(ctx.guild.text_channels, name=channel)
-            )
-        )
+        if channel==None:
+            await ctx.send(embed=Embed(description="You didn't add a `channel`. Please try again", color=Color.red()))
+            return
+        channel = utils.find(lambda channel: (channel.id or channel.name or channel.mention)==channel, ctx.guild.text_channels)
         embed = Embed()
         embed.add_field(name="Channel", value=channel.jump_url, inline=True)
         message = await channel.fetch_message(message_id)
@@ -394,47 +374,17 @@ class ManageCog(Cog, name="ManagePrefix"):
             embed.color = Color.red()
             await ctx.send(embed=embed)
 
-    private_thread_parser = argparse.ArgumentParser(add_help=False)
-    private_thread_parser.add_argument(
-        "-n",
-        "--name",
-        type=str,
-        help="NAME",
-        nargs="+",
-        required=True,
-    )
-    private_thread_parser.add_argument(
-        "-ch",
-        "--channel",
-        type=str,
-        help="CHANNEL",
-        nargs="+",
-        required=True,
-    )
-    private_thread_parser.add_argument(
-        "-s",
-        "--slowmode",
-        type=str,
-        help="SLOWMODE",
-        nargs="+",
-        required=False,
-        default=None,
-    )
 
     @thread.command(description="Make a private thread")
     @Jeanne.has_permissions(create_private_threads=True)
     @Jeanne.bot_has_permissions(create_private_threads=True, manage_threads=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    async def private(self, ctx: Context, *words: str, parser=manage_parser) -> None:
+    async def private(self, ctx: Context, channel:TextChannel, *words: str, parser=manage_parser) -> None:
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            name = parsed_args.name + unknown
-            name = " ".join(name)
-            channel = parsed_args.channel + unknown
-            channel = " ".join(channel)
-            slowmode = parsed_args.slowmode + unknown
-            slowmode = " ".join(slowmode)
+            parsed_args= parser.parse_known_args(words)[0]
+            name = "New Thread" if parsed_args.name== None else  " ".join(parsed_args.name)
+            slowmode = None if parsed_args.slowmode == None else " ".join(parsed_args.slowmode)
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -443,15 +393,10 @@ class ManageCog(Cog, name="ManagePrefix"):
                 )
             )
             return
-        channel = (
-            utils.get(ctx.guild.text_channels, id=channel)
-            if channel.isdigit()
-            else (
-                utils.get(ctx.guild.text_channels, mention=channel)
-                if channel.startswith("<#")
-                else utils.get(ctx.guild.text_channels, name=channel)
-            )
-        )
+
+        if channel==None:
+            await ctx.send(embed=Embed(description="You didn't add a `channel`. Please try again", color=Color.red()))
+            return
         embed = Embed()
         embed.add_field(name="Channel", value=channel.jump_url, inline=True)
         thread = await channel.create_thread(name=name)
@@ -574,8 +519,7 @@ class ManageCog(Cog, name="ManagePrefix"):
             embed.description = "There was a problem making the sticker. Please check that the sticker you are making is:\n\n1. 512kb or less\n2. The file is in a PNG or APNG format\n3. The correct emoji was added\n\nIf all meet the conditions but still fail, that means you have reached the limit of sticker slots"
             await ctx.send(embed=embed)
 
-    @Jeanne.group(aliases=["d"], description="Main delete command")
-    async def delete(self, ctx: Context): ...
+
     @Jeanne.command(aliases=["ch"], description="Deletes a channel")
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
@@ -671,16 +615,13 @@ class ManageCog(Cog, name="ManagePrefix"):
     ) -> None:
         channel = ctx.channel if channel == None else channel
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            name = parsed_args.name + unknown
-            name = " ".join(name)
-            topic = parsed_args.topic + unknown
-            topic = " ".join(topic)
-            category = parsed_args.category + unknown
-            category = " ".join(category)
-            slowmode = parsed_args.slowmode + unknown
-            slowmode = " ".join(slowmode)
+            parsed_args  = parser.parse_known_args(words)[0]
+            name = None if parsed_args.name==None else" ".join(parsed_args.name)
+            topic = None if parsed_args.topic==None else " ".join(parsed_args.topic)
+            category = None if parsed_args.category==None else " ".join(parsed_args.category)
+            slowmode = None if parsed_args.slowmode == None else " ".join(parsed_args.slowmode)
             nsfw_enabled: bool = parsed_args.nsfw
+
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -727,13 +668,12 @@ class ManageCog(Cog, name="ManagePrefix"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def role(
-        self, ctx: Context, *, role: Role, words: tuple[str, ...], parser=manage_parser
+        self, ctx: Context, role: Role, *words:str, parser=manage_parser
     ) -> None:
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            name = parsed_args.name + unknown
-            name = " ".join(name)
-            color = parsed_args.color + unknown
+            parsed_args  = parser.parse_known_args(words)[0]
+            name = "new-channel" if parsed_args.name==None else" ".join(parsed_args.name)
+            color = None if parsed_args.color ==None else " " .join(parsed_args.color)
             color = " ".join(color)
             hoisted: bool = parsed_args.hoisted
             mentionable: bool = parsed_args.mentioned
@@ -784,12 +724,10 @@ class ManageCog(Cog, name="ManagePrefix"):
     @Jeanne.check(check_disabled_prefixed_command)
     async def server(self, ctx: Context, *words: str, parser=manage_parser) -> None:
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            name = parsed_args.name + unknown
-            name = " ".join(name)
-            description = parsed_args.description + unknown
-            description = " ".join(description)
-            verification_level: str = parsed_args.verification_level
+            parsed_args  = parser.parse_known_args(words)[0]
+            name = "new-channel" if parsed_args.name==None else" ".join(parsed_args.name)
+            description = None if parsed_args.description==None else " ".join(parsed_args.description)
+            verification_level: str = 'none' if parsed_args.verification_level == None else parsed_args.verification_level
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -963,11 +901,10 @@ class ManageCog(Cog, name="ManagePrefix"):
     @Jeanne.check(check_disabled_prefixed_command)
     async def welcomer(self, ctx: Context, *words: str, parser=manage_parser) -> None:
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            welcomer = parsed_args.welcomer + unknown
-            welcoming_channel = " ".join(welcomer)
-            leaving = parsed_args.leaving + unknown
-            leaving_channel = " ".join(leaving)
+            parsed_args  = parser.parse_known_args(words)[0]
+            welcomer = None if parsed_args.welcomer==None else " ".join(parsed_args.welcomer)
+            leaving = None if parsed_args.leaving==None else " ".join(parsed_args.leaving)
+
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -985,15 +922,7 @@ class ManageCog(Cog, name="ManagePrefix"):
             return
         setup = Embed(description="Welcomer channels set", color=Color.random())
         if welcoming_channel:
-            welcoming_channel = (
-                utils.get(ctx.guild.text_channels, id=welcoming_channel)
-                if welcoming_channel.isdigit()
-                else (
-                    utils.get(ctx.guild.text_channels, mention=welcoming_channel)
-                    if welcoming_channel.startswith("<#")
-                    else utils.get(ctx.guild.text_channels, name=welcoming_channel)
-                )
-            )
+            welcoming_channel = utils.find(lambda ch:(ch.name or ch.id or ch.mention)== welcomer, ctx.guild.text_channels)
             await Manage(ctx.guild).set_welcomer(welcoming_channel)
             setup.add_field(
                 name="Channel welcoming users",
@@ -1001,15 +930,7 @@ class ManageCog(Cog, name="ManagePrefix"):
                 inline=True,
             )
         if leaving_channel:
-            leaving_channel = (
-                utils.get(ctx.guild.text_channels, id=leaving_channel)
-                if leaving_channel.isdigit()
-                else (
-                    utils.get(ctx.guild.text_channels, mention=leaving_channel)
-                    if leaving_channel.startswith("<#")
-                    else utils.get(ctx.guild.text_channels, name=leaving_channel)
-                )
-            )
+            leaving_channel = utils.find(lambda ch:(ch.name or ch.id or ch.mention)== leaving, ctx.guild.text_channels)
             await Manage(ctx.guild).set_leaver(leaving_channel)
             setup.add_field(
                 name="Channel showing users that left",
@@ -1108,24 +1029,8 @@ class ManageCog(Cog, name="ManagePrefix"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def addrole(
-        self, ctx: Context, member: Member, *words: str, parser=manage_parser
+        self, ctx: Context, *, member: Member, role:Role
     ):
-        ctx
-        try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            role = parsed_args.role + unknown
-            role = " ".join(role)
-        except SystemExit:
-            await ctx.send(
-                embed=Embed(
-                    description=f"You are missing some arguments or using incorrect arguments for this command",
-                    color=Color.red(),
-                )
-            )
-            return
-        role = utils.find(
-            lambda r: (r.name or r.id or r.mention) == role, ctx.guild.roles
-        )
         await member.add_roles(role)
         embed = Embed(color=Color.random())
         embed.add_field(
@@ -1152,26 +1057,10 @@ class ManageCog(Cog, name="ManagePrefix"):
     @Jeanne.check(check_disabled_prefixed_command)
     async def removerole(
         self,
-        ctx: Context,
+        ctx: Context,*,
         member: Member,
-        *words: str,
-        parser=manage_parser,
+        role:Role
     ):
-        try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            role = parsed_args.role + unknown
-            role = " ".join(role)
-        except SystemExit:
-            await ctx.send(
-                embed=Embed(
-                    description=f"You are missing some arguments or using incorrect arguments for this command",
-                    color=Color.red(),
-                )
-            )
-            return
-        role = utils.find(
-            lambda r: (r.name or r.id or r.mention) == role, ctx.guild.roles
-        )
         await member.remove_roles(role)
         embed = Embed(color=Color.random())
         embed.add_field(
@@ -1214,22 +1103,18 @@ class ManageCog(Cog, name="ManagePrefix"):
     async def clone(
         self,
         ctx: Context,
-        *,
         channel: Optional[TextChannel] = None,
-        words: tuple[str, ...],
+        *words: str,
         parser=manage_parser,
     ) -> None:
         channel = ctx.channel if channel == None else channel
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            name = parsed_args.name + unknown
-            name = " ".join(name)
-            topic = parsed_args.topic + unknown
-            topic = " ".join(topic)
-            category = parsed_args.category + unknown
-            category = " ".join(category)
-            slowmode = parsed_args.slowmode + unknown
-            slowmode = " ".join(slowmode)
+            parsed_args,  = parser.parse_known_args(words)
+            parsed_args  = parser.parse_known_args(words)[0]
+            name = "new-channel" if parsed_args.name==None else" ".join(parsed_args.name)
+            topic = None if parsed_args.topic==None else " ".join(parsed_args.topic)
+            category = None if parsed_args.category==None else " ".join(parsed_args.category)
+            slowmode = None if parsed_args.slowmode == None else " ".join(parsed_args.slowmode)
             nsfw_enabled: bool = parsed_args.nsfw
         except SystemExit:
             await ctx.send(
@@ -1281,20 +1166,9 @@ class ManageCog(Cog, name="ManagePrefix"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def renameemoji(
-        self, ctx: Context, *, emoji: str, words: tuple[str, ...], parser=manage_parser
+        self, ctx: Context, *, emoji: str, name:str
     ):
-        try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            name = parsed_args.name + unknown
-            name = " ".join(name)
-        except SystemExit:
-            await ctx.send(
-                embed=Embed(
-                    description=f"You are missing some arguments or using incorrect arguments for this command",
-                    color=Color.red(),
-                )
-            )
-            return
+
         try:
             e: int = emoji.strip().split(":")[-1].rstrip(">")
             emote = await ctx.guild.fetch_emoji(e)
@@ -1329,21 +1203,9 @@ class ManageCog(Cog, name="ManagePrefix"):
         ctx: Context,
         *,
         category: CategoryChannel,
-        words: tuple[str, ...],
-        parser=manage_parser,
+        name:str
     ):
-        try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            name = parsed_args.name + unknown
-            name = " ".join(name)
-        except SystemExit:
-            await ctx.send(
-                embed=Embed(
-                    description=f"You are missing some arguments or using incorrect arguments for this command",
-                    color=Color.red(),
-                )
-            )
-            return
+
         embed = Embed(colour=Color.random())
         if len(name) > 100:
             name = name[:100]
@@ -1361,21 +1223,8 @@ class ManageCog(Cog, name="ManagePrefix"):
         ctx: Context,
         *,
         sticker: Optional[str],
-        words: tuple[str, ...],
-        parser=manage_parser,
+        name:str
     ):
-        try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            name = parsed_args.name + unknown
-            name = " ".join(name)
-        except SystemExit:
-            await ctx.send(
-                embed=Embed(
-                    description=f"You are missing some arguments or using incorrect arguments for this command",
-                    color=Color.red(),
-                )
-            )
-            return
         if sticker == None:
             sticker = ctx.message.stickers[0].name
         sticker: GuildSticker = utils.get(ctx.guild.stickers, name=sticker)
@@ -1435,7 +1284,7 @@ class ManageCog(Cog, name="ManagePrefix"):
     @Jeanne.check(check_botbanned_prefix)
     async def _enable(
         self,
-        ctx: Context,
+        ctx: Context,*,
         command: Jeanne.Range[str, 3],
     ):
         embed = Embed()

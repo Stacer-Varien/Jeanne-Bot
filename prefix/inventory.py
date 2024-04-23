@@ -108,10 +108,9 @@ class Shop_Group(Cog, name="Shop"):
             await ctx.send(embed=nomoney)
             return
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            name = parsed_args.name + unknown
-            name = " ".join(name)
-            link: str = parsed_args.link
+            parsed_args,  = parser.parse_known_args(words)[0]
+            name = None if parsed_args.name==None else  " ".join(parsed_args.name)
+            link: str = None if parsed_args.link== None else parsed_args.link
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -120,8 +119,10 @@ class Shop_Group(Cog, name="Shop"):
                 )
             )
             return
-        m = await ctx.send(
-            "Creating preview... This will take some time <a:loading:1161038734620373062>"
+        if link ==None:
+            await ctx.send(embed=Embed(description="You didn't add a link. Please try again later", color=Color.red()))
+        m = await ctx.send(embed=Embed(description=
+            "Creating preview... This will take some time <a:loading:1161038734620373062>")
         )
         image = await Profile(self.bot).generate_profile(ctx.author, link, True)
         if image == False:
@@ -139,7 +140,7 @@ class Shop_Group(Cog, name="Shop"):
             .add_field(name="Cost", value="1000 <:quantumpiece:1161010445205905418>")
             .set_footer(text="Is this the background you wanted?")
             .set_footer(
-                text="Please note that if the custom background violates ToS or is NSFW, it will be removed with NO REFUNDS!"
+                text="Please note that if the custom background violates ToS or is NSFW, it will be removed with NO REFUNDS and without warning!"
             )
         )
         view = Confirmation(ctx.author)

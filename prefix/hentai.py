@@ -84,11 +84,10 @@ class nsfw(Cog, name="HentaiPrefix"):
         parser=hentai_parser,
     ) -> None:
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            tags = parsed_args.tags + unknown
-            tags = " ".join(tags)
+            parsed_args = parser.parse_known_args(words)[0]
+            tags = "" if parsed_args.tags == None else " ".join(parsed_args.tags)
+            rating:str = parsed_args.rating
             plus: bool = parsed_args.plus
-            rating = parsed_args.rating
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -182,11 +181,10 @@ class nsfw(Cog, name="HentaiPrefix"):
     @Jeanne.cooldown(1, 5, type=BucketType.member)
     async def yandere(self, ctx: Context, *words: str, parser=hentai_parser) -> None:
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            tags = parsed_args.tags + unknown
-            tag = " ".join(tags)
+            parsed_args = parser.parse_known_args(words)[0]
+            tags = "" if parsed_args.tags == None else " ".join(parsed_args.tags)
+            rating:str = parsed_args.rating
             plus: bool = parsed_args.plus
-            rating = parsed_args.rating
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -195,12 +193,12 @@ class nsfw(Cog, name="HentaiPrefix"):
                 )
             )
             return
-        if tag == "02":
+        if tags == "02":
             await ctx.send(
                 "Tag has been blacklisted due to it returning extreme content"
             )
             return
-        image = await Hentai(plus).yandere(rating, tag)
+        image = await Hentai(plus).yandere(rating, tags)
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
             shortened_urls = [shorten_url(img["sample_url"]) for img in images]
@@ -269,11 +267,10 @@ class nsfw(Cog, name="HentaiPrefix"):
     @Jeanne.cooldown(1, 5, type=BucketType.member)
     async def konachan(self, ctx: Context, *words: str, parser=hentai_parser) -> None:
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            tags = parsed_args.tags + unknown
-            tag = " ".join(tags)
+            parsed_args = parser.parse_known_args(words)[0]
+            tags = "" if parsed_args.tags == None else " ".join(parsed_args.tags)
+            rating:str = parsed_args.rating
             plus: bool = parsed_args.plus
-            rating = parsed_args.rating
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -282,7 +279,7 @@ class nsfw(Cog, name="HentaiPrefix"):
                 )
             )
             return
-        image = await Hentai(plus).konachan(rating, tag)
+        image = await Hentai(plus).konachan(rating, tags)
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
             try:
@@ -360,11 +357,10 @@ class nsfw(Cog, name="HentaiPrefix"):
     @Jeanne.cooldown(1, 5, type=BucketType.member)
     async def danbooru(self, ctx: Context, *words: str, parser=hentai_parser) -> None:
         try:
-            parsed_args, unknown = parser.parse_known_args(words)
-            tags = parsed_args.tags + unknown
-            tag = " ".join(tags)
+            parsed_args = parser.parse_known_args(words)[0]
+            tags = "" if parsed_args.tags == None else " ".join(parsed_args.tags)
+            rating: str = parsed_args.rating
             plus: bool = parsed_args.plus
-            rating = parsed_args.rating
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -373,7 +369,7 @@ class nsfw(Cog, name="HentaiPrefix"):
                 )
             )
             return
-        image = await Hentai(plus).danbooru(rating, tag)
+        image = await Hentai(plus).danbooru(rating, tags)
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
             view = ReportContentPlus(*[img["file_url"] for img in images])

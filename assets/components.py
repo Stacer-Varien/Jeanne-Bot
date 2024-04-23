@@ -516,7 +516,7 @@ class RemoveManage(ui.View):
         self.value = None
         self.author = author
 
-    @ui.button(label="Welcoming Channel", style=ButtonStyle.gray)
+    @ui.button(label="Welcoming Channel", style=ButtonStyle.gray, row=1)
     async def welcomer(self, ctx: Interaction, button: ui.Button):
         self.value = "welcomer"
         Embed()
@@ -531,7 +531,7 @@ class RemoveManage(ui.View):
         button.label = "Welcomer Channel Removed"
         await ctx.response.edit_message(view=self)
 
-    @ui.button(label="Greeting Message", style=ButtonStyle.gray)
+    @ui.button(label="Greeting Message", style=ButtonStyle.gray, row=1)
     async def welcomemsg(self, ctx: Interaction, button: ui.Button):
         self.value = "welcomemsg"
         check = Welcomer(ctx.guild).get_welcoming_msg
@@ -545,7 +545,7 @@ class RemoveManage(ui.View):
         await Manage(ctx.guild).remove_welcomemsg()
         await ctx.response.edit_message(view=self)
 
-    @ui.button(label="Leaving Channel", style=ButtonStyle.gray)
+    @ui.button(label="Leaving Channel", style=ButtonStyle.gray, row=1)
     async def leaving(self, ctx: Interaction, button: ui.Button):
         self.value = "leaver"
         check = Welcomer(ctx.guild).get_leaver
@@ -559,7 +559,7 @@ class RemoveManage(ui.View):
             await Manage(ctx.guild).remove_leaver()
             await ctx.response.edit_message(view=self)
 
-    @ui.button(label="Leaving Message", style=ButtonStyle.gray)
+    @ui.button(label="Leaving Message", style=ButtonStyle.gray, row=1)
     async def leavingmsg(self, ctx: Interaction, button: ui.Button):
         self.value = "leavingmsg"
         check = Welcomer(ctx.guild).get_leaving_msg
@@ -573,7 +573,7 @@ class RemoveManage(ui.View):
         await Manage(ctx.guild).remove_leavingmsg()
         await ctx.response.edit_message(view=self)
 
-    @ui.button(label="Level Update Channel", style=ButtonStyle.gray)
+    @ui.button(label="Level Update Channel", style=ButtonStyle.gray, row=2)
     async def level(self, ctx: Interaction, button: ui.Button):
         self.value = "levelup"
         check = Levelling(server=ctx.guild).get_levelup_channel
@@ -587,7 +587,7 @@ class RemoveManage(ui.View):
         await Manage(ctx.guild).remove_levelup()
         await ctx.response.edit_message(view=self)
 
-    @ui.button(label="Level Update Message", style=ButtonStyle.gray)
+    @ui.button(label="Level Update Message", style=ButtonStyle.gray, row=2)
     async def levelupdate(self, ctx: Interaction, button: ui.Button):
         self.value = "levelnotif"
         check = Levelling(server=ctx.guild).get_levelup_msg
@@ -601,7 +601,7 @@ class RemoveManage(ui.View):
         await Manage(ctx.guild).remove_levelup_msg()
         await ctx.response.edit_message(view=self)
 
-    @ui.button(label="Role Reward Message", style=ButtonStyle.gray)
+    @ui.button(label="Role Reward Message", style=ButtonStyle.gray, row=2)
     async def rolereward(self, ctx: Interaction, button: ui.Button):
         self.value = "rolereward"
         check = Levelling(server=ctx.guild).get_rank_up_update
@@ -615,7 +615,7 @@ class RemoveManage(ui.View):
         await Manage(ctx.guild).remove_rolereward_msg()
         await ctx.response.edit_message(view=self)
 
-    @ui.button(label="Modlog", style=ButtonStyle.gray)
+    @ui.button(label="Modlog", style=ButtonStyle.gray, row=2)
     async def modlog(self, ctx: Interaction, button: ui.Button):
         self.value = "modlog"
         check = Moderation(ctx.guild).get_modlog_channel
