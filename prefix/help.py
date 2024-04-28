@@ -109,6 +109,35 @@ class HelpGroupPrefix(Cog, name="Help"):
                     embed = Embed(
                         color=Color.random(),
                     )
+                    if cog_name == "Level":
+                        embed.description = "## How to gain XP\nYou gain XP by sending a message. You gain **5XP/2 Minutes/Message** meaning if you send a message **now**, you will gain **5XP** but you have to wait for **2 minutes** to gain another 5XP on the next message. On weekends, you get **10XP/2 Minutes/Message**. Voting rewards are available depending if you have voted in TopGG and/or DiscordBotList"
+                    elif cog_name == "Manage":
+                        embed.description = "Channel commands requires the **manage channel** permission, role commands require the **manage role** permission and setting a logging channel and editing the server requires the **manage server** permission. Creating, renaming and deleting emojis and stickers requires the **manage emojis and stickers permission**. As for profile related commands, everyone can use it"
+                        create_group = [cmd for cmd in cmds if cmd.startswith("create")]
+                        delete_group = [cmd for cmd in cmds if cmd.startswith("delete")]
+                        set_group = [cmd for cmd in cmds if cmd.startswith("set")]
+                        edit_group = [cmd for cmd in cmds if cmd.startswith("edit")]
+
+                        embed.add_field(
+                            name="create", value="\n".join(create_group), inline=True
+                        )
+
+                        embed.add_field(
+                            name="delete", value="\n".join(delete_group), inline=True
+                        )
+                        embed.add_field(
+                            name="set",
+                            value="\n".join(set_group),
+                            inline=True,
+                        )
+                        embed.add_field(
+                            name="edit",
+                            value="\n".join(edit_group),
+                            inline=True,
+                        )
+                    elif cog_name == "Inventory":
+                        embed.description = "This module has 2 systems working together. It is still under development but working."
+                    # if cmds[0].startswith()
                     embed.add_field(
                         name=f"**{cog.qualified_name.title()}**",
                         value="\n".join(cmds),
@@ -192,6 +221,43 @@ class HelpGroupPrefix(Cog, name="Help"):
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def module(self, ctx: Context, module: str):
+        excluded_cogs = [
+            "listenersCog",
+            "tasksCog",
+            "WelcomerCog",
+            "cmdlogger",
+            "ErrorsPrefix",
+            "CommandLogSlash",
+            "Owner",
+            "Jishaku",
+            "guess",
+            "dice",
+            "flip",
+            "CurrencySlash",
+            "ErrorsSlash",
+            "FunSlash",
+            "help",
+            "nsfw",
+            "ImagesSlash",
+            "InfoSlash",
+            "shop",
+            "background",
+            "rank",
+            "levelling",
+            "manage",
+            "create",
+            "edit",
+            "delete",
+            "set",
+            "rename",
+            "command",
+            "level",
+            "moderation",
+            "ReactionsSlash",
+            "embed",
+            "slashutilities",
+            "reminder",
+        ]
         module_mapping = {
             "currency": SlashModules.currency,
             "fun": SlashModules.fun,
