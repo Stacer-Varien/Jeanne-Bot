@@ -1,0 +1,50 @@
+{
+    "description": "With a dislike of decorations and honor, this spearman prefers to listen to his instincts.\nIf it's a job, he won't hesitate to kill even an ordinary citizen.\nThough he can be merciless outside of the job, he's honorable and takes care of others.",
+    "class": "Lancer",
+    "stats": {
+        "Strength": "D",
+        "Endurance": "C",
+        "Agility": "C",
+        "Mana": "B",
+        "Luck": "E",
+        "NP": "?"
+    },
+    "bond": {
+        "level1": {
+            "points": 3000,
+            "description": "Height/Weight: 185cm, 72kg\nSource: Celtic Mythology, Ulster Cycle\nRegion: Ireland\nAlignment: Lawful-Balanced\nGender: Male\nIt was too much trouble to use the Runes, so he sealed them away."
+        },
+        "level2": {
+            "points": 6125,
+            "description": "『Gáe Bolg』\nRank: B\nNP Type: Anti-Personnel\nBarbed Spear that Pierces with Death.\nThe cursed spear that always pierces the target's heart.\nThe secret is that this spear is able to reverse cause and effect, so that the spear is thrust AFTER it already pierces the target's heart.\nBecause of such, this spear is said to be impossible to dodge."
+        },
+        "level3": {
+            "points": 6125,
+            "description": "He's realistic and often gets the job done quietly.\nCynical and pessimistic, but not a workaholic, he is a playboy that makes nihilistic jokes when he needs to.\nPrefers logical strategies and social justice, but he cannot make himself fully cold-hearted because he wants to save everyone."
+        },
+        "level4": {
+            "points": 6125,
+            "description": "『Unlimited Blade Works』\nRank: E~A\nNP Type: ???\nA special Magecraft called a Reality Marble.\nCan overwrite reality with a world that exists only in one's mind, and instantly replicate all weapons ever seen till that point.\nHowever, replicated weapons suffers rank reduction by 1."
+        },
+        "level5": {
+            "points": 6125,
+            "description": "Projection: C (Conditionally A+)\nA type of Magecraft that can recreate any item momentarily.\nArcher favors 'Kanshou and Bakuya' which are also created by Projection.\nThe rank drastically increases if the projected item is of the 'Sword' category.\nBecause he has the trait of 'creating as many counterfeits as possible', Emiya tends to destroy or detonate the recreated Noble Phantasms to increase their firepower."
+        }
+    },
+    "np": {
+        "name": "Unlimited Blade Works: Infinite Creation of Swords",
+        "type": "???",
+        "damage": {
+            "np1": 400,
+            "np2": 500,
+            "np3": 550,
+            "np4": 575
+        }
+    },
+    "ascension": {
+        "stage1": "/Jeanne-Bot/fateGame/assests/servants/lancer/CúChulainn/Stage1.png",
+        "stage2": "/Jeanne-Bot/fateGame/assests/servants/lancer/CúChulainn/Stage2.png",
+        "stage3": "/Jeanne-Bot/fateGame/assests/servants/lancer/CúChulainn/Stage3.png",
+        "stage4": "/Jeanne-Bot/fateGame/assests/servants/lancer/CúChulainn/Stage4.png"
+    }
+}

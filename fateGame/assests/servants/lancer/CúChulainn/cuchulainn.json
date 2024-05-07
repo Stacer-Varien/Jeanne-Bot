@@ -1,0 +1,50 @@
+{
+    "description": "As his origin is slightly different than other Heroic Spirits, you cannot call him an official Heroic Spirit.\nHe is a Guardian, and serves as the defensive system for humanity's\n'collective unconsciousness.'\nHis very being is humanity's Counter Force. He is a faceless enforcer of justice chosen by the nameless.",
+    "class": "Archer",
+    "stats": {
+        "Strength": "D",
+        "Endurance": "C",
+        "Agility": "C",
+        "Mana": "B",
+        "Luck": "E",
+        "NP": "?"
+    },
+    "bond": {
+        "level1": {
+            "points": 3000,
+            "description": "Even though he has been summoned as a Knight of the Bow, when he was alive, he was a mage rather than a bowman. Using his Projection Magecraft, this 'Faker' imitated many famed and demonic swords.\nHis main weapon became a bow because\nhe was weaker as a Heroic Spirit, and his combat style ultimately came down to sniping from afar."
+        },
+        "level2": {
+            "points": 6125,
+            "description": "Mind's Eye (True): B\nPowers of observation granted from training and practice.\nCan calmly assess one's position and an enemy's powers even in a crisis. He possesses a combat logic that can find the only remaining path. If the chance to win exists even at 1%, he can find that chance and make it a reality.\nOn the surface it is similar to Intuition."
+        },
+        "level3": {
+            "points": 6125,
+            "description": "He's realistic and often gets the job done quietly.\nCynical and pessimistic, but not a workaholic, he is a playboy that makes nihilistic jokes when he needs to.\nPrefers logical strategies and social justice, but he cannot make himself fully cold-hearted because he wants to save everyone."
+        },
+        "level4": {
+            "points": 6125,
+            "description": "『Unlimited Blade Works』\nRank: E~A\nNP Type: ???\nA special Magecraft called a Reality Marble.\nCan overwrite reality with a world that exists only in one's mind, and instantly replicate all weapons ever seen till that point.\nHowever, replicated weapons suffers rank reduction by 1."
+        },
+        "level5": {
+            "points": 6125,
+            "description": "Projection: C (Conditionally A+)\nA type of Magecraft that can recreate any item momentarily.\nArcher favors 'Kanshou and Bakuya' which are also created by Projection.\nThe rank drastically increases if the projected item is of the 'Sword' category.\nBecause he has the trait of 'creating as many counterfeits as possible', Emiya tends to destroy or detonate the recreated Noble Phantasms to increase their firepower."
+        }
+    },
+    "np": {
+        "name": "Unlimited Blade Works: Infinite Creation of Swords",
+        "type": "???",
+        "damage": {
+            "np1": 400,
+            "np2": 500,
+            "np3": 550,
+            "np4": 575
+        }
+    },
+    "ascension": {
+        "stage1": "/Jeanne-Bot/fateGame/assests/servants/archer/EMIYA/Stage1.png",
+        "stage2": "/Jeanne-Bot/fateGame/assests/servants/archer/EMIYA/Stage2.png",
+        "stage3": "/Jeanne-Bot/fateGame/assests/servants/archer/EMIYA/Stage3.png",
+        "stage4": "/Jeanne-Bot/fateGame/assests/servants/archer/EMIYA/Stage4.png"
+    }
+}
