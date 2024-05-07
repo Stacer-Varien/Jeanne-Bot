@@ -71,7 +71,7 @@ class SlashReactions(Cog, name="ReactionsSlash"):
             )
         elif action == "dance":
             msg = (
-                f"*Dancing {ctx.user}*"
+                f"*{ctx.user} is dancing*"
                 if member is None
                 else f"*{ctx.user} is dancing with {member.mention}*"
             )

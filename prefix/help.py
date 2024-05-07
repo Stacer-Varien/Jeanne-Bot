@@ -137,7 +137,7 @@ class HelpGroupPrefix(Cog, name="Help"):
                         )
                     elif cog_name == "Inventory":
                         embed.description = "This module has 2 systems working together. It is still under development but working."
-                    # if cmds[0].startswith()
+                    
                     embed.add_field(
                         name=f"**{cog.qualified_name.title()}**",
                         value="\n".join(cmds),

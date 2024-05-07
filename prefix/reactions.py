@@ -72,7 +72,7 @@ class ReactionsPrefix(Cog, name="Reactions"):
             )
         elif action == "dance":
             msg = (
-                f"*Dancing {ctx.author}*"
+                f"*{ctx.author} is dancing*"
                 if member is None
                 else f"*{ctx.author} is dancing with {member.mention}*"
             )
