@@ -81,6 +81,7 @@ class HelpGroup(GroupCog, name="help"):
                 embed.add_field(
                     name="User Permissions", value="\n".join(perms), inline=True
                 )
+            
             cmd_usage = "/" + cmd.qualified_name + " " + " ".join(parms)
             embed.add_field(name="Command Usage", value=f"`{cmd_usage}`", inline=False)
             embed.set_footer(
@@ -96,18 +97,7 @@ class HelpGroup(GroupCog, name="help"):
             embed = Embed(description="I don't have this command", color=Color.red())
             await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(description="Get help of a certain module")
-    @Jeanne.describe(module="Which module?")
-    @Jeanne.check(check_botbanned_app_command)
-    async def module(self, ctx: Interaction, module: SlashModules):
-        await ctx.response.defer()
-        module_data = dumps(modules[module.value])
-        if module_data:
-            parms = OrderedDict([("%module%", str(module.name.capitalize()))])
-            json_data: dict = loads(replace_all(module_data, parms))
-            embed_data = json_data.get("embeds")
-            embed = Embed.from_dict(embed_data[0])
-        await ctx.followup.send(embed=embed)
+
 
     @Jeanne.command(
         description="Get help from the website or join the support server for further help"

@@ -137,7 +137,9 @@ class HelpGroupPrefix(Cog, name="Help"):
                         )
                     elif cog_name == "Inventory":
                         embed.description = "This module has 2 systems working together. It is still under development but working."
-                    
+                    elif cog_name == "Currency":
+                        embed.description = "When using the commands related to this module, please respect the [rules](https://jeannebot.gitbook.io/jeannebot/tos-and-privacy#terms-of-services)"
+
                     embed.add_field(
                         name=f"**{cog.qualified_name.title()}**",
                         value="\n".join(cmds),
@@ -217,73 +219,6 @@ class HelpGroupPrefix(Cog, name="Help"):
         embed = Embed(description="I don't have this command", color=Color.red())
         await ctx.send(embed=embed)
 
-    @help.command(description="Get help of a certain module")
-    @Jeanne.check(check_disabled_prefixed_command)
-    @Jeanne.check(check_botbanned_prefix)
-    async def module(self, ctx: Context, module: str):
-        excluded_cogs = [
-            "listenersCog",
-            "tasksCog",
-            "WelcomerCog",
-            "cmdlogger",
-            "ErrorsPrefix",
-            "CommandLogSlash",
-            "Owner",
-            "Jishaku",
-            "guess",
-            "dice",
-            "flip",
-            "CurrencySlash",
-            "ErrorsSlash",
-            "FunSlash",
-            "help",
-            "nsfw",
-            "ImagesSlash",
-            "InfoSlash",
-            "shop",
-            "background",
-            "rank",
-            "levelling",
-            "manage",
-            "create",
-            "edit",
-            "delete",
-            "set",
-            "rename",
-            "command",
-            "level",
-            "moderation",
-            "ReactionsSlash",
-            "embed",
-            "slashutilities",
-            "reminder",
-        ]
-        module_mapping = {
-            "currency": SlashModules.currency,
-            "fun": SlashModules.fun,
-            "hentai": SlashModules.hentai,
-            "image": SlashModules.image,
-            "pictures": SlashModules.image,
-            "pics": SlashModules.image,
-            "images": SlashModules.image,
-            "info": SlashModules.info,
-            "information": SlashModules.info,
-            "levelling": SlashModules.levelling,
-            "lvl": SlashModules.levelling,
-            "rank": SlashModules.levelling,
-            "moderation": SlashModules.moderation,
-            "mod": SlashModules.moderation,
-            "reactions": SlashModules.reactions,
-            "react": SlashModules.reactions,
-        }
-        module_instance = module_mapping.get(module.lower())
-        module_data = dumps(modules[module_instance.value])
-        if module_data:
-            parms = OrderedDict([("%module%", str(module.capitalize()))])
-            json_data: dict = loads(self.replace_all(module_data, parms))
-            embed_data = json_data.get("embeds")
-            embed = Embed.from_dict(embed_data[0])
-        await ctx.send(embed=embed)
 
     @help.command(
         description="Get help from the website or join the support server for further help"
