@@ -93,8 +93,10 @@ class HelpGroupPrefix(Cog, name="Help"):
                 ctx,
                 menu_type=ViewMenu.TypeEmbed,
                 disable_items_on_timeout=True,
-                style="Page $/& | If you need help on a specific command, please use `help command COMMAND`. COMMAND must be the full command name",
+                show_page_director=False,
+                timeout=120.0
             )
+            options={}
             for i in self.bot.cogs.items():
                 cog_name = i[0]
                 cog = i[1]
@@ -144,13 +146,19 @@ class HelpGroupPrefix(Cog, name="Help"):
                         name=f"**{cog.qualified_name.title()}**",
                         value="\n".join(cmds),
                     )
+                    embed.set_footer(
+                        text="""If you need help on a specific command, please use  the "help command COMMAND". COMMAND must be the full command name"""
+                    )
+
+                    option={SelectOption(label=cog.qualified_name) : [Page(embed=embed)]}
+                    options.update(option)
                     menu.add_page(embed=embed)
 
             menu.add_button(ViewButton.go_to_first_page())
             menu.add_button(ViewButton.back())
             menu.add_button(ViewButton.next())
             menu.add_button(ViewButton.go_to_last_page())
-            menu.add_go_to_select(ViewSelect.GoTo(title="Go to page", page_numbers=...))
+            menu.add_select(ViewSelect(title="Go to...", options=options))
             await menu.start()
 
     @help.command(aliases=["cmd"], description="Get help on a certain command")
@@ -175,24 +183,31 @@ class HelpGroupPrefix(Cog, name="Help"):
                 parms = "".join(
                     [
                         (
-                            f"<{i.option_strings[1]} {i.help}> "
+                            f"<{i.option_strings[1]} {i.help}> ".replace(
+                                "<", "["
+                            ).replace(">", "]")
                             if i.required
-                            else f"[{i.option_strings[1]} {i.help}] "
+                            else f"[{i.option_strings[1]} {i.help}] ".replace(
+                                "[", "<"
+                            ).replace("]", ">")
                         )
                         for i in actions
                     ]
                 )
                 desc = [
                     (
-                        f"`<{i.option_strings[1]} {i.help}>`"
+                        f"`<{i.option_strings[1]} {i.help}>`".replace("<", "[").replace(
+                            ">", "]"
+                        )
                         if i.required
-                        else f"`[{i.option_strings[1]} {i.help}]`"
+                        else f"`[{i.option_strings[1]} {i.help}]`".replace(
+                            "[", "<"
+                        ).replace("]", ">")
                     )
                     for i in actions
                 ]
                 value = "\n".join(desc)
             except:
-                parms = cmd.signature
                 value = f"`{parms}`"
             if parms:
                 embed.add_field(name="Parameters", value=value, inline=False)
@@ -207,18 +222,17 @@ class HelpGroupPrefix(Cog, name="Help"):
                     name="User Permissions", value="\n".join(perms), inline=True
                 )
             if not cmd.description.startswith("Main"):
-                cmd_usage = "j!" + cmd.qualified_name + " " + parms
+                cmd_usage = "j!" + cmd.qualified_name + " " + cmd.usage
                 embed.add_field(
                     name="Command Usage", value=f"`{cmd_usage}`", inline=False
                 )
             embed.set_footer(
-                text="Legend:\n<> - Required\n[] - Optional\n\nIt is best to go to the website for detailed explanations and usages"
+                text="Legend:\n[] - Required\n<> - Optional\n\nIt is best to go to the website for detailed explanations and usages"
             )
             await ctx.send(embed=embed)
             return
         embed = Embed(description="I don't have this command", color=Color.red())
         await ctx.send(embed=embed)
-
 
     @help.command(
         description="Get help from the website or join the support server for further help"
