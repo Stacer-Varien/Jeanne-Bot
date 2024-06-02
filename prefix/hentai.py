@@ -16,7 +16,10 @@ class HentaiPrefix(Cog, name="Hentai"):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @Jeanne.command(description="Get a random hentai from Jeanne")
+    @Jeanne.command(
+        description="Get a random hentai from Jeanne",
+        usage="<-r questionable | explicit | q | e> <-p Enable plus mode. Just type '-p'>",
+    )
     @Jeanne.is_nsfw()
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
