@@ -71,7 +71,7 @@ class Profile:
                 y2 = nh + y1
 
             card = card.crop((x1, y1, x2, y2)).resize(
-                (900, 500), resample=Image.LANCZOS
+                (900, 500), resample=Image.Resampling.LANCZOS
             )
 
         else:
@@ -80,7 +80,7 @@ class Profile:
         # profile
         profile_bytes = BytesIO(requests.get(user.display_avatar.url).content)
         profile = Image.open(profile_bytes)
-        profile = profile.convert("RGBA").resize((180, 180), resample=Image.LANCZOS)
+        profile = profile.convert("RGBA").resize((180, 180), resample=Image.Resampling.LANCZOS)
 
         profile_pic_holder = Image.new("RGBA", card.size, (255, 255, 255, 0))
 
