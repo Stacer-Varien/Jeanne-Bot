@@ -150,7 +150,7 @@ class Inventory:
         self.user = user
 
     @staticmethod
-    def upload_to_catbox(image_url: str) -> str | None:
+    def upload_to_catbox(image_url: str) -> str:
         url = "https://catbox.moe/user/api.php"
         userhash = CATBOX_HASH
         data = {"reqtype": "urlupload", "userhash": userhash, "url": image_url}
