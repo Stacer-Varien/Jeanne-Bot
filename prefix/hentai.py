@@ -18,7 +18,7 @@ class HentaiPrefix(Cog, name="Hentai"):
 
     @Jeanne.command(
         description="Get a random hentai from Jeanne",
-        usage="<-r questionable | explicit | q | e> <-p Enable plus mode. Just type '-p'>",
+        usage="<-r questionable | explicit | q | e>",
     )
     @Jeanne.is_nsfw()
     @Jeanne.check(check_disabled_prefixed_command)
@@ -75,7 +75,10 @@ class HentaiPrefix(Cog, name="Hentai"):
             )
             await ctx.send(embed=slow)
 
-    @Jeanne.command(description="Get a random media content from Gelbooru")
+    @Jeanne.command(
+        description="Get a random media content from Gelbooru",
+        usage="<-r questionable | explicit | q | e> <-t tags> <-p Enable plus mode. Just type '-p'>",
+    )
     @Jeanne.is_nsfw()
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
@@ -177,7 +180,10 @@ class HentaiPrefix(Cog, name="Hentai"):
             )
             await ctx.send(embed=slow)
 
-    @Jeanne.command(description="Get a random hentai from Yande.re")
+    @Jeanne.command(
+        description="Get a random hentai from Yande.re",
+        usage="<-r questionable | explicit | q | e> <-t tags> <-p Enable plus mode. Just type '-p'>",
+    )
     @Jeanne.is_nsfw()
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
@@ -263,7 +269,10 @@ class HentaiPrefix(Cog, name="Hentai"):
             )
             await ctx.send(embed=slow)
 
-    @Jeanne.command(description="Get a random hentai from Konachan")
+    @Jeanne.command(
+        description="Get a random hentai from Konachan",
+        usage="<-r questionable | explicit | q | e> <-t tags> <-p Enable plus mode. Just type '-p'>",
+    )
     @Jeanne.is_nsfw()
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
@@ -353,7 +362,10 @@ class HentaiPrefix(Cog, name="Hentai"):
             )
             await ctx.send(embed=slow)
 
-    @Jeanne.command(description="Get a random media content from Danbooru")
+    @Jeanne.command(
+        description="Get a random media content from Danbooru",
+        usage="<-r questionable | explicit | q | e> <-t tags> <-p Enable plus mode. Just type '-p'>",
+    )
     @Jeanne.is_nsfw()
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)

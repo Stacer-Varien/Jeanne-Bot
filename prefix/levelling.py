@@ -83,7 +83,9 @@ class LevelPrefix(Cog, name="Level"):
             embed.add_field(name=f"`{r}.` {p}", value=f"`{exp}XP`", inline=True)
         await ctx.send(embed=embed)
 
-    @Jeanne.command(description="See your profile or someone else's profile")
+    @Jeanne.command(
+        description="See your profile or someone else's profile", usage="<MEMBER>"
+    )
     @Jeanne.cooldown(1, 120, type=BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)

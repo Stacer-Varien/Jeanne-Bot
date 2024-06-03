@@ -20,6 +20,7 @@ class FunPrefix(Cog, name="Fun"):
         aliases=["8b", "eightball"],
         description="Ask 8 ball anything and you will get your awnser",
         name="8ball",
+        usage="[QUESTION]",
     )
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
@@ -62,6 +63,7 @@ class FunPrefix(Cog, name="Fun"):
     @Jeanne.command(
         aliases=["backwards"],
         description="Say something and I will say it in reversed text",
+        usage="[TEXT]",
     )
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
@@ -87,6 +89,7 @@ class FunPrefix(Cog, name="Fun"):
     @Jeanne.command(
         aliases=["join"],
         description="Combine 2 words to get 2 combined words",
+        usage="[-f FIRST WORD] [-s SECOND WORD]",
     )
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
@@ -105,8 +108,8 @@ class FunPrefix(Cog, name="Fun"):
             return
         if first and second:
             option_name1letters = first[: round(len(first) / 2)]
-            option_name2letters = second[round(len(second) / 2):]
-            option2_name1letters = first[round(len(" ".join(first)) / 2):]
+            option_name2letters = second[round(len(second) / 2) :]
+            option2_name1letters = first[round(len(" ".join(first)) / 2) :]
             option2_name2letters = second[: round(len(second) / 2)]
             combine1 = "".join([option_name1letters, option_name2letters])
             combine2 = "".join([option2_name1letters, option2_name2letters])
@@ -127,6 +130,7 @@ class FunPrefix(Cog, name="Fun"):
     @Jeanne.command(
         aliases=["pick", "choice"],
         description="Give me a lot of choices and I will pick one for you. Separate them with ','",
+        usage="[CHOICES]",
     )
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
@@ -138,7 +142,9 @@ class FunPrefix(Cog, name="Fun"):
         await ctx.send(embed=choose)
 
     @Jeanne.command(
-        aliases=["simp"], description="Check how much of a simp you or a member are"
+        aliases=["simp"],
+        description="Check how much of a simp you or a member are",
+        usage="<MEMBER>",
     )
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
@@ -155,7 +161,9 @@ class FunPrefix(Cog, name="Fun"):
             simp.set_image(url="https://i.imgur.com/Rs1IP2I.jpg")
         await ctx.send(embed=simp)
 
-    @Jeanne.command(aliases=["gay"], description="Check how gay you are")
+    @Jeanne.command(
+        aliases=["gay"], description="Check how gay you are", usage="<MEMBER>"
+    )
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def gayrate(self, ctx: Context, *, member: Optional[Member] = None):

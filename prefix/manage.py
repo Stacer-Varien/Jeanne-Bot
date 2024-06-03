@@ -46,7 +46,7 @@ class ManagePrefix(Cog, name="Manage"):
     @Jeanne.group(description="Main create command", invoke_without_command=True)
     async def create(self, ctx: Context): ...
 
-    @create.command(aliases=["tc"], description="Creates a text channel")
+    @create.command(aliases=["tc"], description="Creates a text channel", usage="<-n NAME> <-t TOPIC> <-cat CATEGORY> <-s SLOWMODE> <-nsfw Enable NSFW. Just type '-nsfw'>")
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
@@ -114,7 +114,7 @@ class ManagePrefix(Cog, name="Manage"):
             await channel.edit(nsfw=True)
         await ctx.send(embed=embed)
 
-    @create.command(aliases=["vc"], description="Create a voice channel")
+    @create.command(aliases=["vc"], description="Create a voice channel", usage="<-n NAME> <-cat CATEGORY> <-u USERS>")
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
@@ -161,7 +161,7 @@ class ManagePrefix(Cog, name="Manage"):
             embed.add_field(name="User Limit", value=users, inline=True)
         await ctx.send(embed=embed)
 
-    @create.command(aliases=["cat"], description="Create a category")
+    @create.command(aliases=["cat"], description="Create a category", usage="<NAME>")
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
@@ -178,7 +178,7 @@ class ManagePrefix(Cog, name="Manage"):
         embed.color = Color.random()
         await ctx.send(embed=embed)
 
-    @create.command(aliases=["stage"], description="Create a stage channel")
+    @create.command(aliases=["stage"], description="Create a stage channel",usage="<-n NAME> <-cat CATEGORY> <-u USERS>")
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
@@ -235,7 +235,7 @@ class ManagePrefix(Cog, name="Manage"):
             embed.color = Color.red()
             await ctx.send(embed=embed)
 
-    @create.command(description="Create a forum")
+    @create.command(description="Create a forum", usage="<-n NAME> <-cat CATEGORY>")
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
@@ -289,7 +289,7 @@ class ManagePrefix(Cog, name="Manage"):
             embed.color = Color.red()
             await ctx.send(embed=embed)
 
-    @create.command(aliases=["r"], name="role", description="Create a role")
+    @create.command(aliases=["r"], name="role", description="Create a role", usage="<-n NAME> <-c COLOR> <-h Make it hoisted. Just type '-h'> ")
     @Jeanne.has_permissions(manage_roles=True)
     @Jeanne.bot_has_permissions(manage_roles=True)
     @Jeanne.check(check_botbanned_prefix)

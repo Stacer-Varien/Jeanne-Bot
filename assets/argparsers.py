@@ -49,9 +49,9 @@ hentai_parser.add_argument(
 
 # inventory
 inv_parser.add_argument(
-    "--name", type=str, help="NAME", nargs="+", required=False, default=None
+    "--name", "-n", type=str, help="NAME", nargs="+", required=False, default=None
 )
-inv_parser.add_argument("--link", type=str, help="LINK", required=False, default=None)
+inv_parser.add_argument("--link", "-l", type=str, help="LINK", required=False, default=None)
 
 # manage module
 manage_parser.add_argument(
