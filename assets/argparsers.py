@@ -146,6 +146,16 @@ manage_parser.add_argument(
     required=False,
     default=None,
 )
+
+manage_parser.add_argument(
+    "-u",
+    "--users",
+    type=str,
+    help="USERS",
+    required=False,
+    default=None,
+)
+
 manage_parser.add_argument(
     "-v",
     "--verification",
