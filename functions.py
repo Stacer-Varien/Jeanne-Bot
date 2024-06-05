@@ -1414,12 +1414,10 @@ class Partner:
 
     @staticmethod
     async def add(user: User):
-        cur = db.execute(
+        db.execute(
             "INSERT OR IGNORE INTO partnerData (user_id) VALUES (?)", (user.id,)
         )
         db.commit()
-        if cur.rowcount == 0:
-            return True
 
     @staticmethod
     def check(user: User.id):
