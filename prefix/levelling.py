@@ -84,7 +84,7 @@ class LevelPrefix(Cog, name="Level"):
         await ctx.send(embed=embed)
 
     @Jeanne.command(
-        description="See your profile or someone else's profile", usage="<MEMBER>"
+        description="See your profile or someone else's profile", usage="<MEMBER | MEMBER NAME | MEMBER ID>"
     )
     @Jeanne.cooldown(1, 120, type=BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)

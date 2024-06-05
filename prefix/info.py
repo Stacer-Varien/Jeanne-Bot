@@ -132,7 +132,7 @@ class InfoPrefix(Cog, name="Info"):
     @Jeanne.command(
         aliases=["uinfo", "minfo"],
         description="See the information of a member or yourself",
-        usage="<MEMBER>",
+        usage="<MEMBER | MEMBER NAME | MEMBER ID>",
     )
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
@@ -160,8 +160,7 @@ class InfoPrefix(Cog, name="Info"):
         )
         serverinfo.add_field(
             name="Creation Date",
-            value=f"<t:{
-                             date}:F>",
+            value=f"<t:{date}:F>",
             inline=True,
         )
         serverinfo.add_field(
@@ -253,7 +252,7 @@ class InfoPrefix(Cog, name="Info"):
     @Jeanne.command(
         aliases=["av", "pfp"],
         description="See your avatar or another member's avatar",
-        usage="<MEMBER>",
+        usage="<MEMBER | MEMBER NAME | MEMBER ID>",
     )
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
@@ -302,7 +301,8 @@ class InfoPrefix(Cog, name="Info"):
             await ctx.send(embeds=embeds)
 
     @Jeanne.command(
-        description="View a sticker via message ID or sticker name", usage="[STICKER]"
+        description="View a sticker via message ID or sticker name",
+        usage="[STICKER NAME | MESSAGE ID]",
     )
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
@@ -343,7 +343,9 @@ class InfoPrefix(Cog, name="Info"):
             await ctx.send(embed=embed)
             return
 
-    @Jeanne.command(description="View an emoji", usage="[EMOJI | EMOJI ID]")
+    @Jeanne.command(
+        description="View an emoji", usage="[EMOJI | EMOJI ID | EMOJI NAME]"
+    )
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def emoji(self, ctx: Context, *, emoji: Jeanne.Range[str, 1]):

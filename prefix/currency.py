@@ -491,7 +491,7 @@ class CurrencyPrefix(Cog, name="Currency"):
     @Jeanne.command(
         aliases=["bal", "qp"],
         description="Check how much QP you have",
-        usage="<MEMBER>",
+        usage="<MEMBER | MEMBER NAME | MEMBER ID>",
     )
     @Jeanne.cooldown(1, 60, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)

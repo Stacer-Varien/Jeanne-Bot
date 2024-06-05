@@ -92,7 +92,7 @@ class OwnerCog(Cog, name="Owner"):
     @group(
         aliases=["act", "presence"],
         invoke_without_command=True,
-        description="Changes the bot's activity (Developer Only)",
+        description="Changes my activity (Developer Only)",
     )
     @is_owner()
     async def activity(self, ctx: Context):
@@ -105,18 +105,18 @@ class OwnerCog(Cog, name="Owner"):
         await ctx.send(embed=embed)
 
     @activity.command(
-        aliases=["playing"], description="Make the bot play something (Developer Only)"
+        aliases=["playing"], description="Make me play something (Developer Only)"
     )
     @is_owner()
     async def play(self, ctx: Context, *, activity: str):
         if Botban(ctx.author).check_botbanned_user:
             return
         await self.bot.change_presence(activity=Game(name=activity))
-        await ctx.send(f"I'm now playing `{activity}`")
+        await ctx.send(f"I am now playing `{activity}`")
 
     @activity.command(
         aliases=["listening"],
-        description="Make the bot listen to something (Developer Only)",
+        description="Make me listen to something (Developer Only)",
     )
     @is_owner()
     async def listen(self, ctx: Context, *, activity: str):
@@ -129,7 +129,7 @@ class OwnerCog(Cog, name="Owner"):
 
     @activity.command(
         aliases=["remove", "clean", "stop"],
-        description="Clears the bot's activity (Developer Only)",
+        description="Clears my activity (Developer Only)",
     )
     @is_owner()
     async def clear(self, ctx: Context):
