@@ -223,20 +223,7 @@ mod_parser.add_argument(
     required=False,
     default=None,
 )
-mod_parser.add_argument("-wid", "--warnid", type=int, help="WARN ID", required=True)
-mod_parser.add_argument(
-    "-l", "--limit", type=int, help="LIMIT", required=False, default=100
-)
-mod_parser.add_argument(
-    "-n",
-    "--nick",
-    "--nickname",
-    type=str,
-    nargs="+",
-    help="NICKNAME",
-    required=False,
-    default=None,
-)
+
 
 utility_parser = argparse.ArgumentParser(add_help=False)
 utility_parser.add_argument(
