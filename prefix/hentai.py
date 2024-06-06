@@ -19,6 +19,7 @@ class HentaiPrefix(Cog, name="Hentai"):
     @Jeanne.command(
         description="Get a random hentai from Jeanne",
         usage="<-r QUESTIONABLE | EXPLICIT | Q | E>",
+        extras={"nsfw": True},
     )
     @Jeanne.is_nsfw()
     @Jeanne.check(check_disabled_prefixed_command)
@@ -78,6 +79,7 @@ class HentaiPrefix(Cog, name="Hentai"):
     @Jeanne.command(
         description="Get a random media content from Gelbooru",
         usage="<-r QUESTIONABLE | EXPLICIT | Q | E> <-t TAGS> <-p Enable plus mode. Just type '-p'>",
+        extras={"nsfw": True},
     )
     @Jeanne.is_nsfw()
     @Jeanne.check(check_disabled_prefixed_command)
@@ -183,6 +185,7 @@ class HentaiPrefix(Cog, name="Hentai"):
     @Jeanne.command(
         description="Get a random hentai from Yande.re",
         usage="<-r QUESTIONABLE | EXPLICIT | Q | E> <-t TAGS> <-p Enable plus mode. Just type '-p'>",
+        extras={"nsfw": True},
     )
     @Jeanne.is_nsfw()
     @Jeanne.check(check_disabled_prefixed_command)
@@ -272,6 +275,7 @@ class HentaiPrefix(Cog, name="Hentai"):
     @Jeanne.command(
         description="Get a random hentai from Konachan",
         usage="<-r QUESTIONABLE | EXPLICIT | Q | E> <-t TAGS> <-p Enable plus mode. Just type '-p'>",
+        extras={"nsfw": True},
     )
     @Jeanne.is_nsfw()
     @Jeanne.check(check_disabled_prefixed_command)
@@ -365,6 +369,7 @@ class HentaiPrefix(Cog, name="Hentai"):
     @Jeanne.command(
         description="Get a random media content from Danbooru",
         usage="<-r QUESTIONABLE | EXPLICIT | Q | E> <-t TAGS> <-p Enable plus mode. Just type '-p'>",
+        extras={"nsfw": True},
     )
     @Jeanne.is_nsfw()
     @Jeanne.check(check_disabled_prefixed_command)
