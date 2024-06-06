@@ -198,8 +198,18 @@ class HelpGroupPrefix(Cog, name="Help"):
             None,
         )
         if cmd:
-            bot_perms: dict = getattr(cmd, "bot_perms", None)
-            member_perms: dict = getattr(cmd, "member_perms", None)
+            try:
+                bot_perms = cmd.extras["bot_perms"]
+            except:
+                bot_perms=None
+            try:
+                member_perms = cmd.extras["member_perms"]
+            except:
+                member_perms=None
+            try:
+                nsfw=cmd.extras["nsfw"]
+            except:
+                nsfw=None
             embed = Embed(title=f"{command.title()} Help", color=Color.random())
             embed.description = cmd.description
             if len(cmd.aliases) >= 1:
@@ -211,14 +221,16 @@ class HelpGroupPrefix(Cog, name="Help"):
             if parms:
                 embed.add_field(name="Parameters", value=parms, inline=False)
             if bot_perms:
-                perms = [str(i).replace("_", " ").title() for i in bot_perms.keys()]
                 embed.add_field(
-                    name="Bot Permissions", value="\n".join(perms), inline=True
+                    name="Jeanne Permissions", value=bot_perms, inline=True
                 )
             if member_perms:
-                perms = [str(i).replace("_", " ").title() for i in member_perms.keys()]
                 embed.add_field(
-                    name="User Permissions", value="\n".join(perms), inline=True
+                    name="Member Permissions", value=member_perms, inline=True
+                )
+            if nsfw:
+                embed.add_field(
+                    name="NSFW Enabled", value=nsfw, inline=True
                 )
             if not cmd.description.startswith("Main"):
                 cmd_usage = "j!" + cmd.qualified_name + " " + cmd.usage
