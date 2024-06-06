@@ -674,69 +674,58 @@ class ManagePrefix(Cog, name="Manage"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def textchannel(
-        self,
-        ctx: Context,
-        *,
-        channel: Optional[TextChannel] = None,
-        words: tuple[str, ...],
-        parser=manage_parser,
+    self,
+    ctx: Context,
+    channel: Optional[TextChannel] = None,
+    *words: str,
+    parser=manage_parser,
     ) -> None:
-        channel = ctx.channel if channel == None else channel
+        channel = ctx.channel if channel is None else channel
         try:
             parsed_args = parser.parse_known_args(words)[0]
-            name = None if parsed_args.name == None else " ".join(
-                parsed_args.name)
-            topic = None if parsed_args.topic == None else " ".join(
-                parsed_args.topic)
-            category = (
-                None if parsed_args.category == None else " ".join(
-                    parsed_args.category)
-            )
-            slowmode = (
-                None if parsed_args.slowmode == None else " ".join(
-                    parsed_args.slowmode)
-            )
+            name = " ".join(parsed_args.name) if parsed_args.name else None
+            topic = " ".join(parsed_args.topic) if parsed_args.topic else None
+            category = " ".join(parsed_args.category) if parsed_args.category else None
+            slowmode = " ".join(parsed_args.slowmode) if parsed_args.slowmode else None
             nsfw_enabled: bool = parsed_args.nsfw
-
         except SystemExit:
             await ctx.send(
                 embed=Embed(
-                    description=f"You are missing some arguments or using incorrect arguments for this command",
+                    description="You are missing some arguments or using incorrect arguments for this command",
                     color=Color.red(),
                 )
             )
             return
-        embed = Embed()
-        embed.description = "Channel `{}` has been edited".format(channel.name)
-        embed.color = Color.green()
+
+        embed = Embed(description=f"Channel `{channel.name}` has been edited", color=Color.green())
+
         if name:
             await channel.edit(name=name)
             embed.add_field(name="Name", value=name, inline=True)
+
         if category:
             await channel.edit(category=category)
             embed.add_field(name="Category", value=category, inline=True)
+
         if topic:
-            if len(topic) > 1024:
-                topic = topic[:1024]
+            topic = topic[:1024] if len(topic) > 1024 else topic
             await channel.edit(topic=topic)
             embed.add_field(name="Topic", value=topic, inline=True)
+
         if slowmode:
             try:
                 delay = int(parse_timespan(slowmode))
-                if delay > 21600:
-                    delay = 21600
+                delay = min(delay, 21600)
                 await channel.edit(slowmode_delay=delay)
                 added_slowmode = format_timespan(delay)
             except InvalidTimespan as e:
-                added_slowmode = e
+                added_slowmode = str(e)
             embed.add_field(name="Slowmode", value=added_slowmode, inline=True)
+
         if nsfw_enabled:
-            if nsfw_enabled == True:
-                await channel.edit(nsfw=True)
-                embed.add_field(name="NSFW enabled", value="Yes", inline=True)
-            elif nsfw_enabled == False:
-                await channel.edit(nsfw=False)
-                embed.add_field(name="NSFW enabled", value="No", inline=True)
+            await channel.edit(nsfw=nsfw_enabled)
+            embed.add_field(name="NSFW enabled", value="Yes" if nsfw_enabled else "No", inline=True)
+
         await ctx.send(embed=embed)
 
     @edit.command(description="Edit a role", usage="[ROLE | ROLE NAME | ROLE ID | ROLE | ROLE NAME | ROLE ID ID] <-n NAME> <-c COLOR> <-h Make it hoisted. Just type '-h'>")
