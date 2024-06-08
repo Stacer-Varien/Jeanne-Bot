@@ -599,7 +599,7 @@ class ManagePrefix(Cog, name="Manage"):
         await channel.delete()
         await ctx.send(embed=embed)
 
-    @Jeanne.command(aliases=["dr"], description="Deletes a role", usage="[ROLE | ROLE NAME | ROLE ID]")
+    @Jeanne.command(aliases=["dr"], description="Deletes a role", usage="[ROLE | ROLE NAME | ROLE ID]",extras={"bot_perms":"Manage Roles", "member_perms": "Manage Roles"})
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
@@ -611,7 +611,7 @@ class ManagePrefix(Cog, name="Manage"):
         await role.delete()
         await ctx.send(embed=embed)
 
-    @Jeanne.command(aliases=["delemote", "delemoji"], description="Deletes an emoji", usage="[EMOJI | EMOJI NAME | EMOJI ID]")
+    @Jeanne.command(aliases=["delemote", "delemoji"], description="Deletes an emoji", usage="[EMOJI | EMOJI NAME | EMOJI ID]", extras={"bot_perms":"Manage Expressions", "member_perms": "Manage Expressions"})
     @Jeanne.has_permissions(manage_expressions=True)
     @Jeanne.bot_has_permissions(manage_expressions=True)
     @Jeanne.check(check_botbanned_prefix)
@@ -639,7 +639,7 @@ class ManagePrefix(Cog, name="Manage"):
             )
             await ctx.send(embed=embed)
 
-    @Jeanne.command(aliases=["delsticker"], description="Deletes a sticker", usage="[STICKER NAME | STICKER ID]")
+    @Jeanne.command(aliases=["delsticker"], description="Deletes a sticker", usage="[STICKER NAME | STICKER ID]",extras={"bot_perms":"Manage Expressions", "member_perms": "Manage Expressions"})
     @Jeanne.has_permissions(manage_expressions=True)
     @Jeanne.bot_has_permissions(manage_expressions=True)
     @Jeanne.check(check_botbanned_prefix)
@@ -728,7 +728,7 @@ class ManagePrefix(Cog, name="Manage"):
 
         await ctx.send(embed=embed)
 
-    @edit.command(description="Edit a role", usage="[ROLE | ROLE NAME | ROLE ID | ROLE | ROLE NAME | ROLE ID ID] <-n NAME> <-c COLOR> <-h Make it hoisted. Just type '-h'>")
+    @edit.command(description="Edit a role", usage="[ROLE | ROLE NAME | ROLE ID] <-n NAME> <-c COLOR> <-h Make it hoisted. Just type '-h'>", extras={"bot_perms":"Manage Roles", "member_perms": "Manage Roles"})
     @Jeanne.has_permissions(manage_roles=True)
     @Jeanne.bot_has_permissions(manage_roles=True)
     @Jeanne.check(check_botbanned_prefix)
@@ -788,7 +788,7 @@ class ManagePrefix(Cog, name="Manage"):
         await ctx.send(embed=embed)
 
     @edit.command(
-        description="Edits the server's name, description and verification level", usage="<-n NAME> <-d DESCRIPTION> <-v none | low | medium | high | highest>"
+        description="Edits the server's name, description and verification level", usage="<-n NAME> <-d DESCRIPTION> <-v none | low | medium | high | highest>",extras={"bot_perms": "Manage Server","member_perms": "Manage Server"}
     )
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.bot_has_permissions(manage_guild=True)
@@ -885,7 +885,7 @@ class ManagePrefix(Cog, name="Manage"):
                 )
         await ctx.send(embed=embed)
 
-    @edit.command(aliases=["pfp"], description="Change the server's avatar", usage="[IMAGE]")
+    @edit.command(aliases=["pfp"], description="Change the server's avatar", usage="[IMAGE]",extras={"bot_perms": "Manage Server","member_perms": "Manage Server"})
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.bot_has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
@@ -907,7 +907,7 @@ class ManagePrefix(Cog, name="Manage"):
             )
         await ctx.send(embed=embed)
 
-    @edit.command(description="Change the server's banner", usage="[IMAGE]")
+    @edit.command(description="Change the server's banner", usage="[IMAGE]",extras={"bot_perms": "Manage Server","member_perms": "Manage Server"})
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.bot_has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
@@ -938,7 +938,7 @@ class ManagePrefix(Cog, name="Manage"):
                 )
         await ctx.send(embed=embed)
 
-    @edit.command(description="Change the server's splash screen", usage="[IMAGE]")
+    @edit.command(description="Change the server's splash screen", usage="[IMAGE]",extras={"bot_perms": "Manage Server","member_perms": "Manage Server"})
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.bot_has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
@@ -970,18 +970,14 @@ class ManagePrefix(Cog, name="Manage"):
                 )
         await ctx.send(embed=embed)
 
-    @staticmethod
-    def replace_all(text: str, dic: dict):
-        for i, j in dic.items():
-            text = text.replace(i, j)
-        return text
+
 
     @Jeanne.group(
         name="set", description="Main set command", invoke_without_command=True
     )
     async def _set(self, ctx: Context): ...
 
-    @_set.command(description="Set a welcomer and/or leaver channel", usage="<-w CHANNEL | CHANNEL NAME | CHANNEL ID> <-l CHANNEL | CHANNEL NAME | CHANNEL ID>")
+    @_set.command(description="Set a welcomer and/or leaver channel", usage="<-w CHANNEL | CHANNEL NAME | CHANNEL ID> <-l CHANNEL | CHANNEL NAME | CHANNEL ID>", extras={"member_perms": "Manage Server"})
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
@@ -1043,7 +1039,7 @@ class ManagePrefix(Cog, name="Manage"):
         if view.value == None:
             await m.edit(view=None)
 
-    @_set.command(description="Set a modlog channel", usage="[CHANNEL | CHANNEL NAME | CHANNEL ID]")
+    @_set.command(description="Set a modlog channel", usage="[CHANNEL | CHANNEL NAME | CHANNEL ID]",extras={"member_perms": "Manage Server"})
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
@@ -1054,7 +1050,7 @@ class ManagePrefix(Cog, name="Manage"):
                         value=channel.mention, inline=True)
         await ctx.send(embed=embed)
 
-    @_set.command(description="Set a level up notification channel", usage="[CHANNEL | CHANNEL NAME | CHANNEL ID]")
+    @_set.command(description="Set a level up notification channel", usage="[CHANNEL | CHANNEL NAME | CHANNEL ID]",extras={"member_perms": "Manage Server"})
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
@@ -1124,7 +1120,7 @@ class ManagePrefix(Cog, name="Manage"):
             embed.color = Color.red()
         await ctx.send(embed=embed)
 
-    @Jeanne.command(aliases=["ar"], description="Add a role to a member", usage="[MEMBER | MEMBER NAME | MEMBER ID] [ROLE | ROLE NAME | ROLE ID]")
+    @Jeanne.command(aliases=["ar"], description="Add a role to a member", usage="[MEMBER | MEMBER NAME | MEMBER ID] [ROLE | ROLE NAME | ROLE ID]", extras={"bot_perms":"Manage Roles", "member_perms": "Manage Roles"})
     @Jeanne.has_permissions(manage_roles=True)
     @Jeanne.bot_has_permissions(manage_roles=True)
     @Jeanne.check(check_botbanned_prefix)
@@ -1148,7 +1144,7 @@ class ManagePrefix(Cog, name="Manage"):
             await ctx.send(embed=embed)
 
     @Jeanne.command(
-        aliases=["remove-role", "rr"], description="Remove a role from a member", usage="[MEMBER | MEMBER NAME | MEMBER ID] [ROLE | ROLE NAME | ROLE ID]"
+        aliases=["remove-role", "rr"], description="Remove a role from a member", usage="[MEMBER | MEMBER NAME | MEMBER ID] [ROLE | ROLE NAME | ROLE ID]", extras={"bot_perms":"Manage Roles", "member_perms": "Manage Roles"}
     )
     @Jeanne.has_permissions(manage_roles=True)
     @Jeanne.bot_has_permissions(manage_roles=True)
@@ -1174,7 +1170,7 @@ class ManagePrefix(Cog, name="Manage"):
             )
             await ctx.send(embed=embed)
 
-    @Jeanne.command(description="Remove something for the server.")
+    @Jeanne.command(description="Remove something for the server.", extras={"member_perms": "Manage Server"})
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
@@ -1189,7 +1185,7 @@ class ManagePrefix(Cog, name="Manage"):
             embed.description = "All buttons removed due to timeout"
             await m.edit(embed=embed, view=None)
 
-    @Jeanne.command(description="Clone a channel", extras={"bot_perms":"Manage Channels", "member_perms": "Manage Channels"})
+    @Jeanne.command(description="Clone a channel", usage="<CHANNEL | CHANNEL NAME| CHANNEL ID> <-n NAME> <-t TOPIC> <-cat CATEGORY> <-nsfw Enables NSFW. Just type '-nsfw'>",extras={"bot_perms":"Manage Channels", "member_perms": "Manage Channels"})
     @Jeanne.has_permissions(manage_channels=True)
     @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
@@ -1267,9 +1263,9 @@ class ManagePrefix(Cog, name="Manage"):
                 cloned.add_field(name="NSFW enabled", value="No", inline=True)
         await ctx.send(embed=cloned)
 
-    @Jeanne.command(aliases=["rnemote", "rnemoji"], description="Renames an emoji", usage="[EMOJI | EMOJI ID | EMOJI NAME] [NEW NAME]")
-    @Jeanne.has_permissions(manage_emojis_and_stickers=True)
-    @Jeanne.bot_has_permissions(manage_emojis_and_stickers=True)
+    @Jeanne.command(aliases=["rnemote", "rnemoji"], description="Renames an emoji", usage="[EMOJI | EMOJI ID | EMOJI NAME] [NEW NAME]",extras={"bot_perms":"Manage Expressions", "member_perms": "Manage Expressions"})
+    @Jeanne.has_permissions(manage_expressions=True)
+    @Jeanne.bot_has_permissions(manage_expressions=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def renameemoji(self, ctx: Context, *, emoji: str, name: str):
@@ -1301,6 +1297,7 @@ class ManagePrefix(Cog, name="Manage"):
 
     @Jeanne.command(aliases=["rncat"], description="Renames a category", usage="[CATEGORY | CATEGORY NAME | CATEGORY ID | CATEGORY | CATEGORY NAME | CATEGORY ID ID | CATEGORY | CATEGORY NAME | CATEGORY ID NAME] [NEW NAME]", extras={"bot_perms":"Manage Channels", "member_perms": "Manage Channels"})
     @Jeanne.has_permissions(manage_channels=True)
+    @Jeanne.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def renamecategory(
@@ -1314,9 +1311,9 @@ class ManagePrefix(Cog, name="Manage"):
         await category.edit(name=name)
         await ctx.send(embed=embed)
 
-    @Jeanne.command(aliases=["rnstick"], description="Renames a sticker", usage="[STICKER ID | STICKER NAME] [NEW NAME]")
-    @Jeanne.has_permissions(manage_emojis_and_stickers=True)
-    @Jeanne.bot_has_permissions(manage_emojis_and_stickers=True)
+    @Jeanne.command(aliases=["rnstick"], description="Renames a sticker", usage="[STICKER ID | STICKER NAME] [NEW NAME]",extras={"bot_perms":"Manage Expressions", "member_perms": "Manage Expressions"})
+    @Jeanne.has_permissions(manage_expressions=True)
+    @Jeanne.bot_has_permissions(manage_expressions=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def renamesticker(self, ctx: Context, *, sticker: Optional[str], name: str):
@@ -1344,7 +1341,7 @@ class ManagePrefix(Cog, name="Manage"):
             )
             await ctx.send(embed=embed)
 
-    @Jeanne.command(name="disable", description="Disable a command", usage="[COMMAND]")
+    @Jeanne.command(name="disable", description="Disable a command", usage="[COMMAND]",extras={"member_perms": "Manage Server"})
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     async def _disable(
@@ -1375,7 +1372,7 @@ class ManagePrefix(Cog, name="Manage"):
             await cmd.disable(command)
         await ctx.send(embed=embed)
 
-    @Jeanne.command(name="enable", description="Enable a command", usage="[COMMAND]")
+    @Jeanne.command(name="enable", description="Enable a command", usage="[COMMAND]", extras={"member_perms": "Manage Server"})
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     async def _enable(
@@ -1428,7 +1425,7 @@ class ManagePrefix(Cog, name="Manage"):
     async def role(self, ctx: Context): ...
 
     @role.command(
-        name="add", description="Add a level role reward when a user levels up", usage="[ROLE | ROLE NAME | ROLE ID | ROLE | ROLE NAME | ROLE ID ID] [LEVEL]"
+        name="add", description="Add a level role reward when a user levels up", usage="[ROLE | ROLE NAME | ROLE ID] [LEVEL]",extras={"member_perms": "Manage Server"}
     )
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
@@ -1449,7 +1446,7 @@ class ManagePrefix(Cog, name="Manage"):
         )
         await ctx.send(embed=embed)
 
-    @role.command(name="remove", description="Removes a level role reward", usage="[ROLE | ROLE NAME | ROLE ID]")
+    @role.command(name="remove", description="Removes a level role reward", usage="[ROLE | ROLE NAME | ROLE ID]",extras={"member_perms": "Manage Server"})
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
@@ -1482,7 +1479,7 @@ class ManagePrefix(Cog, name="Manage"):
     )
     async def channel_blacklist(self, ctx: Context): ...
 
-    @channel_blacklist.command(description="Blacklists a channel for gaining XP", usage="[CHANNEL | CHANNEL NAME | CHANNEL ID]")
+    @channel_blacklist.command(description="Blacklists a channel for gaining XP", usage="[CHANNEL | CHANNEL NAME | CHANNEL ID]",extras={"member_perms": "Manage Server"})
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
@@ -1501,7 +1498,7 @@ class ManagePrefix(Cog, name="Manage"):
         embed.description = f"{channel.jump_url} is already XP blacklisted"
         await ctx.send(embed=embed)
 
-    @channel_blacklist.command(description="Unblacklists a channel for gaining XP", usage="[TEXT CHANNEL | CHANNEL NAME | CHANNEL ID]")
+    @channel_blacklist.command(description="Unblacklists a channel for gaining XP", usage="[TEXT CHANNEL | CHANNEL NAME | CHANNEL ID]",extras={"member_perms": "Manage Server"})
     @Jeanne.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
