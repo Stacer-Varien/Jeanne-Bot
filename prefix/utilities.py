@@ -187,7 +187,7 @@ class UtilitiesPrefix(Cog, name="Utilities"):
         aliases=["gen"],
         description="Generates an embed message. This needs the Discohook.org embed generator. You can use a JSON script or text file with the script", usage="<JSON SCRIPT | TEXT FILE>"
     )
-    @Jeanne.has_permissions(administrator=True)
+    @Jeanne.has_guild_permissions(administrator=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def generate(
@@ -228,7 +228,7 @@ class UtilitiesPrefix(Cog, name="Utilities"):
     @_embed.command(
         description="Edits an embed message. This needs the Discohook.org embed generator. You can use JSON script or a text file with the script",  usage="[CHANNEL | CHANNEL NAME | CHANNEL ID] [MESSAGE ID] <JSON SCRIPT | TEXT FILE>"
     )
-    @Jeanne.has_permissions(administrator=True)
+    @Jeanne.has_guild_permissions(administrator=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def edit(

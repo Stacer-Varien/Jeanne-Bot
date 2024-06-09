@@ -81,10 +81,11 @@ class ModPrefix(Cog, name="Moderation"):
 
     @Jeanne.command(
         description="Ban someone in or outside the server",
-        usage="[MEMBER | MEMBER NAME | MEMBER ID] <-r REASON> <-t TIME>",
+        usage="[MEMBER | MEMBER NAME | MEMBER ID | USER ID] <-r REASON> <-t TIME>",
+        extras={"bot_perms": "Ban Members", "member_perms": "Ban Members"},
     )
-    @Jeanne.has_permissions(ban_members=True)
-    @Jeanne.bot_has_permissions(ban_members=True)
+    @Jeanne.has_guild_permissions(ban_members=True)
+    @Jeanne.bot_has_guild_permissions(ban_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def ban(
@@ -249,8 +250,12 @@ class ModPrefix(Cog, name="Moderation"):
             embed.color = Color.red()
             await ctx.send(embed=embed)
 
-    @Jeanne.command(description="Warn a member", usage="[MEMBER | MEMBER NAME | MEMBER ID] <-r REASON>")
-    @Jeanne.has_permissions(kick_members=True)
+    @Jeanne.command(
+        description="Warn a member",
+        usage="[MEMBER | MEMBER NAME | MEMBER ID] <-r REASON>",
+        extras={"member_perms": "Kick Members"},
+    )
+    @Jeanne.has_guild_permissions(kick_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def warn(
@@ -324,8 +329,9 @@ class ModPrefix(Cog, name="Moderation"):
         name="clear-warn",
         description="Revoke a warn by warn ID",
         usage="[MEMBER | MEMBER NAME | MEMBER ID] [WARN ID]",
+        extras={"member_perms": "Kick Members"},
     )
-    @Jeanne.has_permissions(kick_members=True)
+    @Jeanne.has_guild_permissions(kick_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def clearwarn(self, ctx: Context, member: Member, warn_id: int) -> None:
@@ -360,10 +366,12 @@ class ModPrefix(Cog, name="Moderation"):
             await ctx.send(embed=embed)
 
     @Jeanne.command(
-        description="Kick a member out of the server", usage="[MEMBER | MEMBER NAME | MEMBER ID] <-r REASON>"
+        description="Kick a member out of the server",
+        usage="[MEMBER | MEMBER NAME | MEMBER ID] <-r REASON>",
+        extras={"bot_perms": "Kick Members", "member_perms": "Kick Members"},
     )
-    @Jeanne.has_permissions(kick_members=True)
-    @Jeanne.bot_has_permissions(kick_members=True)
+    @Jeanne.has_guild_permissions(kick_members=True)
+    @Jeanne.bot_has_guild_permissions(kick_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def kick(
@@ -439,9 +447,13 @@ class ModPrefix(Cog, name="Moderation"):
             embed.color = Color.red()
             await ctx.send(embed=embed)
 
-    @Jeanne.command(description="Bulk delete messages", usage="<MEMBER | MEMBER NAME | MEMBER ID> <LIMIT>")
-    @Jeanne.has_permissions(manage_messages=True)
-    @Jeanne.bot_has_permissions(manage_messages=True)
+    @Jeanne.command(
+        description="Bulk delete messages",
+        usage="<MEMBER | MEMBER NAME | MEMBER ID | USER ID> <LIMIT>",
+        extras={"bot_perms": "Manage Messages", "member_perms": "Manage Messages"},
+    )
+    @Jeanne.has_guild_permissions(manage_messages=True)
+    @Jeanne.bot_has_guild_permissions(manage_messages=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def prune(
@@ -467,9 +479,10 @@ class ModPrefix(Cog, name="Moderation"):
         aliases=["nick"],
         description="Change someone's nickname",
         usage="[MEMBER | MEMBER NAME | MEMBER ID] [NICKNAME]",
+        extras={"bot_perms": "Manage Nicknames", "member_perms": "Manage Nicknames"},
     )
-    @Jeanne.has_permissions(manage_nicknames=True)
-    @Jeanne.bot_has_permissions(manage_nicknames=True)
+    @Jeanne.has_guild_permissions(manage_nicknames=True)
+    @Jeanne.bot_has_guild_permissions(manage_nicknames=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def changenickname(
@@ -503,8 +516,13 @@ class ModPrefix(Cog, name="Moderation"):
         )
         await ctx.send(embed=setnick)
 
-    @Jeanne.command(description="Unbans a user", usage="[USER ID] <-r REASON>")
-    @Jeanne.has_permissions(ban_members=True)
+    @Jeanne.command(
+        description="Unbans a user",
+        usage="[USER ID] <-r REASON>",
+        extras={"bot_perms": "Ban Members", "member_perms": "Ban Members"},
+    )
+    @Jeanne.has_guild_permissions(ban_members=True)
+    @Jeanne.bot_has_guild_permissions(ban_members=True)
     async def unban(
         self, ctx: Context, user: User, *words: str, parser=mod_parser
     ) -> None:
@@ -553,9 +571,12 @@ class ModPrefix(Cog, name="Moderation"):
             await ctx.send(embed=embed)
 
     @Jeanne.command(
-        description="Timeout a member", usage="[MEMBER | MEMBER NAME | MEMBER ID] <-r REASON> <-t TIME>"
+        description="Timeout a member",
+        usage="[MEMBER | MEMBER NAME | MEMBER ID] <-r REASON> <-t TIME>",
+        extras={"bot_perms": "Manage Nicknames", "member_perms": "Manage Nicknames"},
     )
-    @Jeanne.has_permissions(moderate_members=True)
+    @Jeanne.has_guild_permissions(moderate_members=True)
+    @Jeanne.bot_has_guild_permissions(moderate_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def timeout(
@@ -625,9 +646,13 @@ class ModPrefix(Cog, name="Moderation"):
             embed.color = Color.red()
             await ctx.send(embed=embed)
 
-    @Jeanne.command(description="Untimeouts a member", usage="[MEMBER | MEMBER NAME | MEMBER ID] <-r REASON>")
-    @Jeanne.has_permissions(moderate_members=True)
-    @Jeanne.bot_has_permissions(moderate_members=True)
+    @Jeanne.command(
+        description="Untimeouts a member",
+        usage="[MEMBER | MEMBER NAME | MEMBER ID] <-r REASON>",
+        extras={"bot_perms": "Moderate Members", "member_perms": "Moderate Members"},
+    )
+    @Jeanne.has_guild_permissions(moderate_members=True)
+    @Jeanne.bot_has_guild_permissions(moderate_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def untimeout(
@@ -676,10 +701,11 @@ class ModPrefix(Cog, name="Moderation"):
         aliases=["massb", "mb"],
         description="Ban multiple members at once. Split each ID with a space",
         usage="[USER IDS] [-r REASON]",
+        extras={"bot_perms": "Ban Members", "member_perms": "Administrator"},
     )
     @Jeanne.cooldown(1, 1800, type=BucketType.guild)
-    @Jeanne.has_permissions(administrator=True)
-    @Jeanne.bot_has_permissions(ban_members=True)
+    @Jeanne.has_guild_permissions(administrator=True)
+    @Jeanne.bot_has_guild_permissions(ban_members=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def massban(self, ctx: Context, *words: str, parser=mod_parser):
@@ -815,10 +841,11 @@ class ModPrefix(Cog, name="Moderation"):
         aliases=["massub", "mub"],
         description="Unban multiple members at once. Split each ID with a space",
         usage="[USER IDS] [-r REASON]",
+        extras={"bot_perms": "Ban Members", "member_perms": "Administrator"},
     )
     @Jeanne.cooldown(1, 1800, type=BucketType.guild)
-    @Jeanne.bot_has_permissions(ban_members=True)
-    @Jeanne.has_permissions(administrator=True)
+    @Jeanne.bot_has_guild_permissions(ban_members=True)
+    @Jeanne.has_guild_permissions(administrator=True)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def massunban(self, ctx: Context, *words: str, parser=mod_parser):
