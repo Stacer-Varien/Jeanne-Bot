@@ -50,6 +50,7 @@ async def on_ready():
     print("Bot ID: {}".format(bot.user.id))
     print("Connected to {} servers".format(len(bot.guilds)))
     print("Listening to {} users".format(len(bot.users)))
+    print("Listening to {} shards".format(len(bot.shard_count)))
 
 
 bot.run(TOKEN)
