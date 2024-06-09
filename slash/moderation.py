@@ -81,8 +81,8 @@ class moderation(Cog):
         reason="What did they do?",
         time="How long should they be tempbanned? (1m, 1h30m, etc)",
     )
-    @Jeanne.checks.has_permissions(ban_members=True)
-    @Jeanne.checks.bot_has_permissions(ban_members=True)
+    @Jeanne.checks.has_guild_permissions(ban_members=True)
+    @Jeanne.checks.bot_has_guild_permissions(ban_members=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def ban(
@@ -148,7 +148,7 @@ class moderation(Cog):
 
     @Jeanne.command(description="Warn a member")
     @Jeanne.describe(member="Which member are you warning?", reason="What did they do?")
-    @Jeanne.checks.has_permissions(kick_members=True)
+    @Jeanne.checks.has_guild_permissions(kick_members=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def warn(
@@ -277,7 +277,7 @@ class moderation(Cog):
         member="Which member got warned?",
         warn_id="What is their warn ID you want to remove?",
     )
-    @Jeanne.checks.has_permissions(kick_members=True)
+    @Jeanne.checks.has_guild_permissions(kick_members=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def clearwarn(self, ctx: Interaction, member: Member, warn_id: int):
@@ -307,8 +307,8 @@ class moderation(Cog):
     @Jeanne.describe(
         member="Which member are you kicking?", reason="Why are they being kicked?"
     )
-    @Jeanne.checks.has_permissions(kick_members=True)
-    @Jeanne.checks.bot_has_permissions(kick_members=True)
+    @Jeanne.checks.has_guild_permissions(kick_members=True)
+    @Jeanne.checks.bot_has_guild_permissions(kick_members=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def kick(
@@ -373,8 +373,8 @@ class moderation(Cog):
         limit="How many messages? (max is 100)",
         member="Which member's messages you want to delete?",
     )
-    @Jeanne.checks.has_permissions(manage_messages=True)
-    @Jeanne.checks.bot_has_permissions(manage_messages=True)
+    @Jeanne.checks.has_guild_permissions(manage_messages=True)
+    @Jeanne.checks.bot_has_guild_permissions(manage_messages=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def prune(
@@ -396,8 +396,8 @@ class moderation(Cog):
 
     @Jeanne.command(name="change-nickname", description="Change someone's nickname")
     @Jeanne.describe(member="Which member?", nickname="What is their new nickname")
-    @Jeanne.checks.has_permissions(manage_nicknames=True)
-    @Jeanne.checks.bot_has_permissions(manage_nicknames=True)
+    @Jeanne.checks.has_guild_permissions(manage_nicknames=True)
+    @Jeanne.checks.bot_has_guild_permissions(manage_nicknames=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def changenickname(
@@ -436,7 +436,7 @@ class moderation(Cog):
         user_id="What is the user ID you want to unban?",
         reason="Why are they being unbanned?",
     )
-    @Jeanne.checks.has_permissions(ban_members=True)
+    @Jeanne.checks.has_guild_permissions(ban_members=True)
     async def unban(
         self,
         ctx: Interaction,
@@ -471,7 +471,7 @@ class moderation(Cog):
         time="How long should they be on timeout (1m, 1h30m, etc)",
         reason="Why are they on timeout?",
     )
-    @Jeanne.checks.has_permissions(moderate_members=True)
+    @Jeanne.checks.has_guild_permissions(moderate_members=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def timeout(
@@ -525,8 +525,8 @@ class moderation(Cog):
 
     @Jeanne.command(description="Untimeouts a member")
     @Jeanne.describe(member="Which member?", reason="Why are they untimeouted?")
-    @Jeanne.checks.has_permissions(moderate_members=True)
-    @Jeanne.checks.bot_has_permissions(moderate_members=True)
+    @Jeanne.checks.has_guild_permissions(moderate_members=True)
+    @Jeanne.checks.bot_has_guild_permissions(moderate_members=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def untimeout(
@@ -568,8 +568,8 @@ class moderation(Cog):
         reason="Why are they being banned?",
     )
     @Jeanne.checks.cooldown(1, 1800, key=lambda i: (i.guild.id))
-    @Jeanne.checks.has_permissions(administrator=True)
-    @Jeanne.checks.bot_has_permissions(ban_members=True)
+    @Jeanne.checks.has_guild_permissions(administrator=True)
+    @Jeanne.checks.bot_has_guild_permissions(ban_members=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def massban(self, ctx: Interaction, user_ids: str, reason: str):
@@ -670,8 +670,8 @@ class moderation(Cog):
         reason="Why are they being banned?",
     )
     @Jeanne.checks.cooldown(1, 1800, key=lambda i: (i.guild.id))
-    @Jeanne.checks.bot_has_permissions(ban_members=True)
-    @Jeanne.checks.has_permissions(administrator=True)
+    @Jeanne.checks.bot_has_guild_permissions(ban_members=True)
+    @Jeanne.checks.has_guild_permissions(administrator=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def massunban(self, ctx: Interaction, user_ids: str, reason: str):

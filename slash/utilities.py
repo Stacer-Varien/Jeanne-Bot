@@ -66,7 +66,7 @@ class Embed_Group(GroupCog, name="embed"):
         jsonscript="Add a JSON script",
         jsonfile="Add a JSON file",
     )
-    @Jeanne.checks.has_permissions(administrator=True)
+    @Jeanne.checks.has_guild_permissions(administrator=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def generate(
@@ -120,7 +120,7 @@ class Embed_Group(GroupCog, name="embed"):
         jsonscript="Add a JSON script",
         jsonfile="Add a JSON file",
     )
-    @Jeanne.checks.has_permissions(administrator=True)
+    @Jeanne.checks.has_guild_permissions(administrator=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def edit(
