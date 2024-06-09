@@ -76,7 +76,7 @@ class Create_Group(GroupCog, name="create"):
         nsfw_enabled: Optional[bool] = None,
     ) -> None:
         await ctx.response.defer()
-        name == "new-channel" if name == None else name
+        name = "new-channel" if name == None else name
         channel = await ctx.guild.create_text_channel(name=name)
         embed = Embed()
         embed.color = Color.random()
@@ -120,11 +120,12 @@ class Create_Group(GroupCog, name="create"):
     async def voicechannel(
         self,
         ctx: Interaction,
-        name: Jeanne.Range[str, 1, 100],
+        name: Optional[Jeanne.Range[str, 1, 100]]=None,
         category: Optional[CategoryChannel] = None,
         users: Optional[Jeanne.Range[int, None, 99]] = None,
     ) -> None:
         await ctx.response.defer()
+        name="new-channel" if name == None else name
         channel = await ctx.guild.create_voice_channel(name=name)
         embed = Embed()
         embed.description = "{} has been created".format(channel.jump_url)
@@ -139,7 +140,10 @@ class Create_Group(GroupCog, name="create"):
             embed.add_field(name="User Limit", value=users, inline=True)
         await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(description="Create a category")
+    @Jeanne.command(
+        description="Create a category",
+        extras={"bot_perms": "Manage Channels", "member_perms": "Manage Channels"},
+    )
     @Jeanne.describe(name="What will you name it?")
     @Jeanne.checks.has_guild_permissions(manage_channels=True)
     @Jeanne.checks.bot_has_guild_permissions(manage_channels=True)
@@ -153,7 +157,10 @@ class Create_Group(GroupCog, name="create"):
         embed.color = Color.random()
         await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(description="Create a stage channel")
+    @Jeanne.command(
+        description="Create a stage channel",
+        extras={"bot_perms": "Manage Channels", "member_perms": "Manage Channels"},
+    )
     @Jeanne.describe(
         name="What will you name it?",
         category="Place in which category?",
@@ -194,7 +201,10 @@ class Create_Group(GroupCog, name="create"):
             embed.color = Color.red()
             await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(description="Create a forum")
+    @Jeanne.command(
+        description="Create a forum",
+        extras={"bot_perms": "Manage Channels", "member_perms": "Manage Channels"},
+    )
     @Jeanne.describe(
         name="What will you name it?",
         topic="What is the topic",
@@ -237,7 +247,7 @@ class Create_Group(GroupCog, name="create"):
             embed.color = Color.red()
             await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(description="Create a role")
+    @Jeanne.command(description="Create a role", extras={"bot_perms": "Manage Roles", "member_perms": "Manage Roles"},)
     @Jeanne.describe(
         name="What will you name it?",
         color="What color will it be? (use HEX codes)",
@@ -285,7 +295,10 @@ class Create_Group(GroupCog, name="create"):
 
     thread_group = Jeanne.Group(name="thread", description="...")
 
-    @thread_group.command(description="Make a public thread")
+    @thread_group.command(
+        description="Make a public thread",
+        extras={"bot_perms": "Create Public Threads\nManage Threads", "member_perms": "Create Public Threads"},
+    )
     @Jeanne.describe(
         name="What will you name it?",
         channel="Which channel is the message in?",
@@ -293,10 +306,10 @@ class Create_Group(GroupCog, name="create"):
         slowmode="What is the slowmode (1h, 30m, etc) (Max is 6 hours)",
     )
     @Jeanne.checks.has_guild_permissions(
-        create_public_threads=True, create_private_threads=True
+        create_public_threads=True,
     )
     @Jeanne.checks.bot_has_guild_permissions(
-        create_public_threads=True, create_private_threads=True, manage_threads=True
+        create_public_threads=True, manage_threads=True
     )
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
@@ -349,14 +362,22 @@ class Create_Group(GroupCog, name="create"):
             embed.color = Color.red()
             await ctx.followup.send(embed=embed)
 
-    @thread_group.command(description="Make a private thread")
+    @thread_group.command(
+        description="Make a private thread",
+        extras={
+            "bot_perms": "Create Private Threads\nManage Threads",
+            "member_perms": "Create Private Threads",
+        },
+    )
     @Jeanne.describe(
         name="What will you name it?",
         channel="Which channel is the message in?",
         slowmode="What is the slowmode (1h, 30m, etc) (Max is 6 hours)",
     )
     @Jeanne.checks.has_guild_permissions(create_private_threads=True)
-    @Jeanne.checks.bot_has_guild_permissions(create_private_threads=True, manage_threads=True)
+    @Jeanne.checks.bot_has_guild_permissions(
+        create_private_threads=True, manage_threads=True
+    )
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def private(
@@ -397,14 +418,20 @@ class Create_Group(GroupCog, name="create"):
             embed.color = Color.red()
             await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(description="Make a new emoji")
+    @Jeanne.command(
+        description="Make a new emoji",
+        extras={
+            "bot_perms": "Manage Expressions",
+            "member_perms": "Manage Expressions",
+        },
+    )
     @Jeanne.describe(
         name="What will you name it?",
         emoji_link="Insert emoji URL here",
         emoji_image="Insert emoji image here",
     )
-    @Jeanne.checks.has_guild_permissions(manage_emojis_and_stickers=True)
-    @Jeanne.checks.bot_has_guild_permissions(manage_emojis_and_stickers=True)
+    @Jeanne.checks.has_guild_permissions(manage_expressions=True)
+    @Jeanne.checks.bot_has_guild_permissions(manage_expressions=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def emoji(
@@ -451,7 +478,13 @@ class Create_Group(GroupCog, name="create"):
                     embed.description = "There was a problem making the emoji. Please check that the emoji you are making is a PNG, JPEG or GIF"
                 await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(description="Make a new sticker")
+    @Jeanne.command(
+        description="Make a new sticker",
+        extras={
+            "bot_perms": "Manage Expressions",
+            "member_perms": "Manage Expressions",
+        },
+    )
     @Jeanne.describe(
         name="What will you name it?",
         emoji="Emoji that will repesent the sticker",
@@ -506,7 +539,10 @@ class Delete_Group(GroupCog, name="delete"):
         self.bot = bot
         super().__init__()
 
-    @Jeanne.command(description="Deletes a channel")
+    @Jeanne.command(
+        description="Deletes a channel",
+        extras={"bot_perms": "Manage Channels", "member_perms": "Manage Channels"},
+    )
     @Jeanne.describe(channel="Which channel are you deleting?")
     @Jeanne.checks.has_guild_permissions(manage_channels=True)
     @Jeanne.checks.bot_has_guild_permissions(manage_channels=True)
@@ -521,7 +557,10 @@ class Delete_Group(GroupCog, name="delete"):
         await ctx.followup.send(embed=embed)
 
     @Jeanne.command(description="Deletes a role")
-    @Jeanne.describe(role="Which role are you deleting?")
+    @Jeanne.describe(
+        role="Which role are you deleting?",
+        extras={"bot_perms": "Manage Roles", "member_perms": "Manage Roles"},
+    )
     @Jeanne.checks.has_guild_permissions(manage_channels=True)
     @Jeanne.checks.bot_has_guild_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_app_command)
