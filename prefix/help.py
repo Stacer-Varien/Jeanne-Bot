@@ -1,5 +1,5 @@
 from json import dumps, loads
-from discord import ButtonStyle, Color, Embed, SelectOption, ui
+from discord import ButtonStyle, Color, Embed, Interaction, SelectOption, ui
 from discord.ext.commands import Bot, Cog, group, Context, Range
 import discord.ext.commands as Jeanne
 from reactionmenu import Page, ViewButton, ViewMenu, ViewSelect
@@ -8,6 +8,149 @@ from functions import (
     check_disabled_prefixed_command,
 )
 from re import findall
+
+
+class HelpMenu(ui.Select):
+    def __init__(self, bot: Bot):
+        self.bot = bot
+
+        excluded_cogs = [
+            "listenersCog",
+            "tasksCog",
+            "WelcomerCog",
+            "cmdlogger",
+            "ErrorsPrefix",
+            "CommandLogSlash",
+            "Owner",
+            "Jishaku",
+            "guess",
+            "dice",
+            "flip",
+            "CurrencySlash",
+            "ErrorsSlash",
+            "FunSlash",
+            "help",
+            "nsfw",
+            "ImagesSlash",
+            "InfoSlash",
+            "shop",
+            "background",
+            "rank",
+            "levelling",
+            "manage",
+            "create",
+            "edit",
+            "delete",
+            "set",
+            "rename",
+            "command",
+            "level",
+            "ReactionsSlash",
+            "embed",
+            "slashutilities",
+            "reminder",
+            "moderation",
+        ]
+
+        options = []
+        self.embeds = {}
+
+        for cog_name, cog in self.bot.cogs.items():
+            if cog_name in excluded_cogs:
+                continue
+
+            cmds = [
+                command.qualified_name
+                for command in cog.walk_commands()
+                if not command.description.startswith("Main")
+            ]
+
+            embed = Embed(color=Color.random())
+
+            if cog_name == "Level":
+                embed.description = (
+                    "## How to gain XP\n"
+                    "You gain XP by sending a message. You gain **5XP/2 Minutes/Message** "
+                    "meaning if you send a message **now**, you will gain **5XP** but you "
+                    "have to wait for **2 minutes** to gain another 5XP on the next message. "
+                    "On weekends, you get **10XP/2 Minutes/Message**. Voting rewards are "
+                    "available depending if you have voted in TopGG and/or DiscordBotList."
+                )
+                embed.add_field(
+                    name=f"**{cog.qualified_name.title()}**", value="\n".join(cmds)
+                )
+            elif cog_name == "Manage":
+                embed.description = (
+                    "Channel commands require the **manage channel** permission, role commands "
+                    "require the **manage role** permission, and setting a logging channel and "
+                    "editing the server require the **manage server** permission. Creating, "
+                    "renaming, and deleting emojis and stickers requires the **manage emojis "
+                    "and stickers** permission. As for profile-related commands, everyone can use them."
+                )
+                create_group = [cmd for cmd in cmds if cmd.startswith("create")]
+                delete_group = [cmd for cmd in cmds if cmd.startswith("delete")]
+                set_group = [cmd for cmd in cmds if cmd.startswith("set")]
+                edit_group = [cmd for cmd in cmds if cmd.startswith("edit")]
+                level_group = [cmd for cmd in cmds if cmd.startswith("level")]
+                other_group = [
+                    cmd
+                    for cmd in cmds
+                    if not cmd.startswith(("create", "delete", "set", "edit", "level"))
+                ]
+
+                embed.add_field(
+                    name="create", value="\n".join(create_group), inline=True
+                )
+                embed.add_field(
+                    name="delete", value="\n".join(delete_group), inline=True
+                )
+                embed.add_field(name="set", value="\n".join(set_group), inline=True)
+                embed.add_field(name="edit", value="\n".join(edit_group), inline=True)
+                embed.add_field(name="level", value="\n".join(level_group), inline=True)
+                embed.add_field(
+                    name=f"**{cog.qualified_name.title()}**",
+                    value="\n".join(other_group),
+                )
+            elif cog_name == "Inventory":
+                embed.description = "This module has 2 systems working together. It is still under development but functional."
+                embed.add_field(
+                    name=f"**{cog.qualified_name.title()}**", value="\n".join(cmds)
+                )
+            elif cog_name == "Currency":
+                embed.description = "When using the commands related to this module, please respect the [rules](https://jeannebot.gitbook.io/jeannebot/tos-and-privacy#terms-of-services)."
+                embed.add_field(
+                    name=f"**{cog.qualified_name.title()}**", value="\n".join(cmds)
+                )
+            else:
+                embed.add_field(
+                    name=f"**{cog.qualified_name.title()}**", value="\n".join(cmds)
+                )
+
+            embed.set_footer(
+                text='If you need help on a specific command, please use "help command COMMAND". COMMAND must be the full command name.'
+            )
+
+            options.append(
+                SelectOption(label=cog.qualified_name.title(), value=cog_name)
+            )
+            self.embeds[cog_name] = embed
+
+        super().__init__(
+            placeholder="Select an option", max_values=1, min_values=1, options=options
+        )
+
+    async def callback(self, ctx: Interaction):
+        selected_cog_name = self.values[0]
+        embed = self.embeds.get(selected_cog_name)
+        if embed:
+            await ctx.response.edit_message(embed=embed)
+
+
+class HelpSelect(ui.View):
+    def __init__(self, bot:Bot):
+        self.bot=bot
+        super().__init__(timeout=120)
+        self.add_item(HelpMenu(self.bot))
 
 
 class help_button(ui.View):
@@ -54,140 +197,26 @@ class HelpGroupPrefix(Cog, name="Help"):
     @Jeanne.check(check_botbanned_prefix)
     async def help(self, ctx: Context):
         async with ctx.typing():
-            excluded_cogs = [
-                "listenersCog",
-                "tasksCog",
-                "WelcomerCog",
-                "cmdlogger",
-                "ErrorsPrefix",
-                "CommandLogSlash",
-                "Owner",
-                "Jishaku",
-                "guess",
-                "dice",
-                "flip",
-                "CurrencySlash",
-                "ErrorsSlash",
-                "FunSlash",
-                "help",
-                "nsfw",
-                "ImagesSlash",
-                "InfoSlash",
-                "shop",
-                "background",
-                "rank",
-                "levelling",
-                "manage",
-                "create",
-                "edit",
-                "delete",
-                "set",
-                "rename",
-                "command",
-                "level",
-                "moderation",
-                "ReactionsSlash",
-                "embed",
-                "slashutilities",
-                "reminder",
-            ]
+            view=HelpSelect(self.bot)
+            embed=Embed(color=Color.random())
+            embed.description="""
+## The available modules are:
+- Currency
+- Fun
+- Hentai (NSFW)
+- Image
+- Info
+- Inventory
+- Levelling
+- Manage
+- Moderation
+- Reaction
+- Uitilities
 
-            menu = ViewMenu(
-                ctx,
-                menu_type=ViewMenu.TypeEmbed,
-                disable_items_on_timeout=True,
-                show_page_director=False,
-                timeout=120.0,
-            )
+To check availability of commands in each module, use the dropmenu below
+"""
 
-            options = {}
-            for cog_name, cog in self.bot.cogs.items():
-                if cog_name in excluded_cogs:
-                    continue
-
-                cmds = [
-                    command.qualified_name
-                    for command in cog.walk_commands()
-                    if not command.description.startswith("Main")
-                ]
-
-                embed = Embed(color=Color.random())
-                if cog_name == "Level":
-                    embed.description = (
-                        "## How to gain XP\n"
-                        "You gain XP by sending a message. You gain **5XP/2 Minutes/Message** "
-                        "meaning if you send a message **now**, you will gain **5XP** but you "
-                        "have to wait for **2 minutes** to gain another 5XP on the next message. "
-                        "On weekends, you get **10XP/2 Minutes/Message**. Voting rewards are "
-                        "available depending if you have voted in TopGG and/or DiscordBotList."
-                    )
-                    embed.add_field(
-                        name=f"**{cog.qualified_name.title()}**", value="\n".join(cmds)
-                    )
-                elif cog_name == "Manage":
-                    embed.description = (
-                        "Channel commands require the **manage channel** permission, role commands "
-                        "require the **manage role** permission, and setting a logging channel and "
-                        "editing the server require the **manage server** permission. Creating, "
-                        "renaming, and deleting emojis and stickers requires the **manage emojis "
-                        "and stickers** permission. As for profile-related commands, everyone can use them."
-                    )
-                    create_group = [cmd for cmd in cmds if cmd.startswith("create")]
-                    delete_group = [cmd for cmd in cmds if cmd.startswith("delete")]
-                    set_group = [cmd for cmd in cmds if cmd.startswith("set")]
-                    edit_group = [cmd for cmd in cmds if cmd.startswith("edit")]
-                    level_group = [cmd for cmd in cmds if cmd.startswith("level")]
-                    other_group = [
-                        cmd
-                        for cmd in cmds
-                        if not cmd.startswith(
-                            ("create", "delete", "set", "edit", "level")
-                        )
-                    ]
-
-                    embed.add_field(
-                        name="create", value="\n".join(create_group), inline=True
-                    )
-                    embed.add_field(
-                        name="delete", value="\n".join(delete_group), inline=True
-                    )
-                    embed.add_field(name="set", value="\n".join(set_group), inline=True)
-                    embed.add_field(
-                        name="edit", value="\n".join(edit_group), inline=True
-                    )
-                    embed.add_field(
-                        name="level", value="\n".join(level_group), inline=True
-                    )
-                    embed.add_field(
-                        name=f"**{cog.qualified_name.title()}**",
-                        value="\n".join(other_group),
-                    )
-                elif cog_name == "Inventory":
-                    embed.description = "This module has 2 systems working together. It is still under development but functional."
-                    embed.add_field(
-                        name=f"**{cog.qualified_name.title()}**", value="\n".join(cmds)
-                    )
-                elif cog_name == "Currency":
-                    embed.description = "When using the commands related to this module, please respect the [rules](https://jeannebot.gitbook.io/jeannebot/tos-and-privacy#terms-of-services)."
-                    embed.add_field(
-                        name=f"**{cog.qualified_name.title()}**", value="\n".join(cmds)
-                    )
-
-                embed.set_footer(
-                    text='If you need help on a specific command, please use "help command COMMAND". COMMAND must be the full command name.'
-                )
-
-                option = {SelectOption(label=cog.qualified_name): [Page(embed=embed)]}
-                options.update(option)
-                menu.add_page(embed=embed)
-
-            menu.add_button(ViewButton.go_to_first_page())
-            menu.add_button(ViewButton.back())
-            menu.add_button(ViewButton.next())
-            menu.add_button(ViewButton.go_to_last_page())
-            menu.add_select(ViewSelect(title="Go to...", options=options))
-
-            await menu.start()
+            await ctx.send(embed=embed, view=view)
 
     @help.command(aliases=["cmd"], description="Get help on a certain command", usage="[COMMAND NAME]")
     @Jeanne.check(check_disabled_prefixed_command)
@@ -230,7 +259,7 @@ class HelpGroupPrefix(Cog, name="Help"):
                 )
             if nsfw:
                 embed.add_field(
-                    name="NSFW Enabled", value=nsfw, inline=True
+                    name="Requires NSFW Channel", value=nsfw, inline=True
                 )
             if not cmd.description.startswith("Main"):
                 cmd_usage = "j!" + cmd.qualified_name + " " + cmd.usage
