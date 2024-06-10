@@ -559,10 +559,12 @@ class Delete_Group(GroupCog, name="delete"):
         await channel.delete()
         await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(description="Deletes a role")
+    @Jeanne.command(
+        description="Deletes a role",
+        extras={"bot_perms": "Manage Roles", "member_perms": "Manage Roles"},
+    )
     @Jeanne.describe(
         role="Which role are you deleting?",
-        extras={"bot_perms": "Manage Roles", "member_perms": "Manage Roles"},
     )
     @Jeanne.checks.bot_has_permissions(manage_channels=True)
     @Jeanne.checks.has_permissions(manage_channels=True)
@@ -716,7 +718,6 @@ class Edit_Group(GroupCog, name="edit"):
     @Jeanne.describe(
         channel="Which channel are you editing?",
         name="What will be the new name?",
-        name="What is the new name?",
         category="Place in which category?",
         users="How many users are allowed in the channel",
     )
@@ -1362,7 +1363,9 @@ class manage(Cog):
                 )
             else:
                 await cloned_channel.edit(category=category)
-                cloned.add_field(name="Moved to category", value=category.name, inline=True)
+                cloned.add_field(
+                    name="Moved to category", value=category.name, inline=True
+                )
         if nsfw_enabled:
             await cloned_channel.edit(nsfw=nsfw_enabled)
             cloned.add_field(name="NSFW Enabled", value=nsfw_enabled, inline=True)
@@ -1515,7 +1518,7 @@ class Command_Group(GroupCog, name="command"):
 
     @Jeanne.command(name="enable", description="Enable a command")
     @Jeanne.autocomplete(command=AutoCompleteChoices.disabled_commands)
-    @Jeanne.checks.has(manage_guild=True)
+    @Jeanne.checks.has_permissions(manage_guild=True)
     @Jeanne.describe(command="Which command are you enabling?")
     @Jeanne.check(check_botbanned_app_command)
     async def _enable(
