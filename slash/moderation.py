@@ -11,7 +11,7 @@ from discord import (
     User,
     app_commands as Jeanne,
 )
-from discord.ext.commands import Cog, Bot, GroupCog
+from discord.ext.commands import Cog, Bot
 from discord.utils import utcnow
 from datetime import datetime, timedelta
 from humanfriendly import InvalidTimespan, format_timespan, parse_timespan
@@ -75,14 +75,17 @@ class moderation(Cog):
         except NotFound:
             return False
 
-    @Jeanne.command(description="Ban someone from or outside the server")
+    @Jeanne.command(
+        description="Ban someone from or outside the server",
+        extras={"bot_perms": "Ban Members", "member_perms": "Ban Members"},
+    )
     @Jeanne.describe(
         member="What is the member or user ID?",
         reason="What did they do?",
         time="How long should they be tempbanned? (1m, 1h30m, etc)",
     )
-    @Jeanne.checks.has_guild_permissions(ban_members=True)
-    @Jeanne.checks.bot_has_guild_permissions(ban_members=True)
+    @Jeanne.checks.has_permissions(ban_members=True)
+    @Jeanne.checks.bot_has_permissions(ban_members=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def ban(
@@ -146,9 +149,12 @@ class moderation(Cog):
             embed.color = Color.red()
             await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(description="Warn a member")
+    @Jeanne.command(
+        description="Warn a member",
+        extras={"bot_perms": "Kick Members", "member_perms": "Kick Members"},
+    )
     @Jeanne.describe(member="Which member are you warning?", reason="What did they do?")
-    @Jeanne.checks.has_guild_permissions(kick_members=True)
+    @Jeanne.checks.has_permissions(kick_members=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def warn(
@@ -194,7 +200,7 @@ class moderation(Cog):
         if modlog == None:
             await ctx.followup.send(embed=warn)
             return
-        
+
         warned = Embed(
             description=f"{member} has been warned. Check {modlog.mention}",
             color=0xFF0000,
@@ -272,12 +278,16 @@ class moderation(Cog):
         menu.add_button(ViewButton.go_to_last_page())
         await menu.start()
 
-    @Jeanne.command(name="clear-warn", description="Revoke a warn by warn ID")
+    @Jeanne.command(
+        name="clear-warn",
+        description="Revoke a warn by warn ID",
+        extras={"bot_perms": "Kick Members", "member_perms": "Kick Members"},
+    )
     @Jeanne.describe(
         member="Which member got warned?",
         warn_id="What is their warn ID you want to remove?",
     )
-    @Jeanne.checks.has_guild_permissions(kick_members=True)
+    @Jeanne.checks.has_permissions(kick_members=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def clearwarn(self, ctx: Interaction, member: Member, warn_id: int):
@@ -296,19 +306,22 @@ class moderation(Cog):
         if modlog == None:
             await ctx.followup.send(embed=revoked_warn)
             return
-        
+
         revoke = Embed(
             description=f"Warn revoked. Check {modlog.mention}", color=0xFF0000
         )
         await modlog.send(embed=revoke)
         await ctx.followup.send(embed=revoked_warn)
 
-    @Jeanne.command(description="Kick a member out of the server")
+    @Jeanne.command(
+        description="Kick a member out of the server",
+        extras={"bot_perms": "Kick Members", "member_perms": "Kick Members"},
+    )
     @Jeanne.describe(
         member="Which member are you kicking?", reason="Why are they being kicked?"
     )
-    @Jeanne.checks.has_guild_permissions(kick_members=True)
-    @Jeanne.checks.bot_has_guild_permissions(kick_members=True)
+    @Jeanne.checks.has_permissions(kick_members=True)
+    @Jeanne.checks.bot_has_permissions(kick_members=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def kick(
@@ -348,7 +361,6 @@ class moderation(Cog):
             await member.send(embed=kickmsg)
         except:
             pass
-        # await member.kick(reason="{} | {}".format(reason, ctx.user))
         await ctx.guild.kick(member, reason="{} | {}".format(reason, ctx.user))
         kick = Embed(title="Member Kicked", color=0xFF0000)
         kick.add_field(name="Member", value=member, inline=True)
@@ -360,7 +372,7 @@ class moderation(Cog):
         if modlog == None:
             await ctx.followup.send(embed=kick)
             return
-        
+
         kicked = Embed(
             description=f"{member} has been kicked. Check {modlog.mention}",
             color=0xFF0000,
@@ -368,13 +380,16 @@ class moderation(Cog):
         await modlog.send(embed=kick)
         await ctx.followup.send(embed=kicked)
 
-    @Jeanne.command(description="Bulk delete messages")
+    @Jeanne.command(
+        description="Bulk delete messages",
+        extras={"bot_perms": "Manage Messages", "member_perms": "Manage Messages"},
+    )
     @Jeanne.describe(
         limit="How many messages? (max is 100)",
         member="Which member's messages you want to delete?",
     )
-    @Jeanne.checks.has_guild_permissions(manage_messages=True)
-    @Jeanne.checks.bot_has_guild_permissions(manage_messages=True)
+    @Jeanne.checks.has_permissions(manage_messages=True)
+    @Jeanne.checks.bot_has_permissions(manage_messages=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def prune(
@@ -394,10 +409,14 @@ class moderation(Cog):
             return
         await ctx.channel.purge(limit=limit)
 
-    @Jeanne.command(name="change-nickname", description="Change someone's nickname")
+    @Jeanne.command(
+        name="change-nickname",
+        description="Change someone's nickname",
+        extras={"bot_perms": "Manage Nicknames", "member_perms": "Manage Nicknames"},
+    )
     @Jeanne.describe(member="Which member?", nickname="What is their new nickname")
-    @Jeanne.checks.has_guild_permissions(manage_nicknames=True)
-    @Jeanne.checks.bot_has_guild_permissions(manage_nicknames=True)
+    @Jeanne.checks.has_permissions(manage_nicknames=True)
+    @Jeanne.checks.bot_has_permissions(manage_nicknames=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def changenickname(
@@ -431,12 +450,16 @@ class moderation(Cog):
         )
         await ctx.followup.send(embed=setnick)
 
-    @Jeanne.command(description="Unbans a user")
+    @Jeanne.command(
+        description="Unbans a user",
+        extras={"bot_perms": "Ban Members", "member_perms": "Ban Members"},
+    )
     @Jeanne.describe(
         user_id="What is the user ID you want to unban?",
         reason="Why are they being unbanned?",
     )
-    @Jeanne.checks.has_guild_permissions(ban_members=True)
+    @Jeanne.checks.has_permissions(ban_members=True)
+    @Jeanne.checks.bot_has_permissions(ban_members=True)
     async def unban(
         self,
         ctx: Interaction,
@@ -457,7 +480,7 @@ class moderation(Cog):
         if modlog == None:
             await ctx.followup.send(embed=unban)
             return
-        
+
         unbanned = Embed(
             description=f"{user} has been unbanned. Check {modlog.mention}",
             color=0xFF0000,
@@ -465,13 +488,17 @@ class moderation(Cog):
         await ctx.followup.send(embed=unbanned)
         await modlog.send(embed=unban)
 
-    @Jeanne.command(description="Timeout a member")
+    @Jeanne.command(
+        description="Timeout a member",
+        extras={"bot_perms": "Moderate Members", "member_perms": "Moderate Members"},
+    )
     @Jeanne.describe(
         member="Which member?",
         time="How long should they be on timeout (1m, 1h30m, etc)",
         reason="Why are they on timeout?",
     )
-    @Jeanne.checks.has_guild_permissions(moderate_members=True)
+    @Jeanne.checks.has_permissions(moderate_members=True)
+    @Jeanne.checks.bot_has_permissions(moderate_members=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def timeout(
@@ -505,7 +532,7 @@ class moderation(Cog):
         if modlog == None:
             await ctx.followup.send(embed=mute)
             return
-        
+
         muted = Embed(
             description=f"{member} has been put on timeout. Check {modlog.mention}",
             color=0xFF0000,
@@ -523,10 +550,13 @@ class moderation(Cog):
             embed.color = Color.red()
             await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(description="Untimeouts a member")
+    @Jeanne.command(
+        description="Untimeouts a member",
+        extras={"bot_perms": "Moderate Members", "member_perms": "Moderate Members"},
+    )
     @Jeanne.describe(member="Which member?", reason="Why are they untimeouted?")
-    @Jeanne.checks.has_guild_permissions(moderate_members=True)
-    @Jeanne.checks.bot_has_guild_permissions(moderate_members=True)
+    @Jeanne.checks.has_permissions(moderate_members=True)
+    @Jeanne.checks.bot_has_permissions(moderate_members=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def untimeout(
@@ -554,7 +584,7 @@ class moderation(Cog):
         if modlog == None:
             await ctx.followup.send(embed=unmute)
             return
-        
+
         unmuted = Embed(
             description=f"{member} has been untimeouted. Check {modlog.mention}",
             color=0xFF0000,
@@ -562,14 +592,17 @@ class moderation(Cog):
         await ctx.followup.send(embed=unmuted)
         await modlog.send(embed=unmute)
 
-    @Jeanne.command(description="Ban multiple members at once")
+    @Jeanne.command(
+        description="Ban multiple members at once",
+        extras={"bot_perms": "Ban Members", "member_perms": "Ban Members"},
+    )
     @Jeanne.describe(
         user_ids="How many user IDs? Leave a space after each ID (min is 5 and max is 25)",
         reason="Why are they being banned?",
     )
     @Jeanne.checks.cooldown(1, 1800, key=lambda i: (i.guild.id))
-    @Jeanne.checks.has_guild_permissions(administrator=True)
-    @Jeanne.checks.bot_has_guild_permissions(ban_members=True)
+    @Jeanne.checks.has_permissions(administrator=True)
+    @Jeanne.checks.bot_has_permissions(ban_members=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def massban(self, ctx: Interaction, user_ids: str, reason: str):
@@ -641,7 +674,7 @@ class moderation(Cog):
             if modlog == None:
                 await ctx.edit_original_response(embed=embed)
                 return
-            
+
             await ctx.edit_original_response(
                 embed=Embed(
                     description=f"Successfully banned {ban_count} user(s). Check {modlog.mention}",
@@ -664,14 +697,17 @@ class moderation(Cog):
             )
             await ctx.response.send_message(embed=cooldown)
 
-    @Jeanne.command(description="Unban multiple members at once")
+    @Jeanne.command(
+        description="Unban multiple members at once",
+        extras={"bot_perms": "Ban Members", "member_perms": "Ban Members"},
+    )
     @Jeanne.describe(
         user_ids="How many user IDs? Leave a space after each ID (min is 5 and max is 25)",
         reason="Why are they being banned?",
     )
     @Jeanne.checks.cooldown(1, 1800, key=lambda i: (i.guild.id))
-    @Jeanne.checks.bot_has_guild_permissions(ban_members=True)
-    @Jeanne.checks.has_guild_permissions(administrator=True)
+    @Jeanne.checks.bot_has_permissions(ban_members=True)
+    @Jeanne.checks.has_permissions(administrator=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def massunban(self, ctx: Interaction, user_ids: str, reason: str):
@@ -743,7 +779,7 @@ class moderation(Cog):
             if modlog == None:
                 await ctx.edit_original_response(embed=embed)
                 return
-            
+
             await ctx.edit_original_response(
                 embed=Embed(
                     description=f"Successfully unbanned {unban_count} user(s). Check {modlog.mention}",

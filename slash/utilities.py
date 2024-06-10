@@ -59,14 +59,15 @@ class Embed_Group(GroupCog, name="embed"):
         super().__init__()
 
     @Jeanne.command(
-        description="Generates an embed message. This needs the Discohook.org embed generator"
+        description="Generates an embed message. This needs the Discohook.org embed generator",
+        extras={"member_perms": "Administrator"},
     )
     @Jeanne.describe(
         channel="Send to which channel?",
         jsonscript="Add a JSON script",
         jsonfile="Add a JSON file",
     )
-    @Jeanne.checks.has_guild_permissions(administrator=True)
+    @Jeanne.checks.has_permissions(administrator=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def generate(
@@ -112,7 +113,8 @@ class Embed_Group(GroupCog, name="embed"):
         )
 
     @Jeanne.command(
-        description="Edits an embed message. This needs the Discohook.org embed generator"
+        description="Edits an embed message. This needs the Discohook.org embed generator",
+        extras={"member_perms": "Administrator"},
     )
     @Jeanne.describe(
         channel="Which channel is the embed message in?",
@@ -120,7 +122,7 @@ class Embed_Group(GroupCog, name="embed"):
         jsonscript="Add a JSON script",
         jsonfile="Add a JSON file",
     )
-    @Jeanne.checks.has_guild_permissions(administrator=True)
+    @Jeanne.checks.has_permissions(administrator=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def edit(
