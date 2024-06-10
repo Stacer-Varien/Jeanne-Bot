@@ -15,7 +15,11 @@ class nsfw(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @Jeanne.command(description="Get a random hentai from Jeanne", nsfw=True)
+    @Jeanne.command(
+        description="Get a random hentai from Jeanne",
+        nsfw=True,
+        extras={"nsfw": True},
+    )
     @Jeanne.checks.cooldown(1, 5, key=lambda i: (i.user.id))
     @Jeanne.describe(rating="Do you want questionable or explicit content?")
     @Jeanne.check(check_botbanned_app_command)
@@ -58,7 +62,11 @@ class nsfw(Cog):
             )
             await ctx.followup.send(embed=slow)
 
-    @Jeanne.command(description="Get a random media content from Gelbooru", nsfw=True)
+    @Jeanne.command(
+        description="Get a random media content from Gelbooru",
+        nsfw=True,
+        extras={"nsfw": True},
+    )
     @Jeanne.checks.cooldown(1, 5, key=lambda i: (i.user.id))
     @Jeanne.describe(
         rating="Do you want questionable or explicit content?",
@@ -152,7 +160,11 @@ class nsfw(Cog):
             )
             await ctx.followup.send(embed=slow)
 
-    @Jeanne.command(description="Get a random hentai from Yande.re", nsfw=True)
+    @Jeanne.command(
+        description="Get a random hentai from Yande.re",
+        nsfw=True,
+        extras={"nsfw": True},
+    )
     @Jeanne.checks.cooldown(1, 5, key=lambda i: (i.user.id))
     @Jeanne.describe(
         rating="Do you want questionable or explicit content?",
@@ -236,7 +248,11 @@ class nsfw(Cog):
             )
             await ctx.followup.send(embed=slow)
 
-    @Jeanne.command(description="Get a random hentai from Konachan", nsfw=True)
+    @Jeanne.command(
+        description="Get a random hentai from Konachan",
+        nsfw=True,
+        extras={"nsfw": True},
+    )
     @Jeanne.checks.cooldown(1, 5, key=lambda i: (i.user.id))
     @Jeanne.describe(
         rating="Do you want questionable or explicit content?",
@@ -323,7 +339,11 @@ class nsfw(Cog):
             )
             await ctx.followup.send(embed=slow)
 
-    @Jeanne.command(description="Get a random media content from Danbooru", nsfw=True)
+    @Jeanne.command(
+        description="Get a random media content from Danbooru",
+        nsfw=True,
+        extras={"nsfw": True},
+    )
     @Jeanne.checks.cooldown(1, 5, key=lambda i: (i.user.id))
     @Jeanne.describe(
         rating="Do you want questionable or explicit content?",
