@@ -131,7 +131,7 @@ class fun(Cog, name="FunSlash"):
             description="{}'s simp rate is {}%".format(member, perc),
             color=Color.random(),
         )
-        if perc >= 60:
+        if perc > 60:
             simp.set_image(url="https://i.imgur.com/W4u4Igk.jpg")
         else:
             simp.set_image(url="https://i.imgur.com/Rs1IP2I.jpg")
@@ -149,7 +149,7 @@ class fun(Cog, name="FunSlash"):
             description="{}'s gay rate is {}%".format(member, perc),
             color=Color.random(),
         )
-        if perc >= 60:
+        if perc > 60:
             gay.set_image(url="https://i.imgur.com/itOD0Da.png?1")
         else:
             gay.set_image(url="https://i.imgur.com/tYAbWCl.jpg")
