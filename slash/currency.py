@@ -11,7 +11,7 @@ from discord import (
 )
 from datetime import datetime, timedelta
 from discord.ext.commands import Cog, Bot, GroupCog
-from assets.components import Guess_Buttons, Heads_or_Tails
+from assets.components import Dice_Buttons, Guess_Buttons, Heads_or_Tails
 from config import DBL_AUTH
 from functions import (
     BetaTest,
@@ -181,28 +181,38 @@ class Dice_Group(GroupCog, name="dice"):
         super().__init__()
 
     @Jeanne.command(description="Roll a dice for free 20 QP")
-    @Jeanne.describe(digit="Guess what will roll")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
-    async def free(self, ctx: Interaction, digit: Jeanne.Range[int, 1, 6]):
+    async def free(self, ctx: Interaction):
         await ctx.response.defer()
+        view = Dice_Buttons(ctx.user)
+        await ctx.followup.send(
+            embed=Embed(
+                description="What do you think the dice will roll?",
+                color=Color.random(),
+            ),
+            view=view,
+        )
+
+        await view.wait()
+
         rolled = randint(1, 6)
-        if digit == rolled:
+        if view.value == rolled:
             await Currency(ctx.user).add_qp(20)
             embed = Embed(color=Color.random())
             embed.add_field(
                 name=f"YAY! You got it!\n20 <:quantumpiece:1161010445205905418> has been added",
-                value=f"Dice rolled: **{rolled}**\nYou guessed: **{digit}**!",
+                value=f"Dice rolled: **{rolled}**\nYou guessed: **{view.value}**!",
                 inline=False,
             )
-            await ctx.followup.send(embed=embed)
+            await ctx.edit_original_response(embed=embed, view=None)
             return
         embed = Embed(description=f"Oh no. It rolled a **{rolled}**", color=Color.red())
-        await ctx.followup.send(embed=embed)
+        await ctx.edit_original_response(embed=embed, view=None)
 
     @Jeanne.command(description="Roll a dice with betting")
-    @Jeanne.describe(bet="How much are you betting?", digit="Guess what will roll")
+    @Jeanne.describe(bet="How much are you betting?")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
@@ -210,10 +220,8 @@ class Dice_Group(GroupCog, name="dice"):
         self,
         ctx: Interaction,
         bet: Jeanne.Range[int, 5],
-        digit: Jeanne.Range[int, 1, 6],
     ):
         await ctx.response.defer()
-        rolled = randint(1, 6)
         balance = Currency(ctx.user).get_balance
         if bet > balance:
             betlower = Embed(
@@ -227,12 +235,24 @@ class Dice_Group(GroupCog, name="dice"):
             )
             await ctx.followup.send(embed=zerobal)
             return
-        if rolled == digit:
+        view = Dice_Buttons(ctx.user)
+        await ctx.followup.send(
+            embed=Embed(
+                description="What do you think the dice will roll?",
+                color=Color.random(),
+            ),
+            view=view,
+        )
+
+        await view.wait()
+
+        rolled = randint(1, 6)
+        if view.value == rolled:
             await Currency(ctx.user).add_qp(bet)
             embed = Embed(color=Color.random())
             embed.add_field(
                 name=f"YAY! You got it!\n{bet} <:quantumpiece:1161010445205905418> has been added",
-                value=f"Dice rolled: **{rolled}**\nYou guessed: **{digit}**!",
+                value=f"Dice rolled: **{rolled}**\nYou guessed: **{view.value}**!",
                 inline=False,
             )
             if self.dbl.get_user_vote(ctx.user) == True:
@@ -247,12 +267,12 @@ class Dice_Group(GroupCog, name="dice"):
                         name="Beta User Bonus",
                         value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
                     )
-            await ctx.followup.send(embed=embed)
+            await ctx.edit_original_response(embed=embed, view=None)
             return
         await Currency(ctx.user).remove_qp(bet)
         embed = Embed(color=Color.red())
         embed = Embed(description=f"Oh no. It rolled a **{rolled}**", color=Color.red())
-        await ctx.followup.send(embed=embed)
+        await ctx.edit_original_response(embed=embed, view=None)
 
     @free.error
     async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):

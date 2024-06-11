@@ -674,6 +674,27 @@ class Guess_Buttons(ui.View):
         return ctx.user.id == self.author.id
 
 
+class Dice_Buttons(ui.View):
+    def __init__(self, author: User):
+        super().__init__(timeout=60)
+        self.author = author
+        self.value = None
+
+        for i in range(1, 7):
+            row = 0 if i <= 3 else 1
+            button = ui.Button(label=str(i), style=ButtonStyle.grey, row=row)
+            button.callback = partial(self.button_callback, number=i)
+            self.add_item(button)
+
+    async def button_callback(self, ctx: Interaction, number: int):
+        self.value = number
+        for child in self.children:
+            child.disabled = True
+        self.stop()
+
+    async def interaction_check(self, ctx: Interaction):
+        return ctx.user.id == self.author.id
+
 async def buy_function_context(bot: Bot, ctx: Context, name: str, message: Message):
     image_url = Inventory().get_wallpaper(name)[2]
     m = await message.edit(
