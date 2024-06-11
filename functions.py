@@ -263,7 +263,7 @@ class Inventory:
     def get_brightness(self) -> int:
         data = db.execute(
             "SELECT brightness FROM userWallpaperInventory WHERE user_id = ? and selected = ?",
-            (self.user.id, 1),
+            (self.user.id, 1,),
         ).fetchone()
         return 100 if (data == None) else int(data[0])
 
