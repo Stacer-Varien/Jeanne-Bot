@@ -1,4 +1,5 @@
 from functools import partial
+from os import listdir, path
 from discord import (
     CategoryChannel,
     File,
@@ -14,7 +15,7 @@ from discord import (
     Embed,
     SyncWebhook,
     TextChannel,
-    TextStyle,
+    TextStyle, utils
 )
 from typing import Optional
 from collections import OrderedDict
@@ -843,6 +844,34 @@ class LevelSetButtons(ui.View):
         self.value = "customrolerewardmsg"
         await self.message.edit(view=self)
         await ctx.response.send_modal(RankUpmsg())
+
+    async def interaction_check(self, ctx: Interaction):
+        return ctx.user.id == self.author.id
+
+
+class Country_Badge_Buttons(ui.View):
+    def __init__(self, bot:Bot, author: User):
+        super().__init__(timeout=60)
+        self.bot=bot
+        self.author = author
+        self.value = None
+
+        folder=...
+        badges = [
+            i for i in listdir(folder) if i.endswith((".png"))
+        ]
+        server=self.bot.get_guild(913051824095916142)
+        for i in badges:
+            emoji= utils.find(lambda m: m.name == i[:-4], server.emojis)
+            button = ui.Button(label=emoji.name, style=ButtonStyle.green, emoji=emoji)
+            button.callback = partial(self.button_callback, cbadge=emoji.name)
+            self.add_item(button)
+
+    async def button_callback(self, ctx: Interaction, cbadge: str):
+        self.value = cbadge
+        for child in self.children:
+            child.disabled = True
+        self.stop()
 
     async def interaction_check(self, ctx: Interaction):
         return ctx.user.id == self.author.id

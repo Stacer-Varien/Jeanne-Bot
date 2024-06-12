@@ -1,4 +1,4 @@
-from assets.components import Confirmation, buy_function_context, use_function_context
+from assets.components import Confirmation, Country_Badge_Buttons, buy_function_context, use_function_context
 from functions import (
     Currency,
     Inventory,
@@ -23,6 +23,25 @@ class InvPrefix(Cog, name="Inventory"):
         name="shop", description="Main shop command", invoke_without_command=True
     )
     async def shop(self, ctx: Context): ...
+
+    @shop.command(aliases=["nation", "nationality"], description="Buy a country badge")
+    @Jeanne.check(check_botbanned_prefix)
+    @Jeanne.check(check_disabled_prefixed_command)
+    #@Jeanne.cooldown(1, 60, type=BucketType.user)
+    async def country(self, ctx:Context):
+        view=Country_Badge_Buttons(self.bot, ctx.author)
+        embed=Embed(description="Here are the available country badges:", color=Color.random())
+        embed.set_footer(text="Click on one of the buttons to buy the badge")
+        m=await ctx.send(embed=embed, view=view)
+        await view.wait()
+        
+        if view.value:
+            ...
+            return
+        
+        await m.delete()
+
+
 
     @shop.command(
         aliases=["bgs", "bg"], description="Check all the wallpapers available"
