@@ -37,7 +37,7 @@ class vote_button(ui.View):
         self.add_item(
             ui.Button(
                 style=ButtonStyle.link,
-                label="Discord Bot List (Beta)",
+                label="Discord Bot List",
                 url="https://discordbotlist.com/bots/jeanne/upvote",
             )
         )
@@ -546,13 +546,27 @@ class currency(Cog, name="CurrencySlash"):
             )
             await ctx.response.send_message(embed=cooldown)
 
-    @Jeanne.command(description="Vote for me in TopGG to get more QP!")
+    @Jeanne.command(description="Vote for me in TopGG or DiscordBotLists, or both!")
     async def vote(self, ctx: Interaction):
-        await ctx.response.send_message(
-            embed=Embed(
+        embed=Embed(
                 color=Color.random(),
-                description="You can vote for me by clicking one of the buttons below to get more QP!!",
-            ),
+                description="You can vote for me by clicking one of the buttons below to get the following perks:",
+            )
+        topgg_perks="""
+- 100 QP
+- 5XP times their global level
+- - Rewards are double on weekends
+- - Beta users receive 25% extra of the nearest 5 
+"""
+        dbl_perks = """
+- 25% QP boost when winning
+- 10XP per message on weekdays, 15XP per message on weekends
+- - Beta users receive an extra 5XP per message and extra 25% QP boost when winning
+"""
+        embed.add_field(name="TopGG", value=topgg_perks, inline=True)
+        embed.add_field(name="DiscordBotList", value=dbl_perks, inline=True)
+        await ctx.response.send_message(
+            embed=embed,
             view=vote_button(),
         )
 

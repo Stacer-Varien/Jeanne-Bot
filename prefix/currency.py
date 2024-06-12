@@ -518,15 +518,29 @@ class CurrencyPrefix(Cog, name="Currency"):
             )
             await ctx.send(embed=cooldown)
 
-    @Jeanne.command(description="Vote for me in TopGG to get more QP!")
+    @Jeanne.command(description="Vote for me in TopGG or DiscordBotLists, or both!")
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def vote(self, ctx: Context):
-        await ctx.send(
-            embed=Embed(
+        embed=Embed(
                 color=Color.random(),
-                description="You can vote for me by clicking one of the buttons below to get more QP!!",
-            ),
+                description="You can vote for me by clicking one of the buttons below to get the following perks:",
+            )
+        topgg_perks="""
+- 100 QP
+- 5XP times their global level
+- - Rewards are double on weekends
+- - Beta users receive 25% extra of the nearest 5 
+"""
+        dbl_perks = """
+- 25% QP boost when winning
+- 10XP per message on weekdays, 15XP per message on weekends
+- - Beta users receive an extra 5XP per message and extra 25% QP boost when winning
+"""
+        embed.add_field(name="TopGG", value=topgg_perks, inline=True)
+        embed.add_field(name="DiscordBotList", value=dbl_perks, inline=True)
+        await ctx.send(
+            embed=embed,
             view=vote_button(),
         )
 
