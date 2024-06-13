@@ -118,7 +118,7 @@ class InfoPrefix(Cog, name="Info"):
         )
         embed.add_field(
             name="Count",
-            value=f"• **Server Count:** {len(self.bot.guilds)} servers\n• **User Count:** {len(set(
+            value=f"• **Server Count:** {len(self.bot.guilds)} servers\n• **Shards:** {self.bot.shard_count}\n• **User Count:** {len(set(
                 self.bot.get_all_members()))}\n• **Cached Members:** {all_users}\n• **True Members:** {true_users}",
             inline=True,
         )
@@ -173,13 +173,14 @@ class InfoPrefix(Cog, name="Info"):
             value=f"• **Boosters:** {len(ctx.guild.premium_subscribers)}\n• **Boosts:** {ctx.guild.premium_subscription_count}\n• **Tier:** {ctx.guild.premium_tier}",
             inline=True,
         )
+        
         verification_level = (
             ctx.guild.verification_level.name.capitalize()
             if ctx.guild.verification_level.name != "none"
             else None
         )
         serverinfo.add_field(
-            name="Verification Lever",
+            name="Verification Level",
             value=verification_level,
             inline=True,
         )
@@ -201,6 +202,7 @@ class InfoPrefix(Cog, name="Info"):
         )
         serverinfo.set_thumbnail(url=icon)
         serverinfo.set_image(url=splash)
+        serverinfo.set_footer(text=f"Shard ID: {ctx.guild.shard_id}")
         embeds.append(serverinfo)
         if len(emojis) > 0:
             emojie = Embed(

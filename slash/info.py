@@ -132,7 +132,8 @@ class InfoCog(Cog, name="InfoSlash"):
         )
         embed.add_field(
             name="Count",
-            value=f"• **Server Count:** {len(self.bot.guilds)} servers\n• **User Count:** {len(set(self.bot.get_all_members()))}\n• **Cached Members:** {all_users}\n• **True Members:** {true_users}",
+            value=f"• **Server Count:** {len(self.bot.guilds)} servers\n• **Shards:** {self.bot.shard_count}\n• **User Count:** {len(set(
+                self.bot.get_all_members()))}\n• **Cached Members:** {all_users}\n• **True Members:** {true_users}",
             inline=True,
         )
         current_time = time()
@@ -204,6 +205,7 @@ class InfoCog(Cog, name="InfoSlash"):
         )
         serverinfo.set_thumbnail(url=icon)
         serverinfo.set_image(url=splash)
+        serverinfo.set_footer(text=f"Shard ID: {ctx.guild.shard_id}")
         if len(emojis) == 0:
             await ctx.followup.send(embed=serverinfo)
             return
