@@ -165,9 +165,10 @@ class Inventory:
         db.commit()
         await Currency(self.user).remove_qp(500)
 
-    async def selected_country(self):
-        data=db.execute("SELECT country FROM userWallpaperInventory WHERE user_id = ?", (self.user.id)).fetchone()
-        db.execute()
+    @property
+    def selected_country(self)->str|None:
+        data=db.execute("SELECT country FROM userWallpaperInventory WHERE user_id = ? AND selected = ?", (self.user.id, 1,)).fetchone()
+        db.commit()
         return None if data==None else data[0]
 
     @staticmethod
