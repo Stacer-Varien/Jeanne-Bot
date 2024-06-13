@@ -39,6 +39,7 @@ class Profile:
         user: User | Member,
         bg_image: str = None,
         voted: bool = False,
+        country:str = None
     ) -> BytesIO | Literal[False]:
         inventory_instance = Inventory(user)
 
@@ -167,9 +168,13 @@ class Profile:
             richest = ImageEnhance.Brightness(richest).enhance(1.1)
             card.paste(richest, (720, 430), richest)
 
-        if user.id == 597829930964877369:
-            creator_badge = ImageEnhance.Brightness(creator_badge).enhance(1.1)
-            card.paste(creator_badge, (660, 430), creator_badge)
+        if country:
+            country_img = os.path.join(
+                os.path.dirname(__file__), "assets", "country", f"{country}.png"
+            )
+            cimage = Image.open(country_img).convert("RGBA").resize((50, 50))
+            cbadge = ImageEnhance.Brightness(cimage).enhance(1.1)
+            card.paste(cbadge, (660, 430), cbadge)
 
         if Partner.check(user.id):
             partner_badge = ImageEnhance.Brightness(partner_badge).enhance(1.1)
@@ -179,6 +184,10 @@ class Profile:
         if beta == True:
             betatest = ImageEnhance.Brightness(betatest).enhance(1.1)
             card.paste(betatest, (540, 430), betatest)
+
+        if user.id == 597829930964877369:
+            creator_badge = ImageEnhance.Brightness(creator_badge).enhance(1.1)
+            card.paste(creator_badge, (480, 430), creator_badge)
 
         profile_pic_holder.paste(profile, (30, 250))
 
