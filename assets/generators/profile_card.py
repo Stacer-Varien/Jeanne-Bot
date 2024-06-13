@@ -2,7 +2,8 @@ from io import BytesIO
 from typing import Literal
 from PIL import Image, ImageDraw, ImageFont, ImageColor, ImageEnhance
 from discord import Member, User
-from functions import BetaTest, Currency, Inventory, Levelling, Partner, get_richest
+from config import DBL_AUTH
+from functions import BetaTest, Currency, DBLvoter, Inventory, Levelling, Partner, get_richest
 import requests
 import math
 import os
@@ -15,6 +16,7 @@ class Profile:
         self.default_bg = os.path.join(os.path.dirname(__file__), "assets", "card.png")
         self.font1 = os.path.join(os.path.dirname(__file__), "assets", "font.ttf")
         self.vote_badge = os.path.join(os.path.dirname(__file__), "assets", "voted.png")
+        self.dbl_badge = os.path.join(os.path.dirname(__file__), "assets", "discordbotlist.png")
         self.first_badge = os.path.join(os.path.dirname(__file__), "assets", "1st.png")
         self.second_badge = os.path.join(os.path.dirname(__file__), "assets", "2nd.png")
         self.third_badge = os.path.join(os.path.dirname(__file__), "assets", "3rd.png")
@@ -34,11 +36,18 @@ class Profile:
         self.qp = os.path.join(os.path.dirname(__file__), "assets", "qp.png")
         self.beta = os.path.join(os.path.dirname(__file__), "assets", "beta.png")
 
+    @staticmethod
+    def enhance_and_paste(image:Image, position:int, card:Image.Image):
+        enhancer = ImageEnhance.Brightness(image)
+        enhanced_image = enhancer.enhance(1.1)
+        card.paste(enhanced_image, position, enhanced_image)
+
     async def generate_profile(
         self,
         user: User | Member,
         bg_image: str = None,
         voted: bool = False,
+        dbl_voter:bool=False,
         country:str = None
     ) -> BytesIO | Literal[False]:
         inventory_instance = Inventory(user)
@@ -127,67 +136,74 @@ class Profile:
 
         draw.ellipse((30, 250, 210, 430), fill=(255, 255, 255, 0), outline=COLOR)
 
-        voter = Image.open(self.vote_badge).resize((50, 50))
-        richest = Image.open(self.richest_badge).resize((50, 50))
-        _1st = Image.open(self.first_badge).resize((50, 50))
-        _2nd = Image.open(self.second_badge).resize((50, 50))
-        _3rd = Image.open(self.third_badge).resize((50, 50))
-        top30 = Image.open(self.top_30_badge).resize((50, 50))
-        top100 = Image.open(self.top_100_badge).resize((50, 50))
-        creator_badge = Image.open(self.creator_badge).resize((50, 50))
-        partner_badge = Image.open(self.partner).resize((50, 50))
         qp = Image.open(self.qp).resize((50, 50))
-        betatest = Image.open(self.beta).resize((50, 50))
 
-        if voted == True:
-            enhancer = ImageEnhance.Brightness(voter)
-            voter = enhancer.enhance(1.1)
-            card.paste(voter, (840, 430), voter)
+        badges=[]
+        x_position = 840
+
+        if voted:
+            voter = Image.open(self.vote_badge).resize((50, 50))
+            badges.append((voter, x_position))
+            x_position -= 60
+
+        if dbl_voter:
+            dblvoter = Image.open(self.dbl_badge).resize((50, 50))
+            badges.append((dblvoter, x_position))
+            x_position -= 60
+
         grank, srank, rrank = (
             levelling_instance.get_member_global_rank,
             levelling_instance.get_member_server_rank,
             get_richest(user),
         )
-        if grank != None:
-            if grank <= 100:
-                if grank == 1:
-                    ranked = _1st
-                elif grank == 2:
-                    ranked = _2nd
-                elif grank == 3:
-                    ranked = _3rd
-                elif grank <= 30:
-                    ranked = top30
-                else:
-                    ranked = top100
 
-                ranked = ImageEnhance.Brightness(ranked).enhance(1.1)
-                card.paste(ranked, (780, 430), ranked)
+        if grank is not None and grank <= 100:
+            if grank == 1:
+
+                ranked = Image.open(self.first_badge).resize((50, 50))
+            elif grank == 2:
+                ranked = Image.open(self.second_badge).resize((50, 50))
+            elif grank == 3:
+                ranked = Image.open(self.third_badge).resize((50, 50))
+            elif grank <= 30:
+                ranked = Image.open(self.top_30_badge).resize((50, 50))
+            else:
+                ranked = Image.open(self.top_100_badge).resize((50, 50))
+
+            badges.append((ranked, x_position))
+            x_position -= 60
 
         if rrank < 15:
-            richest = ImageEnhance.Brightness(richest).enhance(1.1)
-            card.paste(richest, (720, 430), richest)
+            richest = Image.open(self.richest_badge).resize((50, 50))
+            badges.append((richest, x_position))
+            x_position -= 60
 
         if country:
             country_img = os.path.join(
                 os.path.dirname(__file__), "assets", "country", f"{country}.png"
             )
             cimage = Image.open(country_img).convert("RGBA").resize((50, 50))
-            cbadge = ImageEnhance.Brightness(cimage).enhance(1.1)
-            card.paste(cbadge, (660, 430), cbadge)
+            badges.append((cimage, x_position))
+            x_position -= 60
 
         if Partner.check(user.id):
-            partner_badge = ImageEnhance.Brightness(partner_badge).enhance(1.1)
-            card.paste(partner_badge, (600, 430), partner_badge)
+            partner_badge = Image.open(self.partner).resize((50, 50))
+            badges.append((partner_badge, x_position))
+            x_position -= 60
 
         beta = await BetaTest(self.bot).check(user)
-        if beta == True:
-            betatest = ImageEnhance.Brightness(betatest).enhance(1.1)
-            card.paste(betatest, (540, 430), betatest)
+        if beta:
+            betatest = Image.open(self.beta).resize((50, 50))
+            badges.append((betatest, x_position))
+            x_position -= 60
 
         if user.id == 597829930964877369:
-            creator_badge = ImageEnhance.Brightness(creator_badge).enhance(1.1)
-            card.paste(creator_badge, (480, 430), creator_badge)
+            creator_badge = Image.open(self.creator_badge).resize((50, 50))
+            badges.append((creator_badge, x_position))
+            x_position -= 60
+
+        for badge, x_pos in badges:
+            self.enhance_and_paste(badge, (x_pos, 430), card)
 
         profile_pic_holder.paste(profile, (30, 250))
 
@@ -217,6 +233,7 @@ class Profile:
             font=ImageFont.truetype(self.font1, 35),
             stroke_width=1,
         )
+        profile_draw.rounded_rectangle((620, 510, 835, 630), outline=COLOR, radius=6)
 
         global_rank = ("#" + str(grank)) if grank else "N/A"
         profile_draw.text(
@@ -244,7 +261,7 @@ class Profile:
         )
         profile_canvas.paste(qp, (760, 570), qp)
 
-        profile_draw.rectangle((10, 680, 890, 693), outline=COLOR, width=2)
+        profile_draw.rounded_rectangle((10, 680, 890, 693), outline=COLOR, width=2, radius=6)
         global_level, global_user_xp = (
             levelling_instance.get_user_level,
             levelling_instance.get_user_xp,
@@ -265,13 +282,15 @@ class Profile:
             stroke_width=1,
         )
 
+        profile_draw.rounded_rectangle((20,510,245,630), outline=COLOR, radius=6)
+
         global_xpneed = global_next_xp - levelling_instance.get_user_xp
         global_xphave = global_user_xp
 
         global_current_percentage = (global_xphave / global_xpneed) * 100
         global_length_of_bar = (global_current_percentage * 8.76) + 12
 
-        profile_draw.rectangle((12, 682, global_length_of_bar, 691), fill=COLOR)
+        profile_draw.rounded_rectangle((12, 682, global_length_of_bar, 691), fill=COLOR, radius=6)
         server_level, server_user_xp = (
             levelling_instance.get_member_level,
             levelling_instance.get_member_xp,
@@ -292,8 +311,8 @@ class Profile:
             font=font_small,
             stroke_width=1,
         )
-
-        profile_draw.rectangle((10, 750, 890, 763), outline=COLOR, width=2)
+        profile_draw.rounded_rectangle((320,510,535,630), outline=COLOR, radius=6)
+        profile_draw.rounded_rectangle((10, 750, 890, 763), outline=COLOR, width=2, radius=6)
 
         server_xpneed = server_next_xp - levelling_instance.get_member_xp
         server_xphave = server_user_xp
@@ -301,7 +320,7 @@ class Profile:
         server_current_percentage = (server_xphave / server_xpneed) * 100
         server_length_of_bar = (server_current_percentage * 8.76) + 12
 
-        profile_draw.rectangle((12, 752, server_length_of_bar, 761), fill=COLOR)
+        profile_draw.rounded_rectangle((12, 752, server_length_of_bar, 761), fill=COLOR, radius=6)
 
         bio = inventory_instance.get_bio
         bio = "No bio available" if bio == None else bio
