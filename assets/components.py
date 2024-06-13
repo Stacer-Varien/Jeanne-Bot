@@ -704,7 +704,7 @@ async def buy_function_context(bot: Bot, ctx: Context, name: str, message: Messa
         ),
         view=None,
     )
-    image = await Profile(bot).generate_profile(ctx.author, image_url, True)
+    image = await Profile(bot).generate_profile(ctx.author, image_url, True, True, "southafrica")
     file = File(fp=image, filename=f"preview_profile_card.png")
     preview = (
         Embed(
@@ -740,7 +740,7 @@ async def buy_function_app(bot: Bot, ctx: Interaction, name: str):
     await ctx.edit_original_response(
         "Creating preview... This will take some time <a:loading:1161038734620373062>"
     )
-    image = await Profile(bot).generate_profile(ctx.user, image_url, True)
+    image = await Profile(bot).generate_profile(ctx.user, image_url, True, True, "southafrica")
     file = File(fp=image, filename=f"preview_profile_card.png")
     preview = (
         Embed(

@@ -42,7 +42,7 @@ class Shop_Group(GroupCog, name="shop"):
             country = view.value
             bg_image = Inventory(ctx.user).selected_wallpaper
             image = await Profile(self.bot).generate_profile(
-                ctx.user, bg_image, True, country
+                ctx.user, bg_image, True, True, country
             )
             file = File(fp=image, filename=f"preview_profile_card.png")
             preview = (
@@ -154,7 +154,7 @@ class Background_Group(GroupCog, name="background"):
                 description="Creating preview... This will take some time <a:loading:1161038734620373062>"
             )
         )
-        image = await Profile(self.bot).generate_profile(ctx.user, link, True)
+        image = await Profile(self.bot).generate_profile(ctx.user, link, True, True, "southafrica")
         if image == False:
             size_error = Embed(
                 description="The image is below the 900x500 size.\nPlease enlarge the image and try again"
