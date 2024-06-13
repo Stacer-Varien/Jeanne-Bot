@@ -159,6 +159,16 @@ class Inventory:
             return response.text
         else:
             return None
+    
+    async def add_country(self, country:str):
+        db.execute("UPDATE userWallpaperInventory SET country = ? WHERE user_id = ?", (country, self.user.id,))
+        db.commit()
+        await Currency(self.user).remove_qp(500)
+
+    async def selected_country(self):
+        data=db.execute("SELECT country FROM userWallpaperInventory WHERE user_id = ?", (self.user.id)).fetchone()
+        db.execute()
+        return None if data==None else data[0]
 
     @staticmethod
     def fetch_wallpapers() -> list:

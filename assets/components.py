@@ -1,5 +1,5 @@
 from functools import partial
-from os import listdir, path
+from os import listdir
 from discord import (
     CategoryChannel,
     File,
@@ -22,7 +22,7 @@ from collections import OrderedDict
 from json import loads
 from discord.ext.commands import Context, Bot
 from assets.generators.profile_card import Profile
-from config import WEBHOOK
+from config import WEBHOOK, BADGES
 from functions import Inventory, Levelling, Manage, Moderation, Welcomer
 
 
@@ -856,7 +856,7 @@ class Country_Badge_Buttons(ui.View):
         self.author = author
         self.value = None
 
-        folder=...
+        folder = BADGES
         badges = [
             i for i in listdir(folder) if i.endswith((".png"))
         ]
