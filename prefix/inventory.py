@@ -27,7 +27,7 @@ class InvPrefix(Cog, name="Inventory"):
     @shop.command(aliases=["nation", "nationality"], description="Buy a country badge")
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
-    #@Jeanne.cooldown(1, 60, type=BucketType.user)
+    @Jeanne.cooldown(1, 60, type=BucketType.user)
     async def country(self, ctx:Context):
         view=Country_Badge_Buttons(self.bot, ctx.author)
         embed=Embed(description="Here are the available country badges:", color=Color.random())
@@ -36,12 +36,35 @@ class InvPrefix(Cog, name="Inventory"):
         await view.wait()
         
         if view.value:
-            ...
-            return
-        
-        await m.delete()
-
-
+            m = await m.edit(
+            embed=Embed(
+                description="Creating preview... This will take some time <a:loading:1161038734620373062>"
+            ), view=None
+        )
+            country=view.value
+            bg_image = Inventory(ctx.author).selected_wallpaper
+            image = await Profile(self.bot).generate_profile(ctx.author, bg_image, True, country)
+            file = File(fp=image, filename=f"preview_profile_card.png")
+            preview = (
+                Embed(
+                    description="This is the preview of the profile card.",
+                    color=Color.blue(),
+                )
+                .add_field(name="Cost", value="500 <:quantumpiece:1161010445205905418>")
+                .set_footer(text="Is this the country badge you want? To replace it, run the command again")
+            )
+            view = Confirmation(ctx.author)
+            m = await m.edit(content=None, embed=preview, attachments=[file], view=view)
+            await view.wait()
+            if view.value:
+                await Inventory(ctx.author).add_country(country)
+                embed1 = Embed(
+                    description="Country badge bought and added to profile",
+                    color=Color.random(),
+                )
+                await m.edit(embed=embed1, view=None, attachments=[])
+                return
+        await m.edit(embed=Embed(description="Cancel"), view=None, attachments=[])
 
     @shop.command(
         aliases=["bgs", "bg"], description="Check all the wallpapers available"
@@ -152,7 +175,7 @@ class InvPrefix(Cog, name="Inventory"):
                 description="Creating preview... This will take some time <a:loading:1161038734620373062>"
             )
         )
-        image = await Profile(self.bot).generate_profile(ctx.author, link, True)
+        image = await Profile(self.bot).generate_profile(ctx.author, link, True, "southafrica")
         if image == False:
             size_error = Embed(
                 description="The image is below the 900x500 size.\nPlease enlarge the image and try again"

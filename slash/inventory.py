@@ -1,4 +1,4 @@
-from assets.components import Confirmation, buy_function_app, use_function_app
+from assets.components import Confirmation, Country_Badge_Buttons, buy_function_app, use_function_app
 from functions import (
     Currency,
     Inventory,
@@ -18,7 +18,58 @@ class Shop_Group(GroupCog, name="shop"):
         self.bot = bot
         super().__init__()
 
+    @Jeanne.command(description="Buy a country badge")
+    @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
+    async def country(self, ctx: Interaction):
+        await ctx.response.defer()
+        view = Country_Badge_Buttons(self.bot, ctx.user)
+        embed = Embed(
+            description="Here are the available country badges:", color=Color.random()
+        )
+        embed.set_footer(text="Click on one of the buttons to buy the badge")
+        await ctx.followup.send(embed=embed, view=view)
+        await view.wait()
+
+        if view.value:
+            await ctx.edit_original_response(
+                embed=Embed(
+                    description="Creating preview... This will take some time <a:loading:1161038734620373062>"
+                ),
+                view=None,
+            )
+            country = view.value
+            bg_image = Inventory(ctx.user).selected_wallpaper
+            image = await Profile(self.bot).generate_profile(
+                ctx.user, bg_image, True, country
+            )
+            file = File(fp=image, filename=f"preview_profile_card.png")
+            preview = (
+                Embed(
+                    description="This is the preview of the profile card.",
+                    color=Color.blue(),
+                )
+                .add_field(name="Cost", value="500 <:quantumpiece:1161010445205905418>")
+                .set_footer(
+                    text="Is this the country badge you want? To replace it, run the command again"
+                )
+            )
+            view = Confirmation(ctx.user)
+            await ctx.edit_original_response(content=None, embed=preview, attachments=[file], view=view)
+            await view.wait()
+            if view.value:
+                await Inventory(ctx.user).add_country(country)
+                embed1 = Embed(
+                    description="Country badge bought and added to profile",
+                    color=Color.random(),
+                )
+                await ctx.edit_original_response(embed=embed1, view=None, attachments=[])
+                return
+        await ctx.edit_original_response(embed=Embed(description="Cancelled"), view=None, attachments=[])
+
     @Jeanne.command(description="Check all the wallpapers available")
+    @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def backgrounds(self, ctx: Interaction):
