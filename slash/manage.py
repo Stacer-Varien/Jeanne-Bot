@@ -1205,6 +1205,23 @@ class Set_Group(GroupCog, name="set"):
         embed.color = Color.random()
         await ctx.followup.send(embed=embed)
 
+    @Jeanne.command(name="confession-channel",
+        description="Set a confession channel",
+        extras={"member_perms": "Manage Server"},
+    )
+    @Jeanne.describe(
+        channel="Which channel will receive anonymous confessions from members?",
+    )
+    @Jeanne.checks.bot_has_permissions(manage_guild=True)
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
+    async def confessionchannel(
+        self, ctx: Interaction, channel: TextChannel) -> None:
+            await ctx.response.defer()
+            embed=Embed(description=f"{channel.mention} will recieve anonymous confessions from members", color=Color.random())
+            await ctx.followup.send(embed=embed)
+
+
     @Jeanne.command(
         name="profile-brightness",
         description="Change the brightness of your level and profile card background",
