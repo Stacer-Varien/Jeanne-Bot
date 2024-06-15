@@ -213,27 +213,30 @@ class Profile:
         profile_draw = ImageDraw.Draw(profile_canvas)
 
         profile_draw.text(
-            (30, 510),
-            text="Global Rank",
+            (40, 520),
+            text=f"Global Rank",
             fill=COLOR,
             font=ImageFont.truetype(self.font1, 35),
-            stroke_width=1,
+            stroke_width=1, align="center"
         )
         profile_draw.text(
-            (330, 510),
+            (330, 520),
             text="Server Rank",
             fill=COLOR,
             font=ImageFont.truetype(self.font1, 35),
-            stroke_width=1,
+            stroke_width=1, align="center"
         )
         profile_draw.text(
-            (630, 510),
+            (620, 520),
             text="QP Balance",
             fill=COLOR,
             font=ImageFont.truetype(self.font1, 35),
             stroke_width=1,
+            align="center",
         )
-        profile_draw.rounded_rectangle((620, 510, 835, 630), outline=COLOR, radius=6)
+
+        #qp rect
+        profile_draw.rounded_rectangle((610, 510, 870, 630), outline=COLOR, radius=6)
 
         global_rank = ("#" + str(grank)) if grank else "N/A"
         profile_draw.text(
@@ -242,6 +245,7 @@ class Profile:
             COLOR,
             font=ImageFont.truetype(self.font1, 45),
             stroke_width=1,
+            align="center",
         )
         server_rank = ("#" + str(srank)) if srank else "N/A"
         profile_draw.text(
@@ -261,6 +265,7 @@ class Profile:
         )
         profile_canvas.paste(qp, (760, 570), qp)
 
+        #global level bar
         profile_draw.rounded_rectangle((10, 680, 890, 693), outline=COLOR, width=2, radius=6)
         global_level, global_user_xp = (
             levelling_instance.get_user_level,
@@ -282,7 +287,8 @@ class Profile:
             stroke_width=1,
         )
 
-        profile_draw.rounded_rectangle((20,510,245,630), outline=COLOR, radius=6)
+        #global rank rect
+        profile_draw.rounded_rectangle((30,510,290,630), outline=COLOR, radius=6)
 
         global_xpneed = global_next_xp - levelling_instance.get_user_xp
         global_xphave = global_user_xp
@@ -311,7 +317,10 @@ class Profile:
             font=font_small,
             stroke_width=1,
         )
-        profile_draw.rounded_rectangle((320,510,535,630), outline=COLOR, radius=6)
+        #server rank rect
+        profile_draw.rounded_rectangle((320,510,580,630), outline=COLOR, radius=6)
+
+        #server rank bar
         profile_draw.rounded_rectangle((10, 750, 890, 763), outline=COLOR, width=2, radius=6)
 
         server_xpneed = server_next_xp - levelling_instance.get_member_xp
