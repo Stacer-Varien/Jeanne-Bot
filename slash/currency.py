@@ -548,11 +548,11 @@ class currency(Cog, name="CurrencySlash"):
 
     @Jeanne.command(description="Vote for me in TopGG or DiscordBotLists, or both!")
     async def vote(self, ctx: Interaction):
-        embed=Embed(
-                color=Color.random(),
-                description="You can vote for me by clicking one of the buttons below to get the following perks:",
-            )
-        topgg_perks="""
+        embed = Embed(
+            color=Color.random(),
+            description="You can vote for me by clicking one of the buttons below to get the following perks:",
+        )
+        topgg_perks = """
 - 100 QP
 - 5XP times their global level
 - - Rewards are double on weekends

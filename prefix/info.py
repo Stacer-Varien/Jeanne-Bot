@@ -173,7 +173,7 @@ class InfoPrefix(Cog, name="Info"):
             value=f"• **Boosters:** {len(ctx.guild.premium_subscribers)}\n• **Boosts:** {ctx.guild.premium_subscription_count}\n• **Tier:** {ctx.guild.premium_tier}",
             inline=True,
         )
-        
+
         verification_level = (
             ctx.guild.verification_level.name.capitalize()
             if ctx.guild.verification_level.name != "none"

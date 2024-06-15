@@ -118,13 +118,19 @@ class ReactionsPrefix(Cog, name="Reactions"):
             )
         await ctx.send(msg, embed=reaction_embed)
 
-    @Jeanne.command(description="Hug someone or yourself", usage="<MEMBER | MEMBER NAME | MEMBER ID>")
+    @Jeanne.command(
+        description="Hug someone or yourself",
+        usage="<MEMBER | MEMBER NAME | MEMBER ID>",
+    )
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def hug(self, ctx: Context, *, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "hug", member, hug)
 
-    @Jeanne.command(description="Slap someone or yourself", usage="<MEMBER | MEMBER NAME | MEMBER ID>")
+    @Jeanne.command(
+        description="Slap someone or yourself",
+        usage="<MEMBER | MEMBER NAME | MEMBER ID>",
+    )
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def slap(self, ctx: Context, *, member: Optional[Member] = None) -> None:
@@ -136,37 +142,55 @@ class ReactionsPrefix(Cog, name="Reactions"):
     async def smug(self, ctx: Context):
         await self._send_reaction(ctx, "smug", api_url=smug)
 
-    @Jeanne.command(description="Poke someone or yourself", usage="<MEMBER | MEMBER NAME | MEMBER ID>")
+    @Jeanne.command(
+        description="Poke someone or yourself",
+        usage="<MEMBER | MEMBER NAME | MEMBER ID>",
+    )
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def poke(self, ctx: Context, *, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "poke", member, poke)
 
-    @Jeanne.command(description="Pat someone or yourself", usage="<MEMBER | MEMBER NAME | MEMBER ID>")
+    @Jeanne.command(
+        description="Pat someone or yourself",
+        usage="<MEMBER | MEMBER NAME | MEMBER ID>",
+    )
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def pat(self, ctx: Context, *, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "pat", member, pat)
 
-    @Jeanne.command(description="Kiss someone or yourself", usage="<MEMBER | MEMBER NAME | MEMBER ID>")
+    @Jeanne.command(
+        description="Kiss someone or yourself",
+        usage="<MEMBER | MEMBER NAME | MEMBER ID>",
+    )
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def kiss(self, ctx: Context, *, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "kiss", member, kiss)
 
-    @Jeanne.command(description="Tickle someone or yourself", usage="<MEMBER | MEMBER NAME | MEMBER ID>")
+    @Jeanne.command(
+        description="Tickle someone or yourself",
+        usage="<MEMBER | MEMBER NAME | MEMBER ID>",
+    )
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def tickle(self, ctx: Context, *, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "tickle", member, tickle)
 
-    @Jeanne.command(description="Call someone or yourself a baka!", usage="<MEMBER | MEMBER NAME | MEMBER ID>")
+    @Jeanne.command(
+        description="Call someone or yourself a baka!",
+        usage="<MEMBER | MEMBER NAME | MEMBER ID>",
+    )
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def baka(self, ctx: Context, *, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "baka", member, baka)
 
-    @Jeanne.command(description="Feed someone or yourself", usage="<MEMBER | MEMBER NAME | MEMBER ID>")
+    @Jeanne.command(
+        description="Feed someone or yourself",
+        usage="<MEMBER | MEMBER NAME | MEMBER ID>",
+    )
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def feed(self, ctx: Context, *, member: Optional[Member] = None) -> None:
@@ -178,7 +202,10 @@ class ReactionsPrefix(Cog, name="Reactions"):
     async def cry(self, ctx: Context):
         await self._send_reaction(ctx, "cry", api_url=cry)
 
-    @Jeanne.command(description="Bite someone or yourself", usage="<MEMBER | MEMBER NAME | MEMBER ID>")
+    @Jeanne.command(
+        description="Bite someone or yourself",
+        usage="<MEMBER | MEMBER NAME | MEMBER ID>",
+    )
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def bite(self, ctx: Context, *, member: Optional[Member] = None) -> None:
@@ -190,13 +217,19 @@ class ReactionsPrefix(Cog, name="Reactions"):
     async def blush(self, ctx: Context):
         await self._send_reaction(ctx, "blush", api_url=blush)
 
-    @Jeanne.command(description="Cuddle with someone or yourself", usage="<MEMBER | MEMBER NAME | MEMBER ID>")
+    @Jeanne.command(
+        description="Cuddle with someone or yourself",
+        usage="<MEMBER | MEMBER NAME | MEMBER ID>",
+    )
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def cuddle(self, ctx: Context, *, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "cuddle", member, cuddle)
 
-    @Jeanne.command(description="Dance with someone or yourself", usage="<MEMBER | MEMBER NAME | MEMBER ID>")
+    @Jeanne.command(
+        description="Dance with someone or yourself",
+        usage="<MEMBER | MEMBER NAME | MEMBER ID>",
+    )
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.check(check_disabled_prefixed_command)
     async def dance(self, ctx: Context, *, member: Optional[Member] = None) -> None:

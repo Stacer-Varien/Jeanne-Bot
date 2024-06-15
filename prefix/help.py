@@ -147,8 +147,8 @@ class HelpMenu(ui.Select):
 
 
 class HelpSelect(ui.View):
-    def __init__(self, bot:Bot):
-        self.bot=bot
+    def __init__(self, bot: Bot):
+        self.bot = bot
         super().__init__(timeout=120)
         self.add_item(HelpMenu(self.bot))
 
@@ -184,8 +184,8 @@ class HelpGroupPrefix(Cog, name="Help"):
         return text
 
     @staticmethod
-    def splitsegs(input:str)->list[str]:
-        segments= findall(r"\[.*?\]|\<.*?\>", input)
+    def splitsegs(input: str) -> list[str]:
+        segments = findall(r"\[.*?\]|\<.*?\>", input)
         return [f"`{segment}`" for segment in segments]
 
     @group(
@@ -197,9 +197,9 @@ class HelpGroupPrefix(Cog, name="Help"):
     @Jeanne.check(check_botbanned_prefix)
     async def help(self, ctx: Context):
         async with ctx.typing():
-            view=HelpSelect(self.bot)
-            embed=Embed(color=Color.random())
-            embed.description="""
+            view = HelpSelect(self.bot)
+            embed = Embed(color=Color.random())
+            embed.description = """
 ## The available modules are:
 - Currency
 - Fun
@@ -218,7 +218,11 @@ To check availability of commands in each module, use the dropmenu below
 
             await ctx.send(embed=embed, view=view)
 
-    @help.command(aliases=["cmd"], description="Get help on a certain command", usage="[COMMAND NAME]")
+    @help.command(
+        aliases=["cmd"],
+        description="Get help on a certain command",
+        usage="[COMMAND NAME]",
+    )
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def command(self, ctx: Context, *, command: Range[str, 3]):
@@ -230,15 +234,15 @@ To check availability of commands in each module, use the dropmenu below
             try:
                 bot_perms = cmd.extras["bot_perms"]
             except:
-                bot_perms=None
+                bot_perms = None
             try:
                 member_perms = cmd.extras["member_perms"]
             except:
-                member_perms=None
+                member_perms = None
             try:
-                nsfw=cmd.extras["nsfw"]
+                nsfw = cmd.extras["nsfw"]
             except:
-                nsfw=None
+                nsfw = None
             embed = Embed(title=f"{command.title()} Help", color=Color.random())
             embed.description = cmd.description
             if len(cmd.aliases) >= 1:
@@ -246,21 +250,17 @@ To check availability of commands in each module, use the dropmenu below
                     name="Aliases", value=", ".join(cmd.aliases), inline=True
                 )
 
-            parms = None if cmd.usage==None else "\n".join(self.splitsegs(cmd.usage))
+            parms = None if cmd.usage == None else "\n".join(self.splitsegs(cmd.usage))
             if parms:
                 embed.add_field(name="Parameters", value=parms, inline=False)
             if bot_perms:
-                embed.add_field(
-                    name="Jeanne Permissions", value=bot_perms, inline=True
-                )
+                embed.add_field(name="Jeanne Permissions", value=bot_perms, inline=True)
             if member_perms:
                 embed.add_field(
                     name="Member Permissions", value=member_perms, inline=True
                 )
             if nsfw:
-                embed.add_field(
-                    name="Requires NSFW Channel", value=nsfw, inline=True
-                )
+                embed.add_field(name="Requires NSFW Channel", value=nsfw, inline=True)
             if not cmd.description.startswith("Main"):
                 cmd_usage = "j!" + cmd.qualified_name + " " + cmd.usage
                 embed.add_field(

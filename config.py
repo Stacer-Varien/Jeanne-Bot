@@ -24,7 +24,7 @@ NEKO = str(getenv("neko_album"))
 MORGAN = str(getenv("morgan_album"))
 KITSUNE = str(getenv("kitsune_album"))
 CATBOX_HASH = str(getenv("catbox_hash"))
-BADGES=str(getenv("badges_folder"))
+BADGES = str(getenv("badges_folder"))
 
 db = connect("database.db", check_same_thread=False)
 

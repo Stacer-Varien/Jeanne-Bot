@@ -1,4 +1,9 @@
-from assets.components import Confirmation, Country_Badge_Buttons, buy_function_app, use_function_app
+from assets.components import (
+    Confirmation,
+    Country_Badge_Buttons,
+    buy_function_app,
+    use_function_app,
+)
 from functions import (
     Currency,
     Inventory,
@@ -56,7 +61,9 @@ class Shop_Group(GroupCog, name="shop"):
                 )
             )
             view = Confirmation(ctx.user)
-            await ctx.edit_original_response(content=None, embed=preview, attachments=[file], view=view)
+            await ctx.edit_original_response(
+                content=None, embed=preview, attachments=[file], view=view
+            )
             await view.wait()
             if view.value:
                 await Inventory(ctx.user).add_country(country)
@@ -64,9 +71,13 @@ class Shop_Group(GroupCog, name="shop"):
                     description="Country badge bought and added to profile",
                     color=Color.random(),
                 )
-                await ctx.edit_original_response(embed=embed1, view=None, attachments=[])
+                await ctx.edit_original_response(
+                    embed=embed1, view=None, attachments=[]
+                )
                 return
-        await ctx.edit_original_response(embed=Embed(description="Cancelled"), view=None, attachments=[])
+        await ctx.edit_original_response(
+            embed=Embed(description="Cancelled"), view=None, attachments=[]
+        )
 
     @Jeanne.command(description="Check all the wallpapers available")
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
@@ -154,7 +165,9 @@ class Background_Group(GroupCog, name="background"):
                 description="Creating preview... This will take some time <a:loading:1161038734620373062>"
             )
         )
-        image = await Profile(self.bot).generate_profile(ctx.user, link, True, True, "southafrica")
+        image = await Profile(self.bot).generate_profile(
+            ctx.user, link, True, True, "southafrica"
+        )
         if image == False:
             size_error = Embed(
                 description="The image is below the 900x500 size.\nPlease enlarge the image and try again"
@@ -177,7 +190,8 @@ class Background_Group(GroupCog, name="background"):
         await ctx.edit_original_response(embed=preview, attachments=[file], view=view)
         await view.wait()
         if view.value:
-            await Inventory(ctx.user).add_user_custom_wallpaper(name, link)
+            url=Inventory(ctx.user).upload_to_catbox(link)
+            await Inventory(ctx.user).add_user_custom_wallpaper(name, url)
             embed1 = Embed(
                 description="Background wallpaper bought and selected",
                 color=Color.random(),
