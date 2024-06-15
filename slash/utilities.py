@@ -17,7 +17,7 @@ from discord import (
 from discord.ext.commands import Cog, Bot, GroupCog
 from assets.components import ReportModal
 from assets.dictionary import dictionary
-from functions import Reminder, check_botbanned_app_command, check_disabled_app_command
+from functions import Manage, Reminder, check_botbanned_app_command, check_disabled_app_command
 from config import WEATHER
 from discord.ui import View
 from py_expression_eval import Parser
@@ -296,6 +296,7 @@ class slashutilities(Cog):
         ctx: Interaction,
         city: Jeanne.Range[str, 1],
         units: Optional[Literal["Metric", "Imperial"]] = None,
+        three_day:Optional[bool] = False,
     ):
         await ctx.response.defer()
         emoji_map = {
@@ -311,7 +312,8 @@ class slashutilities(Cog):
             "guste": "💨",
             "rain_chance": "💦",
         }
-        url = f"http://api.weatherapi.com/v1/forecast.json?key={WEATHER}&q={city.lower()}&days=1&aqi=no&alerts=no"
+        days= 1 if three_day==False else 3
+        url = f"http://api.weatherapi.com/v1/forecast.json?key={WEATHER}&q={city.lower()}&days={days}&aqi=no&alerts=no"
         weather_data = get(url).json()
         location = weather_data["location"]
         current = weather_data["current"]
@@ -460,6 +462,25 @@ class slashutilities(Cog):
         word: Jeanne.Range[str, 1],
     ):
         await dictionary(ctx, word.lower())
+    
+    @Jeanne.command(description="Make an anonymous confession")
+    @Jeanne.describe(confession="Say your confession")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
+    async def confess(
+        self,
+        ctx: Interaction,
+        confession: Jeanne.Range[str, 1, 3000],
+    ):
+        await ctx.response.defer(ephemeral=True)
+        embed=Embed(title="Anonymous confession", description=confession, color=Color.random())
+        confession_channel=Manage(ctx.guild).get_confession_channel
+        await ctx.followup.send(embed=Embed(description="Anonymous confession sent.", color=Color.random()))
+        if confession_channel==None:
+            await ctx.channel.send(embed=embed)
+            return
+        await confession_channel.send(embed=embed)
+
 
 
 async def setup(bot: Bot):
