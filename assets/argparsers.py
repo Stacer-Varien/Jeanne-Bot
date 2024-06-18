@@ -245,6 +245,12 @@ utility_parser.add_argument(
 )
 
 utility_parser.add_argument(
+    "-3d",
+    "--three",
+    action="store_true", help="Enable 3 day mode. Just type '-3d'"
+)
+
+utility_parser.add_argument(
     "-r",
     "--reason",
     type=str,

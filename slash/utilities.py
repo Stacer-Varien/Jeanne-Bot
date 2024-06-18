@@ -1,5 +1,7 @@
 from datetime import timedelta, datetime
+from random import randint
 import re
+import aiohttp
 from discord import (
     Attachment,
     ButtonStyle,
@@ -15,9 +17,15 @@ from discord import (
     ui,
 )
 from discord.ext.commands import Cog, Bot, GroupCog
+from reactionmenu import ViewButton, ViewMenu
 from assets.components import ReportModal
 from assets.dictionary import dictionary
-from functions import Manage, Reminder, check_botbanned_app_command, check_disabled_app_command
+from functions import (
+    Manage,
+    Reminder,
+    check_botbanned_app_command,
+    check_disabled_app_command,
+)
 from config import WEATHER
 from discord.ui import View
 from py_expression_eval import Parser
@@ -296,7 +304,7 @@ class slashutilities(Cog):
         ctx: Interaction,
         city: Jeanne.Range[str, 1],
         units: Optional[Literal["Metric", "Imperial"]] = None,
-        three_day:Optional[bool] = False,
+        three_day: Optional[bool] = False,
     ):
         await ctx.response.defer()
         emoji_map = {
@@ -312,9 +320,13 @@ class slashutilities(Cog):
             "guste": "💨",
             "rain_chance": "💦",
         }
-        days= 1 if three_day==False else 3
+        days = 1 if three_day == False else 3
         url = f"http://api.weatherapi.com/v1/forecast.json?key={WEATHER}&q={city.lower()}&days={days}&aqi=no&alerts=no"
-        weather_data = get(url).json()
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                weather_data = await resp.json()
+
         location = weather_data["location"]
         current = weather_data["current"]
         forecast = weather_data["forecast"]["forecastday"][0]["day"]
@@ -330,60 +342,145 @@ class slashutilities(Cog):
             feels_like = f"{current['feelslike_c']}°C"
             gust = f"{current['gust_kph']}km/h"
             visibility = f"{current['vis_km']}km"
-        embed = Embed(
+        day1 = Embed(
             title=f"{emoji_map['globe']} Weather details of {location['name']}, {location['region']}/{location['country']}",
             color=Color.random(),
         )
-        embed.description = (
+        day1.description = (
             f"{emoji_map['newspaper']} Condition: {forecast['condition']['text']}"
         )
-        embed.add_field(
+        day1.add_field(
             name=f"{emoji_map['min_tempe']} Minimum Temperature",
             value=min_temp,
             inline=True,
         )
-        embed.add_field(
+        day1.add_field(
             name=f"{emoji_map['max_tempe']} Maximum Temperature",
             value=max_temp,
             inline=True,
         )
-        embed.add_field(
+        day1.add_field(
             name=f"{emoji_map['feels_like']} Feels Like",
             value=feels_like,
             inline=True,
         )
-        embed.add_field(
+        day1.add_field(
             name=f"{emoji_map['clouds']} Clouds",
             value=f"{current['cloud']}%",
             inline=True,
         )
-        embed.add_field(
+        day1.add_field(
             name=f"{emoji_map['humidity']} Humidity",
             value=f"{current['humidity']}%",
             inline=True,
         )
-        embed.add_field(
+        day1.add_field(
             name=f"{emoji_map['wind_dir']} Wind Direction",
             value=f"{current['wind_degree']}°/{current['wind_dir']}",
             inline=True,
         )
-        embed.add_field(
+        day1.add_field(
             name=f"{emoji_map['guste']} Wind Gust",
             value=gust,
             inline=True,
         )
-        embed.add_field(
+        day1.add_field(
             name=f"{emoji_map['visibility']} Visibility",
             value=visibility,
             inline=True,
         )
-        embed.add_field(
+        day1.add_field(
             name=f"{emoji_map['rain_chance']} Chance of Rain",
             value=f"{forecast['daily_chance_of_rain']}%",
             inline=True,
         )
-        embed.set_footer(text="Fetched from weatherapi.com")
-        await ctx.followup.send(embed=embed)
+        day1.set_footer(text="Fetched from weatherapi.com")
+        if three_day == True:
+            menu = ViewMenu(
+                ctx,
+                menu_type=ViewMenu.TypeEmbed,
+                disable_items_on_timeout=True,
+                show_page_director=False,
+            )
+            forecastday2 = weather_data["forecast"]["forecastday"][1]
+            forecastday3 = weather_data["forecast"]["forecastday"][2]
+            day2 = Embed(
+                title=f"{emoji_map['globe']} Weather details of {location['name']}, {location['region']}/{location['country']} for {forecastday2['date']}", color=Color.random()
+            )
+            day3 = Embed(title=f"{emoji_map['globe']} Weather details of {location['name']}, {location['region']}/{location['country']} for {forecastday3['date']}", color=Color.random()
+            )
+
+            if units == "Imperial":
+                min_temp2 = f"{forecastday2['day']['mintemp_f']}°F"
+                max_temp2 = f"{forecastday2['day']['maxtemp_f']}°F"
+                maxwind2 = f"{forecastday2['day']['maxwind_mph']}mph"
+                min_temp3 = f"{forecastday3['day']['mintemp_f']}°F"
+                max_temp3 = f"{forecastday3['day']['maxtemp_f']}°F"
+                maxwind3 = f"{forecastday3['day']['maxwind_mph']}mph"
+            else:
+                min_temp2 = f"{forecastday2['day']['mintemp_c']}°C"
+                max_temp2 = f"{forecastday2['day']['maxtemp_c']}°C"
+                maxwind2 = f"{forecastday2['day']['maxwind_kph']}mph"
+                min_temp3 = f"{forecastday3['day']['mintemp_c']}°C"
+                max_temp3 = f"{forecastday3['day']['maxtemp_c']}°C"
+                maxwind3 = f"{forecastday3['day']['maxwind_kph']}mph"
+
+            day2.description = f"{emoji_map['newspaper']} Condition: {forecastday2['day']['condition']['text']}"
+            day2.add_field(
+                name=f"{emoji_map['min_tempe']} Minimum Temperature",
+                value=min_temp2,
+                inline=True,
+            )
+            day2.add_field(
+                name=f"{emoji_map['max_tempe']} Maximum Temperature",
+                value=max_temp2,
+                inline=True,
+            )
+            day2.add_field(
+                name=f"{emoji_map['guste']} Maximum Wind",
+                value=maxwind2,
+                inline=True,
+            )
+            day2.add_field(
+                name=f"{emoji_map['rain_chance']} Chance of Rain",
+                value=f"{forecastday2['day']['daily_chance_of_rain']}%",
+                inline=True,
+            )
+            day2.set_footer(text="Fetched from weatherapi.com")
+
+            day3.description = f"{emoji_map['newspaper']} Condition: {forecastday3['day']['condition']['text']}"
+            day3.add_field(
+                name=f"{emoji_map['min_tempe']} Minimum Temperature",
+                value=min_temp3,
+                inline=True,
+            )
+            day3.add_field(
+                name=f"{emoji_map['max_tempe']} Maximum Temperature",
+                value=max_temp3,
+                inline=True,
+            )
+            day3.add_field(
+                name=f"{emoji_map['guste']} Maximum Wind",
+                value=maxwind3,
+                inline=True,
+            )
+            day3.add_field(
+                name=f"{emoji_map['rain_chance']} Chance of Rain",
+                value=f"{forecastday3['day']['daily_chance_of_rain']}%",
+                inline=True,
+            )
+            day3.set_footer(text="Fetched from weatherapi.com")
+
+            menu.add_page(day1)
+            menu.add_page(day2)
+            menu.add_page(day3)
+            menu.add_button(ViewButton.go_to_first_page())
+            menu.add_button(ViewButton.back())
+            menu.add_button(ViewButton.next())
+            menu.add_button(ViewButton.go_to_last_page())
+            await menu.start()
+            return
+        await ctx.followup.send(embed=day1)
 
     @weather.error
     async def weather_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
@@ -462,25 +559,6 @@ class slashutilities(Cog):
         word: Jeanne.Range[str, 1],
     ):
         await dictionary(ctx, word.lower())
-    
-    @Jeanne.command(description="Make an anonymous confession")
-    @Jeanne.describe(confession="Say your confession")
-    @Jeanne.check(check_botbanned_app_command)
-    @Jeanne.check(check_disabled_app_command)
-    async def confess(
-        self,
-        ctx: Interaction,
-        confession: Jeanne.Range[str, 1, 3000],
-    ):
-        await ctx.response.defer(ephemeral=True)
-        embed=Embed(title="Anonymous confession", description=confession, color=Color.random())
-        confession_channel=Manage(ctx.guild).get_confession_channel
-        await ctx.followup.send(embed=Embed(description="Anonymous confession sent.", color=Color.random()))
-        if confession_channel==None:
-            await ctx.channel.send(embed=embed)
-            return
-        await confession_channel.send(embed=embed)
-
 
 
 async def setup(bot: Bot):
