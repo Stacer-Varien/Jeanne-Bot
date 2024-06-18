@@ -1,4 +1,3 @@
-import argparse
 from datetime import timedelta, datetime
 import re
 import aiohttp

@@ -1,5 +1,4 @@
 from datetime import timedelta, datetime
-from random import randint
 import re
 import aiohttp
 from discord import (
@@ -21,7 +20,6 @@ from reactionmenu import ViewButton, ViewMenu
 from assets.components import ReportModal
 from assets.dictionary import dictionary
 from functions import (
-    Manage,
     Reminder,
     check_botbanned_app_command,
     check_disabled_app_command,
