@@ -1,4 +1,4 @@
-from random import choice, randint
+from random import choice, randint, shuffle
 from typing import Optional
 from discord import (
     ButtonStyle,
@@ -11,6 +11,7 @@ from discord import (
 )
 from datetime import datetime, timedelta
 from discord.ext.commands import Cog, Bot, GroupCog
+from assets.blackjack_game import BlackjackView
 from assets.components import Dice_Buttons, Guess_Buttons, Heads_or_Tails
 from config import DBL_AUTH
 from functions import (
@@ -298,8 +299,8 @@ class Dice_Group(GroupCog, name="dice"):
 class Flip_Group(GroupCog, name="flip"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
-        self.dbl = DBLvoter(self.bot, DBL_AUTH)
         super().__init__()
+        self.dbl = DBLvoter(self.bot, DBL_AUTH)
 
     @Jeanne.command(description="Flip a coin and earn 20 QP for free")
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
@@ -430,6 +431,91 @@ class Flip_Group(GroupCog, name="flip"):
                 color=Color.red(),
             )
             await ctx.response.send_message(embed=cooldown)
+
+
+class Blackjack_Group(GroupCog, name="blackjack"):
+    def __init__(self, bot: Bot) -> None:
+        self.bot = bot
+        self.dbl = DBLvoter(self.bot, DBL_AUTH)
+        super().__init__()
+
+    @Jeanne.command(description="Play a game of blackjack and earn 20 QP for free")
+    @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
+    async def free(self, ctx: Interaction):
+        await ctx.response.defer()
+        suits = ["Hearts", "Diamonds", "Clubs", "Spades"]
+        ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
+        def create_deck()->list[tuple[str, str]]:
+            return [(rank, suit) for suit in suits for rank in ranks]
+
+        def deal_card(deck:list[tuple[str, str]]):
+            return deck.pop(randint(0, len(deck) - 1))        
+
+        deck = create_deck()
+        shuffle(deck)
+
+        player_hand = [deal_card(deck), deal_card(deck)]
+        dealer_hand = [deal_card(deck), deal_card(deck)]
+
+        view = BlackjackView(ctx, self.bot,deck, player_hand, dealer_hand, None)
+        await ctx.followup.send(embed=view.embed, view=view)
+
+        await view.wait()
+
+        if view.value==None:
+            timeout = Embed(
+                description=f"Sorry but you took too long. Please try again",
+                color=Color.red(),
+            )
+            await ctx.edit_original_response(embed=timeout, view=None)
+
+    @Jeanne.command(description="Play a game of blackjack and earn 20 QP for free")
+    @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
+    async def bet(self, ctx: Interaction, bet:Jeanne.Range[int, 5]):
+        await ctx.response.defer()
+        balance=Currency(ctx.user).get_balance
+        if balance < bet:
+            betlower = Embed(
+                description=f"Your balance is too low!\nPlease bet lower than {balance} <:quantumpiece:1161010445205905418>"
+            )
+            await ctx.followup.send(embed=betlower)
+            return
+        if balance == 0:
+            zerobal = Embed(
+                description="Unfortunately, you have 0 <:quantumpiece:1161010445205905418>."
+            )
+            await ctx.followup.send(embed=zerobal)
+            return
+        suits = ["Hearts", "Diamonds", "Clubs", "Spades"]
+        ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
+
+        def create_deck() -> list[tuple[str, str]]:
+            return [(rank, suit) for suit in suits for rank in ranks]
+
+        def deal_card(deck: list[tuple[str, str]]):
+            return deck.pop(randint(0, len(deck) - 1))
+
+        deck = create_deck()
+        shuffle(deck)
+
+        player_hand = [deal_card(deck), deal_card(deck)]
+        dealer_hand = [deal_card(deck), deal_card(deck)]
+
+        view = BlackjackView(ctx, self.bot,deck, player_hand, dealer_hand, bet)
+        await ctx.followup.send(embed=view.embed, view=view)
+
+        await view.wait()
+
+        if view.value == None:
+            timeout = Embed(
+                description=f"Sorry but you took too long. Please try again",
+                color=Color.red(),
+            )
+            await ctx.edit_original_response(embed=timeout, view=None)
 
 
 class currency(Cog, name="CurrencySlash"):
@@ -575,4 +661,5 @@ async def setup(bot: Bot):
     await bot.add_cog(Guess_Group(bot))
     await bot.add_cog(Dice_Group(bot))
     await bot.add_cog(Flip_Group(bot))
+    await bot.add_cog(Blackjack_Group(bot))
     await bot.add_cog(currency(bot))

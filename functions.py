@@ -79,7 +79,8 @@ class Currency:
         data = db.execute(
             "SELECT amount FROM bankData WHERE user_id = ?", (self.user.id,)
         ).fetchone()
-        return int(data[0]) if data else 0
+        db.commit()
+        return 0 if data == None else data[0]
 
     async def add_qp(self, amount: int):
         cur = db.execute(

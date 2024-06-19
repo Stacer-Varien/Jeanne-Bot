@@ -1,4 +1,4 @@
-from random import choice, randint
+from random import choice, randint, shuffle
 from typing import Optional
 from discord import (
     ButtonStyle,
@@ -11,6 +11,7 @@ from discord import (
 from datetime import datetime, timedelta
 from discord.ext.commands import Cog, Bot, Context
 import discord.ext.commands as Jeanne
+from assets.blackjack_game import BlackjackView
 from assets.components import Dice_Buttons, Guess_Buttons, Heads_or_Tails
 from functions import (
     BetaTest,
@@ -73,13 +74,13 @@ class CurrencyPrefix(Cog, name="Currency"):
                 description="YES! YOU GUESSED IT CORRECTLY!\nYou have been given 20 <:quantumpiece:1161010445205905418>!",
                 color=Color.random(),
             )
-            if self.dbl.get_user_vote(ctx.author) == True:
+            if await self.dbl.get_user_vote(ctx.author) == True:
                 await Currency(ctx.author).add_qp(round((20 * 1.25), 2))
                 correct.add_field(
                     name="DiscordBotList Bonus",
                     value=f"{round((20 * 1.25), 2)} <:quantumpiece:1161010445205905418>",
                 )
-                if BetaTest(self.bot).check(ctx.author) == True:
+                if await BetaTest(self.bot).check(ctx.user) == True:
                     await Currency(ctx.author).add_qp(round((20 * 1.25), 2))
                     correct.add_field(
                         name="Beta User Bonus",
@@ -131,13 +132,13 @@ class CurrencyPrefix(Cog, name="Currency"):
                 description=f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given {bet} <:quantumpiece:1161010445205905418>!",
                 color=Color.random(),
             )
-            if self.dbl.get_user_vote(ctx.author) == True:
+            if await self.dbl.get_user_vote(ctx.author) == True:
                 await Currency(ctx.author).add_qp(round((bet * 1.25), 2))
                 correct.add_field(
                     name="DiscordBotList Bonus",
                     value=f"{round((bet * 1.25), 2)} <:quantumpiece:1161010445205905418>",
                 )
-                if BetaTest(self.bot).check(ctx.author) == True:
+                if await BetaTest(self.bot).check(ctx.user) == True:
                     await Currency(ctx.author).add_qp(round((bet * 1.25), 2))
                     correct.add_field(
                         name="Beta User Bonus",
@@ -188,13 +189,19 @@ class CurrencyPrefix(Cog, name="Currency"):
     @Jeanne.check(check_botbanned_prefix)
     @Jeanne.cooldown(1, 3600, type=Jeanne.BucketType.user)
     async def dice_free(self, ctx: Context):
-        view=Dice_Buttons(ctx.author)
-        m=await ctx.send(embed=Embed(description="What do you think the dice will roll?", color=Color.random()), view=view)
+        view = Dice_Buttons(ctx.author)
+        m = await ctx.send(
+            embed=Embed(
+                description="What do you think the dice will roll?",
+                color=Color.random(),
+            ),
+            view=view,
+        )
 
         await view.wait()
-        
+
         rolled = randint(1, 6)
-        if view.value== rolled:
+        if view.value == rolled:
             await Currency(ctx.author).add_qp(20)
             embed = Embed(color=Color.random())
             embed.add_field(
@@ -202,13 +209,13 @@ class CurrencyPrefix(Cog, name="Currency"):
                 value=f"Dice rolled: **{rolled}**\nYou guessed: **{view.value}**!",
                 inline=False,
             )
-            if self.dbl.get_user_vote(ctx.author) == True:
+            if await self.dbl.get_user_vote(ctx.author) == True:
                 await Currency(ctx.author).add_qp(round((20 * 1.25), 2))
                 embed.add_field(
                     name="DiscordBotList Bonus",
                     value=f"{round((20 * 1.25), 2)} <:quantumpiece:1161010445205905418>",
                 )
-                if BetaTest(self.bot).check(ctx.author) == True:
+                if await BetaTest(self.bot).check(ctx.user) == True:
                     await Currency(ctx.author).add_qp(round((20 * 1.25), 2))
                     embed.add_field(
                         name="Beta User Bonus",
@@ -244,12 +251,18 @@ class CurrencyPrefix(Cog, name="Currency"):
             )
             await ctx.send(embed=zerobal)
             return
-        view=Dice_Buttons(ctx.author)
-        m=await ctx.send(embed=Embed(description="What do you think the dice will roll?", color=Color.random()), view=view)
+        view = Dice_Buttons(ctx.author)
+        m = await ctx.send(
+            embed=Embed(
+                description="What do you think the dice will roll?",
+                color=Color.random(),
+            ),
+            view=view,
+        )
 
         await view.wait()
-        
-        rolled = randint(1, 6)        
+
+        rolled = randint(1, 6)
         if view.value == rolled:
             await Currency(ctx.author).add_qp(bet)
             embed = Embed(color=Color.random())
@@ -258,14 +271,14 @@ class CurrencyPrefix(Cog, name="Currency"):
                 value=f"Dice rolled: **{rolled}**\nYou guessed: **{view.value}**!",
                 inline=False,
             )
-            if self.dbl.get_user_vote(ctx.author) == True:
+            if await self.dbl.get_user_vote(ctx.author) == True:
                 await Currency(ctx.author).add_qp(round((bet * 1.25), 2))
                 embed.add_field(
                     name="DiscordBotList Bonus",
                     value=f"{round(
                     (bet * 1.25), 2)} <:quantumpiece:1161010445205905418>",
                 )
-                if BetaTest(self.bot).check(ctx.author) == True:
+                if await BetaTest(self.bot).check(ctx.user) == True:
                     await Currency(ctx.author).add_qp(round((bet * 1.25), 2))
                     embed.add_field(
                         name="Beta User Bonus",
@@ -321,13 +334,13 @@ class CurrencyPrefix(Cog, name="Currency"):
                 description="YAY! You got it!\n20 <:quantumpiece:1161010445205905418> has been added",
                 color=Color.random(),
             )
-            if self.dbl.get_user_vote(ctx.author) == True:
+            if await self.dbl.get_user_vote(ctx.author) == True:
                 await Currency(ctx.author).add_qp(round((20 * 1.25), 2))
                 embed.add_field(
                     name="DiscordBotList Bonus",
                     value=f"{round((20 * 1.25), 2)} <:quantumpiece:1161010445205905418>",
                 )
-                if BetaTest(self.bot).check(ctx.author) == True:
+                if await BetaTest(self.bot).check(ctx.user) == True:
                     await Currency(ctx.author).add_qp(round((20 * 1.25), 2))
                     embed.add_field(
                         name="Beta User Bonus",
@@ -383,13 +396,13 @@ class CurrencyPrefix(Cog, name="Currency"):
                     bet
                 )
             )
-            if self.dbl.get_user_vote(ctx.author) == True:
+            if await self.dbl.get_user_vote(ctx.author) == True:
                 await Currency(ctx.author).add_qp(round((bet * 1.25), 2))
                 embed.add_field(
                     name="DiscordBotList Bonus",
                     value=f"{round((bet * 1.25), 2)} <:quantumpiece:1161010445205905418>",
                 )
-                if BetaTest(self.bot).check(ctx.author) == True:
+                if await BetaTest(self.bot).check(ctx.user) == True:
                     await Currency(ctx.author).add_qp(round((bet * 1.25), 2))
                     embed.add_field(
                         name="Beta User Bonus",
@@ -427,6 +440,113 @@ class CurrencyPrefix(Cog, name="Currency"):
 
     @flip_bet.error
     async def flip_bet_error(self, ctx: Context, error: Jeanne.CommandError):
+        if isinstance(error, Jeanne.CommandOnCooldown):
+            cooldown = Embed(
+                description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`",
+                color=Color.red(),
+            )
+            await ctx.send(embed=cooldown)
+
+    @Jeanne.group(
+        aliases=["bj"],
+        invoke_without_command=True,
+        description="Main blackjack command",
+    )
+    async def blackjack(self, ctx: Context): ...
+
+    @blackjack.command(
+        name="free", description="Play a game of blackjack and earn 20 QP for free"
+    )
+    @Jeanne.cooldown(1, 3600, type=Jeanne.BucketType.user)
+    @Jeanne.check(check_disabled_prefixed_command)
+    @Jeanne.check(check_botbanned_prefix)
+    async def bj_free(self, ctx: Context):
+        suits = ["Hearts", "Diamonds", "Clubs", "Spades"]
+        ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
+
+        def create_deck() -> list[tuple[str, str]]:
+            return [(rank, suit) for suit in suits for rank in ranks]
+
+        def deal_card(deck: list[tuple[str, str]]):
+            return deck.pop(randint(0, len(deck) - 1))
+
+        deck = create_deck()
+        shuffle(deck)
+
+        player_hand = [deal_card(deck), deal_card(deck)]
+        dealer_hand = [deal_card(deck), deal_card(deck)]
+
+        view = BlackjackView(ctx, self.bot, deck, player_hand, dealer_hand, None)
+        m = await ctx.send(embed=view.embed, view=view)
+
+        await view.wait()
+
+        if view.value == None:
+            timeout = Embed(
+                description=f"Sorry but you took too long. Please try again",
+                color=Color.red(),
+            )
+            await m.edit(embed=timeout, view=None)
+
+    @blackjack.command(name="bet", description="Play a game of blackjack and earn 20 QP for free")
+    @Jeanne.cooldown(1, 20, type=Jeanne.BucketType.user)
+    @Jeanne.check(check_disabled_prefixed_command)
+    @Jeanne.check(check_botbanned_prefix)
+    async def bj_bet(self, ctx: Context, bet: Jeanne.Range[int, 5]):
+        balance = Currency(ctx.author).get_balance
+        if balance < bet:
+            betlower = Embed(
+                description=f"Your balance is too low!\nPlease bet lower than {balance} <:quantumpiece:1161010445205905418>"
+            )
+            await ctx.send(embed=betlower)
+            return
+        if balance == 0:
+            zerobal = Embed(
+                description="Unfortunately, you have 0 <:quantumpiece:1161010445205905418>."
+            )
+            await ctx.send(embed=zerobal)
+            return
+
+        suits = ["Hearts", "Diamonds", "Clubs", "Spades"]
+        ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
+
+        def create_deck() -> list[tuple[str, str]]:
+            return [(rank, suit) for suit in suits for rank in ranks]
+
+        def deal_card(deck: list[tuple[str, str]]):
+            return deck.pop(randint(0, len(deck) - 1))
+
+        deck = create_deck()
+        shuffle(deck)
+
+        player_hand = [deal_card(deck), deal_card(deck)]
+        dealer_hand = [deal_card(deck), deal_card(deck)]
+
+        view = BlackjackView(ctx, self.bot, deck, player_hand, dealer_hand, bet)
+        m = await ctx.send(embed=view.embed, view=view)
+
+        await view.wait()
+
+        if view.value == None:
+            timeout = Embed(
+                description=f"Sorry but you took too long. Please try again",
+                color=Color.red(),
+            )
+            await m.edit(embed=timeout, view=None)
+
+    @bj_free.error
+    async def bj_free_error(self, ctx: Context, error: Jeanne.CommandError):
+        if isinstance(error, Jeanne.CommandOnCooldown):
+            reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
+            reset_hour = round(reset_hour_time.timestamp())
+            cooldown = Embed(
+                description=f"You have already used your free chance\nTry again after <t:{reset_hour}:R>",
+                color=Color.red(),
+            )
+            await ctx.send(embed=cooldown)
+
+    @bj_bet.error
+    async def bj_bet_error(self, ctx: Context, error: Jeanne.CommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
             cooldown = Embed(
                 description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`",
@@ -522,11 +642,11 @@ class CurrencyPrefix(Cog, name="Currency"):
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def vote(self, ctx: Context):
-        embed=Embed(
-                color=Color.random(),
-                description="You can vote for me by clicking one of the buttons below to get the following perks:",
-            )
-        topgg_perks="""
+        embed = Embed(
+            color=Color.random(),
+            description="You can vote for me by clicking one of the buttons below to get the following perks:",
+        )
+        topgg_perks = """
 - 100 QP
 - 5XP times their global level
 - - Rewards are double on weekends
