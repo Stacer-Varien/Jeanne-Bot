@@ -144,7 +144,7 @@ class FunPrefix(Cog, name="Fun"):
     @Jeanne.command(
         aliases=["simp"],
         description="Check how much of a simp you or a member are",
-        usage="<MEMBER>",
+        usage="<MEMBER | MEMBER NAME | MEMBER ID>",
     )
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
@@ -157,12 +157,12 @@ class FunPrefix(Cog, name="Fun"):
         )
         if perc >= 75:
             simp.set_image(url="https://i.imgur.com/W4u4Igk.jpg")
-        elif perc >= 50:
+        elif perc >= 50<75:
             simp.set_image(url="https://i.imgur.com/Rs1IP2I.jpg")
         await ctx.send(embed=simp)
 
     @Jeanne.command(
-        aliases=["gay"], description="Check how gay you are", usage="<MEMBER>"
+        aliases=["gay"], description="Check how gay you are", usage="<MEMBER | MEMBER NAME | MEMBER ID>"
     )
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
@@ -175,7 +175,7 @@ class FunPrefix(Cog, name="Fun"):
         )
         if perc >= 75:
             gay.set_image(url="https://i.imgur.com/itOD0Da.png?1")
-        elif perc >= 50:
+        elif perc >= 50<75:
             gay.set_image(url="https://i.imgur.com/tYAbWCl.jpg")
         await ctx.send(embed=gay)
 

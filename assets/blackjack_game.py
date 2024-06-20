@@ -146,7 +146,7 @@ class BlackjackView(ui.View):
                 self.embed.description = (
                     f"You have won 20 <:quantumpiece:1161010445205905418>"
                 )
-                await Currency(ctx.user).add_qp(self.bet)
+                await Currency(ctx.user).add_qp(20)
                 if await self.dbl.get_user_vote(ctx.user) == True:
                     await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
                     self.embed.add_field(

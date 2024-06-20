@@ -80,7 +80,7 @@ class CurrencyPrefix(Cog, name="Currency"):
                     name="DiscordBotList Bonus",
                     value=f"{round((20 * 1.25), 2)} <:quantumpiece:1161010445205905418>",
                 )
-                if await BetaTest(self.bot).check(ctx.user) == True:
+                if await BetaTest(self.bot).check(ctx.author) == True:
                     await Currency(ctx.author).add_qp(round((20 * 1.25), 2))
                     correct.add_field(
                         name="Beta User Bonus",
@@ -138,7 +138,7 @@ class CurrencyPrefix(Cog, name="Currency"):
                     name="DiscordBotList Bonus",
                     value=f"{round((bet * 1.25), 2)} <:quantumpiece:1161010445205905418>",
                 )
-                if await BetaTest(self.bot).check(ctx.user) == True:
+                if await BetaTest(self.bot).check(ctx.author) == True:
                     await Currency(ctx.author).add_qp(round((bet * 1.25), 2))
                     correct.add_field(
                         name="Beta User Bonus",
@@ -215,7 +215,7 @@ class CurrencyPrefix(Cog, name="Currency"):
                     name="DiscordBotList Bonus",
                     value=f"{round((20 * 1.25), 2)} <:quantumpiece:1161010445205905418>",
                 )
-                if await BetaTest(self.bot).check(ctx.user) == True:
+                if await BetaTest(self.bot).check(ctx.author) == True:
                     await Currency(ctx.author).add_qp(round((20 * 1.25), 2))
                     embed.add_field(
                         name="Beta User Bonus",
@@ -278,7 +278,7 @@ class CurrencyPrefix(Cog, name="Currency"):
                     value=f"{round(
                     (bet * 1.25), 2)} <:quantumpiece:1161010445205905418>",
                 )
-                if await BetaTest(self.bot).check(ctx.user) == True:
+                if await BetaTest(self.bot).check(ctx.author) == True:
                     await Currency(ctx.author).add_qp(round((bet * 1.25), 2))
                     embed.add_field(
                         name="Beta User Bonus",
@@ -340,7 +340,7 @@ class CurrencyPrefix(Cog, name="Currency"):
                     name="DiscordBotList Bonus",
                     value=f"{round((20 * 1.25), 2)} <:quantumpiece:1161010445205905418>",
                 )
-                if await BetaTest(self.bot).check(ctx.user) == True:
+                if await BetaTest(self.bot).check(ctx.author) == True:
                     await Currency(ctx.author).add_qp(round((20 * 1.25), 2))
                     embed.add_field(
                         name="Beta User Bonus",
@@ -402,7 +402,7 @@ class CurrencyPrefix(Cog, name="Currency"):
                     name="DiscordBotList Bonus",
                     value=f"{round((bet * 1.25), 2)} <:quantumpiece:1161010445205905418>",
                 )
-                if await BetaTest(self.bot).check(ctx.user) == True:
+                if await BetaTest(self.bot).check(ctx.author) == True:
                     await Currency(ctx.author).add_qp(round((bet * 1.25), 2))
                     embed.add_field(
                         name="Beta User Bonus",

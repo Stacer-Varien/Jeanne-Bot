@@ -78,7 +78,7 @@ class Guess_Group(GroupCog, name="guess"):
                     name="DiscordBotList Bonus",
                     value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>",
                 )
-                if BetaTest(self.bot).check(ctx.user) == True:
+                if await BetaTest(self.bot).check(ctx.user) == True:
                     await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
                     correct.add_field(
                         name="Beta User Bonus",
@@ -137,7 +137,7 @@ class Guess_Group(GroupCog, name="guess"):
                     name="DiscordBotList Bonus",
                     value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
                 )
-                if BetaTest(self.bot).check(ctx.user) == True:
+                if await BetaTest(self.bot).check(ctx.user) == True:
                     await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
                     correct.add_field(
                         name="Beta User Bonus",
@@ -262,7 +262,7 @@ class Dice_Group(GroupCog, name="dice"):
                     name="DiscordBotList Bonus",
                     value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
                 )
-                if BetaTest(self.bot).check(ctx.user) == True:
+                if await BetaTest(self.bot).check(ctx.user) == True:
                     await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
                     embed.add_field(
                         name="Beta User Bonus",
@@ -326,7 +326,7 @@ class Flip_Group(GroupCog, name="flip"):
                     name="DiscordBotList Bonus",
                     value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>",
                 )
-                if BetaTest(self.bot).check(ctx.user) == True:
+                if await BetaTest(self.bot).check(ctx.user) == True:
                     await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
                     embed.add_field(
                         name="Beta User Bonus",
@@ -387,7 +387,7 @@ class Flip_Group(GroupCog, name="flip"):
                     name="DiscordBotList Bonus",
                     value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
                 )
-                if BetaTest(self.bot).check(ctx.user) == True:
+                if await BetaTest(self.bot).check(ctx.user) == True:
                     await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
                     embed.add_field(
                         name="Beta User Bonus",
@@ -471,7 +471,7 @@ class Blackjack_Group(GroupCog, name="blackjack"):
             )
             await ctx.edit_original_response(embed=timeout, view=None)
 
-    @Jeanne.command(description="Play a game of blackjack and earn 20 QP for free")
+    @Jeanne.command(description="Play a game of blackjack and earn with betting")
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
