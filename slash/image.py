@@ -49,7 +49,7 @@ class images(Cog, name="ImagesSlash"):
     @Jeanne.check(check_disabled_app_command)
     async def saber(self, ctx: Interaction):
         await ctx.response.defer()
-        embed, file = get_saber_pic()
+        file, embed = get_saber_pic()
         await ctx.followup.send(embed=embed, file=file)
 
     @Jeanne.command(description="Get a neko image")
