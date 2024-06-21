@@ -70,7 +70,7 @@ class ImagePrefix(Cog, name="Images"):
         embed, file = get_medusa_pic()
         await ctx.send(embed=embed, file=file)
 
-    @Jeanne.command(description="Get an image from Safebooru")
+    @Jeanne.command(aliases=["safe"], description="Get an image from Safebooru")
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
     async def safebooru(self, ctx: Context):
