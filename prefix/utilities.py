@@ -426,22 +426,22 @@ class UtilitiesPrefix(Cog, name="Utilities"):
                 day2.add_field(
                     name=f"{emoji_map['min_tempe']} Minimum Temperature",
                     value=min_temp2,
-                    inline=True,
+                    inline=False,
                 )
                 day2.add_field(
                     name=f"{emoji_map['max_tempe']} Maximum Temperature",
                     value=max_temp2,
-                    inline=True,
+                    inline=False,
                 )
                 day2.add_field(
                     name=f"{emoji_map['guste']} Maximum Wind",
                     value=maxwind2,
-                    inline=True,
+                    inline=False,
                 )
                 day2.add_field(
                     name=f"{emoji_map['rain_chance']} Chance of Rain",
                     value=f"{forecastday2['day']['daily_chance_of_rain']}%",
-                    inline=True,
+                    inline=False,
                 )
                 day2.set_footer(text="Fetched from weatherapi.com")
 
@@ -449,22 +449,22 @@ class UtilitiesPrefix(Cog, name="Utilities"):
                 day3.add_field(
                     name=f"{emoji_map['min_tempe']} Minimum Temperature",
                     value=min_temp3,
-                    inline=True,
+                    inline=False,
                 )
                 day3.add_field(
                     name=f"{emoji_map['max_tempe']} Maximum Temperature",
                     value=max_temp3,
-                    inline=True,
+                    inline=False,
                 )
                 day3.add_field(
                     name=f"{emoji_map['guste']} Maximum Wind",
                     value=maxwind3,
-                    inline=True,
+                    inline=False,
                 )
                 day3.add_field(
                     name=f"{emoji_map['rain_chance']} Chance of Rain",
                     value=f"{forecastday3['day']['daily_chance_of_rain']}%",
-                    inline=True,
+                    inline=False,
                 )
                 day3.set_footer(text="Fetched from weatherapi.com")
 
