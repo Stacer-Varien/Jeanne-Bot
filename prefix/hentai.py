@@ -1,5 +1,5 @@
 from random import randint
-from discord import Color, Embed, HTTPException, Message
+from discord import Color, Embed, HTTPException, Message, NotFound
 from discord.ext.commands import Bot, Cog, Context, BucketType
 import discord.ext.commands as Jeanne
 from functions import (
@@ -60,21 +60,17 @@ class HentaiPrefix(Cog, name="Hentai"):
 
     @hentai.error
     async def hentai_error(self, ctx: Context, error: Jeanne.CommandError):
-        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, HTTPException
-        ):
-            slow = Embed(
-                description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
-                color=Color.red(),
-            )
-            await ctx.send(embed=slow)
-            return
         if isinstance(error, Jeanne.CommandOnCooldown):
             slow = Embed(
                 description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
                 color=Color.red(),
             )
             await ctx.send(embed=slow)
+            return
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, NotFound
+        ):
+            return
 
     @Jeanne.command(
         description="Get a random media content from Gelbooru",
@@ -165,22 +161,17 @@ class HentaiPrefix(Cog, name="Hentai"):
 
     @gelbooru.error
     async def gelbooru_error(self, ctx: Context, error: Jeanne.CommandError):
-        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, (IndexError, KeyError, ValueError, TypeError)
-        ):
-            no_tag = Embed(
-                description="The hentai could not be found", color=Color.red()
-            )
-            await ctx.send(embed=no_tag)
-            return
-        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, HTTPException
-        ):
+        if isinstance(error, Jeanne.CommandOnCooldown):
             slow = Embed(
                 description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
                 color=Color.red(),
             )
             await ctx.send(embed=slow)
+            return
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, NotFound
+        ):
+            return
 
     @Jeanne.command(
         description="Get a random hentai from Yande.re",
@@ -255,22 +246,17 @@ class HentaiPrefix(Cog, name="Hentai"):
 
     @yandere.error
     async def yandere_error(self, ctx: Context, error: Jeanne.CommandError):
-        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, (IndexError, KeyError, ValueError, TypeError)
-        ):
-            no_tag = Embed(
-                description="The hentai could not be found", color=Color.red()
-            )
-            await ctx.send(embed=no_tag)
-            return
-        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, HTTPException
-        ):
+        if isinstance(error, Jeanne.CommandOnCooldown):
             slow = Embed(
                 description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
                 color=Color.red(),
             )
             await ctx.send(embed=slow)
+            return
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, NotFound
+        ):
+            return
 
     @Jeanne.command(
         description="Get a random hentai from Konachan",
@@ -349,22 +335,17 @@ class HentaiPrefix(Cog, name="Hentai"):
 
     @konachan.error
     async def konachan_error(self, ctx: Context, error: Jeanne.CommandError):
-        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, (IndexError, KeyError, ValueError, TypeError)
-        ):
-            no_tag = Embed(
-                description="The hentai could not be found", color=Color.red()
-            )
-            await ctx.send(embed=no_tag)
-            return
-        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, HTTPException
-        ):
+        if isinstance(error, Jeanne.CommandOnCooldown):
             slow = Embed(
                 description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
                 color=Color.red(),
             )
             await ctx.send(embed=slow)
+            return
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, NotFound
+        ):
+            return
 
     @Jeanne.command(
         description="Get a random media content from Danbooru",
@@ -444,22 +425,17 @@ class HentaiPrefix(Cog, name="Hentai"):
 
     @danbooru.error
     async def danbooru_error(self, ctx: Context, error: Jeanne.CommandError):
-        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, (IndexError, KeyError, ValueError, TypeError)
-        ):
-            no_tag = Embed(
-                description="The hentai could not be found", color=Color.red()
-            )
-            await ctx.send(embed=no_tag)
-            return
-        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, HTTPException
-        ):
+        if isinstance(error, Jeanne.CommandOnCooldown):
             slow = Embed(
                 description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
                 color=Color.red(),
             )
             await ctx.send(embed=slow)
+            return
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, NotFound
+        ):
+            return
 
 
 async def setup(bot: Bot):

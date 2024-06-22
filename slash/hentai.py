@@ -1,5 +1,12 @@
 from random import randint
-from discord import Color, Embed, HTTPException, Interaction, app_commands as Jeanne
+from discord import (
+    Color,
+    Embed,
+    HTTPException,
+    Interaction,
+    NotFound,
+    app_commands as Jeanne,
+)
 from discord.ext.commands import Cog, Bot
 from functions import (
     Hentai,
@@ -54,13 +61,9 @@ class nsfw(Cog):
     @hentai.error
     async def hentai_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, HTTPException
+            error.original, NotFound
         ):
-            slow = Embed(
-                description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
-                color=Color.red(),
-            )
-            await ctx.followup.send(embed=slow)
+            return
 
     @Jeanne.command(
         description="Get a random media content from Gelbooru",
@@ -152,13 +155,9 @@ class nsfw(Cog):
             await ctx.followup.send(embed=no_tag)
             return
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, HTTPException
+            error.original, NotFound
         ):
-            slow = Embed(
-                description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
-                color=Color.red(),
-            )
-            await ctx.followup.send(embed=slow)
+            return
 
     @Jeanne.command(
         description="Get a random hentai from Yande.re",
@@ -240,13 +239,9 @@ class nsfw(Cog):
             await ctx.followup.send(embed=no_tag)
             return
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, HTTPException
+            error.original, NotFound
         ):
-            slow = Embed(
-                description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
-                color=Color.red(),
-            )
-            await ctx.followup.send(embed=slow)
+            return
 
     @Jeanne.command(
         description="Get a random hentai from Konachan",
@@ -331,13 +326,9 @@ class nsfw(Cog):
             await ctx.followup.send(embed=no_tag)
             return
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, HTTPException
+            error.original, NotFound
         ):
-            slow = Embed(
-                description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
-                color=Color.red(),
-            )
-            await ctx.followup.send(embed=slow)
+            return
 
     @Jeanne.command(
         description="Get a random media content from Danbooru",
@@ -423,13 +414,9 @@ class nsfw(Cog):
             await ctx.followup.send(embed=no_tag)
             return
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, HTTPException
+            error.original, NotFound
         ):
-            slow = Embed(
-                description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
-                color=Color.red(),
-            )
-            await ctx.followup.send(embed=slow)
+            return
 
 
 async def setup(bot: Bot):

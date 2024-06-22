@@ -346,7 +346,7 @@ class InfoPrefix(Cog, name="Info"):
             return
 
     @Jeanne.command(
-        description="View an emoji", usage="[EMOJI | EMOJI ID | EMOJI NAME]"
+        description="View an emoji", usage="[EMOJI]"
     )
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)
