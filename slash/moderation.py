@@ -17,6 +17,7 @@ from datetime import datetime, timedelta
 from humanfriendly import InvalidTimespan, format_timespan, parse_timespan
 from reactionmenu import ViewButton, ViewMenu
 from functions import (
+    AutoCompleteChoices,
     Moderation,
     check_botbanned_app_command,
     check_disabled_app_command,
@@ -35,8 +36,17 @@ class moderation(Cog):
         member: Union[Member | User],
         reason: str,
         time: Optional[str] = None,
+        delete_message_history: Optional[bool] = None,
     ):
-        await ctx.guild.ban(member, reason="{} | {}".format(reason, ctx.user))
+        if delete_message_history:
+            delete_message_history = 604800
+        else:
+            delete_message_history = 86400
+        await ctx.guild.ban(
+            member,
+            reason="{} | {}".format(reason, ctx.user),
+            delete_message_seconds=delete_message_history,
+        )
         ban = Embed(title="User Banned", color=0xFF0000)
         ban.add_field(name="Name", value=member, inline=True)
         ban.add_field(name="ID", value=member.id, inline=True)
@@ -79,9 +89,11 @@ class moderation(Cog):
         description="Ban someone from or outside the server",
         extras={"bot_perms": "Ban Members", "member_perms": "Ban Members"},
     )
+    @Jeanne.autocomplete(reason=AutoCompleteChoices.default_ban_options)
     @Jeanne.describe(
         member="What is the member or user ID?",
-        reason="What did they do?",
+        reason="What did they do? You can also make a custom reason",
+        purge_messages="Delete messages from past 7 days?",
         time="How long should they be tempbanned? (1m, 1h30m, etc)",
     )
     @Jeanne.checks.has_permissions(ban_members=True)
@@ -93,6 +105,7 @@ class moderation(Cog):
         ctx: Interaction,
         member: Union[Member | User],
         reason: Optional[Jeanne.Range[str, None, 470]] = "Unspecified",
+        delete_message_history: Optional[bool] = None,
         time: Optional[str] = None,
     ) -> None:
         await ctx.response.defer()
@@ -123,7 +136,7 @@ class moderation(Cog):
                 await ctx.edit_original_response(embed=cancelled, view=None)
                 return
             if view.value == True:
-                await self.commit_ban(ctx, member, reason)
+                await self.commit_ban(ctx, member, reason, delete_message_history)
                 return
 
             if view.value == False:
@@ -137,7 +150,7 @@ class moderation(Cog):
             )
             await ctx.followup.send(embed=failed)
             return
-        await self.commit_ban(ctx, member, reason, time)
+        await self.commit_ban(ctx, member, reason, time, delete_message_history)
 
     @ban.error
     async def ban_user_error(self, ctx: Interaction, error: Jeanne.AppCommandError):

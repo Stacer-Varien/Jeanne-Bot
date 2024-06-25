@@ -1447,6 +1447,17 @@ class AutoCompleteChoices:
             if current.lower() in str(image[0]).lower()
         ]
 
+    async def default_ban_options(
+        self, ctx: Interaction, current: str
+    ) -> List[Jeanne.Choice[str]]:
+        default_options=["Suspicious or spam account", "Compromised or hacked account", "Breaking server rules"]
+        return [
+            Jeanne.Choice(name=option, value=option)
+            for option in default_options
+            if current.lower() in option.lower()
+        ]    
+
+
 
 class Partner:
     def __init__(self) -> None:

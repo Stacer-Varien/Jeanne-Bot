@@ -36,8 +36,17 @@ class ModPrefix(Cog, name="Moderation"):
         reason: str,
         message: Message,
         time: Optional[str] = None,
+        delete_message_history: Optional[bool] = None,
     ):
-        await ctx.guild.ban(member, reason="{} | {}".format(reason, ctx.author))
+        if delete_message_history:
+            delete_message_history = 604800
+        else:
+            delete_message_history = 86400
+        await ctx.guild.ban(
+            member,
+            reason="{} | {}".format(reason, ctx.author),
+            delete_message_seconds=delete_message_history,
+        )
         ban = Embed(title="User Banned", color=0xFF0000)
         ban.add_field(name="Name", value=member, inline=True)
         ban.add_field(name="ID", value=member.id, inline=True)
@@ -95,6 +104,7 @@ class ModPrefix(Cog, name="Moderation"):
             parsed_args = parser.parse_known_args(words)[0]
             reason = " ".join(parsed_args.reason)
             time = None if parsed_args.time == None else " ".join(parsed_args.time)
+            delete_message_history: bool = parsed_args.deletemessages
         except SystemExit:
             await ctx.send(
                 embed=Embed(
@@ -127,7 +137,7 @@ class ModPrefix(Cog, name="Moderation"):
             await view.wait()
 
             if view.value == True:
-                await self.commit_ban(ctx, member, reason, m)
+                await self.commit_ban(ctx, member, reason, m, delete_message_history)
                 return
 
             if view.value == (False or None):
@@ -145,7 +155,7 @@ class ModPrefix(Cog, name="Moderation"):
             )
             await ctx.send(embed=failed)
             return
-        await self.commit_ban(ctx, member, reason, m, time)
+        await self.commit_ban(ctx, member, reason, m, time, delete_message_history)
 
     @ban.error
     async def ban_error(self, ctx: Context, error: Jeanne.CommandError):

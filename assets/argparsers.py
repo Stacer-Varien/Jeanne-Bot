@@ -51,7 +51,9 @@ hentai_parser.add_argument(
 inv_parser.add_argument(
     "--name", "-n", type=str, help="NAME", nargs="+", required=False, default=None
 )
-inv_parser.add_argument("--link", "-l", type=str, help="LINK", required=False, default=None)
+inv_parser.add_argument(
+    "--link", "-l", type=str, help="LINK", required=False, default=None
+)
 
 # manage module
 manage_parser.add_argument(
@@ -224,6 +226,14 @@ mod_parser.add_argument(
     default=None,
 )
 
+mod_parser.add_argument(
+    "-dmh",
+    "--deletemessages",
+    "-dmsg",
+    action="store_true",
+    help="Delete 7 day message history. Just type '-dmh'",
+)
+
 
 utility_parser = argparse.ArgumentParser(add_help=False)
 utility_parser.add_argument(
@@ -245,9 +255,7 @@ utility_parser.add_argument(
 )
 
 utility_parser.add_argument(
-    "-3d",
-    "--three",
-    action="store_true", help="Enable 3 day mode. Just type '-3d'"
+    "-3d", "--three", action="store_true", help="Enable 3 day mode. Just type '-3d'"
 )
 
 utility_parser.add_argument(
