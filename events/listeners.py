@@ -26,22 +26,21 @@ class listenersCog(Cog):
             if not message.author.bot and not message.channel.me:
                 level_instance = Levelling(message.author, message.guild)
                 if level_instance.check_xpblacklist_channel(message.channel) == (
-                    False | None
+                    False or None
                 ):
                     try:
-                        if (
-                            DBLvoter(self.bot, DBL_AUTH).get_user_vote(message.author)
-                            == True
-                        ):
+                        get_vote=await DBLvoter(self.bot, DBL_AUTH).get_user_vote(message.author)
+                        check= await BetaTest(self.bot).check(message.author)
+                        if get_vote == True:
                             xp = 15 if (datetime.today().weekday() >= 5) else 10
-                            if BetaTest(self.bot).check(message.author):
-                                xp = xp + 5
+                            if check:
+                                xp += 5
                         else:
                             xp = 10 if (datetime.today().weekday() >= 5) else 5
-                            if BetaTest(self.bot).check(message.author):
-                                xp = xp + 5
+                            if check:
+                                xp += 5
                         lvl = await level_instance.add_xp(xp)
-                        if lvl == None:
+                        if lvl is None:
                             return
                         channel, update, levelup = lvl
                         role_reward = message.guild.get_role(
@@ -86,7 +85,7 @@ class listenersCog(Cog):
                                         roles=False, everyone=False, users=True
                                     ),
                                 )
-                            elif levelup == None:
+                            elif levelup is None:
                                 pass
                             else:
                                 json = loads(self.replace_all(levelup, parameters))
@@ -109,7 +108,7 @@ class listenersCog(Cog):
                                         roles=False, everyone=False, users=True
                                     ),
                                 )
-                            elif update == None:
+                            elif update is None:
                                 pass
                             else:
                                 json = loads(self.replace_all(update, parameters))
@@ -126,7 +125,6 @@ class listenersCog(Cog):
         self, channel: Optional[TextChannel], content: str, embed: Optional[Embed]
     ):
         if channel is not None:
-
             await channel.send(content=content, embed=embed)
 
 
