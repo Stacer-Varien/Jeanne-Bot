@@ -373,13 +373,10 @@ class Levelling:
     def get_member_xp(self) -> int:
         xp = db.execute(
             "SELECT exp FROM serverxpData WHERE user_id = ? AND guild_id = ?",
-            (
-                self.member.id,
-                self.server.id,
-            ),
+            (self.member.id, self.server.id),
         ).fetchone()
         db.commit()
-        return 0 if xp == None else int(xp[0])
+        return 0 if xp is None else int(xp[0])
 
     @property
     def get_user_xp(self) -> int:
@@ -387,19 +384,16 @@ class Levelling:
             "SELECT exp FROM globalxpData WHERE user_id = ?", (self.member.id,)
         ).fetchone()
         db.commit()
-        return 0 if xp == None else int(xp[0])
+        return 0 if xp is None else int(xp[0])
 
     @property
     def get_member_cumulated_xp(self) -> int:
         cumulated_exp = db.execute(
             "SELECT cumulative_exp FROM serverxpData WHERE user_id = ? AND guild_id = ?",
-            (
-                self.member.id,
-                self.server.id,
-            ),
+            (self.member.id, self.server.id),
         ).fetchone()
         db.commit()
-        return 0 if cumulated_exp == None else int(cumulated_exp[0])
+        return 0 if cumulated_exp is None else int(cumulated_exp[0])
 
     @property
     def get_user_cumulated_xp(self) -> int:
@@ -408,16 +402,13 @@ class Levelling:
             (self.member.id,),
         ).fetchone()
         db.commit()
-        return 0 if cumulated_exp == None else int(cumulated_exp[0])
+        return 0 if cumulated_exp is None else int(cumulated_exp[0])
 
     @property
     def get_next_time_server(self) -> int:
         next_time = db.execute(
             "SELECT next_time FROM serverxpData WHERE user_id = ? AND guild_id = ?",
-            (
-                self.member.id,
-                self.server.id,
-            ),
+            (self.member.id, self.server.id),
         ).fetchone()
         db.commit()
         return int(next_time[0]) if next_time is not None else 0
@@ -425,8 +416,7 @@ class Levelling:
     @property
     def get_next_time_global(self) -> int:
         next_time = db.execute(
-            "SELECT next_time FROM globalxpData WHERE user_id = ?",
-            (self.member.id,),
+            "SELECT next_time FROM globalxpData WHERE user_id = ?", (self.member.id,)
         ).fetchone()
         db.commit()
         return int(next_time[0]) if next_time is not None else 0
@@ -435,10 +425,7 @@ class Levelling:
     def get_member_level(self) -> int:
         level = db.execute(
             "SELECT lvl FROM serverxpData WHERE user_id = ? AND guild_id = ?",
-            (
-                self.member.id,
-                self.server.id,
-            ),
+            (self.member.id, self.server.id),
         ).fetchone()
         db.commit()
         return int(level[0]) if level else 0
@@ -449,21 +436,16 @@ class Levelling:
             "SELECT lvl FROM globalxpData WHERE user_id = ?", (self.member.id,)
         ).fetchone()
         db.commit()
-        return int(level[0]) if level != None else 0
+        return int(level[0]) if level is not None else 0
 
     async def add_xp(self, xp: int):
         now_time = round(datetime.now().timestamp())
         next_time = round((datetime.now() + timedelta(minutes=2)).timestamp())
-        xp = 10 if (datetime.today().weekday() >= 5) else 5
+        xp = 15 if (datetime.today().weekday() >= 5) else 10
+
         global_cursor = db.execute(
-            "INSERT OR IGNORE INTO globalxpData (user_id, lvl, exp, cumulative_exp, next_time) VALUES (?,?,?,?,?)",
-            (
-                self.member.id,
-                0,
-                xp,
-                xp,
-                next_time,
-            ),
+            "INSERT OR IGNORE INTO globalxpData (user_id, lvl, exp, cumulative_exp, next_time) VALUES (?, ?, ?, ?, ?)",
+            (self.member.id, 0, xp, xp, next_time),
         )
         db.commit()
         if global_cursor.rowcount == 0:
@@ -473,7 +455,7 @@ class Levelling:
                 global_updated_exp = global_exp + xp
                 global_updated_cumulated_exp = global_cumulated_exp + xp
                 db.execute(
-                    "UPDATE globalxpDATA SET exp = ?, cumulative_exp = ?, next_time = ? WHERE user_id = ?",
+                    "UPDATE globalxpData SET exp = ?, cumulative_exp = ?, next_time = ? WHERE user_id = ?",
                     (
                         global_updated_exp,
                         global_updated_cumulated_exp,
@@ -491,25 +473,14 @@ class Levelling:
                 if global_cumulated_exp >= global_next_lvl_exp:
                     global_updated_exp = global_cumulated_exp - global_next_lvl_exp
                     db.execute(
-                        "UPDATE globalxpData SET lvl = lvl + ?, exp = ? WHERE user_id = ?",
-                        (
-                            1,
-                            global_updated_exp,
-                            self.member.id,
-                        ),
+                        "UPDATE globalxpData SET lvl = lvl + 1, exp = ? WHERE user_id = ?",
+                        (global_updated_exp, self.member.id),
                     )
                     db.commit()
 
         server_cursor = db.execute(
-            "INSERT OR IGNORE INTO serverxpData (guild_id, user_id, lvl, exp, cumulative_exp, next_time) VALUES (?,?,?,?,?,?)",
-            (
-                self.server.id,
-                self.member.id,
-                0,
-                xp,
-                xp,
-                next_time,
-            ),
+            "INSERT OR IGNORE INTO serverxpData (guild_id, user_id, lvl, exp, cumulative_exp, next_time) VALUES (?, ?, ?, ?, ?, ?)",
+            (self.server.id, self.member.id, 0, xp, xp, next_time),
         )
         db.commit()
         if server_cursor.rowcount == 0:
@@ -538,52 +509,49 @@ class Levelling:
                 if server_cumulated_exp >= server_next_lvl_exp:
                     server_updated_exp = server_cumulated_exp - server_next_lvl_exp
                     db.execute(
-                        "UPDATE serverxpData SET lvl = lvl + ?, exp = ? WHERE guild_id = ? AND user_id = ?",
-                        (
-                            1,
-                            server_updated_exp,
-                            self.server.id,
-                            self.member.id,
-                        ),
+                        "UPDATE serverxpData SET lvl = lvl + 1, exp = ? WHERE guild_id = ? AND user_id = ?",
+                        (server_updated_exp, self.server.id, self.member.id),
                     )
                     db.commit()
                     return self.get_level_channel
 
     @property
-    def get_level_channel(self) -> tuple[TextChannel | None, str | None, str | None]:
+    def get_level_channel(
+        self,
+    ) -> tuple[Optional[TextChannel], Optional[str], Optional[str]]:
         return self.get_levelup_channel, self.get_levelup_msg, self.get_rank_up_update
 
     @property
-    def get_levelup_msg(self) -> str | None:
+    def get_levelup_msg(self) -> Optional[str]:
         data = db.execute(
             "SELECT levelup_message FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
-        return None if data == None else data[0]
+        return None if data is None else data[0]
 
     @property
-    def get_levelup_channel(self) -> TextChannel | None:
+    def get_levelup_channel(self) -> Optional[TextChannel]:
         data = db.execute(
             "SELECT levelup_channel FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
-        return None if data == None else self.server.get_channel(data[0])
+        return None if data is None else self.server.get_channel(data[0])
 
     @property
-    def get_rank_up_update(self) -> str | None:
+    def get_rank_up_update(self) -> Optional[str]:
         data = db.execute(
             "SELECT rankup_message FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
-        return None if data == None else data[0]
+        return None if data is None else data[0]
 
     @property
-    def get_role_reward(self) -> Role | None:
+    def get_role_reward(self) -> Optional[Role]:
         data = db.execute(
             "SELECT role FROM levelRewardData WHERE server = ? AND level = ?",
             (self.server.id, self.get_member_level),
         ).fetchone()
-        return None if data == None else self.server.get_role(data[0])
+        return None if data is None else self.server.get_role(data[0])
 
     @property
-    def get_server_rank(self) -> list | None:
+    def get_server_rank(self) -> Optional[List]:
         leaders_query = db.execute(
             "SELECT * FROM serverxpData WHERE guild_id = ? ORDER BY lvl DESC LIMIT 15;",
             (self.server.id,),
@@ -592,53 +560,47 @@ class Levelling:
         return leaders_query.fetchall()
 
     @property
-    def get_global_rank(self) -> list | None:
+    def get_global_rank(self) -> Optional[List]:
         leaders_query = db.execute(
             "SELECT * FROM globalxpData ORDER BY lvl DESC LIMIT 15;"
         )
         db.commit()
         return leaders_query.fetchall()
 
-    def check_xpblacklist_channel(
-        self, channel: TextChannel
-    ) -> TextChannel | Literal[False] | None:
+    def check_xpblacklist_channel(self, channel: TextChannel) -> Optional[TextChannel]:
         data = db.execute(
             "SELECT channel FROM xpChannelData WHERE server = ? AND channel = ?",
-            (
-                self.server.id,
-                channel.id,
-            ),
+            (self.server.id, channel.id),
         ).fetchone()
         db.commit()
-        if data == None:
-            return
-        return self.server.get_channel(data[0]) if data != None else False
+        if data is None:
+            return None
+        return self.server.get_channel(data[0]) if data is not None else False
 
     @property
-    def get_member_server_rank(self) -> int | None:
+    def get_member_server_rank(self) -> Optional[int]:
         result = db.execute(
             "SELECT user_id FROM serverxpData WHERE guild_id = ? ORDER BY cumulative_exp DESC",
             (self.member.guild.id,),
         ).fetchall()
-        all_ids = [m_id[0] for m_id in result]
-        try:
-            rank = all_ids.index(self.member.id) + 1
-            return rank
-        except ValueError:
+        all_ids = [item[0] for item in result]
+        if self.member.id not in all_ids:
             return None
+        rank = all_ids.index(self.member.id)
+        return rank + 1
 
     @property
-    def get_member_global_rank(self) -> int | None:
+    def get_user_global_rank(self) -> Optional[int]:
         result = db.execute(
             "SELECT user_id FROM globalxpData ORDER BY cumulative_exp DESC"
         ).fetchall()
-        all_ids = [m_id[0] for m_id in result]
-        try:
-            rank = all_ids.index(self.member.id) + 1
-            return rank
-        except:
+        all_ids = [item[0] for item in result]
+        if self.member.id not in all_ids:
             return None
+        rank = all_ids.index(self.member.id)
+        return rank + 1
 
+    #
     @property
     def get_blacklisted_channels(self) -> list[TextChannel] | None:
         data = db.execute(
@@ -961,8 +923,8 @@ class Manage:
         db.commit()
 
     @property
-    def get_confession_channel(self)->TextChannel | None:
-        data=db.execute(
+    def get_confession_channel(self) -> TextChannel | None:
+        data = db.execute(
             "SELECT confess_channel FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
@@ -1450,13 +1412,16 @@ class AutoCompleteChoices:
     async def default_ban_options(
         self, ctx: Interaction, current: str
     ) -> List[Jeanne.Choice[str]]:
-        default_options=["Suspicious or spam account", "Compromised or hacked account", "Breaking server rules"]
+        default_options = [
+            "Suspicious or spam account",
+            "Compromised or hacked account",
+            "Breaking server rules",
+        ]
         return [
             Jeanne.Choice(name=option, value=option)
             for option in default_options
             if current.lower() in option.lower()
-        ]    
-
+        ]
 
 
 class Partner:
