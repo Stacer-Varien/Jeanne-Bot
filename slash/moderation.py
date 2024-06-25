@@ -93,7 +93,7 @@ class moderation(Cog):
     @Jeanne.describe(
         member="What is the member or user ID?",
         reason="What did they do? You can also make a custom reason",
-        purge_messages="Delete messages from past 7 days?",
+        delete_message_history="Delete messages from past 7 days?",
         time="How long should they be tempbanned? (1m, 1h30m, etc)",
     )
     @Jeanne.checks.has_permissions(ban_members=True)
