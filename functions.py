@@ -600,7 +600,6 @@ class Levelling:
         rank = all_ids.index(self.member.id)
         return rank + 1
 
-    #
     @property
     def get_blacklisted_channels(self) -> list[TextChannel] | None:
         data = db.execute(
