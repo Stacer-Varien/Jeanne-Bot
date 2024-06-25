@@ -52,12 +52,12 @@ class DBL(Cog, name="DBL"):
             async with aiohttp.ClientSession(headers=dblheaders) as session:
                 await session.post(
                     "https://discordbotlist.com/api/v1/bots/831993597166747679/stats",
-                    json={"guilds": servers, "users": len(self.bot.users)},
+                    json={"guilds": servers, "users": len(self.bot.users)}, 
                 )
             async with aiohttp.ClientSession(headers=dbheaders) as session:
                 await session.post(
                     " https://discord.bots.gg/api/v1/bots/831993597166747679/stats",
-                    json={"guildCount": servers},
+                    json={"guildCount": servers, "shardCount": self.bot.shard_count},
                 )
             await self.topggpy.post_guild_count(
                 guild_count=servers, shard_count=self.bot.shard_count
@@ -78,7 +78,7 @@ class DBL(Cog, name="DBL"):
 
     @Cog.listener()
     async def on_dbl_vote(self, data: dict):
-        if data["type"] == "test":
+        if data["type"] == "upvote":
             voter_id = int(data["user"])
             voter = await self.bot.fetch_user(voter_id)
             if Botban(voter).check_botbanned_user:
