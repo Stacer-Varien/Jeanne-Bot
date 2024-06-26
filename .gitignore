@@ -135,3 +135,5 @@ logging.db
 #files
 /assets/media.py
 *.db
+*.csv
+*.txt
