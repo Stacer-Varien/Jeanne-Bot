@@ -249,7 +249,7 @@ class Inventory:
             ),
         )
         db.commit()
-        await Currency(self.user).remove_qp(1000)
+        await Currency(self.user).remove_qp(1500)
 
     @property
     def selected_wallpaper(self) -> str | None:

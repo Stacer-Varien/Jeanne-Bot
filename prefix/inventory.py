@@ -138,12 +138,12 @@ class InvPrefix(Cog, name="Inventory"):
     @Jeanne.check(check_disabled_prefixed_command)
     async def buycustom(self, ctx: Context, *words: str, parser=inv_parser):
         balance = Currency(ctx.author).get_balance
-        if balance is None or balance < 1000:
+        if balance is None or balance < 1500:
             nomoney = Embed(description="You do not have enough QP.")
             await ctx.send(embed=nomoney)
             return
         try:
-            (parsed_args,) = parser.parse_known_args(words)[0]
+            parsed_args = parser.parse_known_args(words)[0]
             name = None if parsed_args.name == None else " ".join(parsed_args.name)
             link: str = None if parsed_args.link == None else parsed_args.link
         except SystemExit:
@@ -181,7 +181,7 @@ class InvPrefix(Cog, name="Inventory"):
                 description="This is the preview of the profile card.",
                 color=Color.blue(),
             )
-            .add_field(name="Cost", value="1000 <:quantumpiece:1161010445205905418>")
+            .add_field(name="Cost", value="1500 <:quantumpiece:1161010445205905418>")
             .set_footer(text="Is this the background you wanted?")
             .set_footer(
                 text="Please note that if the custom background violates ToS or is NSFW, it will be removed with NO REFUNDS and without warning!"
