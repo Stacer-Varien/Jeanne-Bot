@@ -16,7 +16,9 @@ class Profile:
         self.default_bg = os.path.join(os.path.dirname(__file__), "assets", "card.png")
         self.font1 = os.path.join(os.path.dirname(__file__), "assets", "font.ttf")
         self.vote_badge = os.path.join(os.path.dirname(__file__), "assets", "voted.png")
-        self.dbl_badge = os.path.join(os.path.dirname(__file__), "assets", "discordbotlist.png")
+        self.dbl_badge = os.path.join(
+            os.path.dirname(__file__), "assets", "discordbotlist.png"
+        )
         self.first_badge = os.path.join(os.path.dirname(__file__), "assets", "1st.png")
         self.second_badge = os.path.join(os.path.dirname(__file__), "assets", "2nd.png")
         self.third_badge = os.path.join(os.path.dirname(__file__), "assets", "3rd.png")
@@ -37,7 +39,7 @@ class Profile:
         self.beta = os.path.join(os.path.dirname(__file__), "assets", "beta.png")
 
     @staticmethod
-    def enhance_and_paste(image:Image, position:int, card:Image.Image):
+    def enhance_and_paste(image: Image, position: int, card: Image.Image):
         enhancer = ImageEnhance.Brightness(image)
         enhanced_image = enhancer.enhance(1.1)
         card.paste(enhanced_image, position, enhanced_image)
@@ -47,14 +49,14 @@ class Profile:
         user: User | Member,
         bg_image: str = None,
         voted: bool = False,
-        dbl_voter:bool=False,
-        country:str = None
+        dbl_voter: bool = False,
+        country: str = None,
     ) -> BytesIO | Literal[False]:
         inventory_instance = Inventory(user)
 
         background = (
             self.default_bg
-            if bg_image == None
+            if bg_image is None
             else BytesIO(requests.get(bg_image).content)
         )
 
@@ -63,45 +65,37 @@ class Profile:
         card = Image.open(background).convert("RGBA")
 
         card = ImageEnhance.Brightness(card).enhance(
-            float(inventory_instance.get_brightness / 100)
+            float(inventory_instance.get_brightness) / 100
         )
 
         width, height = card.size
         if width == 900 and height == 500:
             pass
-
         elif width > 900 and height > 500:
             x1 = 0
             y1 = 0
             x2 = width
             nh = math.ceil(width * 0.528888)
-            y2 = 0
-
-            if nh < height:
-                y2 = nh + y1
-
+            y2 = nh if nh < height else height
             card = card.crop((x1, y1, x2, y2)).resize(
                 (900, 500), resample=Image.Resampling.LANCZOS
             )
-
         else:
             return False
 
-        # profile
         profile_bytes = BytesIO(requests.get(user.display_avatar.url).content)
-        profile = Image.open(profile_bytes)
-        profile = profile.convert("RGBA").resize((180, 180), resample=Image.Resampling.LANCZOS)
-
+        profile = (
+            Image.open(profile_bytes)
+            .convert("RGBA")
+            .resize((180, 180), resample=Image.Resampling.LANCZOS)
+        )
         profile_pic_holder = Image.new("RGBA", card.size, (255, 255, 255, 0))
 
         mask = Image.new("RGBA", card.size, 0)
         mask_draw = ImageDraw.Draw(mask)
         mask_draw.ellipse((30, 250, 210, 430), fill=(255, 25, 255, 255))
 
-        # ======== Fonts to use =============
         font_small = ImageFont.truetype(self.font1, 30)
-
-        # ======== Colors ========================
         font_color = inventory_instance.get_color
         COLOR = (
             tuple(ImageColor.getcolor(font_color, "RGB"))
@@ -133,12 +127,10 @@ class Profile:
             font=ImageFont.truetype(self.font1, 45),
             stroke_width=1,
         )
-
         draw.ellipse((30, 250, 210, 430), fill=(255, 255, 255, 0), outline=COLOR)
-
         qp = Image.open(self.qp).resize((50, 50))
 
-        badges=[]
+        badges = []
         x_position = 840
 
         if voted:
@@ -152,14 +144,13 @@ class Profile:
             x_position -= 60
 
         grank, srank, rrank = (
-            levelling_instance.get_member_global_rank,
+            levelling_instance.get_user_global_rank,
             levelling_instance.get_member_server_rank,
             get_richest(user),
         )
 
         if grank is not None and grank <= 100:
             if grank == 1:
-
                 ranked = Image.open(self.first_badge).resize((50, 50))
             elif grank == 2:
                 ranked = Image.open(self.second_badge).resize((50, 50))
@@ -235,7 +226,7 @@ class Profile:
             align="center",
         )
 
-        #qp rect
+        # qp rect
         profile_draw.rounded_rectangle((610, 510, 870, 630), outline=COLOR, radius=6)
 
         global_rank = ("#" + str(grank)) if grank else "N/A"
@@ -263,9 +254,9 @@ class Profile:
             font=ImageFont.truetype(self.font1, 45),
             stroke_width=1,
         )
-        profile_canvas.paste(qp, (760, 570), qp)
+        profile_canvas.paste(qp, (820, 570), qp)
 
-        #global level bar
+        # global level bar
         profile_draw.rounded_rectangle((10, 680, 890, 693), outline=COLOR, width=2, radius=6)
         global_level, global_user_xp = (
             levelling_instance.get_user_level,
@@ -287,7 +278,7 @@ class Profile:
             stroke_width=1,
         )
 
-        #global rank rect
+        # global rank rect
         profile_draw.rounded_rectangle((30,510,290,630), outline=COLOR, radius=6)
 
         global_xpneed = global_next_xp - levelling_instance.get_user_xp
@@ -317,10 +308,10 @@ class Profile:
             font=font_small,
             stroke_width=1,
         )
-        #server rank rect
+        # server rank rect
         profile_draw.rounded_rectangle((320,510,580,630), outline=COLOR, radius=6)
 
-        #server rank bar
+        # server rank bar
         profile_draw.rounded_rectangle((10, 750, 890, 763), outline=COLOR, width=2, radius=6)
 
         server_xpneed = server_next_xp - levelling_instance.get_member_xp
