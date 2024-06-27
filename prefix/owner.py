@@ -203,6 +203,7 @@ class OwnerCog(Cog, name="Owner"):
             return
         await Hentai().add_blacklisted_link(link)
         await ctx.send("Link blacklisted")
+        await ctx.message.delete()
 
     @command(
         aliases=["db", "database"],
