@@ -2,7 +2,7 @@ from collections import OrderedDict
 from datetime import datetime
 from json import loads
 from typing import Optional
-from discord import AllowedMentions, Embed, Message, TextChannel
+from discord import AllowedMentions, DMChannel, Embed, Message, TextChannel
 from discord.ext.commands import Bot, Cog
 from functions import BetaTest, Botban, DBLvoter, Levelling
 from config import DBL_AUTH
@@ -23,7 +23,7 @@ class listenersCog(Cog):
         if Botban(message.author).check_botbanned_user:
             return
         try:
-            if not message.author.bot and not message.channel.me:
+            if not message.author.bot and not isinstance(message.channel, DMChannel):
                 level_instance = Levelling(message.author, message.guild)
                 if level_instance.check_xpblacklist_channel(message.channel) == (
                     False or None
