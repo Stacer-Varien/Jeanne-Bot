@@ -128,8 +128,7 @@ class InvPrefix(Cog, name="Inventory"):
             await ctx.send(embed=cooldown)
 
     @background.command(
-        aliases=["custom"],
-        name="buy-custom",
+        aliases=["custom", "buy-custom"],
         description="Buy a custom background pic for your level card",
         usage="[-n NAME] [-l LINK]",
     )
