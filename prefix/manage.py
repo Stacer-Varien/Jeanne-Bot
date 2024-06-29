@@ -454,7 +454,7 @@ class ManagePrefix(Cog, name="Manage"):
 
     @thread.command(
         description="Make a private thread",
-        usage="<-n NAME> <-s SLOWMODE>",
+        usage="[CHANNEL] <-n NAME> <-s SLOWMODE>",
         extras={
             "bot_perms": "Create Private Threads",
             "member_perms": "Create Private Threads\nManage Threads",
@@ -629,7 +629,7 @@ class ManagePrefix(Cog, name="Manage"):
             await ctx.send(embed=embed)
 
     @Jeanne.command(
-        aliases=["ch"],
+        aliases=["dch"],
         description="Deletes a channel",
         usage="[CHANNEL | CHANNEL NAME | CHANNEL ID]",
         extras={"bot_perms": "Manage Channels", "member_perms": "Manage Channels"},
@@ -665,7 +665,7 @@ class ManagePrefix(Cog, name="Manage"):
     @Jeanne.command(
         aliases=["delemote", "delemoji"],
         description="Deletes an emoji",
-        usage="[EMOJI | EMOJI NAME | EMOJI ID]",
+        usage="[EMOJI NAME | EMOJI ID]",
         extras={
             "bot_perms": "Manage Expressions",
             "member_perms": "Manage Expressions",
@@ -1181,7 +1181,7 @@ class ManagePrefix(Cog, name="Manage"):
             await ctx.send(embed=embed)
             return
         await Inventory(ctx.author).set_brightness(brightness)
-        embed.description = "Brightness has been changed to {}".format(brightness)
+        embed.description = "Brightness has been changed to {}%".format(brightness)
         embed.color = Color.random()
         await ctx.send(embed=embed)
 

@@ -1242,7 +1242,7 @@ class Set_Group(GroupCog, name="set"):
             await ctx.followup.send(embed=embed)
             return
         await Inventory(ctx.user).set_brightness(brightness)
-        embed.description = "Brightness has been changed to {}".format(brightness)
+        embed.description = "Brightness has been changed to {}%".format(brightness)
         embed.color = Color.random()
         await ctx.followup.send(embed=embed)
 
