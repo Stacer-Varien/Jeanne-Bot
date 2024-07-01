@@ -441,7 +441,6 @@ class Levelling:
     async def add_xp(self, xp: int):
         now_time = round(datetime.now().timestamp())
         next_time = round((datetime.now() + timedelta(minutes=2)).timestamp())
-        xp = 15 if (datetime.today().weekday() >= 5) else 10
 
         global_cursor = db.execute(
             "INSERT OR IGNORE INTO globalxpData (user_id, lvl, exp, cumulative_exp, next_time) VALUES (?, ?, ?, ?, ?)",
@@ -471,10 +470,9 @@ class Levelling:
                     (global_level * 50) + ((global_level - 1) * 25) + 50
                 )
                 if global_cumulated_exp >= global_next_lvl_exp:
-                    global_updated_exp = global_cumulated_exp - global_next_lvl_exp
                     db.execute(
-                        "UPDATE globalxpData SET lvl = lvl + 1, exp = ? WHERE user_id = ?",
-                        (global_updated_exp, self.member.id),
+                        "UPDATE globalxpData SET lvl = lvl + ?, exp = ? WHERE user_id = ?",
+                        (1, 0, self.member.id),
                     )
                     db.commit()
 
@@ -507,10 +505,9 @@ class Levelling:
                     (server_level * 50) + ((server_level - 1) * 25) + 50
                 )
                 if server_cumulated_exp >= server_next_lvl_exp:
-                    server_updated_exp = server_cumulated_exp - server_next_lvl_exp
                     db.execute(
-                        "UPDATE serverxpData SET lvl = lvl + 1, exp = ? WHERE guild_id = ? AND user_id = ?",
-                        (server_updated_exp, self.server.id, self.member.id),
+                        "UPDATE serverxpData SET lvl = lvl + ?, exp = ? WHERE guild_id = ? AND user_id = ?",
+                        (1, 0, self.server.id, self.member.id,),
                     )
                     db.commit()
                     return self.get_level_channel
