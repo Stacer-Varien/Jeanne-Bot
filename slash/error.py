@@ -1,6 +1,7 @@
 import csv
 from datetime import datetime
-from discord import Color, Embed, Interaction
+from io import BytesIO
+from discord import Color, Embed, File, Interaction
 from discord import app_commands as Jeanne
 from discord.ext.commands import Bot, Cog
 import traceback
@@ -33,16 +34,21 @@ class ErrorsCog(Cog, name="ErrorsSlash"):
             traceback_error = traceback.format_exception(
                 error, error, error.__traceback__
             )
-            fields = ["Date", "Command", "Error"]
-            traceback_dict = {
-                "Date": datetime.now(),
-                "Command": ctx.command.qualified_name,
-                "Error": "".join(traceback_error),
-            }
-            with open("errors.csv", "a", newline="") as f:
-                writer = csv.DictWriter(f, fieldnames=fields)
-                writer.writerows(traceback_dict)
-
+            channel = await self.bot.fetch_channel(1257420940128550942)
+            error_message = f"""
+```
+Command: {ctx.command}
+Date and Time: {datetime.now().strftime("%d/%m%Y %H:%M")}
+Error:
+{"".join(traceback_error)}
+```
+"""
+            if len(error_message) > 2000:
+                file = BytesIO(error_message.encode("utf-8"))
+                file = File(fp=file, filename="slash_error.txt")
+                await channel.send(file=file)
+            else:
+                await channel.send(error_message)
         elif isinstance(error, Jeanne.errors.NoPrivateMessage):
             embed = Embed(description=str(error), color=Color.red())
             await ctx.response.send_message(embed=embed)

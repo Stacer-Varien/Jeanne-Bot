@@ -1,5 +1,6 @@
 from datetime import datetime
-from discord import Color, Embed
+from io import BytesIO
+from discord import Color, Embed, File
 from discord.ext import commands as Jeanne
 from discord.ext.commands import Bot, Cog, Context, NotOwner, CommandNotFound
 import traceback
@@ -22,15 +23,22 @@ class ErrorsCog(Cog, name="ErrorsPrefix"):
             traceback_error = traceback.format_exception(
                 error, error, error.__traceback__
             )
-            fields = ["Date", "Command", "Error"]
-            with open("errors.csv", "a", newline="") as f:
-                traceback_dict = {
-                    "Date": datetime.now(),
-                    "Command": ctx.command.qualified_name,
-                    "Error": "".join(traceback_error),
-                }
-                writer = csv.DictWriter(f, fieldnames=fields)
-                writer.writerow(traceback_dict)
+            channel = await self.bot.fetch_channel(1257420940128550942)
+            error_message=f"""
+```
+Command: {ctx.command}
+Date and Time: {datetime.now().strftime("%d/%m%Y %H:%M")}
+Error:
+{"".join(traceback_error)}
+```
+"""
+            if len(error_message)>2000:
+                file = BytesIO(error_message.encode("utf-8"))
+                file = File(fp=file, filename="prefix_error.txt")
+
+                await channel.send(file=file)
+            else:
+                await channel.send(error_message)
         elif isinstance(error, Jeanne.errors.NoPrivateMessage):
             embed = Embed(description=str(error), color=Color.red())
             await ctx.send(embed=embed)
