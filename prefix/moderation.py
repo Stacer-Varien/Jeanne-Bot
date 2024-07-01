@@ -39,24 +39,24 @@ class ModPrefix(Cog, name="Moderation"):
         delete_message_history: Optional[bool] = None,
     ):
         if delete_message_history:
-            delete_message_history = 604800
+            dmh = 604800
         else:
-            delete_message_history = 86400
+            dmh = 86400
         await ctx.guild.ban(
             member,
             reason="{} | {}".format(reason, ctx.author),
-            delete_message_seconds=delete_message_history,
+            delete_message_seconds=dmh,
         )
         ban = Embed(title="User Banned", color=0xFF0000)
         ban.add_field(name="Name", value=member, inline=True)
         ban.add_field(name="ID", value=member.id, inline=True)
         ban.add_field(name="Moderator", value=ctx.author, inline=True)
         ban.add_field(name="Reason", value=reason, inline=False)
-        if time:
+        if time !=None:
             if time != "":
                 try:
                     a = parse_timespan(time)
-                    await Moderation(ctx.guild, member).softban_member(time)
+                    await Moderation(ctx.guild).softban_member(member, int(a))
                     time = format_timespan(a)
                 except:
                     time = "Invalid time added. User is banned permanently!"
@@ -124,28 +124,27 @@ class ModPrefix(Cog, name="Moderation"):
             failed = Embed(description="You cannot ban yourself...", color=Color.red())
             await ctx.send(embed=failed)
             return
+        if member not in ctx.guild.members:
+            if await self.check_banned(ctx, member) == False:
+                view = Confirmation(ctx.author)
+                confirm = Embed(
+                    description="Is {} the one you want to ban from your server?".format(
+                        member
+                    ),
+                    color=Color.dark_red(),
+                ).set_thumbnail(url=member.display_avatar)
+                m = await ctx.send(embed=confirm, view=view)
+                await view.wait()
 
-        if await self.check_banned(ctx, member) == False:
-            view = Confirmation(ctx.author)
-            confirm = Embed(
-                description="Is {} the one you want to ban from your server?".format(
-                    member
-                ),
-                color=Color.dark_red(),
-            ).set_thumbnail(url=member.display_avatar)
-            m = await ctx.send(embed=confirm, view=view)
-            await view.wait()
+                if view.value == True:
+                    await self.commit_ban(ctx, member, reason, m, delete_message_history)
+                    return
 
-            if view.value == True:
-                await self.commit_ban(ctx, member, reason, m, delete_message_history)
-                return
+                if view.value == (False or None):
+                    cancelled = Embed(description="Ban cancelled", color=Color.red())
+                    await m.edit(embed=cancelled, view=None)
+                    return
 
-            if view.value == (False or None):
-                cancelled = Embed(description="Ban cancelled", color=Color.red())
-                await m.edit(embed=cancelled, view=None)
-                return
-        if await self.check_banned(ctx, member) == None:
-            await self.check_banned(ctx, member)
         if ctx.author.top_role.position <= member.top_role.position:
             failed = Embed(
                 description="{}'s position is higher than or same as you...".format(
