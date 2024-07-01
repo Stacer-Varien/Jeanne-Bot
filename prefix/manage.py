@@ -130,7 +130,7 @@ class ManagePrefix(Cog, name="Manage"):
         self, ctx: Context, *words: str, parser=manage_parser
     ) -> None:
         try:
-            (parsed_args,) = parser.parse_known_args(words)[0]
+            parsed_args = parser.parse_known_args(words)[0]
             name = (
                 "new-channel"
                 if parsed_args.name == None
@@ -1315,7 +1315,6 @@ class ManagePrefix(Cog, name="Manage"):
     ) -> None:
         channel = ctx.channel if channel == None else channel
         try:
-            (parsed_args,) = parser.parse_known_args(words)
             parsed_args = parser.parse_known_args(words)[0]
             name = (
                 "new-channel"
