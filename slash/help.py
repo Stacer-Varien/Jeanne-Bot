@@ -1,4 +1,3 @@
-from json import dumps, loads
 from discord import (
     ButtonStyle,
     Color,
@@ -39,16 +38,14 @@ class HelpGroup(GroupCog, name="help"):
     @Jeanne.describe(command="Which command you need help with?")
     @Jeanne.check(check_botbanned_app_command)
     async def command(self, ctx: Interaction, command: Jeanne.Range[str, 3]):
-        await ctx.response.defer()
-        cmd = next(
-            (
-                cmd
-                for cmd in self.bot.tree.walk_commands()
-                if not isinstance(cmd, Jeanne.Group) and cmd.qualified_name == command
-            ),
-            None,
-        )
-        if cmd:
+            await ctx.response.defer()
+            cmd = next(
+                (
+                    cmd
+                    for cmd in self.bot.tree.walk_commands()
+                    if not isinstance(cmd, Jeanne.Group) and cmd.qualified_name == command
+                ),
+            )
             try:
                 bot_perms = cmd.extras["bot_perms"]
             except:
@@ -90,7 +87,7 @@ class HelpGroup(GroupCog, name="help"):
     @command.error
     async def command_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, IndexError
+            error.original, (IndexError, RuntimeError)
         ):
             embed = Embed(description="I don't have this command", color=Color.red())
             await ctx.followup.send(embed=embed)
