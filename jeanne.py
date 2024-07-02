@@ -35,17 +35,6 @@ bot.remove_command("help")
 
 @bot.event
 async def on_ready():
-    cfields = ["Date and Time", "User", "Command Used", "Command Usage"]
-    efields = ["Date", "Command", "Error"]
-
-    with open("commandlog.csv", "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=cfields)
-        writer.writeheader()
-
-    with open("errors.csv", "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=efields)
-        writer.writeheader()
-
     print("Connected to bot: {}".format(bot.user.name))
     print("Bot ID: {}".format(bot.user.id))
     print("Connected to {} servers".format(len(bot.guilds)))

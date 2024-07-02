@@ -186,7 +186,7 @@ class UtilitiesPrefix(Cog, name="Utilities"):
 
     @_embed.command(
         aliases=["gen"],
-        description="Generates an embed message. This needs the Discohook.org embed generator. You can use a JSON script or text file with the script", usage="<JSON SCRIPT | TEXT FILE>"
+        description="Generates an embed message. This needs the Discohook.org embed generator. You can use a JSON script or text file with the script", usage="[CHANNEL | CHANNEL NAME | CHANNEL ID] <JSON SCRIPT | TEXT FILE>"
     )
     @Jeanne.has_guild_permissions(administrator=True)
     @Jeanne.check(check_disabled_prefixed_command)
@@ -283,7 +283,7 @@ class UtilitiesPrefix(Cog, name="Utilities"):
             )
             await ctx.send(embed=embed)
 
-    @Jeanne.command(description="Get weather information on a city", usage="[-c CITY] <-u METRIC | IMPERIAL")
+    @Jeanne.command(description="Get weather information on a city", usage="[-c CITY] <-u METRIC | IMPERIAL> <-3d>")
     @Jeanne.cooldown(3, 14400, type=Jeanne.BucketType.user)
     @Jeanne.check(check_disabled_prefixed_command)
     @Jeanne.check(check_botbanned_prefix)

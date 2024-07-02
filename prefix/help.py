@@ -15,7 +15,8 @@ class HelpMenu(ui.Select):
         self.bot = bot
 
         excluded_cogs = [
-            "blackjack"
+            "blackjack",
+            "DBL",
             "listenersCog",
             "tasksCog",
             "WelcomerCog",
