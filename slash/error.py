@@ -37,7 +37,7 @@ class ErrorsCog(Cog, name="ErrorsSlash"):
             channel = await self.bot.fetch_channel(1257420940128550942)
             error_message = f"""
 ```
-Command: {ctx.command}
+Command: {ctx.command.qualified_name}
 Date and Time: {datetime.now().strftime("%d/%m%Y %H:%M")}
 Error:
 {"".join(traceback_error)}
