@@ -36,7 +36,7 @@ def deal_card(deck: list[tuple[str, str]])->tuple[str,str]:
 
 
 class BlackjackView(ui.View):
-    def __init__(self, ctx, bot:Bot,deck, player_hand, dealer_hand, bet:Optional[int]):
+    def __init__(self, ctx, bot:Bot,deck, player_hand, dealer_hand, bet:Optional[int]=None):
         super().__init__(timeout=60)
         self.ctx = ctx
         self.deck = deck
@@ -126,36 +126,36 @@ class BlackjackView(ui.View):
         if self.dealer_value > 21 or self.player_value > self.dealer_value:
             result_embed.title = "You win!"
             if self.bet:
-                self.embed.description = (
+                result_embed.description = (
                     f"You have won {self.bet} <:quantumpiece:1161010445205905418>"
                 )
                 await Currency(ctx.user).add_qp(self.bet)
                 if await self.dbl.get_user_vote(ctx.user) == True:
                     await Currency(ctx.user).add_qp(round((self.bet * 1.25), 2))
-                    self.embed.add_field(
+                    result_embed.add_field(
                         name="DiscordBotList Bonus",
                         value=f"{round((self.bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
                     )
                 if await BetaTest(self.bot).check(ctx.user) == True:
                     await Currency(ctx.user).add_qp(round((self.bet * 1.25), 2))
-                    self.embed.add_field(
+                    result_embed.add_field(
                         name="Beta User Bonus",
                         value=f"{round((self.bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
                     )
             else:
-                self.embed.description = (
+                result_embed.description = (
                     f"You have won 20 <:quantumpiece:1161010445205905418>"
                 )
                 await Currency(ctx.user).add_qp(20)
                 if await self.dbl.get_user_vote(ctx.user) == True:
                     await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
-                    self.embed.add_field(
+                    result_embed.add_field(
                         name="DiscordBotList Bonus",
                         value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>",
                     )
                 if await BetaTest(self.bot).check(ctx.user) == True:
                     await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
-                    self.embed.add_field(
+                    result_embed.add_field(
                         name="Beta User Bonus",
                         value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>",
                     )
@@ -163,7 +163,7 @@ class BlackjackView(ui.View):
         elif self.player_value < self.dealer_value:
             result_embed.title = "You lose!"
             if self.bet:
-                self.embed.description = f"Unfortunately, I have to take away {self.bet} <:quantumpiece:1161010445205905418>"
+                result_embed.description = f"Unfortunately, I have to take away {self.bet} <:quantumpiece:1161010445205905418>"
                 await Currency(ctx.user).remove_qp(self.bet)
         else:
             result_embed.title = "It's a tie!"

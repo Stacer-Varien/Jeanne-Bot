@@ -476,7 +476,7 @@ class CurrencyPrefix(Cog, name="Currency"):
         player_hand = [deal_card(deck), deal_card(deck)]
         dealer_hand = [deal_card(deck), deal_card(deck)]
 
-        view = BlackjackView(ctx, self.bot, deck, player_hand, dealer_hand, None)
+        view = BlackjackView(ctx, self.bot, deck, player_hand, dealer_hand)
         m = await ctx.send(embed=view.embed, view=view)
 
         await view.wait()
