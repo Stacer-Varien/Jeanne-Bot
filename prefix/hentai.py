@@ -56,7 +56,10 @@ class HentaiPrefix(Cog, name="Hentai"):
             m: Message = await ctx.send(embed=embed, view=view)
         await view.wait()
         if view.value is None:
-            await m.edit(view=None)
+            try:
+                await m.edit(view=None)
+            except NotFound:
+                return
 
     @hentai.error
     async def hentai_error(self, ctx: Context, error: Jeanne.CommandError):
@@ -111,8 +114,10 @@ class HentaiPrefix(Cog, name="Hentai"):
                 m: Message = await ctx.send("\n".join(imgs), view=view)
                 await view.wait()
                 if view.value is None:
-                    await m.edit(view=None)
-                return
+                    try:
+                        await m.edit(view=None)
+                    except NotFound:
+                        return
             color = Color.random()
             embeds = [
                 Embed(color=color, url="https://gelbooru.com")
@@ -125,16 +130,20 @@ class HentaiPrefix(Cog, name="Hentai"):
             m: Message = await ctx.send(embeds=embeds, view=view)
             await view.wait()
             if view.value is None:
-                await m.edit(view=None)
-            return
+                try:
+                    await m.edit(view=None)
+                except NotFound:
+                    return
         try:
             view = ReportContent(image)
             if str(image).endswith("mp4"):
                 m: Message = await ctx.send(image, view=view)
                 await view.wait()
                 if view.value is None:
-                    await m.edit(view=None)
-                return
+                    try:
+                        await m.edit(view=None)
+                    except NotFound:
+                        return
             embed = (
                 Embed(color=Color.purple())
                 .set_image(url=image)
@@ -145,7 +154,10 @@ class HentaiPrefix(Cog, name="Hentai"):
             m: Message = await ctx.send(embed=embed, view=view)
             await view.wait()
             if view.value is None:
-                await m.edit(view=None)
+                try:
+                    await m.edit(view=None)
+                except NotFound:
+                    return
         except:
             if str(image).endswith("mp4"):
                 await ctx.send(image)
@@ -161,17 +173,22 @@ class HentaiPrefix(Cog, name="Hentai"):
 
     @gelbooru.error
     async def gelbooru_error(self, ctx: Context, error: Jeanne.CommandError):
-        if isinstance(error, Jeanne.CommandOnCooldown):
-            slow = Embed(
-                description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
-                color=Color.red(),
-            )
-            await ctx.send(embed=slow)
-            return
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, NotFound
+            error.original, (IndexError, KeyError)
         ):
-            return
+            no_tag = Embed(
+                description="The hentai could not be found", color=Color.red()
+            )
+            await ctx.send(embed=no_tag)
+
+        elif isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, TypeError
+        ):
+            warning = Embed(
+                description="Please do not use that tag again", color=Color.red()
+            )
+            warning.set_footer(text="If you think this is a mistake, please use the `/report` or `j!report` command")
+            await ctx.send(embed=warning)
 
     @Jeanne.command(
         description="Get a random hentai from Yande.re",
@@ -246,17 +263,22 @@ class HentaiPrefix(Cog, name="Hentai"):
 
     @yandere.error
     async def yandere_error(self, ctx: Context, error: Jeanne.CommandError):
-        if isinstance(error, Jeanne.CommandOnCooldown):
-            slow = Embed(
-                description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
-                color=Color.red(),
-            )
-            await ctx.send(embed=slow)
-            return
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, NotFound
+            error.original, (IndexError, KeyError)
         ):
-            return
+            no_tag = Embed(
+                description="The hentai could not be found", color=Color.red()
+            )
+            await ctx.send(embed=no_tag)
+
+        elif isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, TypeError
+        ):
+            warning = Embed(
+                description="Please do not use that tag again", color=Color.red()
+            )
+            warning.set_footer(text="If you think this is a mistake, please use the `/report` or `j!report` command")
+            await ctx.send(embed=warning)
 
     @Jeanne.command(
         description="Get a random hentai from Konachan",
@@ -335,17 +357,22 @@ class HentaiPrefix(Cog, name="Hentai"):
 
     @konachan.error
     async def konachan_error(self, ctx: Context, error: Jeanne.CommandError):
-        if isinstance(error, Jeanne.CommandOnCooldown):
-            slow = Embed(
-                description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
-                color=Color.red(),
-            )
-            await ctx.send(embed=slow)
-            return
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, NotFound
+            error.original, (IndexError, KeyError)
         ):
-            return
+            no_tag = Embed(
+                description="The hentai could not be found", color=Color.red()
+            )
+            await ctx.send(embed=no_tag)
+
+        elif isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, TypeError
+        ):
+            warning = Embed(
+                description="Please do not use that tag again", color=Color.red()
+            )
+            warning.set_footer(text="If you think this is a mistake, please use the `/report` or `j!report` command")
+            await ctx.send(embed=warning)
 
     @Jeanne.command(
         description="Get a random media content from Danbooru",
@@ -425,17 +452,23 @@ class HentaiPrefix(Cog, name="Hentai"):
 
     @danbooru.error
     async def danbooru_error(self, ctx: Context, error: Jeanne.CommandError):
-        if isinstance(error, Jeanne.CommandOnCooldown):
-            slow = Embed(
-                description="WOAH! Slow down!\nI know you are horny but geez... I am at my limit",
-                color=Color.red(),
-            )
-            await ctx.send(embed=slow)
-            return
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, NotFound
+            error.original, (IndexError, KeyError)
         ):
-            return
+            no_tag = Embed(
+                description="The hentai could not be found", color=Color.red()
+            )
+            await ctx.send(embed=no_tag)
+
+        elif isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, TypeError
+        ):
+            warning = Embed(
+                description="Please do not use that tag again", color=Color.red()
+            )
+            warning.set_footer(text="If you think this is a mistake, please use the `/report` or `j!report` command")
+            warning.set_footer(text="If you think this is a mistake, please use the `/report` or `j!report` command")
+            await ctx.send(embed=warning)
 
 
 async def setup(bot: Bot):
