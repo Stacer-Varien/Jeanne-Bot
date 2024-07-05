@@ -114,7 +114,7 @@ class Currency:
 
     async def give_daily(self):
         next_claim = round((datetime.now() + timedelta(days=1)).timestamp())
-        qp = 200 if (datetime.today().weekday() >= 5) else 100
+        qp = 200 if (datetime.today().weekday() > 4) else 100
         cur = db.execute(
             "INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)",
             (
@@ -443,33 +443,29 @@ class Levelling:
         next_time = round((datetime.now() + timedelta(minutes=2)).timestamp())
 
         global_cursor = db.execute(
-            "INSERT OR IGNORE INTO globalxpData (user_id, lvl, exp, cumulative_exp, next_time) VALUES (?, ?, ?, ?, ?)",
-            (self.member.id, 0, xp, xp, next_time),
+            "INSERT OR IGNORE INTO globalxpData (user_id, lvl, exp, next_time) VALUES (?, ?, ?, ?)",
+            (self.member.id, 0, xp, next_time),
         )
         db.commit()
         if global_cursor.rowcount == 0:
             if now_time >= self.get_next_time_global:
                 global_exp = self.get_user_xp
-                global_cumulated_exp = self.get_user_cumulated_xp
                 global_updated_exp = global_exp + xp
-                global_updated_cumulated_exp = global_cumulated_exp + xp
                 db.execute(
-                    "UPDATE globalxpData SET exp = ?, cumulative_exp = ?, next_time = ? WHERE user_id = ?",
+                    "UPDATE globalxpData SET exp = ?, next_time = ? WHERE user_id = ?",
                     (
                         global_updated_exp,
-                        global_updated_cumulated_exp,
                         next_time,
                         self.member.id,
                     ),
                 )
                 db.commit()
 
-                global_cumulated_exp = self.get_user_cumulated_xp
                 global_level = self.get_user_level
                 global_next_lvl_exp = (
                     (global_level * 50) + ((global_level - 1) * 25) + 50
                 )
-                if global_cumulated_exp >= global_next_lvl_exp:
+                if global_updated_exp >= global_next_lvl_exp:
                     db.execute(
                         "UPDATE globalxpData SET lvl = lvl + ?, exp = ? WHERE user_id = ?",
                         (1, 0, self.member.id),
@@ -477,21 +473,19 @@ class Levelling:
                     db.commit()
 
         server_cursor = db.execute(
-            "INSERT OR IGNORE INTO serverxpData (guild_id, user_id, lvl, exp, cumulative_exp, next_time) VALUES (?, ?, ?, ?, ?, ?)",
-            (self.server.id, self.member.id, 0, xp, xp, next_time),
+            "INSERT OR IGNORE INTO serverxpData (guild_id, user_id, lvl, exp, next_time) VALUES (?, ?, ?, ?, ?)",
+            (self.server.id, self.member.id, 0, xp, next_time),
         )
         db.commit()
+
         if server_cursor.rowcount == 0:
             if now_time > self.get_next_time_server:
                 server_exp = self.get_member_xp
-                cumulated_exp = self.get_member_cumulated_xp
                 server_updated_exp = server_exp + xp
-                server_updated_cumulative_exp = cumulated_exp + xp
                 db.execute(
-                    "UPDATE serverxpData SET exp = ?, cumulative_exp = ?, next_time = ? WHERE guild_id = ? AND user_id = ?",
+                    "UPDATE serverxpData SET exp = ?, next_time = ? WHERE guild_id = ? AND user_id = ?",
                     (
                         server_updated_exp,
-                        server_updated_cumulative_exp,
                         next_time,
                         self.server.id,
                         self.member.id,
@@ -499,15 +493,19 @@ class Levelling:
                 )
                 db.commit()
 
-                server_cumulated_exp = self.get_member_cumulated_xp
                 server_level = self.get_member_level
                 server_next_lvl_exp = (
                     (server_level * 50) + ((server_level - 1) * 25) + 50
                 )
-                if server_cumulated_exp >= server_next_lvl_exp:
+                if server_updated_exp >= server_next_lvl_exp:
                     db.execute(
                         "UPDATE serverxpData SET lvl = lvl + ?, exp = ? WHERE guild_id = ? AND user_id = ?",
-                        (1, 0, self.server.id, self.member.id,),
+                        (
+                            1,
+                            0,
+                            self.server.id,
+                            self.member.id,
+                        ),
                     )
                     db.commit()
                     return self.get_level_channel
@@ -577,7 +575,7 @@ class Levelling:
     @property
     def get_member_server_rank(self) -> Optional[int]:
         result = db.execute(
-            "SELECT user_id FROM serverxpData WHERE guild_id = ? ORDER BY cumulative_exp DESC",
+            "SELECT user_id FROM serverxpData WHERE guild_id = ? ORDER BY exp DESC",
             (self.member.guild.id,),
         ).fetchall()
         all_ids = [item[0] for item in result]
@@ -589,7 +587,7 @@ class Levelling:
     @property
     def get_user_global_rank(self) -> Optional[int]:
         result = db.execute(
-            "SELECT user_id FROM globalxpData ORDER BY cumulative_exp DESC"
+            "SELECT user_id FROM globalxpData ORDER BY exp DESC"
         ).fetchall()
         all_ids = [item[0] for item in result]
         if self.member.id not in all_ids:
@@ -1151,12 +1149,10 @@ def get_richest(member: Member) -> int:
 
 
 class NsfwApis(Enum):
-    KonachanApi = (
-        "https://konachan.com/post.json?s=post&q=index&limit=100&tags=score:>10+rating:"
-    )
-    YandereApi = "https://yande.re/post.json?limit=100&tags=score:>10+rating:"
-    GelbooruApi = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=score:>10+rating:"
-    DanbooruApi = "https://danbooru.donmai.us/posts.json?limit=100&tags=rating:"
+    KonachanApi = "https://konachan.com/post.json?s=post&q=index&limit=100&tags=score:>10+rating:explicit+"
+    YandereApi = "https://yande.re/post.json?limit=100&tags=score:>10+rating:explicit+"
+    GelbooruApi = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=score:>10+rating:explicit+"
+    DanbooruApi = "https://danbooru.donmai.us/posts.json?limit=100&tags=rating:explicit+"
 
 
 class Hentai:
@@ -1182,12 +1178,10 @@ class Hentai:
         else:
             return ""
 
-    async def get_nsfw_image(
-        self, provider: NsfwApis, rating: Optional[str] = None, tags: str = None
-    ) -> list | None:
+    async def get_nsfw_image(self, provider: NsfwApis, tags: str = None) -> list | None:
         bl = self.get_blacklisted_links()
         tags = tags.lower() if tags else None
-        url = provider.value + rating + "+" + self.format_tags(tags)
+        url = provider.value + self.format_tags(tags)
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 nsfw_images: dict = await resp.json()
@@ -1233,52 +1227,44 @@ class Hentai:
         db.commit()
         return [str(link[0]) for link in data] if data else None
 
-    async def gelbooru(self, rating: Optional[str] = None, tag: Optional[str] = None):
-        if rating is None:
-            rating = choice(["questionable", "explicit"])
+    async def gelbooru(self, tag: Optional[str] = None):
+
         if not tag or tag is None:
             tag = None
-        images = await self.get_nsfw_image(NsfwApis.GelbooruApi, rating, tag)
+        images = await self.get_nsfw_image(NsfwApis.GelbooruApi, tag)
         if self.plus:
             return images
         return choice(images)["file_url"]
 
-    async def yandere(self, rating: Optional[str] = None, tag: Optional[str] = None):
-        if rating is None:
-            rating = choice(["questionable", "explicit"])
-        images = await self.get_nsfw_image(NsfwApis.YandereApi, rating, tag)
+    async def yandere(self, tag: Optional[str] = None):
+        images = await self.get_nsfw_image(NsfwApis.YandereApi, tag)
         if self.plus:
             return images
         return choice(images)["sample_url"]
 
-    async def konachan(self, rating: Optional[str] = None, tag: Optional[str] = None):
-        if rating is None:
-            rating = choice(["questionable", "explicit"])
-        images = await self.get_nsfw_image(NsfwApis.KonachanApi, rating, tag)
+    async def konachan(self, tag: Optional[str] = None):
+
+        images = await self.get_nsfw_image(NsfwApis.KonachanApi, tag)
         if self.plus:
             return images
         return choice(images)["file_url"]
 
-    async def danbooru(self, rating: Optional[str] = None, tag: Optional[str] = None):
-        if rating is None:
-            rating = choice(["questionable", "explicit"])
+    async def danbooru(self, tag: Optional[str] = None):
+
         if not tag or tag is None:
             tag = None
         else:
             tag = ",".join(tag.split(",")[:2])
-        images = await self.get_nsfw_image(NsfwApis.DanbooruApi, rating, tag)
+        images = await self.get_nsfw_image(NsfwApis.DanbooruApi, tag)
         if self.plus:
             return images
         return choice(images)["file_url"]
 
     async def hentai(self, rating: Optional[str] = None):
-        if rating == None:
-            rating = ["questionable", "explicit"]
-            rating = choice(rating)
-        gelbooru_image = await self.gelbooru(rating)
-        yandere_image = await self.yandere(rating)
-        konachan_image = await self.konachan(rating)
-        danbooru_image = await self.danbooru(rating)
+        gelbooru_image = await self.gelbooru()
+        yandere_image = await self.yandere()
+        konachan_image = await self.konachan()
+        danbooru_image = await self.danbooru()
         h = [gelbooru_image, yandere_image, konachan_image, danbooru_image]
         hentai: str = choice(h)
         if hentai == gelbooru_image:
@@ -1371,7 +1357,7 @@ class AutoCompleteChoices:
             Jeanne.Choice(name=command, value=command)
             for command in cmds
             if current.lower() in command.lower()
-        ]
+        ][:25]
 
     async def disabled_commands(
         self,
@@ -1383,7 +1369,7 @@ class AutoCompleteChoices:
             Jeanne.Choice(name=command, value=command)
             for command in commands
             if current.lower() in command
-        ]
+        ][:25]
 
     async def list_all_user_inventory(
         self, ctx: Interaction, current: str
@@ -1393,7 +1379,7 @@ class AutoCompleteChoices:
             Jeanne.Choice(name=image[1], value=image[1])
             for image in inventory
             if current.lower() in str(image[1]).lower()
-        ]
+        ][:25]
 
     async def get_all_wallpapers(
         self, ctx: Interaction, current: str
@@ -1403,7 +1389,7 @@ class AutoCompleteChoices:
             Jeanne.Choice(name=image[0], value=image[0])
             for image in wallpapers
             if current.lower() in str(image[0]).lower()
-        ]
+        ][:25]
 
     async def default_ban_options(
         self, ctx: Interaction, current: str
@@ -1412,6 +1398,7 @@ class AutoCompleteChoices:
             "Suspicious or spam account",
             "Compromised or hacked account",
             "Breaking server rules",
+            "Botting account"
         ]
         return [
             Jeanne.Choice(name=option, value=option)
@@ -1481,34 +1468,6 @@ class BetaTest:
             )
 
 
-async def is_beta_prefix(ctx: Context):
-    if not await BetaTest(ctx.bot).check(ctx.author):
-        await ctx.send(
-            embed=Embed(
-                description="Uh Oh!\n\nIt seems you are trying something that is meant for beta users.\nIf you wish to join the beta programme, join [Orleans](https://discord.gg/Vfa796yvNq) and ask the bot developer.",
-                color=Color.red(),
-            ),
-            ephemeral=True,
-        )
-        return
-    return True
-
-
-async def check_disabled_prefixed_command(ctx: Context):
-    if Command(ctx.guild).check_disabled(ctx.command.qualified_name):
-        await ctx.send(
-            "This command is disabled by the server's managers", ephemeral=True
-        )
-        return
-    return True
-
-
-def check_botbanned_prefix(ctx: Context):
-    if Botban(ctx.author).check_botbanned_user:
-        return
-    return True
-
-
 async def check_disabled_app_command(ctx: Interaction):
     if Command(ctx.guild).check_disabled(ctx.command.qualified_name):
         await ctx.response.send_message(
@@ -1535,37 +1494,3 @@ async def is_beta_app_command(ctx: Interaction):
         )
         return
     return True
-
-
-class DBLvoter:
-    def __init__(self, bot: Bot, auth: str) -> None:
-        self.bot = bot
-        self.auth = auth
-        self.url = f"https://discordbotlist.com/api/v1/bots/831993597166747679/"
-        self.headers = {
-            "Content-Type": "application/json",
-            "Authorization": self.auth,
-        }
-
-    async def connect(self, endpoint: Optional[str] = None):
-        async with aiohttp.ClientSession(headers=self.headers) as session:
-            response = await session.get(self.url + endpoint)
-            if response.status == 200:
-                return response
-            return None
-
-    @property
-    async def votes(self):
-        response = await self.connect("upvotes")
-        if response == None:
-            return
-        return await response.json()
-
-    async def get_user_vote(self, user: User) -> bool | None:
-        data = await self.votes
-
-        if data == None:
-            return
-
-        if str(user.id) in str(data["upvotes"]):
-            return True
