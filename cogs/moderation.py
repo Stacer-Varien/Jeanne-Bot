@@ -402,8 +402,8 @@ class moderation(Cog):
         limit="How many messages? (max is 100)",
         member="Which member's messages you want to delete?",
     )
-    @Jeanne.checks.has_permissions(manage_messages=True)
-    @Jeanne.checks.bot_has_permissions(manage_messages=True)
+    @Jeanne.checks.has_permissions(manage_messages=True, read_message_history=True)
+    @Jeanne.checks.bot_has_permissions(manage_messages=True, read_message_history=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def prune(

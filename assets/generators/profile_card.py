@@ -2,8 +2,7 @@ from io import BytesIO
 from typing import Literal
 from PIL import Image, ImageDraw, ImageFont, ImageColor, ImageEnhance
 from discord import Member, User
-from config import DBL_AUTH
-from functions import BetaTest, Currency, DBLvoter, Inventory, Levelling, Partner, get_richest
+from functions import BetaTest, Currency, Inventory, Levelling, Partner, get_richest
 import requests
 import math
 import os
@@ -16,9 +15,6 @@ class Profile:
         self.default_bg = os.path.join(os.path.dirname(__file__), "assets", "card.png")
         self.font1 = os.path.join(os.path.dirname(__file__), "assets", "font.ttf")
         self.vote_badge = os.path.join(os.path.dirname(__file__), "assets", "voted.png")
-        self.dbl_badge = os.path.join(
-            os.path.dirname(__file__), "assets", "discordbotlist.png"
-        )
         self.first_badge = os.path.join(os.path.dirname(__file__), "assets", "1st.png")
         self.second_badge = os.path.join(os.path.dirname(__file__), "assets", "2nd.png")
         self.third_badge = os.path.join(os.path.dirname(__file__), "assets", "3rd.png")
@@ -49,7 +45,6 @@ class Profile:
         user: User | Member,
         bg_image: str = None,
         voted: bool = False,
-        dbl_voter: bool = False,
         country: str = None,
     ) -> BytesIO | Literal[False]:
         inventory_instance = Inventory(user)
@@ -138,11 +133,6 @@ class Profile:
             badges.append((voter, x_position))
             x_position -= 60
 
-        if dbl_voter:
-            dblvoter = Image.open(self.dbl_badge).resize((50, 50))
-            badges.append((dblvoter, x_position))
-            x_position -= 60
-
         grank, srank, rrank = (
             levelling_instance.get_user_global_rank,
             levelling_instance.get_member_server_rank,
@@ -208,14 +198,16 @@ class Profile:
             text=f"Global Rank",
             fill=COLOR,
             font=ImageFont.truetype(self.font1, 35),
-            stroke_width=1, align="center"
+            stroke_width=1,
+            align="center",
         )
         profile_draw.text(
             (330, 520),
             text="Server Rank",
             fill=COLOR,
             font=ImageFont.truetype(self.font1, 35),
-            stroke_width=1, align="center"
+            stroke_width=1,
+            align="center",
         )
         profile_draw.text(
             (620, 520),
@@ -257,7 +249,9 @@ class Profile:
         profile_canvas.paste(qp, (820, 570), qp)
 
         # global level bar
-        profile_draw.rounded_rectangle((10, 680, 890, 693), outline=COLOR, width=2, radius=6)
+        profile_draw.rounded_rectangle(
+            (10, 680, 890, 693), outline=COLOR, width=2, radius=6
+        )
         global_level, global_user_xp = (
             levelling_instance.get_user_level,
             levelling_instance.get_user_xp,
@@ -279,7 +273,7 @@ class Profile:
         )
 
         # global rank rect
-        profile_draw.rounded_rectangle((30,510,290,630), outline=COLOR, radius=6)
+        profile_draw.rounded_rectangle((30, 510, 290, 630), outline=COLOR, radius=6)
 
         global_xpneed = global_next_xp - levelling_instance.get_user_xp
         global_xphave = global_user_xp
@@ -287,7 +281,9 @@ class Profile:
         global_current_percentage = (global_xphave / global_xpneed) * 100
         global_length_of_bar = (global_current_percentage * 8.76) + 12
 
-        profile_draw.rounded_rectangle((12, 682, global_length_of_bar, 691), fill=COLOR, radius=6)
+        profile_draw.rounded_rectangle(
+            (12, 682, global_length_of_bar, 691), fill=COLOR, radius=6
+        )
         server_level, server_user_xp = (
             levelling_instance.get_member_level,
             levelling_instance.get_member_xp,
@@ -309,10 +305,12 @@ class Profile:
             stroke_width=1,
         )
         # server rank rect
-        profile_draw.rounded_rectangle((320,510,580,630), outline=COLOR, radius=6)
+        profile_draw.rounded_rectangle((320, 510, 580, 630), outline=COLOR, radius=6)
 
         # server rank bar
-        profile_draw.rounded_rectangle((10, 750, 890, 763), outline=COLOR, width=2, radius=6)
+        profile_draw.rounded_rectangle(
+            (10, 750, 890, 763), outline=COLOR, width=2, radius=6
+        )
 
         server_xpneed = server_next_xp - levelling_instance.get_member_xp
         server_xphave = server_user_xp
@@ -320,7 +318,9 @@ class Profile:
         server_current_percentage = (server_xphave / server_xpneed) * 100
         server_length_of_bar = (server_current_percentage * 8.76) + 12
 
-        profile_draw.rounded_rectangle((12, 752, server_length_of_bar, 761), fill=COLOR, radius=6)
+        profile_draw.rounded_rectangle(
+            (12, 752, server_length_of_bar, 761), fill=COLOR, radius=6
+        )
 
         bio = inventory_instance.get_bio
         bio = "No bio available" if bio == None else bio

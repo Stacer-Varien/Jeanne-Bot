@@ -49,7 +49,12 @@ Error:
                 await channel.send(file=file)
             else:
                 await channel.send(error_message)
-        elif isinstance(error, Jeanne.errors.NoPrivateMessage):
+        elif isinstance(error, Jeanne.NoPrivateMessage):
+            embed = Embed(description=str(error), color=Color.red())
+            await ctx.response.send_message(embed=embed)
+        elif isinstance(error, Jeanne.CommandInvokeError) and isinstance(error.original, RuntimeError):
+            if ctx.command.qualified_name=="help command":
+                return
             embed = Embed(description=str(error), color=Color.red())
             await ctx.response.send_message(embed=embed)
         elif isinstance(error, Jeanne.CommandOnCooldown):

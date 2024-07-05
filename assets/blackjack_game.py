@@ -2,8 +2,9 @@ from random import randint
 from typing import Optional
 from discord import ButtonStyle, Color, Embed, Interaction, ui
 from discord.ext.commands import Bot
-from config import DBL_AUTH
-from functions import BetaTest, Currency, DBLvoter
+from config import TOPGG
+from functions import BetaTest, Currency
+from topgg import DBLClient
 
 values = {
     "2": 2,
@@ -48,7 +49,7 @@ class BlackjackView(ui.View):
         self.bet=bet
         self.value=None
         self.bot=bot
-        self.dbl = DBLvoter(self.bot, DBL_AUTH)
+        self.topggpy = DBLClient(bot=self.bot, token=TOPGG)
 
     def create_embed(self):
         embed = Embed(title="Blackjack", color=Color.green())
@@ -130,34 +131,34 @@ class BlackjackView(ui.View):
                     f"You have won {self.bet} <:quantumpiece:1161010445205905418>"
                 )
                 await Currency(ctx.user).add_qp(self.bet)
-                if await self.dbl.get_user_vote(ctx.user) == True:
-                    await Currency(ctx.user).add_qp(round((self.bet * 1.25), 2))
+                if await self.topggpy.get_user_vote(ctx.user.id) == True:
+                    await Currency(ctx.user).add_qp(round((self.bet * 1.25)))
                     result_embed.add_field(
                         name="DiscordBotList Bonus",
                         value=f"{round((self.bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
                     )
                 if await BetaTest(self.bot).check(ctx.user) == True:
-                    await Currency(ctx.user).add_qp(round((self.bet * 1.25), 2))
+                    await Currency(ctx.user).add_qp(round((self.bet * 1.25)))
                     result_embed.add_field(
                         name="Beta User Bonus",
-                        value=f"{round((self.bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
+                        value=f"{round((self.bet * 1.25))} <:quantumpiece:1161010445205905418>",
                     )
             else:
                 result_embed.description = (
                     f"You have won 20 <:quantumpiece:1161010445205905418>"
                 )
                 await Currency(ctx.user).add_qp(20)
-                if await self.dbl.get_user_vote(ctx.user) == True:
-                    await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
+                if await self.topggpy.get_user_vote(ctx.user.id) == True:
+                    await Currency(ctx.user).add_qp(round((20 * 1.25)))
                     result_embed.add_field(
                         name="DiscordBotList Bonus",
                         value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>",
                     )
                 if await BetaTest(self.bot).check(ctx.user) == True:
-                    await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
+                    await Currency(ctx.user).add_qp(round((20 * 1.25)))
                     result_embed.add_field(
                         name="Beta User Bonus",
-                        value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>",
+                        value=f"{round((20 * 1.25))} <:quantumpiece:1161010445205905418>",
                     )
             result_embed.color = Color.green()
         elif self.player_value < self.dealer_value:
@@ -169,4 +170,3 @@ class BlackjackView(ui.View):
             result_embed.title = "It's a tie!"
 
         await ctx.edit_original_response(embed=result_embed)
-        return

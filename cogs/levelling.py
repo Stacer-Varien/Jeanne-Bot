@@ -7,9 +7,8 @@ from discord import (
     Member,
     app_commands as Jeanne,
 )
-from config import DBL_AUTH, TOPGG
+from config import TOPGG
 from functions import (
-    DBLvoter,
     Inventory,
     Levelling,
     check_botbanned_app_command,
@@ -90,11 +89,10 @@ class levelling(Cog):
     async def generate_profile_card(self, ctx: Interaction, member: Member):
         try:
             voted = await self.topggpy.get_user_vote(member.id)
-            dblvoter = DBLvoter(self.bot, DBL_AUTH).get_user_vote(member)
             bg_image = Inventory(member).selected_wallpaper
             country = Inventory(member).selected_country
             image = await Profile(self.bot).generate_profile(
-                member, bg_image, voted, dblvoter, country
+                member, bg_image, voted, country
             )
             file = File(fp=image, filename=f"{member.name}_profile_card.png")
             await ctx.followup.send(file=file)

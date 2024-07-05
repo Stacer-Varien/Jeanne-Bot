@@ -3,7 +3,7 @@ from functions import (
     check_disabled_app_command,
 )
 from discord import Color, Embed, Interaction, app_commands as Jeanne
-from discord.ext.commands import Cog, Bot
+from discord.ext.commands import GroupCog, Bot
 from assets.images import (
     get_jeanne_pic,
     get_kistune_pic,
@@ -16,9 +16,10 @@ from assets.images import (
 )
 
 
-class images(Cog, name="ImagesSlash"):
+class images(GroupCog, name="image"):
     def __init__(self, bot):
         self.bot = bot
+        super().__init__()
 
     @Jeanne.command(description="Get a kitsune image")
     @Jeanne.check(check_botbanned_app_command)

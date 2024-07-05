@@ -87,7 +87,7 @@ class HelpGroup(GroupCog, name="help"):
     @command.error
     async def command_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, (IndexError, RuntimeError)
+            error.original, IndexError
         ):
             embed = Embed(description="I don't have this command", color=Color.red())
             await ctx.followup.send(embed=embed)

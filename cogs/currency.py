@@ -13,14 +13,14 @@ from datetime import datetime, timedelta
 from discord.ext.commands import Cog, Bot, GroupCog
 from assets.blackjack_game import BlackjackView
 from assets.components import Dice_Buttons, Guess_Buttons, Heads_or_Tails
-from config import DBL_AUTH
 from functions import (
     BetaTest,
     Currency,
-    DBLvoter,
     check_botbanned_app_command,
     check_disabled_app_command,
 )
+from config import TOPGG
+from topgg import DBLClient
 
 
 class vote_button(ui.View):
@@ -35,19 +35,13 @@ class vote_button(ui.View):
             )
         )
 
-        self.add_item(
-            ui.Button(
-                style=ButtonStyle.link,
-                label="Discord Bot List",
-                url="https://discordbotlist.com/bots/jeanne/upvote",
-            )
-        )
-
 
 class Guess_Group(GroupCog, name="guess"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
-        self.dbl = DBLvoter(self.bot, DBL_AUTH)
+        self.topggpy = DBLClient(
+            bot=self.bot, token=TOPGG
+        )
         super().__init__()
 
     @Jeanne.command(description="Guess my number and you can win 20 QP")
@@ -72,7 +66,7 @@ class Guess_Group(GroupCog, name="guess"):
                 description="YES! YOU GUESSED IT CORRECTLY!\nYou have been given 20 <:quantumpiece:1161010445205905418>!",
                 color=Color.random(),
             )
-            if self.dbl.get_user_vote(ctx.user) == True:
+            if await self.topggpy.get_user_vote(ctx.user.id) == True:
                 await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
                 correct.add_field(
                     name="DiscordBotList Bonus",
@@ -131,7 +125,7 @@ class Guess_Group(GroupCog, name="guess"):
                 description=f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given {bet} <:quantumpiece:1161010445205905418>!",
                 color=Color.random(),
             )
-            if self.dbl.get_user_vote(ctx.user) == True:
+            if await self.topggpy.get_user_vote(ctx.user.id) == True:
                 await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
                 correct.add_field(
                     name="DiscordBotList Bonus",
@@ -178,7 +172,8 @@ class Guess_Group(GroupCog, name="guess"):
 class Dice_Group(GroupCog, name="dice"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
-        self.dbl = DBLvoter(self.bot, DBL_AUTH)
+        self.topggpy = DBLClient(
+            bot=self.bot, token=TOPGG)
         super().__init__()
 
     @Jeanne.command(description="Roll a dice for free 20 QP")
@@ -256,7 +251,7 @@ class Dice_Group(GroupCog, name="dice"):
                 value=f"Dice rolled: **{rolled}**\nYou guessed: **{view.value}**!",
                 inline=False,
             )
-            if self.dbl.get_user_vote(ctx.user) == True:
+            if await self.topggpy.get_user_vote(ctx.user.id) == True:
                 await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
                 embed.add_field(
                     name="DiscordBotList Bonus",
@@ -300,7 +295,7 @@ class Flip_Group(GroupCog, name="flip"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()
-        self.dbl = DBLvoter(self.bot, DBL_AUTH)
+        self.topggpy = DBLClient(bot=self.bot, token=TOPGG)
 
     @Jeanne.command(description="Flip a coin and earn 20 QP for free")
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
@@ -320,7 +315,7 @@ class Flip_Group(GroupCog, name="flip"):
                 description="YAY! You got it!\n20 <:quantumpiece:1161010445205905418> has been added",
                 color=Color.random(),
             )
-            if self.dbl.get_user_vote(ctx.user) == True:
+            if await self.topggpy.get_user_vote(ctx.user.id) == True:
                 await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
                 embed.add_field(
                     name="DiscordBotList Bonus",
@@ -381,7 +376,7 @@ class Flip_Group(GroupCog, name="flip"):
                     bet
                 )
             )
-            if self.dbl.get_user_vote(ctx.user) == True:
+            if await self.topggpy.get_user_vote(ctx.user.id) == True:
                 await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
                 embed.add_field(
                     name="DiscordBotList Bonus",
@@ -436,7 +431,6 @@ class Flip_Group(GroupCog, name="flip"):
 class Blackjack_Group(GroupCog, name="blackjack"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
-        self.dbl = DBLvoter(self.bot, DBL_AUTH)
         super().__init__()
 
     @Jeanne.command(description="Play a game of blackjack and earn 20 QP for free")
@@ -471,8 +465,9 @@ class Blackjack_Group(GroupCog, name="blackjack"):
             )
             await ctx.edit_original_response(embed=timeout, view=None)
 
-    @Jeanne.command(description="Play a game of blackjack and earn with betting")
-    @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
+    @Jeanne.command(description="Play a game of blackjack and win with betting")
+    @Jeanne.describe(bet="How much are you betting?")
+    @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def bet(self, ctx: Interaction, bet:Jeanne.Range[int, 5]):
@@ -643,14 +638,12 @@ class currency(Cog, name="CurrencySlash"):
 - 5XP times their global level
 - - Rewards are double on weekends
 - - Beta users receive 25% extra of the nearest 5 
-"""
-        dbl_perks = """
+
 - 25% QP boost when winning
 - 10XP per message on weekdays, 15XP per message on weekends
 - - Beta users receive an extra 5XP per message and extra 25% QP boost when winning
 """
-        embed.add_field(name="TopGG", value=topgg_perks, inline=True)
-        embed.add_field(name="DiscordBotList", value=dbl_perks, inline=True)
+        embed.add_field(name="Voting perks", value=topgg_perks, inline=True)
         await ctx.response.send_message(
             embed=embed,
             view=vote_button(),

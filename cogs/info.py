@@ -366,6 +366,7 @@ class InfoCog(Cog, name="InfoSlash"):
             embed.color = Color.red()
             embed.description = "Failed to get emoji."
             await ctx.followup.send(embed=embed)
+            return
         embed.color = Color.random()
         embed.add_field(name="Name", value=emote.name, inline=False)
         embed.add_field(name="ID", value=emote.id, inline=False)

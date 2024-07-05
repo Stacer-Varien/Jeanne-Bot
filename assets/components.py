@@ -856,9 +856,10 @@ class Country_Badge_Buttons(ui.View):
         self.author = author
         self.value = None
 
-        folder = BADGES
+        folder_path = BADGES
+        files=listdir(folder_path)
         badges = [
-            i for i in listdir(folder) if i.endswith((".png"))
+            i for i in files if i.endswith((".png"))
         ]
         server=self.bot.get_guild(913051824095916142)
         for i in badges:

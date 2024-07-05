@@ -7,7 +7,7 @@ from config import TOKEN
 
 class Jeanne(AutoShardedBot):
     async def setup_hook(self):
-        dirs = ["./events", "./prefix", "./slash"]
+        dirs = ["./events", "./cogs"]
         for i in dirs:
             for filename in listdir(i):
                 if filename.endswith(".py"):
