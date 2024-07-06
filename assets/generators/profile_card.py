@@ -1,6 +1,7 @@
 from io import BytesIO
 from typing import Literal
 from PIL import Image, ImageDraw, ImageFont, ImageColor, ImageEnhance
+import aiohttp
 from discord import Member, User
 from functions import BetaTest, Currency, Inventory, Levelling, Partner, get_richest
 import requests
@@ -48,12 +49,13 @@ class Profile:
         country: str = None,
     ) -> BytesIO | Literal[False]:
         inventory_instance = Inventory(user)
-
-        background = (
-            self.default_bg
-            if bg_image is None
-            else BytesIO(requests.get(bg_image).content)
-        )
+        if bg_image:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(bg_image) as resp:
+                    bytes_io=await resp.read()
+            background=BytesIO(bytes_io)
+        else:
+            background=self.default_bg
 
         currency_instance = Currency(user)
         levelling_instance = Levelling(user, user.guild)
