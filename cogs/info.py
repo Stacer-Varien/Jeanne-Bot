@@ -35,15 +35,11 @@ class stat_buttons(ui.View):
         super().__init__()
         invite = "https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=1429553343542&scope=bot%20applications.commands"
         votetopgg = "https://top.gg/bot/831993597166747679"
-        votedbl = "https://discordbotlist.com/bots/jeanne/upvote"
         orleans_url = "https://discord.gg/jh7jkuk2pp"
         website = "https://jeannebot.gitbook.io/jeannebot/"
         self.add_item(ui.Button(style=ButtonStyle.link, label="Invite me", url=invite))
         self.add_item(
             ui.Button(style=ButtonStyle.link, label="Vote for me", url=votetopgg)
-        )
-        self.add_item(
-            ui.Button(style=ButtonStyle.link, label="Vote for me (DBL)", url=votedbl)
         )
         self.add_item(
             ui.Button(style=ButtonStyle.link, label="Support Server", url=orleans_url)

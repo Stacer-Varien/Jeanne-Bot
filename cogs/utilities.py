@@ -32,10 +32,9 @@ from json import loads
 from requests import get
 from humanfriendly import parse_timespan, InvalidTimespan
 
-bot_invite_url = "https://discord.com/oauth2/authorize?client_id=831993597166747679&permissions=1428479601718&scope=bot%20applications.commands"
+bot_invite_url = "https://canary.discord.com/oauth2/authorize?client_id=831993597166747679"
 topgg_invite = "https://top.gg/bot/831993597166747679"
 discordbots_url = "https://discord.bots.gg/bots/831993597166747679"
-discordbotlist_url = "https://discordbotlist.com/bots/jeanne"
 orleans = "https://discord.gg/jh7jkuk2pp"
 
 
@@ -50,11 +49,6 @@ class invite_button(View):
         )
         self.add_item(
             ui.Button(style=ButtonStyle.url, label="DiscordBots", url=discordbots_url)
-        )
-        self.add_item(
-            ui.Button(
-                style=ButtonStyle.url, label="Discord Bot List", url=discordbotlist_url
-            )
         )
         self.add_item(ui.Button(style=ButtonStyle.url, label="Orleans", url=orleans))
 
@@ -418,10 +412,10 @@ class slashutilities(Cog):
             else:
                 min_temp2 = f"{forecastday2['day']['mintemp_c']}°C"
                 max_temp2 = f"{forecastday2['day']['maxtemp_c']}°C"
-                maxwind2 = f"{forecastday2['day']['maxwind_kph']}mph"
+                maxwind2 = f"{forecastday2['day']['maxwind_kph']}km/h"
                 min_temp3 = f"{forecastday3['day']['mintemp_c']}°C"
                 max_temp3 = f"{forecastday3['day']['maxtemp_c']}°C"
-                maxwind3 = f"{forecastday3['day']['maxwind_kph']}mph"
+                maxwind3 = f"{forecastday3['day']['maxwind_kph']}km/h"
 
             day2.description = f"{emoji_map['newspaper']} Condition: {forecastday2['day']['condition']['text']}"
             day2.add_field(
