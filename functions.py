@@ -1018,7 +1018,7 @@ class Moderation:
 
     def check_warn_id(self, member: Member, warn_id: int) -> int | None:
         data = db.execute(
-            "SELECT warn_id FROM warnData WHERE guild_id = ?, user_id = ? AND warn_id = ?",
+            "SELECT warn_id FROM warnData WHERE guild_id = ? AND user_id = ? AND warn_id = ?",
             (
                 self.server.id,
                 member.id,
