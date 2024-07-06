@@ -396,7 +396,10 @@ class moderation(Cog):
 
     @Jeanne.command(
         description="Bulk delete messages",
-        extras={"bot_perms": "Manage Messages", "member_perms": "Manage Messages"},
+        extras={
+            "bot_perms": "Manage Messages, Read Message History",
+            "member_perms": "Manage Messages, Read Message History",
+        },
     )
     @Jeanne.describe(
         limit="How many messages? (max is 100)",

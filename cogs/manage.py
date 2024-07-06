@@ -424,8 +424,8 @@ class Create_Group(GroupCog, name="create"):
     @Jeanne.command(
         description="Make a new emoji",
         extras={
-            "bot_perms": "Manage Expressions",
-            "member_perms": "Manage Expressions",
+            "bot_perms": "Manage Expressions, Create Expressions",
+            "member_perms": "Manage Expressions,Create Expressions",
         },
     )
     @Jeanne.describe(
@@ -433,8 +433,8 @@ class Create_Group(GroupCog, name="create"):
         emoji_link="Insert emoji URL here",
         emoji_image="Insert emoji image here",
     )
-    @Jeanne.checks.bot_has_permissions(manage_expressions=True)
-    @Jeanne.checks.has_permissions(manage_expressions=True)
+    @Jeanne.checks.bot_has_permissions(manage_expressions=True, create_expressions=True)
+    @Jeanne.checks.has_permissions(manage_expressions=True, create_expressions=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def emoji(
@@ -484,8 +484,8 @@ class Create_Group(GroupCog, name="create"):
     @Jeanne.command(
         description="Make a new sticker",
         extras={
-            "bot_perms": "Manage Expressions",
-            "member_perms": "Manage Expressions",
+            "bot_perms": "Manage Expressions, Create Expressions",
+            "member_perms": "Manage Expressions,Create Expressions",
         },
     )
     @Jeanne.describe(
@@ -1205,7 +1205,8 @@ class Set_Group(GroupCog, name="set"):
         embed.color = Color.random()
         await ctx.followup.send(embed=embed)
 
-    @Jeanne.command(name="confession-channel",
+    @Jeanne.command(
+        name="confession-channel",
         description="Set a confession channel",
         extras={"member_perms": "Manage Server"},
     )
@@ -1215,12 +1216,13 @@ class Set_Group(GroupCog, name="set"):
     @Jeanne.checks.bot_has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
-    async def confessionchannel(
-        self, ctx: Interaction, channel: TextChannel) -> None:
-            await ctx.response.defer()
-            embed=Embed(description=f"{channel.mention} will recieve anonymous confessions from members", color=Color.random())
-            await ctx.followup.send(embed=embed)
-
+    async def confessionchannel(self, ctx: Interaction, channel: TextChannel) -> None:
+        await ctx.response.defer()
+        embed = Embed(
+            description=f"{channel.mention} will recieve anonymous confessions from members",
+            color=Color.random(),
+        )
+        await ctx.followup.send(embed=embed)
 
     @Jeanne.command(
         name="profile-brightness",
@@ -1397,7 +1399,10 @@ class Rename_Group(GroupCog, name="rename"):
 
     @Jeanne.command(
         description="Renames an emoji",
-        extras={"bot_perms": "Manage Roles", "member_perms": "Manage Roles"},
+        extras={
+            "bot_perms": "Manage Expressions",
+            "member_perms": "Manage Expressions",
+        },
     )
     @Jeanne.describe(emoji="What emoji are you renaming?", name="What is the new name?")
     @Jeanne.checks.bot_has_permissions(manage_expressions=True)
@@ -1431,7 +1436,10 @@ class Rename_Group(GroupCog, name="rename"):
 
     @Jeanne.command(
         description="Renames a category",
-        extras={"bot_perms": "Manage Channel", "member_perms": "Manage Channel"},
+        extras={
+            "bot_perms": "Manage Expressions",
+            "member_perms": "Manage Expressions",
+        },
     )
     @Jeanne.describe(
         category="Which category are you renaming?", name="What is the new name?"

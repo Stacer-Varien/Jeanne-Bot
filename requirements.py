@@ -10,5 +10,5 @@ elif platform.system() == "Linux":  # If you are using a Linux Operating System
     os.system("python3 -m pip install -U pip")
 # Required packages for the bot to use. Also upgrades it if a new release is found
 os.system(
-    "pip install -U discord.py requests asyncio python-dotenv humanfriendly datetime Pillow py-expression-eval topggpy lxml reactionmenu jishaku"
+    "pip install -U discord.py aiohttp requests asyncio python-dotenv humanfriendly datetime Pillow py-expression-eval topggpy lxml reactionmenu jishaku"
 )

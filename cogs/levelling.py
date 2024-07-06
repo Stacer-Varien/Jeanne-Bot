@@ -42,7 +42,7 @@ class Rank_Group(GroupCog, name="rank"):
         r = 0
         for i in leaderboard:
             p = await self.bot.fetch_user(i[0])
-            exp = i[3]
+            exp = i[2]
             r += 1
             embed.add_field(name=f"`{r}.` {p}", value=f"`{exp}XP`", inline=True)
         await ctx.followup.send(embed=embed)
@@ -63,7 +63,7 @@ class Rank_Group(GroupCog, name="rank"):
         r = 0
         for i in leaderboard:
             p = await self.bot.fetch_user(i[0])
-            exp = i[4]
+            exp = i[3]
             r += 1
             embed.add_field(name=f"`{r}.` {p}", value=f"`{exp}XP`", inline=True)
         await ctx.followup.send(embed=embed)

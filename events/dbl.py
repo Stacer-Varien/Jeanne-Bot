@@ -1,5 +1,6 @@
+import aiohttp
 from functions import BetaTest, Botban, Currency, Levelling
-from config import TOPGG, TOPGG_AUTH
+from config import DB_AUTH, TOPGG, TOPGG_AUTH
 from topgg import DBLClient, WebhookManager
 from discord.ext import tasks
 from discord.ext.commands import Cog, Bot
@@ -22,6 +23,16 @@ class DBL(Cog, name="DBL"):
     async def update_stats(self):
         try:
             servers = len(self.bot.guilds)
+            dbheaders = {
+                "Content-Type": "application/json",
+                "Authorization": DB_AUTH,
+            }
+            async with aiohttp.ClientSession(headers=dbheaders) as session:
+                await session.post(
+                    " https://discord.bots.gg/api/v1/bots/831993597166747679/stats",
+                    json={"guildCount": servers, "shardCount": self.bot.shard_count},
+                )
+
             await self.topggpy.post_guild_count(
                 guild_count=servers, shard_count=self.bot.shard_count
             )
