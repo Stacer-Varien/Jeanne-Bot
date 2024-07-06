@@ -1,11 +1,13 @@
+import csv
 from datetime import datetime
-from discord import Color, Embed, Interaction
-from discord import app_commands as Jeanne, Forbidden
-from discord.ext.commands import Bot, Cog, Context, NotOwner, CommandNotFound
+from io import BytesIO
+from discord import Color, Embed, File, Interaction
+from discord import app_commands as Jeanne
+from discord.ext.commands import Bot, Cog
 import traceback
 
 
-class ErrorsCog(Cog):
+class ErrorsCog(Cog, name="ErrorsSlash"):
     def __init__(self, bot: Bot):
         self.bot = bot
 
@@ -32,22 +34,31 @@ class ErrorsCog(Cog):
             traceback_error = traceback.format_exception(
                 error, error, error.__traceback__
             )
-            with open("errors.txt", "a") as f:
-                f.writelines(
-                    f"Date = {datetime.now()}\nComamnd = {error.command.qualified_name}\nError:\n{''.join(traceback_error)}\n"
-                )
-        elif isinstance(error, Jeanne.errors.NoPrivateMessage):
+            channel = await self.bot.fetch_channel(1257420940128550942)
+            error_message = f"""
+```
+Command: {ctx.command.qualified_name}
+Date and Time: {datetime.now().strftime("%d/%m%Y %H:%M")}
+Error:
+{"".join(traceback_error)}
+```
+"""
+            if len(error_message) > 2000:
+                file = BytesIO(error_message.encode("utf-8"))
+                file = File(fp=file, filename="slash_error.txt")
+                await channel.send(file=file)
+            else:
+                await channel.send(error_message)
+        elif isinstance(error, Jeanne.NoPrivateMessage):
+            embed = Embed(description=str(error), color=Color.red())
+            await ctx.response.send_message(embed=embed)
+        elif isinstance(error, Jeanne.CommandInvokeError) and isinstance(error.original, RuntimeError):
+            if ctx.command.qualified_name=="help command":
+                return
             embed = Embed(description=str(error), color=Color.red())
             await ctx.response.send_message(embed=embed)
         elif isinstance(error, Jeanne.CommandOnCooldown):
             pass
-
-    @Cog.listener()
-    async def on_command_error(self, ctx: Context, error):
-        if isinstance(error, CommandNotFound):
-            return
-        if isinstance(error, NotOwner):
-            return
 
 
 async def setup(bot: Bot):
