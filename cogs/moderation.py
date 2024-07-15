@@ -38,7 +38,7 @@ class moderation(Cog):
         time: Optional[str] = None,
         delete_message_history: Optional[bool] = None,
     ):
-        if delete_message_history:
+        if delete_message_history==True:
             dmh = 604800
         else:
             dmh = 86400
@@ -54,8 +54,8 @@ class moderation(Cog):
         ban.add_field(name="Reason", value=reason, inline=False)
         if time !=None:
             try:
-                a = parse_timespan(time)
-                await Moderation(ctx.guild).softban_member(member, int(a))
+                a = round(parse_timespan(time))
+                await Moderation(ctx.guild).softban_member(member, a)
                 time = format_timespan(a)
             except:
                 time = "Invalid time added. User is banned permanently!"
@@ -137,7 +137,7 @@ class moderation(Cog):
                     await ctx.edit_original_response(embed=cancelled, view=None)
                     return
                 if view.value == True:
-                    await self.commit_ban(ctx, member, reason, delete_message_history)
+                    await self.commit_ban(ctx, member, reason, None, delete_message_history)
                     return
 
                 if view.value == False:
