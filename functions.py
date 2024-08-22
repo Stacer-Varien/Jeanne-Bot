@@ -1227,14 +1227,37 @@ class Hentai:
         db.commit()
         return [str(link[0]) for link in data] if data else None
 
+    def cache_hentai(self, source:str, url:str, shorturl:str, tags:str):
+        data=db.execute("INSERT OR IGNORE INTO cachedHentai (source, url, shorturl, tags) VALUES (?,?,?,?)", (source, url, shorturl, tags))
+        db.commit()
+
+        if data.rowcount==0:
+            pass
+    
+    def get_cached_hentai(self, source:str):
+        data=db.execute("SELECT * FROM cachedHentai WHERE source = ?", (source,)).fetchall()
+        if data==None:
+            pass
+        else:
+            if self.plus:
+                return data
+            return choice(data[1])
+
     async def gelbooru(self, tag: Optional[str] = None):
 
         if not tag or tag is None:
             tag = None
-        images = await self.get_nsfw_image(NsfwApis.GelbooruApi, tag)
-        if self.plus:
+        if self.get_cached_hentai('gelbooru')==None:
+            images = await self.get_nsfw_image(NsfwApis.GelbooruApi, tag)
+            if self.plus:
+                    return images
+            return choice(images)["file_url"]
+        else:
+            images=self.get_cached_hentai()
+            if self.plus:
+                    return images
             return images
-        return choice(images)["file_url"]
+
 
     async def yandere(self, tag: Optional[str] = None):
         images = await self.get_nsfw_image(NsfwApis.YandereApi, tag)
