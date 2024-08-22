@@ -28,9 +28,9 @@ Jeanne is a multipurpose Discord bot with miscellaneous, moderation, management,
 
 To invite Jeanne to your server, click the link below:
 
-🔗 [Invite Jeanne](https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=2550197270&redirect_uri=https%3A%2F%2Fdiscord.com%2Foauth2%2Fauthorize%3Fclient_id%3D831993597166747679%26scope%3Dbot&scope=bot%20applications.commands)
+🔗 [Invite Jeanne](https://discord.com/oauth2/authorize?client_id=831993597166747679)
 
-<a href="https://top.gg/bot/831993597166747679"><img src="https://top.gg/api/widget/831993597166747679.svg"></a> <a href="https://discordbotlist.com/bots/jeanne"><img src="https://discordbotlist.com/api/v1/bots/831993597166747679/widget"></a>
+<a href="https://top.gg/bot/831993597166747679"><img src="https://top.gg/api/widget/831993597166747679.svg"></a>
 
 ## Support and Feedback
 
@@ -38,4 +38,4 @@ If you have any questions or need assistance, feel free to join our support serv
 
 🌐 Support Server: [Join Now](https://discord.gg/Vfa796yvNq)
 
-📧 Email: zane544yt@protonmail.com
+📧 Email: jeannebot.discord@gmail.com
