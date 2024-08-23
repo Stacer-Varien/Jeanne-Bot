@@ -23,7 +23,7 @@ from json import loads
 from discord.ext.commands import Context, Bot
 from assets.generators.profile_card import Profile
 from config import WEBHOOK, BADGES
-from functions import Inventory, Levelling, Manage, Moderation, Welcomer
+from functions import Botban, Inventory, Levelling, Manage, Moderation, Welcomer
 
 
 def replace_all(text: str, dic: dict):
@@ -876,3 +876,71 @@ class Country_Badge_Buttons(ui.View):
 
     async def interaction_check(self, ctx: Interaction):
         return ctx.user.id == self.author.id
+
+
+class DevWarningReasonM(ui.Modal, title="Reason of Warn/Suspension"):
+    def __init__(self, user:User, type: str):
+        self.user=user
+        self.type = type
+        super().__init__()
+
+    explaination = ui.TextInput(
+        label="Reason",
+        style=TextStyle.long,
+        required=True,
+        min_length=4,
+        max_length=1024,
+    )
+
+    async def on_submit(self, ctx: Interaction) -> None:
+        embed = Embed(title="Warning from Developer", color=Color.brand_red())
+        embed.add_field(name="Reason of Warn", value=self.type, inline=False)
+        embed.add_field(name="Explanation", value=self.explaination.value, inline=False)
+        warnings=...
+        if warnings ==1:
+            embed.set_footer(text="This is your first warning. There is no serious punishment for it and it will last for 90 days if you are on good behaviour.")
+        if warnings==2:
+            embed.set_footer(
+                text="This is your second warning. You will be given a 7 day suspension from using Jeanne. This warning will last for 180 days if you are on good behaviour."
+            )
+        if warnings==3:
+            embed.set_footer(
+                text="This is your third and last warning! You are PERMANENTLY BANNED from using Jeanne!"
+            )
+            await Botban(self.user).add_botbanned_user(f"Received 3 warnings due to this final warning\n**{self.type}**\n{self.explaination}")
+
+        try:
+            await self.user.send(embed=embed)
+            confirm = Embed(
+            description=f"Warning sent to {self.user} | `{self.user.id}`"
+        )
+            await ctx.response.send_message(embed=confirm, ephemeral=True)
+        except:
+            confirm = Embed(
+                description=f"Warning given to {self.user} | `{self.user.id}` but not sent as their DMs are closed"
+            )
+            await ctx.response.send_message(embed=confirm, ephemeral=True)
+
+
+class DevWarningMenu(ui.Select):
+    def __init__(self) -> None:
+        options = [
+            SelectOption(label="Multiple False Reports", value="falsereports"),
+            SelectOption(label="Violating Bot ToS", value="violate"),
+            SelectOption(label="Attempting to appeal", value="appeal"),
+            SelectOption(label="Other", value="other"),
+        ]
+        super().__init__(
+            placeholder="Select type",
+            max_values=1,
+            min_values=1,
+            options=options,
+        )
+
+    async def callback(self, ctx: Interaction):
+
+        await ctx.response.send_modal(DevWarningReasonM(self.options[0].label))
+        try:
+            await ctx.message.delete()
+        except:
+            pass

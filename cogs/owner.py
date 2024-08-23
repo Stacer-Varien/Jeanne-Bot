@@ -259,6 +259,11 @@ Make sure private messages between **me and you are opened** or check the host i
                 ret += 1
         await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
 
+    @command(description="Warn users suspected of misusing the bot")
+    @guild_only()
+    @is_owner()
+    async def warn(self, ctx:Context, user:User):
+        ...
 
 async def setup(bot: Bot):
     await bot.add_cog(OwnerCog(bot))
