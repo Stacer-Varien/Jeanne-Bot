@@ -94,9 +94,14 @@ class nsfw(Cog):
 
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
-            view = ReportContentPlus(*[img["file_url"] for img in images])
-            vids = [i for i in images if "mp4" in i["file_url"]]
-            media = [j["file_url"] for j in vids]
+            try:
+                view = ReportContentPlus(*[img[1] for img in images])
+                vids = [i for i in images if "mp4" in i[1]]
+                media = [j[1] for j in vids]
+            except:
+                view = ReportContentPlus(*[img["file_url"] for img in images])
+                vids = [i for i in images if "mp4" in i["file_url"]]
+                media = [j["file_url"] for j in vids]
 
             if media:
                 await ctx.followup.send("\n".join(media), view=view)

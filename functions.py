@@ -1152,19 +1152,15 @@ class NsfwApis(Enum):
     KonachanApi = "https://konachan.com/post.json?s=post&q=index&limit=100&tags=score:>10+rating:explicit+"
     YandereApi = "https://yande.re/post.json?limit=100&tags=score:>10+rating:explicit+"
     GelbooruApi = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=score:>10+rating:explicit+"
-    DanbooruApi = "https://danbooru.donmai.us/posts.json?limit=100&tags=rating:explicit+"
+    DanbooruApi = (
+        "https://danbooru.donmai.us/posts.json?limit=100&tags=rating:explicit+"
+    )
 
 
 class Hentai:
     def __init__(self, plus: Optional[bool] = None):
         self.plus = plus
-        self.blacklisted_tags = [
-            "loli",
-            "shota",
-            "cub",
-            "gore",
-            "vore",
-        ]
+        self.blacklisted_tags = ["loli", "shota", "cub", "gore", "vore", "bestiality"]
 
     def format_tags(self, tags: str = None) -> str:
         if tags:
@@ -1227,43 +1223,101 @@ class Hentai:
         db.commit()
         return [str(link[0]) for link in data] if data else None
 
-    def cache_hentai(self, source:str, url:str, shorturl:str, tags:str):
-        data=db.execute("INSERT OR IGNORE INTO cachedHentai (source, url, shorturl, tags) VALUES (?,?,?,?)", (source, url, shorturl, tags))
+    async def cache_hentai(self, source: str, url: str, shorturl: str, tags: str):
+        data = db.execute(
+            "INSERT OR IGNORE INTO cachedHentai (source, url, shorturl, tags) VALUES (?,?,?,?)",
+            (source, url, shorturl, tags),
+        )
         db.commit()
 
-        if data.rowcount==0:
+        if data.rowcount == 0:
             pass
-    
-    def get_cached_hentai(self, source:str):
-        data=db.execute("SELECT * FROM cachedHentai WHERE source = ?", (source,)).fetchall()
-        if data==None:
-            pass
-        else:
-            if self.plus:
-                return data
-            return choice(data[1])
+
+    def get_cached_hentai(self, source: str, tags: Optional[str] = None):
+        images = []
+        data = db.execute(
+            "SELECT * FROM cachedHentai WHERE source = ?", (source,)
+        ).fetchall()
+        if len(data) == 0:
+            return None
+
+        if tags:
+            for i in data:
+                if any(tag in tags.split("+") for tag in str(i[3]).lower().split("+")):
+                    images.append(i)
+        if self.plus:
+            return images if (len(images) > 0) else data
+        return choice(images if (len(images) > 0) else data)[1]
 
     async def gelbooru(self, tag: Optional[str] = None):
-
         if not tag or tag is None:
             tag = None
-        if self.get_cached_hentai('gelbooru')==None:
+        images = self.get_cached_hentai("gelbooru", tag)
+        if images == None:
             images = await self.get_nsfw_image(NsfwApis.GelbooruApi, tag)
+            for i in images:
+                await self.cache_hentai(
+                    "gelbooru",
+                    i["file_url"],
+                    shorten_url(i["file_url"]),
+                    str(i["tags"]).replace(" ", "+"),
+                )
             if self.plus:
-                    return images
-            return choice(images)["file_url"]
-        else:
-            images=self.get_cached_hentai()
-            if self.plus:
-                    return images
-            return images
+                return images
 
+            return choice(images)["file_url"]
+        if len(images) < 10:
+            images = await self.get_nsfw_image(NsfwApis.GelbooruApi, tag)
+            for i in images:
+                await self.cache_hentai(
+                    "gelbooru",
+                    i["file_url"],
+                    shorten_url(i["file_url"]),
+                    str(i["tags"]).replace(" ", "+"),
+                )
+            if self.plus:
+                return images
+
+            return choice(images)["file_url"]
+        if len(images) > 10:
+            images = self.get_cached_hentai("gelbooru", tag)
+            if self.plus:
+                return images
+            return images
 
     async def yandere(self, tag: Optional[str] = None):
-        images = await self.get_nsfw_image(NsfwApis.YandereApi, tag)
-        if self.plus:
+        images = self.get_cached_hentai("yandere", tag)
+        if images == None:
+            images = await self.get_nsfw_image(NsfwApis.YandereApi, tag)
+            for i in images:
+                await self.cache_hentai(
+                    "yandere",
+                    i["sample_url"],
+                    shorten_url(i["sample_url"]),
+                    str(i["tags"]).replace(" ", "+"),
+                )
+            if self.plus:
+                return images
+
+            return choice(images)["sample_url"]
+        if len(images) < 10:
+            images = await self.get_nsfw_image(NsfwApis.YandereApi, tag)
+            for i in images:
+                await self.cache_hentai(
+                    "yandere",
+                    i["sample_url"],
+                    shorten_url(i["sample_url"]),
+                    str(i["tags"]).replace(" ", "+"),
+                )
+            if self.plus:
+                return images
+
+            return choice(images)["sample_url"]
+        if len(images) > 10:
+            images = self.get_cached_hentai("yandere", tag)
+            if self.plus:
+                return images
             return images
-        return choice(images)["sample_url"]
 
     async def konachan(self, tag: Optional[str] = None):
 
@@ -1421,7 +1475,7 @@ class AutoCompleteChoices:
             "Suspicious or spam account",
             "Compromised or hacked account",
             "Breaking server rules",
-            "Botting account"
+            "Botting account",
         ]
         return [
             Jeanne.Choice(name=option, value=option)
@@ -1440,9 +1494,9 @@ class Partner:
         db.commit()
 
     @staticmethod
-    def check(user: User.id):
+    def check(user: User):
         data = db.execute(
-            "SELECT * FROM partnerData WHERE user_id = ?", (user,)
+            "SELECT * FROM partnerData WHERE user_id = ?", (user.id,)
         ).fetchone()
         db.commit()
         return data[0] if data else None
