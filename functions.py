@@ -1233,21 +1233,27 @@ class Hentai:
         if data.rowcount == 0:
             pass
 
-    def get_cached_hentai(self, source: str, tags: Optional[str] = None)-> (list | tuple[str, str] | None):
-        images = []
+    def get_cached_hentai(self, source: str, tags: Optional[str] = None)->list|tuple|None:
+        images_with_tags = []
+        images=[]
         data = db.execute(
             "SELECT * FROM cachedHentai WHERE source = ?", (source,)
         ).fetchall()
         if len(data) == 0:
             return None
 
-        if tags:
-            for i in data:
+        for i in data:
+            if tags:
                 if any(tag in tags.split("+") for tag in str(i[3]).lower().split("+")):
-                    images.append(i)
+                    images_with_tags.append([str(i[1]), str(i[3])])
+            images.append([str(i[1]), str(i[3])])
         if self.plus:
-            return images if (len(images) > 0) else data
-        return str(choice(images if (len(images) > 0) else data)[1]), str(images[3])
+            return images_with_tags if (len(images_with_tags) > 0) else images
+
+        if images_with_tags >= 1:
+            tag_image=choice(images_with_tags)
+            return tag_image[0], tag_image[1]
+        return images[0], images[1]
 
     async def gelbooru(self, tag: Optional[str] = None):
         if not tag or tag is None:
@@ -1262,11 +1268,7 @@ class Hentai:
                     shorten_url(i["file_url"]),
                     str(i["tags"]).replace(" ", "+"),
                 )
-            if self.plus:
-                return images
-
-            return choice(images)["file_url"]
-        if len(images) < 250:
+        if images<250:
             images = await self.get_nsfw_image(NsfwApis.GelbooruApi, tag)
             for i in images:
                 await self.cache_hentai(
@@ -1275,15 +1277,11 @@ class Hentai:
                     shorten_url(i["file_url"]),
                     str(i["tags"]).replace(" ", "+"),
                 )
-            if self.plus:
-                return images
+        if self.plus:
+            return images
 
-            return choice(images)["file_url"]
-        if len(images) > 250:
-            images = self.get_cached_hentai("gelbooru", tag)
-            if self.plus:
-                return images
-            return images[0], images[1]
+        return choice(images)
+
 
     async def yandere(self, tag: Optional[str] = None):
         images = self.get_cached_hentai("yandere", tag)
@@ -1393,19 +1391,31 @@ class Hentai:
             return images[0], images[1]
 
     async def hentai(self):
-        hentai_links=["gelbooru", "yandere", "konachan", "danbooru"]
-        if choice(hentai_links)=="gelbooru":
+        hentai_links = ["gelbooru", "yandere", "konachan", "danbooru"]
+        if choice(hentai_links) == "gelbooru":
             image = await self.gelbooru()
-            return str(image), "Gelbooru",
-        if choice(hentai_links)=="yandere":
+            return (
+                str(image),
+                "Gelbooru",
+            )
+        if choice(hentai_links) == "yandere":
             image = await self.yandere()
-            return str(image), "Yandere",
-        if choice(hentai_links)=="konachan":
+            return (
+                str(image),
+                "Yandere",
+            )
+        if choice(hentai_links) == "konachan":
             image = await self.konachan()
-            return str(image), "Konachan",
-        if choice(hentai_links)=="danbooru":
+            return (
+                str(image),
+                "Konachan",
+            )
+        if choice(hentai_links) == "danbooru":
             image = await self.danbooru()
-            return str(image), "Danbooru",
+            return (
+                str(image),
+                "Danbooru",
+            )
 
 
 def shorten_url(url: str) -> str | None:
