@@ -1,8 +1,10 @@
+from asyncio import sleep
 from discord import Color, Embed
 from functions import Moderation, Reminder
 from discord.ext import tasks
 from discord.ext.commands import Cog, Bot
 from datetime import datetime
+from functions import Hentai
 
 
 class tasksCog(Cog):
@@ -10,6 +12,7 @@ class tasksCog(Cog):
         self.bot = bot
         self.check_softbanned_members.start()
         self.check_reminders.start()
+        self.cache_hentai.start()
 
     @tasks.loop(seconds=60, reconnect=True)
     async def check_softbanned_members(self):
@@ -28,7 +31,7 @@ class tasksCog(Cog):
                         name="Reason", value="Softban expired", inline=True
                     )
                     unmute.set_thumbnail(url=member.display_avatar)
-                    
+
                     await modlog.send(embed=unmute)
                 else:
                     continue
@@ -59,6 +62,22 @@ class tasksCog(Cog):
 
     @check_reminders.before_loop
     async def before_check_reminders(self):
+        await self.bot.wait_until_ready()
+
+    @tasks.loop(hours=4, reconnect=True)
+    async def cache_hentai(self):
+        hentai=Hentai()
+        await hentai.gelbooru()
+        await sleep(5)
+        await hentai.yandere()
+        await sleep(5)
+        await hentai.konachan()
+        await sleep(5)
+        await hentai.danbooru()
+        await sleep(5)
+
+    @cache_hentai.before_loop
+    async def before_cache_hentai(self):
         await self.bot.wait_until_ready()
 
 

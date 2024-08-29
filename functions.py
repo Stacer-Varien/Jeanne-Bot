@@ -1149,18 +1149,27 @@ def get_richest(member: Member) -> int:
 
 
 class NsfwApis(Enum):
-    KonachanApi = "https://konachan.com/post.json?s=post&q=index&limit=50&tags=score:>10+rating:explicit+"
-    YandereApi = "https://yande.re/post.json?limit=50&tags=score:>10+rating:explicit+"
-    GelbooruApi = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=50&tags=score:>10+rating:explicit+"
+    KonachanApi = "https://konachan.com/post.json?s=post&q=index&limit=100&tags=score:>10+rating:explicit+"
+    YandereApi = "https://yande.re/post.json?limit=100&tags=score:>10+rating:explicit+"
+    GelbooruApi = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=score:>10+rating:explicit+"
     DanbooruApi = (
-        "https://danbooru.donmai.us/posts.json?limit=50&tags=rating:explicit+"
+        "https://danbooru.donmai.us/posts.json?limit=100&tags=rating:explicit+"
     )
 
 
 class Hentai:
-    def __init__(self, plus: Optional[bool] = None):
-        self.plus = plus
+    def __init__(self):
         self.blacklisted_tags = ["loli", "shota", "cub", "gore", "vore", "bestiality"]
+
+    def shorten_url(self, url: str) -> str | None:
+        api_url = "http://tinyurl.com/api-create.php"
+        params = {"url": url}
+        response = get(api_url, params=params)
+        if response.status_code == 200:
+            short_url = response.text
+            return short_url
+        else:
+            return None
 
     def format_tags(self, tags: str = None) -> str:
         if tags:
@@ -1216,6 +1225,7 @@ class Hentai:
 
     async def add_blacklisted_link(self, link: str):
         db.execute("INSERT OR IGNORE INTO hentaiBlacklist (links) VALUES (?)", (link,))
+        db.execute("DELETE FROM cachedHentai WHERE url = ?", (link,))
         db.commit()
 
     def get_blacklisted_links(self) -> list[str] | None:
@@ -1260,7 +1270,7 @@ class Hentai:
                 await self.cache_hentai(
                     "gelbooru",
                     i["file_url"],
-                    shorten_url(i["file_url"]),
+                    self.shorten_url(i["file_url"]),
                     str(i["tags"]).replace(" ", "+"),
                 )
 
@@ -1268,13 +1278,13 @@ class Hentai:
 
     async def yandere(self, tag: Optional[str] = None):
         images = self.get_cached_hentai("yandere", tag)
-        if (images == None) or (len(images) > 250):
-            images = await self.get_nsfw_image(NsfwApis.YandereApi, tag)
-            for i in images:
+        if (images == None) or (len(images) <= 250):
+            api_images = await self.get_nsfw_image(NsfwApis.YandereApi, tag)
+            for i in api_images:
                 await self.cache_hentai(
-                    "gelbooru",
-                    i["sample_url"],
-                    shorten_url(i["sample_url"]),
+                    "yandere",
+                    i["jpeg_url"],
+                    self.shorten_url(i["jpeg_url"]),
                     str(i["tags"]).replace(" ", "+"),
                 )
 
@@ -1282,13 +1292,13 @@ class Hentai:
 
     async def konachan(self, tag: Optional[str] = None):
         images = self.get_cached_hentai("konachan", tag)
-        if (images == None) or (len(images) > 250):
+        if (images == None) or (len(images) <= 250):
             api_images = await self.get_nsfw_image(NsfwApis.KonachanApi, tag)
             for i in api_images:
                 await self.cache_hentai(
                     "konachan",
                     i["file_url"],
-                    shorten_url(i["file_url"]),
+                    self.shorten_url(i["file_url"]),
                     str(i["tags"]).replace(" ", "+"),
                 )
         return images
@@ -1300,13 +1310,13 @@ class Hentai:
         else:
             tag = ",".join(tag.split(",")[:2])
         images = self.get_cached_hentai("danbooru", tag)
-        if (images == None) or (len(images) > 250):
+        if (images == None) or (len(images) <= 250):
             api_images = await self.get_nsfw_image(NsfwApis.DanbooruApi, tag)
             for i in api_images:
                 await self.cache_hentai(
                     "danbooru",
                     i["file_url"],
-                    shorten_url(i["file_url"]),
+                    self.shorten_url(i["file_url"]),
                     str(i["tag_string"]).replace(" ", "+"),
                 )
         return images
@@ -1325,17 +1335,6 @@ class Hentai:
         if choice(hentai_links) == "danbooru":
             image = await self.danbooru()
             return str(image[0]), str(image[1]), "Danbooru"
-
-
-def shorten_url(url: str) -> str | None:
-    api_url = "http://tinyurl.com/api-create.php"
-    params = {"url": url}
-    response = get(api_url, params=params)
-    if response.status_code == 200:
-        short_url = response.text
-        return short_url
-    else:
-        return None
 
 
 class Reminder:

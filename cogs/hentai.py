@@ -12,9 +12,8 @@ from functions import (
     Hentai,
     check_botbanned_app_command,
     check_disabled_app_command,
-    shorten_url,
 )
-from typing import Literal, Optional
+from typing import Optional
 from assets.components import ReportContent, ReportContentPlus
 
 
@@ -90,7 +89,7 @@ class nsfw(Cog):
         plus: Optional[bool] = None,
     ) -> None:
         await ctx.response.defer()
-        image = await Hentai(plus).gelbooru(tag)
+        image = await Hentai().gelbooru(tag)
 
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
@@ -209,7 +208,7 @@ class nsfw(Cog):
                 "Tag has been blacklisted due to it returning extreme content"
             )
             return
-        image = await Hentai(plus).yandere(tag)
+        image = await Hentai().yandere(tag)
 
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
@@ -298,7 +297,7 @@ class nsfw(Cog):
         plus: Optional[bool] = None,
     ) -> None:
         await ctx.response.defer()
-        image = await Hentai(plus).konachan(tag)
+        image = await Hentai().konachan(tag)
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
             view = ReportContentPlus(*[img[1] for img in images])
@@ -384,7 +383,7 @@ class nsfw(Cog):
         plus: Optional[bool] = None,
     ) -> None:
         await ctx.response.defer()
-        image = await Hentai(plus).danbooru(tag)
+        image = await Hentai().danbooru(tag)
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
             try:
