@@ -36,10 +36,6 @@ class tasksCog(Cog):
                 else:
                     continue
 
-    @check_softbanned_members.before_loop
-    async def before_check_softbanned_members(self):
-        await self.bot.wait_until_ready()
-
     @tasks.loop(seconds=60, reconnect=True)
     async def check_reminders(self):
         data = Reminder().get_all_reminders
@@ -60,9 +56,6 @@ class tasksCog(Cog):
             else:
                 continue
 
-    @check_reminders.before_loop
-    async def before_check_reminders(self):
-        await self.bot.wait_until_ready()
 
     @tasks.loop(hours=4, reconnect=True)
     async def cache_hentai(self):
@@ -75,11 +68,6 @@ class tasksCog(Cog):
         await sleep(5)
         await hentai.danbooru()
         await sleep(5)
-
-    @cache_hentai.before_loop
-    async def before_cache_hentai(self):
-        await self.bot.wait_until_ready()
-
 
 async def setup(bot: Bot):
     await bot.add_cog(tasksCog(bot))

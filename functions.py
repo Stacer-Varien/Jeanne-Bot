@@ -83,12 +83,13 @@ class Currency:
         return 0 if data == None else data[0]
 
     async def add_qp(self, amount: int):
+        previous_day = round((datetime.now() - timedelta(days=1)).timestamp())
         cur = db.execute(
             "INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)",
             (
                 self.user.id,
                 amount,
-                (current_time - timedelta(days=1)),
+                previous_day,
             ),
         )
         db.commit()
