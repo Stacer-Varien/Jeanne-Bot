@@ -24,6 +24,7 @@ MORGAN = str(getenv("morgan_album"))
 KITSUNE = str(getenv("kitsune_album"))
 CATBOX_HASH = str(getenv("catbox_hash"))
 BADGES = str(getenv("badges_album"))
+STATUS_WEBHOOK=str(getenv("status"))
 
 db = connect("database.db", check_same_thread=False)
 
