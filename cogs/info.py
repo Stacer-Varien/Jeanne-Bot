@@ -160,7 +160,7 @@ class InfoCog(Cog, name="InfoSlash"):
         serverinfo.add_field(name="ID", value=ctx.guild.id, inline=True)
         serverinfo.add_field(
             name="Owner",
-            value=f"• **Name: ** {ctx.guild.owner}\n• ** ID: ** {ctx.guild.owner.id}",
+            value=f"• **Name: ** {ctx.guild.owner}\n• ** ID: ** {ctx.guild.owner_id}",
             inline=True,
         )
         serverinfo.add_field(name="Creation Date", value=f"<t:{date}:F>", inline=True)

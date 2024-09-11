@@ -28,43 +28,22 @@ intents.auto_moderation = False
 bot = Jeanne(
     command_prefix=when_mentioned_or("J!", "j!", "Jeanne", "jeanne"),
     intents=intents,
-    shard_connect_timeout=120,
     allowed_mentions=AllowedMentions.all(),
     case_insensitive=True,
     strip_after_prefix=True,
+    chunk_guilds_at_startup=False
 )
 bot.remove_command("help")
 
-
 @bot.event
 async def on_ready():
+    for server in bot.guilds:
+        await server.chunk()
     print("Connected to bot: {}".format(bot.user.name))
     print("Bot ID: {}".format(bot.user.id))
     print("Connected to {} servers".format(len(bot.guilds)))
     print("Listening to {} users".format(len(bot.users)))
     print("Listening to {} shards".format(bot.shard_count))
-
-
-@bot.event
-async def on_shard_connect(shard_id):
-    while bot.is_ws_ratelimited():
-        print(f"Shard {shard_id} is rate-limited. Retrying in 60 seconds...")
-        await asyncio.sleep(120)
-    print(f"Shard {shard_id} connected successfully.")
-
-
-@bot.event
-async def on_shard_resumed(shard_id):
-    print(f"Shard {shard_id} resumed!")
-
-
-@bot.event
-async def on_shard_disconnect(shard_id):
-    if bot.is_ws_ratelimited():
-        print(f"Shard {shard_id} is rate-limited, delaying reconnection...")
-        await asyncio.sleep(120)
-    else:
-        print(f"Shard {shard_id} disconnected!")
 
 
 bot.run(TOKEN)

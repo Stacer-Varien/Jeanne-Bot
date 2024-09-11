@@ -1,4 +1,4 @@
-from discord import Color, Embed, Member, AllowedMentions
+from discord import Color, Embed, Guild, Member, AllowedMentions, RawMemberRemoveEvent
 from discord.ext.commands import Cog, Bot
 from functions import Welcomer
 from collections import OrderedDict
@@ -22,7 +22,6 @@ class WelcomerCog(Cog):
             return
         server = Welcomer(member.guild).server
         if member.guild.id == server.id:
-            
             welcomemsg = Welcomer(member.guild).get_welcoming_msg
             if welcomemsg is None:
                 welcome = Embed(
@@ -56,9 +55,11 @@ class WelcomerCog(Cog):
                 )
                 return
             await welcomer.send(content=content)
+        await member.guild.chunk()
 
     @Cog.listener()
-    async def on_member_remove(self, member: Member):
+    async def on_raw_member_remove(self,payload:RawMemberRemoveEvent):
+        member=payload.user
         leaver = Welcomer(member.guild).get_leaver
         if leaver is None:
             return
@@ -96,6 +97,9 @@ class WelcomerCog(Cog):
             except:
                 await leaver.send(content=content)
 
+    @Cog.listener()
+    async def on_guild_join(server:Guild):
+        await server.chunk()
 
 async def setup(bot: Bot):
     await bot.add_cog(WelcomerCog(bot))
