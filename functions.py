@@ -1175,7 +1175,6 @@ class Hentai:
 
     def format_tags(self, tags: Optional[str] = None) -> str:
         if tags:
-            # Format tags by replacing spaces with underscores and joining with "+"
             tags_list = [
                 tag.strip().replace(" ", "_")
                 for tag in tags.split(",")
@@ -1187,66 +1186,53 @@ class Hentai:
     async def get_nsfw_image(
         self, provider: NsfwApis, tags: Optional[str] = None
     ) -> Optional[List[Dict]]:
-        # Get blacklisted URLs (assuming this function is defined elsewhere)
         blacklisted_urls = self.get_blacklisted_links()
 
-        # Format and handle tags
         tags = tags.lower() if tags else ""
         formatted_tags = self.format_tags(tags)
 
-        # Construct the request URL
         url = provider.value + formatted_tags
 
-        # Fetch data from the API
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
-                nsfw_images = await resp.json()
+                nsfw_images:dict = await resp.json()
 
-        # Handle cases where no images are returned
         if not nsfw_images:
             return None
 
-        # Handle API-specific logic
         if provider == NsfwApis.GelbooruApi:
             nsfw_images_list = nsfw_images.get("post", [])
         else:
             nsfw_images_list = nsfw_images
 
-        # Shuffle the images for random selection
         shuffle(nsfw_images_list)
 
-        # Filter tags, ensuring none are blacklisted
         tags_list = [
             tag.strip().replace(" ", "_")
             for tag in tags.split(",")
             if tag.strip().replace(" ", "_") not in self.blacklisted_tags
         ]
 
-        # If no valid tags or too many tags are provided, return None
         if not tags_list or len(tags_list) > 3:
             return None
 
         filtered_images = []
         for image in nsfw_images_list:
-            # Extract image tags based on the provider
             if provider == NsfwApis.DanbooruApi:
                 image_tags = str(image["tag_string"]).lower().split(" ")
             else:
                 image_tags = str(image["tags"]).lower().split(" ")
 
-            # Extract the image URL
             try:
                 image_url = str(image["file_url"])
             except KeyError:
                 continue
 
-            # Skip images with blacklisted tags or URLs
             if any(tag in self.blacklisted_tags for tag in image_tags):
                 continue
             if image_url in blacklisted_urls:
                 continue
 
-            # Add the image to the filtered list
             filtered_images.append(image)
 
         return filtered_images if filtered_images else None
@@ -1272,31 +1258,24 @@ class Hentai:
         images_with_tags = []
         images = []
 
-        # Fetch data from the database
         data = db.execute(
             "SELECT * FROM cachedHentai WHERE source = ?", (source,)
         ).fetchall()
 
-        # If no data, return None
         if len(data) == 0:
             return None
 
-        # Process each row in the result set
         for i in data:
-            # Convert entry tags to lowercase and split by '+'
             entry_tags = set(str(i[3]).lower().split("+"))
 
             if tags:
-                # Convert the single tag to lowercase
                 search_tag = tags.lower()
 
-                # Check if the single search tag is in entry tags
                 if search_tag in entry_tags:
                     images_with_tags.append([str(i[1]), str(i[2])])
             else:
                 images.append([str(i[1]), str(i[2])])
 
-        # If images_with_tags is populated, return it; otherwise, return all images
         return images_with_tags if images_with_tags else images
 
     async def gelbooru(self, tag: Optional[str] = None):
@@ -1579,3 +1558,27 @@ async def is_beta_app_command(ctx: Interaction):
         )
         return
     return True
+
+class DevPunishment:
+    def __init__(self) -> None:
+        pass
+
+    def warnpoints(self, user:User)->int|None:
+        data=db.execute("SELECT points FROM devWarnData WHERE user = ?",(user.id,)).fetchone()
+        db.commit()
+        return None if data == None else int(data[0])
+
+    async def autopunish(self, user:User):
+        data = db.execute("SELECT points FROM devWarnData WHERE user = ?",(user.id,)).fetchone()
+        db.commit()
+        if data == None:
+            return
+        if data[0] ==2:
+            ...
+
+    async def warn(self, user:User, reason:str):
+        revoke_date=round((datetime.now() + timedelta(days=90)).timestamp())
+        data=db.execute("INSERT OR IGNORE INTO devWarnData (user, reason, revoke_date, points) VALUES (?,?,?,?,?,)", (user.id, reason, revoke_date,1,))
+
+        if data.rowcount==0:
+            ...
