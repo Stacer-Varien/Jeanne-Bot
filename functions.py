@@ -1569,12 +1569,28 @@ class DevPunishment:
         return None if data == None else int(data[0])
 
     async def autopunish(self, user:User):
-        data = db.execute("SELECT points FROM devWarnData WHERE user = ?",(user.id,)).fetchone()
+        data = db.execute("SELECT * FROM devWarnData WHERE user = ?",(user.id,)).fetchall()
         db.commit()
         if data == None:
             return
-        if data[0] ==2:
-            ...
+        if len(data) ==2:
+            timeout_duration=round((datetime().now() + timedelta(days=7)).timestamp())
+            db.execute("INSERT OR IGNORE INTO suspensionData (user, modules, timeout)", (user.id, "all", timeout_duration))
+            return
+        if len(data)==3:
+            await Botban(user).add_botbanned_user("Recieved 3 dev warnings")
+            return
+
+    async def suspend(self, user:User, duration:int, modules:str):
+        data=db.execute("INSERT OR IGNORE INTO suspensionData (user, modules, timeout)", (user.id, ",".modules, duration,))
+        db.commit()
+
+        if data.rowcount==0:
+            db.execute(
+                "UPDATE suspensionDATA SET modules = ? AND timeout = timeout + ? WHERE user = ?",
+                ",".join(modules), duration, user.id,
+            )
+            db.commit()
 
     async def warn(self, user:User, reason:str):
         revoke_date=round((datetime.now() + timedelta(days=90)).timestamp())
