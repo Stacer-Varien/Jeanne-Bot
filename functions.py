@@ -1,9 +1,9 @@
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 from enum import Enum
-from random import choice, randint, shuffle
+from random import randint, shuffle
 import random
 import aiohttp
-from humanfriendly import parse_timespan
+from humanfriendly import format_timespan, parse_timespan
 from discord import (
     Color,
     Embed,
@@ -22,11 +22,9 @@ from requests import get, post
 from config import db, BB_WEBHOOK, CATBOX_HASH
 from typing import Dict, Literal, Optional, List
 
-current_time = date.today()
 
-
-class Botban:
-    def __init__(self, user: User):
+class DevPunishment:
+    def __init__(self, user: Optional[User] = None) -> None:
         self.user = user
 
     @property
@@ -54,7 +52,7 @@ class Botban:
         db.commit()
         botbanned = Embed(
             title="User has been botbanned!",
-            description="They will no longer use Jeanne,permanently!",
+            description="They will no longer use Jeanne, permanently!",
         )
         botbanned.add_field(name="User", value=self.user)
         botbanned.add_field(name="ID", value=self.user.id, inline=True)
@@ -69,6 +67,83 @@ class Botban:
         botbanned.set_thumbnail(url=self.user.display_avatar)
         webhook = SyncWebhook.from_url(BB_WEBHOOK)
         webhook.send(embed=botbanned)
+
+    def warnpoints(self, user: User) -> int:
+        data = db.execute(
+            "SELECT * FROM devWarnData WHERE user = ?", (user.id,)
+        ).fetchall()
+        db.commit()
+        return 0 if data == None else len(data)
+
+    async def autopunish(self, user: User):
+        points = self.warnpoints(user)
+        db.commit()
+        if points == 0:
+            return
+        if points == 2:
+            timeout_duration = round((datetime.now() + timedelta(days=7)).timestamp())
+            await self.suspend(user, timeout_duration, "all")
+            return
+        if points == 3:
+            await self.add_botbanned_user("Recieved 3 bot warnings")
+            return
+
+    async def suspend(self, user: User, duration: int, modules: str):
+        data = db.execute(
+            "INSERT OR IGNORE INTO suspensionData (user, modules, timeout) VALUES (?,?,?)",
+            (
+                user.id,
+                ",".join(modules),
+                duration,
+            ),
+        )
+        db.commit()
+
+        if data.rowcount == 0:
+            data = db.execute(
+                "SELECT timeout FROM susepnsionData WHERE user = ?", (user.id,)
+            ).fetchone()
+            db.commit()
+            current_timeout_duration = datetime.fromtimestamp(float(data[0]))
+            new_timeout = round(
+                (current_timeout_duration + timedelta(seconds=duration)).timestamp()
+            )
+            db.execute(
+                "UPDATE suspensionDATA SET modules = ? AND timeout = timeout + ? WHERE user = ?",
+                ",".join(modules),
+                new_timeout,
+                user.id,
+            )
+            db.commit()
+
+        embed=Embed(title="User has been Suspended", color=Color.yellow())
+        embed.add_field(name="User", value=user, inline=True)
+        embed.add_field(name="ID", value=user.id, inline=True)
+        embed.add_field(name="Duration", value=format_timespan(duration), inline=True)
+        embed.add_field(name="Modules", value=",".join(modules), inline=True)
+        embed.set_footer(text="This is not a botban. The user is suspended from using certain modules of Jeanne.")
+        embed.set_thumbnail(url=user.display_avatar)
+        webhook = SyncWebhook.from_url(BB_WEBHOOK)
+        webhook.send(embed=embed)
+
+    async def warn(self, user: User, reason: str):
+        warn_id = randint(1, 9999999)
+
+        if self.warnpoints(user) == 1:
+            revoke_date = round((datetime.now() + timedelta(days=180)).timestamp())
+        else:
+            revoke_date = round((datetime.now() + timedelta(days=90)).timestamp())
+        db.execute(
+            "INSERT OR IGNORE INTO devWarnData (user, reason, warn_id, revoke_date) VALUES (?,?,?,?)",
+            (
+                user.id,
+                reason,
+                warn_id,
+                revoke_date,
+            ),
+        )
+        db.commit()
+        await self.autopunish(user)
 
 
 class Currency:
@@ -1195,7 +1270,7 @@ class Hentai:
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
-                nsfw_images:dict = await resp.json()
+                nsfw_images: dict = await resp.json()
 
         if not nsfw_images:
             return None
@@ -1250,7 +1325,12 @@ class Hentai:
     async def cache_hentai(self, source: str, url: str, shorturl: str, tags: str):
         db.execute(
             "INSERT OR IGNORE INTO cachedHentai (source, url, shorturl, tags) VALUES (?,?,?,?)",
-            (source, url, shorturl, tags,),
+            (
+                source,
+                url,
+                shorturl,
+                tags,
+            ),
         )
         db.commit()
 
@@ -1284,11 +1364,11 @@ class Hentai:
             api_images = await self.get_nsfw_image(NsfwApis.GelbooruApi, tag)
             for i in api_images:
                 await self.cache_hentai(
-                        "gelbooru",
-                        i["file_url"],
-                        self.shorten_url(i["file_url"]),
-                        str(i["tags"]).replace(" ", "+"),
-                    )
+                    "gelbooru",
+                    i["file_url"],
+                    self.shorten_url(i["file_url"]),
+                    str(i["tags"]).replace(" ", "+"),
+                )
             images = self.get_cached_hentai("gelbooru", self.format_tags(tag))
         return images
 
@@ -1542,7 +1622,7 @@ async def check_disabled_app_command(ctx: Interaction):
 
 
 def check_botbanned_app_command(ctx: Interaction):
-    if Botban(ctx.user).check_botbanned_user:
+    if DevPunishment(ctx.user).check_botbanned_user:
         return
     return True
 
@@ -1558,43 +1638,3 @@ async def is_beta_app_command(ctx: Interaction):
         )
         return
     return True
-
-class DevPunishment:
-    def __init__(self) -> None:
-        pass
-
-    def warnpoints(self, user:User)->int|None:
-        data=db.execute("SELECT points FROM devWarnData WHERE user = ?",(user.id,)).fetchone()
-        db.commit()
-        return None if data == None else int(data[0])
-
-    async def autopunish(self, user:User):
-        data = db.execute("SELECT * FROM devWarnData WHERE user = ?",(user.id,)).fetchall()
-        db.commit()
-        if data == None:
-            return
-        if len(data) ==2:
-            timeout_duration=round((datetime().now() + timedelta(days=7)).timestamp())
-            db.execute("INSERT OR IGNORE INTO suspensionData (user, modules, timeout)", (user.id, "all", timeout_duration))
-            return
-        if len(data)==3:
-            await Botban(user).add_botbanned_user("Recieved 3 dev warnings")
-            return
-
-    async def suspend(self, user:User, duration:int, modules:str):
-        data=db.execute("INSERT OR IGNORE INTO suspensionData (user, modules, timeout)", (user.id, ",".modules, duration,))
-        db.commit()
-
-        if data.rowcount==0:
-            db.execute(
-                "UPDATE suspensionDATA SET modules = ? AND timeout = timeout + ? WHERE user = ?",
-                ",".join(modules), duration, user.id,
-            )
-            db.commit()
-
-    async def warn(self, user:User, reason:str):
-        revoke_date=round((datetime.now() + timedelta(days=90)).timestamp())
-        data=db.execute("INSERT OR IGNORE INTO devWarnData (user, reason, revoke_date, points) VALUES (?,?,?,?,?,)", (user.id, reason, revoke_date,1,))
-
-        if data.rowcount==0:
-            ...

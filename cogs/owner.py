@@ -1,4 +1,3 @@
-from types import ModuleType
 from discord.ext.commands import (
     Cog,
     Bot,
@@ -21,7 +20,7 @@ from discord import (
 )
 from os import execv
 from sys import executable, argv
-from functions import BetaTest, Botban, Hentai, Partner
+from functions import BetaTest, Botban, DevPunishment, Hentai, Partner
 from typing import Literal, Optional
 
 
@@ -259,11 +258,13 @@ Make sure private messages between **me and you are opened** or check the host i
                 ret += 1
         await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
 
-    @command(description="Warn users suspected of misusing the bot")
+    @command(description="Warn users suspected of misusing Jeanne or the commands")
     @guild_only()
     @is_owner()
-    async def warn(self, ctx:Context, user:User):
-        ...
+    async def warn(self, ctx:Context, user:User, *, reason:str):
+        devpunish=DevPunishment()
+        await devpunish.warn(user, reason)
+        
 
 async def setup(bot: Bot):
     await bot.add_cog(OwnerCog(bot))
