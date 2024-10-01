@@ -8,7 +8,7 @@ from discord import (
 )
 from discord.ext.commands import Cog, Bot
 from functions import (
-    Botban,
+    DevPunishment,
     check_botbanned_app_command,
     check_disabled_app_command,
 )
@@ -71,7 +71,7 @@ class fun(Cog, name="FunSlash"):
         await ctx.response.defer()
         filtered_words = ["riffak", "reggin", "aggin"]
         if any(word in text for word in filtered_words):
-            await Botban(ctx.user).add_botbanned_user(
+            await DevPunishment(ctx.user).add_botbanned_user(
                 "Using the reversed version of a common racial slur"
             )
             return

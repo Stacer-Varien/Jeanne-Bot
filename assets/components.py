@@ -23,7 +23,7 @@ from json import loads
 from discord.ext.commands import Context, Bot
 from assets.generators.profile_card import Profile
 from config import WEBHOOK, BADGES
-from functions import Botban, Inventory, Levelling, Manage, Moderation, Welcomer
+from functions import DevPunishment, Inventory, Levelling, Manage, Moderation, Welcomer
 
 
 def replace_all(text: str, dic: dict):
@@ -907,7 +907,7 @@ class DevWarningReasonM(ui.Modal, title="Reason of Warn/Suspension"):
             embed.set_footer(
                 text="This is your third and last warning! You are PERMANENTLY BANNED from using Jeanne!"
             )
-            await Botban(self.user).add_botbanned_user(f"Received 3 warnings due to this final warning\n**{self.type}**\n{self.explaination}")
+            await DevPunishment(self.user).add_botbanned_user(f"Received 3 warnings due to this final warning\n**{self.type}**\n{self.explaination}")
 
         try:
             await self.user.send(embed=embed)
