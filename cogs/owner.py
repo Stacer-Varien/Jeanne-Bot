@@ -20,7 +20,7 @@ from discord import (
 )
 from os import execv
 from sys import executable, argv
-from functions import BetaTest, Botban, DevPunishment, Hentai, Partner
+from functions import BetaTest, DevPunishment, Hentai, Partner
 from typing import Literal, Optional
 
 
@@ -37,7 +37,7 @@ class OwnerCog(Cog, name="Owner"):
     )
     @is_owner()
     async def partner(self, ctx: Context):
-        if Botban(ctx.author).check_botbanned_user:
+        if DevPunishment(ctx.author).check_botbanned_user:
             return
         embed = Embed(
             title="This is a group command. However, the available commands for this are:",
@@ -48,7 +48,7 @@ class OwnerCog(Cog, name="Owner"):
     @partner.command(description="Adds a partner (Developer Only)")
     @is_owner()
     async def add(self, ctx: Context, user: User):
-        if Botban(ctx.author).check_botbanned_user:
+        if DevPunishment(ctx.author).check_botbanned_user:
             return
         await Partner().add(user)
         await ctx.send(f"{user} has been added as a partner")
@@ -56,7 +56,7 @@ class OwnerCog(Cog, name="Owner"):
     @partner.command(description="Removes a partner (Developer Only)")
     @is_owner()
     async def remove(self, ctx: Context, user: User):
-        if Botban(ctx.author).check_botbanned_user:
+        if DevPunishment(ctx.author).check_botbanned_user:
             return
         await Partner().remove(user)
         await ctx.send(f"{user} has been removed as a partner")
@@ -66,7 +66,7 @@ class OwnerCog(Cog, name="Owner"):
     )
     @is_owner()
     async def beta(self, ctx: Context):
-        if Botban(ctx.author).check_botbanned_user:
+        if DevPunishment(ctx.author).check_botbanned_user:
             return
         embed = Embed(
             title="This is a group command. However, the available commands for this are:",
@@ -77,14 +77,14 @@ class OwnerCog(Cog, name="Owner"):
     @beta.command(description="Add a user to the Beta Programme (Developer Only)")
     @is_owner()
     async def add(self, ctx: Context, *, user: User):
-        if Botban(ctx.author).check_botbanned_user:
+        if DevPunishment(ctx.author).check_botbanned_user:
             return
         await BetaTest(self.bot).add(ctx, user)
 
     @beta.command(description="Removes a user from the Beta Programme (Developer Only)")
     @is_owner()
     async def remove(self, ctx: Context, *, user: User):
-        if Botban(ctx.author).check_botbanned_user:
+        if DevPunishment(ctx.author).check_botbanned_user:
             return
         await BetaTest(self.bot).remove(ctx, user)
 
@@ -95,7 +95,7 @@ class OwnerCog(Cog, name="Owner"):
     )
     @is_owner()
     async def activity(self, ctx: Context):
-        if Botban(ctx.author).check_botbanned_user:
+        if DevPunishment(ctx.author).check_botbanned_user:
             return
         embed = Embed(
             title="This is a group command. However, the available commands for this are:",
@@ -108,7 +108,7 @@ class OwnerCog(Cog, name="Owner"):
     )
     @is_owner()
     async def play(self, ctx: Context, *, activity: str):
-        if Botban(ctx.author).check_botbanned_user:
+        if DevPunishment(ctx.author).check_botbanned_user:
             return
         await self.bot.change_presence(activity=Game(name=activity))
         await ctx.send(f"I am now playing `{activity}`")
@@ -119,7 +119,7 @@ class OwnerCog(Cog, name="Owner"):
     )
     @is_owner()
     async def listen(self, ctx: Context, *, activity: str):
-        if Botban(ctx.author).check_botbanned_user:
+        if DevPunishment(ctx.author).check_botbanned_user:
             return
         await self.bot.change_presence(
             activity=Activity(type=ActivityType.listening, name=activity)
@@ -132,7 +132,7 @@ class OwnerCog(Cog, name="Owner"):
     )
     @is_owner()
     async def clear(self, ctx: Context):
-        if Botban(ctx.author).check_botbanned_user:
+        if DevPunishment(ctx.author).check_botbanned_user:
             return
         await self.bot.change_presence(activity=None)
         await ctx.send(f"I have removed my activity")
@@ -140,7 +140,7 @@ class OwnerCog(Cog, name="Owner"):
     @command(aliases=["fuser"], description="Finds a user (Developer Only)")
     @is_owner()
     async def finduser(self, ctx: Context, user_id: int):
-        if Botban(ctx.author).check_botbanned_user:
+        if DevPunishment(ctx.author).check_botbanned_user:
             return
         user = await self.bot.fetch_user(user_id)
         botr = ":o:" if user.bot else ":x:"
@@ -167,7 +167,7 @@ class OwnerCog(Cog, name="Owner"):
     )
     @is_owner()
     async def update(self, ctx: Context):
-        if Botban(ctx.author).check_botbanned_user:
+        if DevPunishment(ctx.author).check_botbanned_user:
             return
         await ctx.send("YAY! NEW UPDATE!")
         self.restart_bot()
@@ -178,19 +178,19 @@ class OwnerCog(Cog, name="Owner"):
     )
     @is_owner()
     async def botban(self, ctx: Context, user_id: int, *, reason: str):
-        if Botban(ctx.author).check_botbanned_user:
+        if DevPunishment(ctx.author).check_botbanned_user:
             return
         if not reason:
             await ctx.send("Reason missing for botban", ephemeral=True)
             return
         user = await self.bot.fetch_user(user_id)
-        await Botban(user).add_botbanned_user(reason)
+        await DevPunishment(user).add_botbanned_user(reason)
         await ctx.send("User botbanned", ephemeral=True)
         orleans = await self.bot.fetch_guild(740584420645535775)
         ha = await self.bot.fetch_guild(925790259160166460)
         vhf = await self.bot.fetch_guild(974028573893595146)
         for server in [orleans, ha, vhf]:
-            await server.ban(user, reason=f"Botbanned - {reason}")
+            await server.ban(user, reason=f"DevPunishmentned - {reason}")
 
     @command(
         aliases=["hb", "slice"],
@@ -198,7 +198,7 @@ class OwnerCog(Cog, name="Owner"):
     )
     @is_owner()
     async def hentaiblacklist(self, ctx: Context, link: str):
-        if Botban(ctx.author).check_botbanned_user:
+        if DevPunishment(ctx.author).check_botbanned_user:
             return
         await Hentai().add_blacklisted_link(link)
         await ctx.send("Link blacklisted")
@@ -229,7 +229,7 @@ Make sure private messages between **me and you are opened** or check the host i
         guilds: Greedy[Object],
         spec: Optional[Literal["~", "*", "^"]] = None,
     ) -> None:
-        if Botban(ctx.author).check_botbanned_user:
+        if DevPunishment(ctx.author).check_botbanned_user:
             return
         if not guilds:
             if spec == "~":
