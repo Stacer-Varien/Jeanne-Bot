@@ -81,14 +81,15 @@ class DevPunishment:
         if points == 0:
             return
         if points == 2:
-            timeout_duration = round((datetime.now() + timedelta(days=7)).timestamp())
-            await self.suspend(user, timeout_duration, "all")
+            duration=timedelta(days=7)
+            await self.suspend(user, duration.total_seconds(), ["all"])
             return
         if points == 3:
             await self.add_botbanned_user("Recieved 3 bot warnings")
             return
 
-    async def suspend(self, user: User, duration: int, modules: str):
+    async def suspend(self, user: User, duration: int, modules: list[str]):
+        duration=round((datetime.now()+timedelta(seconds=duration)).timestamp())
         data = db.execute(
             "INSERT OR IGNORE INTO suspensionData (user, modules, timeout) VALUES (?,?,?)",
             (
@@ -101,7 +102,7 @@ class DevPunishment:
 
         if data.rowcount == 0:
             data = db.execute(
-                "SELECT timeout FROM susepnsionData WHERE user = ?", (user.id,)
+                "SELECT timeout FROM suspensionDATA WHERE user = ?", (user.id,)
             ).fetchone()
             db.commit()
             current_timeout_duration = datetime.fromtimestamp(float(data[0]))
@@ -116,10 +117,14 @@ class DevPunishment:
             )
             db.commit()
 
-        embed=Embed(title="User has been Suspended", color=Color.yellow())
+        timeout = db.execute(
+            "SELECT timeout FROM suspensionDATA WHERE user = ?", (user.id,)
+        ).fetchone()
+        db.commit()
+        embed=Embed(title="User has been Dev Suspended", color=Color.yellow())
         embed.add_field(name="User", value=user, inline=True)
         embed.add_field(name="ID", value=user.id, inline=True)
-        embed.add_field(name="Duration", value=format_timespan(duration), inline=True)
+        embed.add_field(name="Suspended until", value=f"<t:{timeout[0]}:F>", inline=True)
         embed.add_field(name="Modules", value=",".join(modules), inline=True)
         embed.set_footer(text="This is not a botban. The user is suspended from using certain modules of Jeanne.")
         embed.set_thumbnail(url=user.display_avatar)
@@ -128,8 +133,8 @@ class DevPunishment:
 
     async def warn(self, user: User, reason: str):
         warn_id = randint(1, 9999999)
-
-        if self.warnpoints(user) == 1:
+        points=self.warnpoints(user) 
+        if points== 1:
             revoke_date = round((datetime.now() + timedelta(days=180)).timestamp())
         else:
             revoke_date = round((datetime.now() + timedelta(days=90)).timestamp())
@@ -143,6 +148,15 @@ class DevPunishment:
             ),
         )
         db.commit()
+        embed = Embed(title="User has been Dev Warned", color=Color.yellow())
+        embed.add_field(name="User", value=user, inline=True)
+        embed.add_field(name="ID", value=user.id, inline=True)
+        embed.add_field(name="Reason", value=reason, inline=True)
+        embed.add_field(name="Warn ID", value=warn_id, inline=True)
+        embed.add_field(name="Points", value=self.warnpoints(user))
+        embed.set_thumbnail(url=user.display_avatar)
+        webhook = SyncWebhook.from_url(BB_WEBHOOK)
+        webhook.send(embed=embed)
         await self.autopunish(user)
 
 
