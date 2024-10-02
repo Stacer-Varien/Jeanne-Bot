@@ -109,14 +109,14 @@ class moderation(Cog):
         time: Optional[str] = None,
     ) -> None:
         await ctx.response.defer()
-        if member.id == ctx.guild.owner.id:
+        if member == ctx.guild.owner:
             failed = Embed(
                 description="You can't ban the owner of the server...",
                 color=Color.red(),
             )
             await ctx.followup.send(embed=failed)
             return
-        if member.id == ctx.user.id:
+        if member == ctx.user:
             failed = Embed(description="You cannot ban yourself...", color=Color.red())
             await ctx.followup.send(embed=failed)
             return
@@ -185,7 +185,7 @@ class moderation(Cog):
             )
             await ctx.followup.send(embed=failed)
             return
-        if member.id == ctx.guild.owner.id:
+        if member == ctx.guild.owner:
             failed = Embed(
                 description="You can't warn the owner of the server...",
                 color=Color.red(),
@@ -345,7 +345,7 @@ class moderation(Cog):
         reason: Optional[Jeanne.Range[str, None, 470]] = None,
     ) -> None:
         await ctx.response.defer()
-        if member.id == ctx.user.id:
+        if member == ctx.user:
             failed = Embed(description="You can't kick yourself out")
             await ctx.followup.send(embed=failed)
             return
@@ -356,7 +356,7 @@ class moderation(Cog):
             )
             await ctx.followup.send(embed=failed)
             return
-        if member.id == ctx.guild.owner.id:
+        if member == ctx.guild.owner:
             failed = Embed(
                 description="You cannot kick the owner of the server out...",
                 color=Color.red(),
