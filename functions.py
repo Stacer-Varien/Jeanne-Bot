@@ -68,32 +68,32 @@ class DevPunishment:
         webhook = SyncWebhook.from_url(BB_WEBHOOK)
         webhook.send(embed=botbanned)
 
-    def warnpoints(self, user: User) -> int:
+    def warnpoints(self) -> int:
         data = db.execute(
-            "SELECT * FROM devWarnData WHERE user = ?", (user.id,)
+            "SELECT * FROM devWarnData WHERE user = ?", (self.user.id,)
         ).fetchall()
         db.commit()
         return 0 if data == None else len(data)
 
-    async def autopunish(self, user: User):
-        points = self.warnpoints(user)
+    async def autopunish(self):
+        points = self.warnpoints(self.user)
         db.commit()
         if points == 0:
             return
         if points == 2:
-            duration=timedelta(days=7)
-            await self.suspend(user, duration.total_seconds(), ["all"])
+            duration = timedelta(days=7)
+            await self.suspend(self.user, duration.total_seconds(), ["all"])
             return
         if points == 3:
             await self.add_botbanned_user("Recieved 3 bot warnings")
             return
 
-    async def suspend(self, user: User, duration: int, modules: list[str]):
-        duration=round((datetime.now()+timedelta(seconds=duration)).timestamp())
+    async def suspend(self, duration: int, modules: list[str]):
+        duration = round((datetime.now() + timedelta(seconds=duration)).timestamp())
         data = db.execute(
             "INSERT OR IGNORE INTO suspensionData (user, modules, timeout) VALUES (?,?,?)",
             (
-                user.id,
+                self.user.id,
                 ",".join(modules),
                 duration,
             ),
@@ -102,7 +102,7 @@ class DevPunishment:
 
         if data.rowcount == 0:
             data = db.execute(
-                "SELECT timeout FROM suspensionDATA WHERE user = ?", (user.id,)
+                "SELECT timeout FROM suspensionDATA WHERE user = ?", (self.user.id,)
             ).fetchone()
             db.commit()
             current_timeout_duration = datetime.fromtimestamp(float(data[0]))
@@ -113,28 +113,32 @@ class DevPunishment:
                 "UPDATE suspensionDATA SET modules = ? AND timeout = timeout + ? WHERE user = ?",
                 ",".join(modules),
                 new_timeout,
-                user.id,
+                self.user.id,
             )
             db.commit()
 
         timeout = db.execute(
-            "SELECT timeout FROM suspensionDATA WHERE user = ?", (user.id,)
+            "SELECT timeout FROM suspensionDATA WHERE user = ?", (self.user.id,)
         ).fetchone()
         db.commit()
-        embed=Embed(title="User has been Dev Suspended", color=Color.yellow())
-        embed.add_field(name="User", value=user, inline=True)
-        embed.add_field(name="ID", value=user.id, inline=True)
-        embed.add_field(name="Suspended until", value=f"<t:{timeout[0]}:F>", inline=True)
+        embed = Embed(title="User has been Dev Suspended", color=Color.yellow())
+        embed.add_field(name="User", value=self.user, inline=True)
+        embed.add_field(name="ID", value=self.user.id, inline=True)
+        embed.add_field(
+            name="Suspended until", value=f"<t:{timeout[0]}:F>", inline=True
+        )
         embed.add_field(name="Modules", value=",".join(modules), inline=True)
-        embed.set_footer(text="This is not a botban. The user is suspended from using certain modules of Jeanne.")
-        embed.set_thumbnail(url=user.display_avatar)
+        embed.set_footer(
+            text="This is not a botban. The user is suspended from using certain modules of Jeanne."
+        )
+        embed.set_thumbnail(url=self.user.display_avatar)
         webhook = SyncWebhook.from_url(BB_WEBHOOK)
         webhook.send(embed=embed)
 
     async def warn(self, user: User, reason: str):
         warn_id = randint(1, 9999999)
-        points=self.warnpoints(user) 
-        if points== 1:
+        points = self.warnpoints(user)
+        if points == 1:
             revoke_date = round((datetime.now() + timedelta(days=180)).timestamp())
         else:
             revoke_date = round((datetime.now() + timedelta(days=90)).timestamp())
@@ -158,6 +162,17 @@ class DevPunishment:
         webhook = SyncWebhook.from_url(BB_WEBHOOK)
         webhook.send(embed=embed)
         await self.autopunish(user)
+
+    def check_suspended_user(self, module: str):
+        data = db.execute(
+            "SELECT * FROM suspensionDATA WHERE user = ?", (self.user.id,)
+        ).fetchone()
+        db.commit()
+        return (
+            True
+            if (self.user.id == int(data[0])) and (module in str(data[1]))
+            else False
+        )
 
 
 class Currency:
@@ -1650,5 +1665,11 @@ async def is_beta_app_command(ctx: Interaction):
             ),
             ephemeral=True,
         )
+        return
+    return True
+
+
+async def is_suspended(ctx: Interaction):
+    if DevPunishment(ctx.user).check_suspended_user(ctx.command):
         return
     return True
