@@ -10,7 +10,7 @@ from discord import (
     GuildSticker,
     HTTPException,
     Interaction,
-    Member,
+    User,
     NotFound,
     Role,
     StageChannel,
@@ -1297,7 +1297,7 @@ class manage(Cog):
     @Jeanne.checks.has_permissions(manage_roles=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
-    async def addrole(self, ctx: Interaction, member: Member, role: Role):
+    async def addrole(self, ctx: Interaction, member: User, role: Role):
         await ctx.response.defer()
         await member.add_roles(role)
         embed = Embed(color=Color.random())
@@ -1316,9 +1316,10 @@ class manage(Cog):
     @Jeanne.checks.has_permissions(manage_roles=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
-    async def removerole(self, ctx: Interaction, member: Member, role: Role):
+    async def removerole(self, ctx: Interaction, member: User, role: Role):
         await ctx.response.defer()
-        await member.remove_roles(role)
+        m=await ctx.guild.fetch_member(member.id)
+        await m.remove_roles(role)
         embed = Embed(color=Color.random())
         embed.add_field(
             name="Role removed",

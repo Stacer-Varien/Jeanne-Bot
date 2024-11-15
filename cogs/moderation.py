@@ -5,10 +5,10 @@ from discord import (
     Embed,
     HTTPException,
     Interaction,
-    Member,
+    User,
     Message,
     NotFound,
-    User,
+    Member,
     app_commands as Jeanne,
 )
 from discord.ext.commands import Cog, Bot
@@ -33,7 +33,7 @@ class moderation(Cog):
     async def commit_ban(
         self,
         ctx: Interaction,
-        member: Union[Member | User],
+        member: User,
         reason: str,
         time: Optional[str] = None,
         delete_message_history: Optional[bool] = None,
@@ -42,6 +42,7 @@ class moderation(Cog):
             dmh = 604800
         else:
             dmh = 86400
+
         await ctx.guild.ban(
             member,
             reason="{} | {}".format(reason, ctx.user),
@@ -103,7 +104,7 @@ class moderation(Cog):
     async def ban(
         self,
         ctx: Interaction,
-        member: Union[Member | User],
+        member: User,
         reason: Optional[Jeanne.Range[str, None, 470]] = "Unspecified",
         delete_message_history: Optional[bool] = None,
         time: Optional[str] = None,
@@ -521,20 +522,25 @@ class moderation(Cog):
     async def timeout(
         self,
         ctx: Interaction,
-        member: Member,
+        member: User,
         time: Optional[str] = None,
         reason: Optional[Jeanne.Range[str, None, 470]] = None,
     ) -> None:
         await ctx.response.defer()
-        if member == ctx.user:
+        m = await ctx.guild.fetch_member(member.id)
+        if m == ctx.user:
             failed = Embed(description="You can't time yourself out")
+            await ctx.followup.send(embed=failed)
+            return
+        if m not in ctx.guild.members:
+            failed = Embed(description="This person is not in this server")
             await ctx.followup.send(embed=failed)
             return
         reason = reason if reason else "Unspecified"
         if not time or (parse_timespan(time) > 2505600.0):
             time = "28d"
         timed = parse_timespan(time)
-        await member.edit(
+        await m.edit(
             timed_out_until=utcnow() + timedelta(seconds=timed),
             reason="{} | {}".format(reason, ctx.user),
         )
@@ -568,31 +574,33 @@ class moderation(Cog):
             await ctx.followup.send(embed=embed)
 
     @Jeanne.command(
-        description="Untimeouts a member",
+            name="timeout-remove",
+        description="Removes a timeout from a member",
         extras={"bot_perms": "Moderate Members", "member_perms": "Moderate Members"},
     )
-    @Jeanne.describe(member="Which member?", reason="Why are they untimeouted?")
+    @Jeanne.describe(member="Which member?", reason="Why is their timeout removed?")
     @Jeanne.checks.has_permissions(moderate_members=True)
     @Jeanne.checks.bot_has_permissions(moderate_members=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
-    async def untimeout(
+    async def timeoutremove(
         self,
         ctx: Interaction,
-        member: Member,
+        member: User,
         reason: Optional[Jeanne.Range[str, None, 470]] = None,
     ) -> None:
         await ctx.response.defer()
+        m=await ctx.guild.fetch_member(member.id)
         reason = reason if reason else "Unspecified"
-        if member == ctx.user:
+        if m == ctx.user:
             failed = Embed(description="You can't untime yourself out")
             await ctx.followup.send(embed=failed)
             return
-        await member.edit(
+        await m.edit(
             timed_out_until=None, reason="{} | {}".format(reason, ctx.user)
         )
-        unmute = Embed(title="Member Untimeout", color=0xFF0000)
-        unmute.add_field(name="Member", value=member, inline=True)
+        unmute = Embed(title="User Untimeout", color=0xFF0000)
+        unmute.add_field(name="User", value=member, inline=True)
         unmute.add_field(name="ID", value=member.id, inline=True)
         unmute.add_field(name="Moderator", value=ctx.user, inline=True)
         unmute.add_field(name="Reason", value=reason, inline=False)
