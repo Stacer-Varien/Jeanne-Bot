@@ -257,15 +257,16 @@ class Inventory:
         self.user = user
 
     @staticmethod
-    def upload_to_catbox(image_url: str) -> str:
-        url = "https://catbox.moe/user/api.php"
-        userhash = CATBOX_HASH
-        data = {"reqtype": "urlupload", "userhash": userhash, "url": image_url}
-        response = post(url, data=data)
-        if response.status_code == 200:
-            return response.text
+    async def upload_to_catbox(image_url: str) -> str:
+        async with aiohttp.ClientSession() as session:
+            url = "https://catbox.moe/user/api.php"
+            userhash = CATBOX_HASH
+            data = {"reqtype": "urlupload", "userhash": userhash, "url": image_url}
+            response = await session.post(url, data=data)
+        if response.status == 200:
+                return response.content
         else:
-            return None
+                return None
 
     async def add_country(self, country: str):
         db.execute(
