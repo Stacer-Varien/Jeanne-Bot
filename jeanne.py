@@ -4,7 +4,6 @@ from discord import Intents, AllowedMentions
 from os import listdir
 from config import TOKEN
 
-
 class Jeanne(AutoShardedBot):
     async def setup_hook(self):
         dirs = ["./events", "./cogs"]
@@ -18,7 +17,6 @@ class Jeanne(AutoShardedBot):
 
         await self.load_extension("jishaku")
         await self.tree.sync()
-
 
 intents = Intents.all()
 intents.presences = False
@@ -37,13 +35,9 @@ bot.remove_command("help")
 
 @bot.event
 async def on_ready():
-    for server in bot.guilds:
-        await server.chunk()
     print("Connected to bot: {}".format(bot.user.name))
     print("Bot ID: {}".format(bot.user.id))
     print("Connected to {} servers".format(len(bot.guilds)))
-    print("Listening to {} users".format(len(bot.users)))
     print("Listening to {} shards".format(bot.shard_count))
-
 
 bot.run(TOKEN)
