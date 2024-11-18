@@ -264,9 +264,9 @@ class Inventory:
             data = {"reqtype": "urlupload", "userhash": userhash, "url": image_url}
             response = await session.post(url, data=data)
         if response.status == 200:
-                return response.content
+            return response.content
         else:
-                return None
+            return None
 
     async def add_country(self, country: str):
         db.execute(
@@ -1100,6 +1100,7 @@ class Moderation:
         )
         db.commit()
 
+    @property
     def fetch_warnings_server(self) -> list | None:
         warnings = db.execute(
             "SELECT * FROM warnDATA WHERE guild_id = ?", (self.server.id,)
@@ -1579,6 +1580,37 @@ class AutoCompleteChoices:
             for option in default_options
             if current.lower() in option.lower()
         ]
+
+    async def warned_users(
+        self,
+        ctx: Interaction,
+        current: str,
+    ) -> List[Jeanne.Choice[Member]]:
+        user_ids = []
+        warnings = Moderation(ctx.guild).fetch_warnings_server
+        for warning in warnings:
+            user_ids.append(warning[0])
+
+        warned_users = [ctx.guild.get_member(int(user_id)) for user_id in user_ids]
+
+        unique_names = set()
+        choices = []
+
+        for user in warned_users:
+            if not user:
+                continue
+
+            name = user.global_name or user.name
+            user_id = str(user.id)
+
+            if name not in unique_names and current.lower() in name.lower():
+                unique_names.add(name)
+                choices.append(Jeanne.Choice(name=name, value=user_id))
+
+            if len(choices) >= 25:
+                break
+
+        return choices
 
 
 class Partner:

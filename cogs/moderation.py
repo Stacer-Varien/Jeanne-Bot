@@ -224,22 +224,27 @@ class moderation(Cog):
         await modlog.send(embed=warn)
 
     @Jeanne.command(
-        name="list-warns", description="View warnings in the server or a member"
+        name="list-warns",
+        description="View warnings in the server or a member",
     )
+    @Jeanne.describe(
+        member="Whose warnings do you want to see?",
+    )
+    @Jeanne.autocomplete(member=AutoCompleteChoices.warned_users)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
-    async def listwarns(self, ctx: Interaction, member: Optional[Member]):
+    async def listwarns(self, ctx: Interaction, member: Optional[str]):
         await ctx.response.defer()
+        if member!=None:
+            mem = ctx.guild.get_member(int(member))
         record = (
-            Moderation(ctx.guild).fetch_warnings_user(member)
+            Moderation(ctx.guild).fetch_warnings_user(mem)
             if member is not None
-            else Moderation(ctx.guild).fetch_warnings_server()
+            else Moderation(ctx.guild).fetch_warnings_server
         )
         if record == None:
             await ctx.followup.send(
-                f"{member or 'No one'} has no warn IDs"
-                if member
-                else "No warnings up to date"
+                f"No one has no warn IDs"
             )
             return
 
@@ -249,9 +254,10 @@ class moderation(Cog):
             disable_items_on_timeout=True,
             style="Page $/&",
         )
+        unique_names = set()
         for i in range(0, len(record), 5):
             embed_title = (
-                f"{member}'s warnings"
+                f"{mem}'s warnings"
                 if member is not None
                 else "Currently warned members"
             )
@@ -259,7 +265,7 @@ class moderation(Cog):
 
             embed = Embed(title=embed_title, colour=embed_color)
 
-            embed.set_thumbnail(url=member.display_avatar if member else ctx.guild.icon)
+            embed.set_thumbnail(url=mem.display_avatar if member else ctx.guild.icon)
             for j in record[i : i + 5]:
                 mod = await self.bot.fetch_user(j[2])
                 user = await self.bot.fetch_user(j[0])
@@ -269,15 +275,17 @@ class moderation(Cog):
                 date = f"<t:{j[5]}:F>"
 
                 if member == None:
-                    embed.add_field(
-                        name=f"{user} | {user.id}",
-                        value=f"**Warn ID:** {warn_id}\n**Reason:** {reason}\n**Date:** {date}\n**Points:** {points}",
-                        inline=False,
-                    )
+                    if user not in unique_names:
+                        unique_names.add(user)
+                        embed.add_field(
+                            name=f"{user} | {user.id}",
+                            value=f"- **Points:** {points}",
+                            inline=False,
+                        )
                 else:
                     embed.add_field(
                         name=f"**Warn ID:** {warn_id}",
-                        value=f"**Moderator:** {mod}\n**Reason:** {reason}\n**Date:** {date}",
+                        value=f"- **Moderator:** {mod}\n- **Reason:** {reason}\n- **Date:** {date}",
                         inline=False,
                     )
                     embed.set_footer(text=f"Total warn points: {points}")
@@ -292,6 +300,12 @@ class moderation(Cog):
         menu.add_button(ViewButton.next())
         menu.add_button(ViewButton.go_to_last_page())
         await menu.start()
+
+    @listwarns.error
+    async def listwarns_error(self, ctx:Interaction, error:Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(error.original, (ValueError, AttributeError)):
+            embed = Embed(description="This member has no warnings or this member does not exist in this server", color=Color.red())
+            await ctx.followup.send(embed=embed)
 
     @Jeanne.command(
         name="clear-warn",
