@@ -1612,6 +1612,27 @@ class AutoCompleteChoices:
 
         return choices
 
+    async def banned_users(
+        self,
+        ctx: Interaction,
+        current: str,
+    ) -> List[Jeanne.Choice[Member]]:
+        entries=[entry async for entry in ctx.guild.bans()]
+
+        banned_users = [entry.user for entry in entries]
+
+        choices = []
+
+        for user in banned_users:
+                name=user.name or user.global_name
+                user_id=str(user.id)
+                choices.append(Jeanne.Choice(name=f"{name} - {user_id}", value=user_id))
+
+                if len(choices) >= 25:
+                    break
+
+        return choices
+
 
 class Partner:
     def __init__(self) -> None:

@@ -487,9 +487,10 @@ class moderation(Cog):
         extras={"bot_perms": "Ban Members", "member_perms": "Ban Members"},
     )
     @Jeanne.describe(
-        user_id="What is the user ID you want to unban?",
+        user_id="Which user do you want to unban?",
         reason="Why are they being unbanned?",
     )
+    @Jeanne.autocomplete(user_id=AutoCompleteChoices.banned_users)
     @Jeanne.checks.has_permissions(ban_members=True)
     @Jeanne.checks.bot_has_permissions(ban_members=True)
     async def unban(
@@ -519,6 +520,14 @@ class moderation(Cog):
         )
         await ctx.followup.send(embed=unbanned)
         await modlog.send(embed=unban)
+    
+    @unban.error
+    async def unban_error(self, ctx:Interaction, error:Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(error.original, NotFound):
+            embed=Embed()
+            embed.color=Color.red()
+            embed.description=str(error.original)
+            await ctx.followup.send(embed=embed)
 
     @Jeanne.command(
         description="Timeout a member",
@@ -536,33 +545,32 @@ class moderation(Cog):
     async def timeout(
         self,
         ctx: Interaction,
-        member: User,
+        member: Member,
         time: Optional[str] = None,
         reason: Optional[Jeanne.Range[str, None, 470]] = None,
     ) -> None:
         await ctx.response.defer()
-        m = await ctx.guild.fetch_member(member.id)
-        if m == ctx.user:
+        if member == ctx.user:
             failed = Embed(description="You can't time yourself out")
             await ctx.followup.send(embed=failed)
             return
-        if m not in ctx.guild.members:
+        if member not in ctx.guild.members:
             failed = Embed(description="This person is not in this server")
             await ctx.followup.send(embed=failed)
             return
         reason = reason if reason else "Unspecified"
-        if not time or (parse_timespan(time) > 2505600.0):
-            time = "28d"
-        timed = parse_timespan(time)
-        await m.edit(
-            timed_out_until=utcnow() + timedelta(seconds=timed),
+        if not time or (parse_timespan(time) > 2419199.0):
+            time = 2419199
+        timed = parse_timespan(str(time))
+        await member.edit(
+            timed_out_until=(datetime.now().astimezone() + timedelta(seconds=timed)),
             reason="{} | {}".format(reason, ctx.user),
         )
         mute = Embed(title="Member Timeout", color=0xFF0000)
         mute.add_field(name="Member", value=member, inline=True)
         mute.add_field(name="ID", value=member.id, inline=True)
         mute.add_field(name="Moderator", value=ctx.user, inline=True)
-        mute.add_field(name="Duration", value=time, inline=True)
+        mute.add_field(name="Duration", value=format_timespan(time), inline=True)
         mute.add_field(name="Reason", value=reason, inline=False)
         mute.set_thumbnail(url=member.display_avatar)
         modlog = Moderation(ctx.guild).get_modlog_channel
@@ -600,17 +608,16 @@ class moderation(Cog):
     async def timeoutremove(
         self,
         ctx: Interaction,
-        member: User,
+        member: Member,
         reason: Optional[Jeanne.Range[str, None, 470]] = None,
     ) -> None:
         await ctx.response.defer()
-        m=await ctx.guild.fetch_member(member.id)
         reason = reason if reason else "Unspecified"
-        if m == ctx.user:
+        if member == ctx.user:
             failed = Embed(description="You can't untime yourself out")
             await ctx.followup.send(embed=failed)
             return
-        await m.edit(
+        await member.edit(
             timed_out_until=None, reason="{} | {}".format(reason, ctx.user)
         )
         unmute = Embed(title="User Untimeout", color=0xFF0000)
