@@ -11,7 +11,7 @@ def get_saber_pic() -> tuple[File, Embed]:
     files = listdir(folder_path)
 
     image_files = [
-        file for file in files if file.endswith((".jpg", ".jpeg", ".png", "gif"))
+        file for file in files if file.endswith((".jpg", ".jpeg", ".png", ".gif"))
     ]
     random_image = choice(image_files)
     file = File(path.join(folder_path, random_image), random_image)
@@ -27,7 +27,7 @@ def get_jeanne_pic() -> tuple[Embed, File]:
     files = listdir(folder_path)
 
     image_files = [
-        file for file in files if file.endswith((".jpg", ".jpeg", ".png", "gif"))
+        file for file in files if file.endswith((".jpg", ".jpeg", ".png", ".gif"))
     ]
 
     random_image = choice(image_files)
@@ -44,7 +44,7 @@ def get_wallpaper_pic() -> tuple[Embed, File]:
     files = listdir(folder_path)
 
     image_files = [
-        file for file in files if file.endswith((".jpg", ".jpeg", ".png", "gif"))
+        file for file in files if file.endswith((".jpg", ".jpeg", ".png", ".gif"))
     ]
     random_image = choice(image_files)
     file = File(path.join(folder_path, random_image), random_image)
@@ -60,7 +60,7 @@ def get_medusa_pic() -> tuple[Embed, File]:
     files = listdir(folder_path)
 
     image_files = [
-        file for file in files if file.endswith((".jpg", ".jpeg", ".png", "gif"))
+        file for file in files if file.endswith((".jpg", ".jpeg", ".png", ".gif"))
     ]
     random_image = choice(image_files)
     embed = Embed(color=Color.random())
@@ -75,7 +75,7 @@ def get_animeme_pic() -> tuple[Embed, File]:
     files = listdir(folder_path)
 
     image_files = [
-        file for file in files if file.endswith((".jpg", ".jpeg", ".png", "gif"))
+        file for file in files if file.endswith((".jpg", ".jpeg", ".png", "..gif"))
     ]
     random_image = choice(image_files)
     embed = Embed(color=Color.random())
@@ -90,7 +90,7 @@ def get_neko_pic() -> tuple[Embed, File]:
     files = listdir(folder_path)
 
     image_files = [
-        file for file in files if file.endswith((".jpg", ".jpeg", ".png", "gif"))
+        file for file in files if file.endswith((".jpg", ".jpeg", ".png", ".gif"))
     ]
 
     random_image = choice(image_files)
@@ -107,7 +107,7 @@ def get_morgan_pic() -> tuple[Embed, File]:
     files = listdir(folder_path)
 
     image_files = [
-        file for file in files if file.endswith((".jpg", ".jpeg", ".png", "gif"))
+        file for file in files if file.endswith((".jpg", ".jpeg", ".png", ".gif"))
     ]
 
     random_image = choice(image_files)
@@ -126,7 +126,7 @@ def get_kistune_pic() -> tuple[Embed, File]:
     files = listdir(folder_path)
 
     image_files = [
-        file for file in files if file.endswith((".jpg", ".jpeg", ".png", "gif"))
+        file for file in files if file.endswith((".jpg", ".jpeg", ".png", ".gif"))
     ]
 
     random_image = choice(image_files)
