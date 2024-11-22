@@ -164,7 +164,7 @@ class Background_Group(GroupCog, name="background"):
         await ctx.edit_original_response(embed=preview, attachments=[file], view=view)
         await view.wait()
         if view.value:
-            url=Inventory(ctx.user).upload_to_catbox(link)
+            url=await Inventory(ctx.user).upload_to_catbox(link)
             await Inventory(ctx.user).add_user_custom_wallpaper(name, url)
             embed1 = Embed(
                 description="Background wallpaper bought and selected",
