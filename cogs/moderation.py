@@ -520,7 +520,7 @@ class moderation(Cog):
         )
         await ctx.followup.send(embed=unbanned)
         await modlog.send(embed=unban)
-    
+
     @unban.error
     async def unban_error(self, ctx:Interaction, error:Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(error.original, NotFound):
@@ -559,8 +559,8 @@ class moderation(Cog):
             await ctx.followup.send(embed=failed)
             return
         reason = reason if reason else "Unspecified"
-        if not time or (parse_timespan(time) > 2419199.0):
-            time = 2419199
+        if not time or (parse_timespan(time) > 2332800.0):
+            time = 2332800.0
         timed = parse_timespan(str(time))
         await member.edit(
             timed_out_until=(datetime.now().astimezone() + timedelta(seconds=timed)),
@@ -570,7 +570,7 @@ class moderation(Cog):
         mute.add_field(name="Member", value=member, inline=True)
         mute.add_field(name="ID", value=member.id, inline=True)
         mute.add_field(name="Moderator", value=ctx.user, inline=True)
-        mute.add_field(name="Duration", value=format_timespan(time), inline=True)
+        mute.add_field(name="Duration", value=format_timespan(timed), inline=True)
         mute.add_field(name="Reason", value=reason, inline=False)
         mute.set_thumbnail(url=member.display_avatar)
         modlog = Moderation(ctx.guild).get_modlog_channel
@@ -614,7 +614,11 @@ class moderation(Cog):
         await ctx.response.defer()
         reason = reason if reason else "Unspecified"
         if member == ctx.user:
-            failed = Embed(description="You can't untime yourself out")
+            failed = Embed(description="You can't untime yourself out", color=Color.red())
+            await ctx.followup.send(embed=failed)
+            return
+        if member.is_timed_out()==False:
+            failed = Embed(description="This member is not on timeout", color=Color.red())
             await ctx.followup.send(embed=failed)
             return
         await member.edit(
