@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from enum import Enum
-from random import randint, shuffle
+from random import choice, randint, shuffle
 import random
 import aiohttp
 from humanfriendly import format_timespan, parse_timespan
@@ -1266,86 +1266,70 @@ class NsfwApis(Enum):
 
 
 class Hentai:
-    def __init__(self):
-        self.blacklisted_tags = ["loli", "shota", "cub", "gore", "vore", "bestiality"]
+    def __init__(self, plus: Optional[bool] = None):
+        self.plus = plus
+        self.blacklisted_tags = [
+            "loli",
+            "shota",
+            "cub",
+            "gore",
+            "vore",
+        ]
 
-    def shorten_url(self, url: str) -> str | None:
-        api_url = "http://tinyurl.com/api-create.php"
-        params = {"url": url}
-        response = get(api_url, params=params)
-        if response.status_code == 200:
-            short_url = response.text
-            return short_url
-        else:
-            return None
-
-    def format_tags(self, tags: Optional[str] = None) -> str:
+    def format_tags(self, tags: str = None) -> str:
         if tags:
-            tags_list = [
+            tags = [
                 tag.strip().replace(" ", "_")
                 for tag in tags.split(",")
                 if tag.strip().replace(" ", "_")
             ]
-            return "+".join(tags_list)
-        return ""
+            tags_string = "+".join(tags)
+            return tags_string
+        else:
+            return ""
 
-    async def get_nsfw_image(
-        self, provider: NsfwApis, tags: Optional[str] = None
-    ) -> Optional[List[Dict]]:
-        blacklisted_urls = self.get_blacklisted_links()
-
-        tags = tags.lower() if tags else ""
-        formatted_tags = self.format_tags(tags)
-
-        url = provider.value + formatted_tags
-
+    async def get_nsfw_image(self, provider: NsfwApis, tags: str = None) -> list | None:
+        bl = self.get_blacklisted_links()
+        tags = tags.lower() if tags else None
+        url = provider.value + self.format_tags(tags)
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 nsfw_images: dict = await resp.json()
-
         if not nsfw_images:
             return None
-
-        if provider == NsfwApis.GelbooruApi:
-            nsfw_images_list = nsfw_images.get("post", [])
+        if provider.value == provider.GelbooruApi.value:
+            nsfw_images_list = list(nsfw_images.get("post", []))
         else:
-            nsfw_images_list = nsfw_images
-
+            nsfw_images_list = list(nsfw_images)
         shuffle(nsfw_images_list)
-
+        if (not tags) or (tags == None):
+            tags = ""
         tags_list = [
             tag.strip().replace(" ", "_")
             for tag in tags.split(",")
             if tag.strip().replace(" ", "_") not in self.blacklisted_tags
         ]
-
-        if not tags_list or len(tags_list) > 3:
+        if len(tags_list) == 0 or len(tags_list) > 3:
             return None
-
         filtered_images = []
         for image in nsfw_images_list:
-            if provider == NsfwApis.DanbooruApi:
-                image_tags = str(image["tag_string"]).lower().split(" ")
+            if provider.value == provider.DanbooruApi.value:
+                img_tags = str(image["tag_string"]).lower().split(" ")
             else:
-                image_tags = str(image["tags"]).lower().split(" ")
-
+                img_tags = str(image["tags"]).lower().split(" ")
             try:
-                image_url = str(image["file_url"])
-            except KeyError:
+                urls = str(image["file_url"])
+            except:
                 continue
-
-            if any(tag in self.blacklisted_tags for tag in image_tags):
+            if any(tag in self.blacklisted_tags for tag in img_tags):
                 continue
-            if image_url in blacklisted_urls:
+            if any(url in bl for url in urls):
                 continue
-
             filtered_images.append(image)
-
-        return filtered_images if filtered_images else None
+        return filtered_images
 
     async def add_blacklisted_link(self, link: str):
         db.execute("INSERT OR IGNORE INTO hentaiBlacklist (links) VALUES (?)", (link,))
-        db.execute("DELETE FROM cachedHentai WHERE url = ?", (link,))
         db.commit()
 
     def get_blacklisted_links(self) -> list[str] | None:
@@ -1353,114 +1337,54 @@ class Hentai:
         db.commit()
         return [str(link[0]) for link in data] if data else None
 
-    async def cache_hentai(self, source: str, url: str, shorturl: str, tags: str):
-        db.execute(
-            "INSERT OR IGNORE INTO cachedHentai (source, url, shorturl, tags) VALUES (?,?,?,?)",
-            (
-                source,
-                url,
-                shorturl,
-                tags,
-            ),
-        )
-        db.commit()
-
-    def get_cached_hentai(self, source: str, tags: Optional[str] = None):
-        images_with_tags = []
-        images = []
-
-        data = db.execute(
-            "SELECT * FROM cachedHentai WHERE source = ?", (source,)
-        ).fetchall()
-
-        if len(data) == 0:
-            return None
-
-        for i in data:
-            entry_tags = set(str(i[3]).lower().split("+"))
-
-            if tags:
-                search_tag = tags.lower()
-
-                if search_tag in entry_tags:
-                    images_with_tags.append([str(i[1]), str(i[2])])
-            else:
-                images.append([str(i[1]), str(i[2])])
-
-        return images_with_tags if images_with_tags else images
-
     async def gelbooru(self, tag: Optional[str] = None):
-        images = self.get_cached_hentai("gelbooru", tag)
-        if not images or len(images) <= 250:
-            api_images = await self.get_nsfw_image(NsfwApis.GelbooruApi, tag)
-            for i in api_images:
-                await self.cache_hentai(
-                    "gelbooru",
-                    i["file_url"],
-                    self.shorten_url(i["file_url"]),
-                    str(i["tags"]).replace(" ", "+"),
-                )
-            images = self.get_cached_hentai("gelbooru", self.format_tags(tag))
-        return images
+
+        if not tag or tag is None:
+            tag = None
+        images = await self.get_nsfw_image(NsfwApis.GelbooruApi, tag)
+        if self.plus:
+            return images
+        return choice(images)["file_url"]
 
     async def yandere(self, tag: Optional[str] = None):
-        images = self.get_cached_hentai("yandere", tag)
-        if not images or len(images) <= 250:
-            api_images = await self.get_nsfw_image(NsfwApis.YandereApi, tag)
-            for i in api_images:
-                await self.cache_hentai(
-                    "yandere",
-                    i["jpeg_url"],
-                    self.shorten_url(i["jpeg_url"]),
-                    str(i["tags"]).replace(" ", "+"),
-                )
-            images = self.get_cached_hentai("yandere", self.format_tags(tag))
-        return images
+        images = await self.get_nsfw_image(NsfwApis.YandereApi, tag)
+        if self.plus:
+            return images
+        return choice(images)["sample_url"]
 
     async def konachan(self, tag: Optional[str] = None):
-        images = self.get_cached_hentai("konachan", tag)
-        if not images or len(images) <= 250:
-            api_images = await self.get_nsfw_image(NsfwApis.KonachanApi, tag)
-            for i in api_images:
-                await self.cache_hentai(
-                    "konachan",
-                    i["file_url"],
-                    self.shorten_url(i["file_url"]),
-                    str(i["tags"]).replace(" ", "+"),
-                )
-            images = self.get_cached_hentai("konachan", self.format_tags(tag))
-        return images
+
+        images = await self.get_nsfw_image(NsfwApis.KonachanApi, tag)
+        if self.plus:
+            return images
+        return choice(images)["file_url"]
 
     async def danbooru(self, tag: Optional[str] = None):
-        if tag:
-            tag = ",".join(tag.split(",")[:2])
-        images = self.get_cached_hentai("danbooru", tag)
-        if not images or len(images) <= 250:
-            api_images = await self.get_nsfw_image(NsfwApis.DanbooruApi, tag)
-            for i in api_images:
-                await self.cache_hentai(
-                    "danbooru",
-                    i["file_url"],
-                    self.shorten_url(i["file_url"]),
-                    str(i["tag_string"]).replace(" ", "+"),
-                )
-            images = self.get_cached_hentai("danbooru", self.format_tags(tag))
-        return images
 
-    async def hentai(self):
-        hentai_sources = ["gelbooru", "yandere", "konachan", "danbooru"]
-        chosen_source = random.choice(hentai_sources)
-
-        if chosen_source == "gelbooru":
-            image = await self.gelbooru()
-        elif chosen_source == "yandere":
-            image = await self.yandere()
-        elif chosen_source == "konachan":
-            image = await self.konachan()
+        if not tag or tag is None:
+            tag = None
         else:
-            image = await self.danbooru()
+            tag = ",".join(tag.split(",")[:2])
+        images = await self.get_nsfw_image(NsfwApis.DanbooruApi, tag)
+        if self.plus:
+            return images
+        return choice(images)["file_url"]
 
-        return str(image[0]), str(image[1]), chosen_source.capitalize()
+    async def hentai(self, rating: Optional[str] = None):
+        gelbooru_image = await self.gelbooru()
+        yandere_image = await self.yandere()
+        konachan_image = await self.konachan()
+        danbooru_image = await self.danbooru()
+        h = [gelbooru_image, yandere_image, konachan_image, danbooru_image]
+        hentai: str = choice(h)
+        if hentai == gelbooru_image:
+            return hentai, "Gelbooru"
+        if hentai == yandere_image:
+            return hentai, "Yande.re"
+        if hentai == konachan_image:
+            return hentai, "Konachan"
+        if hentai == danbooru_image:
+            return hentai, "Danbooru"
 
 
 class Reminder:
@@ -1727,3 +1651,14 @@ async def is_suspended(ctx: Interaction):
     if DevPunishment(ctx.user).check_suspended_user(ctx.command):
         return
     return True
+
+
+def shorten_url(url: str) -> str | None:
+    api_url = "http://tinyurl.com/api-create.php"
+    params = {"url": url}
+    response = get(api_url, params=params)
+    if response.status_code == 200:
+        short_url = response.text
+        return short_url
+    else:
+        return None
