@@ -304,7 +304,6 @@ class slashutilities(Cog):
             "newspaper": "📰",
             "min_tempe": "🌡️",
             "max_tempe": "🔥",
-            "feels_like": "🤚",
             "humidity": "💧",
             "clouds": "☁️",
             "visibility": "👁️",
@@ -325,13 +324,11 @@ class slashutilities(Cog):
         if units == "Imperial":
             min_temp = f"{forecast['mintemp_f']}°F"
             max_temp = f"{forecast['maxtemp_f']}°F"
-            feels_like = f"{current['feelslike_f']}°F"
             gust = f"{current['gust_mph']}mph"
             visibility = f"{current['vis_miles']}mi"
         else:
             min_temp = f"{forecast['mintemp_c']}°C"
             max_temp = f"{forecast['maxtemp_c']}°C"
-            feels_like = f"{current['feelslike_c']}°C"
             gust = f"{current['gust_kph']}km/h"
             visibility = f"{current['vis_km']}km"
         day1 = Embed(
@@ -349,11 +346,6 @@ class slashutilities(Cog):
         day1.add_field(
             name=f"{emoji_map['max_tempe']} Maximum Temperature",
             value=max_temp,
-            inline=True,
-        )
-        day1.add_field(
-            name=f"{emoji_map['feels_like']} Feels Like",
-            value=feels_like,
             inline=True,
         )
         day1.add_field(
