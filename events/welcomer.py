@@ -60,29 +60,30 @@ class WelcomerCog(Cog):
     @Cog.listener()
     async def on_raw_member_remove(self,payload:RawMemberRemoveEvent):
         member=payload.user
-        leaver = Welcomer(member.guild).get_leaver
+        server=await self.bot.fetch_guild(payload.guild_id)
+        leaver = Welcomer(server).get_leaver
         if leaver is None:
             return
-        server = Welcomer(member.guild).server
-        if member.guild.id == server.id:
-            leavingmsg = Welcomer(member.guild).get_leaving_msg
+        server = Welcomer(server).server
+        if payload.guild_id == server.id:
+            leavingmsg = Welcomer(server).get_leaving_msg
             if leavingmsg is None:
                 leave = Embed(
                     description=f"{member} left the server", color=Color.random()
                 ).set_thumbnail(url=member.display_avatar.url)
                 await leaver.send(embed=leave)
                 return
-            humans = len([member for member in member.guild.members if not member.bot])
+            humans = len([member for member in server.members if not member.bot])
             parameters = OrderedDict(
                 [
                     ("%member%", str(member)),
                     ("%pfp%", str(member.display_avatar)),
-                    ("%server%", str(member.guild.name)),
+                    ("%server%", str(server.name)),
                     ("%mention%", str(member.mention)),
                     ("%name%", str(member.global_name)),
-                    ("%members%", str(member.guild.member_count)),
+                    ("%members%", str(server.member_count)),
                     ("%humans%", str(humans)),
-                    ("%icon%", str(member.guild.icon)),
+                    ("%icon%", str(server.icon)),
                 ]
             )
             json_data: dict = loads(self.replace_all(leavingmsg, parameters))
