@@ -1,9 +1,8 @@
 from datetime import datetime, timedelta
 from enum import Enum
 from random import choice, randint, shuffle
-import random
 import aiohttp
-from humanfriendly import format_timespan, parse_timespan
+from humanfriendly import parse_timespan
 from discord import (
     Color,
     Embed,
@@ -18,9 +17,9 @@ from discord import (
 )
 
 from discord.ext.commands import Bot, Context
-from requests import get, post
+from requests import get
 from config import db, BB_WEBHOOK, CATBOX_HASH
-from typing import Dict, Literal, Optional, List
+from typing import Literal, Optional, List
 
 
 class DevPunishment:

@@ -11,7 +11,7 @@ class ShardEvents(Cog):
 
     @Cog.listener()
     async def on_shard_connect(self, shard_id:int):
-        while self.bot.is_ws_ratelimited():
+        if self.bot.is_ws_ratelimited():
             embed=Embed(color=Color.yellow())
             embed.title="A shard is being ratelimited"
             embed.add_field(name="Affected shard", value=shard_id, inline=True)
@@ -19,10 +19,6 @@ class ShardEvents(Cog):
             embed.set_thumbnail(url="https://files.catbox.moe/0sv1zq.png")
             self.webhook.send(embed=embed)
             await asyncio.sleep(60)
-        embed=Embed(color=Color.green())
-        embed.description=f"Shard {shard_id} connected successfully!"
-        embed.set_thumbnail(url="https://files.catbox.moe/lerkqk.png")
-        self.webhook.send(embed=embed)
 
     @Cog.listener()
     async def on_shard_resumed(self, shard_id:int):
@@ -47,11 +43,7 @@ class ShardEvents(Cog):
             embed.set_thumbnail(url="https://files.catbox.moe/pkiq8r.png")
             self.webhook.send(embed=embed)
 
-    @Cog.listener()
-    async def on_connect(self):
-        for server in self.bot.guilds:
-            await server.chunk()
-        print("Listening to {} users".format(len(self.bot.users)))
+
 
 async def setup(bot:Bot):
     await bot.add_cog(ShardEvents(bot))

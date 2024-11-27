@@ -1,5 +1,5 @@
 import aiohttp
-from functions import BetaTest, Botban, Currency, Levelling
+from functions import BetaTest, Currency, Levelling, DevPunishment
 from config import DB_AUTH, TOPGG, TOPGG_AUTH
 from topgg import DBLClient, WebhookManager
 from discord.ext import tasks
@@ -54,7 +54,7 @@ class DBL(Cog, name="DBL"):
         if data["type"] == "upvote":
             voter_id = int(data["user"])
             voter = await self.bot.fetch_user(voter_id)
-            if Botban(voter).check_botbanned_user:
+            if DevPunishment(voter).check_botbanned_user:
                 return
             credits = 100 if await self.topggpy.get_weekend_status() else 50
             xp = (

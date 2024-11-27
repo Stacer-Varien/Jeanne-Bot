@@ -4,6 +4,7 @@ from discord import Intents, AllowedMentions
 from os import listdir
 from config import TOKEN
 
+
 class Jeanne(AutoShardedBot):
     async def setup_hook(self):
         dirs = ["./events", "./cogs"]
@@ -18,6 +19,7 @@ class Jeanne(AutoShardedBot):
         await self.load_extension("jishaku")
         await self.tree.sync()
 
+
 intents = Intents.all()
 intents.presences = False
 intents.voice_states = False
@@ -29,7 +31,7 @@ bot = Jeanne(
     allowed_mentions=AllowedMentions.all(),
     case_insensitive=True,
     strip_after_prefix=True,
-    chunk_guilds_at_startup=False
+    chunk_guilds_at_startup=False,
 )
 bot.remove_command("help")
 
@@ -39,5 +41,17 @@ async def on_ready():
     print("Bot ID: {}".format(bot.user.id))
     print("Connected to {} servers".format(len(bot.guilds)))
     print("Listening to {} shards".format(bot.shard_count))
+    for guild in bot.guilds:
+        try:
+            print(f"Chunking guild: {guild.name} ({guild.id})...")
+            # Using asyncio.wait_for with a timeout for guild.chunk
+            await asyncio.wait_for(guild.chunk(), timeout=60.0)
+            print(f"Successfully chunked {guild.name}.")
+        except asyncio.TimeoutError:
+            print(f"Chunking timed out for {guild.name}.")
+        except Exception as e:
+            print(f"An error occurred while chunking {guild.name}: {e}")
+    print("Listening to {} users".format(len(bot.users)))
+
 
 bot.run(TOKEN)

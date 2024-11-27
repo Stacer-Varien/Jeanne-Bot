@@ -4,7 +4,7 @@ from json import loads
 from typing import Optional
 from discord import AllowedMentions, DMChannel, Embed, Message, TextChannel
 from discord.ext.commands import Bot, Cog
-from functions import BetaTest, Botban, Levelling
+from functions import BetaTest, DevPunishment, Levelling
 from topgg import DBLClient
 from config import TOPGG
 
@@ -22,7 +22,7 @@ class listenersCog(Cog):
 
     @Cog.listener()
     async def on_message(self, message: Message):
-        if Botban(message.author).check_botbanned_user:
+        if DevPunishment(message.author).check_botbanned_user:
             return
 
         try:
