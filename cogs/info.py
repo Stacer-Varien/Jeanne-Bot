@@ -180,7 +180,7 @@ class InfoCog(Cog, name="InfoSlash"):
             else None
         )
         serverinfo.add_field(
-            name="Verification Lever",
+            name="Verification Level",
             value=verification_level,
             inline=True,
         )
