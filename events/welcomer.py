@@ -55,7 +55,6 @@ class WelcomerCog(Cog):
                 )
                 return
             await welcomer.send(content=content)
-        await member.guild.chunk()
 
     @Cog.listener()
     async def on_raw_member_remove(self,payload:RawMemberRemoveEvent):
