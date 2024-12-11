@@ -82,7 +82,7 @@ class InfoCog(Cog, name="InfoSlash"):
         userinfo = Embed(title=f"{member.name}'s Info", color=member.color)
         userinfo.add_field(name="Name", value=member, inline=True)
         userinfo.add_field(name="Global Name", value=member.global_name, inline=True)
-        if member.nick!= member.global_name:
+        if member.nick != member.global_name:
             userinfo.add_field(name="Nickname", value=member.nick, inline=True)
         userinfo.add_field(name="ID", value=member.id, inline=True)
         userinfo.add_field(name="Is Bot?", value=bot_check, inline=True)
@@ -128,8 +128,7 @@ class InfoCog(Cog, name="InfoSlash"):
         )
         embed.add_field(
             name="Count",
-            value=f"• **Server Count:** {len(self.bot.guilds)} servers\n• **Shards:** {self.bot.shard_count}\n• **User Count:** {len(set(
-                self.bot.get_all_members()))}\n• **Cached Members:** {all_users}\n• **True Members:** {true_users}",
+            value=f"• **Server Count:** {len(self.bot.guilds)} servers\n• **Shards:** {self.bot.shard_count}\n• **User Count:** {len(set(self.bot.get_all_members()))}\n• **Cached Members:** {all_users}\n• **True Members:** {true_users}",
             inline=True,
         )
         current_time = time()

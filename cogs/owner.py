@@ -151,8 +151,7 @@ class OwnerCog(Cog, name="Owner"):
             value=f"<t:{int(user.created_at.timestamp())}:F>",
             inline=True,
         )
-        fuser.add_field(name="Mutuals", value=len(
-            user.mutual_guilds), inline=True)
+        fuser.add_field(name="Mutuals", value=len(user.mutual_guilds), inline=True)
         fuser.add_field(name="Bot?", value=botr, inline=True)
         fuser.set_image(url=user.display_avatar)
         if user.banner == None:
@@ -244,8 +243,7 @@ Make sure private messages between **me and you are opened** or check the host i
             else:
                 synced = await self.bot.tree.sync()
             await ctx.send(
-                f"Synced {len(synced)} commands {
-                    'globally' if spec is None else 'to the current guild.'}"
+                f"Synced {len(synced)} commands {'globally' if spec is None else 'to the current guild.'}"
             )
             return
         ret = 0
@@ -261,10 +259,10 @@ Make sure private messages between **me and you are opened** or check the host i
     @command(description="Warn users suspected of misusing Jeanne or the commands")
     @guild_only()
     @is_owner()
-    async def warn(self, ctx:Context, user:User, *, reason:str):
-        devpunish=DevPunishment()
+    async def warn(self, ctx: Context, user: User, *, reason: str):
+        devpunish = DevPunishment()
         await devpunish.warn(user, reason)
-        
+
 
 async def setup(bot: Bot):
     await bot.add_cog(OwnerCog(bot))
