@@ -1273,6 +1273,14 @@ class Hentai:
             "cub",
             "gore",
             "vore",
+            "flat_chest",
+            "loli_nude",
+            "milkshakework",
+            "oppai_loli",
+            "onee_loli",
+            "child",
+            "kodomo_doushi",
+            "child_on_child",
         ]
 
     def format_tags(self, tags: str = None) -> str:
