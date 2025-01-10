@@ -1,7 +1,7 @@
 from asyncio import sleep
 import asyncio
 from discord import Color, Embed
-from functions import Moderation, Reminder
+from functions import DevPunishment, Moderation, Reminder
 from discord.ext import tasks
 from discord.ext.commands import Cog, Bot
 from datetime import datetime
@@ -55,6 +55,14 @@ class tasksCog(Cog):
                 await Reminder(member).remove(id)
             else:
                 continue
+    
+    @tasks.loop(seconds=60, reconnect=True)
+    async def check_suspended_users(self):
+        data=DevPunishment().get_suspended_users()
+        if data ==None:
+            return
+        for i in data:
+            ... #needs more work
 
     @check_softbanned_members.before_loop
     async def before_softbans(self):
