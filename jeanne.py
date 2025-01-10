@@ -44,7 +44,6 @@ async def on_ready():
     for guild in bot.guilds:
         try:
             print(f"Chunking guild: {guild.name} ({guild.id})...")
-            # Using asyncio.wait_for with a timeout for guild.chunk
             await asyncio.wait_for(guild.chunk(), timeout=60.0)
             print(f"Successfully chunked {guild.name}.")
         except asyncio.TimeoutError:
