@@ -57,9 +57,9 @@ class WelcomerCog(Cog):
             await welcomer.send(content=content)
 
     @Cog.listener()
-    async def on_raw_member_remove(self,payload:RawMemberRemoveEvent):
-        member=payload.user
-        server=await self.bot.fetch_guild(payload.guild_id)
+    async def on_raw_member_remove(self, payload: RawMemberRemoveEvent):
+        member = payload.user
+        server = await self.bot.fetch_guild(payload.guild_id)
         leaver = Welcomer(server).get_leaver
         if leaver is None:
             return
@@ -98,8 +98,9 @@ class WelcomerCog(Cog):
                 await leaver.send(content=content)
 
     @Cog.listener()
-    async def on_guild_join(server:Guild):
+    async def on_guild_join(self, server: Guild):
         await server.chunk()
+
 
 async def setup(bot: Bot):
     await bot.add_cog(WelcomerCog(bot))
