@@ -164,7 +164,7 @@ class DevPunishment:
 
     def check_suspended_user(self, module: str):
         data = db.execute(
-            "SELECT * FROM suspensionDATA WHERE user = ?", (self.user.id,)
+            "SELECT * FROM suspensionData WHERE user = ?", (self.user.id,)
         ).fetchone()
         db.commit()
         return (
@@ -172,6 +172,13 @@ class DevPunishment:
             if (self.user.id == int(data[0])) and (module in str(data[1]))
             else False
         )
+    
+    def get_suspended_users(self):
+        data=db.execute("SELECT * FROM suspensionData").fetchall()
+        db.commit()
+
+        return data
+
 
 
 class Currency:
@@ -1281,6 +1288,7 @@ class Hentai:
             "child",
             "kodomo_doushi",
             "child_on_child",
+            "small_breasts",
         ]
 
     def format_tags(self, tags: str = None) -> str:
@@ -1377,7 +1385,7 @@ class Hentai:
             return images
         return choice(images)["file_url"]
 
-    async def hentai(self, rating: Optional[str] = None):
+    async def hentai(self):
         gelbooru_image = await self.gelbooru()
         yandere_image = await self.yandere()
         konachan_image = await self.konachan()
