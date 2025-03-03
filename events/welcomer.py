@@ -1,3 +1,4 @@
+import asyncio
 from discord import Color, Embed, Guild, Member, AllowedMentions, RawMemberRemoveEvent
 from discord.ext.commands import Cog, Bot
 from functions import Welcomer
@@ -99,7 +100,14 @@ class WelcomerCog(Cog):
 
     @Cog.listener()
     async def on_guild_join(self, server: Guild):
-        await server.chunk()
+        try:
+            print(f"Chunking guild: {server.name} ({server.id})...")
+            await asyncio.wait_for(server.chunk(), timeout=60.0)
+            print(f"Successfully chunked {server.name}.")
+        except asyncio.TimeoutError:
+            print(f"Chunking timed out for {server.name}.")
+        except Exception as e:
+            print(f"An error occurred while chunking {server.name}: {e}")
 
 
 async def setup(bot: Bot):

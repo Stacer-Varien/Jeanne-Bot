@@ -1289,6 +1289,7 @@ class Hentai:
             "kodomo_doushi",
             "child_on_child",
             "small_breasts",
+            "short_stack"
         ]
 
     def format_tags(self, tags: str = None) -> str:

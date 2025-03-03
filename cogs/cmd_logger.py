@@ -1,8 +1,8 @@
-import csv
 from typing import Union
 from discord import Interaction, app_commands as Jeanne
 from discord.ext.commands import Bot, Cog
 from datetime import datetime
+import pandas as pd
 
 
 class CommandLog(Cog, name="CommandLogSlash"):
@@ -21,9 +21,18 @@ class CommandLog(Cog, name="CommandLogSlash"):
             "Command Usage": str(ctx.data),
         }
 
-        with open("commandlog.csv", "a", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=fields)
-            writer.writerow(command_dict)
+        existing_file = "commands.xlsx"
+        new_data = {
+            "Date and Time": [str(datetime.now())],
+            "Username": [ctx.user],
+            "User ID": [str(ctx.user.id)],
+            "Command Used": [command.qualified_name],
+            "Command Usage": [str(ctx.data)],
+        }
+        df_new = pd.DataFrame(new_data)
+        df_existing = pd.read_excel(existing_file)
+        df_combined = df_existing._append(df_new, ignore_index=True)
+        df_combined.to_excel(existing_file, index=False)
 
 
 async def setup(bot: Bot):

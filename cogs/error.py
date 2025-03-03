@@ -1,11 +1,8 @@
-import csv
 from datetime import datetime
-from io import BytesIO
-from discord import Color, Embed, File, Interaction
+from discord import Color, Embed, Interaction
 from discord import app_commands as Jeanne
 from discord.ext.commands import Bot, Cog
-import traceback
-
+import pandas as pd
 
 class ErrorsCog(Cog, name="ErrorsSlash"):
     def __init__(self, bot: Bot):
@@ -24,6 +21,13 @@ class ErrorsCog(Cog, name="ErrorsSlash"):
     async def on_app_command_error(
         self, ctx: Interaction, error: Jeanne.AppCommandError
     ):
+        existing_file = "errors.xlsx"
+        new_data = {'Date': [f"{datetime.now()}"], 'Command': [f"{ctx.command.qualified_name}"], 'Error': [{f"{str(error)}"}]}
+        df_new = pd.DataFrame(new_data)
+        df_existing = pd.read_excel(existing_file)
+        df_combined = df_existing._append(df_new, ignore_index=True)
+        df_combined.to_excel(existing_file, index=False)
+        
         if isinstance(error, Jeanne.MissingPermissions):
             embed = Embed(description=str(error), color=Color.red())
             await ctx.response.send_message(embed=embed)
