@@ -1,8 +1,10 @@
 from datetime import datetime
+import traceback
 from discord import Color, Embed, Interaction
 from discord import app_commands as Jeanne
 from discord.ext.commands import Bot, Cog
 import pandas as pd
+
 
 class ErrorsCog(Cog, name="ErrorsSlash"):
     def __init__(self, bot: Bot):
@@ -22,12 +24,19 @@ class ErrorsCog(Cog, name="ErrorsSlash"):
         self, ctx: Interaction, error: Jeanne.AppCommandError
     ):
         existing_file = "errors.xlsx"
-        new_data = {'Date': [f"{datetime.now()}"], 'Command': [f"{ctx.command.qualified_name}"], 'Error': [{f"{str(error)}"}]}
+        error_traceback = "".join(
+            traceback.format_exception(type(error), error, error.__traceback__)
+        )
+        new_data = {
+            "Date": [f"{datetime.now()}"],
+            "Command": [f"{ctx.command.qualified_name}"],
+            "Error": [{f"{error_traceback}"}],
+        }
         df_new = pd.DataFrame(new_data)
         df_existing = pd.read_excel(existing_file)
         df_combined = df_existing._append(df_new, ignore_index=True)
         df_combined.to_excel(existing_file, index=False)
-        
+
         if isinstance(error, Jeanne.MissingPermissions):
             embed = Embed(description=str(error), color=Color.red())
             await ctx.response.send_message(embed=embed)
@@ -37,8 +46,10 @@ class ErrorsCog(Cog, name="ErrorsSlash"):
         elif isinstance(error, Jeanne.NoPrivateMessage):
             embed = Embed(description=str(error), color=Color.red())
             await ctx.response.send_message(embed=embed)
-        elif isinstance(error, Jeanne.CommandInvokeError) and isinstance(error.original, RuntimeError):
-            if ctx.command.qualified_name=="help command":
+        elif isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, RuntimeError
+        ):
+            if ctx.command.qualified_name == "help command":
                 return
             embed = Embed(description=str(error), color=Color.red())
             await ctx.response.send_message(embed=embed)
