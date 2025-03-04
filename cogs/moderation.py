@@ -38,7 +38,7 @@ class moderation(Cog):
         time: Optional[str] = None,
         delete_message_history: Optional[bool] = None,
     ):
-        if delete_message_history==True:
+        if delete_message_history == True:
             dmh = 604800
         else:
             dmh = 86400
@@ -53,7 +53,7 @@ class moderation(Cog):
         ban.add_field(name="ID", value=member.id, inline=True)
         ban.add_field(name="Moderator", value=ctx.user, inline=True)
         ban.add_field(name="Reason", value=reason, inline=False)
-        if time !=None:
+        if time != None:
             try:
                 a = round(parse_timespan(time))
                 await Moderation(ctx.guild).softban_member(member, a)
@@ -138,7 +138,9 @@ class moderation(Cog):
                     await ctx.edit_original_response(embed=cancelled, view=None)
                     return
                 if view.value == True:
-                    await self.commit_ban(ctx, member, reason, None, delete_message_history)
+                    await self.commit_ban(
+                        ctx, member, reason, None, delete_message_history
+                    )
                     return
 
                 if view.value == False:
@@ -235,7 +237,7 @@ class moderation(Cog):
     @Jeanne.check(check_disabled_app_command)
     async def listwarns(self, ctx: Interaction, member: Optional[str]):
         await ctx.response.defer()
-        if member!=None:
+        if member != None:
             mem = ctx.guild.get_member(int(member))
         record = (
             Moderation(ctx.guild).fetch_warnings_user(mem)
@@ -243,9 +245,7 @@ class moderation(Cog):
             else Moderation(ctx.guild).fetch_warnings_server
         )
         if record == None:
-            await ctx.followup.send(
-                f"No one has no warn IDs"
-            )
+            await ctx.followup.send(f"No one has no warn IDs")
             return
 
         menu = ViewMenu(
@@ -302,9 +302,14 @@ class moderation(Cog):
         await menu.start()
 
     @listwarns.error
-    async def listwarns_error(self, ctx:Interaction, error:Jeanne.AppCommandError):
-        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(error.original, (ValueError, AttributeError)):
-            embed = Embed(description="This member has no warnings or this member does not exist in this server", color=Color.red())
+    async def listwarns_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, (ValueError, AttributeError)
+        ):
+            embed = Embed(
+                description="This member has no warnings or this member does not exist in this server",
+                color=Color.red(),
+            )
             await ctx.followup.send(embed=embed)
 
     @Jeanne.command(
@@ -522,11 +527,13 @@ class moderation(Cog):
         await modlog.send(embed=unban)
 
     @unban.error
-    async def unban_error(self, ctx:Interaction, error:Jeanne.AppCommandError):
-        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(error.original, NotFound):
-            embed=Embed()
-            embed.color=Color.red()
-            embed.description=str(error.original)
+    async def unban_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            error.original, NotFound
+        ):
+            embed = Embed()
+            embed.color = Color.red()
+            embed.description = str(error.original)
             await ctx.followup.send(embed=embed)
 
     @Jeanne.command(
@@ -596,7 +603,7 @@ class moderation(Cog):
             await ctx.followup.send(embed=embed)
 
     @Jeanne.command(
-            name="timeout-remove",
+        name="timeout-remove",
         description="Removes a timeout from a member",
         extras={"bot_perms": "Moderate Members", "member_perms": "Moderate Members"},
     )
@@ -614,11 +621,15 @@ class moderation(Cog):
         await ctx.response.defer()
         reason = reason if reason else "Unspecified"
         if member == ctx.user:
-            failed = Embed(description="You can't untime yourself out", color=Color.red())
+            failed = Embed(
+                description="You can't untime yourself out", color=Color.red()
+            )
             await ctx.followup.send(embed=failed)
             return
-        if member.is_timed_out()==False:
-            failed = Embed(description="This member is not on timeout", color=Color.red())
+        if member.is_timed_out() == False:
+            failed = Embed(
+                description="This member is not on timeout", color=Color.red()
+            )
             await ctx.followup.send(embed=failed)
             return
         await member.edit(
@@ -657,7 +668,8 @@ class moderation(Cog):
     @Jeanne.check(check_disabled_app_command)
     async def massban(self, ctx: Interaction, user_ids: str, reason: str):
         await ctx.response.defer()
-        ids = user_ids.split()[:25]
+        ids_str = user_ids.split()[:100]
+        ids=list(map(int, ids_str))
         if len(ids) < 5:
             embed = Embed(
                 description=f"There are too few IDs. Please add more and try again after <t:{round((datetime.now() + timedelta(minutes=30)).timestamp())}:R>"
@@ -671,8 +683,8 @@ class moderation(Cog):
             user_id
             for user_id in ids
             if user_id not in banned_ids
-            and user_id != str(author_id)
-            and user_id != str(guild_owner_id)
+            and user_id != author_id
+            and user_id != guild_owner_id
         ]
         if not to_ban_ids:
             embed = Embed(description="No users can be banned.", color=Color.red())
@@ -680,42 +692,48 @@ class moderation(Cog):
             return
         view = Confirmation(ctx.user)
         alert = Embed(
-            title="BEWARE",
-            description="The developer is **NOT** responsible in any way or form if you mess up, even if it was misused.\n\nDo you want to proceed?",
+            title="Found users:",
+            description="\n".join([f"{self.bot.get_user(i).global_name}" for i in to_ban_ids]),
             color=Color.red(),
         )
+        alert.set_footer(text="BEWARE: The developer is **NOT** responsible in any way or form if you mess up, even if it was misused.\n\nDo you want to proceed?")
         await ctx.followup.send(embed=alert, view=view)
         await view.wait()
         if view.value == True:
+
             em = Embed(
                 description="Banning users now <a:loading:1161038734620373062>",
                 color=Color.red(),
             )
-            await ctx.edit_original_response(embed=em, view=None)
-            ban_count = 0
-            failed_ids = []
-            banned = []
-            for user_id in to_ban_ids:
+            to_ban: list[User] = []
+            for i in to_ban_ids:
                 try:
-                    user = await self.bot.fetch_user(int(user_id))
-                    await ctx.guild.ban(user, reason=reason)
-                    banned.append(f"{user} | `{user.id}`")
-                    await asyncio.sleep(0.5)
-                    ban_count += 1
-                except Exception:
-                    failed_ids.append(user_id)
+                    user = await self.bot.fetch_user(i)
+                    to_ban.append(user)
+                except:
                     continue
-            if ban_count > 0:
+            await ctx.edit_original_response(embed=em, view=None)
+            ban_results = await ctx.guild.bulk_ban(to_ban, reason=reason)
+
+            if len(ban_results)> 0:
                 embed = Embed(
                     title="List of banned users",
                     color=Color.red(),
                 )
-                embed.description = "\n".join(banned)
+                banned_users=[]
+                for i in ban_results.banned:
+                    u=await self.bot.fetch_user(i.id)
+                    banned_users.append(f"{u.global_name} | `{i.id}`")
+                embed.description = "\n".join(banned_users)
                 embed.add_field(name="Reason", value=reason, inline=False)
-                if failed_ids:
+                if ban_results.failed:
+                    failed_banned_users = []
+                    for i in ban_results.failed:
+                        u = await self.bot.fetch_user(i.id)
+                        failed_banned_users.append(f"{u.global_name} | `{i.id}`")
                     embed.add_field(
                         name="Failed to ban",
-                        value="\n".join(failed_ids),
+                        value="\n".join(failed_banned_users),
                         inline=False,
                     )
             else:
@@ -727,7 +745,7 @@ class moderation(Cog):
 
             await ctx.edit_original_response(
                 embed=Embed(
-                    description=f"Successfully banned {ban_count} user(s). Check {modlog.mention}",
+                    description=f"Successfully banned {len(ban_results.banned)} user(s). Check {modlog.mention}",
                     color=Color.red(),
                 )
             )
