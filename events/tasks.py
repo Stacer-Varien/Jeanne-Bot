@@ -5,7 +5,6 @@ from functions import DevPunishment, Moderation, Reminder
 from discord.ext import tasks
 from discord.ext.commands import Cog, Bot
 from datetime import datetime
-from functions import Hentai
 
 
 class tasksCog(Cog):
@@ -13,6 +12,7 @@ class tasksCog(Cog):
         self.bot = bot
         self.check_softbanned_members.start()
         self.check_reminders.start()
+        self.check_suspended_users.start()
 
     @tasks.loop(seconds=30, reconnect=True)
     async def check_softbanned_members(self):
@@ -62,7 +62,11 @@ class tasksCog(Cog):
         if data ==None:
             return
         for i in data:
-            ... #needs more work
+            if int(round(datetime.now().timestamp()))>int(i[2]):
+                member=await self.bot.fetch_user(i[0])
+                await DevPunishment(member).remove_suspended_user()
+            else:
+                continue
 
     @check_softbanned_members.before_loop
     async def before_softbans(self):

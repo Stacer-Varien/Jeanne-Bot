@@ -12,7 +12,6 @@ from discord import (
     app_commands as Jeanne,
 )
 from discord.ext.commands import Cog, Bot
-from discord.utils import utcnow
 from datetime import datetime, timedelta
 from humanfriendly import InvalidTimespan, format_timespan, parse_timespan
 from reactionmenu import ViewButton, ViewMenu
@@ -23,7 +22,7 @@ from functions import (
     check_disabled_app_command,
 )
 from assets.components import Confirmation
-from typing import Optional, Union
+from typing import Optional
 
 
 class moderation(Cog):
