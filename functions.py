@@ -87,7 +87,7 @@ class DevPunishment:
             await self.add_botbanned_user("Recieved 3 bot warnings")
             return
 
-    async def suspend(self, duration: int, modules: list[str]):
+    async def suspend(self, duration: int, modules: list[str], reason:str):
         duration = round((datetime.now() + timedelta(seconds=duration)).timestamp())
         data = db.execute(
             "INSERT OR IGNORE INTO suspensionData (user, modules, timeout) VALUES (?,?,?)",
@@ -126,7 +126,8 @@ class DevPunishment:
         embed.add_field(
             name="Suspended until", value=f"<t:{timeout[0]}:F>", inline=True
         )
-        embed.add_field(name="Modules", value=",".join(modules), inline=True)
+        embed.add_field(name="Modules", value="\n".join(modules).title(), inline=True)
+        embed.add_field(name="Reason", value=reason, inline=True)
         embed.set_footer(
             text="This is not a botban. The user is suspended from using certain modules of Jeanne."
         )
@@ -176,8 +177,11 @@ class DevPunishment:
     def get_suspended_users(self):
         data=db.execute("SELECT * FROM suspensionData").fetchall()
         db.commit()
-
         return data
+
+    async def remove_suspended_user(self):
+        db.execute("DELETE FROM suspensionData WHERE user = ?", (self.user.id,))
+        db.commit()
 
 
 
