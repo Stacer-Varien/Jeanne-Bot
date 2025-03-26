@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from discord.ext.commands import (
     Cog,
     Bot,
@@ -20,6 +21,9 @@ from discord import (
 )
 from os import execv
 from sys import executable, argv
+
+from humanfriendly import format_timespan, parse_timespan
+from assets.components import ModuleSelect
 from functions import BetaTest, DevPunishment, Hentai, Partner
 from typing import Literal, Optional
 
@@ -264,16 +268,19 @@ Make sure private messages between **me and you are opened** or check the host i
             return
         devpunish = DevPunishment()
         await devpunish.warn(user, reason)
-    
+
     @command(description="Suspend a user from a certain module/s")
     @guild_only()
     @is_owner()
-    async def suspend(self, ctx: Context, user: User, module: str, *, reason: str):
+    async def suspend(self, ctx: Context, user: User, duration:str, *, reason: str):
         if DevPunishment(ctx.author).check_botbanned_user:
             return
-        devpunish = DevPunishment()
-        modules=module.split()
-        await devpunish.suspend(user, modules, reason) #more work to be done
+        seconds=parse_timespan(duration)
+        timestamp = round((datetime.now() + timedelta(seconds=seconds)).timestamp())
+        view=ModuleSelect(user, reason, duration=timestamp)
+        await ctx.send(view=view)
+        
+
 
 
 async def setup(bot: Bot):

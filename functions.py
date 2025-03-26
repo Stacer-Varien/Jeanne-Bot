@@ -124,7 +124,7 @@ class DevPunishment:
         embed.add_field(name="User", value=self.user, inline=True)
         embed.add_field(name="ID", value=self.user.id, inline=True)
         embed.add_field(
-            name="Suspended until", value=f"<t:{timeout[0]}:F>", inline=True
+            name="Suspended until", value=f"<t:{timeout[0]}:f>", inline=True
         )
         embed.add_field(name="Modules", value="\n".join(modules).title(), inline=True)
         embed.add_field(name="Reason", value=reason, inline=True)
@@ -163,17 +163,22 @@ class DevPunishment:
         webhook.send(embed=embed)
         await self.autopunish(user)
 
-    def check_suspended_user(self, module: str):
+    def check_suspended_module(self, bot:Bot, command:Jeanne.Command):
         data = db.execute(
             "SELECT * FROM suspensionData WHERE user = ?", (self.user.id,)
         ).fetchone()
         db.commit()
-        return (
-            True
-            if (self.user.id == int(data[0])) and (module in str(data[1]))
-            else False
-        )
-    
+        suspended_modules: list[str] = data[1].split(",") if data else []
+        cog = next(
+            (
+                cmd
+                for cmd in bot.tree.walk_commands()
+                if not isinstance(cmd, Jeanne.Group) and cmd == command
+            ),
+            None)
+        if cog and any(cog.qualified_name in suspended_modules):
+            return data is not None and self.user.id == data[0]
+
     def get_suspended_users(self):
         data=db.execute("SELECT * FROM suspensionData").fetchall()
         db.commit()
@@ -182,7 +187,6 @@ class DevPunishment:
     async def remove_suspended_user(self):
         db.execute("DELETE FROM suspensionData WHERE user = ?", (self.user.id,))
         db.commit()
-
 
 
 class Currency:
@@ -1668,7 +1672,7 @@ async def is_beta_app_command(ctx: Interaction):
 
 
 async def is_suspended(ctx: Interaction):
-    if DevPunishment(ctx.user).check_suspended_user(ctx.command):
+    if DevPunishment(ctx.user).check_suspended_module(ctx.client, ctx.command):
         return
     return True
 

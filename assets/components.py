@@ -22,7 +22,7 @@ from collections import OrderedDict
 from json import loads
 from discord.ext.commands import Context, Bot
 from assets.generators.profile_card import Profile
-from config import WEBHOOK, BADGES
+from config import BB_WEBHOOK, WEBHOOK, BADGES
 from functions import DevPunishment, Inventory, Levelling, Manage, Moderation, Welcomer
 
 
@@ -30,7 +30,6 @@ def replace_all(text: str, dic: dict):
     for i, j in dic.items():
         text = text.replace(i, j)
     return text
-
 
 class Confirmation(ui.View):
     def __init__(self, author: User):
@@ -333,6 +332,39 @@ class RankUpmsg(ui.Modal, title="Role Reward Message"):
         else:
             embed = Embed(description="Timeout")
             await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+
+
+class ModuleMenu(ui.Select):
+    def __init__(self, user: User, reason: str, duration:int) -> None:
+        self.modules = [
+            "cogs.utilities",
+            "cogs.fun",
+            "cogs.image",
+            "cogs.help",
+            "cogs.hentai",
+            "cogs.levelling",
+            "cogs.currency",
+            "cogs.reactions",
+            "cogs.manage",
+            "cogs.inventory",
+            "cogs.moderation",
+            "cogs.info",
+        ]
+        options = [SelectOption(label=module, value=module) for module in self.modules]
+        super().__init__(placeholder="Select a module", max_values=12, min_values=1, options=options)
+        self.reason = reason
+        self.user = user
+        self.duration= duration
+
+    async def callback(self, ctx: Interaction):
+        selected_modules = [i for i in self.values]
+        await DevPunishment(self.user).suspend(duration=self.duration, reason=self.reason, modules=selected_modules)
+        await ctx.message.edit(content="User has been suspended from the following modules: {}".format(", ".join(selected_modules)), view=None, embed=None, delete_after=5)
+
+class ModuleSelect(ui.View):
+    def __init__(self, user: User, reason: str, duration:int, timeout: int = 60):
+        super().__init__(timeout=timeout)
+        self.add_item(ModuleMenu(user, reason, duration))
 
 
 class BotReportMenu(ui.Select):
