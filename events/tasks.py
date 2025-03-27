@@ -14,7 +14,7 @@ class tasksCog(Cog):
         self.check_reminders.start()
         self.check_suspended_users.start()
 
-    @tasks.loop(seconds=30, reconnect=True)
+    @tasks.loop(seconds=60, reconnect=True)
     async def check_softbanned_members(self):
         for bans in Moderation().get_softban_data():
             if int(round(datetime.now().timestamp())) > int(bans[2]):
@@ -55,16 +55,18 @@ class tasksCog(Cog):
                 await Reminder(member).remove(id)
             else:
                 continue
-    
+
     @tasks.loop(seconds=60, reconnect=True)
     async def check_suspended_users(self):
         data=DevPunishment().get_suspended_users()
         if data ==None:
             return
         for i in data:
-            if int(round(datetime.now().timestamp()))>int(i[2]):
-                member=await self.bot.fetch_user(i[0])
-                await DevPunishment(member).remove_suspended_user()
+            current_time = int(round(datetime.now().timestamp()))
+            suspended_time = int(i[2])
+            user=await self.bot.fetch_user(int(i[0]))
+            if current_time > suspended_time:
+                await DevPunishment(user).remove_suspended_user()
             else:
                 continue
 
@@ -75,6 +77,11 @@ class tasksCog(Cog):
     @check_reminders.before_loop
     async def before_reminders(self):
         await self.bot.wait_until_ready()
+
+    @check_suspended_users.before_loop
+    async def before_check_suspended_users(self):
+        await self.bot.wait_until_ready()
+
 
 async def setup(bot: Bot):
     await bot.add_cog(tasksCog(bot))

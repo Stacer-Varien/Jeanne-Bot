@@ -4,7 +4,7 @@ from functions import (
     check_botbanned_app_command,
     check_disabled_app_command,
     get_cached_users,
-    get_true_members,
+    get_true_members, is_suspended,
 )
 from time import time
 from datetime import timedelta
@@ -211,6 +211,7 @@ class InfoCog(Cog, name="InfoSlash"):
         await ctx.followup.send(embeds=e)
 
     @Jeanne.command(description="Check how fast I respond to a command")
+    @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def ping(self, ctx: Interaction):
