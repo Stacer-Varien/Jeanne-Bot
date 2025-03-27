@@ -88,7 +88,6 @@ class DevPunishment:
             return
 
     async def suspend(self, duration: int, modules: list[str], reason:str):
-        duration = round((datetime.now() + timedelta(seconds=duration)).timestamp())
         data = db.execute(
             "INSERT OR IGNORE INTO suspensionData (user, modules, timeout) VALUES (?,?,?)",
             (
@@ -109,10 +108,8 @@ class DevPunishment:
                 (current_timeout_duration + timedelta(seconds=duration)).timestamp()
             )
             db.execute(
-                "UPDATE suspensionDATA SET modules = ? AND timeout = timeout + ? WHERE user = ?",
-                ",".join(modules),
-                new_timeout,
-                self.user.id,
+                "UPDATE suspensionDATA SET modules = ?, timeout = ? WHERE user = ?",
+                (",".join(modules), new_timeout, self.user.id)
             )
             db.commit()
 
@@ -126,7 +123,7 @@ class DevPunishment:
         embed.add_field(
             name="Suspended until", value=f"<t:{timeout[0]}:f>", inline=True
         )
-        embed.add_field(name="Modules", value="\n".join(modules).title(), inline=True)
+        embed.add_field(name="Modules", value="\n".replace("Cogs.", "").join(modules).title(), inline=True)
         embed.add_field(name="Reason", value=reason, inline=True)
         embed.set_footer(
             text="This is not a botban. The user is suspended from using certain modules of Jeanne."
@@ -171,12 +168,12 @@ class DevPunishment:
         suspended_modules: list[str] = data[1].split(",") if data else []
         cog = next(
             (
-                cmd
+                cmd.module
                 for cmd in bot.tree.walk_commands()
-                if not isinstance(cmd, Jeanne.Group) and cmd == command
+                if not isinstance(cmd, Jeanne.Group) and cmd.qualified_name == command.qualified_name
             ),
             None)
-        if cog and any(cog.qualified_name in suspended_modules):
+        if cog in suspended_modules:
             return data is not None and self.user.id == data[0]
 
     def get_suspended_users(self):
