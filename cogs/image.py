@@ -1,6 +1,7 @@
 from functions import (
     check_botbanned_app_command,
     check_disabled_app_command,
+    is_suspended,  
 )
 from discord import Color, Embed, Interaction, app_commands as Jeanne
 from discord.ext.commands import GroupCog, Bot
@@ -24,6 +25,7 @@ class images(GroupCog, name="image"):
     @Jeanne.command(description="Get a kitsune image")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)  
     async def kitsune(self, ctx: Interaction):
         await ctx.response.defer()
         embed, file = get_kistune_pic()
@@ -32,6 +34,7 @@ class images(GroupCog, name="image"):
     @Jeanne.command(description="Need a wallpaper for your PC or phone?")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)  
     async def wallpaper(self, ctx: Interaction):
         await ctx.response.defer()
         embed, file = get_wallpaper_pic()
@@ -40,6 +43,7 @@ class images(GroupCog, name="image"):
     @Jeanne.command(description="Get a Jeanne d'Arc image")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)  
     async def jeanne(self, ctx: Interaction):
         await ctx.response.defer()
         embed, file = get_jeanne_pic()
@@ -48,6 +52,7 @@ class images(GroupCog, name="image"):
     @Jeanne.command(description="Get a Saber image")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)  
     async def saber(self, ctx: Interaction):
         await ctx.response.defer()
         file, embed = get_saber_pic()
@@ -56,6 +61,7 @@ class images(GroupCog, name="image"):
     @Jeanne.command(description="Get a neko image")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)  
     async def neko(self, ctx: Interaction):
         await ctx.response.defer()
         embed, file = get_neko_pic()
@@ -64,6 +70,7 @@ class images(GroupCog, name="image"):
     @Jeanne.command(description="Get a Morgan le Fay (Fate) image")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)  
     async def morgan(self, ctx: Interaction):
         await ctx.response.defer()
         embed, file = get_morgan_pic()
@@ -72,6 +79,7 @@ class images(GroupCog, name="image"):
     @Jeanne.command(description="Get a Medusa (Fate) image")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)  
     async def medusa(self, ctx: Interaction):
         await ctx.response.defer()
         embed, file = get_medusa_pic()
@@ -80,6 +88,7 @@ class images(GroupCog, name="image"):
     @Jeanne.command(description="Get an image from Safebooru")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)  
     async def safebooru(self, ctx: Interaction):
         await ctx.response.defer()
         embed = Embed(color=Color.random())

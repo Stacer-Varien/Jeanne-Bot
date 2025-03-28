@@ -23,6 +23,7 @@ from functions import (
     Reminder,
     check_botbanned_app_command,
     check_disabled_app_command,
+    is_suspended,
 )
 from config import WEATHER
 from discord.ui import View
@@ -62,6 +63,7 @@ class Embed_Group(GroupCog, name="embed"):
         description="Generates an embed message. This needs the Discohook.org embed generator",
         extras={"member_perms": "Administrator"},
     )
+    @Jeanne.check(is_suspended)
     @Jeanne.describe(
         channel="Send to which channel?",
         jsonscript="Add a JSON script",
@@ -116,6 +118,7 @@ class Embed_Group(GroupCog, name="embed"):
         description="Edits an embed message. This needs the Discohook.org embed generator",
         extras={"member_perms": "Administrator"},
     )
+    @Jeanne.check(is_suspended)
     @Jeanne.describe(
         channel="Which channel is the embed message in?",
         messageid="What is the message ID?",
@@ -189,6 +192,7 @@ class ReminderCog(GroupCog, name="reminder"):
         super().__init__()
 
     @Jeanne.command(description="Add a reminder")
+    @Jeanne.check(is_suspended)
     @Jeanne.describe(
         reason="Reason for the reminder",
         time="Time that you want to be reminded at? (1h, 30m, etc)",
@@ -243,6 +247,7 @@ class ReminderCog(GroupCog, name="reminder"):
             await ctx.followup.send(embed=embed, ephemeral=True)
 
     @Jeanne.command(name="list", description="List all the reminders you have")
+    @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
     async def _list(self, ctx: Interaction):
         await ctx.response.defer(ephemeral=True)
@@ -265,6 +270,7 @@ class ReminderCog(GroupCog, name="reminder"):
         await ctx.followup.send(embed=embed, ephemeral=True)
 
     @Jeanne.command(name="cancel", description="Cancel a reminder")
+    @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
     async def cancel(self, ctx: Interaction, reminder_id: int):
         await ctx.response.defer(ephemeral=True)
@@ -287,6 +293,7 @@ class slashutilities(Cog):
         self.parser = Parser()
 
     @Jeanne.command(description="Get weather information on a city")
+    @Jeanne.check(is_suspended)
     @Jeanne.checks.cooldown(3, 14400, key=lambda i: (i.user.id))
     @Jeanne.describe(city="Add a city", units="Metric or Imperial? (Default is metric)")
     @Jeanne.check(check_botbanned_app_command)
@@ -487,6 +494,7 @@ class slashutilities(Cog):
             await ctx.followup.send(embed=no_city)
 
     @Jeanne.command(description="Do a calculation")
+    @Jeanne.check(is_suspended)
     @Jeanne.describe(calculate="Add a calculation")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
@@ -520,6 +528,7 @@ class slashutilities(Cog):
             await ctx.followup.send(embed=failed)
 
     @Jeanne.command(description="Invite me to your server or join the support server")
+    @Jeanne.check(is_suspended)
     async def invite(self, ctx: Interaction):
         await ctx.response.defer()
         invite = Embed(
@@ -530,11 +539,13 @@ class slashutilities(Cog):
         await ctx.followup.send(embed=invite, view=invite_button())
 
     @Jeanne.command(description="Submit a bot report if you found something wrong")
+    @Jeanne.check(is_suspended)
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     async def botreport(self, ctx: Interaction):
         await ctx.response.send_modal(ReportModal())
 
     @Jeanne.command(description="Check the meaning of a word")
+    @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def dictionary(

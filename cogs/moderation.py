@@ -20,6 +20,7 @@ from functions import (
     Moderation,
     check_botbanned_app_command,
     check_disabled_app_command,
+    is_suspended,  
 )
 from assets.components import Confirmation
 from typing import Optional
@@ -89,6 +90,7 @@ class moderation(Cog):
         description="Ban someone from or outside the server",
         extras={"bot_perms": "Ban Members", "member_perms": "Ban Members"},
     )
+    @Jeanne.check(is_suspended)  
     @Jeanne.autocomplete(reason=AutoCompleteChoices.default_ban_options)
     @Jeanne.describe(
         member="What is the member or user ID?",
@@ -169,6 +171,7 @@ class moderation(Cog):
         description="Warn a member",
         extras={"bot_perms": "Kick Members", "member_perms": "Kick Members"},
     )
+    @Jeanne.check(is_suspended)  
     @Jeanne.describe(member="Which member are you warning?", reason="What did they do?")
     @Jeanne.checks.has_permissions(kick_members=True)
     @Jeanne.check(check_botbanned_app_command)
@@ -228,6 +231,7 @@ class moderation(Cog):
         name="list-warns",
         description="View warnings in the server or a member",
     )
+    @Jeanne.check(is_suspended)  
     @Jeanne.describe(
         member="Whose warnings do you want to see?",
     )
@@ -316,6 +320,7 @@ class moderation(Cog):
         description="Revoke a warn by warn ID",
         extras={"bot_perms": "Kick Members", "member_perms": "Kick Members"},
     )
+    @Jeanne.check(is_suspended)  
     @Jeanne.describe(
         member="Which member got warned?",
         warn_id="What is their warn ID you want to remove?",
@@ -350,6 +355,7 @@ class moderation(Cog):
         description="Kick a member out of the server",
         extras={"bot_perms": "Kick Members", "member_perms": "Kick Members"},
     )
+    @Jeanne.check(is_suspended)  
     @Jeanne.describe(
         member="Which member are you kicking?", reason="Why are they being kicked?"
     )
@@ -420,6 +426,7 @@ class moderation(Cog):
             "member_perms": "Manage Messages, Read Message History",
         },
     )
+    @Jeanne.check(is_suspended)  
     @Jeanne.describe(
         limit="How many messages? (max is 100)",
         member="Which member's messages you want to delete?",
@@ -450,6 +457,7 @@ class moderation(Cog):
         description="Change someone's nickname",
         extras={"bot_perms": "Manage Nicknames", "member_perms": "Manage Nicknames"},
     )
+    @Jeanne.check(is_suspended)  
     @Jeanne.describe(member="Which member?", nickname="What is their new nickname")
     @Jeanne.checks.has_permissions(manage_nicknames=True)
     @Jeanne.checks.bot_has_permissions(manage_nicknames=True)
@@ -490,6 +498,7 @@ class moderation(Cog):
         description="Unbans a user",
         extras={"bot_perms": "Ban Members", "member_perms": "Ban Members"},
     )
+    @Jeanne.check(is_suspended)  
     @Jeanne.describe(
         user_id="Which user do you want to unban?",
         reason="Why are they being unbanned?",
@@ -539,6 +548,7 @@ class moderation(Cog):
         description="Timeout a member",
         extras={"bot_perms": "Moderate Members", "member_perms": "Moderate Members"},
     )
+    @Jeanne.check(is_suspended)  
     @Jeanne.describe(
         member="Which member?",
         time="How long should they be on timeout (1m, 1h30m, etc)",
@@ -606,6 +616,7 @@ class moderation(Cog):
         description="Removes a timeout from a member",
         extras={"bot_perms": "Moderate Members", "member_perms": "Moderate Members"},
     )
+    @Jeanne.check(is_suspended)  
     @Jeanne.describe(member="Which member?", reason="Why is their timeout removed?")
     @Jeanne.checks.has_permissions(moderate_members=True)
     @Jeanne.checks.bot_has_permissions(moderate_members=True)
@@ -656,6 +667,7 @@ class moderation(Cog):
         description="Ban multiple members at once",
         extras={"bot_perms": "Ban Members", "member_perms": "Ban Members"},
     )
+    @Jeanne.check(is_suspended)  
     @Jeanne.describe(
         user_ids="How many user IDs? Leave a space after each ID (min is 5 and max is 25)",
         reason="Why are they being banned?",
@@ -768,6 +780,7 @@ class moderation(Cog):
         description="Unban multiple members at once",
         extras={"bot_perms": "Ban Members", "member_perms": "Ban Members"},
     )
+    @Jeanne.check(is_suspended)  
     @Jeanne.describe(
         user_ids="How many user IDs? Leave a space after each ID (min is 5 and max is 25)",
         reason="Why are they being banned?",

@@ -9,6 +9,7 @@ from functions import (
     Inventory,
     check_botbanned_app_command,
     check_disabled_app_command,
+    is_suspended,  
 )
 from discord import ButtonStyle, Color, Embed, File, Interaction, app_commands as Jeanne
 from PIL import UnidentifiedImageError
@@ -27,6 +28,7 @@ class Shop_Group(GroupCog, name="shop"):
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)  
     async def country(self, ctx: Interaction):
         await ctx.response.defer()
         balance = Currency(ctx.user).get_balance
@@ -57,6 +59,7 @@ class Shop_Group(GroupCog, name="shop"):
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)  
     async def backgrounds(self, ctx: Interaction):
         await ctx.response.defer()
         disabled = False
@@ -127,6 +130,7 @@ class Background_Group(GroupCog, name="background"):
     @Jeanne.describe(name="What will you name it?", link="Add an image link")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)  
     async def buycustom(self, ctx: Interaction, name: str, link: str):
         await ctx.response.defer()
         balance = Currency(ctx.user).get_balance
@@ -199,6 +203,7 @@ class Background_Group(GroupCog, name="background"):
     @Jeanne.command(description="Check which backgrounds you have")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)  
     async def list(self, ctx: Interaction):
         await ctx.response.defer()
         if Inventory(ctx.user).get_user_inventory == None:

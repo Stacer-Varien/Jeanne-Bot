@@ -18,6 +18,7 @@ from functions import (
     Currency,
     check_botbanned_app_command,
     check_disabled_app_command,
+    is_suspended,
 )
 from config import TOPGG
 from topgg import DBLClient
@@ -48,6 +49,7 @@ class Guess_Group(GroupCog, name="guess"):
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def free(self, ctx: Interaction):
         view = Guess_Buttons(ctx.user)
         await ctx.response.defer()
@@ -69,7 +71,7 @@ class Guess_Group(GroupCog, name="guess"):
             if await self.topggpy.get_user_vote(ctx.user.id) == True:
                 await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
                 correct.add_field(
-                    name="DiscordBotList Bonus",
+                    name="TopGG Bonus",
                     value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>",
                 )
                 if await BetaTest(self.bot).check(ctx.user) == True:
@@ -90,6 +92,7 @@ class Guess_Group(GroupCog, name="guess"):
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def bet(
         self,
         ctx: Interaction,
@@ -128,7 +131,7 @@ class Guess_Group(GroupCog, name="guess"):
             if await self.topggpy.get_user_vote(ctx.user.id) == True:
                 await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
                 correct.add_field(
-                    name="DiscordBotList Bonus",
+                    name="TopGG Bonus",
                     value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
                 )
                 if await BetaTest(self.bot).check(ctx.user) == True:
@@ -179,6 +182,7 @@ class Dice_Group(GroupCog, name="dice"):
     @Jeanne.command(description="Roll a dice for free 20 QP")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     async def free(self, ctx: Interaction):
         await ctx.response.defer()
@@ -211,6 +215,7 @@ class Dice_Group(GroupCog, name="dice"):
     @Jeanne.describe(bet="How much are you betting?")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     async def bet(
         self,
@@ -254,7 +259,7 @@ class Dice_Group(GroupCog, name="dice"):
             if await self.topggpy.get_user_vote(ctx.user.id) == True:
                 await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
                 embed.add_field(
-                    name="DiscordBotList Bonus",
+                    name="TopGG Bonus",
                     value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
                 )
                 if await BetaTest(self.bot).check(ctx.user) == True:
@@ -301,6 +306,7 @@ class Flip_Group(GroupCog, name="flip"):
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def free(self, ctx: Interaction):
         await ctx.response.defer()
         picks = ["Heads", "Tails"]
@@ -318,7 +324,7 @@ class Flip_Group(GroupCog, name="flip"):
             if await self.topggpy.get_user_vote(ctx.user.id) == True:
                 await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
                 embed.add_field(
-                    name="DiscordBotList Bonus",
+                    name="TopGG Bonus",
                     value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>",
                 )
                 if await BetaTest(self.bot).check(ctx.user) == True:
@@ -348,6 +354,7 @@ class Flip_Group(GroupCog, name="flip"):
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def bet(self, ctx: Interaction, bet: Jeanne.Range[int, 5]):
         await ctx.response.defer()
         picks = ["Heads", "Tails"]
@@ -379,7 +386,7 @@ class Flip_Group(GroupCog, name="flip"):
             if await self.topggpy.get_user_vote(ctx.user.id) == True:
                 await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
                 embed.add_field(
-                    name="DiscordBotList Bonus",
+                    name="TopGG Bonus",
                     value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
                 )
                 if await BetaTest(self.bot).check(ctx.user) == True:
@@ -437,6 +444,7 @@ class Blackjack_Group(GroupCog, name="blackjack"):
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def free(self, ctx: Interaction):
         await ctx.response.defer()
         suits = ["Hearts", "Diamonds", "Clubs", "Spades"]
@@ -470,6 +478,7 @@ class Blackjack_Group(GroupCog, name="blackjack"):
     @Jeanne.checks.cooldown(1, 20, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def bet(self, ctx: Interaction, bet:Jeanne.Range[int, 5]):
         await ctx.response.defer()
         balance=Currency(ctx.user).get_balance
@@ -532,6 +541,7 @@ class currency(Cog, name="CurrencySlash"):
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def balance_callback(self, ctx: Interaction, member: Member):
         await self.get_balance(ctx, member)
 
@@ -560,6 +570,7 @@ class currency(Cog, name="CurrencySlash"):
     @Jeanne.command(description="Claim your daily")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def daily(self, ctx: Interaction):
         await ctx.response.defer()
         bank = Currency(ctx.user)
@@ -612,6 +623,7 @@ class currency(Cog, name="CurrencySlash"):
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def balance(self, ctx: Interaction, member: Optional[Member] = None):
         member = ctx.user if (member == None) else member
         await self.get_balance(ctx, member)
@@ -627,7 +639,8 @@ class currency(Cog, name="CurrencySlash"):
             )
             await ctx.response.send_message(embed=cooldown)
 
-    @Jeanne.command(description="Vote for me in TopGG or DiscordBotLists, or both!")
+    @Jeanne.command(description="Vote for me in TopGG")
+    @Jeanne.check(is_suspended)
     async def vote(self, ctx: Interaction):
         embed = Embed(
             color=Color.random(),

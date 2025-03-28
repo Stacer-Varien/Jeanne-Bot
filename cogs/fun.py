@@ -11,6 +11,7 @@ from functions import (
     DevPunishment,
     check_botbanned_app_command,
     check_disabled_app_command,
+    is_suspended,
 )
 from assets.images import get_animeme_pic
 from typing import Optional
@@ -26,6 +27,7 @@ class fun(Cog, name="FunSlash"):
     @Jeanne.describe(question="Add your question")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def _8ball(self, ctx: Interaction, question: str):
         await ctx.response.defer()
         eight_ball_answers = [
@@ -67,6 +69,7 @@ class fun(Cog, name="FunSlash"):
     @Jeanne.describe(text="What are you reversing?")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def reverse(self, ctx: Interaction, text: str):
         await ctx.response.defer()
         filtered_words = ["riffak", "reggin", "aggin"]
@@ -83,6 +86,7 @@ class fun(Cog, name="FunSlash"):
     @Jeanne.command(description="Get a random animeme")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def animeme(self, ctx: Interaction):
         await ctx.response.defer()
         embed, file = get_animeme_pic()
@@ -111,6 +115,7 @@ class fun(Cog, name="FunSlash"):
     @Jeanne.describe(choices="Add your choices here. Separate them with ','")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def choose(self, ctx: Interaction, choices: str):
         await ctx.response.defer()
         choices = choices.split(sep=",")
@@ -123,6 +128,7 @@ class fun(Cog, name="FunSlash"):
     @Jeanne.describe(member="Which member?")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def simprate(self, ctx: Interaction, member: Optional[Member] = None):
         await ctx.response.defer()
         perc = randint(0, 100)
@@ -141,6 +147,7 @@ class fun(Cog, name="FunSlash"):
     @Jeanne.describe(member="Which member?")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def gayrate(self, ctx: Interaction, member: Optional[Member] = None):
         await ctx.response.defer()
         perc = randint(0, 100)

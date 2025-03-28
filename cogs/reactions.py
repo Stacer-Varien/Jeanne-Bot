@@ -3,6 +3,7 @@ import random
 from functions import (
     check_botbanned_app_command,
     check_disabled_app_command,
+    is_suspended,  
 )
 from discord import Color, Embed, Interaction, Member, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
@@ -118,6 +119,7 @@ class SlashReactions(Cog, name="ReactionsSlash"):
         await ctx.response.send_message(msg, embed=reaction_embed)
 
     @Jeanne.command(description="Hug someone or yourself")
+    @Jeanne.check(is_suspended)  
     @Jeanne.describe(member="Who are you hugging?")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
@@ -125,6 +127,7 @@ class SlashReactions(Cog, name="ReactionsSlash"):
         await self._send_reaction(ctx, "hug", member, hug)
 
     @Jeanne.command(description="Slap someone or yourself")
+    @Jeanne.check(is_suspended)  
     @Jeanne.describe(member="Who are you slapping?")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
@@ -132,12 +135,14 @@ class SlashReactions(Cog, name="ReactionsSlash"):
         await self._send_reaction(ctx, "slap", member, slap)
 
     @Jeanne.command(description="Show a smuggy look")
+    @Jeanne.check(is_suspended)  
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def smug(self, ctx: Interaction):
         await self._send_reaction(ctx, "smug", api_url=smug)
 
     @Jeanne.command(description="Poke someone or yourself")
+    @Jeanne.check(is_suspended)  
     @Jeanne.describe(member="Who are you poking?")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
@@ -145,6 +150,7 @@ class SlashReactions(Cog, name="ReactionsSlash"):
         await self._send_reaction(ctx, "poke", member, poke)
 
     @Jeanne.command(description="Pat someone or yourself")
+    @Jeanne.check(is_suspended)  
     @Jeanne.describe(member="Who are you patting?")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
@@ -152,6 +158,7 @@ class SlashReactions(Cog, name="ReactionsSlash"):
         await self._send_reaction(ctx, "pat", member, pat)
 
     @Jeanne.command(description="Kiss someone or yourself")
+    @Jeanne.check(is_suspended)  
     @Jeanne.describe(member="Who are you kissing?")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
@@ -159,6 +166,7 @@ class SlashReactions(Cog, name="ReactionsSlash"):
         await self._send_reaction(ctx, "kiss", member, kiss)
 
     @Jeanne.command(description="Tickle someone or yourself")
+    @Jeanne.check(is_suspended)  
     @Jeanne.describe(member="Who are you tickling?")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
@@ -166,6 +174,7 @@ class SlashReactions(Cog, name="ReactionsSlash"):
         await self._send_reaction(ctx, "tickle", member, tickle)
 
     @Jeanne.command(description="Call someone or yourself a baka!")
+    @Jeanne.check(is_suspended)  
     @Jeanne.describe(member="Who are you calling a baka?")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
@@ -173,6 +182,7 @@ class SlashReactions(Cog, name="ReactionsSlash"):
         await self._send_reaction(ctx, "baka", member, baka)
 
     @Jeanne.command(description="Feed someone or yourself")
+    @Jeanne.check(is_suspended)  
     @Jeanne.describe(member="Who are you feeding?")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
@@ -180,12 +190,14 @@ class SlashReactions(Cog, name="ReactionsSlash"):
         await self._send_reaction(ctx, "feed", member, feed)
 
     @Jeanne.command(description="Show a crying expression")
+    @Jeanne.check(is_suspended)  
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def cry(self, ctx: Interaction):
         await self._send_reaction(ctx, "cry", api_url=cry)
 
     @Jeanne.command(description="Bite someone or yourself")
+    @Jeanne.check(is_suspended)  
     @Jeanne.describe(member="Who are you biting?")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
@@ -193,12 +205,14 @@ class SlashReactions(Cog, name="ReactionsSlash"):
         await self._send_reaction(ctx, "bite", member, bite)
 
     @Jeanne.command(description="Show a blushing expression")
+    @Jeanne.check(is_suspended)  
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def blush(self, ctx: Interaction):
         await self._send_reaction(ctx, "blush", api_url=blush)
 
     @Jeanne.command(description="Cuddle with someone or yourself")
+    @Jeanne.check(is_suspended)  
     @Jeanne.describe(member="Who are you cuddling with?")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
@@ -206,6 +220,7 @@ class SlashReactions(Cog, name="ReactionsSlash"):
         await self._send_reaction(ctx, "cuddle", member, cuddle)
 
     @Jeanne.command(description="Dance with someone or yourself")
+    @Jeanne.check(is_suspended)  
     @Jeanne.describe(member="Who are you dancing with?")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)

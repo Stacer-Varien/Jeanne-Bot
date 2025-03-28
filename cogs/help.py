@@ -7,7 +7,7 @@ from discord import (
     app_commands as Jeanne,
 )
 from discord.ext.commands import GroupCog, Bot
-from functions import AutoCompleteChoices, check_botbanned_app_command
+from functions import AutoCompleteChoices, check_botbanned_app_command, is_suspended
 
 class help_button(ui.View):
     def __init__(self):
@@ -37,6 +37,7 @@ class HelpGroup(GroupCog, name="help"):
     @Jeanne.autocomplete(command=AutoCompleteChoices.command_choices)
     @Jeanne.describe(command="Which command you need help with?")
     @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(is_suspended)
     async def command(self, ctx: Interaction, command: Jeanne.Range[str, 3]):
             await ctx.response.defer()
             cmd = next(
@@ -96,6 +97,7 @@ class HelpGroup(GroupCog, name="help"):
         description="Get help from the website or join the support server for further help"
     )
     @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(is_suspended)
     async def support(self, ctx: Interaction):
         view = help_button()
         help = Embed(

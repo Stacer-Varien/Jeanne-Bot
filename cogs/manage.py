@@ -33,6 +33,7 @@ from functions import (
     Manage,
     check_botbanned_app_command,
     check_disabled_app_command,
+    is_suspended,
 )
 from assets.components import (
     Confirmation,
@@ -67,6 +68,7 @@ class Create_Group(GroupCog, name="create"):
     @Jeanne.checks.has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def textchannel(
         self,
         ctx: Interaction,
@@ -118,6 +120,7 @@ class Create_Group(GroupCog, name="create"):
     @Jeanne.checks.has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def voicechannel(
         self,
         ctx: Interaction,
@@ -150,6 +153,7 @@ class Create_Group(GroupCog, name="create"):
     @Jeanne.checks.has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def category(self, ctx: Interaction, name: Jeanne.Range[str, 1, 100]):
         await ctx.response.defer()
         cat = await ctx.guild.create_category(name=name)
@@ -170,6 +174,7 @@ class Create_Group(GroupCog, name="create"):
     @Jeanne.checks.has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def stagechannel(
         self,
         ctx: Interaction,
@@ -215,6 +220,7 @@ class Create_Group(GroupCog, name="create"):
     @Jeanne.checks.has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def forum(
         self,
         ctx: Interaction,
@@ -262,6 +268,7 @@ class Create_Group(GroupCog, name="create"):
     @Jeanne.checks.has_permissions(manage_roles=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def role(
         self,
         ctx: Interaction,
@@ -318,6 +325,7 @@ class Create_Group(GroupCog, name="create"):
     @Jeanne.checks.bot_has_permissions(create_public_threads=True, manage_threads=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def public(
         self,
         ctx: Interaction,
@@ -383,6 +391,7 @@ class Create_Group(GroupCog, name="create"):
     @Jeanne.checks.has_permissions(create_private_threads=True, manage_threads=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def private(
         self,
         ctx: Interaction,
@@ -437,6 +446,7 @@ class Create_Group(GroupCog, name="create"):
     @Jeanne.checks.has_permissions(manage_expressions=True, create_expressions=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def emoji(
         self,
         ctx: Interaction,
@@ -498,6 +508,7 @@ class Create_Group(GroupCog, name="create"):
     @Jeanne.checks.has_permissions(manage_expressions=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def sticker(
         self,
         ctx: Interaction,
@@ -551,6 +562,7 @@ class Delete_Group(GroupCog, name="delete"):
     @Jeanne.checks.has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def channel(self, ctx: Interaction, channel: abc.GuildChannel):
         await ctx.response.defer()
         embed = Embed(
@@ -570,6 +582,7 @@ class Delete_Group(GroupCog, name="delete"):
     @Jeanne.checks.has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def role(self, ctx: Interaction, role: Role):
         await ctx.response.defer()
         embed = Embed(
@@ -590,6 +603,7 @@ class Delete_Group(GroupCog, name="delete"):
     @Jeanne.checks.has_permissions(manage_expressions=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def emoji(self, ctx: Interaction, emoji: str):
         await ctx.response.defer()
         try:
@@ -626,6 +640,7 @@ class Delete_Group(GroupCog, name="delete"):
     @Jeanne.checks.has_permissions(manage_expressions=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def sticker(self, ctx: Interaction, sticker: str):
         await ctx.response.defer()
         stick = utils.get(ctx.guild.stickers, name=sticker)
@@ -668,6 +683,7 @@ class Edit_Group(GroupCog, name="edit"):
     @Jeanne.checks.has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def textchannel(
         self,
         ctx: Interaction,
@@ -725,6 +741,7 @@ class Edit_Group(GroupCog, name="edit"):
     @Jeanne.checks.has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def voicechannel(
         self,
         ctx: Interaction,
@@ -766,6 +783,7 @@ class Edit_Group(GroupCog, name="edit"):
     @Jeanne.checks.bot_has_permissions(manage_roles=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def role(
         self,
         ctx: Interaction,
@@ -822,6 +840,7 @@ class Edit_Group(GroupCog, name="edit"):
     @Jeanne.checks.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def server(
         self,
         ctx: Interaction,
@@ -969,6 +988,7 @@ class Set_Group(GroupCog, name="set"):
     @Jeanne.checks.bot_has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def welcomer(
         self,
         ctx: Interaction,
@@ -1010,6 +1030,7 @@ class Set_Group(GroupCog, name="set"):
     @Jeanne.checks.bot_has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def modlog(self, ctx: Interaction, channel: TextChannel):
         await ctx.response.defer()
         await Manage(ctx.guild).set_modloger(channel)
@@ -1025,6 +1046,7 @@ class Set_Group(GroupCog, name="set"):
     @Jeanne.checks.bot_has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def welcomingmsg(
         self, ctx: Interaction, jsonfile: Optional[Attachment] = None
     ) -> None:
@@ -1096,6 +1118,7 @@ class Set_Group(GroupCog, name="set"):
     @Jeanne.checks.bot_has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def leavingmsg(
         self, ctx: Interaction, jsonfile: Optional[Attachment] = None
     ) -> None:
@@ -1166,6 +1189,7 @@ class Set_Group(GroupCog, name="set"):
     @Jeanne.checks.bot_has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def rolereward_message(
         self, ctx: Interaction, message: Optional[bool] = None
     ) -> None:
@@ -1190,6 +1214,7 @@ class Set_Group(GroupCog, name="set"):
     @Jeanne.checks.bot_has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def levelupdate(
         self, ctx: Interaction, channel: TextChannel, levelmsg: Optional[bool] = None
     ) -> None:
@@ -1216,6 +1241,7 @@ class Set_Group(GroupCog, name="set"):
     @Jeanne.checks.bot_has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def confessionchannel(self, ctx: Interaction, channel: TextChannel) -> None:
         await ctx.response.defer()
         embed = Embed(
@@ -1233,6 +1259,7 @@ class Set_Group(GroupCog, name="set"):
     )
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def brightness(
         self, ctx: Interaction, brightness: Jeanne.Range[int, 10, 150]
     ):
@@ -1251,6 +1278,7 @@ class Set_Group(GroupCog, name="set"):
     @Jeanne.command(name="profile-bio", description="Change your profile bio")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def bio(self, ctx: Interaction, bio: Jeanne.Range[str, 1, 120]):
         await ctx.response.defer()
         if len(bio) > 60 <= 120:
@@ -1267,6 +1295,7 @@ class Set_Group(GroupCog, name="set"):
     @Jeanne.describe(color="Add your color")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def color(self, ctx: Interaction, color: Jeanne.Range[str, 1]):
         await ctx.response.defer()
         embed = Embed()
@@ -1297,6 +1326,7 @@ class manage(Cog):
     @Jeanne.checks.has_permissions(manage_roles=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def addrole(self, ctx: Interaction, member: User, role: Role):
         await ctx.response.defer()
         await member.add_roles(role)
@@ -1316,6 +1346,7 @@ class manage(Cog):
     @Jeanne.checks.has_permissions(manage_roles=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def removerole(self, ctx: Interaction, member: User, role: Role):
         await ctx.response.defer()
         m=await ctx.guild.fetch_member(member.id)
@@ -1335,6 +1366,7 @@ class manage(Cog):
     @Jeanne.checks.bot_has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def remove(self, ctx: Interaction) -> None:
         await ctx.response.defer()
         embed = Embed(
@@ -1358,6 +1390,7 @@ class manage(Cog):
     @Jeanne.checks.has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def clone(
         self,
         ctx: Interaction,
@@ -1410,6 +1443,7 @@ class Rename_Group(GroupCog, name="rename"):
     @Jeanne.checks.has_permissions(manage_expressions=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def emoji(self, ctx: Interaction, emoji: str, name: Jeanne.Range[str, 2, 30]):
         await ctx.response.defer()
         try:
@@ -1449,6 +1483,7 @@ class Rename_Group(GroupCog, name="rename"):
     @Jeanne.checks.bot_has_permissions(manage_channels=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def category(
         self,
         ctx: Interaction,
@@ -1475,6 +1510,7 @@ class Rename_Group(GroupCog, name="rename"):
     @Jeanne.checks.has_permissions(manage_expressions=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def sticker(
         self, ctx: Interaction, sticker: str, name: Jeanne.Range[str, 2, 30]
     ):
@@ -1514,6 +1550,7 @@ class Command_Group(GroupCog, name="command"):
     @Jeanne.describe(command="Which command are you disabling?")
     @Jeanne.checks.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(is_suspended)
     async def _disable(
         self,
         ctx: Interaction,
@@ -1547,6 +1584,7 @@ class Command_Group(GroupCog, name="command"):
     @Jeanne.checks.has_permissions(manage_guild=True)
     @Jeanne.describe(command="Which command are you enabling?")
     @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(is_suspended)
     async def _enable(
         self,
         ctx: Interaction,
@@ -1574,6 +1612,7 @@ class Command_Group(GroupCog, name="command"):
 
     @Jeanne.command(name="list-disabled", description="List all disabled commands")
     @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(is_suspended)
     async def listdisabled(self, ctx: Interaction):
         await ctx.response.defer()
         cmd = Command(ctx.guild)
@@ -1607,6 +1646,7 @@ class Level_Group(GroupCog, name="level"):
     )
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def _add(self, ctx: Interaction, role: Role, level: Jeanne.Range[int, 1]):
         await ctx.response.defer()
         botmember = await ctx.guild.fetch_member(self.bot.user.id)
@@ -1635,6 +1675,7 @@ class Level_Group(GroupCog, name="level"):
     )
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def _remove(self, ctx: Interaction, role: Role):
         await ctx.response.defer()
         await Manage(server=ctx.guild).remove_role_reward(role)
@@ -1649,6 +1690,7 @@ class Level_Group(GroupCog, name="level"):
     )
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def _list(self, ctx: Interaction):
         await ctx.response.defer()
         roles = Levelling(server=ctx.guild).list_all_roles
@@ -1672,6 +1714,7 @@ class Level_Group(GroupCog, name="level"):
     @Jeanne.checks.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def add(self, ctx: Interaction, channel: TextChannel) -> None:
         await ctx.response.defer()
         if Levelling(server=ctx.guild).check_xpblacklist_channel(channel) == False:
@@ -1696,6 +1739,7 @@ class Level_Group(GroupCog, name="level"):
     @Jeanne.checks.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def remove(self, ctx: Interaction, channel: TextChannel) -> None:
         await ctx.response.defer()
         if Levelling(server=ctx.guild).check_xpblacklist_channel(channel) == False:
@@ -1718,6 +1762,7 @@ class Level_Group(GroupCog, name="level"):
     )
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def _list(self, ctx: Interaction) -> None:
         await ctx.response.defer()
         embed = Embed()

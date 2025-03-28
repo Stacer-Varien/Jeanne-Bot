@@ -13,6 +13,7 @@ from functions import (
     check_botbanned_app_command,
     check_disabled_app_command,
     shorten_url,
+    is_suspended,  
 )
 from typing import Optional
 from assets.components import ReportContent, ReportContentPlus
@@ -30,6 +31,7 @@ class nsfw(Cog):
     @Jeanne.checks.cooldown(1, 5, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)  
     async def hentai(
         self,
         ctx: Interaction,
@@ -83,6 +85,7 @@ class nsfw(Cog):
     )
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)  
     async def gelbooru(
         self,
         ctx: Interaction,
@@ -195,6 +198,7 @@ class nsfw(Cog):
     )
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)  
     async def yandere(
         self,
         ctx: Interaction,
@@ -287,6 +291,7 @@ class nsfw(Cog):
     )
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)  
     async def konachan(
         self,
         ctx: Interaction,
@@ -382,6 +387,7 @@ class nsfw(Cog):
     )
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)  
     async def danbooru(
         self,
         ctx: Interaction,

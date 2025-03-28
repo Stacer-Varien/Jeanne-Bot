@@ -13,6 +13,7 @@ from functions import (
     Levelling,
     check_botbanned_app_command,
     check_disabled_app_command,
+    is_suspended,  
 )
 from typing import Optional
 from assets.generators.profile_card import Profile
@@ -30,6 +31,7 @@ class Rank_Group(GroupCog, name="rank"):
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)  
     async def _global(self, ctx: Interaction):
         await ctx.response.defer()
         embed = Embed(color=Color.random())
@@ -51,6 +53,7 @@ class Rank_Group(GroupCog, name="rank"):
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)  
     async def server(self, ctx: Interaction):
         await ctx.response.defer()
         embed = Embed(color=Color.random())
@@ -103,6 +106,7 @@ class levelling(Cog):
     @Jeanne.checks.cooldown(1, 120, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)  
     async def profile_generate(self, ctx: Interaction, member: Member):
         await ctx.response.defer()
         await self.generate_profile_card(ctx, member)
@@ -120,6 +124,7 @@ class levelling(Cog):
     @Jeanne.checks.cooldown(1, 120, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)  
     async def profile(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         member = ctx.user if member == None else member
         await ctx.response.defer()

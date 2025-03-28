@@ -69,6 +69,7 @@ class InfoCog(Cog, name="InfoSlash"):
 
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def userinfo_callback(self, ctx: Interaction, member: Member):
         await self.get_userinfo(ctx, member)
 
@@ -105,6 +106,7 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.command(description="See the bot's status from development to now")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def stats(self, ctx: Interaction):
         await ctx.response.defer()
         all_users = get_cached_users()
@@ -142,6 +144,7 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.describe(member="Which member?")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def userinfo(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         member = ctx.user if member is None else member
         await self.get_userinfo(ctx, member)
@@ -149,6 +152,7 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.command(description="Get information about this server")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def serverinfo(self, ctx: Interaction):
         await ctx.response.defer()
         emojis = [str(x) for x in ctx.guild.emojis]
@@ -214,6 +218,7 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def ping(self, ctx: Interaction):
         await ctx.response.defer()
         start_time = time()
@@ -236,6 +241,7 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.command(description="See the server's banner")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def serverbanner(self, ctx: Interaction):
         await ctx.response.defer()
         if ctx.guild.premium_subscription_count < 2:
@@ -257,6 +263,7 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.describe(member="Which member?")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def avatar(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await ctx.response.defer()
         member = ctx.user if member is None else member
@@ -312,6 +319,7 @@ class InfoCog(Cog, name="InfoSlash"):
     )
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def sticker(self, ctx: Interaction, sticker: str):
         await ctx.response.defer()
         try:
@@ -354,6 +362,7 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.describe(emoji="What is the name of the emoji?")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
     async def emoji(self, ctx: Interaction, emoji: Jeanne.Range[str, 1]):
         await ctx.response.defer()
         emote = PartialEmoji.from_str(emoji)
