@@ -123,7 +123,7 @@ class DevPunishment:
         embed.add_field(
             name="Suspended until", value=f"<t:{timeout[0]}:f>", inline=True
         )
-        embed.add_field(name="Modules", value="\n".replace("Cogs.", "").join(modules).title(), inline=True)
+        embed.add_field(name="Modules", value="\n".join(modules).title(), inline=True)
         embed.add_field(name="Reason", value=reason, inline=True)
         embed.set_footer(
             text="This is not a botban. The user is suspended from using certain modules of Jeanne."
@@ -160,7 +160,7 @@ class DevPunishment:
         webhook.send(embed=embed)
         await self.autopunish(user)
 
-    def check_suspended_module(self, bot:Bot, command:Jeanne.Command):
+    def check_suspended_module(self, bot: Bot, command: Jeanne.Command) -> bool:
         data = db.execute(
             "SELECT * FROM suspensionData WHERE user = ?", (self.user.id,)
         ).fetchone()
@@ -173,8 +173,9 @@ class DevPunishment:
                 if not isinstance(cmd, Jeanne.Group) and cmd.qualified_name == command.qualified_name
             ),
             None)
-        if cog in suspended_modules:
-            return data is not None and self.user.id == data[0]
+        if cog and any(module in cog for module in suspended_modules):
+            return True
+        return False
 
     def get_suspended_users(self):
         data=db.execute("SELECT * FROM suspensionData").fetchall()
