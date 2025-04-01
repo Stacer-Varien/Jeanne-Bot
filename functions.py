@@ -270,7 +270,10 @@ class Inventory:
 
     @staticmethod
     async def upload_to_catbox(image_url: str) -> str:
-        async with aiohttp.ClientSession() as session:
+        headers = {
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"
+        }
+        async with aiohttp.ClientSession(headers=headers) as session:
             url = "https://catbox.moe/user/api.php"
             userhash = CATBOX_HASH
             data = {"reqtype": "urlupload", "userhash": userhash, "url": image_url}

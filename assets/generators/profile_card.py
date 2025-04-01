@@ -50,12 +50,17 @@ class Profile:
     ) -> BytesIO | Literal[False]:
         inventory_instance = Inventory(user)
         if bg_image:
-            async with aiohttp.ClientSession() as session:
+            headers = {
+                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"
+            }
+            async with aiohttp.ClientSession(headers=headers) as session:
                 async with session.get(bg_image) as resp:
-                    bytes_io=await resp.read()
-            background=BytesIO(bytes_io)
+                    if resp.status != 200:
+                        return False
+                    bytes_io = await resp.read()
+            background = BytesIO(bytes_io)
         else:
-            background=self.default_bg
+            background = self.default_bg
 
         currency_instance = Currency(user)
         levelling_instance = Levelling(user, user.guild)
@@ -169,7 +174,7 @@ class Profile:
             badges.append((cimage, x_position))
             x_position -= 60
 
-        if Partner.check(user.id):
+        if Partner.check(user):
             partner_badge = Image.open(self.partner).resize((50, 50))
             badges.append((partner_badge, x_position))
             x_position -= 60
