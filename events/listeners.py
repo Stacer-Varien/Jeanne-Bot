@@ -28,26 +28,20 @@ class listenersCog(Cog):
         try:
             if not message.author.bot and not isinstance(message.channel, DMChannel):
                 level_instance = Levelling(message.author, message.guild)
-                if level_instance.check_xpblacklist_channel(message.channel) == (
-                    False or None
-                ):
+                if level_instance.check_xpblacklist_channel(message.channel) is None:
                     try:
                         now_time = round(datetime.now().timestamp())
-                        if now_time> level_instance.get_next_time_global:
+                        if now_time > level_instance.get_next_time_global:
                             get_vote = await self.topggpy.get_user_vote(message.author.id)
 
                             check = await BetaTest(self.bot).check(message.author)
-                            weekend_check = (
-                                True if (datetime.isoweekday(datetime.now()) < 5) else False
-                            )
-                            if get_vote == True:
-                                xp = 15 if weekend_check else 10
-                                if check:
-                                    xp += 5
-                            else:
+                            weekend_check = datetime.now().isoweekday() >= 6
+                            xp = 15 if weekend_check else 10
+                            if not get_vote:
                                 xp = 10 if weekend_check else 5
-                                if check:
-                                    xp += 5
+                            if check:
+                                xp += 5
+
                             lvl = await level_instance.add_xp(xp)
                             if lvl is None:
                                 return
@@ -81,7 +75,8 @@ class listenersCog(Cog):
                                 ]
                             )
                             try:
-                                await message.author.add_roles(role_reward)
+                                if role_reward:
+                                    await message.author.add_roles(role_reward)
                                 if levelup == "0":
                                     msg = "CONGRATS {}! You were role awarded {}".format(
                                         message.author,
@@ -102,7 +97,8 @@ class listenersCog(Cog):
                                     embed = Embed.from_dict(json["embeds"][0])
 
                                     await channel.send(content=msg, embed=embed)
-                            except:
+                            except Exception as e:
+                                print(f"Error sending level-up message: {e}")
                                 if update == "0":
                                     msg = "{} has leveled up to `level {}`".format(
                                         message.author,
@@ -126,9 +122,11 @@ class listenersCog(Cog):
 
                                     await channel.send(content=msg, embed=embed)
                             return
-                    except AttributeError:
+                    except AttributeError as e:
+                        print(f"AttributeError: {e}")
                         return
-        except:
+        except Exception as e:
+            print(f"Error in on_message: {e}")
             return
 
     async def send_level_message(
