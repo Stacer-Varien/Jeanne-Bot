@@ -55,7 +55,7 @@ class images(GroupCog, name="image"):
     @Jeanne.check(is_suspended)  
     async def saber(self, ctx: Interaction):
         await ctx.response.defer()
-        file, embed = get_saber_pic()
+        embed, file = get_saber_pic() 
         await ctx.followup.send(embed=embed, file=file)
 
     @Jeanne.command(description="Get a neko image")
@@ -65,7 +65,7 @@ class images(GroupCog, name="image"):
     async def neko(self, ctx: Interaction):
         await ctx.response.defer()
         embed, file = get_neko_pic()
-        await ctx.followup.send(file=file, embed=embed)
+        await ctx.followup.send(embed=embed, file=file)
 
     @Jeanne.command(description="Get a Morgan le Fay (Fate) image")
     @Jeanne.check(check_botbanned_app_command)
@@ -74,7 +74,7 @@ class images(GroupCog, name="image"):
     async def morgan(self, ctx: Interaction):
         await ctx.response.defer()
         embed, file = get_morgan_pic()
-        await ctx.followup.send(file=file, embed=embed)
+        await ctx.followup.send(embed=embed, file=file)
 
     @Jeanne.command(description="Get a Medusa (Fate) image")
     @Jeanne.check(check_botbanned_app_command)

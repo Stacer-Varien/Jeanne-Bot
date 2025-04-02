@@ -6,7 +6,7 @@ import lxml.etree as ET
 from os import listdir, path
 
 
-def get_saber_pic() -> tuple[File, Embed]:
+def get_saber_pic() -> tuple[Embed, File]:
     folder_path = SABER
     files = listdir(folder_path)
 
@@ -19,7 +19,7 @@ def get_saber_pic() -> tuple[File, Embed]:
     embed.set_image(url=f"attachment://{random_image}")
     embed.set_footer(text="Fetched from Saber_1936 • Credits must go to the artist")
 
-    return file, embed
+    return embed, file
 
 
 def get_jeanne_pic() -> tuple[Embed, File]:
