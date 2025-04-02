@@ -13,7 +13,7 @@ from functions import (
     check_botbanned_app_command,
     check_disabled_app_command,
     shorten_url,
-    is_suspended,  
+    is_suspended,
 )
 from typing import Optional
 from assets.components import ReportContent, ReportContentPlus
@@ -31,15 +31,14 @@ class nsfw(Cog):
     @Jeanne.checks.cooldown(1, 5, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
-    @Jeanne.check(is_suspended)  
+    @Jeanne.check(is_suspended)
     async def hentai(
         self,
         ctx: Interaction,
     ) -> None:
         await ctx.response.defer()
         hentai, source = await Hentai().hentai()
-        is_mp4 = hentai.endswith("mp4")
-        if is_mp4:
+        if hentai.endswith(("mp4", "webm")):
             view = ReportContent(shorten_url(hentai))
             await ctx.followup.send(hentai, view=view)
             try:
@@ -64,15 +63,6 @@ class nsfw(Cog):
             except (NotFound, HTTPException):
                 return
 
-    @hentai.error
-    async def hentai_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-        if isinstance(error, Jeanne.errors.CommandOnCooldown):
-            cooldown = Embed(
-                description=f"WOAH! Calm down! Give me a breather!\nTry again after `{round(error.retry_after, 2)} seconds`",
-                color=Color.red(),
-            )
-            await ctx.response.send_message(embed=cooldown)
-
     @Jeanne.command(
         description="Get a random media content from Gelbooru",
         nsfw=True,
@@ -85,7 +75,7 @@ class nsfw(Cog):
     )
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
-    @Jeanne.check(is_suspended)  
+    @Jeanne.check(is_suspended)
     async def gelbooru(
         self,
         ctx: Interaction,
@@ -98,7 +88,7 @@ class nsfw(Cog):
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
             view = ReportContentPlus(*[img["file_url"] for img in images])
-            vids = [i for i in images if "mp4" in i["file_url"]]
+            vids = [i for i in images if "mp4" in i["file_url"] or "webm" in i["file_url"]]
             media = [j["file_url"] for j in vids]
 
             if media:
@@ -131,7 +121,7 @@ class nsfw(Cog):
 
         try:
             view = ReportContent(image)
-            if str(image).endswith("mp4"):
+            if str(image).endswith(("mp4", "webm")):
                 await ctx.followup.send(image, view=view)
                 await view.wait()
                 if view.value is None:
@@ -157,7 +147,7 @@ class nsfw(Cog):
                     return
             return
         except:
-            if str(image).endswith("mp4"):
+            if str(image).endswith(("mp4", "webm")):
                 await ctx.followup.send(image)
                 return
             embed = (
@@ -169,22 +159,6 @@ class nsfw(Cog):
             )
             await ctx.followup.send(embed=embed)
 
-    @gelbooru.error
-    async def gelbooru_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, (IndexError, KeyError, TypeError)
-        ):
-            no_tag = Embed(
-                description="The hentai could not be found", color=Color.red()
-            )
-            await ctx.followup.send(embed=no_tag)
-            return
-        if isinstance(error, Jeanne.errors.CommandOnCooldown):
-            cooldown = Embed(
-                description=f"WOAH! Calm down! Give me a breather!\nTry again after `{round(error.retry_after, 2)} seconds`",
-                color=Color.red(),
-            )
-            await ctx.response.send_message(embed=cooldown)
 
     @Jeanne.command(
         description="Get a random hentai from Yande.re",
@@ -198,7 +172,7 @@ class nsfw(Cog):
     )
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
-    @Jeanne.check(is_suspended)  
+    @Jeanne.check(is_suspended)
     async def yandere(
         self,
         ctx: Interaction,
@@ -262,22 +236,6 @@ class nsfw(Cog):
             embed.set_footer(text=footer_text)
             await ctx.followup.send(embed=embed)
 
-    @yandere.error
-    async def yandere_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, (IndexError, KeyError, TypeError)
-        ):
-            no_tag = Embed(
-                description="The hentai could not be found", color=Color.red()
-            )
-            await ctx.followup.send(embed=no_tag)
-            return
-        if isinstance(error, Jeanne.errors.CommandOnCooldown):
-            cooldown = Embed(
-                description=f"WOAH! Calm down! Give me a breather!\nTry again after `{round(error.retry_after, 2)} seconds`",
-                color=Color.red(),
-            )
-            await ctx.response.send_message(embed=cooldown)
 
     @Jeanne.command(
         description="Get a random hentai from Konachan",
@@ -291,7 +249,7 @@ class nsfw(Cog):
     )
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
-    @Jeanne.check(is_suspended)  
+    @Jeanne.check(is_suspended)
     async def konachan(
         self,
         ctx: Interaction,
@@ -358,23 +316,6 @@ class nsfw(Cog):
             embed.set_footer(text=footer_text)
             await ctx.followup.send(embed=embed)
 
-    @konachan.error
-    async def konachan_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, (IndexError, KeyError, TypeError)
-        ):
-            no_tag = Embed(
-                description="The hentai could not be found", color=Color.red()
-            )
-            await ctx.followup.send(embed=no_tag)
-            return
-        if isinstance(error, Jeanne.errors.CommandOnCooldown):
-            cooldown = Embed(
-                description=f"WOAH! Calm down! Give me a breather!\nTry again after `{round(error.retry_after, 2)} seconds`",
-                color=Color.red(),
-            )
-            await ctx.response.send_message(embed=cooldown)
-
     @Jeanne.command(
         description="Get a random media content from Danbooru",
         nsfw=True,
@@ -387,7 +328,7 @@ class nsfw(Cog):
     )
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
-    @Jeanne.check(is_suspended)  
+    @Jeanne.check(is_suspended)
     async def danbooru(
         self,
         ctx: Interaction,
@@ -397,12 +338,12 @@ class nsfw(Cog):
         await ctx.response.defer()
         image = await Hentai(plus).danbooru(tag)
         if plus:
-            images = [image[randint(1, len(image)) - 1] for _ in range(4)]
+            images = [img for img in (image[randint(1, len(image)) - 1] for _ in range(4)) if ".zip" not in img["file_url"]]
             view = ReportContentPlus(*[img["file_url"] for img in images])
-            vids = [i for i in images if "mp4" in i["file_url"]]
+            vids = [i for i in images if "mp4" in i["file_url"] or "webm" in i["file_url"]]
             media = [j["file_url"] for j in vids]
             if media:
-                await ctx.followup.send("\n".join(images), view=view)
+                await ctx.followup.send("\n".join(media), view=view)
                 await view.wait()
                 if view.value == None:
                     try:
@@ -423,7 +364,7 @@ class nsfw(Cog):
             return
         try:
             view = ReportContent(image)
-            if str(image).endswith("mp4"):
+            if str(image).endswith(("mp4", "webm")):
                 await ctx.followup.send(image, view=view)
                 return
             embed = (
@@ -442,7 +383,7 @@ class nsfw(Cog):
                     return
             return
         except:
-            if str(image).endswith("mp4"):
+            if str(image).endswith(("mp4", "webm")):
                 await ctx.followup.send(image)
                 return
             embed = (
@@ -454,8 +395,12 @@ class nsfw(Cog):
             )
             await ctx.followup.send(embed=embed)
 
+    @hentai.error
+    @gelbooru.error
+    @konachan.error
+    @yandere.error
     @danbooru.error
-    async def danbooru_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+    async def Hentai_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (IndexError, KeyError, TypeError)
         ):
