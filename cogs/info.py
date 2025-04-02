@@ -56,7 +56,7 @@ class stat_buttons(ui.View):
 class InfoCog(Cog, name="InfoSlash"):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.bot_version = "v5.0"
+        self.bot_version = "v5.0b"
         self.userinfo_context = Jeanne.ContextMenu(
             name="Userinfo", callback=self.userinfo_callback
         )
@@ -267,51 +267,26 @@ class InfoCog(Cog, name="InfoSlash"):
     async def avatar(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await ctx.response.defer()
         member = ctx.user if member is None else member
-        globalav = member.avatar
-        defaultav = member.default_avatar
-        serverav = None if DMChannel else member.guild_avatar
+        serverav = member.guild_avatar if ctx.guild else None
         color = Color.random()
         embeds = []
+
         normav = Embed(
             description=f"**{member}'s Avatar**",
-            url="https://discordapp.com",
             color=color,
-            type="image",
         )
+        normav.set_image(url=member.display_avatar)
+        embeds.append(normav)
 
-        try:
-            if ctx.channel.me:
-                normav.set_image(url=member.display_avatar)
-                await ctx.followup.send(embed=normav)
-        except:
-            if globalav == None and serverav:
-                guildav = Embed(
-                    url="https://discordapp.com",
-                    color=color,
-                    type="image",
-                )
-                normav.set_image(url=defaultav)
-                guildav.set_image(url=serverav)
-                embeds.append(normav)
-                embeds.append(guildav)
+        if serverav:
+            guildav = Embed(
+                description=f"**{member}'s Server Avatar**",
+                color=color,
+            )
+            guildav.set_image(url=serverav)
+            embeds.append(guildav)
 
-            elif globalav and serverav == None:
-
-                normav.set_image(url=globalav)
-
-                embeds.append(normav)
-            elif globalav and serverav:
-                guildav = Embed(
-                    url="https://discordapp.com",
-                    color=color,
-                    type="image",
-                )
-                normav.set_image(url=globalav)
-                guildav.set_image(url=serverav)
-                embeds.append(normav)
-                embeds.append(guildav)
-
-            await ctx.followup.send(embeds=embeds)
+        await ctx.followup.send(embeds=embeds)
 
     @Jeanne.command(description="View a sticker")
     @Jeanne.describe(
@@ -325,11 +300,18 @@ class InfoCog(Cog, name="InfoSlash"):
         try:
             m: Message = await ctx.channel.fetch_message(int(sticker))
             s: StickerItem = m.stickers[0]
-        except:
+        except (ValueError, IndexError, AttributeError):
             s: StickerItem = utils.get(ctx.guild.stickers, name=sticker)
+            if not s:
+                embed = Embed(
+                    description="This sticker doesn't exist in the server",
+                    color=Color.red(),
+                )
+                await ctx.followup.send(embed=embed)
+                return
+
         q = await self.bot.fetch_sticker(s.id)
-        embed = Embed()
-        embed.colour = Color.random()
+        embed = Embed(color=Color.random())
         embed.add_field(name="Sticker Name", value=q.name, inline=False)
         embed.add_field(name="Sticker ID", value=q.id, inline=False)
         embed.set_image(url=q.url)
@@ -363,20 +345,23 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
-    async def emoji(self, ctx: Interaction, emoji: Jeanne.Range[str, 1]):
+    async def emoji(self, ctx: Interaction, emoji: str):
         await ctx.response.defer()
-        emote = PartialEmoji.from_str(emoji)
-        embed = Embed()
-        if emote.id == None:
-            embed.color = Color.red()
-            embed.description = "Failed to get emoji."
+        try:
+            emote = PartialEmoji.from_str(emoji)
+            if not emote.id:
+                raise ValueError("Invalid emoji format")
+            embed = Embed(color=Color.random())
+            embed.add_field(name="Name", value=emote.name, inline=False)
+            embed.add_field(name="ID", value=emote.id, inline=False)
+            embed.set_image(url=emote.url)
             await ctx.followup.send(embed=embed)
-            return
-        embed.color = Color.random()
-        embed.add_field(name="Name", value=emote.name, inline=False)
-        embed.add_field(name="ID", value=emote.id, inline=False)
-        embed.set_image(url=emote.url)
-        await ctx.followup.send(embed=embed)
+        except ValueError:
+            embed = Embed(
+                description="Failed to get emoji. Ensure the emoji is valid.",
+                color=Color.red(),
+            )
+            await ctx.followup.send(embed=embed)
 
     @emoji.error
     async def emoji_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
