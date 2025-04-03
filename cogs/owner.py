@@ -266,8 +266,8 @@ Make sure private messages between **me and you are opened** or check the host i
     async def warn(self, ctx: Context, user: User, *, reason: str):
         if DevPunishment(ctx.author).check_botbanned_user:
             return
-        devpunish = DevPunishment()
-        await devpunish.warn(user, reason)
+        devpunish = DevPunishment(user)
+        await devpunish.warn(reason)
 
     @command(description="Suspend a user from a certain module/s")
     @guild_only()

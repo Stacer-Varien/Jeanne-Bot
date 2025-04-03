@@ -72,28 +72,44 @@ class DevPunishment:
             "SELECT * FROM devWarnData WHERE user = ?", (self.user.id,)
         ).fetchall()
         db.commit()
-        return 0 if data == None else len(data)
+        return 0 if not data else len(data)
 
     async def autopunish(self):
-        points = self.warnpoints(self.user)
+        points = self.warnpoints()
         db.commit()
-        if points == 0:
+        if points == 1:
             return
         if points == 2:
             duration = timedelta(days=7)
-            await self.suspend(self.user, duration.total_seconds(), ["all"])
+            await self.suspend(
+                duration.total_seconds(),
+                [
+                    "cogs.utilities",
+                    "cogs.fun",
+                    "cogs.image",
+                    "cogs.help",
+                    "cogs.hentai",
+                    "cogs.levelling",
+                    "cogs.currency",
+                    "cogs.reactions",
+                    "cogs.manage",
+                    "cogs.inventory",
+                    "cogs.moderation",
+                    "cogs.info",
+                ],
+                "Recieved 2 bot warnings",)
             return
         if points == 3:
             await self.add_botbanned_user("Recieved 3 bot warnings")
             return
 
-    async def suspend(self, duration: int, modules: list[str], reason:str):
-        data = db.execute(
+    async def suspend(self, duration: int, modules: list[str], reason: str):
+        data=db.execute(
             "INSERT OR IGNORE INTO suspensionData (user, modules, timeout) VALUES (?,?,?)",
             (
                 self.user.id,
                 ",".join(modules),
-                duration,
+                round((datetime.now() + timedelta(seconds=duration)).timestamp()),
             ),
         )
         db.commit()
@@ -132,17 +148,18 @@ class DevPunishment:
         webhook = SyncWebhook.from_url(BB_WEBHOOK)
         webhook.send(embed=embed)
 
-    async def warn(self, user: User, reason: str):
+    async def warn(self, reason: str):
         warn_id = randint(1, 9999999)
-        points = self.warnpoints(user)
-        if points == 1:
+        points = self.warnpoints()
+        revoke_date=None
+        if points == 2:
             revoke_date = round((datetime.now() + timedelta(days=180)).timestamp())
-        else:
+        elif points:
             revoke_date = round((datetime.now() + timedelta(days=90)).timestamp())
         db.execute(
             "INSERT OR IGNORE INTO devWarnData (user, reason, warn_id, revoke_date) VALUES (?,?,?,?)",
             (
-                user.id,
+                self.user.id,
                 reason,
                 warn_id,
                 revoke_date,
@@ -150,15 +167,15 @@ class DevPunishment:
         )
         db.commit()
         embed = Embed(title="User has been Dev Warned", color=Color.yellow())
-        embed.add_field(name="User", value=user, inline=True)
-        embed.add_field(name="ID", value=user.id, inline=True)
+        embed.add_field(name="User", value=self.user, inline=True)
+        embed.add_field(name="ID", value=self.user.id, inline=True)
         embed.add_field(name="Reason", value=reason, inline=True)
         embed.add_field(name="Warn ID", value=warn_id, inline=True)
-        embed.add_field(name="Points", value=self.warnpoints(user))
-        embed.set_thumbnail(url=user.display_avatar)
+        embed.add_field(name="Points", value=self.warnpoints())
+        embed.set_thumbnail(url=self.user.display_avatar)
         webhook = SyncWebhook.from_url(BB_WEBHOOK)
         webhook.send(embed=embed)
-        await self.autopunish(user)
+        await self.autopunish()
 
     def check_suspended_module(self, bot: Bot, command: Jeanne.Command) -> bool:
         data = db.execute(
