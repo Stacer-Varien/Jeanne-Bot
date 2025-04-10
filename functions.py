@@ -199,7 +199,7 @@ class DevPunishment:
         db.commit()
         return data
 
-    async def remove_suspended_user(self):
+    async def remove_suspended_user():
         db.execute("DELETE FROM suspensionData WHERE user = ?", (self.user.id,))
         db.commit()
 
@@ -544,23 +544,6 @@ class Levelling:
         return 0 if cumulated_exp is None else int(cumulated_exp[0])
 
     @property
-    def get_next_time_server(self) -> int:
-        next_time = db.execute(
-            "SELECT next_time FROM serverxpData WHERE user_id = ? AND guild_id = ?",
-            (self.member.id, self.server.id),
-        ).fetchone()
-        db.commit()
-        return int(next_time[0]) if next_time is not None else 0
-
-    @property
-    def get_next_time_global(self) -> int:
-        next_time = db.execute(
-            "SELECT next_time FROM globalxpData WHERE user_id = ?", (self.member.id,)
-        ).fetchone()
-        db.commit()
-        return int(next_time[0]) if next_time is not None else 0
-
-    @property
     def get_member_level(self) -> int:
         level = db.execute(
             "SELECT lvl FROM serverxpData WHERE user_id = ? AND guild_id = ?",
@@ -579,75 +562,69 @@ class Levelling:
 
     async def add_xp(self, xp: int):
         now_time = round(datetime.now().timestamp())
-        next_time = round((datetime.now() + timedelta(minutes=2)).timestamp())
-
         global_cursor = db.execute(
-            "INSERT OR IGNORE INTO globalxpData (user_id, lvl, exp, next_time) VALUES (?, ?, ?, ?)",
-            (self.member.id, 0, xp, next_time),
+            "INSERT OR IGNORE INTO globalxpData (user_id, lvl, exp) VALUES (?, ?, ?)",
+            (self.member.id, 0, xp),
         )
         db.commit()
         if global_cursor.rowcount == 0:
-            if now_time >= self.get_next_time_global:
-                global_exp = self.get_user_xp
-                global_updated_exp = global_exp + xp
+            global_exp = self.get_user_xp
+            global_updated_exp = global_exp + xp
+            db.execute(
+                "UPDATE globalxpData SET exp = ? WHERE user_id = ?",
+                (
+                    global_updated_exp,
+                    self.member.id,
+                ),
+            )
+            db.commit()
+
+            global_level = self.get_user_level
+            global_next_lvl_exp = (
+                (global_level * 50) + ((global_level - 1) * 25) + 50
+            )
+            if global_updated_exp >= global_next_lvl_exp:
                 db.execute(
-                    "UPDATE globalxpData SET exp = ?, next_time = ? WHERE user_id = ?",
-                    (
-                        global_updated_exp,
-                        next_time,
-                        self.member.id,
-                    ),
+                    "UPDATE globalxpData SET lvl = lvl + ?, exp = ? WHERE user_id = ?",
+                    (1, 0, self.member.id),
                 )
                 db.commit()
 
-                global_level = self.get_user_level
-                global_next_lvl_exp = (
-                    (global_level * 50) + ((global_level - 1) * 25) + 50
-                )
-                if global_updated_exp >= global_next_lvl_exp:
-                    db.execute(
-                        "UPDATE globalxpData SET lvl = lvl + ?, exp = ? WHERE user_id = ?",
-                        (1, 0, self.member.id),
-                    )
-                    db.commit()
-
         server_cursor = db.execute(
-            "INSERT OR IGNORE INTO serverxpData (guild_id, user_id, lvl, exp, next_time) VALUES (?, ?, ?, ?, ?)",
-            (self.server.id, self.member.id, 0, xp, next_time),
+            "INSERT OR IGNORE INTO serverxpData (guild_id, user_id, lvl, exp) VALUES (?, ?, ?, ?)",
+            (self.server.id, self.member.id, 0, xp),
         )
         db.commit()
 
         if server_cursor.rowcount == 0:
-            if now_time > self.get_next_time_server:
-                server_exp = self.get_member_xp
-                server_updated_exp = server_exp + xp
+            server_exp = self.get_member_xp
+            server_updated_exp = server_exp + xp
+            db.execute(
+                "UPDATE serverxpData SET exp = ? WHERE guild_id = ? AND user_id = ?",
+                (
+                    server_updated_exp,
+                    self.server.id,
+                    self.member.id,
+                ),
+            )
+            db.commit()
+
+            server_level = self.get_member_level
+            server_next_lvl_exp = (
+                (server_level * 50) + ((server_level - 1) * 25) + 50
+            )
+            if server_updated_exp >= server_next_lvl_exp:
                 db.execute(
-                    "UPDATE serverxpData SET exp = ?, next_time = ? WHERE guild_id = ? AND user_id = ?",
+                    "UPDATE serverxpData SET lvl = lvl + ?, exp = ? WHERE guild_id = ? AND user_id = ?",
                     (
-                        server_updated_exp,
-                        next_time,
+                        1,
+                        0,
                         self.server.id,
                         self.member.id,
                     ),
                 )
                 db.commit()
-
-                server_level = self.get_member_level
-                server_next_lvl_exp = (
-                    (server_level * 50) + ((server_level - 1) * 25) + 50
-                )
-                if server_updated_exp >= server_next_lvl_exp:
-                    db.execute(
-                        "UPDATE serverxpData SET lvl = lvl + ?, exp = ? WHERE guild_id = ? AND user_id = ?",
-                        (
-                            1,
-                            0,
-                            self.server.id,
-                            self.member.id,
-                        ),
-                    )
-                    db.commit()
-                    return self.get_level_channel
+                return self.get_level_channel
 
     @property
     def get_level_channel(

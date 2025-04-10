@@ -8,31 +8,36 @@ from functions import BetaTest, DevPunishment, Levelling
 from asyncio import Lock, sleep
 from pathlib import Path
 
-# Path to the cooldowns JSON file
 COOLDOWNS_FILE = Path("lvlcooldowns.json")
 
-# In-memory cache for cooldowns
 cooldowns = defaultdict(lambda: {"global": {"next_time": datetime.min}, "servers": {}})
 
-# Load cooldowns from the JSON file
+
 def load_cooldowns():
     if COOLDOWNS_FILE.exists():
         with open(COOLDOWNS_FILE, "r") as file:
-            data = json.load(file)
+            try:
+                data = json.load(file)
+            except json.JSONDecodeError:
+                data = {}
             for user_id, user_data in data.items():
                 cooldowns[int(user_id)] = {
                     "global": {
-                        "next_time": datetime.fromisoformat(user_data["global"]["next_time"])
+                        "next_time": datetime.fromisoformat(
+                            user_data["global"]["next_time"]
+                        )
                     },
                     "servers": {
                         int(server_id): {
-                            "next_time": datetime.fromisoformat(server_data["next_time"])
+                            "next_time": datetime.fromisoformat(
+                                server_data["next_time"]
+                            )
                         }
                         for server_id, server_data in user_data["servers"].items()
                     },
                 }
 
-# Save cooldowns to the JSON file
+
 def save_cooldowns():
     with open(COOLDOWNS_FILE, "w") as file:
         json.dump(
@@ -75,7 +80,6 @@ class listenersCog(Cog):
         server_id = message.guild.id
         now_time = datetime.now()
 
-
         if user_id not in cooldowns:
             cooldowns[user_id] = {
                 "global": {"next_time": datetime.min},
@@ -84,25 +88,24 @@ class listenersCog(Cog):
 
         user_cooldowns = cooldowns[user_id]
 
-
         if server_id not in user_cooldowns["servers"]:
             user_cooldowns["servers"][server_id] = {"next_time": datetime.min}
 
+        if now_time >= user_cooldowns["servers"][server_id]["next_time"]:
+            try:
+                level_instance = Levelling(message.author, message.guild)
+                if level_instance.check_xpblacklist_channel(message.channel) is None:
+                    weekend_check = now_time.isoweekday() >= 6
+                    xp = 15 if weekend_check else 10
+                    await level_instance.add_xp(xp)
+                    user_cooldowns["servers"][server_id]["next_time"] = now_time + timedelta(minutes=2)
 
-        if now_time >= user_cooldowns["global"]["next_time"]:
-            if now_time >= user_cooldowns["servers"][server_id]["next_time"]:
-                try:
-                    level_instance = Levelling(message.author, message.guild)
-                    if level_instance.check_xpblacklist_channel(message.channel) is None:
-                        weekend_check = now_time.isoweekday() >= 6
-                        xp = 15 if weekend_check else 10
-                        await level_instance.add_xp(xp)
+                    if now_time >= user_cooldowns["global"]["next_time"]:
                         user_cooldowns["global"]["next_time"] = now_time + timedelta(minutes=2)
-                        user_cooldowns["servers"][server_id]["next_time"] = now_time + timedelta(minutes=2)
 
-                        save_cooldowns()
-                except Exception as e:
-                    print(f"Error in on_message: {e}")
+                    save_cooldowns()
+            except Exception as e:
+                print(f"Error in on_message: {e}")
 
     async def send_level_message(
         self, channel: Optional[TextChannel], content: str, embed: Optional[Embed]
