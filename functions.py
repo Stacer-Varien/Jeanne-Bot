@@ -1,5 +1,9 @@
+from asyncio import sleep
+from collections import defaultdict
 from datetime import datetime, timedelta
 from enum import Enum
+import json
+from pathlib import Path
 from random import choice, randint, shuffle
 import aiohttp
 from humanfriendly import parse_timespan
@@ -18,7 +22,7 @@ from discord import (
 
 from discord.ext.commands import Bot, Context
 from requests import get
-from config import db, BB_WEBHOOK, CATBOX_HASH
+from config import db, BB_WEBHOOK, CATBOX_HASH, LVLCOOLDOWNS
 from typing import Literal, Optional, List
 
 
@@ -97,14 +101,15 @@ class DevPunishment:
                     "cogs.moderation",
                     "cogs.info",
                 ],
-                "Recieved 2 bot warnings",)
+                "Recieved 2 bot warnings",
+            )
             return
         if points == 3:
             await self.add_botbanned_user("Recieved 3 bot warnings")
             return
 
     async def suspend(self, duration: int, modules: list[str], reason: str):
-        data=db.execute(
+        data = db.execute(
             "INSERT OR IGNORE INTO suspensionData (user, modules, timeout) VALUES (?,?,?)",
             (
                 self.user.id,
@@ -125,7 +130,7 @@ class DevPunishment:
             )
             db.execute(
                 "UPDATE suspensionDATA SET modules = ?, timeout = ? WHERE user = ?",
-                (",".join(modules), new_timeout, self.user.id)
+                (",".join(modules), new_timeout, self.user.id),
             )
             db.commit()
 
@@ -151,7 +156,7 @@ class DevPunishment:
     async def warn(self, reason: str):
         warn_id = randint(1, 9999999)
         points = self.warnpoints()
-        revoke_date=None
+        revoke_date = None
         if points == 2:
             revoke_date = round((datetime.now() + timedelta(days=180)).timestamp())
         elif points:
@@ -187,19 +192,21 @@ class DevPunishment:
             (
                 cmd.module
                 for cmd in bot.tree.walk_commands()
-                if not isinstance(cmd, Jeanne.Group) and cmd.qualified_name == command.qualified_name
+                if not isinstance(cmd, Jeanne.Group)
+                and cmd.qualified_name == command.qualified_name
             ),
-            None)
+            None,
+        )
         if cog and any(module in cog for module in suspended_modules):
             return True
         return False
 
     def get_suspended_users(self):
-        data=db.execute("SELECT * FROM suspensionData").fetchall()
+        data = db.execute("SELECT * FROM suspensionData").fetchall()
         db.commit()
         return data
 
-    async def remove_suspended_user():
+    async def remove_suspended_user(self):
         db.execute("DELETE FROM suspensionData WHERE user = ?", (self.user.id,))
         db.commit()
 
@@ -507,6 +514,11 @@ class Levelling:
     ) -> None:
         self.member = member
         self.server = server
+        self.COOLDOWNS_FILE = Path(LVLCOOLDOWNS)
+
+    cooldowns = defaultdict(
+        lambda: {"global": {"next_time": datetime.min}, "servers": {}}
+    )
 
     @property
     def get_member_xp(self) -> int:
@@ -580,9 +592,7 @@ class Levelling:
             db.commit()
 
             global_level = self.get_user_level
-            global_next_lvl_exp = (
-                (global_level * 50) + ((global_level - 1) * 25) + 50
-            )
+            global_next_lvl_exp = (global_level * 50) + ((global_level - 1) * 25) + 50
             if global_updated_exp >= global_next_lvl_exp:
                 db.execute(
                     "UPDATE globalxpData SET lvl = lvl + ?, exp = ? WHERE user_id = ?",
@@ -610,9 +620,7 @@ class Levelling:
             db.commit()
 
             server_level = self.get_member_level
-            server_next_lvl_exp = (
-                (server_level * 50) + ((server_level - 1) * 25) + 50
-            )
+            server_next_lvl_exp = (server_level * 50) + ((server_level - 1) * 25) + 50
             if server_updated_exp >= server_next_lvl_exp:
                 db.execute(
                     "UPDATE serverxpData SET lvl = lvl + ?, exp = ? WHERE guild_id = ? AND user_id = ?",
@@ -727,6 +735,78 @@ class Levelling:
         ).fetchall()
         db.commit()
         return [i for i in data] if data else None
+
+    def load_cooldowns(self):
+        if self.COOLDOWNS_FILE.exists():
+            with open(self.COOLDOWNS_FILE, "r") as file:
+                try:
+                    data = json.load(file)
+                except json.JSONDecodeError:
+                    data = {}
+                for user_id, user_data in data.items():
+                    self.cooldowns[int(user_id)] = {
+                        "global": {
+                            "next_time": datetime.fromisoformat(
+                                user_data["global"]["next_time"]
+                            )
+                        },
+                        "servers": {
+                            int(server_id): {
+                                "next_time": datetime.fromisoformat(
+                                    server_data["next_time"]
+                                )
+                            }
+                            for server_id, server_data in user_data["servers"].items()
+                        },
+                    }
+
+    def save_cooldowns(self):
+        with open(self.COOLDOWNS_FILE, "w") as file:
+            json.dump(
+                {
+                    user_id: {
+                        "global": {
+                            "next_time": data["global"]["next_time"].isoformat()
+                        },
+                        "servers": {
+                            server_id: {
+                                "next_time": server_data["next_time"].isoformat()
+                            }
+                            for server_id, server_data in data["servers"].items()
+                        },
+                    }
+                    for user_id, data in self.cooldowns.items()
+                },
+                file,
+                indent=4,
+            )
+
+    async def cleanup_cooldowns(self):
+        while True:
+            now_time = datetime.now()
+            expired_users = []
+
+            for user_id, data in list(self.cooldowns.items()):
+                if now_time >= data["global"]["next_time"]:
+                    data["global"]["next_time"] = datetime.min
+
+                expired_servers = [
+                    server_id
+                    for server_id, server_data in data["servers"].items()
+                    if now_time >= server_data["next_time"]
+                ]
+                for server_id in expired_servers:
+                    del data["servers"][server_id]
+
+                if data["global"]["next_time"] == datetime.min and not data["servers"]:
+                    expired_users.append(user_id)
+
+            for user_id in expired_users:
+                del self.cooldowns[user_id]
+
+            self.save_cooldowns()
+
+            await sleep(60)
 
 
 class Manage:
@@ -1292,7 +1372,7 @@ class Hentai:
             "kodomo_doushi",
             "child_on_child",
             "small_breasts",
-            "short_stack"
+            "short_stack",
         ]
 
     def format_tags(self, tags: str = None) -> str:
@@ -1560,19 +1640,19 @@ class AutoCompleteChoices:
         ctx: Interaction,
         current: str,
     ) -> List[Jeanne.Choice[Member]]:
-        entries=[entry async for entry in ctx.guild.bans()]
+        entries = [entry async for entry in ctx.guild.bans()]
 
         banned_users = [entry.user for entry in entries]
 
         choices = []
 
         for user in banned_users:
-                name=user.name or user.global_name
-                user_id=str(user.id)
-                choices.append(Jeanne.Choice(name=f"{name} - {user_id}", value=user_id))
+            name = user.name or user.global_name
+            user_id = str(user.id)
+            choices.append(Jeanne.Choice(name=f"{name} - {user_id}", value=user_id))
 
-                if len(choices) >= 25:
-                    break
+            if len(choices) >= 25:
+                break
 
         return choices
 
