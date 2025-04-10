@@ -537,23 +537,7 @@ class Levelling:
         db.commit()
         return 0 if xp is None else int(xp[0])
 
-    @property
-    def get_member_cumulated_xp(self) -> int:
-        cumulated_exp = db.execute(
-            "SELECT cumulative_exp FROM serverxpData WHERE user_id = ? AND guild_id = ?",
-            (self.member.id, self.server.id),
-        ).fetchone()
-        db.commit()
-        return 0 if cumulated_exp is None else int(cumulated_exp[0])
 
-    @property
-    def get_user_cumulated_xp(self) -> int:
-        cumulated_exp = db.execute(
-            "SELECT cumulative_exp FROM globalxpData WHERE user_id = ?",
-            (self.member.id,),
-        ).fetchone()
-        db.commit()
-        return 0 if cumulated_exp is None else int(cumulated_exp[0])
 
     @property
     def get_member_level(self) -> int:
