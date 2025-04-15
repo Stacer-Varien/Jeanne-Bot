@@ -21,29 +21,25 @@ class DBL(Cog, name="DBL"):
 
     @tasks.loop(minutes=30, reconnect=True)
     async def update_stats(self):
+        servers = len(self.bot.guilds)
+        dbheaders = {
+            "Content-Type": "application/json",
+            "Authorization": DB_AUTH,
+        }
         try:
-            servers = len(self.bot.guilds)
-            dbheaders = {
-                "Content-Type": "application/json",
-                "Authorization": DB_AUTH,
-            }
             async with aiohttp.ClientSession(headers=dbheaders) as session:
                 await session.post(
-                    " https://discord.bots.gg/api/v1/bots/831993597166747679/stats",
+                    "https://discord.bots.gg/api/v1/bots/831993597166747679/stats",
                     json={"guildCount": servers, "shardCount": self.bot.shard_count},
                 )
-
             await self.topggpy.post_guild_count(
                 guild_count=servers, shard_count=self.bot.shard_count
             )
             print(
-                f"Posted server count ({servers}) at {datetime.now().strftime('%H:%M')}"
-            )
-            print(
-                f"Posted shard count ({self.bot.shard_count}) at {datetime.now().strftime('%H:%M')}"
+                f"Posted server and shard count ({servers}, {self.bot.shard_count}) at {datetime.now().strftime('%H:%M')}"
             )
         except Exception as e:
-            print(f"Failed to post server count\n{e.__class__.__name__}: {e}")
+            print(f"Failed to post stats\n{e.__class__.__name__}: {e}")
 
     @update_stats.before_loop
     async def before_update_stats(self):
@@ -51,22 +47,25 @@ class DBL(Cog, name="DBL"):
 
     @Cog.listener()
     async def on_dbl_vote(self, data: dict):
-        if data["type"] == "upvote":
-            voter_id = int(data["user"])
-            voter = await self.bot.fetch_user(voter_id)
-            if DevPunishment(voter).check_botbanned_user:
-                return
-            credits = 100 if await self.topggpy.get_weekend_status() else 50
-            xp = (
-                (10 * Levelling(voter).get_user_level)
-                if await self.topggpy.get_weekend_status()
-                else (5 * Levelling(voter).get_user_level)
-            )
-            if await BetaTest(self.bot).check(voter):
-                credits = round(credits * 1.25)
-                await Levelling(voter).add_xp((5 * round(xp / 5)))
-            await Currency(voter).add_qp(credits)
-            await Levelling(voter).add_xp(xp)
+        if data["type"] != "upvote":
+            return
+
+        voter_id = int(data["user"])
+        voter = await self.bot.fetch_user(voter_id)
+        if DevPunishment(voter).check_botbanned_user:
+            return
+
+        weekend_bonus = await self.topggpy.get_weekend_status()
+        credits = 100 if weekend_bonus else 50
+        xp_multiplier = 10 if weekend_bonus else 5
+        xp = xp_multiplier * Levelling(voter).get_user_level
+
+        if await BetaTest(self.bot).check(voter):
+            credits = round(credits * 1.25)
+            xp = 5 * round(xp / 5) 
+
+        await Currency(voter).add_qp(credits)
+        await Levelling(voter).add_xp(xp)
 
 
 async def setup(bot: Bot):
