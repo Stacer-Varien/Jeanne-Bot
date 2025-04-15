@@ -13,33 +13,44 @@ from discord.ext.commands import Bot
 class Profile:
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.default_bg = os.path.join(os.path.dirname(__file__), "assets", "card.png")
-        self.font1 = os.path.join(os.path.dirname(__file__), "assets", "font.ttf")
-        self.vote_badge = os.path.join(os.path.dirname(__file__), "assets", "voted.png")
-        self.first_badge = os.path.join(os.path.dirname(__file__), "assets", "1st.png")
-        self.second_badge = os.path.join(os.path.dirname(__file__), "assets", "2nd.png")
-        self.third_badge = os.path.join(os.path.dirname(__file__), "assets", "3rd.png")
-        self.creator_badge = os.path.join(
-            os.path.dirname(__file__), "assets", "creator.png"
-        )
-        self.richest_badge = os.path.join(
-            os.path.dirname(__file__), "assets", "richest.png"
-        )
-        self.top_30_badge = os.path.join(
-            os.path.dirname(__file__), "assets", "top30.png"
-        )
-        self.top_100_badge = os.path.join(
-            os.path.dirname(__file__), "assets", "top100.png"
-        )
-        self.partner = os.path.join(os.path.dirname(__file__), "assets", "partner.png")
-        self.qp = os.path.join(os.path.dirname(__file__), "assets", "qp.png")
-        self.beta = os.path.join(os.path.dirname(__file__), "assets", "beta.png")
+        assets_dir = os.path.join(os.path.dirname(__file__), "assets")
+        self.default_bg = os.path.join(assets_dir, "card.png")
+        self.font1 = os.path.join(assets_dir, "font.ttf")
+        self.badges = {
+            "vote": os.path.join(assets_dir, "voted.png"),
+            "first": os.path.join(assets_dir, "1st.png"),
+            "second": os.path.join(assets_dir, "2nd.png"),
+            "third": os.path.join(assets_dir, "3rd.png"),
+            "creator": os.path.join(assets_dir, "creator.png"),
+            "richest": os.path.join(assets_dir, "richest.png"),
+            "top_30": os.path.join(assets_dir, "top30.png"),
+            "top_100": os.path.join(assets_dir, "top100.png"),
+            "partner": os.path.join(assets_dir, "partner.png"),
+            "qp": os.path.join(assets_dir, "qp.png"),
+            "beta": os.path.join(assets_dir, "beta.png"),
+        }
 
     @staticmethod
-    def enhance_and_paste(image: Image, position: int, card: Image.Image):
+    def enhance_and_paste(image: Image, position: tuple[int, int], card: Image.Image):
         enhancer = ImageEnhance.Brightness(image)
         enhanced_image = enhancer.enhance(1.1)
         card.paste(enhanced_image, position, enhanced_image)
+
+    @staticmethod
+    def format_number(value: int) -> str:
+        if value < 1000:
+            return str(value)
+        if value < 1_000_000:
+            return f"{value / 1000:.1f}k"
+        return f"{value / 1_000_000:.1f}M"
+
+    async def fetch_image(self, url: str) -> BytesIO | Literal[False]:
+        headers = {"User-Agent": "Mozilla/5.0"}
+        async with aiohttp.ClientSession(headers=headers) as session:
+            async with session.get(url) as resp:
+                if resp.status != 200:
+                    return False
+                return BytesIO(await resp.read())
 
     async def generate_profile(
         self,
@@ -49,41 +60,17 @@ class Profile:
         country: str = None,
     ) -> BytesIO | Literal[False]:
         inventory_instance = Inventory(user)
-        if bg_image:
-            headers = {
-                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"
-            }
-            async with aiohttp.ClientSession(headers=headers) as session:
-                async with session.get(bg_image) as resp:
-                    if resp.status != 200:
-                        return False
-                    bytes_io = await resp.read()
-            background = BytesIO(bytes_io)
-        else:
-            background = self.default_bg
+        background = await self.fetch_image(bg_image) if bg_image else self.default_bg
+        if not background:
+            return False
 
-        currency_instance = Currency(user)
-        levelling_instance = Levelling(user, user.guild)
         card = Image.open(background).convert("RGBA")
-
         card = ImageEnhance.Brightness(card).enhance(
             float(inventory_instance.get_brightness) / 100
         )
 
-        width, height = card.size
-        if width == 900 and height == 500:
-            pass
-        elif width > 900 and height > 500:
-            x1 = 0
-            y1 = 0
-            x2 = width
-            nh = math.ceil(width * 0.528888)
-            y2 = nh if nh < height else height
-            card = card.crop((x1, y1, x2, y2)).resize(
-                (900, 500), resample=Image.Resampling.LANCZOS
-            )
-        else:
-            return False
+        if card.size != (900, 500):
+            card = card.resize((900, 500), resample=Image.Resampling.LANCZOS)
 
         profile_bytes = BytesIO(requests.get(user.display_avatar.url).content)
         profile = (
@@ -91,196 +78,186 @@ class Profile:
             .convert("RGBA")
             .resize((180, 180), resample=Image.Resampling.LANCZOS)
         )
-        profile_pic_holder = Image.new("RGBA", card.size, (255, 255, 255, 0))
 
-        mask = Image.new("RGBA", card.size, 0)
-        mask_draw = ImageDraw.Draw(mask)
-        mask_draw.ellipse((30, 250, 210, 430), fill=(255, 25, 255, 255))
+        mask = Image.new("L", (180, 180), 0)
+        ImageDraw.Draw(mask).ellipse((0, 0, 180, 180), fill=255)
+        profile_pic_holder = Image.new("RGBA", card.size, (255, 255, 255, 0))
+        profile_pic_holder.paste(profile, (30, 250), mask)
 
         font_small = ImageFont.truetype(self.font1, 30)
         font_color = inventory_instance.get_color
-        COLOR = (
+        color = (
             tuple(ImageColor.getcolor(font_color, "RGB"))
             if font_color
             else (204, 204, 255)
         )
 
-        def get_str(xp: int):
-            if xp < 1000:
-                return str(xp)
-            if xp >= 1000 and xp < 1000000:
-                return str(round(xp / 1000, 1)) + "k"
-            if xp > 1000000:
-                return str(round(xp / 1000000, 1)) + "M"
-
-        def get_str_qp(balance: int):
-            if balance < 1000:
-                return str(balance)
-            if balance >= 1000 and balance < 1000000:
-                return str(round(balance / 1000, 1)) + "k"
-            if balance > 1000000:
-                return str(round(balance / 1000000, 1)) + "M"
-
         draw = ImageDraw.Draw(card)
         draw.text(
             (215, 320),
             str(user),
-            COLOR,
+            color,
             font=ImageFont.truetype(self.font1, 45),
             stroke_width=1,
         )
-        draw.ellipse((30, 250, 210, 430), fill=(255, 255, 255, 0), outline=COLOR)
-        qp = Image.open(self.qp).resize((50, 50))
+        draw.ellipse((30, 250, 210, 430), outline=color)
 
+        badges = await self.get_badges(user, voted, country)
+        for badge, x_pos in badges:
+            self.enhance_and_paste(badge, (x_pos, 430), card)
+
+        card.paste(profile_pic_holder, (0, 0), profile_pic_holder)
+
+        profile_canvas = self.create_profile_canvas(user, color, inventory_instance)
+        profile_canvas.paste(card, (0, 0), card)
+
+        final_bytes = BytesIO()
+        profile_canvas.save(final_bytes, "png")
+        final_bytes.seek(0)
+        return final_bytes
+
+    async def get_badges(self, user: User, voted: bool, country: str) -> list[tuple[Image.Image, int]]:
         badges = []
         x_position = 840
 
         if voted:
-            voter = Image.open(self.vote_badge).resize((50, 50))
-            badges.append((voter, x_position))
+            badges.append((Image.open(self.badges["vote"]).resize((50, 50)), x_position))
             x_position -= 60
 
-        grank, srank, rrank = (
-            levelling_instance.get_user_global_rank,
-            levelling_instance.get_member_server_rank,
-            get_richest(user),
-        )
-
+        grank, rrank = Levelling(user).get_user_global_rank, get_richest(user)
         if grank is not None and grank <= 100:
-            if grank == 1:
-                ranked = Image.open(self.first_badge).resize((50, 50))
-            elif grank == 2:
-                ranked = Image.open(self.second_badge).resize((50, 50))
-            elif grank == 3:
-                ranked = Image.open(self.third_badge).resize((50, 50))
-            elif grank <= 30:
-                ranked = Image.open(self.top_30_badge).resize((50, 50))
-            else:
-                ranked = Image.open(self.top_100_badge).resize((50, 50))
-
-            badges.append((ranked, x_position))
+            rank_badge = self.get_rank_badge(grank)
+            badges.append((rank_badge, x_position))
             x_position -= 60
 
         if rrank < 15:
-            richest = Image.open(self.richest_badge).resize((50, 50))
-            badges.append((richest, x_position))
+            badges.append((Image.open(self.badges["richest"]).resize((50, 50)), x_position))
             x_position -= 60
 
         if country:
             country_img = os.path.join(
                 os.path.dirname(__file__), "assets", "country", f"{country}.png"
             )
-            cimage = Image.open(country_img).convert("RGBA").resize((50, 50))
-            badges.append((cimage, x_position))
+            badges.append((Image.open(country_img).resize((50, 50)), x_position))
             x_position -= 60
 
         if Partner.check(user):
-            partner_badge = Image.open(self.partner).resize((50, 50))
-            badges.append((partner_badge, x_position))
+            badges.append((Image.open(self.badges["partner"]).resize((50, 50)), x_position))
             x_position -= 60
 
-        beta = await BetaTest(self.bot).check(user)
-        if beta:
-            betatest = Image.open(self.beta).resize((50, 50))
-            badges.append((betatest, x_position))
+        if await BetaTest(self.bot).check(user):
+            badges.append((Image.open(self.badges["beta"]).resize((50, 50)), x_position))
             x_position -= 60
 
         if user.id == 597829930964877369:
-            creator_badge = Image.open(self.creator_badge).resize((50, 50))
-            badges.append((creator_badge, x_position))
+            badges.append((Image.open(self.badges["creator"]).resize((50, 50)), x_position))
             x_position -= 60
 
-        for badge, x_pos in badges:
-            self.enhance_and_paste(badge, (x_pos, 430), card)
+        return badges
 
-        profile_pic_holder.paste(profile, (30, 250))
+    def get_rank_badge(self, rank: int) -> Image.Image:
+        if rank == 1:
+            return Image.open(self.badges["first"]).resize((50, 50))
+        if rank == 2:
+            return Image.open(self.badges["second"]).resize((50, 50))
+        if rank == 3:
+            return Image.open(self.badges["third"]).resize((50, 50))
+        if rank <= 30:
+            return Image.open(self.badges["top_30"]).resize((50, 50))
+        return Image.open(self.badges["top_100"]).resize((50, 50))
 
-        pre = Image.composite(profile_pic_holder, card, mask)
+    def create_profile_canvas(self, user: User, color: tuple[int, int, int], inventory_instance: Inventory) -> Image.Image:
+        canvas = Image.new("RGB", (900, 900), (32, 32, 32))
+        draw = ImageDraw.Draw(canvas)
 
-        profile_canvas = Image.new("RGB", (900, 900), (32, 32, 32))
-        profile_draw = ImageDraw.Draw(profile_canvas)
+        currency_instance = Currency(user)
+        levelling_instance = Levelling(user, user.guild)
 
-        profile_draw.text(
+        font_small = ImageFont.truetype(self.font1, 30)
+
+        # Draw text and rectangles for ranks, levels, and bio
+        draw.text(
             (40, 520),
             text=f"Global Rank",
-            fill=COLOR,
+            fill=color,
             font=ImageFont.truetype(self.font1, 35),
             stroke_width=1,
             align="center",
         )
-        profile_draw.text(
+        draw.text(
             (330, 520),
             text="Server Rank",
-            fill=COLOR,
+            fill=color,
             font=ImageFont.truetype(self.font1, 35),
             stroke_width=1,
             align="center",
         )
-        profile_draw.text(
+        draw.text(
             (620, 520),
             text="QP Balance",
-            fill=COLOR,
+            fill=color,
             font=ImageFont.truetype(self.font1, 35),
             stroke_width=1,
             align="center",
         )
 
         # qp rect
-        profile_draw.rounded_rectangle((610, 510, 870, 630), outline=COLOR, radius=6)
+        draw.rounded_rectangle((610, 510, 870, 630), outline=color, radius=6)
 
-        global_rank = ("#" + str(grank)) if grank else "N/A"
-        profile_draw.text(
+        global_rank = ("#" + str(levelling_instance.get_user_global_rank)) if levelling_instance.get_user_global_rank else "N/A"
+        draw.text(
             (70, 570),
             global_rank,
-            COLOR,
+            color,
             font=ImageFont.truetype(self.font1, 45),
             stroke_width=1,
             align="center",
         )
-        server_rank = ("#" + str(srank)) if srank else "N/A"
-        profile_draw.text(
+        server_rank = ("#" + str(levelling_instance.get_member_server_rank)) if levelling_instance.get_member_server_rank else "N/A"
+        draw.text(
             (370, 570),
             server_rank,
-            COLOR,
+            color,
             font=ImageFont.truetype(self.font1, 45),
             stroke_width=1,
         )
 
-        profile_draw.text(
+        draw.text(
             (640, 570),
-            f"{get_str_qp(currency_instance.get_balance)}",
-            COLOR,
+            f"{self.format_number(currency_instance.get_balance)}",
+            color,
             font=ImageFont.truetype(self.font1, 45),
             stroke_width=1,
         )
-        profile_canvas.paste(qp, (820, 570), qp)
+        qp = Image.open(self.badges["qp"]).resize((50, 50))
+        canvas.paste(qp, (820, 570), qp)
 
         # global level bar
-        profile_draw.rounded_rectangle(
-            (10, 680, 890, 693), outline=COLOR, width=2, radius=6
+        draw.rounded_rectangle(
+            (10, 680, 890, 693), outline=color, width=2, radius=6
         )
         global_level, global_user_xp = (
             levelling_instance.get_user_level,
             levelling_instance.get_user_xp,
         )
-        profile_draw.text(
+        draw.text(
             (20, 640),
             f"Global Level: {global_level}",
-            COLOR,
+            color,
             font=font_small,
             stroke_width=1,
         )
         global_next_xp = (global_level * 50) + ((global_level - 1) * 25) + 50
-        profile_draw.text(
+        draw.text(
             (520, 640),
-            f"Global XP: {get_str(global_user_xp)}/{get_str(global_next_xp)}",
-            COLOR,
+            f"Global XP: {self.format_number(global_user_xp)}/{self.format_number(global_next_xp)}",
+            color,
             font=font_small,
             stroke_width=1,
         )
 
         # global rank rect
-        profile_draw.rounded_rectangle((30, 510, 290, 630), outline=COLOR, radius=6)
+        draw.rounded_rectangle((30, 510, 290, 630), outline=color, radius=6)
 
         global_xpneed = global_next_xp - levelling_instance.get_user_xp
         global_xphave = global_user_xp
@@ -288,35 +265,35 @@ class Profile:
         global_current_percentage = (global_xphave / global_xpneed) * 100
         global_length_of_bar = (global_current_percentage * 8.76) + 12
 
-        profile_draw.rounded_rectangle(
-            (12, 682, global_length_of_bar, 691), fill=COLOR, radius=6
+        draw.rounded_rectangle(
+            (12, 682, global_length_of_bar, 691), fill=color, radius=6
         )
         server_level, server_user_xp = (
             levelling_instance.get_member_level,
             levelling_instance.get_member_xp,
         )
 
-        profile_draw.text(
+        draw.text(
             (20, 710),
             f"Server Level: {server_level}",
-            COLOR,
+            color,
             font=font_small,
             stroke_width=1,
         )
         server_next_xp = (server_level * 50) + ((server_level - 1) * 25) + 50
-        profile_draw.text(
+        draw.text(
             (520, 710),
-            f"Server XP: {get_str(server_user_xp)}/{get_str(server_next_xp)}",
-            COLOR,
+            f"Server XP: {self.format_number(server_user_xp)}/{self.format_number(server_next_xp)}",
+            color,
             font=font_small,
             stroke_width=1,
         )
         # server rank rect
-        profile_draw.rounded_rectangle((320, 510, 580, 630), outline=COLOR, radius=6)
+        draw.rounded_rectangle((320, 510, 580, 630), outline=color, radius=6)
 
         # server rank bar
-        profile_draw.rounded_rectangle(
-            (10, 750, 890, 763), outline=COLOR, width=2, radius=6
+        draw.rounded_rectangle(
+            (10, 750, 890, 763), outline=color, width=2, radius=6
         )
 
         server_xpneed = server_next_xp - levelling_instance.get_member_xp
@@ -325,26 +302,22 @@ class Profile:
         server_current_percentage = (server_xphave / server_xpneed) * 100
         server_length_of_bar = (server_current_percentage * 8.76) + 12
 
-        profile_draw.rounded_rectangle(
-            (12, 752, server_length_of_bar, 761), fill=COLOR, radius=6
+        draw.rounded_rectangle(
+            (12, 752, server_length_of_bar, 761), fill=color, radius=6
         )
 
         bio = inventory_instance.get_bio
         bio = "No bio available" if bio == None else bio
 
-        profile_draw.rounded_rectangle(
-            (10, 780, 890, 890), radius=7, width=2, outline=COLOR, fill=(59, 59, 59)
+        draw.rounded_rectangle(
+            (10, 780, 890, 890), radius=7, width=2, outline=color, fill=(59, 59, 59)
         )
-        profile_draw.text(
+        draw.text(
             (20, 790),
             f"{bio}",
-            COLOR,
+            color,
             font=ImageFont.truetype(self.font1, 25),
             stroke_width=1,
         )
 
-        profile_canvas.paste(pre)
-        final_bytes = BytesIO()
-        profile_canvas.save(final_bytes, "png")
-        final_bytes.seek(0)
-        return final_bytes
+        return canvas
