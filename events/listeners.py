@@ -61,7 +61,7 @@ class listenersCog(Cog):
 
         if now_time >= user_cooldowns["servers"][server_id]["next_time"]:
             if level_instance.check_xpblacklist_channel(message.channel) is None:
-                voted = self.topggpy.get_user_vote(message.author.id)
+                voted = await self.topggpy.get_user_vote(message.author.id)
                 checkbeta = await BetaTest(self.bot).check(message.author)
                 weekend_check = datetime.isoweekday(datetime.now()) < 5
                 if voted:
