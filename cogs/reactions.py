@@ -44,78 +44,69 @@ class SlashReactions(Cog, name="ReactionsSlash"):
         random_gif = random.choice(json.loads(reaction_api.content)["results"])
         reaction_url = random_gif["media_formats"]["gif"]["url"]
         reaction_embed.set_image(url=reaction_url)
-        if action == "baka":
-            msg = (
+
+        messages = {
+            "baka": (
                 f"*{ctx.user}*, you are a baka!"
                 if member is None
-                else f"*{member.mention}*, *{ctx.user} called you a baka!"
-            )
-        elif action == "smug":
-            msg = f"*{ctx.user}* is smugging"
-        elif action == "hug":
-            msg = (
+                else f"*{member.mention}*, *{ctx.user} called you a baka!*"
+            ),
+            "smug": f"*{ctx.user}* is smirking",
+            "hug": (
                 f"*Hugging {ctx.user}*"
                 if member is None
                 else f"*{ctx.user} hugged {member.mention}*"
-            )
-        elif action == "poke":
-            msg = (
+            ),
+            "poke": (
                 f"*Poking {ctx.user}*"
                 if member is None
                 else f"*{ctx.user} is poking {member.mention}*"
-            )
-        elif action == "cuddle":
-            msg = (
+            ),
+            "cuddle": (
                 f"*Cuddling {ctx.user}*"
                 if member is None
                 else f"*{ctx.user} is cuddling with {member.mention}*"
-            )
-        elif action == "dance":
-            msg = (
+            ),
+            "dance": (
                 f"*{ctx.user} is dancing*"
                 if member is None
                 else f"*{ctx.user} is dancing with {member.mention}*"
-            )
-        elif action == "pat":
-            msg = (
+            ),
+            "pat": (
                 f"*Patting {ctx.user}*"
                 if member is None
                 else f"*{ctx.user} patted {member.mention}*"
-            )
-        elif action == "blush":
-            msg = f"*{ctx.user} is blushing*"
-        elif action == "bite":
-            msg = (
+            ),
+            "blush": f"*{ctx.user} is blushing*",
+            "bite": (
                 f"*Biting {ctx.user}*"
                 if member is None
                 else f"*{ctx.user} bit {member.mention}*"
-            )
-        elif action == "feed":
-            msg = (
+            ),
+            "feed": (
                 f"*Feeding {ctx.user}*"
                 if member is None
                 else f"*{ctx.user} is feeding {member.mention}. Eat up*"
-            )
-        elif action == "cry":
-            msg = f"*{ctx.user} is crying*"
-        elif action == "slap":
-            msg = (
+            ),
+            "cry": f"*{ctx.user} is crying*",
+            "slap": (
                 f"*Slapping {ctx.user}*"
                 if member is None
                 else f"*{ctx.user} slapped {member.mention}*"
-            )
-        elif action == "kiss":
-            msg = (
+            ),
+            "kiss": (
                 f"*Kissing {ctx.user}*"
                 if member is None
                 else f"*{ctx.user} kissed {member.mention}*"
-            )
-        elif action == "tickle":
-            msg = (
+            ),
+            "tickle": (
                 f"*Tickling {ctx.user}*"
                 if member is None
                 else f"*{ctx.user} tickled {member.mention}*"
-            )
+            ),
+        }
+
+        msg = messages.get(action, f"*{ctx.user} is performing an action*")
         await ctx.response.send_message(msg, embed=reaction_embed)
 
     @Jeanne.command(description="Hug someone or yourself")
@@ -134,7 +125,7 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     async def slap(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "slap", member, slap)
 
-    @Jeanne.command(description="Show a smuggy look")
+    @Jeanne.command(description="Show a smug expression")
     @Jeanne.check(is_suspended)  
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
