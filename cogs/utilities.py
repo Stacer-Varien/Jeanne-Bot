@@ -2,28 +2,15 @@ from datetime import timedelta, datetime
 import re
 import aiohttp
 from discord import (
-    Attachment,
-    ButtonStyle,
-    Color,
-    Embed,
-    Forbidden,
-    HTTPException,
-    Interaction,
-    Message,
-    NotFound,
-    TextChannel,
-    app_commands as Jeanne,
-    ui,
+    Attachment, ButtonStyle, Color, Embed, Forbidden, HTTPException, Interaction,
+    NotFound, TextChannel, app_commands as Jeanne, ui
 )
 from discord.ext.commands import Cog, Bot, GroupCog
 from reactionmenu import ViewButton, ViewMenu
 from assets.components import ReportModal
 from assets.dictionary import dictionary
 from functions import (
-    Reminder,
-    check_botbanned_app_command,
-    check_disabled_app_command,
-    is_suspended,
+    Reminder, check_botbanned_app_command, check_disabled_app_command, is_suspended
 )
 from config import WEATHER
 from discord.ui import View
@@ -39,151 +26,92 @@ discordbots_url = "https://discord.bots.gg/bots/831993597166747679"
 orleans = "https://discord.gg/jh7jkuk2pp"
 
 
-class invite_button(View):
+class InviteButton(View):
     def __init__(self):
         super().__init__()
-        self.add_item(
-            ui.Button(style=ButtonStyle.url, label="Bot Invite", url=bot_invite_url)
-        )
-        self.add_item(
-            ui.Button(style=ButtonStyle.url, label="Top.gg", url=topgg_invite)
-        )
-        self.add_item(
-            ui.Button(style=ButtonStyle.url, label="DiscordBots", url=discordbots_url)
-        )
-        self.add_item(ui.Button(style=ButtonStyle.url, label="Orleans", url=orleans))
+        urls = [
+            ("Bot Invite", bot_invite_url),
+            ("Top.gg", topgg_invite),
+            ("DiscordBots", discordbots_url),
+            ("Orleans", orleans),
+        ]
+        for label, url in urls:
+            self.add_item(ui.Button(style=ButtonStyle.url, label=label, url=url))
 
 
-class Embed_Group(GroupCog, name="embed"):
+class EmbedGroup(GroupCog, name="embed"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()
 
     @Jeanne.command(
-        description="Generates an embed message. This needs the Discohook.org embed generator",
+        description="Generates an embed message. Use Discohook.org for JSON generation.",
         extras={"member_perms": "Administrator"},
     )
-    @Jeanne.check(is_suspended)
-    @Jeanne.describe(
-        channel="Send to which channel?",
-        jsonscript="Add a JSON script",
-        jsonfile="Add a JSON file",
-    )
     @Jeanne.checks.has_permissions(administrator=True)
+    @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.describe(channel="Target channel", jsonscript="JSON script", jsonfile="JSON file")
     async def generate(
-        self,
-        ctx: Interaction,
-        channel: TextChannel,
-        jsonscript: Optional[str] = None,
-        jsonfile: Optional[Attachment] = None,
+        self, ctx: Interaction, channel: TextChannel, jsonscript: Optional[str] = None, jsonfile: Optional[Attachment] = None
     ):
         await ctx.response.defer()
         if not (jsonscript or jsonfile):
-            embed = Embed(
-                description="You are missing the JSON script or JSON file\nPlease use [Discohook](https://discohook.org/)"
-            )
-            await ctx.followup.send(embed=embed)
+            await ctx.followup.send(embed=Embed(description="Provide either a JSON script or file. Use [Discohook](https://discohook.org/)"))
             return
         if jsonscript and jsonfile:
-            embed = Embed(
-                description="You are using both the JSON script and JSON file\nPlease use one"
-            )
-            await ctx.followup.send(embed=embed)
+            await ctx.followup.send(embed=Embed(description="Use either a JSON script or file, not both."))
             return
-        json: dict = (
-            loads(jsonscript) if jsonscript else loads(get(jsonfile.url).content)
-        )
-        try:
-            content = json.get("content", None)
-        except:
-            pass
-        try:
-            embeds = [Embed.from_dict(i) for i in json.get("embeds", [])]
-            if len(embeds) > 10:
-                await ctx.followup.send(
-                    content="Too many embeds! 10 is the maximum limit",
-                    ephemeral=True,
-                )
-                return
-            m = await channel.send(content=content, embeds=embeds)
-        except:
-            m = await channel.send(content=content)
-        await ctx.followup.send(
-            content="{} sent in {}".format(m.jump_url, channel.mention)
-        )
+
+        json_data = loads(jsonscript) if jsonscript else loads(get(jsonfile.url).content)
+        content = json_data.get("content", None)
+        embeds = [Embed.from_dict(i) for i in json_data.get("embeds", [])]
+
+        if len(embeds) > 10:
+            await ctx.followup.send(content="Too many embeds! Maximum is 10.", ephemeral=True)
+            return
+
+        message = await channel.send(content=content, embeds=embeds or None)
+        await ctx.followup.send(content=f"{message.jump_url} sent in {channel.mention}")
 
     @Jeanne.command(
-        description="Edits an embed message. This needs the Discohook.org embed generator",
+        description="Edits an embed message. Use Discohook.org for JSON generation.",
         extras={"member_perms": "Administrator"},
     )
-    @Jeanne.check(is_suspended)
-    @Jeanne.describe(
-        channel="Which channel is the embed message in?",
-        messageid="What is the message ID?",
-        jsonscript="Add a JSON script",
-        jsonfile="Add a JSON file",
-    )
     @Jeanne.checks.has_permissions(administrator=True)
+    @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    @Jeanne.describe(channel="Channel of the message", messageid="Message ID", jsonscript="JSON script", jsonfile="JSON file")
     async def edit(
-        self,
-        ctx: Interaction,
-        channel: TextChannel,
-        messageid: str,
-        jsonscript: Optional[str] = None,
-        jsonfile: Optional[Attachment] = None,
+        self, ctx: Interaction, channel: TextChannel, messageid: str, jsonscript: Optional[str] = None, jsonfile: Optional[Attachment] = None
     ):
         await ctx.response.defer()
-
-        message: Message = await channel.fetch_message(int(messageid))
+        message = await channel.fetch_message(int(messageid))
 
         if not (jsonscript or jsonfile):
-            embed = Embed(
-                description="You are missing the JSON script or JSON file\nPlease use [Discohook](https://discohook.org/)"
-            )
-            await ctx.followup.send(embed=embed)
+            await ctx.followup.send(embed=Embed(description="Provide either a JSON script or file. Use [Discohook](https://discohook.org/)"))
             return
         if jsonscript and jsonfile:
-            embed = Embed(
-                description="You are using both the JSON script and JSON file\nPlease use one"
-            )
-            await ctx.followup.send(embed=embed)
+            await ctx.followup.send(embed=Embed(description="Use either a JSON script or file, not both."))
             return
-        json: dict = (
-            loads(jsonscript) if jsonscript else loads(get(jsonfile.url).content)
-        )
-        try:
-            content = json.get("content", None)
-        except:
-            pass
-        try:
-            embeds = [Embed.from_dict(i) for i in json.get("embeds", [])]
-            if len(embeds) > 10:
-                await ctx.followup.send(
-                    content="Too many embeds! 10 is the maximum limit",
-                    ephemeral=True,
-                )
-                return
-            await message.edit(content=content, embeds=embeds)
-        except:
-            await message.edit(content=content)
-        await ctx.followup.send(
-            content="{} edited in {}".format(message.jump_url, channel.jump_url)
-        )
+
+        json_data = loads(jsonscript) if jsonscript else loads(get(jsonfile.url).content)
+        content = json_data.get("content", None)
+        embeds = [Embed.from_dict(i) for i in json_data.get("embeds", [])]
+
+        if len(embeds) > 10:
+            await ctx.followup.send(content="Too many embeds! Maximum is 10.", ephemeral=True)
+            return
+
+        await message.edit(content=content, embeds=embeds or None)
+        await ctx.followup.send(content=f"{message.jump_url} edited in {channel.mention}")
 
     @edit.error
     async def edit_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
-            error.original, (Forbidden, NotFound, HTTPException)
-        ):
-            embed = Embed(
-                description=error,
-                color=Color.red(),
-            )
-            await ctx.followup.send(embed=embed)
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(error.original, (Forbidden, NotFound, HTTPException)):
+            await ctx.followup.send(embed=Embed(description=str(error), color=Color.red()))
 
 
 class ReminderCog(GroupCog, name="reminder"):
@@ -193,56 +121,42 @@ class ReminderCog(GroupCog, name="reminder"):
 
     @Jeanne.command(description="Add a reminder")
     @Jeanne.check(is_suspended)
-    @Jeanne.describe(
-        reason="Reason for the reminder",
-        time="Time that you want to be reminded at? (1h, 30m, etc)",
-    )
     @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.describe(reason="Reason for the reminder", time="Time (e.g., 1h, 30m)")
     async def add(self, ctx: Interaction, reason: str, time: str):
         await ctx.response.defer(ephemeral=True)
-        embed = Embed()
         user_reminders = Reminder(ctx.user).get_all_user_reminders
 
-        if user_reminders == None or len(user_reminders) < 10:
-            date = datetime.now() + timedelta(seconds=parse_timespan(time))
-            embed.title = "Reminder added"
-            embed.description = f"On <t:{round(date.timestamp())}:F>, I will alert you about your reminder."
-            embed.color = Color.random()
-            embed.add_field(name="Reason", value=reason, inline=False)
-            embed.set_footer(
-                text="Please allow your DMs to be opened in this server (or any other server you are mutual to me) to receive alerts."
-            )
-            await Reminder(ctx.user).add(reason, round(date.timestamp()))
-            await ctx.followup.send(embed=embed, ephemeral=True)
-            return
-        if len(user_reminders) == 10:
-            embed.description = (
-                "You have too many reminders! Wait for one to be due or cancel one."
-            )
-            embed.color = Color.red()
-            await ctx.followup.send(embed=embed, ephemeral=True)
+        if user_reminders and len(user_reminders) >= 10:
+            await ctx.followup.send(embed=Embed(description="Too many reminders! Cancel one or wait for one to expire.", color=Color.red()), ephemeral=True)
             return
 
-        if parse_timespan(time) < parse_timespan("1 minute"):
-            embed.color = Color.red()
-            embed.description = "Please add a time more than 1 minute."
-            await ctx.followup.send(embed=embed, ephemeral=True)
+        try:
+            reminder_time = parse_timespan(time)
+            if reminder_time < 60:
+                raise InvalidTimespan
+        except InvalidTimespan:
+            await ctx.followup.send(embed=Embed(description="Invalid time! Use a duration greater than 1 minute.", color=Color.red()), ephemeral=True)
             return
+
+        date = datetime.now() + timedelta(seconds=reminder_time)
+        await Reminder(ctx.user).add(reason, round(date.timestamp()))
+        embed = Embed(
+            title="Reminder added",
+            description=f"On <t:{round(date.timestamp())}:F>, I will remind you.",
+            color=Color.random(),
+        )
+        embed.add_field(name="Reason", value=reason, inline=False)
+        embed.set_footer(text="Ensure your DMs are open to receive alerts.")
+        await ctx.followup.send(embed=embed, ephemeral=True)
 
     @add.error
     async def add_error(self, ctx: Interaction, error: Jeanne.errors.AppCommandError):
-        if isinstance(error, Jeanne.errors.CommandInvokeError) and isinstance(
-            error.original, InvalidTimespan
-        ):
+        if isinstance(error, Jeanne.errors.CommandInvokeError) and isinstance(error.original, InvalidTimespan):
             embed = Embed(
-                title="Invalid time added",
-                description="You have entered the time incorrectly!",
+                title="Invalid time",
+                description="Supported time units: ms, s, m, h, d, w, y.",
                 color=Color.red(),
-            )
-            embed.add_field(
-                name="The time units (and abbreviations) supported by this command are:",
-                value="- ms, millisecond, milliseconds\n- s, sec, secs, second, seconds\n- m, min, mins, minute, minutes\n- h, hour, hours\n- d, day, days\n- w, week, weeks\n- y, year, years",
-                inline=False,
             )
             await ctx.followup.send(embed=embed, ephemeral=True)
 
@@ -287,7 +201,7 @@ class ReminderCog(GroupCog, name="reminder"):
         await ctx.followup.send(embed=embed, ephemeral=True)
 
 
-class slashutilities(Cog):
+class SlashUtilities(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.parser = Parser()
@@ -536,7 +450,7 @@ class slashutilities(Cog):
             description="Click on one of these buttons to invite me to you server or join my creator's server",
             color=Color.random(),
         )
-        await ctx.followup.send(embed=invite, view=invite_button())
+        await ctx.followup.send(embed=invite, view=InviteButton())
 
     @Jeanne.command(description="Submit a bot report if you found something wrong")
     @Jeanne.check(is_suspended)
@@ -557,6 +471,6 @@ class slashutilities(Cog):
 
 
 async def setup(bot: Bot):
-    await bot.add_cog(Embed_Group(bot))
-    await bot.add_cog(slashutilities(bot))
+    await bot.add_cog(EmbedGroup(bot))
+    await bot.add_cog(SlashUtilities(bot))
     await bot.add_cog(ReminderCog(bot))
