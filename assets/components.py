@@ -472,7 +472,7 @@ class ReportContentM(ui.Modal, title="Illicit Content Report"):
     illegalcontent = ui.TextInput(
         label="Reason",
         style=TextStyle.short,
-        placeholder="Why are you reporting this link? (eg. loli hentai, too much blood)",
+        placeholder="Why are you reporting this link? (e.g., inappropriate content)",
         required=True,
         min_length=4,
         max_length=256,
@@ -482,16 +482,15 @@ class ReportContentM(ui.Modal, title="Illicit Content Report"):
         report = Embed(title="Illicit Content Reported", color=Color.brand_red())
         report.add_field(name="Link", value=self.link, inline=False)
         report.add_field(name="Reason", value=self.illegalcontent.value, inline=False)
-        report.set_footer(text="Reporter {}| `{}`".format(ctx.user, ctx.user.id))
+        report.set_footer(text=f"Reporter: {ctx.user} | ID: `{ctx.user.id}`")
         SyncWebhook.from_url(WEBHOOK).send(embed=report)
         embed = Embed(
-            description="Than you for submitting the report.\n\nPlease know that your user ID has been logged if you are trolling around."
+            description="Thank you for submitting the report. Your user ID has been logged for accountability."
         )
         await ctx.response.send_message(embed=embed, ephemeral=True)
 
 
 class ReportContentPlus(ui.View):
-
     def __init__(
         self,
         link1: Optional[str] = None,
@@ -510,24 +509,28 @@ class ReportContentPlus(ui.View):
     async def report1(self, ctx: Interaction, button: ui.Button):
         self.value = "report1"
         await ctx.response.send_modal(ReportContentM(self.link1))
+        button.disabled = True
         await ctx.edit_original_response(view=self)
 
     @ui.button(label="Report 2nd Content", style=ButtonStyle.grey, row=1)
     async def report2(self, ctx: Interaction, button: ui.Button):
         self.value = "report2"
         await ctx.response.send_modal(ReportContentM(self.link2))
+        button.disabled = True
         await ctx.edit_original_response(view=self)
 
     @ui.button(label="Report 3rd Content", style=ButtonStyle.grey, row=2)
     async def report3(self, ctx: Interaction, button: ui.Button):
         self.value = "report3"
         await ctx.response.send_modal(ReportContentM(self.link3))
+        button.disabled = True
         await ctx.edit_original_response(view=self)
 
     @ui.button(label="Report 4th Content", style=ButtonStyle.grey, row=2)
     async def report4(self, ctx: Interaction, button: ui.Button):
         self.value = "report4"
         await ctx.response.send_modal(ReportContentM(self.link4))
+        button.disabled = True
         await ctx.edit_original_response(view=self)
 
 
