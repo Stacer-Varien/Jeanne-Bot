@@ -4,8 +4,11 @@ from functions import (
     check_botbanned_app_command,
     check_disabled_app_command,
     get_cached_users,
-    get_true_members, is_suspended,
+    get_true_members,
+    is_suspended,
 )
+from assets.translations import translations
+from discord.app_commands import locale_str as T
 from time import time
 from datetime import timedelta
 from sys import version_info as py_version
@@ -13,7 +16,6 @@ from discord.ext.commands import Cog, Bot
 from discord import (
     ButtonStyle,
     Color,
-    DMChannel,
     Embed,
     Interaction,
     Member,
@@ -214,7 +216,11 @@ class InfoCog(Cog, name="InfoSlash"):
         e = [serverinfo, emojie]
         await ctx.followup.send(embeds=e)
 
-    @Jeanne.command(description="Check how fast I respond to a command")
+    @Jeanne.command(
+        name=T("ping_name", default="ping"),
+        description=T(
+            "ping_desc", default="Check how fast I respond to a command"
+        ),)
     @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
@@ -222,17 +228,17 @@ class InfoCog(Cog, name="InfoSlash"):
     async def ping(self, ctx: Interaction):
         await ctx.response.defer()
         start_time = time()
-        test = Embed(description="Testing ping", color=Color.random())
+        test = Embed(description=translations["ping"]["test"][ctx.locale], color=Color.random())
         await ctx.followup.send(embed=test)
         ping = Embed(color=Color.random())
         ping.add_field(
-            name="Bot Latency",
+            name=translations["ping"]["ping_embed_names"][ctx.locale][0],
             value=f"{round(self.bot.latency * 1000)}ms",
             inline=False,
         )
         end_time = time()
         ping.add_field(
-            name="API Latency",
+            name=translations["ping"]["ping_embed_names"][ctx.locale][1],
             value=f"{round((end_time - start_time) * 1000)}ms",
             inline=False,
         )

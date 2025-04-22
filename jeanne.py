@@ -2,7 +2,9 @@ import asyncio
 from discord.ext.commands import AutoShardedBot, when_mentioned_or
 from discord import Intents, AllowedMentions
 from os import listdir
+from assets.Translator import MyTranslator
 from config import TOKEN
+
 
 
 class Jeanne(AutoShardedBot):
@@ -15,7 +17,8 @@ class Jeanne(AutoShardedBot):
                     print(f"{i}.{filename} loaded")
                 else:
                     print(f"Unable to load {i}.{filename[:-3]}")
-
+        self.translator = MyTranslator()
+        await self.tree.set_translator(self.translator)
         await self.load_extension("jishaku")
         await self.tree.sync()
 
@@ -54,6 +57,7 @@ async def on_ready():
     print("Bot ID: {}".format(bot.user.id))
     print("Connected to {} servers".format(len(bot.guilds)))
     print("Listening to {} shards".format(bot.shard_count))
+
     for guild in bot.guilds:
         try:
             print(f"Chunking guild: {guild.name} ({guild.id})...")
