@@ -2,7 +2,7 @@ import asyncio
 from discord.ext.commands import AutoShardedBot, when_mentioned_or
 from discord import Intents, AllowedMentions
 from os import listdir
-from assets.Translator import MyTranslator
+from languages.Translator import MyTranslator
 from config import TOKEN
 
 

@@ -4,6 +4,8 @@ from discord import Color, Embed, Interaction
 from discord import app_commands as Jeanne
 from discord.ext.commands import Bot, Cog
 import pandas as pd
+import languages.en.error as en
+import languages.fr.error as fr
 
 
 class ErrorsCog(Cog, name="ErrorsSlash"):
@@ -38,11 +40,15 @@ class ErrorsCog(Cog, name="ErrorsSlash"):
         df_combined.to_excel(existing_file, index=False)
 
         if isinstance(error, Jeanne.MissingPermissions):
-            embed = Embed(description=str(error), color=Color.red())
-            await ctx.response.send_message(embed=embed)
+            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+                await en.Errors.handle_missing_permissions(self, ctx, error)
+            elif ctx.locale.value == "fr":
+                await fr.Errors.handle_missing_permissions(self, ctx, error)
         elif isinstance(error, Jeanne.BotMissingPermissions):
-            embed = Embed(description=str(error), color=Color.red())
-            await ctx.response.send_message(embed=embed)
+            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+                await en.Errors.handle_bot_missing_permissions(self, ctx, error)
+            elif ctx.locale.value == "fr":
+                await fr.Errors.handle_bot_missing_permissions(self, ctx, error)
         elif isinstance(error, Jeanne.NoPrivateMessage):
             embed = Embed(description=str(error), color=Color.red())
             await ctx.response.send_message(embed=embed)
