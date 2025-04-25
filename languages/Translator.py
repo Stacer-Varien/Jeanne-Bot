@@ -18,7 +18,7 @@ class MyTranslator(Jeanne.Translator):
         context: Jeanne.TranslationContext,
     ) -> Optional[str]:
         translations = {
-            #currency commands
+            # currency commands
             "ping_name": {"en-GB": "ping", "en-US": "ping", "fr": "ping"},
             "ping_desc": {
                 "en-GB": "Check how fast I respond to a command",
@@ -86,7 +86,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Vote for me in TopGG",
                 "fr": "Votez pour moi dans TopGG",
             },
-            #fun commands
+            # fun commands
             "8ball_name": {
                 "en-GB": "8ball",
                 "en-US": "8ball",
@@ -201,36 +201,98 @@ class MyTranslator(Jeanne.Translator):
                 "en-GB": "member",
                 "en-US": "member",
                 "fr": "membre",
-            }, "member_parm_desc": {
+            },
+            "member_parm_desc": {
                 "en-GB": "Which member?",
                 "en-US": "Which member?",
                 "fr": "Quel membre?",
             },
-            #help commands
+            # help commands
             "command_name": {
                 "en-GB": "command",
                 "en-US": "command",
                 "fr": "commande",
-            }, "command_desc": {
+            },
+            "command_desc": {
                 "en-GB": "Get help on a certain command",
                 "en-US": "Get help on a certain command",
                 "fr": "Obtenez de l'aide sur une certaine commande",
-            }, "command_parm_name": {
+            },
+            "command_parm_name": {
                 "en-GB": "command",
                 "en-US": "command",
                 "fr": "commande",
-            }, "command_parm_desc": {
+            },
+            "command_parm_desc": {
                 "en-GB": "Which command you need help with?",
                 "en-US": "Which command you need help with?",
                 "fr": "Avec quelle commande avez-vous besoin d'aide?",
-            }, "support_name": {
+            },
+            "support_name": {
                 "en-GB": "support",
                 "en-US": "support",
                 "fr": "soutien",
-            }, "support_desc": {
+            },
+            "support_desc": {
                 "en-GB": "Get help from the website or join the support server for further help",
                 "en-US": "Get help from the website or join the support server for further help",
                 "fr": "Obtenez de l'aide sur le site Web ou rejoignez le serveur d'assistance pour obtenir de l'aide supplémentaire",
+            },
+            # hentai commands
+            "hentai_name": {
+                "en-GB": "hentai",
+                "en-US": "hentai",
+                "fr": "hentai",
+            },
+            "hentai_desc": {
+                "en-GB": "Get a random hentai from Jeanne",
+                "en-US": "Get a random hentai from Jeanne",
+                "fr": "Obtenez un hentai aléatoire de Jeanne",
+            },
+            "gelbooru_desc": {
+                "en-GB": "Get a random media content from Gelbooru",
+                "en-US": "Get a random media content from Gelbooru",
+                "fr": "Obtenez un contenu multimédia aléatoire de Gelbooru",
+            },
+            "yandere_desc": {
+                "en-GB": "Get a random media content from Yandere",
+                "en-US": "Get a random media content from Yandere",
+                "fr": "Obtenez un contenu multimédia aléatoire de Yandere",
+            },
+            "danbooru_desc": {
+                "en-GB": "Get a random media content from Danbooru",
+                "en-US": "Get a random media content from Danbooru",
+                "fr": "Obtenez un contenu multimédia aléatoire de Danbooru",
+            },
+            "konachan_desc": {
+                "en-GB": "Get a random media content from Konachan",
+                "en-US": "Get a random media content from Konachan",
+                "fr": "Obtenez un contenu multimédia aléatoire de Konachan",
+            },
+            "tag_parm_name": {
+                "en-GB": "tag",
+                "en-US": "tag",
+                "fr": "étiquette",
+            },
+            "tag_parm_desc": {
+                "en-GB": "Add your tag",
+                "en-US": "Add your tag",
+                "fr": "Ajoutez votre étiquette",
+            },
+            "plus_parm_name": {
+                "en-GB": "plus",
+                "en-US": "plus",
+                "fr": "plus",
+            },
+            "plus_parm_desc": {
+                "en-GB": "Need more content? (up to 4)",
+                "en-US": "Need more content? (up to 4)",
+                "fr": "Besoin de plus de contenu? (jusqu'à 4)",
+                "danbooru_tag_parm_name": {
+                    "en-GB": "Add your tag (up to 2 tags)",
+                    "en-US": "Add your tag (up to 2 tags)",
+                    "fr": "Ajoutez votre étiquette (jusqu'à 2 étiquettes)",
+                },
             },
         }
 

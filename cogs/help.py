@@ -44,5 +44,6 @@ class HelpGroup(GroupCog, name="help"):
             await en.HelpGroup(self.bot).support(ctx)
         elif ctx.locale.value == "fr":
             await fr.HelpGroup(self.bot).support(ctx)
+            
 async def setup(bot: Bot):
     await bot.add_cog(HelpGroup(bot))
