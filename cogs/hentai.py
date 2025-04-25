@@ -1,22 +1,14 @@
-from random import randint
 from discord import (
-    Color,
-    Embed,
-    HTTPException,
     Interaction,
-    NotFound,
     app_commands as Jeanne,
 )
 from discord.ext.commands import Cog, Bot
 from functions import (
-    Hentai,
     check_botbanned_app_command,
     check_disabled_app_command,
-    shorten_url,
     is_suspended,
 )
 from typing import Optional
-from assets.components import ReportContent, ReportContentPlus
 import languages.en.hentai as en
 import languages.fr.hentai as fr
 from discord.app_commands import locale_str as T
