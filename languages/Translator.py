@@ -336,6 +336,21 @@ class MyTranslator(Jeanne.Translator):
                     "en-US": "Get a random image from Safebooru",
                     "fr": "Obtenez une image aléatoire de Safebooru",
                 },
+                #info commands
+                "stats_desc": {"en-GB": "See the bot's status from development to now",
+                    "en-US": "See the bot's status from development to now",
+                    "fr": "Voir le statut du bot depuis le développement jusqu'à maintenant",
+                },
+                "userinfo_desc": {
+                    "en-GB": "See the information of a member or yourself",
+                    "en-US": "See the information of a member or yourself",
+                    "fr": "Voir les informations d'un membre ou de vous-même",
+                },
+                "serverinfo_desc": {
+                    "en-GB": "Get information about this server",
+                    "en-US": "Get information about this server",
+                    "fr": "Obtenez des informations sur ce serveur",
+                },
             },
         )
 

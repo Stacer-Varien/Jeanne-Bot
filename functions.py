@@ -1303,17 +1303,6 @@ class Welcomer:
         db.commit()
         return data[0] if data is not None else None
 
-
-def get_cached_users() -> int:
-    data = db.execute("SELECT * FROM globalxpData").fetchall()
-    return len(data)
-
-
-def get_true_members() -> int:
-    data = db.execute("SELECT * FROM bankData").fetchall()
-    return len(data)
-
-
 def get_richest(member: Member) -> int:
     try:
         result = db.execute(
