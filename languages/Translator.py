@@ -206,6 +206,32 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Which member?",
                 "fr": "Quel membre?",
             },
+            #help commands
+            "command_name": {
+                "en-GB": "command",
+                "en-US": "command",
+                "fr": "commande",
+            }, "command_desc": {
+                "en-GB": "Get help on a certain command",
+                "en-US": "Get help on a certain command",
+                "fr": "Obtenez de l'aide sur une certaine commande",
+            }, "command_parm_name": {
+                "en-GB": "command",
+                "en-US": "command",
+                "fr": "commande",
+            }, "command_parm_desc": {
+                "en-GB": "Which command you need help with?",
+                "en-US": "Which command you need help with?",
+                "fr": "Avec quelle commande avez-vous besoin d'aide?",
+            }, "support_name": {
+                "en-GB": "support",
+                "en-US": "support",
+                "fr": "soutien",
+            }, "support_desc": {
+                "en-GB": "Get help from the website or join the support server for further help",
+                "en-US": "Get help from the website or join the support server for further help",
+                "fr": "Obtenez de l'aide sur le site Web ou rejoignez le serveur d'assistance pour obtenir de l'aide supplémentaire",
+            },
         }
 
         return translations.get(string.message, {}).get(str(locale), string.message)
