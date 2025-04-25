@@ -15,14 +15,14 @@ from assets.images import (
     get_wallpaper_pic,
     safebooru_pic,
 )
-
+from discord.app_commands import locale_str as T
 
 class images(GroupCog, name="image"):
     def __init__(self, bot):
         self.bot = bot
         super().__init__()
 
-    @Jeanne.command(description="Get a kitsune image")
+    @Jeanne.command(description=T("kitsune_desc"))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)  
@@ -31,7 +31,7 @@ class images(GroupCog, name="image"):
         embed, file = get_kistune_pic()
         await ctx.followup.send(embed=embed, file=file)
 
-    @Jeanne.command(description="Need a wallpaper for your PC or phone?")
+    @Jeanne.command(description=T("wallpaper_desc"))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)  
@@ -40,7 +40,7 @@ class images(GroupCog, name="image"):
         embed, file = get_wallpaper_pic()
         await ctx.followup.send(embed=embed, file=file)
 
-    @Jeanne.command(description="Get a Jeanne d'Arc image")
+    @Jeanne.command(description=T("jeanne_desc"))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)  
@@ -49,7 +49,7 @@ class images(GroupCog, name="image"):
         embed, file = get_jeanne_pic()
         await ctx.followup.send(embed=embed, file=file)
 
-    @Jeanne.command(description="Get a Saber image")
+    @Jeanne.command(description=T("saber_desc"))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)  
@@ -58,7 +58,7 @@ class images(GroupCog, name="image"):
         embed, file = get_saber_pic() 
         await ctx.followup.send(embed=embed, file=file)
 
-    @Jeanne.command(description="Get a neko image")
+    @Jeanne.command(description=T("neko_desc"))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)  
@@ -67,7 +67,7 @@ class images(GroupCog, name="image"):
         embed, file = get_neko_pic()
         await ctx.followup.send(embed=embed, file=file)
 
-    @Jeanne.command(description="Get a Morgan le Fay (Fate) image")
+    @Jeanne.command(description=T("morgan_desc"))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)  
@@ -76,7 +76,7 @@ class images(GroupCog, name="image"):
         embed, file = get_morgan_pic()
         await ctx.followup.send(embed=embed, file=file)
 
-    @Jeanne.command(description="Get a Medusa (Fate) image")
+    @Jeanne.command(description=T("medusa_desc"))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)  
@@ -85,7 +85,7 @@ class images(GroupCog, name="image"):
         embed, file = get_medusa_pic()
         await ctx.followup.send(embed=embed, file=file)
 
-    @Jeanne.command(description="Get an image from Safebooru")
+    @Jeanne.command(description=T("safebooru_desc"))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)  
@@ -93,7 +93,10 @@ class images(GroupCog, name="image"):
         await ctx.response.defer()
         embed = Embed(color=Color.random())
         embed.set_image(url=safebooru_pic())
-        embed.set_footer(text="Fetched from Safebooru • Credits must go to the artist")
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            embed.set_footer(text="Fetched from Safebooru • Credits must go to the artist")
+        elif ctx.locale.value == "fr":  
+            embed.set_footer(text="Récupéré depuis Safebooru • Les crédits doivent aller à l'artiste")
         await ctx.followup.send(embed=embed)
 
 
