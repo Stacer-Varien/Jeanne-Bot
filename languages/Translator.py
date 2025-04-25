@@ -17,7 +17,8 @@ class MyTranslator(Jeanne.Translator):
         locale: Locale,
         context: Jeanne.TranslationContext,
     ) -> Optional[str]:
-        translations = {#currency commands
+        translations = {
+            #currency commands
             "ping_name": {"en-GB": "ping", "en-US": "ping", "fr": "ping"},
             "ping_desc": {
                 "en-GB": "Check how fast I respond to a command",
@@ -84,6 +85,126 @@ class MyTranslator(Jeanne.Translator):
                 "en-GB": "Vote for me in TopGG",
                 "en-US": "Vote for me in TopGG",
                 "fr": "Votez pour moi dans TopGG",
+            },
+            #fun commands
+            "8ball_name": {
+                "en-GB": "8ball",
+                "en-US": "8ball",
+                "fr": "8ball",
+            },
+            "8ball_desc": {
+                "en-GB": "Ask 8 ball anything and you will get your answer",
+                "en-US": "Ask 8 ball anything and you will get your answer",
+                "fr": "Demandez à 8 ball n'importe quoi et vous obtiendrez votre réponse",
+            },
+            "question_parm_name": {
+                "en-GB": "question",
+                "en-US": "question",
+                "fr": "question",
+            },
+            "question_parm_desc": {
+                "en-GB": "Add your question",
+                "en-US": "Add your question",
+                "fr": "Ajoutez votre question",
+            },
+            "reverse_name": {
+                "en-GB": "reverse",
+                "en-US": "reverse",
+                "fr": "inverse",
+            },
+            "reverse_desc": {
+                "en-GB": "Say something and I will say it in reversed text",
+                "en-US": "Say something and I will say it in reversed text",
+                "fr": "Dites quelque chose et je le dirai dans un texte inversé",
+            },
+            "text_parm_name": {
+                "en-GB": "text",
+                "en-US": "text",
+                "fr": "texte",
+            },
+            "text_parm_desc": {
+                "en-GB": "What are you reversing?",
+                "en-US": "What are you reversing?",
+                "fr": "Qu'est-ce que vous inversez?",
+            },
+            "combine_name": {
+                "en-GB": "combine",
+                "en-US": "combine",
+                "fr": "combiner",
+            },
+            "combine_desc": {
+                "en-GB": "Combine 2 words to get 2 combined words",
+                "en-US": "Combine 2 words to get 2 combined words",
+                "fr": "Combinez 2 mots pour obtenir 2 mots combinés",
+            },
+            "first_word_parm_name": {
+                "en-GB": "first_word",
+                "en-US": "first_word",
+                "fr": "premier_mot",
+            },
+            "first_word_parm_desc": {
+                "en-GB": "Add first word",
+                "en-US": "Add first word",
+                "fr": "Ajouter le premier mot",
+            },
+            "second_word_parm_name": {
+                "en-GB": "second_word",
+                "en-US": "second_word",
+                "fr": "deuxième_mot",
+            },
+            "second_word_parm_desc": {
+                "en-GB": "Add second word",
+                "en-US": "Add second word",
+                "fr": "Ajouter le deuxième mot",
+            },
+            "choose_name": {
+                "en-GB": "choose",
+                "en-US": "choose",
+                "fr": "choisir",
+            },
+            "choose_desc": {
+                "en-GB": "Give me a lot of choices and I will pick one for you",
+                "en-US": "Give me a lot of choices and I will pick one for you",
+                "fr": "Donnez-moi beaucoup de choix et je choisirai un pour vous",
+            },
+            "choices_parm_name": {
+                "en-GB": "choices",
+                "en-US": "choices",
+                "fr": "choix",
+            },
+            "choices_parm_desc": {
+                "en-GB": "Add your choices here. Separate them with ','",
+                "en-US": "Add your choices here. Separate them with ','",
+                "fr": "Ajoutez vos choix ici. Séparez-les par ','",
+            },
+            "animeme_name": {
+                "en-GB": "animeme",
+                "en-US": "animeme",
+                "fr": "animeme",
+            },
+            "animeme_desc": {
+                "en-GB": "Get a random animeme",
+                "en-US": "Get a random animeme",
+                "fr": "Obtenez un animeme aléatoire",
+            },
+            "simprate_name": {
+                "en-GB": "simprate",
+                "en-US": "simprate",
+                "fr": "taux_de_simp",
+            },
+            "simprate_desc": {
+                "en-GB": "Get a random simp rate for you or someone else",
+                "en-US": "Get a random simp rate for you or someone else",
+                "fr": "Obtenez un taux de simp aléatoire pour vous ou quelqu'un d'autre",
+            },
+            "member_parm_name": {
+                "en-GB": "member",
+                "en-US": "member",
+                "fr": "membre",
+            }, "member_parm_desc": {
+                "en-GB": "Which member?",
+                "en-US": "Which member?",
+                "fr": "Quel membre?",
             },
         }
 
