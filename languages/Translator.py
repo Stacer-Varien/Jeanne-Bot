@@ -383,6 +383,40 @@ class MyTranslator(Jeanne.Translator):
                     "en-US": "What is the name of the emoji?",
                     "fr": "Quel est le nom de l'emoji?",
                 },
+                #inventory commands
+                "country_name": {
+                    "en-GB": "country",
+                    "en-US": "country",
+                    "fr": "pays",
+                },
+                "country_desc": {
+                    "en-GB": "Buy a country badge",
+                    "en-US": "Buy a country badge",
+                    "fr": "Acheter un badge de pays",
+                },
+                "backgrounds_desc": {
+                    "en-GB": "Check all the wallpapers available",
+                    "en-US": "Check all the wallpapers available",
+                    "fr": "Vérifiez tous les fonds d'écran disponibles",
+                },"buy-custom_desc": {
+                    "en-GB": "Buy a custom background pic for your level card",
+                    "en-US": "Buy a custom background pic for your level card",
+                    "fr": "Acheter une image d'arrière-plan personnalisée pour votre carte de niveau",},"list_name": {
+                    "en-GB": "list",
+                    "en-US": "list",
+                    "fr": "liste",},"list_desc": {
+                    "en-GB": "Check which backgrounds you have",
+                    "en-US": "Check which backgrounds you have",
+                    "fr": "Vérifiez quels fonds d'écran vous avez",},"name_parm_name": {"en-GB": "name","en_US": "name","fr": "nom",},"name_parm_desc": {
+                    "en-GB": "What will you name it?",
+                    "en-US": "What will you name it?",
+                    "fr": "Quel nom lui donnerez-vous?",},"link_parm_name": {
+                    "en-GB": "link",
+                    "en-US": "link",
+                    "fr": "lien",},"link_parm_desc": {
+                    "en-GB": "Add an image link",
+                    "en-US": "Add an image link",
+                    "fr": "Ajouter un lien d'image",},
             },
         )
 
