@@ -11,6 +11,7 @@ from discord import (
     app_commands as Jeanne,
 )
 from typing import Optional
+from discord.app_commands import locale_str as T
 import languages.en.info as en
 import languages.fr.info as fr
 
@@ -41,7 +42,7 @@ class InfoCog(Cog, name="InfoSlash"):
         elif ctx.locale.value == "fr":
             await fr.Info(self.bot).get_userinfo(ctx, member)
 
-    @Jeanne.command(description="See the bot's status from development to now")
+    @Jeanne.command(description=T("stats_desc"))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
@@ -51,8 +52,9 @@ class InfoCog(Cog, name="InfoSlash"):
         elif ctx.locale.value == "fr":
             await fr.Info(self.bot).stats(ctx)
 
-    @Jeanne.command(description="See the information of a member or yourself")
-    @Jeanne.describe(member="Which member?")
+    @Jeanne.command(description=T("userinfo_desc"))
+    @Jeanne.describe(member=T("member_parm_desc"))
+    @Jeanne.rename(member=T("member_parm_name"))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
@@ -60,7 +62,7 @@ class InfoCog(Cog, name="InfoSlash"):
         member = ctx.user if member is None else member
         await self.get_userinfo(ctx, member)
 
-    @Jeanne.command(description="Get information about this server")
+    @Jeanne.command(description=T("serverinfo_desc"))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
@@ -71,8 +73,8 @@ class InfoCog(Cog, name="InfoSlash"):
             await fr.Info(self.bot).serverinfo(ctx)
 
     @Jeanne.command(
-        name=T("ping_name", default="ping"),
-        description=T("ping_desc", default="Check how fast I respond to a command"),
+        name=T("ping_name"),
+        description=T("ping_desc"),
     )
     @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
@@ -84,7 +86,7 @@ class InfoCog(Cog, name="InfoSlash"):
         elif ctx.locale.value == "fr":
             await fr.Info(self.bot).ping(ctx)
 
-    @Jeanne.command(description="See the server's banner")
+    @Jeanne.command(description=T("serverbanner_desc"))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
@@ -94,8 +96,9 @@ class InfoCog(Cog, name="InfoSlash"):
         elif ctx.locale.value == "fr":
             await fr.Info(self.bot).serverbanner(ctx)
 
-    @Jeanne.command(description="See your avatar or another member's avatar")
-    @Jeanne.describe(member="Which member?")
+    @Jeanne.command(description=T("avatar_desc"))
+    @Jeanne.describe(member=T("member_parm_desc"))
+    @Jeanne.rename(member=T("member_parm_name"))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
@@ -105,9 +108,9 @@ class InfoCog(Cog, name="InfoSlash"):
         elif ctx.locale.value == "fr":
             await fr.Info(self.bot).avatar(ctx, member)
 
-    @Jeanne.command(description="View a sticker")
+    @Jeanne.command(description=T("sticker_desc"))
     @Jeanne.describe(
-        sticker="Insert message ID with the sticker or name of the sticker in the server"
+        sticker=T("sticker_parm_desc"),
     )
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
@@ -135,8 +138,8 @@ class InfoCog(Cog, name="InfoSlash"):
             elif ctx.locale.value == "fr":
                 await fr.Info(self.bot).sticker_error(ctx, error, "StickerNotFound")
 
-    @Jeanne.command(description="View an emoji")
-    @Jeanne.describe(emoji="What is the name of the emoji?")
+    @Jeanne.command(description=T("emoji_desc"))
+    @Jeanne.describe(emoji=T("emoji_parm_desc"))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)

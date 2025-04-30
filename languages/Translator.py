@@ -19,13 +19,18 @@ class MyTranslator(Jeanne.Translator):
     ) -> Optional[str]:
         translations = (
             {
-                # currency commands
-                "ping_name": {"en-GB": "ping", "en-US": "ping", "fr": "ping"},
-                "ping_desc": {
-                    "en-GB": "Check how fast I respond to a command",
-                    "en-US": "Check how fast I respond to a command",
-                    "fr": "Vérifiez la rapidité de ma réponse à une commande",
+                # global
+                "member_parm_name": {
+                    "en-GB": "member",
+                    "en-US": "member",
+                    "fr": "membre",
                 },
+                "member_parm_desc": {
+                    "en-GB": "Which member?",
+                    "en-US": "Which member?",
+                    "fr": "Quel membre?",
+                },
+                # currency commands
                 "free_name": {"en-GB": "free", "en-US": "free", "fr": "libre"},
                 "bet_name": {"en-GB": "bet", "en-US": "bet", "fr": "parier"},
                 "guess_free_desc": {
@@ -198,16 +203,6 @@ class MyTranslator(Jeanne.Translator):
                     "en-US": "Get a random simp rate for you or someone else",
                     "fr": "Obtenez un taux de simp aléatoire pour vous ou quelqu'un d'autre",
                 },
-                "member_parm_name": {
-                    "en-GB": "member",
-                    "en-US": "member",
-                    "fr": "membre",
-                },
-                "member_parm_desc": {
-                    "en-GB": "Which member?",
-                    "en-US": "Which member?",
-                    "fr": "Quel membre?",
-                },
                 # help commands
                 "command_name": {
                     "en-GB": "command",
@@ -336,8 +331,9 @@ class MyTranslator(Jeanne.Translator):
                     "en-US": "Get a random image from Safebooru",
                     "fr": "Obtenez une image aléatoire de Safebooru",
                 },
-                #info commands
-                "stats_desc": {"en-GB": "See the bot's status from development to now",
+                # info commands
+                "stats_desc": {
+                    "en-GB": "See the bot's status from development to now",
                     "en-US": "See the bot's status from development to now",
                     "fr": "Voir le statut du bot depuis le développement jusqu'à maintenant",
                 },
@@ -350,6 +346,42 @@ class MyTranslator(Jeanne.Translator):
                     "en-GB": "Get information about this server",
                     "en-US": "Get information about this server",
                     "fr": "Obtenez des informations sur ce serveur",
+                },
+                "serverbanner_desc": {
+                    "en-GB": "Get the server banner",
+                    "en-US": "Get the server banner",
+                    "fr": "Obtenez la bannière du serveur",
+                },
+                "avatar_desc": {
+                    "en-GB": "See your avatar or another member's avatar",
+                    "en-US": "See your avatar or another member's avatar",
+                    "fr": "Voir votre avatar ou l'avatar d'un autre membre",
+                },
+                "ping_name": {"en-GB": "ping", "en-US": "ping", "fr": "ping"},
+                "ping_desc": {
+                    "en-GB": "Check how fast I respond to a command",
+                    "en-US": "Check how fast I respond to a command",
+                    "fr": "Vérifiez la rapidité de ma réponse à une commande",
+                },
+                "sticker_desc": {
+                    "en-GB": "Get a random sticker from the server",
+                    "en-US": "Get a random sticker from the server",
+                    "fr": "Obtenez un autocollant aléatoire du serveur",
+                },
+                "sticker_parm_desc": {
+                    "en-GB": "Insert message ID with the sticker or name of the sticker in the server",
+                    "en-US": "Insert message ID with the sticker or name of the sticker in the server",
+                    "fr": "Insérez l'ID du message avec l'autocollant ou le nom de l'autocollant dans le serveur",
+                },
+                "emoji_desc": {
+                    "en-GB": "View an emoji",
+                    "en_US": "View an emoji",
+                    "fr": "Voir un emoji",
+                },
+                "emoji_parm_desc": {
+                    "en-GB": "What is the name of the emoji?",
+                    "en-US": "What is the name of the emoji?",
+                    "fr": "Quel est le nom de l'emoji?",
                 },
             },
         )
