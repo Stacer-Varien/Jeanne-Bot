@@ -57,7 +57,7 @@ class levelling(Cog):
 
     async def generate_profile_card(self, ctx: Interaction, member: Member):
         try:
-            voted = False #await self.topggpy.get_user_vote(member.id)
+            voted = await self.topggpy.get_user_vote(member.id)
             inventory = Inventory(member)
             image = await Profile(self.bot).generate_profile(ctx,
                 member,

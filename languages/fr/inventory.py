@@ -117,7 +117,7 @@ class Background_Group():
                 description="Création de la prévisualisation... Cela prendra un peu de temps <a:loading:1161038734620373062>"
             )
         )
-        image = await Profile(self.bot).generate_profile(
+        image = await Profile(self.bot).generate_profile(ctx,
             ctx.user, link, True, True, "southafrica"
         )
         if image == False:
