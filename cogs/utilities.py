@@ -455,8 +455,8 @@ class SlashUtilities(Cog):
     @Jeanne.command(description="Submit a bot report if you found something wrong")
     @Jeanne.check(is_suspended)
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
-    async def botreport(self, ctx: Interaction):
-        await ctx.response.send_modal(ReportModal())
+    async def botreport(self, ctx: Interaction, type: Literal["Fault", "Bug", "ToS Violator", "Exploit", "Translation Error","Other"]):
+        await ctx.response.send_modal(ReportModal(type))
 
     @Jeanne.command(description="Check the meaning of a word")
     @Jeanne.check(is_suspended)
