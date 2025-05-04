@@ -18,6 +18,9 @@ from functions import (
 from typing import Optional
 from assets.generators.profile_card import Profile
 from topgg import DBLClient
+import languages.en.levelling as en
+import languages.fr.levelling as fr
+from discord.app_commands import locale_str as T
 
 
 class Rank_Group(GroupCog, name="rank"):
@@ -28,20 +31,12 @@ class Rank_Group(GroupCog, name="rank"):
     async def send_leaderboard(
         self, ctx: Interaction, title: str, leaderboard: list, exp_index: int
     ):
-        await ctx.response.defer()
-        embed = Embed(color=Color.random())
-        embed.set_author(name=title)
-        if not leaderboard:
-            embed.description = f"No {title.lower()} provided"
-            await ctx.followup.send(embed=embed)
-            return
-        for rank, entry in enumerate(leaderboard, start=1):
-            user = await self.bot.fetch_user(entry[0])
-            exp = entry[exp_index]
-            embed.add_field(name=f"`{rank}.` {user}", value=f"`{exp}XP`", inline=True)
-        await ctx.followup.send(embed=embed)
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            await en.Rank_Group(self.bot).send_leaderboard(ctx, title, leaderboard, exp_index)
+        elif ctx.locale.value == "fr":
+            await fr.Rank_Group(self.bot).send_leaderboard(ctx, title, leaderboard, exp_index)
 
-    @Jeanne.command(name="global", description="Check the users with the most XP globally")
+    @Jeanne.command(name="global", description=T("global_desc"))
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
@@ -50,7 +45,7 @@ class Rank_Group(GroupCog, name="rank"):
         leaderboard = Levelling().get_global_rank
         await self.send_leaderboard(ctx, "Global XP Leaderboard", leaderboard, 2)
 
-    @Jeanne.command(description="Check the users with the most XP in the server")
+    @Jeanne.command(description=T("server_desc"))
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
@@ -76,20 +71,10 @@ class levelling(Cog):
         )
 
     async def generate_profile_card(self, ctx: Interaction, member: Member):
-        try:
-            voted = await self.topggpy.get_user_vote(member.id)
-            inventory = Inventory(member)
-            image = await Profile(self.bot).generate_profile(
-                member,
-                bg_image=inventory.selected_wallpaper,
-                voted=voted,
-                country=inventory.selected_country,
-            )
-            file = File(fp=image, filename=f"{member.name}_profile_card.png")
-            await ctx.followup.send(file=file)
-        except Exception as e:
-            embed = Embed(description=f"Failed to generate profile card: {e}", color=Color.red())
-            await ctx.followup.send(embed=embed)
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            await en.levelling(self.bot).generate_profile_card(ctx, member)
+        elif ctx.locale.value == "fr":
+            await fr.levelling(self.bot).generate_profile_card(ctx, member)
 
     @Jeanne.checks.cooldown(1, 120, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
@@ -101,30 +86,31 @@ class levelling(Cog):
 
     async def profile_generate_error(self, ctx: Interaction, error: Exception) -> None:
         if isinstance(error, Jeanne.CommandOnCooldown):
-            embed = Embed(
-                description=f"You have already used the profile command!\nTry again after `{round(error.retry_after, 2)} seconds`",
-                color=Color.red(),
-            )
-            await ctx.response.send_message(embed=embed)
+            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+                await en.levelling(self.bot).profile_error(ctx, error)
+            elif ctx.locale.value == "fr":
+                await fr.levelling(self.bot).profile_error(ctx, error)
 
-    @Jeanne.command(description="See your profile or someone else's profile")
-    @Jeanne.describe(member="Which member?")
+    @Jeanne.command(name=T("profile_name"),description=T("profile_desc"))
+    @Jeanne.describe(member=T("member_parm_desc"))
+    @Jeanne.rename(member=T("member_parm_name"))
     @Jeanne.checks.cooldown(1, 120, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def profile(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        await ctx.response.defer()
-        await self.generate_profile_card(ctx, member or ctx.user)
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            await en.levelling(self.bot).profile(ctx, member)
+        elif ctx.locale.value == "fr":
+            await fr.levelling(self.bot).profile(ctx, member)
 
     @profile.error
     async def profile_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            embed = Embed(
-                description=f"You have already used the profile command!\nTry again after `{round(error.retry_after, 2)} seconds`",
-                color=Color.red(),
-            )
-            await ctx.response.send_message(embed=embed)
+            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+                await en.levelling(self.bot).profile_error(ctx, error)
+            elif ctx.locale.value == "fr":
+                await fr.levelling(self.bot).profile_error(ctx, error)
 
 
 async def setup(bot: Bot):

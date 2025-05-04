@@ -17,8 +17,7 @@ class MyTranslator(Jeanne.Translator):
         locale: Locale,
         context: Jeanne.TranslationContext,
     ) -> Optional[str]:
-        translations = (
-            {
+        translations = {
                 # global
                 "member_parm_name": {
                     "en-GB": "member",
@@ -332,6 +331,10 @@ class MyTranslator(Jeanne.Translator):
                     "fr": "Obtenez une image aléatoire de Safebooru",
                 },
                 # info commands
+                "stats_name": {
+                    "en-GB": "stats",
+                    "en-US": "stats",
+                    "fr": "stats",},
                 "stats_desc": {
                     "en-GB": "See the bot's status from development to now",
                     "en-US": "See the bot's status from development to now",
@@ -383,7 +386,7 @@ class MyTranslator(Jeanne.Translator):
                     "en-US": "What is the name of the emoji?",
                     "fr": "Quel est le nom de l'emoji?",
                 },
-                #inventory commands
+                # inventory commands
                 "country_name": {
                     "en-GB": "country",
                     "en-US": "country",
@@ -398,26 +401,63 @@ class MyTranslator(Jeanne.Translator):
                     "en-GB": "Check all the wallpapers available",
                     "en-US": "Check all the wallpapers available",
                     "fr": "Vérifiez tous les fonds d'écran disponibles",
-                },"buy-custom_desc": {
+                },
+                "buy-custom_desc": {
                     "en-GB": "Buy a custom background pic for your level card",
                     "en-US": "Buy a custom background pic for your level card",
-                    "fr": "Acheter une image d'arrière-plan personnalisée pour votre carte de niveau",},"list_name": {
+                    "fr": "Acheter une image d'arrière-plan personnalisée pour votre carte de niveau",
+                },
+                "list_name": {
                     "en-GB": "list",
                     "en-US": "list",
-                    "fr": "liste",},"list_desc": {
+                    "fr": "liste",
+                },
+                "list_desc": {
                     "en-GB": "Check which backgrounds you have",
                     "en-US": "Check which backgrounds you have",
-                    "fr": "Vérifiez quels fonds d'écran vous avez",},"name_parm_name": {"en-GB": "name","en_US": "name","fr": "nom",},"name_parm_desc": {
+                    "fr": "Vérifiez quels fonds d'écran vous avez",
+                },
+                "name_parm_name": {
+                    "en-GB": "name",
+                    "en_US": "name",
+                    "fr": "nom",
+                },
+                "name_parm_desc": {
                     "en-GB": "What will you name it?",
                     "en-US": "What will you name it?",
-                    "fr": "Quel nom lui donnerez-vous?",},"link_parm_name": {
+                    "fr": "Quel nom lui donnerez-vous?",
+                },
+                "link_parm_name": {
                     "en-GB": "link",
                     "en-US": "link",
-                    "fr": "lien",},"link_parm_desc": {
+                    "fr": "lien",
+                },
+                "link_parm_desc": {
                     "en-GB": "Add an image link",
                     "en-US": "Add an image link",
-                    "fr": "Ajouter un lien d'image",},
-            },
-        )
+                    "fr": "Ajouter un lien d'image",
+                },
+                #levelling
+                "global_desc": {
+                    "en-GB": "Check the users with the most XP globally",
+                    "en-US": "Check the users with the most XP globally",
+                    "fr": "Vérifiez les utilisateurs avec le plus d'XP au niveau mondial",
+                },
+                "server_desc": {
+                    "en-GB": "Check the users with the most XP in the server",
+                    "en-US": "Check the users with the most XP in the server",
+                    "fr": "Vérifiez les utilisateurs avec le plus d'XP sur le serveur",
+                },
+                "profile_name": {
+                    "en-GB": "profile",
+                    "en-US": "profile",
+                    "fr": "profil",
+                },
+                "profile_desc": {
+                    "en-GB": "See your profile or someone else's profile",
+                    "en-US": "See your profile or someone else's profile",
+                    "fr": "Voir votre profil ou celui de quelqu'un d'autre",
+                },
+        }
 
-        return translations.get(string.message, {}).get(str(locale), string.message)
+        return translations.get(string.message, {}).get(locale.value, string.message)
