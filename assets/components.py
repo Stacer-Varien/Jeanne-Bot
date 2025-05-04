@@ -401,49 +401,58 @@ class BotReportSelect(ui.View):
 
 
 class ReportModal(ui.Modal, title="Bot Report"):
-    def __init__(self, type: str):
-        self.type = type
+    def __init__(self, type_of_report: str):
+        self.type = type_of_report
         super().__init__()
 
-    if type == "Translation Error":
-        lang = ui.TextInput(
-            label="Language",
-            required=True,
-            min_length=10,
-            max_length=2000,
-            placeholder="Type the language here",
-        )
-        incorrect = ui.TextInput(
-            label="Incorrect Translation",
-            required=True,
-            min_length=10,
-            max_length=2000,
-            placeholder="Type the incorrect translation here",
-        )
-        correct = ui.TextInput(
-            label="Correct Translation",
-            required=True,
-            min_length=10,
-            max_length=2000,
-            placeholder="Type the correct translation here",
-        )
-    else:
-        report = ui.TextInput(
-            label="Problem",
-            placeholder="Type the problem here",
-            required=True,
-            min_length=10,
-            max_length=2000,
-            style=TextStyle.paragraph,
-        )
-        steps = ui.TextInput(
-            label="Steps of how you got this problem",
-            placeholder="Type the steps here",
-            required=False,
-            min_length=10,
-            max_length=1024,
-            style=TextStyle.paragraph,
-        )
+    def __init__(self, type_of_report: str):
+        self.type = type_of_report
+        super().__init__()
+
+        if self.type == "Translation Error":
+            self.lang = ui.TextInput(
+                label="Language",
+                required=True,
+                min_length=2,
+                max_length=2000,
+                placeholder="Type the language here",
+            )
+            self.incorrect = ui.TextInput(
+                label="Incorrect Translation",
+                required=True,
+                min_length=2,
+                max_length=2000,
+                placeholder="Type the incorrect translation here",
+            )
+            self.correct = ui.TextInput(
+                label="Correct Translation",
+                required=True,
+                min_length=2,
+                max_length=2000,
+                placeholder="Type the correct translation here",
+            )
+            self.add_item(self.lang)
+            self.add_item(self.incorrect)
+            self.add_item(self.correct)
+        else:
+            self.report = ui.TextInput(
+                label="Problem",
+                placeholder="Type the problem here",
+                required=True,
+                min_length=10,
+                max_length=2000,
+                style=TextStyle.paragraph,
+            )
+            self.steps = ui.TextInput(
+                label="Steps of how you got this problem",
+                placeholder="Type the steps here",
+                required=False,
+                min_length=10,
+                max_length=1024,
+                style=TextStyle.paragraph,
+            )
+            self.add_item(self.report)
+            self.add_item(self.steps)
 
     async def on_submit(self, ctx: Interaction) -> None:
         if self.type == "Translation Error":
