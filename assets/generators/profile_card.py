@@ -5,7 +5,7 @@ import aiohttp
 from discord import Member, User
 from functions import BetaTest, Currency, Inventory, Levelling, Partner, get_richest
 import requests
-import math
+from discord import Interaction
 import os
 from discord.ext.commands import Bot
 
@@ -54,6 +54,7 @@ class Profile:
 
     async def generate_profile(
         self,
+        ctx: Interaction,
         user: User | Member,
         bg_image: str = None,
         voted: bool = False,
@@ -108,7 +109,7 @@ class Profile:
 
         card.paste(profile_pic_holder, (0, 0), profile_pic_holder)
 
-        profile_canvas = self.create_profile_canvas(user, color, inventory_instance)
+        profile_canvas = self.create_profile_canvas(ctx, user, color, inventory_instance)
         profile_canvas.paste(card, (0, 0), card)
 
         final_bytes = BytesIO()
@@ -166,9 +167,30 @@ class Profile:
             return Image.open(self.badges["top_30"]).resize((50, 50))
         return Image.open(self.badges["top_100"]).resize((50, 50))
 
-    def create_profile_canvas(self, user: User, color: tuple[int, int, int], inventory_instance: Inventory) -> Image.Image:
+    def create_profile_canvas(self, ctx:Interaction, user: User, color: tuple[int, int, int], inventory_instance: Inventory) -> Image.Image:
         canvas = Image.new("RGB", (900, 900), (32, 32, 32))
         draw = ImageDraw.Draw(canvas)
+
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            global_rank_text = "Global Rank"
+            server_rank_text = "Server Rank"
+            qp_balance_text = "QP Balance"
+            global_level_text = "Global Level"
+            global_xp_text = "Global XP"
+            server_level_text = "Server Level"
+            server_xp_text = "Server XP"
+            no_bio_text = "No bio available"
+            rank_font_size = 35
+        elif ctx.locale.value == "fr":
+            global_rank_text = "Classement Global"
+            server_rank_text = "Classement Serveur"
+            qp_balance_text = "Solde QP"
+            global_level_text = "Niveau Global"
+            global_xp_text = "XP Globale"
+            server_level_text = "Niveau Serveur"
+            server_xp_text = "XP Serveur"
+            no_bio_text = "Aucune bio disponible"
+            rank_font_size = 27
 
         currency_instance = Currency(user)
         levelling_instance = Levelling(user, user.guild)
@@ -178,23 +200,23 @@ class Profile:
         # Draw text and rectangles for ranks, levels, and bio
         draw.text(
             (40, 520),
-            text=f"Global Rank",
+            text=global_rank_text,
             fill=color,
-            font=ImageFont.truetype(self.font1, 35),
+            font=ImageFont.truetype(self.font1, rank_font_size),
             stroke_width=1,
             align="center",
         )
         draw.text(
             (330, 520),
-            text="Server Rank",
+            text=server_rank_text,
             fill=color,
-            font=ImageFont.truetype(self.font1, 35),
+            font=ImageFont.truetype(self.font1, rank_font_size),
             stroke_width=1,
             align="center",
         )
         draw.text(
             (620, 520),
-            text="QP Balance",
+            text=qp_balance_text,
             fill=color,
             font=ImageFont.truetype(self.font1, 35),
             stroke_width=1,
@@ -242,7 +264,7 @@ class Profile:
         )
         draw.text(
             (20, 640),
-            f"Global Level: {global_level}",
+            f"{global_level_text}: {global_level}",
             color,
             font=font_small,
             stroke_width=1,
@@ -250,7 +272,7 @@ class Profile:
         global_next_xp = (global_level * 50) + ((global_level - 1) * 25) + 50
         draw.text(
             (520, 640),
-            f"Global XP: {self.format_number(global_user_xp)}/{self.format_number(global_next_xp)}",
+            f"{global_xp_text}: {self.format_number(global_user_xp)}/{self.format_number(global_next_xp)}",
             color,
             font=font_small,
             stroke_width=1,
@@ -275,7 +297,7 @@ class Profile:
 
         draw.text(
             (20, 710),
-            f"Server Level: {server_level}",
+            f"{server_level_text}: {server_level}",
             color,
             font=font_small,
             stroke_width=1,
@@ -283,7 +305,7 @@ class Profile:
         server_next_xp = (server_level * 50) + ((server_level - 1) * 25) + 50
         draw.text(
             (520, 710),
-            f"Server XP: {self.format_number(server_user_xp)}/{self.format_number(server_next_xp)}",
+            f"{server_xp_text}: {self.format_number(server_user_xp)}/{self.format_number(server_next_xp)}",
             color,
             font=font_small,
             stroke_width=1,
@@ -307,7 +329,7 @@ class Profile:
         )
 
         bio = inventory_instance.get_bio
-        bio = "No bio available" if bio == None else bio
+        bio = no_bio_text if bio == None else bio
 
         draw.rounded_rectangle(
             (10, 780, 890, 890), radius=7, width=2, outline=color, fill=(59, 59, 59)
