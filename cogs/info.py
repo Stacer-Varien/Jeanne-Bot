@@ -11,7 +11,6 @@ from discord import (
     app_commands as Jeanne,
 )
 from typing import Optional
-from discord.app_commands import locale_str as T
 import languages.en.info as en
 import languages.fr.info as fr
 
