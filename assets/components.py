@@ -374,6 +374,7 @@ class BotReportMenu(ui.Select):
             SelectOption(label="Exploit", value="exploit"),
             SelectOption(label="Bug and/or Fault", value="bugorfault"),
             SelectOption(label="Illicit NSFW Content", value="illicit"),
+            SelectOption(label="Translation Error", value="translation_error"),
             SelectOption(label="Other", value="other"),
         ]
         super().__init__(
@@ -404,28 +405,63 @@ class ReportModal(ui.Modal, title="Bot Report"):
         self.type = type
         super().__init__()
 
-    report = ui.TextInput(
-        label="Problem",
-        placeholder="Type the problem here",
-        required=True,
-        min_length=10,
-        max_length=2000,
-        style=TextStyle.paragraph,
-    )
-    steps = ui.TextInput(
-        label="Steps of how you got this problem",
-        placeholder="Type the steps here",
-        required=False,
-        min_length=10,
-        max_length=1024,
-        style=TextStyle.paragraph,
-    )
+    if type == "Translation Error":
+        lang = ui.TextInput(
+            label="Language",
+            required=True,
+            min_length=10,
+            max_length=2000,
+            placeholder="Type the language here",
+        )
+        incorrect = ui.TextInput(
+            label="Incorrect Translation",
+            required=True,
+            min_length=10,
+            max_length=2000,
+            placeholder="Type the incorrect translation here",
+        )
+        correct = ui.TextInput(
+            label="Correct Translation",
+            required=True,
+            min_length=10,
+            max_length=2000,
+            placeholder="Type the correct translation here",
+        )
+    else:
+        report = ui.TextInput(
+            label="Problem",
+            placeholder="Type the problem here",
+            required=True,
+            min_length=10,
+            max_length=2000,
+            style=TextStyle.paragraph,
+        )
+        steps = ui.TextInput(
+            label="Steps of how you got this problem",
+            placeholder="Type the steps here",
+            required=False,
+            min_length=10,
+            max_length=1024,
+            style=TextStyle.paragraph,
+        )
 
     async def on_submit(self, ctx: Interaction) -> None:
-        report = Embed(title=self.type, color=Color.brand_red())
-        report.description = self.report.value
-        if self.steps.value != None or self.steps.value == "":
-            report.add_field(name="Steps", value=self.steps.value, inline=False)
+        if self.type == "Translation Error":
+            report = Embed(title=self.type, color=Color.brand_red())
+            report.add_field(
+                name="Language", value=self.lang.value, inline=False
+            )
+            report.add_field(
+                name="Incorrect Translation", value=self.incorrect.value, inline=False
+            )
+            report.add_field(
+                name="Correct Translation", value=self.correct.value, inline=False
+            )
+        else:
+            report = Embed(title=self.type, color=Color.brand_red())
+            report.description = self.report.value
+            if self.steps.value != None or self.steps.value == "":
+                report.add_field(name="Steps", value=self.steps.value, inline=False)
         report.set_footer(text="Reporter {}| `{}`".format(ctx.user, ctx.user.id))
         SyncWebhook.from_url(WEBHOOK).send(embed=report)
         embed = Embed(
