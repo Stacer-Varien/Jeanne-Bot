@@ -1,51 +1,25 @@
 from typing import Optional
-from json import loads
 from discord import (
-    AllowedMentions,
     Attachment,
     CategoryChannel,
-    Color,
-    Embed,
-    File,
-    GuildSticker,
     HTTPException,
     Interaction,
     User,
     NotFound,
     Role,
-    StageChannel,
     TextChannel,
     VerificationLevel,
     VoiceChannel,
     app_commands as Jeanne,
     abc,
-    utils,
 )
-from PIL import ImageColor
 from discord.ext.commands import Bot, Cog, GroupCog
-from humanfriendly import format_timespan, parse_timespan, InvalidTimespan
-from collections import OrderedDict
 from functions import (
     AutoCompleteChoices,
-    Command,
-    Inventory,
-    Levelling,
-    Manage,
     check_botbanned_app_command,
     check_disabled_app_command,
     is_suspended,
 )
-from assets.components import (
-    Confirmation,
-    Levelmsg,
-    RemoveManage,
-    Welcomingmsg,
-    Leavingmsg,
-    ForumGuildlines,
-    RankUpmsg,
-)
-from requests import get
-from io import BytesIO
 from discord.app_commands import locale_str as T
 import languages.en.manage as en
 import languages.en.manage as fr
