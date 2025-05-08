@@ -695,6 +695,223 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Change your level and profile card font and bar color",
                 "fr": "Changer la couleur de la police et de la barre de votre carte de niveau et de profil",
             },
+            # Command Names
+            "ban_name": {
+                "en-GB": "ban",
+                "en-US": "ban",
+                "fr": "bannir",
+            },
+            "warn_name": {
+                "en-GB": "warn",
+                "en-US": "warn",
+                "fr": "avertir",
+            },
+            "list_warns_name": {
+                "en-GB": "list-warns",
+                "en-US": "list-warns",
+                "fr": "liste-avertissements",
+            },
+            "clear_warn_name": {
+                "en-GB": "clear-warn",
+                "en-US": "clear-warn",
+                "fr": "effacer-avertissement",
+            },
+            "kick_name": {
+                "en-GB": "kick",
+                "en-US": "kick",
+                "fr": "expulser",
+            },
+            "prune_name": {
+                "en-GB": "prune",
+                "en-US": "prune",
+                "fr": "purger",
+            },
+            "change_nickname_name": {
+                "en-GB": "change-nickname",
+                "en-US": "change-nickname",
+                "fr": "changer-surnom",
+            },
+            "unban_name": {
+                "en-GB": "unban",
+                "en-US": "unban",
+                "fr": "débannir",
+            },
+            "timeout_name": {
+                "en-GB": "timeout",
+                "en-US": "timeout",
+                "fr": "mettre-en-sourdine",
+            },
+            "timeout_remove_name": {
+                "en-GB": "timeout-remove",
+                "en-US": "timeout-remove",
+                "fr": "retirer-sourdine",
+            },
+            "massban_name": {
+                "en-GB": "massban",
+                "en-US": "massban",
+                "fr": "bannissement-massif",
+            },
+            "massunban_name": {
+                "en-GB": "massunban",
+                "en-US": "massunban",
+                "fr": "débannissement-massif",
+            },
+
+            # Command Descriptions
+            "ban_desc": {
+                "en-GB": "Ban someone from or outside the server",
+                "en-US": "Ban someone from or outside the server",
+                "fr": "Bannir quelqu'un du serveur ou de l'extérieur",
+            },
+            "warn_desc": {
+                "en-GB": "Warn a member",
+                "en-US": "Warn a member",
+                "fr": "Avertir un membre",
+            },
+            "list_warns_desc": {
+                "en-GB": "View warnings in the server or a member",
+                "en-US": "View warnings in the server or a member",
+                "fr": "Voir les avertissements dans le serveur ou d'un membre",
+            },
+            "clear_warn_desc": {
+                "en-GB": "Revoke a warn by warn ID",
+                "en-US": "Revoke a warn by warn ID",
+                "fr": "Révoquer un avertissement par ID d'avertissement",
+            },
+            "kick_desc": {
+                "en-GB": "Kick a member out of the server",
+                "en-US": "Kick a member out of the server",
+                "fr": "Expulser un membre du serveur",
+            },
+            "prune_desc": {
+                "en-GB": "Bulk delete messages",
+                "en-US": "Bulk delete messages",
+                "fr": "Supprimer en masse des messages",
+            },
+            "change_nickname_desc": {
+                "en-GB": "Change someone's nickname",
+                "en-US": "Change someone's nickname",
+                "fr": "Changer le surnom de quelqu'un",
+            },
+            "unban_desc": {
+                "en-GB": "Unbans a user",
+                "en-US": "Unbans a user",
+                "fr": "Débannir un utilisateur",
+            },
+            "timeout_desc": {
+                "en-GB": "Timeout a member",
+                "en-US": "Timeout a member",
+                "fr": "Mettre un membre en sourdine",
+            },
+            "timeout_remove_desc": {
+                "en-GB": "Removes a timeout from a member",
+                "en-US": "Removes a timeout from a member",
+                "fr": "Retirer une sourdine d'un membre",
+            },
+            "massban_desc": {
+                "en-GB": "Ban multiple members at once",
+                "en-US": "Ban multiple members at once",
+                "fr": "Bannir plusieurs membres à la fois",
+            },
+            "massunban_desc": {
+                "en-GB": "Unban multiple members at once",
+                "en-US": "Unban multiple members at once",
+                "fr": "Débannir plusieurs membres à la fois",
+            },
+
+            # Parameter Names
+            "member_param_name": {
+                "en-GB": "member",
+                "en-US": "member",
+                "fr": "membre",
+            },
+            "reason_param_name": {
+                "en-GB": "reason",
+                "en-US": "reason",
+                "fr": "raison",
+            },
+            "delete_message_history_param_name": {
+                "en-GB": "delete_message_history",
+                "en-US": "delete_message_history",
+                "fr": "supprimer_historique_messages",
+            },
+            "time_param_name": {
+                "en-GB": "time",
+                "en-US": "time",
+                "fr": "temps",
+            },
+            "warn_id_param_name": {
+                "en-GB": "warn_id",
+                "en-US": "warn_id",
+                "fr": "id_avertissement",
+            },
+            "limit_param_name": {
+                "en-GB": "limit",
+                "en-US": "limit",
+                "fr": "limite",
+            },
+            "nickname_param_name": {
+                "en-GB": "nickname",
+                "en-US": "nickname",
+                "fr": "surnom",
+            },
+            "user_id_param_name": {
+                "en-GB": "user_id",
+                "en-US": "user_id",
+                "fr": "id_utilisateur",
+            },
+            "user_ids_param_name": {
+                "en-GB": "user_ids",
+                "en-US": "user_ids",
+                "fr": "ids_utilisateurs",
+            },
+
+            # Parameter Descriptions
+            "member_param_desc": {
+                "en-GB": "What is the member or user ID?",
+                "en-US": "What is the member or user ID?",
+                "fr": "Quel est le membre ou l'ID utilisateur ?",
+            },
+            "reason_param_desc": {
+                "en-GB": "What did they do? You can also make a custom reason",
+                "en-US": "What did they do? You can also make a custom reason",
+                "fr": "Qu'ont-ils fait ? Vous pouvez également créer une raison personnalisée",
+            },
+            "delete_message_history_param_desc": {
+                "en-GB": "Delete messages from past 7 days?",
+                "en-US": "Delete messages from past 7 days?",
+                "fr": "Supprimer les messages des 7 derniers jours ?",
+            },
+            "time_param_desc": {
+                "en-GB": "How long should they be tempbanned? (1m, 1h30m, etc)",
+                "en-US": "How long should they be tempbanned? (1m, 1h30m, etc)",
+                "fr": "Combien de temps doivent-ils être temporairement bannis ? (1m, 1h30m, etc)",
+            },
+            "warn_id_param_desc": {
+                "en-GB": "What is their warn ID you want to remove?",
+                "en-US": "What is their warn ID you want to remove?",
+                "fr": "Quel est leur ID d'avertissement que vous souhaitez supprimer ?",
+            },
+            "limit_param_desc": {
+                "en-GB": "How many messages? (max is 100)",
+                "en-US": "How many messages? (max is 100)",
+                "fr": "Combien de messages ? (max est 100)",
+            },
+            "nickname_param_desc": {
+                "en-GB": "What is their new nickname?",
+                "en-US": "What is their new nickname?",
+                "fr": "Quel est leur nouveau surnom ?",
+            },
+            "user_id_param_desc": {
+                "en-GB": "Which user do you want to unban?",
+                "en-US": "Which user do you want to unban?",
+                "fr": "Quel utilisateur voulez-vous débannir ?",
+            },
+            "user_ids_param_desc": {
+                "en-GB": "How many user IDs? Leave a space after each ID (min is 5 and max is 25)",
+                "en-US": "How many user IDs? Leave a space after each ID (min is 5 and max is 25)",
+                "fr": "Combien d'IDs utilisateur ? Laissez un espace après chaque ID (min est 5 et max est 25)",
+            },
         }
 
-        return translations.get(string.message, {}).get(locale.value, string.message)
+        return translations.get(string.message_id, {}).get(locale.value)
