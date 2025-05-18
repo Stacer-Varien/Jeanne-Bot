@@ -912,6 +912,271 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "How many user IDs? Leave a space after each ID (min is 5 and max is 25)",
                 "fr": "Combien d'IDs utilisateur ? Laissez un espace après chaque ID (min est 5 et max est 25)",
             },
+
+            # reactions commands
+            "hug_name": {
+                "en-GB": "hug",
+                "en-US": "hug",
+                "fr": "câlin",
+            },
+            "hug_desc": {
+                "en-GB": "Hug someone or yourself",
+                "en-US": "Hug someone or yourself",
+                "fr": "Faites un câlin à quelqu'un ou à vous-même",
+            },
+            "hug_member_parm_name": {
+                "en-GB": "member",
+                "en-US": "member",
+                "fr": "membre",
+            },
+            "hug_member_parm_desc": {
+                "en-GB": "Who are you hugging?",
+                "en-US": "Who are you hugging?",
+                "fr": "Qui câlinez-vous ?",
+            },
+
+            "slap_name": {
+                "en-GB": "slap",
+                "en-US": "slap",
+                "fr": "gifler",
+            },
+            "slap_desc": {
+                "en-GB": "Slap someone or yourself",
+                "en-US": "Slap someone or yourself",
+                "fr": "Gifle quelqu'un ou vous-même",
+            },
+            "slap_member_parm_name": {
+                "en-GB": "member",
+                "en-US": "member",
+                "fr": "membre",
+            },
+            "slap_member_parm_desc": {
+                "en-GB": "Who are you slapping?",
+                "en-US": "Who are you slapping?",
+                "fr": "Qui giflez-vous ?",
+            },
+
+            "smug_name": {
+                "en-GB": "smug",
+                "en-US": "smug",
+                "fr": "suffisant",
+            },
+            "smug_desc": {
+                "en-GB": "Show a smug expression",
+                "en-US": "Show a smug expression",
+                "fr": "Affichez une expression suffisante",
+            },
+
+            "poke_name": {
+                "en-GB": "poke",
+                "en-US": "poke",
+                "fr": "pousser",
+            },
+            "poke_desc": {
+                "en-GB": "Poke someone or yourself",
+                "en-US": "Poke someone or yourself",
+                "fr": "Piquez quelqu'un ou vous-même",
+            },
+            "poke_member_parm_name": {
+                "en-GB": "member",
+                "en-US": "member",
+                "fr": "membre",
+            },
+            "poke_member_parm_desc": {
+                "en-GB": "Who are you poking?",
+                "en-US": "Who are you poking?",
+                "fr": "Qui piquez-vous ?",
+            },
+
+            "pat_name": {
+                "en-GB": "pat",
+                "en-US": "pat",
+                "fr": "tapoter",
+            },
+            "pat_desc": {
+                "en-GB": "Pat someone or yourself",
+                "en-US": "Pat someone or yourself",
+                "fr": "Tapotez quelqu'un ou vous-même",
+            },
+            "pat_member_parm_name": {
+                "en-GB": "member",
+                "en-US": "member",
+                "fr": "membre",
+            },
+            "pat_member_parm_desc": {
+                "en-GB": "Who are you patting?",
+                "en-US": "Who are you patting?",
+                "fr": "Qui tapotez-vous ?",
+            },
+
+            "kiss_name": {
+                "en-GB": "kiss",
+                "en-US": "kiss",
+                "fr": "embrasser",
+            },
+            "kiss_desc": {
+                "en-GB": "Kiss someone or yourself",
+                "en-US": "Kiss someone or yourself",
+                "fr": "Embrassez quelqu'un ou vous-même",
+            },
+            "kiss_member_parm_name": {
+                "en-GB": "member",
+                "en-US": "member",
+                "fr": "membre",
+            },
+            "kiss_member_parm_desc": {
+                "en-GB": "Who are you kissing?",
+                "en-US": "Who are you kissing?",
+                "fr": "Qui embrassez-vous ?",
+            },
+
+            "tickle_name": {
+                "en-GB": "tickle",
+                "en-US": "tickle",
+                "fr": "chatouiller",
+            },
+            "tickle_desc": {
+                "en-GB": "Tickle someone or yourself",
+                "en-US": "Tickle someone or yourself",
+                "fr": "Chatouillez quelqu'un ou vous-même",
+            },
+            "tickle_member_parm_name": {
+                "en-GB": "member",
+                "en-US": "member",
+                "fr": "membre",
+            },
+            "tickle_member_parm_desc": {
+                "en-GB": "Who are you tickling?",
+                "en-US": "Who are you tickling?",
+                "fr": "Qui chatouillez-vous ?",
+            },
+
+            "baka_name": {
+                "en-GB": "baka",
+                "en-US": "baka",
+                "fr": "baka",
+            },
+            "baka_desc": {
+                "en-GB": "Call someone or yourself a baka!",
+                "en-US": "Call someone or yourself a baka!",
+                "fr": "Traitez quelqu'un ou vous-même de baka !",
+            },
+            "baka_member_parm_name": {
+                "en-GB": "member",
+                "en-US": "member",
+                "fr": "membre",
+            },
+            "baka_member_parm_desc": {
+                "en-GB": "Who are you calling a baka?",
+                "en-US": "Who are you calling a baka?",
+                "fr": "Qui traitez-vous de baka ?",
+            },
+
+            "feed_name": {
+                "en-GB": "feed",
+                "en-US": "feed",
+                "fr": "nourrir",
+            },
+            "feed_desc": {
+                "en-GB": "Feed someone or yourself",
+                "en-US": "Feed someone or yourself",
+                "fr": "Nourrissez quelqu'un ou vous-même",
+            },
+            "feed_member_parm_name": {
+                "en-GB": "member",
+                "en-US": "member",
+                "fr": "membre",
+            },
+            "feed_member_parm_desc": {
+                "en-GB": "Who are you feeding?",
+                "en-US": "Who are you feeding?",
+                "fr": "Qui nourrissez-vous ?",
+            },
+
+            "cry_name": {
+                "en-GB": "cry",
+                "en-US": "cry",
+                "fr": "pleurer",
+            },
+            "cry_desc": {
+                "en-GB": "Show a crying expression",
+                "en-US": "Show a crying expression",
+                "fr": "Affichez une expression de pleurs",
+            },
+
+            "bite_name": {
+                "en-GB": "bite",
+                "en-US": "bite",
+                "fr": "mordre",
+            },
+            "bite_desc": {
+                "en-GB": "Bite someone or yourself",
+                "en-US": "Bite someone or yourself",
+                "fr": "Mordez quelqu'un ou vous-même",
+            },
+            "bite_member_parm_name": {
+                "en-GB": "member",
+                "en-US": "member",
+                "fr": "membre",
+            },
+            "bite_member_parm_desc": {
+                "en-GB": "Who are you biting?",
+                "en-US": "Who are you biting?",
+                "fr": "Qui mordez-vous ?",
+            },
+
+            "blush_name": {
+                "en-GB": "blush",
+                "en-US": "blush",
+                "fr": "rougir",
+            },
+            "blush_desc": {
+                "en-GB": "Show a blushing expression",
+                "en-US": "Show a blushing expression",
+                "fr": "Affichez une expression de rougissement",
+            },
+
+            "cuddle_name": {
+                "en-GB": "cuddle",
+                "en-US": "cuddle",
+                "fr": "câliner",
+            },
+            "cuddle_desc": {
+                "en-GB": "Cuddle with someone or yourself",
+                "en-US": "Cuddle with someone or yourself",
+                "fr": "Câlinez quelqu'un ou vous-même",
+            },
+            "cuddle_member_parm_name": {
+                "en-GB": "member",
+                "en-US": "member",
+                "fr": "membre",
+            },
+            "cuddle_member_parm_desc": {
+                "en-GB": "Who are you cuddling with?",
+                "en-US": "Who are you cuddling with?",
+                "fr": "Avec qui câlinez-vous ?",
+            },
+
+            "dance_name": {
+                "en-GB": "dance",
+                "en-US": "dance",
+                "fr": "danser",
+            },
+            "dance_desc": {
+                "en-GB": "Dance with someone or yourself",
+                "en-US": "Dance with someone or yourself",
+                "fr": "Dansez avec quelqu'un ou vous-même",
+            },
+            "dance_member_parm_name": {
+                "en-GB": "member",
+                "en-US": "member",
+                "fr": "membre",
+            },
+            "dance_member_parm_desc": {
+                "en-GB": "Who are you dancing with?",
+                "en-US": "Who are you dancing with?",
+                "fr": "Avec qui dansez-vous ?",
+            },
         }
 
         return translations.get(string.message_id, {}).get(locale.value)
