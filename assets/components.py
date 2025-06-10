@@ -90,17 +90,28 @@ class Cancellation(ui.View):
 
 
 class Welcomingmsg(ui.Modal, title="Welcoming Message"):
-    def __init__(self) -> None:
+    def __init__(self, ctx:Interaction) -> None:
         super().__init__()
 
-    jsonscript = ui.TextInput(
-        label="JSON",
-        style=TextStyle.paragraph,
-        placeholder="Insert JSON script here. If you don't have, type a plain message as long it follows the parameters",
-        required=True,
-        min_length=1,
-        max_length=4000,
-    )
+        if ctx.locale.value=="en-GB" or ctx.locale.value=="en-US":
+            self.jsonscript = ui.TextInput(
+                label="JSON",
+                style=TextStyle.paragraph,
+                placeholder="Insert JSON script here. If you don't have, type a plain message as long it follows the parameters",
+                required=True,
+                min_length=1,
+                max_length=4000,
+            )
+        elif ctx.locale.value=="fr":
+                self.jsonscript = ui.TextInput(
+                label="JSON",
+                style=TextStyle.paragraph,
+                placeholder="Insert JSON script here. If you don't have, type a plain message as long it follows the parameters",
+                required=True,
+                min_length=1,
+                max_length=4000,
+            )
+    
 
     async def on_submit(self, ctx: Interaction) -> None:
         humans = str(len([member for member in ctx.guild.members if not member.bot]))
@@ -122,46 +133,84 @@ class Welcomingmsg(ui.Modal, title="Welcoming Message"):
             embed = Embed.from_dict(json["embeds"][0])
         except:
             content = replace_all(self.jsonscript.value, parameters)
-        confirm = Embed(
-            description="This is the preview of the welcoming message.\nAre you happy with it?"
-        )
-        view = Confirmation(ctx.user)
-        try:
-            embeds = [embed, confirm]
-        except:
-            embeds = [confirm]
-        await ctx.response.send_message(
-            content=content,
-            embeds=embeds,
-            view=view,
-            allowed_mentions=AllowedMentions(everyone=False, roles=False, users=False),
-            ephemeral=True,
-        )
-        await view.wait()
-        if view.value == True:
-            await Manage(ctx.guild).set_welcomer_msg(self.jsonscript.value)
-            embed = Embed(description="Welcoming message set")
-            await ctx.edit_original_response(content=None, embeds=[embed], view=None)
-        elif view.value == False:
-            embed = Embed(description="Action cancelled")
-            await ctx.edit_original_response(content=None, embeds=[embed], view=None)
-        else:
-            embed = Embed(description="Timeout")
-            await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+        if ctx.locale.value=="en-GB" or ctx.locale.value=="en-US":
+            confirm = Embed(
+                description="This is the preview of the welcoming message.\nAre you happy with it?"
+            )
+            view = Confirmation(ctx.user)
+            try:
+                embeds = [embed, confirm]
+            except:
+                embeds = [confirm]
+            await ctx.response.send_message(
+                content=content,
+                embeds=embeds,
+                view=view,
+                allowed_mentions=AllowedMentions(everyone=False, roles=False, users=False),
+                ephemeral=True,
+            )
+            await view.wait()
+            if view.value == True:
+                await Manage(ctx.guild).set_welcomer_msg(self.jsonscript.value)
+                embed = Embed(description="Welcoming message set")
+                await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+            elif view.value == False:
+                embed = Embed(description="Action cancelled")
+                await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+            else:
+                embed = Embed(description="Timeout")
+                await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+        elif ctx.locale.value=="fr":
+            confirm = Embed(
+                description="Ceci est l'aperçu du message de bienvenue.\nÊtes-vous satisfait ?"
+            )
+            view = Confirmation(ctx.user)
+            try:
+                embeds = [embed, confirm]
+            except:
+                embeds = [confirm]
+            await ctx.response.send_message(
+                content=content,
+                embeds=embeds,
+                view=view,
+                allowed_mentions=AllowedMentions(everyone=False, roles=False, users=False),
+                ephemeral=True,
+            )
+            await view.wait()
+            if view.value == True:
+                await Manage(ctx.guild).set_welcomer_msg(self.jsonscript.value)
+                embed = Embed(description="Message de bienvenue défini")
+                await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+            elif view.value == False:
+                embed = Embed(description="Action annulée")
+                await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+            else:
+                embed = Embed(description="Temps écoulé")
+                await ctx.edit_original_response(content=None, embeds=[embed], view=None)
 
 
 class Leavingmsg(ui.Modal, title="Leaving Message"):
-    def __init__(self) -> None:
+    def __init__(self, ctx:Interaction) -> None:
         super().__init__()
 
-    jsonscript = ui.TextInput(
-        label="JSON",
-        style=TextStyle.paragraph,
-        placeholder="Insert JSON script here. If you don't have, type a plain message as long it follows the parameters",
-        required=True,
-        min_length=1,
-        max_length=4000,
-    )
+        if ctx.locale.value=="en-GB" or ctx.locale.value=="en-US":
+            self.jsonscript = ui.TextInput(
+                label="JSON",
+                style=TextStyle.paragraph,
+                placeholder="Insert JSON script here. If you don't have, type a plain message as long it follows the parameters",
+                required=True,
+                min_length=1,
+                max_length=4000,
+            )
+        elif ctx.locale.value == "fr":
+            self.jsonscript = ui.TextInput(
+                label="JSON",
+                style=TextStyle.paragraph,
+                placeholder="Insérez un script JSON ici. Si vous n'en avez pas, tapez un message simple tant qu'il respecte les paramètres",
+                required=True,
+                min_length=1,
+                max_length=4000,
+            )
 
     async def on_submit(self, ctx: Interaction) -> None:
         humans = str(len([member for member in ctx.guild.members if not member.bot]))
@@ -183,32 +232,68 @@ class Leavingmsg(ui.Modal, title="Leaving Message"):
             embed = Embed.from_dict(json["embeds"][0])
         except:
             content = replace_all(self.jsonscript.value, parameters)
-        confirm = Embed(
-            description="This is the preview of the leaving message.\nAre you happy with it?"
-        )
-        view = Confirmation(ctx.user)
-        try:
-            embeds = [embed, confirm]
-        except:
-            embeds = [confirm]
-        await ctx.response.send_message(
-            content=content,
-            embeds=embeds,
-            view=view,
-            allowed_mentions=AllowedMentions(everyone=False, roles=False, users=False),
-            ephemeral=True,
-        )
-        await view.wait()
-        if view.value == True:
-            await Manage(ctx.guild).set_leaving_msg(self.jsonscript.value)
-            embed = Embed(description="Leaving message set")
-            await ctx.edit_original_response(content=None, embeds=[embed], view=None)
-        elif view.value == False:
-            embed = Embed(description="Action cancelled")
-            await ctx.edit_original_response(content=None, embeds=[embed], view=None)
-        else:
-            embed = Embed(description="Timeout")
-            await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+        if ctx.locale.value=="en-GB" or ctx.locale.value=="en-US":
+            confirm = Embed(
+                description="This is the preview of the leaving message.\nAre you happy with it?"
+            )
+            view = Confirmation(ctx.user)
+            try:
+                embeds = [embed, confirm]
+            except:
+                embeds = [confirm]
+            await ctx.response.send_message(
+                content=content,
+                embeds=embeds,
+                view=view,
+                allowed_mentions=AllowedMentions(everyone=False, roles=False, users=False),
+                ephemeral=True,
+            )
+            await view.wait()
+            if view.value == True:
+                await Manage(ctx.guild).set_leaving_msg(self.jsonscript.value)
+                embed = Embed(description="Leaving message set")
+                await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+            elif view.value == False:
+                embed = Embed(description="Action cancelled")
+                await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+            else:
+                embed = Embed(description="Timeout")
+                await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+        elif ctx.locale.value=="fr":
+            confirm = Embed(
+                description="Ceci est l'aperçu du message de départ.\nÊtes-vous satisfait ?"
+            )
+            view = Confirmation(ctx.user)
+            try:
+                embeds = [embed, confirm]
+            except:
+                embeds = [confirm]
+            await ctx.response.send_message(
+                content=content,
+                embeds=embeds,
+                view=view,
+                allowed_mentions=AllowedMentions(
+                    everyone=False, roles=False, users=False
+                ),
+                ephemeral=True,
+            )
+            await view.wait()
+            if view.value == True:
+                await Manage(ctx.guild).set_leaving_msg(self.jsonscript.value)
+                embed = Embed(description="Message de départ défini")
+                await ctx.edit_original_response(
+                    content=None, embeds=[embed], view=None
+                )
+            elif view.value == False:
+                embed = Embed(description="Action annulée")
+                await ctx.edit_original_response(
+                    content=None, embeds=[embed], view=None
+                )
+            else:
+                embed = Embed(description="Temps écoulé")
+                await ctx.edit_original_response(
+                    content=None, embeds=[embed], view=None
+                )
 
 
 class Levelmsg(ui.Modal, title="Level Update Message"):

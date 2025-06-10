@@ -1,43 +1,18 @@
-from datetime import timedelta, datetime
-import re
-import aiohttp
 from discord import (
-    Attachment, ButtonStyle, Color, Embed, Forbidden, HTTPException, Interaction,
-    NotFound, TextChannel, app_commands as Jeanne, ui
+    Forbidden, HTTPException, Interaction,
+    NotFound, TextChannel, app_commands as Jeanne
 )
 from discord.ext.commands import Cog, Bot, GroupCog
-from reactionmenu import ViewButton, ViewMenu
-from assets.components import ReportModal
 from assets.dictionary import dictionary
 from functions import (
-    Reminder, check_botbanned_app_command, check_disabled_app_command, is_suspended
+    check_botbanned_app_command, check_disabled_app_command, is_suspended
 )
-from config import WEATHER
-from discord.ui import View
 from py_expression_eval import Parser
 from typing import Literal, Optional
-from json import loads
-from requests import get
-from humanfriendly import parse_timespan, InvalidTimespan
-
-bot_invite_url = "https://canary.discord.com/oauth2/authorize?client_id=831993597166747679"
-topgg_invite = "https://top.gg/bot/831993597166747679"
-discordbots_url = "https://discord.bots.gg/bots/831993597166747679"
-orleans = "https://discord.gg/jh7jkuk2pp"
-
-
-class InviteButton(View):
-    def __init__(self):
-        super().__init__()
-        urls = [
-            ("Bot Invite", bot_invite_url),
-            ("Top.gg", topgg_invite),
-            ("DiscordBots", discordbots_url),
-            ("Orleans", orleans),
-        ]
-        for label, url in urls:
-            self.add_item(ui.Button(style=ButtonStyle.url, label=label, url=url))
-
+from humanfriendly import InvalidTimespan
+from discord.app_commands import locale_str as T
+import languages.en.utilities as en
+import languages.fr.utilities as fr
 
 class EmbedGroup(GroupCog, name="embed"):
     def __init__(self, bot: Bot) -> None:
@@ -45,73 +20,63 @@ class EmbedGroup(GroupCog, name="embed"):
         super().__init__()
 
     @Jeanne.command(
-        description="Generates an embed message. Use Discohook.org for JSON generation.",
+        name=T("generate_name"),
+        description=T("generate_desc"),
         extras={"member_perms": "Administrator"},
     )
     @Jeanne.checks.has_permissions(administrator=True)
     @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
-    @Jeanne.describe(channel="Target channel", jsonscript="JSON script", jsonfile="JSON file")
+    @Jeanne.describe(
+        channel=T("generate_channel_parm_desc"),
+        jsonscript=T("generate_jsonscript_parm_desc"),
+    )
+    @Jeanne.rename(
+        channel=T("generate_channel_parm_name"),
+        jsonscript=T("generate_jsonscript_parm_name"),
+    )
     async def generate(
-        self, ctx: Interaction, channel: TextChannel, jsonscript: Optional[str] = None, jsonfile: Optional[Attachment] = None
-    ):
-        await ctx.response.defer()
-        if not (jsonscript or jsonfile):
-            await ctx.followup.send(embed=Embed(description="Provide either a JSON script or file. Use [Discohook](https://discohook.org/)"))
-            return
-        if jsonscript and jsonfile:
-            await ctx.followup.send(embed=Embed(description="Use either a JSON script or file, not both."))
-            return
-
-        json_data = loads(jsonscript) if jsonscript else loads(get(jsonfile.url).content)
-        content = json_data.get("content", None)
-        embeds = [Embed.from_dict(i) for i in json_data.get("embeds", [])]
-
-        if len(embeds) > 10:
-            await ctx.followup.send(content="Too many embeds! Maximum is 10.", ephemeral=True)
-            return
-
-        message = await channel.send(content=content, embeds=embeds or None)
-        await ctx.followup.send(content=f"{message.jump_url} sent in {channel.mention}")
+        self, ctx: Interaction, channel: TextChannel, jsonscript: str):
+        if ctx.locale.value=="en-GB" or ctx.locale.value=="en-US":
+            await en.EmbedGroup(self.bot).generate(ctx, channel, jsonscript)
+        elif ctx.locale.value=="fr":
+            await fr.EmbedGroup(self.bot).generate(ctx, channel, jsonscript)
 
     @Jeanne.command(
-        description="Edits an embed message. Use Discohook.org for JSON generation.",
+        name=T("edit_name"),
+        description=T("edit_desc"),
         extras={"member_perms": "Administrator"},
     )
     @Jeanne.checks.has_permissions(administrator=True)
     @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
-    @Jeanne.describe(channel="Channel of the message", messageid="Message ID", jsonscript="JSON script", jsonfile="JSON file")
+    @Jeanne.describe(
+        channel=T("edit_channel_parm_desc"),
+        messageid=T("edit_messageid_parm_desc"),
+        jsonscript=T("edit_jsonscript_parm_desc"),
+    )
+    @Jeanne.rename(
+        channel=T("edit_channel_parm_name"),
+        messageid=T("edit_messageid_parm_name"),
+        jsonscript=T("edit_jsonscript_parm_name"),
+    )
     async def edit(
-        self, ctx: Interaction, channel: TextChannel, messageid: str, jsonscript: Optional[str] = None, jsonfile: Optional[Attachment] = None
-    ):
+        self, ctx: Interaction, channel: TextChannel, messageid: str, jsonscript: str):
         await ctx.response.defer()
-        message = await channel.fetch_message(int(messageid))
-
-        if not (jsonscript or jsonfile):
-            await ctx.followup.send(embed=Embed(description="Provide either a JSON script or file. Use [Discohook](https://discohook.org/)"))
-            return
-        if jsonscript and jsonfile:
-            await ctx.followup.send(embed=Embed(description="Use either a JSON script or file, not both."))
-            return
-
-        json_data = loads(jsonscript) if jsonscript else loads(get(jsonfile.url).content)
-        content = json_data.get("content", None)
-        embeds = [Embed.from_dict(i) for i in json_data.get("embeds", [])]
-
-        if len(embeds) > 10:
-            await ctx.followup.send(content="Too many embeds! Maximum is 10.", ephemeral=True)
-            return
-
-        await message.edit(content=content, embeds=embeds or None)
-        await ctx.followup.send(content=f"{message.jump_url} edited in {channel.mention}")
+        if ctx.locale.value=="en-GB" or ctx.locale.value=="en-US":
+            await en.EmbedGroup(self.bot).edit(ctx, channel, messageid, jsonscript)
+        elif ctx.locale.value=="fr":
+            await fr.EmbedGroup(self.bot).edit(ctx, channel, messageid, jsonscript)
 
     @edit.error
     async def edit_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(error.original, (Forbidden, NotFound, HTTPException)):
-            await ctx.followup.send(embed=Embed(description=str(error), color=Color.red()))
+            if ctx.locale.value=="en-GB" or ctx.locale.value=="en-US":
+                await en.EmbedGroup(self.bot).edit_error(ctx, error)
+            elif ctx.locale.value=="fr":
+                await fr.EmbedGroup(self.bot).edit_error(ctx, error)
 
 
 class ReminderCog(GroupCog, name="reminder"):
@@ -119,97 +84,84 @@ class ReminderCog(GroupCog, name="reminder"):
         self.bot = bot
         super().__init__()
 
-    @Jeanne.command(description="Add a reminder")
+    @Jeanne.command(
+        name=T("reminder_add_name"),
+        description=T("reminder_add_desc"),
+    )
     @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
-    @Jeanne.describe(reason="Reason for the reminder", time="Time (e.g., 1h, 30m)")
+    @Jeanne.check(check_disabled_app_command)
+    @Jeanne.describe(
+        reason=T("reminder_add_reason_parm_desc"),
+        time=T("reminder_add_time_parm_desc"),
+    )
+    @Jeanne.rename(
+        reason=T("reminder_add_reason_parm_name"),
+        time=T("reminder_add_time_parm_name"),
+    )
     async def add(self, ctx: Interaction, reason: str, time: str):
-        await ctx.response.defer(ephemeral=True)
-        user_reminders = Reminder(ctx.user).get_all_user_reminders
-
-        if user_reminders and len(user_reminders) >= 10:
-            await ctx.followup.send(embed=Embed(description="Too many reminders! Cancel one or wait for one to expire.", color=Color.red()), ephemeral=True)
-            return
-
-        try:
-            reminder_time = parse_timespan(time)
-            if reminder_time < 60:
-                raise InvalidTimespan
-        except InvalidTimespan:
-            await ctx.followup.send(embed=Embed(description="Invalid time! Use a duration greater than 1 minute.", color=Color.red()), ephemeral=True)
-            return
-
-        date = datetime.now() + timedelta(seconds=reminder_time)
-        await Reminder(ctx.user).add(reason, round(date.timestamp()))
-        embed = Embed(
-            title="Reminder added",
-            description=f"On <t:{round(date.timestamp())}:F>, I will remind you.",
-            color=Color.random(),
-        )
-        embed.add_field(name="Reason", value=reason, inline=False)
-        embed.set_footer(text="Ensure your DMs are open to receive alerts.")
-        await ctx.followup.send(embed=embed, ephemeral=True)
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            await en.ReminderCog(self.bot).add(ctx, reason, time)
+        elif ctx.locale.value == "fr":
+            await fr.ReminderCog(self.bot).add(ctx, reason, time)
 
     @add.error
     async def add_error(self, ctx: Interaction, error: Jeanne.errors.AppCommandError):
         if isinstance(error, Jeanne.errors.CommandInvokeError) and isinstance(error.original, InvalidTimespan):
-            embed = Embed(
-                title="Invalid time",
-                description="Supported time units: ms, s, m, h, d, w, y.",
-                color=Color.red(),
-            )
-            await ctx.followup.send(embed=embed, ephemeral=True)
+            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+                await en.ReminderCog(self.bot).add_error(ctx, error)
+            elif ctx.locale.value == "fr":
+                await fr.ReminderCog(self.bot).add_error(ctx, error)
 
-    @Jeanne.command(name="list", description="List all the reminders you have")
+    @Jeanne.command(
+        name=T("reminder_list_name"),
+        description=T("reminder_list_desc"),
+    )
     @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
     async def _list(self, ctx: Interaction):
-        await ctx.response.defer(ephemeral=True)
-        embed = Embed()
-        reminders = Reminder(ctx.user).get_all_user_reminders
-        if reminders == None:
-            embed.description = "No reminders"
-        else:
-            for i in reminders:
-                ids = i[1]
-                reminder = i[3]
-                time = f"<t:{i[2]}:F>"
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            await en.ReminderCog(self.bot)._list(ctx)
+        elif ctx.locale.value == "fr":
+            await fr.ReminderCog(self.bot)._list(ctx)
 
-                embed.add_field(
-                    name=f"ID: {ids}",
-                    value=f"*Reminder:* {reminder}\n*Time:* {time}",
-                    inline=True,
-                )
-        embed.color = Color.random()
-        await ctx.followup.send(embed=embed, ephemeral=True)
-
-    @Jeanne.command(name="cancel", description="Cancel a reminder")
+    @Jeanne.command(
+        name=T("reminder_cancel_name"),
+        description=T("reminder_cancel_desc"),
+    )
     @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
+    @Jeanne.describe(reminder_id=T("reminder_cancel_reminder_id_parm_desc"))
+    @Jeanne.rename(reminder_id=T("reminder_cancel_reminder_id_parm_name"))
     async def cancel(self, ctx: Interaction, reminder_id: int):
-        await ctx.response.defer(ephemeral=True)
-        reminder = Reminder(ctx.user)
-        embed = Embed()
-        if await reminder.remove(reminder_id) == False:
-            embed.color = Color.red()
-            embed.description = "You don't have a reminder with that ID"
-            await ctx.followup.send(embed=embed, ephemeral=True)
-            return
-        embed.color = Color.random()
-        embed.description = "Reminder `{}` has been removed".format(reminder_id)
-        await reminder.remove(reminder_id)
-        await ctx.followup.send(embed=embed, ephemeral=True)
-
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            await en.ReminderCog(self.bot).cancel(ctx, reminder_id)
+        elif ctx.locale.value == "fr":
+            await fr.ReminderCog(self.bot).cancel(ctx, reminder_id)
 
 class SlashUtilities(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.parser = Parser()
 
-    @Jeanne.command(description="Get weather information on a city")
+    @Jeanne.command(
+        name=T("weather_name"),
+        description=T("weather_desc"),
+    )
     @Jeanne.check(is_suspended)
     @Jeanne.checks.cooldown(3, 14400, key=lambda i: (i.user.id))
-    @Jeanne.describe(city="Add a city", units="Metric or Imperial? (Default is metric)")
+    @Jeanne.describe(
+        city=T("weather_city_parm_desc"),
+        units=T("weather_units_parm_desc"),
+        three_day=T("weather_three_day_parm_desc"),
+    )
+    @Jeanne.rename(
+        city=T("weather_city_parm_name"),
+        units=T("weather_units_parm_name"),
+        three_day=T("weather_three_day_parm_name"),
+    )
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def weather(
@@ -219,249 +171,96 @@ class SlashUtilities(Cog):
         units: Optional[Literal["Metric", "Imperial"]] = None,
         three_day: Optional[bool] = False,
     ):
-        await ctx.response.defer()
-        emoji_map = {
-            "globe": "🌍",
-            "newspaper": "📰",
-            "min_tempe": "🌡️",
-            "max_tempe": "🔥",
-            "humidity": "💧",
-            "clouds": "☁️",
-            "visibility": "👁️",
-            "wind_dir": "➡️",
-            "guste": "💨",
-            "rain_chance": "💦",
-        }
-        days = 1 if three_day == False else 3
-        url = f"http://api.weatherapi.com/v1/forecast.json?key={WEATHER}&q={city.lower()}&days={days}&aqi=no&alerts=no"
-
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                weather_data = await resp.json()
-
-        location = weather_data["location"]
-        current = weather_data["current"]
-        forecast = weather_data["forecast"]["forecastday"][0]["day"]
-        if units == "Imperial":
-            min_temp = f"{forecast['mintemp_f']}°F"
-            max_temp = f"{forecast['maxtemp_f']}°F"
-            gust = f"{current['gust_mph']}mph"
-            visibility = f"{current['vis_miles']}mi"
-        else:
-            min_temp = f"{forecast['mintemp_c']}°C"
-            max_temp = f"{forecast['maxtemp_c']}°C"
-            gust = f"{current['gust_kph']}km/h"
-            visibility = f"{current['vis_km']}km"
-        day1 = Embed(
-            title=f"{emoji_map['globe']} Weather details of {location['name']}, {location['region']}/{location['country']}",
-            color=Color.random(),
-        )
-        day1.description = (
-            f"{emoji_map['newspaper']} Condition: {forecast['condition']['text']}"
-        )
-        day1.add_field(
-            name=f"{emoji_map['min_tempe']} Minimum Temperature",
-            value=min_temp,
-            inline=True,
-        )
-        day1.add_field(
-            name=f"{emoji_map['max_tempe']} Maximum Temperature",
-            value=max_temp,
-            inline=True,
-        )
-        day1.add_field(
-            name=f"{emoji_map['clouds']} Clouds",
-            value=f"{current['cloud']}%",
-            inline=True,
-        )
-        day1.add_field(
-            name=f"{emoji_map['humidity']} Humidity",
-            value=f"{current['humidity']}%",
-            inline=True,
-        )
-        day1.add_field(
-            name=f"{emoji_map['wind_dir']} Wind Direction",
-            value=f"{current['wind_degree']}°/{current['wind_dir']}",
-            inline=True,
-        )
-        day1.add_field(
-            name=f"{emoji_map['guste']} Wind Gust",
-            value=gust,
-            inline=True,
-        )
-        day1.add_field(
-            name=f"{emoji_map['visibility']} Visibility",
-            value=visibility,
-            inline=True,
-        )
-        day1.add_field(
-            name=f"{emoji_map['rain_chance']} Chance of Rain",
-            value=f"{forecast['daily_chance_of_rain']}%",
-            inline=True,
-        )
-        day1.set_footer(text="Fetched from weatherapi.com")
-        if three_day == True:
-            menu = ViewMenu(
-                ctx,
-                menu_type=ViewMenu.TypeEmbed,
-                disable_items_on_timeout=True,
-                show_page_director=False,
-            )
-            forecastday2 = weather_data["forecast"]["forecastday"][1]
-            forecastday3 = weather_data["forecast"]["forecastday"][2]
-            day2 = Embed(
-                title=f"{emoji_map['globe']} Weather details of {location['name']}, {location['region']}/{location['country']} for {forecastday2['date']}", color=Color.random()
-            )
-            day3 = Embed(title=f"{emoji_map['globe']} Weather details of {location['name']}, {location['region']}/{location['country']} for {forecastday3['date']}", color=Color.random()
-            )
-
-            if units == "Imperial":
-                min_temp2 = f"{forecastday2['day']['mintemp_f']}°F"
-                max_temp2 = f"{forecastday2['day']['maxtemp_f']}°F"
-                maxwind2 = f"{forecastday2['day']['maxwind_mph']}mph"
-                min_temp3 = f"{forecastday3['day']['mintemp_f']}°F"
-                max_temp3 = f"{forecastday3['day']['maxtemp_f']}°F"
-                maxwind3 = f"{forecastday3['day']['maxwind_mph']}mph"
-            else:
-                min_temp2 = f"{forecastday2['day']['mintemp_c']}°C"
-                max_temp2 = f"{forecastday2['day']['maxtemp_c']}°C"
-                maxwind2 = f"{forecastday2['day']['maxwind_kph']}km/h"
-                min_temp3 = f"{forecastday3['day']['mintemp_c']}°C"
-                max_temp3 = f"{forecastday3['day']['maxtemp_c']}°C"
-                maxwind3 = f"{forecastday3['day']['maxwind_kph']}km/h"
-
-            day2.description = f"{emoji_map['newspaper']} Condition: {forecastday2['day']['condition']['text']}"
-            day2.add_field(
-                name=f"{emoji_map['min_tempe']} Minimum Temperature",
-                value=min_temp2,
-                inline=False,
-            )
-            day2.add_field(
-                name=f"{emoji_map['max_tempe']} Maximum Temperature",
-                value=max_temp2,
-                inline=False,
-            )
-            day2.add_field(
-                name=f"{emoji_map['guste']} Maximum Wind",
-                value=maxwind2,
-                inline=False,
-            )
-            day2.add_field(
-                name=f"{emoji_map['rain_chance']} Chance of Rain",
-                value=f"{forecastday2['day']['daily_chance_of_rain']}%",
-                inline=False,
-            )
-            day2.set_footer(text="Fetched from weatherapi.com")
-
-            day3.description = f"{emoji_map['newspaper']} Condition: {forecastday3['day']['condition']['text']}"
-            day3.add_field(
-                name=f"{emoji_map['min_tempe']} Minimum Temperature",
-                value=min_temp3,
-                inline=False,
-            )
-            day3.add_field(
-                name=f"{emoji_map['max_tempe']} Maximum Temperature",
-                value=max_temp3,
-                inline=False,
-            )
-            day3.add_field(
-                name=f"{emoji_map['guste']} Maximum Wind",
-                value=maxwind3,
-                inline=False,
-            )
-            day3.add_field(
-                name=f"{emoji_map['rain_chance']} Chance of Rain",
-                value=f"{forecastday3['day']['daily_chance_of_rain']}%",
-                inline=False,
-            )
-            day3.set_footer(text="Fetched from weatherapi.com")
-
-            menu.add_page(day1)
-            menu.add_page(day2)
-            menu.add_page(day3)
-            menu.add_button(ViewButton.go_to_first_page())
-            menu.add_button(ViewButton.back())
-            menu.add_button(ViewButton.next())
-            menu.add_button(ViewButton.go_to_last_page())
-            await menu.start()
-            return
-        await ctx.followup.send(embed=day1)
+        if ctx.locale.value=="en-GB" or ctx.locale.value=="en-US":
+            await en.Utilities(self.bot).weather(ctx, city, units, three_day)
+        elif ctx.locale.value=="fr":
+            await fr.Utilities(self.bot).weather(ctx, city, units, three_day)
 
     @weather.error
     async def weather_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
-            reset_hour = round(reset_hour_time.timestamp())
-            cooldown = Embed(
-                description=f"WOAH! You have already checked the weather.\nTry again after <t:{reset_hour}:R>",
-                color=0xFF0000,
-            )
-            await ctx.response.send_message(embed=cooldown)
-            return
+            if ctx.locale.value=="en-GB" or ctx.locale.value=="en-US":
+                await en.Utilities(self.bot).weather_error(ctx, error, "cooldown")
+            elif ctx.locale.value=="fr":
+                await fr.Utilities(self.bot).weather_error(ctx, error, "cooldown")
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (KeyError, TypeError)
         ):
-            no_city = Embed(
-                description="Failed to get weather information on this city\nPlease note that ZIP/postal codes are only supported for Canada, the US, and the UK for this command.",
-                color=Color.red(),
-            )
-            await ctx.followup.send(embed=no_city)
+            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+                await en.Utilities(self.bot).weather_error(ctx, error, "failed")
+            elif ctx.locale.value == "fr":
+                await fr.Utilities(self.bot).weather_error(ctx, error, "failed")
 
-    @Jeanne.command(description="Do a calculation")
+    @Jeanne.command(
+        name=T("calculator_name"),
+        description=T("calculator_desc"),
+    )
     @Jeanne.check(is_suspended)
-    @Jeanne.describe(calculate="Add a calculation")
+    @Jeanne.describe(calculate=T("calculator_calculate_parm_desc"))
+    @Jeanne.rename(calculate=T("calculator_calculate_parm_name"))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def calculator(self, ctx: Interaction, calculate: str):
-        await ctx.response.defer()
-        check = "".join(
-            [
-                str(float(part)) if part.isdigit() else part
-                for part in re.split(r"(\d+\.\d+|\d+)", calculate)
-            ]
-        )
-        self.parser.parse(check).evaluate({})
-        answer = self.parser.parse(calculate).evaluate({})
-        calculation = Embed(title="Result", color=Color.random())
-        calculation.add_field(name=f"`{calculate}`", value=answer)
-        await ctx.followup.send(embed=calculation)
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            await en.Utilities(self.bot).calculator(ctx, calculate)
+        elif ctx.locale.value == "fr":
+            await fr.Utilities(self.bot).calculator(ctx, calculate)
 
     @calculator.error
     async def calculator_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, OverflowError
         ):
-            failed = Embed(description=str(error))
-            await ctx.followup.send(embed=failed)
+            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+                await en.Utilities(self.bot).calculator_error(ctx, error, "overflow")
+            elif ctx.locale.value == "fr":
+                await fr.Utilities(self.bot).calculator_error(ctx, error, "overflow")
         elif isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, Exception
         ):
-            failed = Embed(
-                description=f"{error}\nPlease refer to [Python Operators](https://www.geeksforgeeks.org/python-operators/?ref=lbp) if you don't know how to use the command"
-            )
-            await ctx.followup.send(embed=failed)
+            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+                await en.Utilities(self.bot).weather_error(ctx, error, "failed")
+            elif ctx.locale.value == "fr":
+                await fr.Utilities(self.bot).weather_error(ctx, error, "failed")
 
-    @Jeanne.command(description="Invite me to your server or join the support server")
-    @Jeanne.check(is_suspended)
-    async def invite(self, ctx: Interaction):
-        await ctx.response.defer()
-        invite = Embed(
-            title="Invite me!",
-            description="Click on one of these buttons to invite me to you server or join my creator's server",
-            color=Color.random(),
-        )
-        await ctx.followup.send(embed=invite, view=InviteButton())
-
-    @Jeanne.command(description="Submit a bot report if you found something wrong")
-    @Jeanne.check(is_suspended)
-    @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
-    async def botreport(self, ctx: Interaction, type: Literal["Fault", "Bug", "ToS Violator", "Exploit", "Translation Error","Other"]):
-        await ctx.response.send_modal(ReportModal(type))
-
-    @Jeanne.command(description="Check the meaning of a word")
+    @Jeanne.command(
+        name=T("invite_name"),
+        description=T("invite_desc"),
+    )
     @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
+    async def invite(self, ctx: Interaction):
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            await en.Utilities(self.bot).invite(ctx)
+        elif ctx.locale.value == "fr":
+            await fr.Utilities(self.bot).invite(ctx)
+
+    @Jeanne.command(
+        name=T("botreport_name"),
+        description=T("botreport_desc"),
+    )
+    @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
+    @Jeanne.describe(type=T("botreport_type_parm_desc"))
+    @Jeanne.rename(type=T("botreport_type_parm_name"))
+    @Jeanne.check(is_suspended)
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
+    async def botreport(self, ctx: Interaction, report_type: Literal["Fault", "Bug", "ToS Violator", "Exploit", "Translation Error","Other"]):
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            await en.Utilities(self.bot).botreport(ctx, report_type)
+        elif ctx.locale.value == "fr":
+            await fr.Utilities(self.bot).botreport(ctx, report_type)
+
+    @Jeanne.command(
+        name=T("dictionary_name"),
+        description=T("dictionary_desc"),
+    )
+    @Jeanne.check(is_suspended)
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
+    @Jeanne.describe(word=T("dictionary_word_parm_desc"))
+    @Jeanne.rename(word=T("dictionary_word_parm_name"))
     async def dictionary(
         self,
         ctx: Interaction,

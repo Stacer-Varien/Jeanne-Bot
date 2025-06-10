@@ -22,7 +22,7 @@ from config import (
 from typing import Optional
 
 
-class Reactions():
+class Reactions:
     def __init__(self, bot: Bot):
         self.bot = bot
 
@@ -103,58 +103,45 @@ class Reactions():
 
         msg = messages.get(action, f"*{ctx.user} is performing an action*")
         await ctx.response.send_message(msg, embed=reaction_embed)
+
     async def hug(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "hug", member, hug)
-
 
     async def slap(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "slap", member, slap)
 
-
     async def smug(self, ctx: Interaction):
         await self._send_reaction(ctx, "smug", api_url=smug)
-
 
     async def poke(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "poke", member, poke)
 
-
     async def pat(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "pat", member, pat)
-
 
     async def kiss(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "kiss", member, kiss)
 
-
     async def tickle(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "tickle", member, tickle)
-
 
     async def baka(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "baka", member, baka)
 
-
     async def feed(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "feed", member, feed)
-
 
     async def cry(self, ctx: Interaction):
         await self._send_reaction(ctx, "cry", api_url=cry)
 
-
     async def bite(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "bite", member, bite)
-
 
     async def blush(self, ctx: Interaction):
         await self._send_reaction(ctx, "blush", api_url=blush)
 
-
     async def cuddle(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "cuddle", member, cuddle)
 
-
     async def dance(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "dance", member, dance)
-

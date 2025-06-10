@@ -28,12 +28,29 @@ class WelcomerCog(Cog):
             if member.guild.id == server.id:
                 welcomemsg = welcomer_instance.get_welcoming_msg
                 if welcomemsg is None:
-                    welcome = Embed(
-                        description=f"Hi {member} and welcome to {member.guild.name}!",
-                        color=Color.random(),
-                    ).set_thumbnail(url=member.display_avatar.url if member.display_avatar else "")
-                    await welcomer.send(embed=welcome)
-                    return
+                    if (
+                        server.preferred_locale.value == "en-GB"
+                        or server.preferred_locale.value == "en-US"
+                    ):
+                        welcome = Embed(
+                            description=f"Hi {member} and welcome to {member.guild.name}!",
+                            color=Color.random(),
+                        ).set_thumbnail(url=member.display_avatar.url if member.display_avatar else "")
+                        await welcomer.send(embed=welcome)
+                        return
+                    elif server.preferred_locale.value=="fr":
+                        welcome = Embed(
+                            description=f"Salut {member} et bienvenue sur {member.guild.name} !",
+                            color=Color.random(),
+                        ).set_thumbnail(
+                            url=(
+                                member.display_avatar.url
+                                if member.display_avatar
+                                else ""
+                            )
+                        )
+                        await welcomer.send(embed=welcome)
+                        return
 
                 humans = sum(not m.bot for m in member.guild.members)
                 parameters = OrderedDict(
@@ -80,12 +97,29 @@ class WelcomerCog(Cog):
             if payload.guild_id == server_data.id:
                 leavingmsg = welcomer_instance.get_leaving_msg
                 if leavingmsg is None:
-                    leave = Embed(
+                    if (
+                        server.preferred_locale.value == "en-GB"
+                        or server.preferred_locale.value == "en-US"
+                    ):
+                        leave = Embed(
                         description=f"{member} left the server",
                         color=Color.random(),
                     ).set_thumbnail(url=member.display_avatar.url if member.display_avatar else "")
                     await leaver.send(embed=leave)
                     return
+                if server.preferred_locale.value == "fr":
+                        leave = Embed(
+                            description=f"{member} a quitté le serveur",
+                            color=Color.random(),
+                        ).set_thumbnail(
+                            url=(
+                                member.display_avatar.url
+                                if member.display_avatar
+                                else ""
+                            )
+                        )
+                        await leaver.send(embed=leave)
+                        return
 
                 humans = len([m for m in server.members if not m.bot])
                 parameters = OrderedDict(

@@ -913,269 +913,486 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Combien d'IDs utilisateur ? Laissez un espace après chaque ID (min est 5 et max est 25)",
             },
 
-            # reactions commands
+            # Reaction command names
             "hug_name": {
                 "en-GB": "hug",
                 "en-US": "hug",
                 "fr": "câlin",
             },
-            "hug_desc": {
-                "en-GB": "Hug someone or yourself",
-                "en-US": "Hug someone or yourself",
-                "fr": "Faites un câlin à quelqu'un ou à vous-même",
-            },
-            "hug_member_parm_name": {
-                "en-GB": "member",
-                "en-US": "member",
-                "fr": "membre",
-            },
-            "hug_member_parm_desc": {
-                "en-GB": "Who are you hugging?",
-                "en-US": "Who are you hugging?",
-                "fr": "Qui câlinez-vous ?",
-            },
-
             "slap_name": {
                 "en-GB": "slap",
                 "en-US": "slap",
                 "fr": "gifler",
+            },
+            "smug_name": {
+                "en-GB": "smug",
+                "en-US": "smug",
+                "fr": "suffisant",
+            },
+            "poke_name": {
+                "en-GB": "poke",
+                "en-US": "poke",
+                "fr": "pousser",
+            },
+            "pat_name": {
+                "en-GB": "pat",
+                "en-US": "pat",
+                "fr": "tapoter",
+            },
+            "kiss_name": {
+                "en-GB": "kiss",
+                "en-US": "kiss",
+                "fr": "embrasser",
+            },
+            "tickle_name": {
+                "en-GB": "tickle",
+                "en-US": "tickle",
+                "fr": "chatouiller",
+            },
+            "baka_name": {
+                "en-GB": "baka",
+                "en-US": "baka",
+                "fr": "baka",
+            },
+            "feed_name": {
+                "en-GB": "feed",
+                "en-US": "feed",
+                "fr": "nourrir",
+            },
+            "cry_name": {
+                "en-GB": "cry",
+                "en-US": "cry",
+                "fr": "pleurer",
+            },
+            "bite_name": {
+                "en-GB": "bite",
+                "en-US": "bite",
+                "fr": "mordre",
+            },
+            "blush_name": {
+                "en-GB": "blush",
+                "en-US": "blush",
+                "fr": "rougir",
+            },
+            "cuddle_name": {
+                "en-GB": "cuddle",
+                "en-US": "cuddle",
+                "fr": "câliner",
+            },
+            "dance_name": {
+                "en-GB": "dance",
+                "en-US": "dance",
+                "fr": "danser",
+            },
+
+            # Reaction command descriptions
+            "hug_desc": {
+                "en-GB": "Hug someone or yourself",
+                "en-US": "Hug someone or yourself",
+                "fr": "Faites un câlin à quelqu'un ou à vous-même",
             },
             "slap_desc": {
                 "en-GB": "Slap someone or yourself",
                 "en-US": "Slap someone or yourself",
                 "fr": "Gifle quelqu'un ou vous-même",
             },
-            "slap_member_parm_name": {
-                "en-GB": "member",
-                "en-US": "member",
-                "fr": "membre",
-            },
-            "slap_member_parm_desc": {
-                "en-GB": "Who are you slapping?",
-                "en-US": "Who are you slapping?",
-                "fr": "Qui giflez-vous ?",
-            },
-
-            "smug_name": {
-                "en-GB": "smug",
-                "en-US": "smug",
-                "fr": "suffisant",
-            },
             "smug_desc": {
                 "en-GB": "Show a smug expression",
                 "en-US": "Show a smug expression",
                 "fr": "Affichez une expression suffisante",
             },
-
-            "poke_name": {
-                "en-GB": "poke",
-                "en-US": "poke",
-                "fr": "pousser",
-            },
             "poke_desc": {
                 "en-GB": "Poke someone or yourself",
                 "en-US": "Poke someone or yourself",
-                "fr": "Piquez quelqu'un ou vous-même",
-            },
-            "poke_member_parm_name": {
-                "en-GB": "member",
-                "en-US": "member",
-                "fr": "membre",
-            },
-            "poke_member_parm_desc": {
-                "en-GB": "Who are you poking?",
-                "en-US": "Who are you poking?",
-                "fr": "Qui piquez-vous ?",
-            },
-
-            "pat_name": {
-                "en-GB": "pat",
-                "en-US": "pat",
-                "fr": "tapoter",
+                "fr": "Poussez quelqu'un ou vous-même",
             },
             "pat_desc": {
                 "en-GB": "Pat someone or yourself",
                 "en-US": "Pat someone or yourself",
                 "fr": "Tapotez quelqu'un ou vous-même",
             },
-            "pat_member_parm_name": {
-                "en-GB": "member",
-                "en-US": "member",
-                "fr": "membre",
-            },
-            "pat_member_parm_desc": {
-                "en-GB": "Who are you patting?",
-                "en-US": "Who are you patting?",
-                "fr": "Qui tapotez-vous ?",
-            },
-
-            "kiss_name": {
-                "en-GB": "kiss",
-                "en-US": "kiss",
-                "fr": "embrasser",
-            },
             "kiss_desc": {
                 "en-GB": "Kiss someone or yourself",
                 "en-US": "Kiss someone or yourself",
                 "fr": "Embrassez quelqu'un ou vous-même",
-            },
-            "kiss_member_parm_name": {
-                "en-GB": "member",
-                "en-US": "member",
-                "fr": "membre",
-            },
-            "kiss_member_parm_desc": {
-                "en-GB": "Who are you kissing?",
-                "en-US": "Who are you kissing?",
-                "fr": "Qui embrassez-vous ?",
-            },
-
-            "tickle_name": {
-                "en-GB": "tickle",
-                "en-US": "tickle",
-                "fr": "chatouiller",
             },
             "tickle_desc": {
                 "en-GB": "Tickle someone or yourself",
                 "en-US": "Tickle someone or yourself",
                 "fr": "Chatouillez quelqu'un ou vous-même",
             },
-            "tickle_member_parm_name": {
-                "en-GB": "member",
-                "en-US": "member",
-                "fr": "membre",
-            },
-            "tickle_member_parm_desc": {
-                "en-GB": "Who are you tickling?",
-                "en-US": "Who are you tickling?",
-                "fr": "Qui chatouillez-vous ?",
-            },
-
-            "baka_name": {
-                "en-GB": "baka",
-                "en-US": "baka",
-                "fr": "baka",
-            },
             "baka_desc": {
                 "en-GB": "Call someone or yourself a baka!",
                 "en-US": "Call someone or yourself a baka!",
                 "fr": "Traitez quelqu'un ou vous-même de baka !",
-            },
-            "baka_member_parm_name": {
-                "en-GB": "member",
-                "en-US": "member",
-                "fr": "membre",
-            },
-            "baka_member_parm_desc": {
-                "en-GB": "Who are you calling a baka?",
-                "en-US": "Who are you calling a baka?",
-                "fr": "Qui traitez-vous de baka ?",
-            },
-
-            "feed_name": {
-                "en-GB": "feed",
-                "en-US": "feed",
-                "fr": "nourrir",
             },
             "feed_desc": {
                 "en-GB": "Feed someone or yourself",
                 "en-US": "Feed someone or yourself",
                 "fr": "Nourrissez quelqu'un ou vous-même",
             },
-            "feed_member_parm_name": {
-                "en-GB": "member",
-                "en-US": "member",
-                "fr": "membre",
-            },
-            "feed_member_parm_desc": {
-                "en-GB": "Who are you feeding?",
-                "en-US": "Who are you feeding?",
-                "fr": "Qui nourrissez-vous ?",
-            },
-
-            "cry_name": {
-                "en-GB": "cry",
-                "en-US": "cry",
-                "fr": "pleurer",
-            },
             "cry_desc": {
                 "en-GB": "Show a crying expression",
                 "en-US": "Show a crying expression",
                 "fr": "Affichez une expression de pleurs",
-            },
-
-            "bite_name": {
-                "en-GB": "bite",
-                "en-US": "bite",
-                "fr": "mordre",
             },
             "bite_desc": {
                 "en-GB": "Bite someone or yourself",
                 "en-US": "Bite someone or yourself",
                 "fr": "Mordez quelqu'un ou vous-même",
             },
-            "bite_member_parm_name": {
-                "en-GB": "member",
-                "en-US": "member",
-                "fr": "membre",
-            },
-            "bite_member_parm_desc": {
-                "en-GB": "Who are you biting?",
-                "en-US": "Who are you biting?",
-                "fr": "Qui mordez-vous ?",
-            },
-
-            "blush_name": {
-                "en-GB": "blush",
-                "en-US": "blush",
-                "fr": "rougir",
-            },
             "blush_desc": {
                 "en-GB": "Show a blushing expression",
                 "en-US": "Show a blushing expression",
-                "fr": "Affichez une expression de rougissement",
-            },
-
-            "cuddle_name": {
-                "en-GB": "cuddle",
-                "en-US": "cuddle",
-                "fr": "câliner",
+                "fr": "Affichez une expression rougissante",
             },
             "cuddle_desc": {
                 "en-GB": "Cuddle with someone or yourself",
                 "en-US": "Cuddle with someone or yourself",
                 "fr": "Câlinez quelqu'un ou vous-même",
             },
-            "cuddle_member_parm_name": {
+            "dance_desc": {
+                "en-GB": "Dance with someone or yourself",
+                "en-US": "Dance with someone or yourself",
+                "fr": "Dansez avec quelqu'un ou vous-même",
+            },
+
+            # Reaction parameter names
+            "member_parm_name": {
                 "en-GB": "member",
                 "en-US": "member",
                 "fr": "membre",
+            },
+
+            # Reaction parameter descriptions
+            "hug_member_parm_desc": {
+                "en-GB": "Who are you hugging?",
+                "en-US": "Who are you hugging?",
+                "fr": "Qui câlinez-vous ?",
+            },
+            "slap_member_parm_desc": {
+                "en-GB": "Who are you slapping?",
+                "en-US": "Who are you slapping?",
+                "fr": "Qui giflez-vous ?",
+            },
+            "poke_member_parm_desc": {
+                "en-GB": "Who are you poking?",
+                "en-US": "Who are you poking?",
+                "fr": "Qui poussez-vous ?",
+            },
+            "pat_member_parm_desc": {
+                "en-GB": "Who are you patting?",
+                "en-US": "Who are you patting?",
+                "fr": "Qui tapotez-vous ?",
+            },
+            "kiss_member_parm_desc": {
+                "en-GB": "Who are you kissing?",
+                "en-US": "Who are you kissing?",
+                "fr": "Qui embrassez-vous ?",
+            },
+            "tickle_member_parm_desc": {
+                "en-GB": "Who are you tickling?",
+                "en-US": "Who are you tickling?",
+                "fr": "Qui chatouillez-vous ?",
+            },
+            "baka_member_parm_desc": {
+                "en-GB": "Who are you calling a baka?",
+                "en-US": "Who are you calling a baka?",
+                "fr": "Qui traitez-vous de baka ?",
+            },
+            "feed_member_parm_desc": {
+                "en-GB": "Who are you feeding?",
+                "en-US": "Who are you feeding?",
+                "fr": "Qui nourrissez-vous ?",
+            },
+            "bite_member_parm_desc": {
+                "en-GB": "Who are you biting?",
+                "en-US": "Who are you biting?",
+                "fr": "Qui mordez-vous ?",
             },
             "cuddle_member_parm_desc": {
                 "en-GB": "Who are you cuddling with?",
                 "en-US": "Who are you cuddling with?",
                 "fr": "Avec qui câlinez-vous ?",
             },
-
-            "dance_name": {
-                "en-GB": "dance",
-                "en-US": "dance",
-                "fr": "danser",
-            },
-            "dance_desc": {
-                "en-GB": "Dance with someone or yourself",
-                "en-US": "Dance with someone or yourself",
-                "fr": "Dansez avec quelqu'un ou vous-même",
-            },
-            "dance_member_parm_name": {
-                "en-GB": "member",
-                "en-US": "member",
-                "fr": "membre",
-            },
             "dance_member_parm_desc": {
                 "en-GB": "Who are you dancing with?",
                 "en-US": "Who are you dancing with?",
                 "fr": "Avec qui dansez-vous ?",
+            },
+
+            # --- utilities.py commands ---
+            # EmbedGroup
+            "generate_name": {
+                "en-GB": "generate",
+                "en-US": "generate",
+                "fr": "générer",
+            },
+            "generate_desc": {
+                "en-GB": "Generates an embed message. Use Discohook.org for JSON generation.",
+                "en-US": "Generates an embed message. Use Discohook.org for JSON generation.",
+                "fr": "Génère un message embed. Utilisez Discohook.org pour générer le JSON.",
+            },
+            "generate_channel_parm_name": {
+                "en-GB": "channel",
+                "en-US": "channel",
+                "fr": "canal",
+            },
+            "generate_channel_parm_desc": {
+                "en-GB": "Target channel",
+                "en-US": "Target channel",
+                "fr": "Canal cible",
+            },
+            "generate_jsonscript_parm_name": {
+                "en-GB": "jsonscript",
+                "en-US": "jsonscript",
+                "fr": "jsonscript",
+            },
+            "generate_jsonscript_parm_desc": {
+                "en-GB": "JSON script",
+                "en-US": "JSON script",
+                "fr": "Script JSON",
+            },
+            "generate_jsonfile_parm_name": {
+                "en-GB": "jsonfile",
+                "en-US": "jsonfile",
+                "fr": "fichierjson",
+            },
+            "generate_jsonfile_parm_desc": {
+                "en-GB": "JSON file",
+                "en-US": "JSON file",
+                "fr": "Fichier JSON",
+            },
+
+            "edit_name": {
+                "en-GB": "edit",
+                "en-US": "edit",
+                "fr": "éditer",
+            },
+            "edit_desc": {
+                "en-GB": "Edits an embed message. Use Discohook.org for JSON generation.",
+                "en-US": "Edits an embed message. Use Discohook.org for JSON generation.",
+                "fr": "Modifie un message embed. Utilisez Discohook.org pour générer le JSON.",
+            },
+            "edit_channel_parm_name": {
+                "en-GB": "channel",
+                "en-US": "channel",
+                "fr": "canal",
+            },
+            "edit_channel_parm_desc": {
+                "en-GB": "Channel of the message",
+                "en-US": "Channel of the message",
+                "fr": "Canal du message",
+            },
+            "edit_messageid_parm_name": {
+                "en-GB": "messageid",
+                "en-US": "messageid",
+                "fr": "idmessage",
+            },
+            "edit_messageid_parm_desc": {
+                "en-GB": "Message ID",
+                "en-US": "Message ID",
+                "fr": "ID du message",
+            },
+            "edit_jsonscript_parm_name": {
+                "en-GB": "jsonscript",
+                "en-US": "jsonscript",
+                "fr": "jsonscript",
+            },
+            "edit_jsonscript_parm_desc": {
+                "en-GB": "JSON script",
+                "en-US": "JSON script",
+                "fr": "Script JSON",
+            },
+            "edit_jsonfile_parm_name": {
+                "en-GB": "jsonfile",
+                "en-US": "jsonfile",
+                "fr": "fichierjson",
+            },
+            "edit_jsonfile_parm_desc": {
+                "en-GB": "JSON file",
+                "en-US": "JSON file",
+                "fr": "Fichier JSON",
+            },
+
+            # ReminderCog
+            "reminder_add_name": {
+                "en-GB": "add",
+                "en-US": "add",
+                "fr": "ajouter",
+            },
+            "reminder_add_desc": {
+                "en-GB": "Add a reminder",
+                "en-US": "Add a reminder",
+                "fr": "Ajouter un rappel",
+            },
+            "reminder_add_reason_parm_name": {
+                "en-GB": "reason",
+                "en-US": "reason",
+                "fr": "raison",
+            },
+            "reminder_add_reason_parm_desc": {
+                "en-GB": "Reason for the reminder",
+                "en-US": "Reason for the reminder",
+                "fr": "Raison du rappel",
+            },
+            "reminder_add_time_parm_name": {
+                "en-GB": "time",
+                "en-US": "time",
+                "fr": "temps",
+            },
+            "reminder_add_time_parm_desc": {
+                "en-GB": "Time (e.g., 1h, 30m)",
+                "en-US": "Time (e.g., 1h, 30m)",
+                "fr": "Temps (ex: 1h, 30m)",
+            },
+
+            "reminder_list_name": {
+                "en-GB": "list",
+                "en-US": "list",
+                "fr": "liste",
+            },
+            "reminder_list_desc": {
+                "en-GB": "List all the reminders you have",
+                "en-US": "List all the reminders you have",
+                "fr": "Lister tous vos rappels",
+            },
+
+            "reminder_cancel_name": {
+                "en-GB": "cancel",
+                "en-US": "cancel",
+                "fr": "annuler",
+            },
+            "reminder_cancel_desc": {
+                "en-GB": "Cancel a reminder",
+                "en-US": "Cancel a reminder",
+                "fr": "Annuler un rappel",
+            },
+            "reminder_cancel_reminder_id_parm_name": {
+                "en-GB": "reminder_id",
+                "en-US": "reminder_id",
+                "fr": "id_rappel",
+            },
+            "reminder_cancel_reminder_id_parm_desc": {
+                "en-GB": "Reminder ID",
+                "en-US": "Reminder ID",
+                "fr": "ID du rappel",
+            },
+
+            # SlashUtilities
+            "weather_name": {
+                "en-GB": "weather",
+                "en-US": "weather",
+                "fr": "météo",
+            },
+            "weather_desc": {
+                "en-GB": "Get weather information on a city",
+                "en-US": "Get weather information on a city",
+                "fr": "Obtenir les informations météo d'une ville",
+            },
+            "weather_city_parm_name": {
+                "en-GB": "city",
+                "en-US": "city",
+                "fr": "ville",
+            },
+            "weather_city_parm_desc": {
+                "en-GB": "Add a city",
+                "en-US": "Add a city",
+                "fr": "Ajouter une ville",
+            },
+            "weather_units_parm_name": {
+                "en-GB": "units",
+                "en-US": "units",
+                "fr": "unités",
+            },
+            "weather_units_parm_desc": {
+                "en-GB": "Metric or Imperial? (Default is metric)",
+                "en-US": "Metric or Imperial? (Default is metric)",
+                "fr": "Métrique ou Impérial ? (Par défaut métrique)",
+            },
+            "weather_three_day_parm_name": {
+                "en-GB": "three_day",
+                "en-US": "three_day",
+                "fr": "trois_jours",
+            },
+            "weather_three_day_parm_desc": {
+                "en-GB": "Show 3 day forecast?",
+                "en-US": "Show 3 day forecast?",
+                "fr": "Afficher la prévision sur 3 jours ?",
+            },
+
+            "calculator_name": {
+                "en-GB": "calculator",
+                "en-US": "calculator",
+                "fr": "calculatrice",
+            },
+            "calculator_desc": {
+                "en-GB": "Do a calculation",
+                "en-US": "Do a calculation",
+                "fr": "Faire un calcul",
+            },
+            "calculator_calculate_parm_name": {
+                "en-GB": "calculate",
+                "en-US": "calculate",
+                "fr": "calcul",
+            },
+            "calculator_calculate_parm_desc": {
+                "en-GB": "Add a calculation",
+                "en-US": "Add a calculation",
+                "fr": "Ajouter un calcul",
+            },
+
+            "invite_name": {
+                "en-GB": "invite",
+                "en-US": "invite",
+                "fr": "inviter",
+            },
+            "invite_desc": {
+                "en-GB": "Invite me to your server or join the support server",
+                "en-US": "Invite me to your server or join the support server",
+                "fr": "Invitez-moi sur votre serveur ou rejoignez le serveur de support",
+            },
+
+            "botreport_name": {
+                "en-GB": "botreport",
+                "en-US": "botreport",
+                "fr": "rapportbot",
+            },
+            "botreport_desc": {
+                "en-GB": "Submit a bot report if you found something wrong",
+                "en-US": "Submit a bot report if you found something wrong",
+                "fr": "Soumettez un rapport si vous avez trouvé un problème",
+            },
+            "botreport_type_parm_name": {
+                "en-GB": "type",
+                "en-US": "type",
+                "fr": "type",
+            },
+            "botreport_type_parm_desc": {
+                "en-GB": "Type of report",
+                "en-US": "Type of report",
+                "fr": "Type de rapport",
+            },
+
+            "dictionary_name": {
+                "en-GB": "dictionary",
+                "en-US": "dictionary",
+                "fr": "dictionnaire",
+            },
+            "dictionary_desc": {
+                "en-GB": "Check the meaning of a word",
+                "en-US": "Check the meaning of a word",
+                "fr": "Vérifiez la signification d'un mot",
+            },
+            "dictionary_word_parm_name": {
+                "en-GB": "word",
+                "en-US": "word",
+                "fr": "mot",
+            },
+            "dictionary_word_parm_desc": {
+                "en-GB": "Word to check",
+                "en-US": "Word to check",
+                "fr": "Mot à vérifier",
             },
         }
 

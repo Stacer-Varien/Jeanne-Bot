@@ -407,7 +407,7 @@ class Blackjack_Group():
         player_hand = [deal_card(deck), deal_card(deck)]
         dealer_hand = [deal_card(deck), deal_card(deck)]
 
-        view = BlackjackView(ctx, self.bot, deck, player_hand, dealer_hand)
+        view = BlackjackView(self.bot, deck, player_hand, dealer_hand)
         await ctx.followup.send(embed=view.embed, view=view)
 
         await view.wait()
@@ -449,7 +449,7 @@ class Blackjack_Group():
         player_hand = [deal_card(deck), deal_card(deck)]
         dealer_hand = [deal_card(deck), deal_card(deck)]
 
-        view = BlackjackView(ctx, self.bot, deck, player_hand, dealer_hand, bet)
+        view = BlackjackView(self.bot, deck, player_hand, dealer_hand, bet)
         await ctx.followup.send(embed=view.embed, view=view)
 
         await view.wait()
