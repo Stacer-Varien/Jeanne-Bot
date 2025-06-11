@@ -1137,7 +1137,7 @@ class Command_Group(GroupCog, name="command"):
 
     @Jeanne.command(
         name=T("list_disabled_commands_name"),
-        description=T("list_disabled_commands_description"),
+        description=T("list_disabled_cmds_description"),
     )
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(is_suspended)
@@ -1153,7 +1153,7 @@ class Level_Group(GroupCog, name="level"):
         self.bot = bot
         super().__init__()
 
-    role = Jeanne.Group(name=T("role_reward_group_name"), description=T("role_reward_group_description"))
+    role = Jeanne.Group(name=T("role_reward_group_name"), description="...")
 
     @role.command(
         name=T("add_role_reward_name"),
@@ -1208,15 +1208,15 @@ class Level_Group(GroupCog, name="level"):
         elif ctx.locale.value == "fr":
             await fr.Level_Group(self.bot)._list(ctx)
 
-    channel_blacklist = Jeanne.Group(name=T("blacklist_channel_group_name"), description=T("blacklist_channel_group_description"))
+    channel_blacklist = Jeanne.Group(name=T("blacklist_channel_group_name"), description="...")
 
     @channel_blacklist.command(
         name=T("add_blacklist_channel_name"),
-        description=T("add_blacklist_channel_description"),
+        description=T("add_blacklist_ch_description"),
         extras={"member_perms": "Manage Server"},
     )
-    @Jeanne.describe(channel=T("add_blacklist_channel_channel_desc"))
-    @Jeanne.rename(channel=T("add_blacklist_channel_channel_name"))
+    @Jeanne.describe(channel=T("add_blacklist_ch_channel_desc"))
+    @Jeanne.rename(channel=T("add_blacklist_ch_channel_name"))
     @Jeanne.checks.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
@@ -1229,11 +1229,11 @@ class Level_Group(GroupCog, name="level"):
 
     @channel_blacklist.command(
         name=T("remove_blacklist_channel_name"),
-        description=T("remove_blacklist_channel_description"),
+        description=T("remove_blacklist_ch_description"),
         extras={"member_perms": "Manage Server"},
     )
-    @Jeanne.describe(channel=T("remove_blacklist_channel_channel_desc"))
-    @Jeanne.rename(channel=T("remove_blacklist_channel_channel_name"))
+    @Jeanne.describe(channel=T("remove_blacklist_ch_channel_desc"))
+    @Jeanne.rename(channel=T("remove_blcklist_ch_channel_name"))
     @Jeanne.checks.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
@@ -1246,7 +1246,7 @@ class Level_Group(GroupCog, name="level"):
 
     @channel_blacklist.command(
         name=T("list_blacklist_channels_name"),
-        description=T("list_blacklist_channels_description"),
+        description=T("list_blacklist_channels_desc"),
     )
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)

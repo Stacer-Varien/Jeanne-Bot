@@ -525,6 +525,286 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Create a voice channel",
                 "fr": "Créer un canal vocal",
             },
+            "add_blacklist_ch_description": {
+                "en-GB": "Blacklists a channel for gaining XP",
+                "en-US": "Blacklists a channel for gaining XP",
+                "fr": "Met en liste noire un canal pour gagner de l'XP",
+            },
+            "clone_channel_desc": {
+                "en-GB": "Clone a channel",
+                "en-US": "Clone a channel",
+                "fr": "Cloner un canal",
+            },
+            "clone_channel_name": {
+                "en-GB": "clone", 
+                "en-US": "clone", 
+                "fr": "cloner"},
+            "voicechannel_name": {
+                "en-GB": "voicechannel",
+                "en-US": "voicechannel",
+                "fr": "canal_vocal",
+            },
+            "category_name": {
+                "en-GB": "category",
+                "en-US": "category",
+                "fr": "catégorie",
+            },
+            "stagechannel_name": {
+                "en-GB": "stagechannel",
+                "en-US": "stagechannel",
+                "fr": "canal_scène",
+            },
+            "forum_name": {
+                "en-GB": "forum",
+                "en-US": "forum",
+                "fr": "forum",
+            },
+            "role_name": {
+                "en-GB": "role",
+                "en-US": "role",
+                "fr": "rôle",
+            },
+            "public_thread_name": {
+                "en-GB": "public-thread",
+                "en-US": "public-thread",
+                "fr": "fil-public",
+            },
+            "private_thread_name": {
+                "en-GB": "private-thread",
+                "en-US": "private-thread",
+                "fr": "fil-privé",
+            },
+            "emoji_name": {
+                "en-GB": "emoji",
+                "en-US": "emoji",
+                "fr": "emoji",
+            },
+            "sticker_name": {
+                "en-GB": "sticker",
+                "en-US": "sticker",
+                "fr": "autocollant",
+            },
+            "delete_channel_name": {
+                "en-GB": "delete-channel",
+                "en-US": "delete-channel",
+                "fr": "supprimer-canal",
+            },
+            "delete_role_name": {
+                "en-GB": "delete-role",
+                "en-US": "delete-role",
+                "fr": "supprimer-rôle",
+            },
+            "delete_emoji_name": {
+                "en-GB": "delete-emoji",
+                "en-US": "delete-emoji",
+                "fr": "supprimer-emoji",
+            },
+            "delete_sticker_name": {
+                "en-GB": "delete-sticker",
+                "en-US": "delete-sticker",
+                "fr": "supprimer-autocollant",
+            },
+            "edit_textchannel_name": {
+                "en-GB": "edit-textchannel",
+                "en-US": "edit-textchannel",
+                "fr": "modifier-canal-texte",
+            },
+            "edit_voicechannel_name": {
+                "en-GB": "edit-voicechannel",
+                "en-US": "edit-voicechannel",
+                "fr": "modifier-canal-vocal",
+            },
+            "edit_role_name": {
+                "en-GB": "edit-role",
+                "en-US": "edit-role",
+                "fr": "modifier-rôle",
+            },
+            "edit_server_name": {
+                "en-GB": "edit-server",
+                "en-US": "edit-server",
+                "fr": "modifier-serveur",
+            },
+            "set_welcomer_name": {
+                "en-GB": "set-welcomer",
+                "en-US": "set-welcomer",
+                "fr": "définir-accueil",
+            },
+            "set_modlog_name": {
+                "en-GB": "set-modlog",
+                "en-US": "set-modlog",
+                "fr": "définir-journal-mod",
+            },
+            "set_welcomingmsg_name": {
+                "en-GB": "set-welcomingmsg",
+                "en-US": "set-welcomingmsg",
+                "fr": "définir-message-accueil",
+            },
+            "set_leavingmsg_name": {
+                "en-GB": "set-leavingmsg",
+                "en-US": "set-leavingmsg",
+                "fr": "définir-message-départ",
+            },
+            "set_rolereward_message_name": {
+                "en-GB": "set-rolereward-message",
+                "en-US": "set-rolereward-message",
+                "fr": "définir-message-récompense-rôle",
+            },
+            "set_levelupdate_name": {
+                "en-GB": "set-levelupdate",
+                "en-US": "set-levelupdate",
+                "fr": "définir-niveau-mise-à-jour",
+            },
+            "set_confessionchannel_name": {
+                "en-GB": "set-confessionchannel",
+                "en-US": "set-confessionchannel",
+                "fr": "définir-canal-confession",
+            },
+            "set_brightness_name": {
+                "en-GB": "set-brightness",
+                "en-US": "set-brightness",
+                "fr": "définir-luminosité",
+            },
+            "set_bio_name": {
+                "en-GB": "set-bio",
+                "en-US": "set-bio",
+                "fr": "définir-bio",
+            },
+            "set_color_name": {
+                "en-GB": "set-color",
+                "en-US": "set-color",
+                "fr": "définir-couleur",
+            },
+            "add_role_name": {
+                "en-GB": "add-role",
+                "en-US": "add-role",
+                "fr": "ajouter-rôle",
+            },
+            "remove_role_name": {
+                "en-GB": "remove-role",
+                "en-US": "remove-role",
+                "fr": "supprimer-rôle",
+            },
+            "remove_name": {
+                "en-GB": "remove",
+                "en-US": "remove",
+                "fr": "supprimer",
+            },
+            "remove_description": {
+                "en-GB": "Remove a role from a member",
+                "en-US": "Remove a role from a member",
+                "fr": "Supprimer un rôle d'un membre",
+            },
+            "list_disabled_commands_name": {"en-GB": "list-disabled", "en-US": "list-disabled", "fr": "lister-désactivé"},
+            "list_disabled_cmds_description": {
+                "en-GB": "List all disabled commands in the server",
+                "en-US": "List all disabled commands in the server",
+                "fr": "Lister toutes les commandes désactivées sur le serveur",
+            },
+            "blacklist_channel_group_name": {
+                "en-GB": "blacklist-channel",
+                "en-US": "blacklist-channel",
+                "fr": "liste-noire-canal",
+            },
+            "add_blacklist_channel_name":{
+                "en-GB": "add",
+                "en-US": "add",
+                "fr": "ajouter",
+            },
+            "remove_blacklist_channel_name": {
+                "en-GB": "remove",
+                "en-US": "remove",
+                "fr": "supprimer",
+            },
+            "list_blacklist_channels_name": {
+                "en-GB": "list",
+                "en-US": "list",
+                "fr": "liste",
+            },
+            "list_blacklist_channels_desc": {
+                "en-GB": "List all blacklisted channels for gaining XP",
+                "en-US": "List all blacklisted channels for gaining XP",
+                "fr": "Lister tous les canaux mis en liste noire pour gagner de l'XP",
+            },
+            "add_role_reward_level_name": {
+                "en-GB": "add",
+                "en-US": "add",
+                "fr": "ajouter",
+            },
+            "add_role_reward_name": {
+                "en-GB": "add",
+                "en-US": "add",
+                "fr": "ajouter",
+            },
+            "add_role_reward_description": {
+                "en-GB": "Add a role reward for a level",
+                "en-US": "Add a role reward for a level",
+                "fr": "Ajouter une récompense de rôle pour un niveau",
+            },
+            "add_role_reward_role_desc": {
+                "en-GB": "What role do you want to add?",
+                "en-US": "What role do you want to add?",
+                "fr": "Quel rôle voulez-vous ajouter?",
+            },
+            "add_role_reward_role_name": {
+                "en-GB": "role",
+                "en-US": "role",
+                "fr": "rôle",
+            },
+            "remove_role_reward_role_name": {
+                "en-GB": "role",
+                "en-US": "role",
+                "fr": "rôle",
+            },
+            "remove_role_reward_description": {
+                "en-GB": "Remove a role reward for a level",
+                "en-US": "Remove a role reward for a level",
+                "fr": "Supprimer une récompense de rôle pour un niveau",
+            },
+            "remove_role_reward_role_desc": {
+                "en-GB": "What role do you want to remove?",
+                "en-US": "What role do you want to remove?",
+                "fr": "Quel rôle voulez-vous supprimer?",
+            },
+            "list_role_rewards_name": {
+                "en-GB": "list",
+                "en-US": "list",
+                "fr": "liste",
+            },
+            "list_role_rewards_description": {
+                "en-GB": "List all role rewards for levels",
+                "en-US": "List all role rewards for levels",
+                "fr": "Lister toutes les récompenses de rôle pour les niveaux",
+            },
+            "role_reward_group_name": {
+                "en-GB": "role-reward",
+                "en-US": "role-reward",
+                "fr": "récompense-rôle",
+            },
+            "add_blacklist_ch_channel_name": {
+                "en-GB": "add",
+                "en-US": "add",
+                "fr": "ajouter",
+            },
+            "remove_blacklist_channel_name": {
+                "en-GB": "remove",
+                "en-US": "remove",
+                "fr": "supprimer",
+            },
+            "remove_blacklist_ch_description": {
+                "en-GB": "Remove a channel from the blacklist for gaining XP",
+                "en-US": "Remove a channel from the blacklist for gaining XP",
+                "fr": "Supprimer un canal de la liste noire pour gagner de l'XP",
+            },
+            "remove_blacklist_ch_channel_desc": {
+                "en-GB": "What channel do you want to remove?",
+                "en-US": "What channel do you want to remove?",
+                "fr": "Quel canal voulez-vous supprimer?",
+            },
+            "remove_blcklist_ch_channel_name": {
+                "en-GB": "channel",
+                "en-US": "channel",
+                "fr": "canal",
+            },
             "users_parm_name": {
                 "en-GB": "users",
                 "en-US": "users",
@@ -756,7 +1036,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "massunban",
                 "fr": "débannissement-massif",
             },
-
             # Command Descriptions
             "ban_desc": {
                 "en-GB": "Ban someone from or outside the server",
@@ -818,7 +1097,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Unban multiple members at once",
                 "fr": "Débannir plusieurs membres à la fois",
             },
-
             # Parameter Names
             "member_param_name": {
                 "en-GB": "member",
@@ -830,7 +1108,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "reason",
                 "fr": "raison",
             },
-            "delete_message_history_param_name": {
+            "delete_msg_history_param_name": {
                 "en-GB": "delete_message_history",
                 "en-US": "delete_message_history",
                 "fr": "supprimer_historique_messages",
@@ -865,7 +1143,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "user_ids",
                 "fr": "ids_utilisateurs",
             },
-
             # Parameter Descriptions
             "member_param_desc": {
                 "en-GB": "What is the member or user ID?",
@@ -877,7 +1154,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "What did they do? You can also make a custom reason",
                 "fr": "Qu'ont-ils fait ? Vous pouvez également créer une raison personnalisée",
             },
-            "delete_message_history_param_desc": {
+            "delete_msg_history_param_desc": {
                 "en-GB": "Delete messages from past 7 days?",
                 "en-US": "Delete messages from past 7 days?",
                 "fr": "Supprimer les messages des 7 derniers jours ?",
@@ -912,7 +1189,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "How many user IDs? Leave a space after each ID (min is 5 and max is 25)",
                 "fr": "Combien d'IDs utilisateur ? Laissez un espace après chaque ID (min est 5 et max est 25)",
             },
-
             # Reaction command names
             "hug_name": {
                 "en-GB": "hug",
@@ -984,7 +1260,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "dance",
                 "fr": "danser",
             },
-
             # Reaction command descriptions
             "hug_desc": {
                 "en-GB": "Hug someone or yourself",
@@ -1056,14 +1331,12 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Dance with someone or yourself",
                 "fr": "Dansez avec quelqu'un ou vous-même",
             },
-
             # Reaction parameter names
             "member_parm_name": {
                 "en-GB": "member",
                 "en-US": "member",
                 "fr": "membre",
             },
-
             # Reaction parameter descriptions
             "hug_member_parm_desc": {
                 "en-GB": "Who are you hugging?",
@@ -1120,7 +1393,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Who are you dancing with?",
                 "fr": "Avec qui dansez-vous ?",
             },
-
             # --- utilities.py commands ---
             # EmbedGroup
             "generate_name": {
@@ -1163,7 +1435,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "JSON file",
                 "fr": "Fichier JSON",
             },
-
             "edit_name": {
                 "en-GB": "edit",
                 "en-US": "edit",
@@ -1214,7 +1485,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "JSON file",
                 "fr": "Fichier JSON",
             },
-
             # ReminderCog
             "reminder_add_name": {
                 "en-GB": "add",
@@ -1246,7 +1516,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Time (e.g., 1h, 30m)",
                 "fr": "Temps (ex: 1h, 30m)",
             },
-
             "reminder_list_name": {
                 "en-GB": "list",
                 "en-US": "list",
@@ -1257,7 +1526,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "List all the reminders you have",
                 "fr": "Lister tous vos rappels",
             },
-
             "reminder_cancel_name": {
                 "en-GB": "cancel",
                 "en-US": "cancel",
@@ -1278,7 +1546,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Reminder ID",
                 "fr": "ID du rappel",
             },
-
             # SlashUtilities
             "weather_name": {
                 "en-GB": "weather",
@@ -1320,7 +1587,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Show 3 day forecast?",
                 "fr": "Afficher la prévision sur 3 jours ?",
             },
-
             "calculator_name": {
                 "en-GB": "calculator",
                 "en-US": "calculator",
@@ -1341,7 +1607,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Add a calculation",
                 "fr": "Ajouter un calcul",
             },
-
             "invite_name": {
                 "en-GB": "invite",
                 "en-US": "invite",
@@ -1352,7 +1617,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Invite me to your server or join the support server",
                 "fr": "Invitez-moi sur votre serveur ou rejoignez le serveur de support",
             },
-
             "botreport_name": {
                 "en-GB": "botreport",
                 "en-US": "botreport",
@@ -1373,7 +1637,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Type of report",
                 "fr": "Type de rapport",
             },
-
             "dictionary_name": {
                 "en-GB": "dictionary",
                 "en-US": "dictionary",
