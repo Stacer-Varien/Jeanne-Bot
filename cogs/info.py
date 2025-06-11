@@ -47,9 +47,9 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.check(is_suspended)
     async def stats(self, ctx: Interaction):
         if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            await en.Info(self.bot).stats(ctx)
+            await en.Info(self.bot).stats(ctx, self.bot_version)
         elif ctx.locale.value == "fr":
-            await fr.Info(self.bot).stats(ctx)
+            await fr.Info(self.bot).stats(ctx, self.bot_version)
 
     @Jeanne.command(description=T("userinfo_desc"))
     @Jeanne.describe(member=T("member_parm_desc"))

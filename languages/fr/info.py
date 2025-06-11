@@ -84,7 +84,7 @@ class Info:
         if view.value is None:
             await ctx.edit_original_response(embeds=[userinfo], view=None)
 
-    async def stats(self, ctx: Interaction):
+    async def stats(self, ctx: Interaction, bot_version: str):
         await ctx.response.defer()
         embed = Embed(title="Statistiques du bot", color=Color.random())
         embed.add_field(
@@ -100,12 +100,12 @@ class Info:
         )
         embed.add_field(
             name="Version",
-            value=f"• **Version Python :** {py_version.major}.{py_version.minor}.{py_version.micro}\n• **Version Discord.PY :** {discord_version}\n• **Bot :** {self.bot_version}",
+            value=f"• **Python :** {py_version.major}.{py_version.minor}.{py_version.micro}\n• **discord.py:** {discord_version}\n• **Bot :** {bot_version}",
             inline=True,
         )
         embed.add_field(
             name="Comptes",
-            value=f"• **Nombre de serveurs :** {len(self.bot.guilds)} serveurs\n• **Shards :** {self.bot.shard_count}\n• **Nombre d'utilisateurs :** {len(self.bot.users())}\n• **Membres en cache :** {len(set(self.bot.get_all_members()))}",
+            value=f"• **Nombre de serveurs :** {len(self.bot.guilds)} serveurs\n• **Shards :** {self.bot.shard_count}\n• **Nombre d'utilisateurs :** {len(self.bot.users)}\n• **Membres en cache :** {len(set(self.bot.get_all_members()))}",
             inline=True,
         )
         current_time = time()
