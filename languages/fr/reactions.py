@@ -22,10 +22,6 @@ from config import (
 from typing import Optional
 
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 7fb6b0c2fdf8fc2615489920611c9b05f6f20e1b
 class Reactions():
     def __init__(self, bot: Bot):
         self.bot = bot
@@ -57,15 +53,9 @@ class Reactions():
                 else f"*{ctx.user} a fait un câlin à {member.mention}*"
             ),
             "poke": (
-<<<<<<< HEAD
                 f"*{ctx.user} se fait un poke*"
                 if member is None
                 else f"*{ctx.user} poke {member.mention}*"
-=======
-                f"*{ctx.user} se fait tapoter*"
-                if member is None
-                else f"*{ctx.user} tapote {member.mention}*"
->>>>>>> 7fb6b0c2fdf8fc2615489920611c9b05f6f20e1b
             ),
             "cuddle": (
                 f"*{ctx.user} se fait un câlin*"
@@ -86,11 +76,7 @@ class Reactions():
             "bite": (
                 f"*{ctx.user} se mord*"
                 if member is None
-<<<<<<< HEAD
                 else f"*{ctx.user} mord {member.mention}*"
-=======
-                else f"*{ctx.user} a mordu {member.mention}*"
->>>>>>> 7fb6b0c2fdf8fc2615489920611c9b05f6f20e1b
             ),
             "feed": (
                 f"*{ctx.user} se nourrit*"
@@ -99,11 +85,7 @@ class Reactions():
             ),
             "cry": f"*{ctx.user} pleure*",
             "slap": (
-<<<<<<< HEAD
                 f"*{ctx.user} se gifle*"
-=======
-                f"*{ctx.user} se donne une claque*"
->>>>>>> 7fb6b0c2fdf8fc2615489920611c9b05f6f20e1b
                 if member is None
                 else f"*{ctx.user} a giflé {member.mention}*"
             ),
@@ -119,7 +101,6 @@ class Reactions():
             ),
         }
 
-<<<<<<< HEAD
         msg = messages.get(action, f"*{ctx.user} effectue une action*")
         await ctx.response.send_message(msg, embed=reaction_embed)
 
@@ -129,18 +110,6 @@ class Reactions():
     async def slap(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "slap", member, slap)
 
-=======
-        msg = messages.get(action, f"*{ctx.user} is performing an action*")
-        await ctx.response.send_message(msg, embed=reaction_embed)
-    async def hug(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        await self._send_reaction(ctx, "hug", member, hug)
-
-
-    async def slap(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        await self._send_reaction(ctx, "slap", member, slap)
-
-
->>>>>>> 7fb6b0c2fdf8fc2615489920611c9b05f6f20e1b
     async def smug(self, ctx: Interaction):
         await self._send_reaction(ctx, "smug", api_url=smug)
 
@@ -176,17 +145,9 @@ class Reactions():
     async def bite(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "bite", member, bite)
 
-<<<<<<< HEAD
     async def blush(self, ctx: Interaction):
         await self._send_reaction(ctx, "blush", api_url=blush)
 
-=======
-
-    async def blush(self, ctx: Interaction):
-        await self._send_reaction(ctx, "blush", api_url=blush)
-
-
->>>>>>> 7fb6b0c2fdf8fc2615489920611c9b05f6f20e1b
     async def cuddle(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "cuddle", member, cuddle)
 
@@ -194,7 +155,3 @@ class Reactions():
     async def dance(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "dance", member, dance)
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 7fb6b0c2fdf8fc2615489920611c9b05f6f20e1b
