@@ -133,8 +133,8 @@ class ReminderCog(GroupCog, name="reminder"):
     @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
-    @Jeanne.describe(reminder_id=T("reminder_cancel_reminder_id_parm_desc"))
-    @Jeanne.rename(reminder_id=T("reminder_cancel_reminder_id_parm_name"))
+    @Jeanne.describe(reminder_id=T("reminder_cancel_rmd_id_parm_desc"))
+    @Jeanne.rename(reminder_id=T("reminder_cancel_rmd_id_parm_name"))
     async def cancel(self, ctx: Interaction, reminder_id: int):
         if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.ReminderCog(self.bot).cancel(ctx, reminder_id)
@@ -241,8 +241,8 @@ class SlashUtilities(Cog):
         description=T("botreport_desc"),
     )
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
-    @Jeanne.describe(type=T("botreport_type_parm_desc"))
-    @Jeanne.rename(type=T("botreport_type_parm_name"))
+    @Jeanne.describe(report_type=T("botreport_type_parm_desc"))
+    @Jeanne.rename(report_type=T("botreport_type_parm_name"))
     @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
