@@ -66,13 +66,13 @@ class moderation(Cog):
     @Jeanne.describe(
         member=T("member_param_desc"),
         reason=T("reason_param_desc"),
-        delete_message_history=T("delete_message_history_param_desc"),
+        delete_message_history=T("delete_msg_history_param_desc"),
         time=T("time_param_desc"),
     )
     @Jeanne.rename(
         member=T("member_param_name"),
         reason=T("reason_param_name"),
-        delete_message_history=T("delete_message_history_param_name"),
+        delete_message_history=T("delete_msg_history_param_name"),
         time=T("time_param_name"),
     )
     @Jeanne.checks.has_permissions(ban_members=True)
