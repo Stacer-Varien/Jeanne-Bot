@@ -19,8 +19,6 @@ from functions import (
 from config import TOPGG
 from topgg import DBLClient
 
-# all must be in french translated
-
 class vote_button(ui.View):
     def __init__(self):
         super().__init__()

@@ -15,13 +15,13 @@ class MyTranslator(Jeanne.Translator):
         self,
         string: Jeanne.locale_str,
         locale: Locale,
-        context: Jeanne.TranslationContext,
+        _context: Jeanne.TranslationContext,
     ) -> Optional[str]:
         translations = {
             # global
             "name_parm_name": {
                 "en-GB": "name",
-                "en_US": "name",
+                "en-US": "name",
                 "fr": "nom",
             },
             "name_parm_desc": {
@@ -40,6 +40,26 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Quel membre?",
             },
             # currency commands
+            "guess_group_name": {
+                "en-GB": "guess",
+                "en-US": "guess",
+                "fr": "deviner",
+            },
+            "dice_group_name": {
+                "en-GB": "dice",
+                "en-US": "dice",
+                "fr": "dé",
+            },
+            "flip_group_name": {
+                "en-GB": "flip",
+                "en-US": "flip",
+                "fr": "lancer",
+            },
+            "blackjack_group_name": {
+                "en-GB": "blackjack",
+                "en-US": "blackjack",
+                "fr": "blackjack",
+            },
             "free_name": {"en-GB": "free", "en-US": "free", "fr": "libre"},
             "bet_name": {"en-GB": "bet", "en-US": "bet", "fr": "parier"},
             "guess_free_desc": {
@@ -389,7 +409,7 @@ class MyTranslator(Jeanne.Translator):
             },
             "emoji_desc": {
                 "en-GB": "View an emoji",
-                "en_US": "View an emoji",
+                "en-US": "View an emoji",
                 "fr": "Voir un emoji",
             },
             "emoji_parm_desc": {
@@ -535,10 +555,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Clone a channel",
                 "fr": "Cloner un canal",
             },
-            "clone_channel_name": {
-                "en-GB": "clone", 
-                "en-US": "clone", 
-                "fr": "cloner"},
+            "clone_channel_name": {"en-GB": "clone", "en-US": "clone", "fr": "cloner"},
             "voicechannel_name": {
                 "en-GB": "voicechannel",
                 "en-US": "voicechannel",
@@ -694,7 +711,11 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Remove a role from a member",
                 "fr": "Supprimer un rôle d'un membre",
             },
-            "list_disabled_commands_name": {"en-GB": "list-disabled", "en-US": "list-disabled", "fr": "lister-désactivé"},
+            "list_disabled_commands_name": {
+                "en-GB": "list-disabled",
+                "en-US": "list-disabled",
+                "fr": "lister-désactivé",
+            },
             "list_disabled_cmds_description": {
                 "en-GB": "List all disabled commands in the server",
                 "en-US": "List all disabled commands in the server",
@@ -705,7 +726,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "blacklist-channel",
                 "fr": "liste-noire-canal",
             },
-            "add_blacklist_channel_name":{
+            "add_blacklist_channel_name": {
                 "en-GB": "add",
                 "en-US": "add",
                 "fr": "ajouter",
@@ -1541,7 +1562,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "reminder_id",
                 "fr": "id_rappel",
             },
-            "reminder_cancel_reminder_id_parm_desc": {
+            "reminder_cancel_rmd_id_parm_desc": {
                 "en-GB": "Reminder ID",
                 "en-US": "Reminder ID",
                 "fr": "ID du rappel",
@@ -1659,4 +1680,4 @@ class MyTranslator(Jeanne.Translator):
             },
         }
 
-        return translations.get(string.message_id, {}).get(locale.value)
+        return translations.get(string.message, {}).get(locale.value)

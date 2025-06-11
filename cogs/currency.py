@@ -30,7 +30,7 @@ class vote_button(ui.View):
             )
         )
 
-class Guess_Group(GroupCog, name="guess"):
+class Guess_Group(GroupCog, group_name=T("guess_group_name")):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         self.topggpy = DBLClient(
@@ -82,7 +82,8 @@ class Guess_Group(GroupCog, name="guess"):
             elif ctx.locale.value == "fr":
                 await fr.Guess_Group(self.bot).bet_error(ctx, error)
 
-class Dice_Group(GroupCog, name="dice"):
+
+class Dice_Group(GroupCog, group_name=T("dice_group_name")):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         self.topggpy = DBLClient(
@@ -120,9 +121,9 @@ class Dice_Group(GroupCog, name="dice"):
     @free.error
     async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-           if ctx.locale.value == "en-US" or ctx.locale.value=="en-GB":
+            if ctx.locale.value == "en-US" or ctx.locale.value=="en-GB":
                 await en.Dice_Group(self.bot).free_error(ctx, error)
-           elif ctx.locale.value == "fr":
+            elif ctx.locale.value == "fr":
                 await fr.Dice_Group(self.bot).free_error(ctx, error)
 
     @bet.error
@@ -134,7 +135,7 @@ class Dice_Group(GroupCog, name="dice"):
                 await fr.Dice_Group(self.bot).bet_error(ctx, error)
 
 
-class Flip_Group(GroupCog, name="flip"):
+class Flip_Group(GroupCog, group_name=T("flip_group_name")):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()
@@ -180,7 +181,8 @@ class Flip_Group(GroupCog, name="flip"):
         elif ctx.locale.value == "fr":
             await fr.Flip_Group(self.bot).bet_error(ctx, error)
 
-class Blackjack_Group(GroupCog, name="blackjack"):
+
+class Blackjack_Group(GroupCog, group_name=T("blackjack_group_name")):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()
@@ -214,7 +216,7 @@ class currency(Cog, name="CurrencySlash"):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.balance_context = Jeanne.ContextMenu(
-            name="Balance", callback=self.balance_callback
+            name=T("balance_name"), callback=self.balance_callback
         )
         self.bot.tree.add_command(self.balance_context)
 
@@ -242,9 +244,9 @@ class currency(Cog, name="CurrencySlash"):
 
     async def get_balance(self, ctx: Interaction, member: Member):
         if ctx.locale.value == "en-US" or ctx.locale.value=="en-GB":
-            await en.currency(self.bot).balance(ctx, member)
+            await en.currency(self.bot).get_balance(ctx, member)
         elif ctx.locale.value == "fr":
-            await fr.currency(self.bot).balance(ctx, member)
+            await fr.currency(self.bot).get_balance(ctx, member)
 
     @Jeanne.command(name=T("daily_name"), description=T("daily_desc"))
     @Jeanne.check(check_botbanned_app_command)
