@@ -6,15 +6,17 @@ from discord.ext.commands import GroupCog, Bot
 from functions import AutoCompleteChoices, check_botbanned_app_command, is_suspended
 import languages.en.help as en
 import languages.fr.help as fr
+from discord.app_commands import locale_str as T
 
 
-class HelpGroup(GroupCog, name="help"):
+class HelpGroup(GroupCog, name=T("help_group_name")):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @Jeanne.command(description="Get help on a certain command")
+    @Jeanne.command(name=T("command_name"),description=T("command_desc"))
     @Jeanne.autocomplete(command=AutoCompleteChoices.command_choices)
-    @Jeanne.describe(command="Which command you need help with?")
+    @Jeanne.rename(command=T("command_parm_name"))
+    @Jeanne.describe(command=T("command_parm_desc"))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(is_suspended)
     async def command(self, ctx: Interaction, command: Jeanne.Range[str, 3]):
@@ -32,11 +34,8 @@ class HelpGroup(GroupCog, name="help"):
                 await en.HelpGroup(self.bot).command_error(ctx, error)
             elif ctx.locale.value == "fr":
                 await fr.HelpGroup(self.bot).command_error(ctx, error)
-        
 
-    @Jeanne.command(
-        description="Get help from the website or join the support server for further help"
-    )
+    @Jeanne.command(name=T("support_name"), description=T("support_desc"))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(is_suspended)
     async def support(self, ctx: Interaction):
@@ -44,6 +43,6 @@ class HelpGroup(GroupCog, name="help"):
             await en.HelpGroup(self.bot).support(ctx)
         elif ctx.locale.value == "fr":
             await fr.HelpGroup(self.bot).support(ctx)
-            
+
 async def setup(bot: Bot):
     await bot.add_cog(HelpGroup(bot))

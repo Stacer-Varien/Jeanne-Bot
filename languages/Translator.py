@@ -233,6 +233,11 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Obtenez un taux de simp aléatoire pour vous ou quelqu'un d'autre",
             },
             # help commands
+            "help_group_name": {
+                "en-GB": "help",
+                "en-US": "help",
+                "fr": "aide",
+            },
             "command_name": {
                 "en-GB": "command",
                 "en-US": "command",
@@ -259,9 +264,9 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "soutien",
             },
             "support_desc": {
-                "en-GB": "Get help from the website or join the support server for further help",
-                "en-US": "Get help from the website or join the support server for further help",
-                "fr": "Obtenez de l'aide sur le site Web ou rejoignez le serveur d'assistance pour obtenir de l'aide supplémentaire",
+                "en-GB": "Need help? Visit the website or join the server for further assistance.",
+                "en-US": "Need help? Visit the website or join the server for further assistance.",
+                "fr": "Besoin d'aide ? Visitez le site web ou rejoignez le serveur pour plus d'assistance.",
             },
             # hentai commands
             "hentai_name": {
