@@ -22,7 +22,7 @@ class images(GroupCog, name="image"):
         self.bot = bot
         super().__init__()
 
-    @Jeanne.command(description=T("kitsune_desc"))
+    @Jeanne.command(description=T("kitsune_desc"), extras={"en": {"name": "kitsune", "description": "Get a random kitsune image"}, "fr": {"name": "kitsune", "description": "Obtenez une image de kitsune aléatoire"}})
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)  
@@ -31,7 +31,7 @@ class images(GroupCog, name="image"):
         embed, file = get_kistune_pic()
         await ctx.followup.send(embed=embed, file=file)
 
-    @Jeanne.command(description=T("wallpaper_desc"))
+    @Jeanne.command(description=T("wallpaper_desc"), extras={"en": {"name": "wallpaper", "description": "Get a random wallpaper for your PC or phone"}, "fr": {"name": "wallpaper", "description": "Obtenez un fond d'écran aléatoire pour votre PC ou téléphone"}})
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)  
@@ -40,7 +40,7 @@ class images(GroupCog, name="image"):
         embed, file = get_wallpaper_pic()
         await ctx.followup.send(embed=embed, file=file)
 
-    @Jeanne.command(description=T("jeanne_desc"))
+    @Jeanne.command(description=T("jeanne_desc"), extras={"en": {"name": "jeanne", "description": "Get a random image of Jeanne d'Arc"},"fr": {"name": "jeanne", "description": "Obtenez une image aléatoire de Jeanne d'Arc"}})
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)  
@@ -49,7 +49,7 @@ class images(GroupCog, name="image"):
         embed, file = get_jeanne_pic()
         await ctx.followup.send(embed=embed, file=file)
 
-    @Jeanne.command(description=T("saber_desc"))
+    @Jeanne.command(description=T("saber_desc"), extras={"en": {"name": "saber", "description": "Get a random Saber image"},"fr": {"name": "saber", "description": "Obtenez une image aléatoire de Saber"}})
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)  
@@ -58,7 +58,7 @@ class images(GroupCog, name="image"):
         embed, file = get_saber_pic() 
         await ctx.followup.send(embed=embed, file=file)
 
-    @Jeanne.command(description=T("neko_desc"))
+    @Jeanne.command(description=T("neko_desc"), extras={"en": {"name": "neko", "description": "Get a random Neko image"},"fr": {"name": "neko", "description": "Obtenez une image aléatoire de Neko"}})
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)  
@@ -67,7 +67,7 @@ class images(GroupCog, name="image"):
         embed, file = get_neko_pic()
         await ctx.followup.send(embed=embed, file=file)
 
-    @Jeanne.command(description=T("morgan_desc"))
+    @Jeanne.command(description=T("morgan_desc"), extras={"en": {"name": "morgan", "description": "Get a random image of Morgan Le Fay"},"fr": {"name": "morgan", "description": "Obtenez une image aléatoire de Morgan Le Fay"}})
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)  
@@ -76,7 +76,7 @@ class images(GroupCog, name="image"):
         embed, file = get_morgan_pic()
         await ctx.followup.send(embed=embed, file=file)
 
-    @Jeanne.command(description=T("medusa_desc"))
+    @Jeanne.command(description=T("medusa_desc"), extras={"en": {"name": "medusa", "description": "Get a random Medusa image"},"fr": {"name": "medusa", "description": "Obtenez une image aléatoire de Medusa"}})
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)  
@@ -85,7 +85,7 @@ class images(GroupCog, name="image"):
         embed, file = get_medusa_pic()
         await ctx.followup.send(embed=embed, file=file)
 
-    @Jeanne.command(description=T("safebooru_desc"))
+    @Jeanne.command(description=T("safebooru_desc"), extras={"en": {"name": "safebooru", "description": "Get a random image from Safebooru"},"fr": {"name": "safebooru", "description": "Obtenez une image aléatoire de Safebooru"}})
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)  
