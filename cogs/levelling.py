@@ -1,22 +1,17 @@
 from discord.ext.commands import Cog, Bot, GroupCog
 from discord import (
-    Color,
-    Embed,
-    File,
     Interaction,
     Member,
     app_commands as Jeanne,
 )
 from config import TOPGG
 from functions import (
-    Inventory,
     Levelling,
     check_botbanned_app_command,
     check_disabled_app_command,
     is_suspended,
 )
 from typing import Optional
-from assets.generators.profile_card import Profile
 from topgg import DBLClient
 import languages.en.levelling as en
 import languages.fr.levelling as fr
@@ -32,11 +27,28 @@ class Rank_Group(GroupCog, name="rank"):
         self, ctx: Interaction, title: str, leaderboard: list, exp_index: int
     ):
         if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            await en.Rank_Group(self.bot).send_leaderboard(ctx, title, leaderboard, exp_index)
+            await en.Rank_Group(self.bot).send_leaderboard(
+                ctx, title, leaderboard, exp_index
+            )
         elif ctx.locale.value == "fr":
-            await fr.Rank_Group(self.bot).send_leaderboard(ctx, title, leaderboard, exp_index)
+            await fr.Rank_Group(self.bot).send_leaderboard(
+                ctx, title, leaderboard, exp_index
+            )
 
-    @Jeanne.command(name="global", description=T("global_desc"))
+    @Jeanne.command(
+        name="global",
+        description=T("global_desc"),
+        extras={
+            "en": {
+                "name": "global",
+                "description": "Check the users with the most XP globally",
+            },
+            "fr": {
+                "name": "global",
+                "description": "Vérifiez les utilisateurs avec le plus d'XP globalement",
+            },
+        },
+    )
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
@@ -45,7 +57,19 @@ class Rank_Group(GroupCog, name="rank"):
         leaderboard = Levelling().get_global_rank
         await self.send_leaderboard(ctx, "Global XP Leaderboard", leaderboard, 2)
 
-    @Jeanne.command(description=T("server_desc"))
+    @Jeanne.command(
+        description=T("server_desc"),
+        extras={
+            "en": {
+                "name": "server",
+                "description": "Check the users with the most XP in this server",
+            },
+            "fr": {
+                "name": "serveur",
+                "description": "Vérifiez les utilisateurs avec le plus d'XP dans ce serveur",
+            },
+        },
+    )
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
@@ -91,7 +115,30 @@ class levelling(Cog):
             elif ctx.locale.value == "fr":
                 await fr.levelling(self.bot).profile_error(ctx, error)
 
-    @Jeanne.command(name=T("profile_name"),description=T("profile_desc"))
+    @Jeanne.command(
+        name=T("profile_name"),
+        description=T("profile_desc"),
+        extras={
+            "en": {
+                "name": "profile",
+                "description": "See your profile or someone else's profile",
+                "parameters": [
+                    {
+                        "name": "member",
+                        "description": "Which member?",
+                        "required": False,
+                    }
+                ],
+            },
+            "fr": {
+                "name": "profil",
+                "description": "Voir votre profil ou celui d'un autre membre",
+                "parameters": [
+                    {"name": "membre", "description": "Quel membre?", "required": False}
+                ],
+            },
+        },
+    )
     @Jeanne.describe(member=T("member_parm_desc"))
     @Jeanne.rename(member=T("member_parm_name"))
     @Jeanne.checks.cooldown(1, 120, key=lambda i: (i.user.id))
