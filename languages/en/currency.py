@@ -461,6 +461,22 @@ class Blackjack_Group():
             )
             await ctx.edit_original_response(embed=timeout, view=None)
 
+    async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+        reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
+        reset_hour = round(reset_hour_time.timestamp())
+        cooldown = Embed(
+            description=f"You have already used your free chance\nTry again after <t:{reset_hour}:R>",
+            color=Color.red(),
+        )
+        await ctx.response.send_message(embed=cooldown)
+
+    async def bet_error(self, ctx: Interaction, error: Jeanne.errors.AppCommandError):
+        cooldown = Embed(
+            description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`",
+            color=Color.red(),
+        )
+        await ctx.response.send_message(embed=cooldown)
+
 
 class currency():
     def __init__(self, bot: Bot):
