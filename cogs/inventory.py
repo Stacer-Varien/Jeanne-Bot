@@ -1,22 +1,10 @@
-from assets.components import (
-    Confirmation,
-    Country_Badge_Buttons,
-    buy_function_app,
-    use_function_app,
-)
 from functions import (
-    Currency,
-    Inventory,
     check_botbanned_app_command,
     check_disabled_app_command,
-    is_suspended,  
+    is_suspended,
 )
-from discord import ButtonStyle, Color, Embed, File, Interaction, app_commands as Jeanne
-from PIL import UnidentifiedImageError
+from discord import Interaction, app_commands as Jeanne
 from discord.ext.commands import Bot, GroupCog
-from assets.generators.profile_card import Profile
-from requests import exceptions
-from reactionmenu import ViewButton, ViewMenu
 from discord.app_commands import locale_str as T
 import languages.en.inventory as en
 import languages.fr.inventory as fr
@@ -27,22 +15,42 @@ class Shop_Group(GroupCog, name="shop"):
         self.bot = bot
         super().__init__()
 
-    @Jeanne.command(name=T("country_name"), description=T("country_desc"))
+    @Jeanne.command(
+        name=T("country_name"),
+        description=T("country_desc"),
+        extras={
+            "en": {"name": "country", "description": "Buy a country badge"},
+            "fr": {"name": "pays", "description": "Acheter un badge de pays"},
+        },
+    )
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
-    @Jeanne.check(is_suspended)  
+    @Jeanne.check(is_suspended)
     async def country(self, ctx: Interaction):
         if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Shop_Group(self.bot).country(ctx)
         elif ctx.locale.value == "fr":
             await fr.Shop_Group(self.bot).country(ctx)
 
-    @Jeanne.command(name=T("backgrounds_name"), description=T("backgrounds_desc"))
+    @Jeanne.command(
+        name=T("backgrounds_name"),
+        description=T("backgrounds_desc"),
+        extras={
+            "en": {
+                "name": "backgrounds",
+                "description": "Check all the wallpapers available",
+            },
+            "fr": {
+                "name": "fonds d'écran",
+                "description": "Vérifiez tous les fonds d'écran disponibles",
+            },
+        },
+    )
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
-    @Jeanne.check(is_suspended)  
+    @Jeanne.check(is_suspended)
     async def backgrounds(self, ctx: Interaction):
         if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Shop_Group(self.bot).backgrounds(ctx)
@@ -63,15 +71,48 @@ class Background_Group(GroupCog, name="background"):
         super().__init__()
 
     @Jeanne.command(
-        name=T("buycustom_name"), description=T("buycustom_desc")
+        name=T("buycustom_name"),
+        description=T("buycustom_desc"),
+        extras={
+            "en": {
+                "name": "buycustom",
+                "description": "Buy a custom background pic for your level card",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "description": "What will you name it?",
+                        "required": True,
+                    },
+                    {
+                        "name": "link",
+                        "description": "Add an image link",
+                        "required": True,
+                    },
+                ],
+            },
+            "fr": {
+                "name": "buy-custom",
+                "description": "Acheter une image de fond personnalisée pour votre carte de niveau",
+                "parameters": [
+                    {
+                        "name": "nom",
+                        "description": "Comment voulez-vous l'appeler?",
+                        "required": True,
+                    },
+                    {
+                        "name": "lien",
+                        "description": "Ajoutez un lien d'image",
+                        "required": True,
+                    },
+                ],
+            },
+        },
     )
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
-    @Jeanne.describe(
-        name=T("buycustom_name_desc"), link=T("buycustom_link_desc")
-    )
+    @Jeanne.describe(name=T("buycustom_name_desc"), link=T("buycustom_link_desc"))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
-    @Jeanne.check(is_suspended)  
+    @Jeanne.check(is_suspended)
     async def buycustom(self, ctx: Interaction, name: str, link: str):
         if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Background_Group(self.bot).buycustom(ctx, name, link)
@@ -81,14 +122,40 @@ class Background_Group(GroupCog, name="background"):
     @buycustom.error
     async def buycustom_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            await en.Background_Group(self.bot).buycustom_error(ctx, error, "cooldown" if isinstance(error, Jeanne.CommandOnCooldown) else "invalid")
+            await en.Background_Group(self.bot).buycustom_error(
+                ctx,
+                error,
+                (
+                    "cooldown"
+                    if isinstance(error, Jeanne.CommandOnCooldown)
+                    else "invalid"
+                ),
+            )
         elif ctx.locale.value == "fr":
-            await fr.Background_Group(self.bot).buycustom_error(ctx, error, "cooldown" if isinstance(error, Jeanne.CommandOnCooldown) else "invalid")
+            await fr.Background_Group(self.bot).buycustom_error(
+                ctx,
+                error,
+                (
+                    "cooldown"
+                    if isinstance(error, Jeanne.CommandOnCooldown)
+                    else "invalid"
+                ),
+            )
 
-    @Jeanne.command(name=T("list_name"), description=T("list_desc"))
+    @Jeanne.command(
+        name=T("list_name"),
+        description=T("list_desc"),
+        extras={
+            "en": {"name": "list", "description": "Check which backgrounds you have"},
+            "fr": {
+                "name": "liste",
+                "description": "Vérifiez quels fonds d'écran vous avez",
+            },
+        },
+    )
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
-    @Jeanne.check(is_suspended)  
+    @Jeanne.check(is_suspended)
     async def list(self, ctx: Interaction):
         if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Background_Group(self.bot).list(ctx)
