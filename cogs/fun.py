@@ -17,7 +17,34 @@ class fun(Cog, name="FunSlash"):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @Jeanne.command(name=T("8ball_name"), description=T("8ball_desc"))
+    @Jeanne.command(
+        name=T("8ball_name"),
+        description=T("8ball_desc"),
+        extras={
+            "en": {
+                "name": "8ball",
+                "description": "Ask 8 ball anything and you will get your answer",
+                "parameters": [
+                    {
+                        "name": "question",
+                        "description": "The question you want to ask the 8ball",
+                        "required": True,
+                    }
+                ],
+            },
+            "fr": {
+                "name": "8ball",
+                "description": "Demandez à 8 ball n'importe quoi et vous obtiendrez votre réponse",
+                "parameters": [
+                    {
+                        "name": "question",
+                        "description": "Ajoutez votre question",
+                        "required": True,
+                    }
+                ],
+            },
+        },
+    )
     @Jeanne.describe(question=T("question_parm_desc"))
     @Jeanne.rename(question=T("question_parm_name"))
     @Jeanne.check(check_botbanned_app_command)
@@ -29,7 +56,34 @@ class fun(Cog, name="FunSlash"):
         elif ctx.locale.value == "fr":
             await fr.fun(self.bot)._8ball(ctx, question)
 
-    @Jeanne.command(name=T("reverse_name"), description=T("reverse_desc"))
+    @Jeanne.command(
+        name=T("reverse_name"),
+        description=T("reverse_desc"),
+        extras={
+            "en": {
+                "name": "reverse",
+                "description": "Say something and I will say it in reversed text",
+                "parameters": [
+                    {
+                        "name": "text",
+                        "description": "The text you want to reverse",
+                        "required": True,
+                    }
+                ],
+            },
+            "fr": {
+                "name": "reverse",
+                "description": "Dites quelque chose et je le dirai dans un texte inversé",
+                "parameters": [
+                    {
+                        "name": "texte",
+                        "description": "Qu'est-ce que vous inversez?",
+                        "required": True,
+                    }
+                ],
+            },
+        },
+    )
     @Jeanne.describe(text=T("text_parm_desc"))
     @Jeanne.rename(text=T("text_parm_name"))
     @Jeanne.check(check_botbanned_app_command)
@@ -41,7 +95,16 @@ class fun(Cog, name="FunSlash"):
         if ctx.locale.value == "fr":
             await fr.fun(self.bot).reverse(ctx, text)
 
-    @Jeanne.command(description=T("animeme_desc"))
+    @Jeanne.command(
+        description=T("animeme_desc"),
+        extras={
+            "en": {"name": "animeme", "description": "Get a random animeme"},
+            "fr": {
+                "name": "animeme",
+                "description": "Obtenez un animeme aléatoire",
+            },
+        },
+    )
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
@@ -50,7 +113,44 @@ class fun(Cog, name="FunSlash"):
         embed, file = get_animeme_pic()
         await ctx.followup.send(embed=embed, file=file)
 
-    @Jeanne.command(name=T("combine_name"), description=T("combine_desc"))
+    @Jeanne.command(
+        name=T("combine_name"),
+        description=T("combine_desc"),
+        extras={
+            "en": {
+                "name": "combine",
+                "description": "Combine 2 words to get 2 combined words",
+                "parameters": [
+                    {
+                        "name": "first_word",
+                        "description": "Add first word",
+                        "required": True,
+                    },
+                    {
+                        "name": "second_word",
+                        "description": "Add second word",
+                        "required": True,
+                    },
+                ],
+            },
+            "fr": {
+                "name": "combine",
+                "description": "Combinez deux mots en un seul",
+                "parameters": [
+                    {
+                        "name": "premier_mot",
+                        "description": "Le premier mot à combiner",
+                        "required": True,
+                    },
+                    {
+                        "name": "deuxième_mot",
+                        "description": "Le deuxième mot à combiner",
+                        "required": True,
+                    },
+                ],
+            },
+        },
+    )
     @Jeanne.describe(
         first_word=T("first_word_parm_desc"), second_word=T("second_word_parm_desc")
     )
@@ -66,7 +166,34 @@ class fun(Cog, name="FunSlash"):
         if ctx.locale.value == "fr-FR":
             await fr.fun(self.bot).combine(ctx, first_word, second_word)
 
-    @Jeanne.command(name=T("choose_name"), description=T("choose_desc"))
+    @Jeanne.command(
+        name=T("choose_name"),
+        description=T("choose_desc"),
+        extras={
+            "en": {
+                "name": "choose",
+                "description": "Give me a lot of choices and I will pick one for you",
+                "parameters": [
+                    {
+                        "name": "choices",
+                        "description": "Add your choices here. Separate them with ','",
+                        "required": True,
+                    }
+                ],
+            },
+            "fr": {
+                "name": "choisir",
+                "description": "Donnez-moi beaucoup de choix et je choisirai l'un d'entre eux pour vous",
+                "parameters": [
+                    {
+                        "name": "choix",
+                        "description": "Ajoutez vos choix ici. Séparez-les par ','",
+                        "required": True,
+                    }
+                ],
+            },
+        },
+    )
     @Jeanne.describe(choices=T("choose_parm_desc"))
     @Jeanne.rename(choices=T("choose_parm_name"))
     @Jeanne.check(check_botbanned_app_command)
@@ -78,7 +205,34 @@ class fun(Cog, name="FunSlash"):
         if ctx.locale.value == "fr":
             await fr.fun(self.bot).choose(ctx, choices)
 
-    @Jeanne.command(name=T("simprate_name"), description=T("simprate_desc"))
+    @Jeanne.command(
+        name=T("simprate_name"),
+        description=T("simprate_desc"),
+        extras={
+            "en": {
+                "name": "simprate",
+                "description": "Get a random simp rate for you or someone else",
+                "parameters": [
+                    {
+                        "name": "member",
+                        "description": "Which member?",
+                        "required": False,
+                    }
+                ],
+            },
+            "fr": {
+                "name": "simprate",
+                "description": "Obtenez un taux de simp aléatoire pour vous ou quelqu'un d'autre",
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "description": "Quel membre ?",
+                        "required": False,
+                    }
+                ],
+            },
+        },
+    )
     @Jeanne.describe(member=T("member_parm_desc"))
     @Jeanne.rename(member=T("member_parm_name"))
     @Jeanne.check(check_botbanned_app_command)
@@ -90,7 +244,34 @@ class fun(Cog, name="FunSlash"):
         if ctx.locale.value == "fr":
             await fr.fun(self.bot).simprate(ctx, member)
 
-    @Jeanne.command(name=T("gayrate_name"), description=T("gayrate_desc"))
+    @Jeanne.command(
+        name=T("gayrate_name"),
+        description=T("gayrate_desc"),
+        extras={
+            "en": {
+                "name": "gayrate",
+                "description": "Rate how gay a member is",
+                "parameters": [
+                    {
+                        "name": "member",
+                        "description": "Which member?",
+                        "required": False,
+                    }
+                ],
+            },
+            "fr": {
+                "name": "gayrate",
+                "description": "Obtenez un taux de gay aléatoire pour vous ou quelqu'un d'autre",
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "description": "Quel membre ?",
+                        "required": False,
+                    }
+                ],
+            },
+        },
+    )
     @Jeanne.describe(member=T("member_parm_desc"))
     @Jeanne.rename(member=T("member_parm_name"))
     @Jeanne.check(check_botbanned_app_command)
