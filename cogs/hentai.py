@@ -24,9 +24,12 @@ class nsfw(Cog):
         nsfw=True,
         extras={
             "nsfw": True,
-            "name": "hentai", "en":{
-            "description": "Get a random hentai from Jeanne"},"fr": {
-            "name": "hentai", "description": "Obtenez un hentai aléatoire de Jeanne"},
+            "name": "hentai",
+            "en": {"description": "Get a random hentai from Jeanne"},
+            "fr": {
+                "name": "hentai",
+                "description": "Obtenez un hentai aléatoire de Jeanne",
+            },
         },
     )
     @Jeanne.checks.cooldown(1, 5, key=lambda i: (i.user.id))
@@ -45,7 +48,37 @@ class nsfw(Cog):
     @Jeanne.command(
         description=T("gelbooru_desc"),
         nsfw=True,
-        extras={"nsfw": True, "en": {"name": "gelbooru", "description": "Get a random media content from Gelbooru", "parameters": [{"name": "tag", "description": "Add your tags", "required": False}, {"name": "plus", "description": "Need more content? (up to 4)", "required": False}]}, "fr": {"name": "gelbooru", "description": "Obtenez un contenu multimédia aléatoire de Gelbooru", "parameters": [{"name": "tag", "description": "Ajoutez vos tags", "required": False}, {"name": "plus", "description": "Besoin de plus de contenu? (jusqu'à 4)", "required": False}]}},
+        extras={
+            "nsfw": True,
+            "en": {
+                "name": "gelbooru",
+                "description": "Get a random media content from Gelbooru",
+                "parameters": [
+                    {"name": "tag", "description": "Add your tags", "required": False},
+                    {
+                        "name": "plus",
+                        "description": "Need more content? (up to 4)",
+                        "required": False,
+                    },
+                ],
+            },
+            "fr": {
+                "name": "gelbooru",
+                "description": "Obtenez un contenu multimédia aléatoire de Gelbooru",
+                "parameters": [
+                    {
+                        "name": "tag",
+                        "description": "Ajoutez vos tags",
+                        "required": False,
+                    },
+                    {
+                        "name": "plus",
+                        "description": "Besoin de plus de contenu? (jusqu'à 4)",
+                        "required": False,
+                    },
+                ],
+            },
+        },
     )
     @Jeanne.checks.cooldown(1, 5, key=lambda i: (i.user.id))
     @Jeanne.describe(tag=T("tag_parm_desc"), plus=T("plus_parm_desc"))
@@ -229,7 +262,7 @@ class nsfw(Cog):
     ) -> None:
         if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.nsfw(self.bot).danbooru(ctx, tag, plus)
-        elif ctx.locale.value=="fr":
+        elif ctx.locale.value == "fr":
             await fr.nsfw(self.bot).danbooru(ctx, tag, plus)
 
     @hentai.error

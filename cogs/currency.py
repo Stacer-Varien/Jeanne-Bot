@@ -69,24 +69,24 @@ class Guess_Group(GroupCog, group_name=T("guess_group_name")):
             "en": {
                 "name": "guess bet",
                 "description": "Guess my number and you can win with betting",
-                "parameters": 
-                    [{
+                "parameters": [
+                    {
                         "name": "bet",
                         "description": "How much are you betting?",
                         "required": True,
-                    }],
-                
+                    }
+                ],
             },
             "fr": {
                 "name": "deviner parier",
                 "description": "Devinez mon nombre et vous pouvez gagner avec des paris",
-                "parameters": 
-                    [{
+                "parameters": [
+                    {
                         "name": "pari",
                         "description": "Combien pariez-vous?",
                         "required": True,
-                    }],
-                
+                    }
+                ],
             },
         },
     )
@@ -160,24 +160,24 @@ class Dice_Group(GroupCog, group_name=T("dice_group_name")):
             "en": {
                 "name": "dice bet",
                 "description": "Roll a dice and win with betting",
-                "parameters": 
-                    [{
+                "parameters": [
+                    {
                         "name": "bet",
                         "description": "How much are you betting?",
                         "required": True,
-                    }],
-                
+                    }
+                ],
             },
             "fr": {
                 "name": "dé parier",
                 "description": "Lancez un dé et gagnez avec des paris",
-                "parameters": 
-                    [{
+                "parameters": [
+                    {
                         "name": "pari",
                         "description": "Combien pariez-vous?",
                         "required": True,
-                    }],
-                
+                    }
+                ],
             },
         },
     )
@@ -251,24 +251,24 @@ class Flip_Group(GroupCog, group_name=T("flip_group_name")):
             "en": {
                 "name": "flip bet",
                 "description": "Flip a coin and earn with betting",
-                "parameters": 
-                    [{
+                "parameters": [
+                    {
                         "name": "bet",
                         "description": "How much are you betting?",
                         "required": True,
-                    }],
-                
+                    }
+                ],
             },
             "fr": {
                 "name": "lancer parier",
                 "description": "Lancez une pièce et gagnez avec des paris",
-                "parameters": 
-                    [{
+                "parameters": [
+                    {
                         "name": "pari",
                         "description": "Combien pariez-vous?",
                         "required": True,
-                    }],
-                
+                    }
+                ],
             },
         },
     )
@@ -337,24 +337,24 @@ class Blackjack_Group(GroupCog, group_name=T("blackjack_group_name")):
             "en": {
                 "name": "blackjack bet",
                 "description": "Play a game of blackjack and win with betting",
-                "parameters": 
-                    [{
+                "parameters": [
+                    {
                         "name": "bet",
                         "description": "How much are you betting?",
                         "required": True,
-                    }],
-                
+                    }
+                ],
             },
             "fr": {
                 "name": "blackjack parier",
                 "description": "Jouez au blackjack et gagnez avec des paris",
-                "parameters": 
-                    [{
+                "parameters": [
+                    {
                         "name": "pari",
                         "description": "Combien pariez-vous?",
                         "required": True,
-                    }],
-                
+                    }
+                ],
             },
         },
     )
@@ -423,10 +423,17 @@ class currency(Cog, name="CurrencySlash"):
         elif ctx.locale.value == "fr":
             await fr.currency(self.bot).get_balance(ctx, member)
 
-    @Jeanne.command(name=T("daily_name"), description=T("daily_desc"), extras={
-        "en": {"name": "daily", "description": "Claim your daily QP reward"},
-        "fr": {"name": "quotidien", "description": "Réclamez votre récompense quotidienne de QP"},
-    })
+    @Jeanne.command(
+        name=T("daily_name"),
+        description=T("daily_desc"),
+        extras={
+            "en": {"name": "daily", "description": "Claim your daily QP reward"},
+            "fr": {
+                "name": "quotidien",
+                "description": "Réclamez votre récompense quotidienne de QP",
+            },
+        },
+    )
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
@@ -436,10 +443,26 @@ class currency(Cog, name="CurrencySlash"):
         elif ctx.locale.value == "fr":
             await fr.currency(self.bot).daily(ctx)
 
-    @Jeanne.command(name=T("balance_name"), description=T("balance_desc"), extras={
-        "en": {"name": "balance", "description": "Check your or another user's balance", "parameters": [{"name": "member", "description": "Which member?","required": 1}]},
-        "fr": {"name": "solde", "description": "Vérifiez votre solde ou celui d'un autre utilisateur", "parameters": [{"name": "member", "description": "Quel membre ?","required": 1}]},
-    })
+    @Jeanne.command(
+        name=T("balance_name"),
+        description=T("balance_desc"),
+        extras={
+            "en": {
+                "name": "balance",
+                "description": "Check your or another user's balance",
+                "parameters": [
+                    {"name": "member", "description": "Which member?", "required": 1}
+                ],
+            },
+            "fr": {
+                "name": "solde",
+                "description": "Vérifiez votre solde ou celui d'un autre utilisateur",
+                "parameters": [
+                    {"name": "member", "description": "Quel membre ?", "required": 1}
+                ],
+            },
+        },
+    )
     @Jeanne.describe(member=T("member_parm_desc"))
     @Jeanne.rename(member=T("member_parm_name"))
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
@@ -460,10 +483,14 @@ class currency(Cog, name="CurrencySlash"):
             elif ctx.locale.value == "fr":
                 await fr.currency(self.bot).balance_error(ctx, error)
 
-    @Jeanne.command(name=T("vote_name"), description=T("vote_desc"), extras={
-        "en": {"name": "vote", "description": "Vote for Jeanne on Top.gg"},
-        "fr": {"name": "voter", "description": "Votez pour Jeanne sur Top.gg"},
-    })
+    @Jeanne.command(
+        name=T("vote_name"),
+        description=T("vote_desc"),
+        extras={
+            "en": {"name": "vote", "description": "Vote for Jeanne on Top.gg"},
+            "fr": {"name": "voter", "description": "Votez pour Jeanne sur Top.gg"},
+        },
+    )
     @Jeanne.check(is_suspended)
     async def vote(self, ctx: Interaction):
         if ctx.locale.value == "en-US" or ctx.locale.value == "en-GB":
