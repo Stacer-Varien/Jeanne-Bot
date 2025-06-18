@@ -15,46 +15,31 @@ class MyTranslator(Jeanne.Translator):
         self,
         string: Jeanne.locale_str,
         locale: Locale,
-        _context: Jeanne.TranslationContext,
+        context: Jeanne.TranslationContext,
     ) -> Optional[str]:
         translations = {
-            # global
-            "name_parm_name": {
-                "en-GB": "name",
-                "en-US": "name",
-                "fr": "nom",
-            },
+            #global
+            "name_parm_name": {"en-GB": "name", "en-US": "name", "fr": "nom"},
             "name_parm_desc": {
                 "en-GB": "What will you name it?",
                 "en-US": "What will you name it?",
                 "fr": "Quel nom lui donnerez-vous?",
             },
-            "member_parm_name": {
-                "en-GB": "member",
-                "en-US": "member",
-                "fr": "membre",
-            },
+            "member_parm_name": {"en-GB": "member", "en-US": "member", "fr": "membre"},
             "member_parm_desc": {
                 "en-GB": "Which member?",
                 "en-US": "Which member?",
                 "fr": "Quel membre?",
             },
-            # currency commands
-            "guess_group_name": {
-                "en-GB": "guess",
-                "en-US": "guess",
-                "fr": "deviner",
+            #currency commands
+            "guess_group_name free_name": {
+                "en-GB": "guess free",
+                "en-US": "guess free",
+                "fr": "deviner libre",
             },
-            "dice_group_name": {
-                "en-GB": "dice",
-                "en-US": "dice",
-                "fr": "dé",
-            },
-            "flip_group_name": {
-                "en-GB": "flip",
-                "en-US": "flip",
-                "fr": "lancer",
-            },
+            "guess_group_name": {"en-GB": "guess", "en-US": "guess", "fr": "deviner"},
+            "dice_group_name": {"en-GB": "dice", "en-US": "dice", "fr": "dé"},
+            "flip_group_name": {"en-GB": "flip", "en-US": "flip", "fr": "lancer"},
             "blackjack_group_name": {
                 "en-GB": "blackjack",
                 "en-US": "blackjack",
@@ -70,7 +55,7 @@ class MyTranslator(Jeanne.Translator):
             "guess_bet_name": {
                 "en-GB": "Guess my number and you can win with betting",
                 "en-US": "Guess my number and you can win with betting",
-                "fr": "Devinez mon nombre et vous pouvez gagner avec les paris",
+                "fr": "Devinez mon nombre et vous pouvez gagner avec des paris",
             },
             "bet_parm_name": {"en-GB": "bet", "en-US": "bet", "fr": "parier"},
             "bet_parm_desc": {
@@ -79,54 +64,55 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Combien pariez-vous?",
             },
             "dice_free_desc": {
-                "en-GB": "Roll a dice with betting",
-                "en-US": "Roll a dice with betting",
-                "fr": "Rouler un dé avec des paris",
+                "en-GB": "Roll a dice and earn 20 QP for free",
+                "en-US": "Roll a dice and earn 20 QP for free",
+                "fr": "Lancez un dé et gagnez 20 QP gratuitement",
+            },
+            "dice_bet_desc": {
+                "en-GB": "Roll a dice and win with betting",
+                "en-US": "Roll a dice and win with betting",
+                "fr": "Lancez un dé et gagnez avec des paris",
             },
             "flip_free_desc": {
                 "en-GB": "Flip a coin and earn 20 QP for free",
                 "en-US": "Flip a coin and earn 20 QP for free",
                 "fr": "Lancez une pièce et gagnez 20 QP gratuitement",
             },
-            "flip_deb_desc": {
+            "flip_bet_desc": {
                 "en-GB": "Flip a coin and earn with betting",
                 "en-US": "Flip a coin and earn with betting",
                 "fr": "Lancez une pièce et gagnez avec des paris",
             },
             "bj_free_desc": {
-                "en-GB": "Play a game of blackjack and earn 20 QP for free",
-                "en-US": "Play a game of blackjack and earn 20 QP for free",
-                "fr": "Jouez à un jeu de blackjack et gagnez 20 QP gratuitement",
+                "en-GB": "Play blackjack for free and earn 20 QP",
+                "en-US": "Play blackjack for free and earn 20 QP",
+                "fr": "Jouez au blackjack gratuitement et gagnez 20 QP",
             },
             "bj_bet_desc": {
                 "en-GB": "Play a game of blackjack and win with betting",
                 "en-US": "Play a game of blackjack and win with betting",
-                "fr": "Jouez à un jeu de blackjack et gagnez avec des paris",
+                "fr": "Jouez au blackjack et gagnez avec des paris",
             },
             "daily_name": {"en-GB": "daily", "en-US": "daily", "fr": "quotidien"},
             "daily_desc": {
-                "en-GB": "Get your daily QP",
-                "en-US": "Get your daily QP",
-                "fr": "Obtenez votre QP quotidien",
+                "en-GB": "Claim your daily QP reward",
+                "en-US": "Claim your daily QP reward",
+                "fr": "Réclamez votre récompense quotidienne de QP",
             },
             "balance_name": {"en-GB": "balance", "en-US": "balance", "fr": "solde"},
             "balance_desc": {
-                "en-GB": "Check your QP balance or someone's QP balance",
-                "en-US": "Check your QP balance or someone's QP balance",
-                "fr": "Vérifiez votre solde QP ou le solde QP de quelqu'un",
+                "en-GB": "Check your or another user's balance",
+                "en-US": "Check your or another user's balance",
+                "fr": "Vérifiez votre solde ou celui d'un autre utilisateur",
             },
             "vote_name": {"en-GB": "vote", "en-US": "vote", "fr": "voter"},
             "vote_desc": {
-                "en-GB": "Vote for me in TopGG",
-                "en-US": "Vote for me in TopGG",
-                "fr": "Votez pour moi dans TopGG",
+                "en-GB": "Vote for Jeanne on Top.gg",
+                "en-US": "Vote for Jeanne on Top.gg",
+                "fr": "Votez pour Jeanne sur Top.gg",
             },
-            # fun commands
-            "8ball_name": {
-                "en-GB": "8ball",
-                "en-US": "8ball",
-                "fr": "8ball",
-            },
+            #fun commands
+            "8ball_name": {"en-GB": "8ball", "en-US": "8ball", "fr": "8ball"},
             "8ball_desc": {
                 "en-GB": "Ask 8 ball anything and you will get your answer",
                 "en-US": "Ask 8 ball anything and you will get your answer",
@@ -142,31 +128,19 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Add your question",
                 "fr": "Ajoutez votre question",
             },
-            "reverse_name": {
-                "en-GB": "reverse",
-                "en-US": "reverse",
-                "fr": "inverse",
-            },
+            "reverse_name": {"en-GB": "reverse", "en-US": "reverse", "fr": "inverse"},
             "reverse_desc": {
                 "en-GB": "Say something and I will say it in reversed text",
                 "en-US": "Say something and I will say it in reversed text",
                 "fr": "Dites quelque chose et je le dirai dans un texte inversé",
             },
-            "text_parm_name": {
-                "en-GB": "text",
-                "en-US": "text",
-                "fr": "texte",
-            },
+            "text_parm_name": {"en-GB": "text", "en-US": "text", "fr": "texte"},
             "text_parm_desc": {
                 "en-GB": "What are you reversing?",
                 "en-US": "What are you reversing?",
                 "fr": "Qu'est-ce que vous inversez?",
             },
-            "combine_name": {
-                "en-GB": "combine",
-                "en-US": "combine",
-                "fr": "combiner",
-            },
+            "combine_name": {"en-GB": "combine", "en-US": "combine", "fr": "combiner"},
             "combine_desc": {
                 "en-GB": "Combine 2 words to get 2 combined words",
                 "en-US": "Combine 2 words to get 2 combined words",
@@ -192,11 +166,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Add second word",
                 "fr": "Ajouter le deuxième mot",
             },
-            "choose_name": {
-                "en-GB": "choose",
-                "en-US": "choose",
-                "fr": "choisir",
-            },
+            "choose_name": {"en-GB": "choose", "en-US": "choose", "fr": "choisir"},
             "choose_desc": {
                 "en-GB": "Give me a lot of choices and I will pick one for you",
                 "en-US": "Give me a lot of choices and I will pick one for you",
@@ -212,37 +182,34 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Add your choices here. Separate them with ','",
                 "fr": "Ajoutez vos choix ici. Séparez-les par ','",
             },
-            "animeme_name": {
-                "en-GB": "animeme",
-                "en-US": "animeme",
-                "fr": "animeme",
-            },
+            "animeme_name": {"en-GB": "animeme", "en-US": "animeme", "fr": "animeme"},
             "animeme_desc": {
                 "en-GB": "Get a random animeme",
                 "en-US": "Get a random animeme",
                 "fr": "Obtenez un animeme aléatoire",
             },
-            "simprate_name": {
-                "en-GB": "simprate",
-                "en-US": "simprate",
-                "fr": "taux_de_simp",
+            "gayrate_name": {
+                "en-GB": "gayrate",
+                "en-US": "gayrate",
+                "fr": "taux_de_gay",
             },
-            "simprate_desc": {
-                "en-GB": "Get a random simp rate for you or someone else",
-                "en-US": "Get a random simp rate for you or someone else",
-                "fr": "Obtenez un taux de simp aléatoire pour vous ou quelqu'un d'autre",
+            "gayrate_desc": {
+                "en-GB": "Get a random gay rate for you or someone else",
+                "en-US": "Get a random gay rate for you or someone else",
+                "fr": "Obtenez un taux de gay aléatoire pour vous ou quelqu'un d'autre",
             },
-            # help commands
-            "help_group_name": {
-                "en-GB": "help",
-                "en-US": "help",
-                "fr": "aide",
+            "gayrate_name": {
+                "en-GB": "gayrate",
+                "en-US": "gayrate",
+                "fr": "taux_de_gay",
             },
-            "command_name": {
-                "en-GB": "command",
-                "en-US": "command",
-                "fr": "commande",
+            "gayrate_desc": {
+                "en-GB": "Get a random gay rate for you or someone else",
+                "en-US": "Get a random gay rate for you or someone else",
+                "fr": "Obtenez un taux de gay aléatoire pour vous ou quelqu'un d'autre",
             },
+            "help_group_name": {"en-GB": "help", "en-US": "help", "fr": "aide"},
+            "command_name": {"en-GB": "command", "en-US": "command", "fr": "commande"},
             "command_desc": {
                 "en-GB": "Get help on a certain command",
                 "en-US": "Get help on a certain command",
@@ -258,22 +225,14 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Which command you need help with?",
                 "fr": "Avec quelle commande avez-vous besoin d'aide?",
             },
-            "support_name": {
-                "en-GB": "support",
-                "en-US": "support",
-                "fr": "soutien",
-            },
+            "support_name": {"en-GB": "support", "en-US": "support", "fr": "soutien"},
             "support_desc": {
                 "en-GB": "Need help? Visit the website or join the server for further assistance.",
                 "en-US": "Need help? Visit the website or join the server for further assistance.",
                 "fr": "Besoin d'aide ? Visitez le site web ou rejoignez le serveur pour plus d'assistance.",
             },
-            # hentai commands
-            "hentai_name": {
-                "en-GB": "hentai",
-                "en-US": "hentai",
-                "fr": "hentai",
-            },
+            #hentai commands
+            "hentai_name": {"en-GB": "hentai", "en-US": "hentai", "fr": "hentai"},
             "hentai_desc": {
                 "en-GB": "Get a random hentai from Jeanne",
                 "en-US": "Get a random hentai from Jeanne",
@@ -299,21 +258,13 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Get a random media content from Konachan",
                 "fr": "Obtenez un contenu multimédia aléatoire de Konachan",
             },
-            "tag_parm_name": {
-                "en-GB": "tag",
-                "en-US": "tag",
-                "fr": "étiquette",
-            },
+            "tag_parm_name": {"en-GB": "tag", "en-US": "tag", "fr": "tag"},
             "tag_parm_desc": {
                 "en-GB": "Add your tag",
                 "en-US": "Add your tag",
-                "fr": "Ajoutez votre étiquette",
+                "fr": "Ajoutez votre tags",
             },
-            "plus_parm_name": {
-                "en-GB": "plus",
-                "en-US": "plus",
-                "fr": "plus",
-            },
+            "plus_parm_name": {"en-GB": "plus", "en-US": "plus", "fr": "plus"},
             "plus_parm_desc": {
                 "en-GB": "Need more content? (up to 4)",
                 "en-US": "Need more content? (up to 4)",
@@ -324,7 +275,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Add your tag (up to 2 tags)",
                 "fr": "Ajoutez votre étiquette (jusqu'à 2 étiquettes)",
             },
-            # image commands
+            #image commands
             "kitsune_desc": {
                 "en-GB": "Get a random kitsune image",
                 "en-US": "Get a random kitsune image",
@@ -353,24 +304,20 @@ class MyTranslator(Jeanne.Translator):
             "medusa_desc": {
                 "en-GB": "Get a random Medusa image",
                 "en-US": "Get a random Medusa image",
-                "fr": "Obtenez une image de Méduse aléatoire",
+                "fr": "Obtenez une image de Medusa aléatoire",
             },
             "morgan_desc": {
-                "en-GB": "Get a random Morgan image",
-                "en-US": "Get a random Morgan image",
-                "fr": "Obtenez une image de Morgan aléatoire",
+                "en-GB": "Get a random image of Morgan Le Fay",
+                "en-US": "Get a random image of Morgan Le Fay",
+                "fr": "Obtenez une image de Morgan Le Fay aléatoire",
             },
             "safebooru_desc": {
                 "en-GB": "Get a random image from Safebooru",
                 "en-US": "Get a random image from Safebooru",
                 "fr": "Obtenez une image aléatoire de Safebooru",
             },
-            # info commands
-            "stats_name": {
-                "en-GB": "stats",
-                "en-US": "stats",
-                "fr": "stats",
-            },
+            #info commands
+            "stats_name": {"en-GB": "stats", "en-US": "stats", "fr": "stats"},
             "stats_desc": {
                 "en-GB": "See the bot's status from development to now",
                 "en-US": "See the bot's status from development to now",
@@ -391,6 +338,11 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Get the server banner",
                 "fr": "Obtenez la bannière du serveur",
             },
+            "avatar_name": {
+                "en-GB": "avatar",
+                "en-US": "avatar",
+                "fr": "avatar",
+            },
             "avatar_desc": {
                 "en-GB": "See your avatar or another member's avatar",
                 "en-US": "See your avatar or another member's avatar",
@@ -402,10 +354,15 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Check how fast I respond to a command",
                 "fr": "Vérifiez la rapidité de ma réponse à une commande",
             },
+            "sticker_name": {
+                "en-GB": "sticker",
+                "en-US": "sticker",
+                "fr": "sticker",
+            },
             "sticker_desc": {
-                "en-GB": "Get a random sticker from the server",
-                "en-US": "Get a random sticker from the server",
-                "fr": "Obtenez un autocollant aléatoire du serveur",
+                "en-GB": "Views a sticker",
+                "en-US": "Views a sticker",
+                "fr": "Voir un sticker",
             },
             "sticker_parm_desc": {
                 "en-GB": "Insert message ID with the sticker or name of the sticker in the server",
@@ -422,48 +379,46 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "What is the name of the emoji?",
                 "fr": "Quel est le nom de l'emoji?",
             },
-            # inventory commands
-            "country_name": {
-                "en-GB": "country",
-                "en-US": "country",
-                "fr": "pays",
-            },
+            #inventory commands
+            "country_name": {"en-GB": "country", "en-US": "country", "fr": "pays"},
             "country_desc": {
                 "en-GB": "Buy a country badge",
                 "en-US": "Buy a country badge",
                 "fr": "Acheter un badge de pays",
+            },
+            "backgrounds_name": {
+                "en-GB": "backgrounds",
+                "en-US": "backgrounds",
+                "fr": "backgrounds",
             },
             "backgrounds_desc": {
                 "en-GB": "Check all the wallpapers available",
                 "en-US": "Check all the wallpapers available",
                 "fr": "Vérifiez tous les fonds d'écran disponibles",
             },
+            "buy-custom_name": {
+                "en-GB": "buy-custom",
+                "en-US": "buy-custom",
+                "fr": "buy-custom",
+            },
             "buy-custom_desc": {
                 "en-GB": "Buy a custom background pic for your level card",
                 "en-US": "Buy a custom background pic for your level card",
                 "fr": "Acheter une image d'arrière-plan personnalisée pour votre carte de niveau",
             },
-            "list_name": {
-                "en-GB": "list",
-                "en-US": "list",
-                "fr": "liste",
-            },
+            "list_name": {"en-GB": "list", "en-US": "list", "fr": "liste"},
             "list_desc": {
                 "en-GB": "Check which backgrounds you have",
                 "en-US": "Check which backgrounds you have",
                 "fr": "Vérifiez quels fonds d'écran vous avez",
             },
-            "link_parm_name": {
-                "en-GB": "link",
-                "en-US": "link",
-                "fr": "lien",
-            },
+            "link_parm_name": {"en-GB": "link", "en-US": "link", "fr": "lien"},
             "link_parm_desc": {
                 "en-GB": "Add an image link",
                 "en-US": "Add an image link",
                 "fr": "Ajouter un lien d'image",
             },
-            # levelling
+            #levelling commands
             "global_desc": {
                 "en-GB": "Check the users with the most XP globally",
                 "en-US": "Check the users with the most XP globally",
@@ -474,17 +429,13 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Check the users with the most XP in the server",
                 "fr": "Vérifiez les utilisateurs avec le plus d'XP sur le serveur",
             },
-            "profile_name": {
-                "en-GB": "profile",
-                "en-US": "profile",
-                "fr": "profil",
-            },
+            "profile_name": {"en-GB": "profile", "en-US": "profile", "fr": "profil"},
             "profile_desc": {
                 "en-GB": "See your profile or someone else's profile",
                 "en-US": "See your profile or someone else's profile",
                 "fr": "Voir votre profil ou celui de quelqu'un d'autre",
             },
-            # manage commands
+            #manage commands. will continue later
             "textchannel_name": {
                 "en-GB": "textchannel",
                 "en-US": "textchannel",
@@ -495,21 +446,13 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Create a text channel",
                 "fr": "Créer un canal texte",
             },
-            "name_parm_name": {
-                "en-GB": "name",
-                "en-US": "name",
-                "fr": "nom",
-            },
+            "name_parm_name": {"en-GB": "name", "en-US": "name", "fr": "nom"},
             "name_parm_desc": {
                 "en-GB": "What will you name it?",
                 "en-US": "What will you name it?",
                 "fr": "Quel nom lui donnerez-vous?",
             },
-            "topic_parm_name": {
-                "en-GB": "topic",
-                "en-US": "topic",
-                "fr": "sujet",
-            },
+            "topic_parm_name": {"en-GB": "topic", "en-US": "topic", "fr": "sujet"},
             "topic_parm_desc": {
                 "en-GB": "What is the channel topic?",
                 "en-US": "What is the channel topic?",
@@ -576,16 +519,8 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "stagechannel",
                 "fr": "canal_scène",
             },
-            "forum_name": {
-                "en-GB": "forum",
-                "en-US": "forum",
-                "fr": "forum",
-            },
-            "role_name": {
-                "en-GB": "role",
-                "en-US": "role",
-                "fr": "rôle",
-            },
+            "forum_name": {"en-GB": "forum", "en-US": "forum", "fr": "forum"},
+            "role_name": {"en-GB": "role", "en-US": "role", "fr": "rôle"},
             "public_thread_name": {
                 "en-GB": "public-thread",
                 "en-US": "public-thread",
@@ -596,11 +531,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "private-thread",
                 "fr": "fil-privé",
             },
-            "emoji_name": {
-                "en-GB": "emoji",
-                "en-US": "emoji",
-                "fr": "emoji",
-            },
+            "emoji_name": {"en-GB": "emoji", "en-US": "emoji", "fr": "emoji"},
             "sticker_name": {
                 "en-GB": "sticker",
                 "en-US": "sticker",
@@ -706,11 +637,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "remove-role",
                 "fr": "supprimer-rôle",
             },
-            "remove_name": {
-                "en-GB": "remove",
-                "en-US": "remove",
-                "fr": "supprimer",
-            },
+            "remove_name": {"en-GB": "remove", "en-US": "remove", "fr": "supprimer"},
             "remove_description": {
                 "en-GB": "Remove a role from a member",
                 "en-US": "Remove a role from a member",
@@ -756,11 +683,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "add",
                 "fr": "ajouter",
             },
-            "add_role_reward_name": {
-                "en-GB": "add",
-                "en-US": "add",
-                "fr": "ajouter",
-            },
+            "add_role_reward_name": {"en-GB": "add", "en-US": "add", "fr": "ajouter"},
             "add_role_reward_description": {
                 "en-GB": "Add a role reward for a level",
                 "en-US": "Add a role reward for a level",
@@ -791,11 +714,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "What role do you want to remove?",
                 "fr": "Quel rôle voulez-vous supprimer?",
             },
-            "list_role_rewards_name": {
-                "en-GB": "list",
-                "en-US": "list",
-                "fr": "liste",
-            },
+            "list_role_rewards_name": {"en-GB": "list", "en-US": "list", "fr": "liste"},
             "list_role_rewards_description": {
                 "en-GB": "List all role rewards for levels",
                 "en-US": "List all role rewards for levels",
@@ -861,11 +780,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Create a role",
                 "fr": "Créer un rôle",
             },
-            "color_parm_name": {
-                "en-GB": "color",
-                "en-US": "color",
-                "fr": "couleur",
-            },
+            "color_parm_name": {"en-GB": "color", "en-US": "color", "fr": "couleur"},
             "color_parm_desc": {
                 "en-GB": "What color will it be? (use HEX codes)",
                 "en-US": "What color will it be? (use HEX codes)",
@@ -1001,17 +916,8 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Change your level and profile card font and bar color",
                 "fr": "Changer la couleur de la police et de la barre de votre carte de niveau et de profil",
             },
-            # Command Names
-            "ban_name": {
-                "en-GB": "ban",
-                "en-US": "ban",
-                "fr": "bannir",
-            },
-            "warn_name": {
-                "en-GB": "warn",
-                "en-US": "warn",
-                "fr": "avertir",
-            },
+            "ban_name": {"en-GB": "ban", "en-US": "ban", "fr": "bannir"},
+            "warn_name": {"en-GB": "warn", "en-US": "warn", "fr": "avertir"},
             "list_warns_name": {
                 "en-GB": "list-warns",
                 "en-US": "list-warns",
@@ -1022,26 +928,14 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "clear-warn",
                 "fr": "effacer-avertissement",
             },
-            "kick_name": {
-                "en-GB": "kick",
-                "en-US": "kick",
-                "fr": "expulser",
-            },
-            "prune_name": {
-                "en-GB": "prune",
-                "en-US": "prune",
-                "fr": "purger",
-            },
+            "kick_name": {"en-GB": "kick", "en-US": "kick", "fr": "expulser"},
+            "prune_name": {"en-GB": "prune", "en-US": "prune", "fr": "purger"},
             "change_nickname_name": {
                 "en-GB": "change-nickname",
                 "en-US": "change-nickname",
                 "fr": "changer-surnom",
             },
-            "unban_name": {
-                "en-GB": "unban",
-                "en-US": "unban",
-                "fr": "débannir",
-            },
+            "unban_name": {"en-GB": "unban", "en-US": "unban", "fr": "débannir"},
             "timeout_name": {
                 "en-GB": "timeout",
                 "en-US": "timeout",
@@ -1062,7 +956,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "massunban",
                 "fr": "débannissement-massif",
             },
-            # Command Descriptions
             "ban_desc": {
                 "en-GB": "Ban someone from or outside the server",
                 "en-US": "Ban someone from or outside the server",
@@ -1123,37 +1016,20 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Unban multiple members at once",
                 "fr": "Débannir plusieurs membres à la fois",
             },
-            # Parameter Names
-            "member_param_name": {
-                "en-GB": "member",
-                "en-US": "member",
-                "fr": "membre",
-            },
-            "reason_param_name": {
-                "en-GB": "reason",
-                "en-US": "reason",
-                "fr": "raison",
-            },
+            "member_param_name": {"en-GB": "member", "en-US": "member", "fr": "membre"},
+            "reason_param_name": {"en-GB": "reason", "en-US": "reason", "fr": "raison"},
             "delete_msg_history_param_name": {
                 "en-GB": "delete_message_history",
                 "en-US": "delete_message_history",
                 "fr": "supprimer_historique_messages",
             },
-            "time_param_name": {
-                "en-GB": "time",
-                "en-US": "time",
-                "fr": "temps",
-            },
+            "time_param_name": {"en-GB": "time", "en-US": "time", "fr": "temps"},
             "warn_id_param_name": {
                 "en-GB": "warn_id",
                 "en-US": "warn_id",
                 "fr": "id_avertissement",
             },
-            "limit_param_name": {
-                "en-GB": "limit",
-                "en-US": "limit",
-                "fr": "limite",
-            },
+            "limit_param_name": {"en-GB": "limit", "en-US": "limit", "fr": "limite"},
             "nickname_param_name": {
                 "en-GB": "nickname",
                 "en-US": "nickname",
@@ -1169,7 +1045,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "user_ids",
                 "fr": "ids_utilisateurs",
             },
-            # Parameter Descriptions
             "member_param_desc": {
                 "en-GB": "What is the member or user ID?",
                 "en-US": "What is the member or user ID?",
@@ -1215,78 +1090,20 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "How many user IDs? Leave a space after each ID (min is 5 and max is 25)",
                 "fr": "Combien d'IDs utilisateur ? Laissez un espace après chaque ID (min est 5 et max est 25)",
             },
-            # Reaction command names
-            "hug_name": {
-                "en-GB": "hug",
-                "en-US": "hug",
-                "fr": "câlin",
-            },
-            "slap_name": {
-                "en-GB": "slap",
-                "en-US": "slap",
-                "fr": "gifler",
-            },
-            "smug_name": {
-                "en-GB": "smug",
-                "en-US": "smug",
-                "fr": "suffisant",
-            },
-            "poke_name": {
-                "en-GB": "poke",
-                "en-US": "poke",
-                "fr": "pousser",
-            },
-            "pat_name": {
-                "en-GB": "pat",
-                "en-US": "pat",
-                "fr": "tapoter",
-            },
-            "kiss_name": {
-                "en-GB": "kiss",
-                "en-US": "kiss",
-                "fr": "embrasser",
-            },
-            "tickle_name": {
-                "en-GB": "tickle",
-                "en-US": "tickle",
-                "fr": "chatouiller",
-            },
-            "baka_name": {
-                "en-GB": "baka",
-                "en-US": "baka",
-                "fr": "baka",
-            },
-            "feed_name": {
-                "en-GB": "feed",
-                "en-US": "feed",
-                "fr": "nourrir",
-            },
-            "cry_name": {
-                "en-GB": "cry",
-                "en-US": "cry",
-                "fr": "pleurer",
-            },
-            "bite_name": {
-                "en-GB": "bite",
-                "en-US": "bite",
-                "fr": "mordre",
-            },
-            "blush_name": {
-                "en-GB": "blush",
-                "en-US": "blush",
-                "fr": "rougir",
-            },
-            "cuddle_name": {
-                "en-GB": "cuddle",
-                "en-US": "cuddle",
-                "fr": "câliner",
-            },
-            "dance_name": {
-                "en-GB": "dance",
-                "en-US": "dance",
-                "fr": "danser",
-            },
-            # Reaction command descriptions
+            "hug_name": {"en-GB": "hug", "en-US": "hug", "fr": "câlin"},
+            "slap_name": {"en-GB": "slap", "en-US": "slap", "fr": "gifler"},
+            "smug_name": {"en-GB": "smug", "en-US": "smug", "fr": "suffisant"},
+            "poke_name": {"en-GB": "poke", "en-US": "poke", "fr": "pousser"},
+            "pat_name": {"en-GB": "pat", "en-US": "pat", "fr": "tapoter"},
+            "kiss_name": {"en-GB": "kiss", "en-US": "kiss", "fr": "embrasser"},
+            "tickle_name": {"en-GB": "tickle", "en-US": "tickle", "fr": "chatouiller"},
+            "baka_name": {"en-GB": "baka", "en-US": "baka", "fr": "baka"},
+            "feed_name": {"en-GB": "feed", "en-US": "feed", "fr": "nourrir"},
+            "cry_name": {"en-GB": "cry", "en-US": "cry", "fr": "pleurer"},
+            "bite_name": {"en-GB": "bite", "en-US": "bite", "fr": "mordre"},
+            "blush_name": {"en-GB": "blush", "en-US": "blush", "fr": "rougir"},
+            "cuddle_name": {"en-GB": "cuddle", "en-US": "cuddle", "fr": "câliner"},
+            "dance_name": {"en-GB": "dance", "en-US": "dance", "fr": "danser"},
             "hug_desc": {
                 "en-GB": "Hug someone or yourself",
                 "en-US": "Hug someone or yourself",
@@ -1357,13 +1174,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Dance with someone or yourself",
                 "fr": "Dansez avec quelqu'un ou vous-même",
             },
-            # Reaction parameter names
-            "member_parm_name": {
-                "en-GB": "member",
-                "en-US": "member",
-                "fr": "membre",
-            },
-            # Reaction parameter descriptions
+            "member_parm_name": {"en-GB": "member", "en-US": "member", "fr": "membre"},
             "hug_member_parm_desc": {
                 "en-GB": "Who are you hugging?",
                 "en-US": "Who are you hugging?",
@@ -1419,8 +1230,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Who are you dancing with?",
                 "fr": "Avec qui dansez-vous ?",
             },
-            # --- utilities.py commands ---
-            # EmbedGroup
             "generate_name": {
                 "en-GB": "generate",
                 "en-US": "generate",
@@ -1461,11 +1270,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "JSON file",
                 "fr": "Fichier JSON",
             },
-            "edit_name": {
-                "en-GB": "edit",
-                "en-US": "edit",
-                "fr": "éditer",
-            },
+            "edit_name": {"en-GB": "edit", "en-US": "edit", "fr": "éditer"},
             "edit_desc": {
                 "en-GB": "Edits an embed message. Use Discohook.org for JSON generation.",
                 "en-US": "Edits an embed message. Use Discohook.org for JSON generation.",
@@ -1511,12 +1316,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "JSON file",
                 "fr": "Fichier JSON",
             },
-            # ReminderCog
-            "reminder_add_name": {
-                "en-GB": "add",
-                "en-US": "add",
-                "fr": "ajouter",
-            },
+            "reminder_add_name": {"en-GB": "add", "en-US": "add", "fr": "ajouter"},
             "reminder_add_desc": {
                 "en-GB": "Add a reminder",
                 "en-US": "Add a reminder",
@@ -1542,11 +1342,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Time (e.g., 1h, 30m)",
                 "fr": "Temps (ex: 1h, 30m)",
             },
-            "reminder_list_name": {
-                "en-GB": "list",
-                "en-US": "list",
-                "fr": "liste",
-            },
+            "reminder_list_name": {"en-GB": "list", "en-US": "list", "fr": "liste"},
             "reminder_list_desc": {
                 "en-GB": "List all the reminders you have",
                 "en-US": "List all the reminders you have",
@@ -1572,22 +1368,13 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Reminder ID",
                 "fr": "ID du rappel",
             },
-            # SlashUtilities
-            "weather_name": {
-                "en-GB": "weather",
-                "en-US": "weather",
-                "fr": "météo",
-            },
+            "weather_name": {"en-GB": "weather", "en-US": "weather", "fr": "météo"},
             "weather_desc": {
                 "en-GB": "Get weather information on a city",
                 "en-US": "Get weather information on a city",
                 "fr": "Obtenir les informations météo d'une ville",
             },
-            "weather_city_parm_name": {
-                "en-GB": "city",
-                "en-US": "city",
-                "fr": "ville",
-            },
+            "weather_city_parm_name": {"en-GB": "city", "en-US": "city", "fr": "ville"},
             "weather_city_parm_desc": {
                 "en-GB": "Add a city",
                 "en-US": "Add a city",
@@ -1633,11 +1420,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Add a calculation",
                 "fr": "Ajouter un calcul",
             },
-            "invite_name": {
-                "en-GB": "invite",
-                "en-US": "invite",
-                "fr": "inviter",
-            },
+            "invite_name": {"en-GB": "invite", "en-US": "invite", "fr": "inviter"},
             "invite_desc": {
                 "en-GB": "Invite me to your server or join the support server",
                 "en-US": "Invite me to your server or join the support server",
@@ -1684,5 +1467,4 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Mot à vérifier",
             },
         }
-
         return translations.get(string.message, {}).get(locale.value)
