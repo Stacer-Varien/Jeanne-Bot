@@ -62,7 +62,7 @@ class HelpGroup:
         embed.description = description
         try:
             parms = [
-                f"[{i["name"]}]" if i["required"] else f"<{i["name"]}>"
+                f"[{i["name"]}]" if bool(i["required"])==True else f"<{i["name"]}>"
                 for i in command["parameters"]
             ]
             descs = [
@@ -86,7 +86,7 @@ class HelpGroup:
         )
         await ctx.followup.send(embed=embed)
 
-    async def command_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+    async def command_error(self, ctx: Interaction):
         embed = Embed(description="I don't have this command", color=Color.red())
         await ctx.followup.send(embed=embed)
 
