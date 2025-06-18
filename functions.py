@@ -24,6 +24,7 @@ from discord.ext.commands import Bot, Context
 from requests import get
 from config import db, BB_WEBHOOK, CATBOX_HASH, LVLCOOLDOWNS
 from typing import Literal, Optional, List
+from discord.app_commands import locale_str as T
 
 
 class DevPunishment:
@@ -1525,7 +1526,7 @@ class AutoCompleteChoices:
             if not isinstance(cmd, Jeanne.Group)
         ]
         return [
-            Jeanne.Choice(name=command, value=command)
+            Jeanne.Choice(name=T(command), value=command)
             for command in cmds
             if current.lower() in command.lower()
         ][:25]
@@ -1565,12 +1566,20 @@ class AutoCompleteChoices:
     async def default_ban_options(
         self, ctx: Interaction, current: str
     ) -> List[Jeanne.Choice[str]]:
-        default_options = [
-            "Suspicious or spam account",
-            "Compromised or hacked account",
-            "Breaking server rules",
-            "Botting account",
-        ]
+        if ctx.locale.value=="en-GB" or ctx.locale.value=="en-US":
+            default_options = [
+                "Suspicious or spam account",
+                "Compromised or hacked account",
+                "Breaking server rules",
+                "Botting account",
+            ]
+        elif ctx.locale.value=="fr":
+            default_options = [
+                "Compte suspect ou spam",
+                "Compte compromis ou piraté",
+                "Violation des règles du serveur",
+                "Compte de botting",
+            ]
         return [
             Jeanne.Choice(name=option, value=option)
             for option in default_options
