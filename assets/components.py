@@ -22,7 +22,7 @@ from collections import OrderedDict
 from json import loads
 from discord.ext.commands import Context, Bot
 from assets.generators.profile_card import Profile
-from config import BB_WEBHOOK, WEBHOOK, BADGES
+from config import WEBHOOK, BADGES
 from functions import DevPunishment, Inventory, Levelling, Manage, Moderation, Welcomer
 
 
@@ -360,17 +360,18 @@ class Levelmsg(ui.Modal, title="Level Update Message"):
 
 
 class RankUpmsg(ui.Modal, title="Role Reward Message"):
-    def __init__(self) -> None:
+    def __init__(self, ctx:Interaction) -> None:
         super().__init__()
 
-    jsonscript = ui.TextInput(
-        label="JSON",
-        style=TextStyle.paragraph,
-        placeholder="Insert JSON script here. If you don't have, type a plain message as long it follows the parameters",
-        required=True,
-        min_length=1,
-        max_length=4000,
-    )
+        if ctx.locale.value=="en-GB" or ctx.locale.value=="en-US":
+            self.jsonscript = ui.TextInput(
+            label="JSON",
+            style=TextStyle.paragraph,
+            placeholder="Insert JSON script here. If you don't have, type a plain message as long it follows the parameters",
+            required=True,
+            min_length=1,
+            max_length=4000,
+        )
 
     async def on_submit(self, ctx: Interaction) -> None:
         parameters = OrderedDict(
@@ -391,32 +392,60 @@ class RankUpmsg(ui.Modal, title="Role Reward Message"):
             embed = Embed.from_dict(json["embeds"][0])
         except:
             content = replace_all(self.jsonscript.value, parameters)
-        confirm = Embed(
-            description="This is the preview of the role reward message whenever someone recieves a role reward after levelling up in the server and will be sent to the current level update channel\nAre you happy with it?"
-        )
-        view = Confirmation(ctx.user)
-        try:
-            embeds = [embed, confirm]
-        except:
-            embeds = [confirm]
-        await ctx.response.send_message(
-            content=content,
-            embeds=embeds,
-            view=view,
-            allowed_mentions=AllowedMentions(everyone=False, roles=False, users=False),
-            ephemeral=True,
-        )
-        await view.wait()
-        if view.value == True:
-            await Manage(server=ctx.guild).add_rankup_rolereward(self.jsonscript.value)
-            embed = Embed(description="Level update message set")
-            await ctx.edit_original_response(content=None, embeds=[embed], view=None)
-        elif view.value == False:
-            embed = Embed(description="Action cancelled")
-            await ctx.edit_original_response(content=None, embeds=[embed], view=None)
-        else:
-            embed = Embed(description="Timeout")
-            await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+        if ctx.locale.value=="en-GB" or ctx.locale.value=="en-US":
+            confirm = Embed(
+                description="This is the preview of the role reward message whenever someone recieves a role reward after levelling up in the server and will be sent to the current level update channel\nAre you happy with it?"
+            )
+            view = Confirmation(ctx.user)
+            try:
+                embeds = [embed, confirm]
+            except:
+                embeds = [confirm]
+            await ctx.response.send_message(
+                content=content,
+                embeds=embeds,
+                view=view,
+                allowed_mentions=AllowedMentions(everyone=False, roles=False, users=False),
+                ephemeral=True,
+            )
+            await view.wait()
+            if view.value == True:
+                await Manage(server=ctx.guild).add_rankup_rolereward(self.jsonscript.value)
+                embed = Embed(description="Level update message set")
+                await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+            elif view.value == False:
+                embed = Embed(description="Action cancelled")
+                await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+            else:
+                embed = Embed(description="Timeout")
+                await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+        elif ctx.locale.value=="fr":
+            confirm = Embed(
+                description="Ceci est l'aperçu du message de récompense de rôle chaque fois que quelqu'un reçoit une récompense de rôle après avoir monté en niveau dans le serveur et sera envoyé au canal de mise à jour de niveau actuel\nÊtes-vous satisfait ?"
+            )
+            view = Confirmation(ctx.user)
+            try:
+                embeds = [embed, confirm]
+            except:
+                embeds = [confirm]
+            await ctx.response.send_message(
+                content=content,
+                embeds=embeds,
+                view=view,
+                allowed_mentions=AllowedMentions(everyone=False, roles=False, users=False),
+                ephemeral=True,
+            )
+            await view.wait()
+            if view.value == True:
+                await Manage(server=ctx.guild).add_rankup_rolereward(self.jsonscript.value)
+                embed = Embed(description="Message de mise à jour du niveau défini")
+                await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+            elif view.value == False:
+                embed = Embed(description="Action annulée")
+                await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+            else:
+                embed = Embed(description="Temps écoulé")
+                await ctx.edit_original_response(content=None, embeds=[embed], view=None)
 
 
 class ModuleMenu(ui.Select):
@@ -453,17 +482,28 @@ class ModuleSelect(ui.View):
 
 
 class BotReportMenu(ui.Select):
-    def __init__(self) -> None:
-        options = [
-            SelectOption(label="ToS Violator", value="violator"),
-            SelectOption(label="Exploit", value="exploit"),
-            SelectOption(label="Bug and/or Fault", value="bugorfault"),
-            SelectOption(label="Illicit NSFW Content", value="illicit"),
-            SelectOption(label="Translation Error", value="translation_error"),
-            SelectOption(label="Other", value="other"),
-        ]
+    def __init__(self, ctx:Interaction) -> None:
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            options = [
+                SelectOption(label="ToS Violator", value="violator"),
+                SelectOption(label="Exploit", value="exploit"),
+                SelectOption(label="Bug and/or Fault", value="bugorfault"),
+                SelectOption(label="Illicit NSFW Content", value="illicit"),
+                SelectOption(label="Translation Error", value="translation_error"),
+                SelectOption(label="Other", value="other"),
+            ]
+        elif ctx.locale.value == "fr":
+            options = [
+                SelectOption(label="Violation des CGU", value="violator"),
+                SelectOption(label="Exploitation", value="exploit"),
+                SelectOption(label="Bug et/ou défaut", value="bugorfault"),
+                SelectOption(label="Contenu NSFW illicite", value="illicit"),
+                SelectOption(label="Erreur de traduction", value="translation_error"),
+                SelectOption(label="Autre", value="other"),
+            ]
+        
         super().__init__(
-            placeholder="Select type of the report",
+            placeholder=("Select type of the report" if (ctx.locale.value == "en-GB" or ctx.locale.value == "en-US") else "Sélectionnez le type du rapport"),
             max_values=1,
             min_values=1,
             options=options,
@@ -486,56 +526,96 @@ class BotReportSelect(ui.View):
 
 
 class ReportModal(ui.Modal, title="Bot Report"):
-    def __init__(self, type_of_report: str):
+    def __init__(self, ctx:Interaction, type_of_report: str):
         self.type = type_of_report
         super().__init__()
 
-    def __init__(self, type_of_report: str):
-        self.type = type_of_report
-        super().__init__()
-
-        if self.type == "Translation Error":
-            self.lang = ui.TextInput(
-                label="Language",
-                required=True,
-                min_length=2,
-                max_length=2000,
-                placeholder="Type the language here",
-            )
-            self.incorrect = ui.TextInput(
-                label="Incorrect Translation",
-                required=True,
-                min_length=2,
-                max_length=2000,
-                placeholder="Type the incorrect translation here",
-            )
-            self.correct = ui.TextInput(
-                label="Correct Translation",
-                required=True,
-                min_length=2,
-                max_length=2000,
-                placeholder="Type the correct translation here",
-            )
-            self.add_item(self.lang)
-            self.add_item(self.incorrect)
-            self.add_item(self.correct)
-        else:
-            self.report = ui.TextInput(
-                label="Problem",
-                placeholder="Type the problem here",
-                required=True,
-                min_length=10,
-                max_length=2000,
-                style=TextStyle.paragraph,
-            )
-            self.steps = ui.TextInput(
-                label="Steps of how you got this problem",
-                placeholder="Type the steps here",
-                required=False,
-                min_length=10,
-                max_length=1024,
-                style=TextStyle.paragraph,
-            )
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            if self.type == "Translation Error":
+                self.lang = ui.TextInput(
+                    label="Language",
+                    required=True,
+                    min_length=2,
+                    max_length=2000,
+                    placeholder="Type the language here",
+                )
+                self.incorrect = ui.TextInput(
+                    label="Incorrect Translation",
+                    required=True,
+                    min_length=2,
+                    max_length=2000,
+                    placeholder="Type the incorrect translation here",
+                )
+                self.correct = ui.TextInput(
+                    label="Correct Translation",
+                    required=True,
+                    min_length=2,
+                    max_length=2000,
+                    placeholder="Type the correct translation here",
+                )
+                self.add_item(self.lang)
+                self.add_item(self.incorrect)
+                self.add_item(self.correct)
+            else:
+                self.report = ui.TextInput(
+                    label="Problem",
+                    placeholder="Type the problem here",
+                    required=True,
+                    min_length=10,
+                    max_length=2000,
+                    style=TextStyle.paragraph,
+                )
+                self.steps = ui.TextInput(
+                    label="Steps of how you got this problem",
+                    placeholder="Type the steps here",
+                    required=False,
+                    min_length=10,
+                    max_length=1024,
+                    style=TextStyle.paragraph,
+                )
+        elif ctx.locale.value == "fr":
+            if self.type == "Translation Error":
+                self.lang = ui.TextInput(
+                    label="Langue",
+                    required=True,
+                    min_length=2,
+                    max_length=2000,
+                    placeholder="Tapez la langue ici",
+                )
+                self.incorrect = ui.TextInput(
+                    label="Traduction incorrecte",
+                    required=True,
+                    min_length=2,
+                    max_length=2000,
+                    placeholder="Tapez la traduction incorrecte ici",
+                )
+                self.correct = ui.TextInput(
+                    label="Traduction correcte",
+                    required=True,
+                    min_length=2,
+                    max_length=2000,
+                    placeholder="Tapez la traduction correcte ici",
+                )
+                self.add_item(self.lang)
+                self.add_item(self.incorrect)
+                self.add_item(self.correct)
+            else:
+                self.report = ui.TextInput(
+                    label="Problème",
+                    placeholder="Tapez le problème ici",
+                    required=True,
+                    min_length=10,
+                    max_length=2000,
+                    style=TextStyle.paragraph,
+                )
+                self.steps = ui.TextInput(
+                    label="Étapes pour reproduire le problème",
+                    placeholder="Tapez les étapes ici",
+                    required=False,
+                    min_length=10,
+                    max_length=1024,
+                    style=TextStyle.paragraph,
+                )
             self.add_item(self.report)
             self.add_item(self.steps)
 
@@ -565,48 +645,79 @@ class ReportModal(ui.Modal, title="Bot Report"):
 
 
 class ForumGuildlines(ui.Modal, title="Forum Guideline"):
-    def __init__(self, name: str, category: CategoryChannel = None):
+    def __init__(self, name: str, ctx:Interaction, category: CategoryChannel = None):
         self.name = name
         self.category = category
         super().__init__()
 
-    guidelines = ui.TextInput(
-        label="Guidelines",
-        placeholder="Type here. Markdown supported",
-        required=True,
-        min_length=1,
-        max_length=4000,
-        style=TextStyle.paragraph,
-    )
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            self.guidelines = ui.TextInput(
+                label="Guidelines",
+                placeholder="Type here. Markdown supported",
+                required=True,
+                min_length=1,
+                max_length=4000,
+                style=TextStyle.paragraph,
+            )
+        elif ctx.locale.value == "fr":
+            self.guidelines = ui.TextInput(
+                label="Directives",
+                placeholder="Tapez ici. Markdown pris en charge",
+                required=True,
+                min_length=1,
+                max_length=4000,
+                style=TextStyle.paragraph,
+            )
 
     async def on_submit(self, ctx: Interaction) -> None:
         embed = Embed()
         forum = await ctx.guild.create_forum(
             name=self.name, topic=self.guidelines.value
         )
-        embed.description = "{} has been created".format(forum.jump_url)
-        embed.color = Color.random()
-        if self.category:
-            await forum.edit(category=self.category)
-            embed.add_field(
-                name="Added into category", value=self.category.name, inline=True
-            )
-        await ctx.response.send_message(embed=embed)
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            embed.description = "{} has been created".format(forum.jump_url)
+            embed.color = Color.random()
+            if self.category:
+                await forum.edit(category=self.category)
+                embed.add_field(
+                    name="Added into category", value=self.category.name, inline=True
+                )
+            await ctx.response.send_message(embed=embed)
+        elif ctx.locale.value == "fr":
+            embed.description = "{} a été créé".format(forum.jump_url)
+            embed.color = Color.random()
+            if self.category:
+                await forum.edit(category=self.category)
+                embed.add_field(
+                    name="Ajouté dans la catégorie", value=self.category.name, inline=True
+                )
+            await ctx.response.send_message(embed=embed)
 
 
 class ReportContentM(ui.Modal, title="Illicit Content Report"):
-    def __init__(self, link: str):
+    def __init__(self, ctx:Interaction,link: str):
         self.link = link
         super().__init__()
-
-    illegalcontent = ui.TextInput(
-        label="Reason",
-        style=TextStyle.short,
-        placeholder="Why are you reporting this link? (e.g., inappropriate content)",
-        required=True,
-        min_length=4,
-        max_length=256,
-    )
+        
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            self.illegalcontent = ui.TextInput(
+                label="Reason",
+                style=TextStyle.short,
+                placeholder="Why are you reporting this link? (e.g., inappropriate content)",
+                required=True,
+                min_length=4,
+                max_length=256,
+            )
+        elif ctx.locale.value == "fr":
+            self.illegalcontent = ui.TextInput(
+                label="Raison",
+                style=TextStyle.short,
+                placeholder="Pourquoi signalez-vous ce lien? (par exemple, contenu inapproprié)",
+                required=True,
+                min_length=4,
+                max_length=256,
+            )
+    
 
     async def on_submit(self, ctx: Interaction) -> None:
         report = Embed(title="Illicit Content Reported", color=Color.brand_red())
@@ -673,7 +784,7 @@ class ReportContent(ui.View):
     @ui.button(label="Report Content", style=ButtonStyle.grey)
     async def report1(self, ctx: Interaction, button: ui.Button):
         self.value = "report"
-        await ctx.response.send_modal(ReportContentM(self.link))
+        await ctx.response.send_modal(ReportContentM(ctx, self.link))
 
 
 class RemoveManage(ui.View):
@@ -687,113 +798,201 @@ class RemoveManage(ui.View):
         self.value = "welcomer"
         Embed()
         check = Welcomer(ctx.guild).get_welcomer
-        if check == None:
-            button.label = "No welcoming channel found"
-            button.style = ButtonStyle.danger
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            if check == None:
+                button.label = "No welcoming channel found"
+                button.style = ButtonStyle.danger
+                await ctx.response.edit_message(view=self)
+                return
+            button.style = ButtonStyle.green
+            await Manage(ctx.guild).remove_welcomer()
+            button.label = "Welcomer Channel Removed"
             await ctx.response.edit_message(view=self)
-            return
-        button.style = ButtonStyle.green
-        await Manage(ctx.guild).remove_welcomer()
-        button.label = "Welcomer Channel Removed"
-        await ctx.response.edit_message(view=self)
+        elif ctx.locale.value == "fr":
+            if check == None:
+                button.label = "Aucun canal de bienvenue trouvé"
+                button.style = ButtonStyle.danger
+                await ctx.response.edit_message(view=self)
+                return
+            button.style = ButtonStyle.green
+            await Manage(ctx.guild).remove_welcomer()
+            button.label = "Canal de bienvenue supprimé"
+            await ctx.response.edit_message(view=self)
 
     @ui.button(label="Greeting Message", style=ButtonStyle.gray, row=1)
     async def welcomemsg(self, ctx: Interaction, button: ui.Button):
         self.value = "welcomemsg"
         check = Welcomer(ctx.guild).get_welcoming_msg
-        if check == None:
-            button.style = ButtonStyle.danger
-            button.label = "No welcoming message set"
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            if check == None:
+                button.style = ButtonStyle.danger
+                button.label = "No welcoming message set"
+                await ctx.response.edit_message(view=self)
+                return
+            button.style = ButtonStyle.green
+            button.label = "Welcoming Message Removed"
+            await Manage(ctx.guild).remove_welcomemsg()
             await ctx.response.edit_message(view=self)
-            return
-        button.style = ButtonStyle.green
-        button.label = "Welcoming Message Removed"
-        await Manage(ctx.guild).remove_welcomemsg()
-        await ctx.response.edit_message(view=self)
+        elif ctx.locale.value == "fr":
+            if check == None:
+                button.style = ButtonStyle.danger
+                button.label = "Aucun message de bienvenue défini"
+                await ctx.response.edit_message(view=self)
+                return
+            button.style = ButtonStyle.green
+            button.label = "Message de bienvenue supprimé"
+            await Manage(ctx.guild).remove_welcomemsg()
+            await ctx.response.edit_message(view=self)
 
     @ui.button(label="Leaving Channel", style=ButtonStyle.gray, row=1)
     async def leaving(self, ctx: Interaction, button: ui.Button):
         self.value = "leaver"
         check = Welcomer(ctx.guild).get_leaver
-        if check == None:
-            button.style = ButtonStyle.danger
-            button.label = "No leaving channel found"
-            await ctx.response.edit_message(view=self)
-        else:
-            button.style = ButtonStyle.green
-            button.label = "Leaving Channel Removed"
-            await Manage(ctx.guild).remove_leaver()
-            await ctx.response.edit_message(view=self)
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            if check == None:
+                button.style = ButtonStyle.danger
+                button.label = "No leaving channel found"
+                await ctx.response.edit_message(view=self)
+            else:
+                button.style = ButtonStyle.green
+                button.label = "Leaving Channel Removed"
+                await Manage(ctx.guild).remove_leaver()
+                await ctx.response.edit_message(view=self)
+        elif ctx.locale.value == "fr":
+            if check == None:
+                button.style = ButtonStyle.danger
+                button.label = "Aucun canal de départ trouvé"
+                await ctx.response.edit_message(view=self)
+            else:
+                button.style = ButtonStyle.green
+                button.label = "Canal de départ supprimé"
+                await Manage(ctx.guild).remove_leaver()
+                await ctx.response.edit_message(view=self)
 
     @ui.button(label="Leaving Message", style=ButtonStyle.gray, row=1)
     async def leavingmsg(self, ctx: Interaction, button: ui.Button):
         self.value = "leavingmsg"
         check = Welcomer(ctx.guild).get_leaving_msg
-        if check == None:
-            button.style = ButtonStyle.danger
-            button.label = "No leaving message set"
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            if check == None:
+                button.style = ButtonStyle.danger
+                button.label = "No leaving message set"
+                await ctx.response.edit_message(view=self)
+                return
+            button.style = ButtonStyle.green
+            button.label = "Leaving Message Removed"
+            await Manage(ctx.guild).remove_leavingmsg()
             await ctx.response.edit_message(view=self)
-            return
-        button.style = ButtonStyle.green
-        button.label = "Leaving Message Removed"
-        await Manage(ctx.guild).remove_leavingmsg()
-        await ctx.response.edit_message(view=self)
+        elif ctx.locale.value == "fr":
+            if check == None:
+                button.style = ButtonStyle.danger
+                button.label = "Aucun message de départ défini"
+                await ctx.response.edit_message(view=self)
+                return
+            button.style = ButtonStyle.green
+            button.label = "Message de départ supprimé"
+            await Manage(ctx.guild).remove_leavingmsg()
+            await ctx.response.edit_message(view=self)
 
     @ui.button(label="Level Update Channel", style=ButtonStyle.gray, row=2)
     async def level(self, ctx: Interaction, button: ui.Button):
         self.value = "levelup"
         check = Levelling(server=ctx.guild).get_levelup_channel
-        if check == None:
-            button.style = ButtonStyle.danger
-            button.label = "No level update channel found"
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            if check == None:
+                button.style = ButtonStyle.danger
+                button.label = "No level update channel found"
+                await ctx.response.edit_message(view=self)
+                return
+            button.style = ButtonStyle.green
+            button.label = "Level Update Channel Removed"
+            await Manage(ctx.guild).remove_levelup()
             await ctx.response.edit_message(view=self)
-            return
-        button.style = ButtonStyle.green
-        button.label = "Level Update Channel Removed"
-        await Manage(ctx.guild).remove_levelup()
-        await ctx.response.edit_message(view=self)
+        elif ctx.locale.value == "fr":
+            if check == None:
+                button.style = ButtonStyle.danger
+                button.label = "Aucun canal de mise à jour de niveau trouvé"
+                await ctx.response.edit_message(view=self)
+                return
+            button.style = ButtonStyle.green
+            button.label = "Canal de mise à jour de niveau supprimé"
+            await Manage(ctx.guild).remove_levelup()
+            await ctx.response.edit_message(view=self)
 
     @ui.button(label="Level Update Message", style=ButtonStyle.gray, row=2)
     async def levelupdate(self, ctx: Interaction, button: ui.Button):
         self.value = "levelnotif"
         check = Levelling(server=ctx.guild).get_levelup_msg
-        if check == None:
-            button.style = ButtonStyle.danger
-            button.label = "No level update message set"
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            if check == None:
+                button.style = ButtonStyle.danger
+                button.label = "No level update message set"
+                await ctx.response.edit_message(view=self)
+                return
+            button.style = ButtonStyle.green
+            button.label = "Level Update Message Removed"
+            await Manage(ctx.guild).remove_levelup_msg()
             await ctx.response.edit_message(view=self)
-            return
-        button.style = ButtonStyle.green
-        button.label = "Level Update Message Removed"
-        await Manage(ctx.guild).remove_levelup_msg()
-        await ctx.response.edit_message(view=self)
+        elif ctx.locale.value == "fr":
+            if check == None:
+                button.style = ButtonStyle.danger
+                button.label = "Aucun message de mise à jour de niveau défini"
+                await ctx.response.edit_message(view=self)
+                return
+            button.style = ButtonStyle.green
+            button.label = "Message de mise à jour de niveau supprimé"
+            await Manage(ctx.guild).remove_levelup_msg()
+            await ctx.response.edit_message(view=self)
 
     @ui.button(label="Role Reward Message", style=ButtonStyle.gray, row=2)
     async def rolereward(self, ctx: Interaction, button: ui.Button):
         self.value = "rolereward"
         check = Levelling(server=ctx.guild).get_rank_up_update
-        if check == None:
-            button.style = ButtonStyle.danger
-            button.label = "No role reward message set"
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            if check == None:
+                button.style = ButtonStyle.danger
+                button.label = "No role reward message set"
+                await ctx.response.edit_message(view=self)
+                return
+            button.style = ButtonStyle.green
+            button.label = "Role Reward Message Removed"
+            await Manage(ctx.guild).remove_rolereward_msg()
             await ctx.response.edit_message(view=self)
-            return
-        button.style = ButtonStyle.green
-        button.label = "Role Reward Message Removed"
-        await Manage(ctx.guild).remove_rolereward_msg()
-        await ctx.response.edit_message(view=self)
+        elif ctx.locale.value == "fr":
+            if check == None:
+                button.style = ButtonStyle.danger
+                button.label = "Aucun message de récompense de rôle défini"
+                await ctx.response.edit_message(view=self)
+                return
+            button.style = ButtonStyle.green
+            button.label = "Message de récompense de rôle supprimé"
+            await Manage(ctx.guild).remove_rolereward_msg()
+            await ctx.response.edit_message(view=self)
 
     @ui.button(label="Modlog", style=ButtonStyle.gray, row=2)
     async def modlog(self, ctx: Interaction, button: ui.Button):
         self.value = "modlog"
         check = Moderation(ctx.guild).get_modlog_channel
-        if check == None:
-            button.style = ButtonStyle.danger
-            button.label = "No modlog found"
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            if check == None:
+                button.style = ButtonStyle.danger
+                button.label = "No modlog found"
+                await ctx.response.edit_message(view=self)
+                return
+            button.style = ButtonStyle.green
+            button.label = "Modlog Removed"
+            await Manage(ctx.guild).remove_modloger()
             await ctx.response.edit_message(view=self)
-            return
-        button.style = ButtonStyle.green
-        button.label = "Modlog Removed"
-        await Manage(ctx.guild).remove_modloger()
-        await ctx.response.edit_message(view=self)
+        elif ctx.locale.value == "fr":
+            if check == None:
+                button.style = ButtonStyle.danger
+                button.label = "Aucun modlog trouvé"
+                await ctx.response.edit_message(view=self)
+                return
+            button.style = ButtonStyle.green
+            button.label = "Modlog supprimé"
+            await Manage(ctx.guild).remove_modloger()
+            await ctx.response.edit_message(view=self)
 
     async def interaction_check(self, ctx: Interaction):
         return ctx.user.id == self.author.id
@@ -863,35 +1062,66 @@ class Dice_Buttons(ui.View):
 
 async def buy_function_context(bot: Bot, ctx: Context, name: str, message: Message):
     image_url = Inventory().get_wallpaper(name)[2]
-    m = await message.edit(
-        embed=Embed(
-            description="Creating preview... This will take some time <a:loading:1161038734620373062>"
-        ),
-        view=None,
-    )
-    image = await Profile(bot).generate_profile(ctx, ctx.author, image_url, True, True, "southafrica")
-    file = File(fp=image, filename=f"preview_profile_card.png")
-    preview = (
-        Embed(
-            description="This is the preview of the profile card.",
-            color=Color.random(),
+    if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        m = await message.edit(
+            embed=Embed(
+                description="Creating preview... This will take some time <a:loading:1161038734620373062>"
+            ),
+            view=None,
         )
-        .add_field(name="Cost", value="1000 <:quantumpiece:1161010445205905418>")
-        .set_footer(text="Is this the background you wanted?")
-    )
-    view = Confirmation(ctx.author)
-    m = await m.edit(attachments=[file], embed=preview, view=view)
-    await view.wait()
+        image = await Profile(bot).generate_profile(ctx, ctx.author, image_url, True, True, "southafrica")
+        file = File(fp=image, filename=f"preview_profile_card.png")
+        preview = (
+            Embed(
+                description="This is the preview of the profile card.",
+                color=Color.random(),
+            )
+            .add_field(name="Cost", value="1000 <:quantumpiece:1161010445205905418>")
+            .set_footer(text="Is this the background you wanted?")
+        )
+        view = Confirmation(ctx.author)
+        m = await m.edit(attachments=[file], embed=preview, view=view)
+        await view.wait()
 
-    if view.value == True:
-        await Inventory(ctx.author).add_user_wallpaper(name)
-        embed1 = Embed(
-            description=f"Background wallpaper bought and selected",
-            color=Color.random(),
+        if view.value == True:
+            await Inventory(ctx.author).add_user_wallpaper(name)
+            embed1 = Embed(
+                description=f"Background wallpaper bought and selected",
+                color=Color.random(),
+            )
+            await m.edit(embed=embed1, view=None)
+            return
+        await m.edit(embed=Embed(description="Cancel"), view=None, attachments=[])
+    elif ctx.locale.value == "fr":
+        m = await message.edit(
+            embed=Embed(
+                description="Création de l'aperçu... Cela prendra un certain temps <a:loading:1161038734620373062>"
+            ),
+            view=None,
         )
-        await m.edit(embed=embed1, view=None)
-        return
-    await m.edit(embed=Embed(description="Cancel"), view=None, attachments=[])
+        image = await Profile(bot).generate_profile(ctx, ctx.author, image_url, True, True, "southafrica")
+        file = File(fp=image, filename=f"preview_profile_card.png")
+        preview = (
+            Embed(
+                description="Ceci est l'aperçu de la carte de profil.",
+                color=Color.random(),
+            )
+            .add_field(name="Coût", value="1000 <:quantumpiece:1161010445205905418>")
+            .set_footer(text="Est-ce le fond que vous vouliez ?")
+        )
+        view = Confirmation(ctx.author)
+        m = await m.edit(attachments=[file], embed=preview, view=view)
+        await view.wait()
+
+        if view.value == True:
+            await Inventory(ctx.author).add_user_wallpaper(name)
+            embed1 = Embed(
+                description=f"Fond d'écran acheté et sélectionné",
+                color=Color.random(),
+            )
+            await m.edit(embed=embed1, view=None)
+            return
+        await m.edit(embed=Embed(description="Annulé"), view=None, attachments=[])
 
 
 async def use_function_context(ctx: Context, name: str, message: Message):
@@ -902,47 +1132,86 @@ async def use_function_context(ctx: Context, name: str, message: Message):
 
 async def buy_function_app(bot: Bot, ctx: Interaction, name: str):
     image_url = Inventory().get_wallpaper(name)[2]
-    await ctx.edit_original_response(
-        "Creating preview... This will take some time <a:loading:1161038734620373062>"
-    )
-    image = await Profile(bot).generate_profile(ctx, ctx.user, image_url, True, True, "southafrica")
-    file = File(fp=image, filename=f"preview_profile_card.png")
-    preview = (
-        Embed(
-            description="This is the preview of the profile card.",
-            color=Color.random(),
-        )
-        .add_field(name="Cost", value="1000 <:quantumpiece:1161010445205905418>")
-        .set_footer(text="Is this the background you wanted?")
-    )
-    view = Confirmation(ctx.user)
-    await ctx.edit_original_response(
-        content=None, attachments=[file], embed=preview, view=view
-    )
-    await view.wait()
-    if view.value == None:
+    if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
         await ctx.edit_original_response(
-            content="Timeout", view=None, embed=None, attachments=[]
+            "Creating preview... This will take some time <a:loading:1161038734620373062>"
         )
-        return
-    if view.value == True:
-        await Inventory(ctx.user).add_user_wallpaper(name)
-        embed1 = Embed(
-            description=f"Background wallpaper bought and selected",
-            color=Color.random(),
+        image = await Profile(bot).generate_profile(ctx, ctx.user, image_url, True, True, "southafrica")
+        file = File(fp=image, filename=f"preview_profile_card.png")
+        preview = (
+            Embed(
+                description="This is the preview of the profile card.",
+                color=Color.random(),
+            )
+            .add_field(name="Cost", value="1000 <:quantumpiece:1161010445205905418>")
+            .set_footer(text="Is this the background you wanted?")
         )
-        await ctx.edit_original_response(embed=embed1, view=None)
-    else:
+        view = Confirmation(ctx.user)
         await ctx.edit_original_response(
-            content="Cancelled", view=None, embed=None, attachments=[]
+            content=None, attachments=[file], embed=preview, view=view
         )
+        await view.wait()
+        if view.value == None:
+            await ctx.edit_original_response(
+                content="Timeout", view=None, embed=None, attachments=[]
+            )
+            return
+        if view.value == True:
+            await Inventory(ctx.user).add_user_wallpaper(name)
+            embed1 = Embed(
+                description=f"Background wallpaper bought and selected",
+                color=Color.random(),
+            )
+            await ctx.edit_original_response(embed=embed1, view=None)
+        else:
+            await ctx.edit_original_response(
+                content="Cancelled", view=None, embed=None, attachments=[]
+            )
+    elif ctx.locale.value == "fr":
+        await ctx.edit_original_response(
+            "Création de l'aperçu... Cela prendra un certain temps <a:loading:1161038734620373062>"
+        )
+        image = await Profile(bot).generate_profile(ctx, ctx.user, image_url, True, True, "southafrica")
+        file = File(fp=image, filename=f"preview_profile_card.png")
+        preview = (
+            Embed(
+                description="Ceci est l'aperçu de la carte de profil.",
+                color=Color.random(),
+            )
+            .add_field(name="Coût", value="1000 <:quantumpiece:1161010445205905418>")
+            .set_footer(text="Est-ce le fond que vous vouliez ?")
+        )
+        view = Confirmation(ctx.user)
+        await ctx.edit_original_response(
+            content=None, attachments=[file], embed=preview, view=view
+        )
+        await view.wait()
+        if view.value == None:
+            await ctx.edit_original_response(
+                content="Temps écoulé", view=None, embed=None, attachments=[]
+            )
+            return
+        if view.value == True:
+            await Inventory(ctx.user).add_user_wallpaper(name)
+            embed1 = Embed(
+                description=f"Fond d'écran acheté et sélectionné",
+                color=Color.random(),
+            )
+            await ctx.edit_original_response(embed=embed1, view=None)
+        else:
+            await ctx.edit_original_response(
+                content="Annulé", view=None, embed=None, attachments=[]
+            )
 
 
 async def use_function_app(ctx: Interaction, name: str):
     await Inventory(ctx.user).use_wallpaper(name)
-    embed = Embed(description=f"{name} has been selected", color=Color.random())
-    await ctx.edit_original_response(embed=embed, view=None)
-
+    if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        embed = Embed(description=f"{name} has been selected", color=Color.random())
+        await ctx.edit_original_response(embed=embed, view=None)
+    elif ctx.locale.value == "fr":
+        embed = Embed(description=f"{name} a été sélectionné", color=Color.random())
+        await ctx.edit_original_response(embed=embed, view=None)
 
 class TopicButton(ui.View):
     def __init__(self, author: Member, name: str, category: CategoryChannel):
@@ -955,7 +1224,7 @@ class TopicButton(ui.View):
     @ui.button(label="Add Guidelines")
     async def guidelines(self, button: ui.Button, ctx: Interaction):
         self.value = "guidelines"
-        await ctx.response.send_modal(ForumGuildlines(self.name, self.category))
+        await ctx.response.send_modal(ForumGuildlines(self.name, ctx, self.category))
 
     async def interaction_check(self, ctx: Interaction):
         return ctx.user.id == self.author.id
@@ -972,43 +1241,13 @@ class WelcomerSetButtons(ui.View):
     async def setwelcomemsg(self, button: ui.Button, ctx: Interaction):
         self.value = "welcomemsg"
         await self.message.edit(view=self)
-        await ctx.response.send_modal(Welcomingmsg())
+        await ctx.response.send_modal(Welcomingmsg(ctx))
 
     @ui.button(label="Set Leaving Message")
     async def setleavingmsg(self, button: ui.Button, ctx: Interaction):
         self.value = "leavingmsg"
         await self.message.edit(view=self)
-        await ctx.response.send_modal(Leavingmsg())
-
-    async def interaction_check(self, ctx: Interaction):
-        return ctx.user.id == self.author.id
-
-
-class LevelSetButtons(ui.View):
-    def __init__(self, author: Member, message: Message, channel: TextChannel):
-        self.value = None
-        self.author = author
-        self.message = message
-        self.channel = channel
-        super().__init__(timeout=180)
-
-    @ui.button(label="Set Level Update Message")
-    async def setwelcomemsg(self, button: ui.Button, ctx: Interaction):
-        self.value = "levelmsg"
-        await self.message.edit(view=self)
-        await ctx.response.send_modal(Levelmsg())
-
-    @ui.button(label="Set Default Role Reward Message")
-    async def setdefaultleavingmsg(self, button: ui.Button, ctx: Interaction):
-        self.value = "defaultrolerewardmsg"
-        await Manage(ctx.guild).add_rankup_rolereward(None)
-        await self.message.edit(view=self)
-
-    @ui.button(label="Set Custom Role Reward Message")
-    async def setleavingmsg(self, button: ui.Button, ctx: Interaction):
-        self.value = "customrolerewardmsg"
-        await self.message.edit(view=self)
-        await ctx.response.send_modal(RankUpmsg())
+        await ctx.response.send_modal(Leavingmsg(ctx))
 
     async def interaction_check(self, ctx: Interaction):
         return ctx.user.id == self.author.id
