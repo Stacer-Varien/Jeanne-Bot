@@ -18,7 +18,7 @@ class MyTranslator(Jeanne.Translator):
         context: Jeanne.TranslationContext,
     ) -> Optional[str]:
         translations = {
-            #global
+            # global
             "name_parm_name": {"en-GB": "name", "en-US": "name", "fr": "nom"},
             "name_parm_desc": {
                 "en-GB": "What will you name it?",
@@ -31,7 +31,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Which member?",
                 "fr": "Quel membre?",
             },
-            #currency commands
+            # currency commands
             "guess_group_name free_name": {
                 "en-GB": "guess free",
                 "en-US": "guess free",
@@ -111,7 +111,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Vote for Jeanne on Top.gg",
                 "fr": "Votez pour Jeanne sur Top.gg",
             },
-            #fun commands
+            # fun commands
             "8ball_name": {"en-GB": "8ball", "en-US": "8ball", "fr": "8ball"},
             "8ball_desc": {
                 "en-GB": "Ask 8 ball anything and you will get your answer",
@@ -231,7 +231,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Need help? Visit the website or join the server for further assistance.",
                 "fr": "Besoin d'aide ? Visitez le site web ou rejoignez le serveur pour plus d'assistance.",
             },
-            #hentai commands
+            # hentai commands
             "hentai_name": {"en-GB": "hentai", "en-US": "hentai", "fr": "hentai"},
             "hentai_desc": {
                 "en-GB": "Get a random hentai from Jeanne",
@@ -275,7 +275,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Add your tag (up to 2 tags)",
                 "fr": "Ajoutez votre étiquette (jusqu'à 2 étiquettes)",
             },
-            #image commands
+            # image commands
             "kitsune_desc": {
                 "en-GB": "Get a random kitsune image",
                 "en-US": "Get a random kitsune image",
@@ -316,7 +316,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Get a random image from Safebooru",
                 "fr": "Obtenez une image aléatoire de Safebooru",
             },
-            #info commands
+            # info commands
             "stats_name": {"en-GB": "stats", "en-US": "stats", "fr": "stats"},
             "stats_desc": {
                 "en-GB": "See the bot's status from development to now",
@@ -379,7 +379,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "What is the name of the emoji?",
                 "fr": "Quel est le nom de l'emoji?",
             },
-            #inventory commands
+            # inventory commands
             "country_name": {"en-GB": "country", "en-US": "country", "fr": "pays"},
             "country_desc": {
                 "en-GB": "Buy a country badge",
@@ -418,7 +418,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Add an image link",
                 "fr": "Ajouter un lien d'image",
             },
-            #levelling commands
+            # levelling commands
             "global_desc": {
                 "en-GB": "Check the users with the most XP globally",
                 "en-US": "Check the users with the most XP globally",
@@ -435,7 +435,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "See your profile or someone else's profile",
                 "fr": "Voir votre profil ou celui de quelqu'un d'autre",
             },
-            #manage commands. will continue later
+            # manage commands. will continue later
             "textchannel_name": {
                 "en-GB": "textchannel",
                 "en-US": "textchannel",
@@ -638,11 +638,12 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "supprimer-rôle",
             },
             "remove_name": {"en-GB": "remove", "en-US": "remove", "fr": "supprimer"},
-            "remove_description": {
+            "remove_role_description": {
                 "en-GB": "Remove a role from a member",
                 "en-US": "Remove a role from a member",
                 "fr": "Supprimer un rôle d'un membre",
             },
+            "remove_description":{"en-GB": "remove", "en-US": "remove", "fr": "supprimer"},
             "list_disabled_commands_name": {
                 "en-GB": "list-disabled",
                 "en-US": "list-disabled",
