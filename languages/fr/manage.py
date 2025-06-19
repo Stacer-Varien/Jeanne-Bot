@@ -157,7 +157,7 @@ class Create_Group():
         topic: Optional[bool] = None,
     ):
         if topic:
-            await ctx.response.send_modal(ForumGuildlines(name, category))
+            await ctx.response.send_modal(ForumGuildlines(name, ctx, category))
             return
         await ctx.response.defer()
         embed = Embed()
@@ -718,7 +718,7 @@ class Set_Group():
         self, ctx: Interaction, jsonfile: Optional[Attachment] = None
     ) -> None:
         if (jsonfile == None):
-            await ctx.response.send_modal(Welcomingmsg())
+            await ctx.response.send_modal(Welcomingmsg(ctx))
             return
         if (jsonfile != None):
             await ctx.response.defer()
@@ -781,7 +781,7 @@ class Set_Group():
         self, ctx: Interaction, jsonfile: Optional[Attachment] = None
     ) -> None:
         if (jsonfile == None):
-            await ctx.response.send_modal(Leavingmsg())
+            await ctx.response.send_modal(Leavingmsg(ctx))
             return
         if (jsonfile != None):
             await ctx.response.defer()
@@ -844,7 +844,7 @@ class Set_Group():
         self, ctx: Interaction, message: Optional[bool] = None
     ) -> None:
         if message == True:
-            await ctx.response.send_modal(RankUpmsg())
+            await ctx.response.send_modal(RankUpmsg(ctx))
             return
         await ctx.response.defer()
         await Manage(ctx.guild).add_rankup_rolereward(message)
@@ -858,7 +858,7 @@ class Set_Group():
         self, ctx: Interaction, channel: TextChannel, levelmsg: Optional[bool] = None
     ) -> None:
         if levelmsg == True:
-            await ctx.response.send_modal(Levelmsg(channel))
+            await ctx.response.send_modal(Levelmsg(ctx, channel))
             return
         await ctx.response.defer()
         await Manage(server=ctx.guild).add_level_channel(channel)
@@ -947,7 +947,7 @@ class manage():
         embed = Embed(
             description="Click on one of the buttons to remove", color=Color.random()
         )
-        view = RemoveManage(ctx.user)
+        view = RemoveManage(ctx, ctx.user)
         await ctx.followup.send(embed=embed, view=view)
         await view.wait()
         if view.value == None:

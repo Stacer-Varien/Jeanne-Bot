@@ -27,7 +27,7 @@ class nsfw(Cog):
         await ctx.response.defer()
         hentai, source = await Hentai().hentai()
         if hentai.endswith(("mp4", "webm")):
-            view = ReportContent(shorten_url(hentai))
+            view = ReportContent(ctx, shorten_url(hentai))
             await ctx.followup.send(hentai, view=view)
             try:
                 await ctx.edit_original_response(view=None)
@@ -42,7 +42,7 @@ class nsfw(Cog):
                 text="Fetched from {} • Credits must go to the artist".format(source)
             )
         )
-        view = ReportContent(shorten_url(hentai))
+        view = ReportContent(ctx, shorten_url(hentai))
         await ctx.followup.send(embed=embed, view=view)
         await view.wait()
         if view.value == None:
@@ -62,7 +62,7 @@ class nsfw(Cog):
 
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
-            view = ReportContentPlus(*[img["file_url"] for img in images])
+            view = ReportContentPlus(ctx, *[img["file_url"] for img in images])
             vids = [i for i in images if "mp4" in i["file_url"] or "webm" in i["file_url"]]
             media = [j["file_url"] for j in vids]
 
@@ -95,7 +95,7 @@ class nsfw(Cog):
             return
 
         try:
-            view = ReportContent(image)
+            view = ReportContent(ctx, image)
             if str(image).endswith(("mp4", "webm")):
                 await ctx.followup.send(image, view=view)
                 await view.wait()
@@ -150,7 +150,7 @@ class nsfw(Cog):
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
             shortened_urls = [shorten_url(img["sample_url"]) for img in images]
-            view = ReportContentPlus(*shortened_urls)
+            view = ReportContentPlus(ctx, *shortened_urls)
             color = Color.random()
             embeds = [
                 Embed(color=color, url="https://yande.re")
@@ -182,7 +182,7 @@ class nsfw(Cog):
         embed.set_image(url=shortened_url)
         footer_text = "Fetched from Yande.re • Credits must go to the artist"
         try:
-            view = ReportContent(shortened_url)
+            view = ReportContent(ctx, shortened_url)
             embed.set_footer(text=footer_text)
             await ctx.followup.send(embed=embed, view=view)
             await view.wait()
@@ -209,7 +209,7 @@ class nsfw(Cog):
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
             try:
                 shortened_urls = [shorten_url(img["file_url"]) for img in images]
-                view = ReportContentPlus(*shortened_urls)
+                view = ReportContentPlus(ctx, *shortened_urls)
                 color = Color.random()
                 embeds = [
                     Embed(color=color, url="https://konachan.com")
@@ -248,7 +248,7 @@ class nsfw(Cog):
         embed.set_image(url=shorten_url(str(image)))
         footer_text = "Fetched from Konachan • Credits must go to the artist"
         try:
-            view = ReportContent(shorten_url(str(image)))
+            view = ReportContent(ctx, shorten_url(str(image)))
             embed.set_footer(text=footer_text)
             await ctx.followup.send(embed=embed, view=view)
             await view.wait()
@@ -273,7 +273,7 @@ class nsfw(Cog):
         image = await Hentai(plus).danbooru(tag)
         if plus:
             images = [img for img in (image[randint(1, len(image)) - 1] for _ in range(4)) if ".zip" not in img["file_url"]]
-            view = ReportContentPlus(*[img["file_url"] for img in images])
+            view = ReportContentPlus(ctx, *[img["file_url"] for img in images])
             vids = [i for i in images if "mp4" in i["file_url"] or "webm" in i["file_url"]]
             media = [j["file_url"] for j in vids]
             if media:
@@ -297,7 +297,7 @@ class nsfw(Cog):
             await ctx.followup.send(embeds=embeds, view=view)
             return
         try:
-            view = ReportContent(image)
+            view = ReportContent(ctx, image)
             if str(image).endswith(("mp4", "webm")):
                 await ctx.followup.send(image, view=view)
                 return

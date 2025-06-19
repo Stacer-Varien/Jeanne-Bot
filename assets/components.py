@@ -32,18 +32,40 @@ def replace_all(text: str, dic: dict):
     return text
 
 class Confirmation(ui.View):
-    def __init__(self, author: User):
+    def __init__(self, ctx:Interaction, author: User):
         super().__init__(timeout=60)
         self.author = author
         self.value = None
 
-    @ui.button(label="Confirm", style=ButtonStyle.green)
+        if ctx.locale.value == "en-GB" or ctx.locale.value=="en-US":
+            self.confirm="Confirm"
+            self.cancel="Cancel"
+        elif ctx.locale.value=="fr":
+            self.confirm = "Confirmer"
+            self.cancel = "Annuler"
+
+        confirm_button=ui.Button(label=self.confirm, style=ButtonStyle.green)
+        cancel_button=ui.Button(label=self.cancel, style=ButtonStyle.red)
+    
+        async def confirm_callback(ctx: Interaction):
+            await self.confirm(ctx, confirm_button)
+
+        async def cancel_callback(ctx: Interaction):
+            await self.cancel(ctx, cancel_button)
+
+        confirm_button.callback = confirm_callback
+        cancel_button.callback = cancel_callback
+
+        self.add_item(confirm_button)
+        self.add_item(cancel_callback)
+        
+    
     async def confirm(self, ctx: Interaction, button: ui.Button):
         self.value = True
         button.disabled = True
         self.stop()
 
-    @ui.button(label="Cancel", style=ButtonStyle.red)
+    
     async def cancel(self, ctx: Interaction, button: ui.Button):
         self.value = False
         button.disabled = True
@@ -54,36 +76,32 @@ class Confirmation(ui.View):
 
 
 class Heads_or_Tails(ui.View):
-    def __init__(self, author: User):
+    def __init__(self, ctx:Interaction, author: User):
         self.author = author
         super().__init__(timeout=30)
         self.value = None
 
-    @ui.button(label="Heads", style=ButtonStyle.green)
-    async def confirm(self, ctx: Interaction, button: ui.Button):
-        self.value = "Heads"
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            self.heads = "Heads"
+            self.tails = "Tails"
+        elif ctx.locale.value == "fr":
+            self.heads = "Face"
+            self.tails = "Pile"
+
+
+        heads = ui.Button(label=self.heads, style=ButtonStyle.green)
+        tails = ui.Button(label=self.tails, style=ButtonStyle.red)
+        heads.callback = lambda ctx: self.button_callback(ctx, self.heads)
+        tails.callback = lambda ctx: self.button_callback(ctx, self.tails)
+        self.add_item(heads)
+        self.add_item(tails)
+
+    async def button_callback(self, ctx: Interaction, label: str):
+        self.value = label
+        for child in self.children:
+            child.disabled = True
         self.stop()
-
-    @ui.button(label="Tails", style=ButtonStyle.green)
-    async def cancel(self, ctx: Interaction, button: ui.Button):
-        self.value = "Tails"
-        self.stop()
-
-    async def interaction_check(self, ctx: Interaction):
-        return ctx.user.id == self.author.id
-
-
-class Cancellation(ui.View):
-    def __init__(self, author: User):
-        super().__init__()
-        self.author = author
-        self.value = None
-
-    @ui.button(label="Cancel", style=ButtonStyle.red)
-    async def cancel(self, ctx: Interaction, button: ui.Button):
-        self.value = "cancel"
-        button.disabled = True
-        self.stop()
+        
 
     async def interaction_check(self, ctx: Interaction):
         return ctx.user.id == self.author.id
@@ -137,7 +155,7 @@ class Welcomingmsg(ui.Modal, title="Welcoming Message"):
             confirm = Embed(
                 description="This is the preview of the welcoming message.\nAre you happy with it?"
             )
-            view = Confirmation(ctx.user)
+            view = Confirmation(ctx, ctx.user)
             try:
                 embeds = [embed, confirm]
             except:
@@ -164,7 +182,7 @@ class Welcomingmsg(ui.Modal, title="Welcoming Message"):
             confirm = Embed(
                 description="Ceci est l'aperçu du message de bienvenue.\nÊtes-vous satisfait ?"
             )
-            view = Confirmation(ctx.user)
+            view = Confirmation(ctx, ctx.user)
             try:
                 embeds = [embed, confirm]
             except:
@@ -236,7 +254,7 @@ class Leavingmsg(ui.Modal, title="Leaving Message"):
             confirm = Embed(
                 description="This is the preview of the leaving message.\nAre you happy with it?"
             )
-            view = Confirmation(ctx.user)
+            view = Confirmation(ctx, ctx.user)
             try:
                 embeds = [embed, confirm]
             except:
@@ -263,7 +281,7 @@ class Leavingmsg(ui.Modal, title="Leaving Message"):
             confirm = Embed(
                 description="Ceci est l'aperçu du message de départ.\nÊtes-vous satisfait ?"
             )
-            view = Confirmation(ctx.user)
+            view = Confirmation(ctx, ctx.user)
             try:
                 embeds = [embed, confirm]
             except:
@@ -297,18 +315,29 @@ class Leavingmsg(ui.Modal, title="Leaving Message"):
 
 
 class Levelmsg(ui.Modal, title="Level Update Message"):
-    def __init__(self, channel: TextChannel) -> None:
+    def __init__(self, ctx:Interaction, channel: TextChannel) -> None:
         super().__init__()
         self.channel = channel
 
-    jsonscript = ui.TextInput(
-        label="JSON",
-        style=TextStyle.paragraph,
-        placeholder="Insert JSON script here. If you don't have, type a plain message as long it follows the parameters",
-        required=True,
-        min_length=1,
-        max_length=4000,
-    )
+        if ctx.locale.value == "en-GB" or ctx.locale.value=="en-US":
+            self.jsonscript = ui.TextInput(
+                label="JSON",
+                style=TextStyle.paragraph,
+                placeholder="Insert JSON script here. If you don't have, type a plain message as long it follows the parameters",
+                required=True,
+                min_length=1,
+                max_length=4000,
+            )
+
+        elif ctx.locale.value=="fr":
+            self.jsonscript = ui.TextInput(
+                label="JSON",
+                style=TextStyle.paragraph,
+                placeholder="Insérez un script JSON ici. Si vous n'en avez pas, tapez un message simple tant qu'il respecte les paramètres",
+                required=True,
+                min_length=1,
+                max_length=4000,
+            )
 
     async def on_submit(self, ctx: Interaction) -> None:
         parameters = OrderedDict(
@@ -327,36 +356,76 @@ class Levelmsg(ui.Modal, title="Level Update Message"):
             embed = Embed.from_dict(json["embeds"][0])
         except:
             content = replace_all(self.jsonscript.value, parameters)
-        confirm = Embed(
-            description="This is the preview of the level update message whenever someone levels up in the server and will be sent to {}.\nAre you happy with it?".format(
-                self.channel.mention
+        if ctx.locale.value=="en-US" or ctx.locale.value=="en-GB":
+            confirm = Embed(
+                description="This is the preview of the level update message whenever someone levels up in the server and will be sent to {}.\nAre you happy with it?".format(
+                    self.channel.mention
+                )
             )
-        )
-        view = Confirmation(ctx.user)
-        try:
-            embeds = [embed, confirm]
-        except:
-            embeds = [confirm]
-        await ctx.response.send_message(
-            content=content,
-            embeds=embeds,
-            view=view,
-            allowed_mentions=AllowedMentions(everyone=False, roles=False, users=False),
-            ephemeral=True,
-        )
-        await view.wait()
-        if view.value == True:
-            await Manage(server=ctx.guild).add_level_channel(
-                self.channel, self.jsonscript.value
+            view = Confirmation(ctx, ctx.user)
+            try:
+                embeds = [embed, confirm]
+            except:
+                embeds = [confirm]
+            await ctx.response.send_message(
+                content=content,
+                embeds=embeds,
+                view=view,
+                allowed_mentions=AllowedMentions(everyone=False, roles=False, users=False),
+                ephemeral=True,
             )
-            embed = Embed(description="Level update message set")
-            await ctx.edit_original_response(content=None, embeds=[embed], view=None)
-        elif view.value == False:
-            embed = Embed(description="Action cancelled")
-            await ctx.edit_original_response(content=None, embeds=[embed], view=None)
-        else:
-            embed = Embed(description="Timeout")
-            await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+            await view.wait()
+            if view.value == True:
+                await Manage(server=ctx.guild).add_level_channel(
+                    self.channel, self.jsonscript.value
+                )
+                embed = Embed(description="Level update message set")
+                await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+            elif view.value == False:
+                embed = Embed(description="Action cancelled")
+                await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+            else:
+                embed = Embed(description="Timeout")
+                await ctx.edit_original_response(content=None, embeds=[embed], view=None)
+        elif ctx.locale.value == "fr":
+            confirm = Embed(
+                description="Ceci est l'aperçu du message de mise à jour de niveau chaque fois que quelqu'un monte de niveau dans le serveur et il sera envoyé dans {}.\nÊtes-vous satisfait ?".format(
+                    self.channel.mention
+                )
+            )
+            view = Confirmation(ctx, ctx.user)
+            try:
+                embeds = [embed, confirm]
+            except:
+                embeds = [confirm]
+            await ctx.response.send_message(
+                content=content,
+                embeds=embeds,
+                view=view,
+                allowed_mentions=AllowedMentions(
+                    everyone=False, roles=False, users=False
+                ),
+                ephemeral=True,
+            )
+            await view.wait()
+            if view.value == True:
+                await Manage(server=ctx.guild).add_level_channel(
+                    self.channel, self.jsonscript.value
+                )
+                embed = Embed(description="Message de mise à jour de niveau défini")
+                await ctx.edit_original_response(
+                    content=None, embeds=[embed], view=None
+                )
+            elif view.value == False:
+                embed = Embed(description="Action annulée")
+                await ctx.edit_original_response(
+                    content=None, embeds=[embed], view=None
+                )
+            else:
+                embed = Embed(description="Temps écoulé")
+                await ctx.edit_original_response(
+                    content=None, embeds=[embed], view=None
+                )
 
 
 class RankUpmsg(ui.Modal, title="Role Reward Message"):
@@ -372,6 +441,15 @@ class RankUpmsg(ui.Modal, title="Role Reward Message"):
             min_length=1,
             max_length=4000,
         )
+        elif ctx.locale.value=="fr":
+            self.jsonscript = ui.TextInput(
+                label="JSON",
+                style=TextStyle.paragraph,
+                placeholder="Insérez un script JSON ici. Si vous n'en avez pas, tapez un message simple tant qu'il respecte les paramètres",
+                required=True,
+                min_length=1,
+                max_length=4000,
+            )
 
     async def on_submit(self, ctx: Interaction) -> None:
         parameters = OrderedDict(
@@ -396,7 +474,7 @@ class RankUpmsg(ui.Modal, title="Role Reward Message"):
             confirm = Embed(
                 description="This is the preview of the role reward message whenever someone recieves a role reward after levelling up in the server and will be sent to the current level update channel\nAre you happy with it?"
             )
-            view = Confirmation(ctx.user)
+            view = Confirmation(ctx, ctx.user)
             try:
                 embeds = [embed, confirm]
             except:
@@ -423,7 +501,7 @@ class RankUpmsg(ui.Modal, title="Role Reward Message"):
             confirm = Embed(
                 description="Ceci est l'aperçu du message de récompense de rôle chaque fois que quelqu'un reçoit une récompense de rôle après avoir monté en niveau dans le serveur et sera envoyé au canal de mise à jour de niveau actuel\nÊtes-vous satisfait ?"
             )
-            view = Confirmation(ctx.user)
+            view = Confirmation(ctx, ctx.user)
             try:
                 embeds = [embed, confirm]
             except:
@@ -519,10 +597,10 @@ class BotReportMenu(ui.Select):
 
 
 class BotReportSelect(ui.View):
-    def __init__(self):
+    def __init__(self, ctx:Interaction):
         self.value = None
         super().__init__(timeout=60)
-        self.add_item(BotReportMenu())
+        self.add_item(BotReportMenu(ctx))
 
 
 class ReportModal(ui.Modal, title="Bot Report"):
@@ -638,17 +716,24 @@ class ReportModal(ui.Modal, title="Bot Report"):
                 report.add_field(name="Steps", value=self.steps.value, inline=False)
         report.set_footer(text="Reporter {}| `{}`".format(ctx.user, ctx.user.id))
         SyncWebhook.from_url(WEBHOOK).send(embed=report)
-        embed = Embed(
-            description="Thank you for submitting your bot report. The developer will look into it but will not tell you the results.\n\nPlease know that your user ID has been logged if you are trolling around."
-        )
+        if ctx.locale.value=="en-GB" or ctx.locale.value=="en-US":
+            embed = Embed(
+                description="Thank you for submitting your bot report. The developer will look into it but will not tell you the results.\n\nPlease know that your user ID has been logged if you are trolling around."
+            )
+        elif ctx.locale.value=="fr":
+            embed = Embed(
+                description="Merci d'avoir soumis votre rapport sur le bot. Le développeur l'examinera mais ne vous communiquera pas les résultats.\n\nVeuillez noter que votre identifiant utilisateur a été enregistré si vous envoyez de faux rapports."
+            )
+        
         await ctx.response.send_message(embed=embed, ephemeral=True)
 
 
-class ForumGuildlines(ui.Modal, title="Forum Guideline"):
+class ForumGuildlines(ui.Modal, title=str):
     def __init__(self, name: str, ctx:Interaction, category: CategoryChannel = None):
+        self.title = "Forum Guideline" if (ctx.locale.value == "en-GB" or ctx.locale.value == "en-US") else "Directives du forum"
         self.name = name
         self.category = category
-        super().__init__()
+        super().__init__(title=self.title)
 
         if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             self.guidelines = ui.TextInput(
@@ -725,274 +810,361 @@ class ReportContentM(ui.Modal, title="Illicit Content Report"):
         report.add_field(name="Reason", value=self.illegalcontent.value, inline=False)
         report.set_footer(text=f"Reporter: {ctx.user} | ID: `{ctx.user.id}`")
         SyncWebhook.from_url(WEBHOOK).send(embed=report)
-        embed = Embed(
+        if ctx.locale.value=="en-GB" or ctx.locale.value=="en-US":
+            embed = Embed(
             description="Thank you for submitting the report. Your user ID has been logged for accountability."
+        )
+        elif ctx.locale.value=="f":
+            embed = Embed(
+            description="Thank you for submitting the report. Your user ID has been logged for accountability."
+        )
+        elif ctx.locale.value=="fr":
+            embed = Embed(
+            description="Merci d'avoir soumis le rapport. Votre identifiant utilisateur a été enregistré à des fins de responsabilité."
         )
         await ctx.response.send_message(embed=embed, ephemeral=True)
 
 
 class ReportContentPlus(ui.View):
     def __init__(
-        self,
+        self, ctx:Interaction,
         link1: Optional[str] = None,
         link2: Optional[str] = None,
         link3: Optional[str] = None,
         link4: Optional[str] = None,
     ):
-        self.link1 = link1
-        self.link2 = link2
-        self.link3 = link3
-        self.link4 = link4
-        self.value = None
         super().__init__(timeout=60)
+        self.links = [link1, link2, link3, link4]
+        self.value = None
+        if ctx.locale.value=="en-GB" or ctx.locale.value=="en-US":
+            labels = [
+                "Report 1st Content",
+                "Report 2nd Content",
+                "Report 3rd Content",
+                "Report 4th Content",
+            ]
+        elif ctx.locale.value=="fr":
+            labels = [
+                "Signaler le 1er contenu",
+                "Signaler le 2ème contenu",
+                "Signaler le 3ème contenu",
+                "Signaler le 4ème contenu",
+            ]
+        for idx, (label, link) in enumerate(zip(labels, self.links)):
+            if link:
+                row = 1 if idx < 2 else 2
+                button = ui.Button(label=label, style=ButtonStyle.grey, row=row)
+                button.callback = self._make_callback(idx)
+                self.add_item(button)
 
-    @ui.button(label="Report 1st Content", style=ButtonStyle.grey, row=1)
-    async def report1(self, ctx: Interaction, button: ui.Button):
-        self.value = "report1"
-        await ctx.response.send_modal(ReportContentM(self.link1))
-        button.disabled = True
-        await ctx.edit_original_response(view=self)
-
-    @ui.button(label="Report 2nd Content", style=ButtonStyle.grey, row=1)
-    async def report2(self, ctx: Interaction, button: ui.Button):
-        self.value = "report2"
-        await ctx.response.send_modal(ReportContentM(self.link2))
-        button.disabled = True
-        await ctx.edit_original_response(view=self)
-
-    @ui.button(label="Report 3rd Content", style=ButtonStyle.grey, row=2)
-    async def report3(self, ctx: Interaction, button: ui.Button):
-        self.value = "report3"
-        await ctx.response.send_modal(ReportContentM(self.link3))
-        button.disabled = True
-        await ctx.edit_original_response(view=self)
-
-    @ui.button(label="Report 4th Content", style=ButtonStyle.grey, row=2)
-    async def report4(self, ctx: Interaction, button: ui.Button):
-        self.value = "report4"
-        await ctx.response.send_modal(ReportContentM(self.link4))
-        button.disabled = True
-        await ctx.edit_original_response(view=self)
+    def _make_callback(self, idx):
+        async def callback(ctx: Interaction, button: ui.Button = None):
+            self.value = f"report{idx+1}"
+            await ctx.response.send_modal(ReportContentM(ctx, self.links[idx]))
+            if button:
+                button.disabled = True
+                await ctx.edit_original_response(view=self)
+        return callback
 
 
 class ReportContent(ui.View):
-    def __init__(self, link: str):
+    def __init__(self, ctx:Interaction, link: str):
         super().__init__(timeout=180)
         self.link = link
         self.value = None
 
-    @ui.button(label="Report Content", style=ButtonStyle.grey)
-    async def report1(self, ctx: Interaction, button: ui.Button):
-        self.value = "report"
-        await ctx.response.send_modal(ReportContentM(ctx, self.link))
+        if ctx.locale.value=="en-GB" or ctx.locale.value=="en-US":
+            label="Report Content"
+        
+        if ctx.locale.value=="fr":
+            label="Signaler le contenu"
+
+        report_button=ui.Button(label=label, style=ButtonStyle.grey)
+        
+        async def report1(self, ctx: Interaction):
+            self.value = "report"
+            await ctx.response.send_modal(ReportContentM(ctx, self.link))
+        
+        report_button.callback=report1
+
+        self.add_item(report_button)
 
 
 class RemoveManage(ui.View):
-    def __init__(self, author: User):
+    def __init__(self, ctx:Interaction, author: User):
         super().__init__(timeout=180)
         self.value = None
         self.author = author
 
-    @ui.button(label="Welcoming Channel", style=ButtonStyle.gray, row=1)
+        if ctx.locale.value=="en-GB" or ctx.locale.value=="en-US":
+            labels = [
+                "Welcoming Channel",
+                "Greeting Message",
+                "Leaving Channel",
+                "Leaving Message",
+                "Level Update Channel",
+                "Level Update Message",
+                "Role Reward Message",
+                "Modlog"
+            ]
+
+        elif ctx.locale.value=="fr":
+            labels = [
+                "Canal de bienvenue",
+                "Message de bienvenue",
+                "Canal de départ",
+                "Message de départ",
+                "Canal de mise à jour de niveau",
+                "Message de mise à jour de niveau",
+                "Message de récompense de rôle",
+                "Modlog",
+            ]
+
+        welcomer_button = ui.Button(label=labels[0], style=ButtonStyle.gray, row=1)
+        greeting_button = ui.Button(label=labels[1], style=ButtonStyle.gray, row=1)
+        leaving_buttion = ui.Button(label=labels[2], style=ButtonStyle.gray, row=1)
+        bye_button = ui.Button(label=labels[3], style=ButtonStyle.gray, row=1)
+        levelup_button = ui.Button(label=labels[4], style=ButtonStyle.gray, row=2)
+        levelupdate_button = ui.Button(label=labels[5], style=ButtonStyle.gray, row=2)
+        rolereward_button = ui.Button(label=labels[6], style=ButtonStyle.gray, row=2)
+        modlog_button = ui.Button(label=labels[7], style=ButtonStyle.gray, row=2)
+
+        async def welcomer_callback(ctx: Interaction):
+            await self.welcomer(ctx, welcomer_button)
+
+        async def greeting_callback(ctx: Interaction):
+            await self.welcomemsg(ctx, greeting_button)
+
+        async def leaving_callback(ctx: Interaction):
+            await self.leaving(ctx, leaving_buttion)
+
+        async def bye_callback(ctx: Interaction):
+            await self.leavingmsg(ctx, bye_button)
+
+        async def levelup_callback(ctx: Interaction):
+            await self.level(ctx, levelup_button)
+
+        async def levelupdate_callback(ctx: Interaction):
+            await self.levelupdate(ctx, levelupdate_button)
+
+        async def rolereward_callback(ctx: Interaction):
+            await self.rolereward(ctx, rolereward_button)
+
+        async def modlog_callback(ctx: Interaction):
+            await self.modlog(ctx, modlog_button)
+
+        welcomer_button.callback = welcomer_callback
+        greeting_button.callback = greeting_callback
+        leaving_buttion.callback = leaving_callback
+        bye_button.callback = bye_callback
+        levelup_button.callback = levelup_callback
+        levelupdate_button.callback = levelupdate_callback
+        rolereward_button.callback = rolereward_callback
+        modlog_button.callback = modlog_callback
+
+        self.add_item(welcomer_button)
+        self.add_item(greeting_button)
+        self.add_item(leaving_buttion)
+        self.add_item(bye_button)
+        self.add_item(levelup_button)
+        self.add_item(levelupdate_button)
+        self.add_item(rolereward_button)
+        self.add_item(modlog_button)
+
     async def welcomer(self, ctx: Interaction, button: ui.Button):
-        self.value = "welcomer"
-        Embed()
-        check = Welcomer(ctx.guild).get_welcomer
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            if check == None:
-                button.label = "No welcoming channel found"
-                button.style = ButtonStyle.danger
+            self.value = "welcomer"
+            Embed()
+            check = Welcomer(ctx.guild).get_welcomer
+            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+                if check == None:
+                    button.label = "No welcoming channel found"
+                    button.style = ButtonStyle.danger
+                    await ctx.response.edit_message(view=self)
+                    return
+                button.style = ButtonStyle.green
+                await Manage(ctx.guild).remove_welcomer()
+                button.label = "Welcomer Channel Removed"
                 await ctx.response.edit_message(view=self)
-                return
-            button.style = ButtonStyle.green
-            await Manage(ctx.guild).remove_welcomer()
-            button.label = "Welcomer Channel Removed"
-            await ctx.response.edit_message(view=self)
-        elif ctx.locale.value == "fr":
-            if check == None:
-                button.label = "Aucun canal de bienvenue trouvé"
-                button.style = ButtonStyle.danger
+            elif ctx.locale.value == "fr":
+                if check == None:
+                    button.label = "Aucun canal de bienvenue trouvé"
+                    button.style = ButtonStyle.danger
+                    await ctx.response.edit_message(view=self)
+                    return
+                button.style = ButtonStyle.green
+                await Manage(ctx.guild).remove_welcomer()
+                button.label = "Canal de bienvenue supprimé"
                 await ctx.response.edit_message(view=self)
-                return
-            button.style = ButtonStyle.green
-            await Manage(ctx.guild).remove_welcomer()
-            button.label = "Canal de bienvenue supprimé"
-            await ctx.response.edit_message(view=self)
 
-    @ui.button(label="Greeting Message", style=ButtonStyle.gray, row=1)
     async def welcomemsg(self, ctx: Interaction, button: ui.Button):
-        self.value = "welcomemsg"
-        check = Welcomer(ctx.guild).get_welcoming_msg
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            if check == None:
-                button.style = ButtonStyle.danger
-                button.label = "No welcoming message set"
+            self.value = "welcomemsg"
+            check = Welcomer(ctx.guild).get_welcoming_msg
+            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+                if check == None:
+                    button.style = ButtonStyle.danger
+                    button.label = "No welcoming message set"
+                    await ctx.response.edit_message(view=self)
+                    return
+                button.style = ButtonStyle.green
+                button.label = "Welcoming Message Removed"
+                await Manage(ctx.guild).remove_welcomemsg()
                 await ctx.response.edit_message(view=self)
-                return
-            button.style = ButtonStyle.green
-            button.label = "Welcoming Message Removed"
-            await Manage(ctx.guild).remove_welcomemsg()
-            await ctx.response.edit_message(view=self)
-        elif ctx.locale.value == "fr":
-            if check == None:
-                button.style = ButtonStyle.danger
-                button.label = "Aucun message de bienvenue défini"
+            elif ctx.locale.value == "fr":
+                if check == None:
+                    button.style = ButtonStyle.danger
+                    button.label = "Aucun message de bienvenue défini"
+                    await ctx.response.edit_message(view=self)
+                    return
+                button.style = ButtonStyle.green
+                button.label = "Message de bienvenue supprimé"
+                await Manage(ctx.guild).remove_welcomemsg()
                 await ctx.response.edit_message(view=self)
-                return
-            button.style = ButtonStyle.green
-            button.label = "Message de bienvenue supprimé"
-            await Manage(ctx.guild).remove_welcomemsg()
-            await ctx.response.edit_message(view=self)
 
-    @ui.button(label="Leaving Channel", style=ButtonStyle.gray, row=1)
     async def leaving(self, ctx: Interaction, button: ui.Button):
-        self.value = "leaver"
-        check = Welcomer(ctx.guild).get_leaver
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            if check == None:
-                button.style = ButtonStyle.danger
-                button.label = "No leaving channel found"
-                await ctx.response.edit_message(view=self)
-            else:
-                button.style = ButtonStyle.green
-                button.label = "Leaving Channel Removed"
-                await Manage(ctx.guild).remove_leaver()
-                await ctx.response.edit_message(view=self)
-        elif ctx.locale.value == "fr":
-            if check == None:
-                button.style = ButtonStyle.danger
-                button.label = "Aucun canal de départ trouvé"
-                await ctx.response.edit_message(view=self)
-            else:
-                button.style = ButtonStyle.green
-                button.label = "Canal de départ supprimé"
-                await Manage(ctx.guild).remove_leaver()
-                await ctx.response.edit_message(view=self)
+            self.value = "leaver"
+            check = Welcomer(ctx.guild).get_leaver
+            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+                if check == None:
+                    button.style = ButtonStyle.danger
+                    button.label = "No leaving channel found"
+                    await ctx.response.edit_message(view=self)
+                else:
+                    button.style = ButtonStyle.green
+                    button.label = "Leaving Channel Removed"
+                    await Manage(ctx.guild).remove_leaver()
+                    await ctx.response.edit_message(view=self)
+            elif ctx.locale.value == "fr":
+                if check == None:
+                    button.style = ButtonStyle.danger
+                    button.label = "Aucun canal de départ trouvé"
+                    await ctx.response.edit_message(view=self)
+                else:
+                    button.style = ButtonStyle.green
+                    button.label = "Canal de départ supprimé"
+                    await Manage(ctx.guild).remove_leaver()
+                    await ctx.response.edit_message(view=self)
 
-    @ui.button(label="Leaving Message", style=ButtonStyle.gray, row=1)
     async def leavingmsg(self, ctx: Interaction, button: ui.Button):
-        self.value = "leavingmsg"
-        check = Welcomer(ctx.guild).get_leaving_msg
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            if check == None:
-                button.style = ButtonStyle.danger
-                button.label = "No leaving message set"
+            self.value = "leavingmsg"
+            check = Welcomer(ctx.guild).get_leaving_msg
+            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+                if check == None:
+                    button.style = ButtonStyle.danger
+                    button.label = "No leaving message set"
+                    await ctx.response.edit_message(view=self)
+                    return
+                button.style = ButtonStyle.green
+                button.label = "Leaving Message Removed"
+                await Manage(ctx.guild).remove_leavingmsg()
                 await ctx.response.edit_message(view=self)
-                return
-            button.style = ButtonStyle.green
-            button.label = "Leaving Message Removed"
-            await Manage(ctx.guild).remove_leavingmsg()
-            await ctx.response.edit_message(view=self)
-        elif ctx.locale.value == "fr":
-            if check == None:
-                button.style = ButtonStyle.danger
-                button.label = "Aucun message de départ défini"
+            elif ctx.locale.value == "fr":
+                if check == None:
+                    button.style = ButtonStyle.danger
+                    button.label = "Aucun message de départ défini"
+                    await ctx.response.edit_message(view=self)
+                    return
+                button.style = ButtonStyle.green
+                button.label = "Message de départ supprimé"
+                await Manage(ctx.guild).remove_leavingmsg()
                 await ctx.response.edit_message(view=self)
-                return
-            button.style = ButtonStyle.green
-            button.label = "Message de départ supprimé"
-            await Manage(ctx.guild).remove_leavingmsg()
-            await ctx.response.edit_message(view=self)
 
-    @ui.button(label="Level Update Channel", style=ButtonStyle.gray, row=2)
     async def level(self, ctx: Interaction, button: ui.Button):
-        self.value = "levelup"
-        check = Levelling(server=ctx.guild).get_levelup_channel
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            if check == None:
-                button.style = ButtonStyle.danger
-                button.label = "No level update channel found"
+            self.value = "levelup"
+            check = Levelling(server=ctx.guild).get_levelup_channel
+            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+                if check == None:
+                    button.style = ButtonStyle.danger
+                    button.label = "No level update channel found"
+                    await ctx.response.edit_message(view=self)
+                    return
+                button.style = ButtonStyle.green
+                button.label = "Level Update Channel Removed"
+                await Manage(ctx.guild).remove_levelup()
                 await ctx.response.edit_message(view=self)
-                return
-            button.style = ButtonStyle.green
-            button.label = "Level Update Channel Removed"
-            await Manage(ctx.guild).remove_levelup()
-            await ctx.response.edit_message(view=self)
-        elif ctx.locale.value == "fr":
-            if check == None:
-                button.style = ButtonStyle.danger
-                button.label = "Aucun canal de mise à jour de niveau trouvé"
+            elif ctx.locale.value == "fr":
+                if check == None:
+                    button.style = ButtonStyle.danger
+                    button.label = "Aucun canal de mise à jour de niveau trouvé"
+                    await ctx.response.edit_message(view=self)
+                    return
+                button.style = ButtonStyle.green
+                button.label = "Canal de mise à jour de niveau supprimé"
+                await Manage(ctx.guild).remove_levelup()
                 await ctx.response.edit_message(view=self)
-                return
-            button.style = ButtonStyle.green
-            button.label = "Canal de mise à jour de niveau supprimé"
-            await Manage(ctx.guild).remove_levelup()
-            await ctx.response.edit_message(view=self)
 
-    @ui.button(label="Level Update Message", style=ButtonStyle.gray, row=2)
     async def levelupdate(self, ctx: Interaction, button: ui.Button):
-        self.value = "levelnotif"
-        check = Levelling(server=ctx.guild).get_levelup_msg
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            if check == None:
-                button.style = ButtonStyle.danger
-                button.label = "No level update message set"
+            self.value = "levelnotif"
+            check = Levelling(server=ctx.guild).get_levelup_msg
+            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+                if check == None:
+                    button.style = ButtonStyle.danger
+                    button.label = "No level update message set"
+                    await ctx.response.edit_message(view=self)
+                    return
+                button.style = ButtonStyle.green
+                button.label = "Level Update Message Removed"
+                await Manage(ctx.guild).remove_levelup_msg()
                 await ctx.response.edit_message(view=self)
-                return
-            button.style = ButtonStyle.green
-            button.label = "Level Update Message Removed"
-            await Manage(ctx.guild).remove_levelup_msg()
-            await ctx.response.edit_message(view=self)
-        elif ctx.locale.value == "fr":
-            if check == None:
-                button.style = ButtonStyle.danger
-                button.label = "Aucun message de mise à jour de niveau défini"
+            elif ctx.locale.value == "fr":
+                if check == None:
+                    button.style = ButtonStyle.danger
+                    button.label = "Aucun message de mise à jour de niveau défini"
+                    await ctx.response.edit_message(view=self)
+                    return
+                button.style = ButtonStyle.green
+                button.label = "Message de mise à jour de niveau supprimé"
+                await Manage(ctx.guild).remove_levelup_msg()
                 await ctx.response.edit_message(view=self)
-                return
-            button.style = ButtonStyle.green
-            button.label = "Message de mise à jour de niveau supprimé"
-            await Manage(ctx.guild).remove_levelup_msg()
-            await ctx.response.edit_message(view=self)
 
-    @ui.button(label="Role Reward Message", style=ButtonStyle.gray, row=2)
     async def rolereward(self, ctx: Interaction, button: ui.Button):
-        self.value = "rolereward"
-        check = Levelling(server=ctx.guild).get_rank_up_update
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            if check == None:
-                button.style = ButtonStyle.danger
-                button.label = "No role reward message set"
+            self.value = "rolereward"
+            check = Levelling(server=ctx.guild).get_rank_up_update
+            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+                if check == None:
+                    button.style = ButtonStyle.danger
+                    button.label = "No role reward message set"
+                    await ctx.response.edit_message(view=self)
+                    return
+                button.style = ButtonStyle.green
+                button.label = "Role Reward Message Removed"
+                await Manage(ctx.guild).remove_rolereward_msg()
                 await ctx.response.edit_message(view=self)
-                return
-            button.style = ButtonStyle.green
-            button.label = "Role Reward Message Removed"
-            await Manage(ctx.guild).remove_rolereward_msg()
-            await ctx.response.edit_message(view=self)
-        elif ctx.locale.value == "fr":
-            if check == None:
-                button.style = ButtonStyle.danger
-                button.label = "Aucun message de récompense de rôle défini"
+            elif ctx.locale.value == "fr":
+                if check == None:
+                    button.style = ButtonStyle.danger
+                    button.label = "Aucun message de récompense de rôle défini"
+                    await ctx.response.edit_message(view=self)
+                    return
+                button.style = ButtonStyle.green
+                button.label = "Message de récompense de rôle supprimé"
+                await Manage(ctx.guild).remove_rolereward_msg()
                 await ctx.response.edit_message(view=self)
-                return
-            button.style = ButtonStyle.green
-            button.label = "Message de récompense de rôle supprimé"
-            await Manage(ctx.guild).remove_rolereward_msg()
-            await ctx.response.edit_message(view=self)
 
-    @ui.button(label="Modlog", style=ButtonStyle.gray, row=2)
     async def modlog(self, ctx: Interaction, button: ui.Button):
-        self.value = "modlog"
-        check = Moderation(ctx.guild).get_modlog_channel
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            if check == None:
-                button.style = ButtonStyle.danger
-                button.label = "No modlog found"
+            self.value = "modlog"
+            check = Moderation(ctx.guild).get_modlog_channel
+            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+                if check == None:
+                    button.style = ButtonStyle.danger
+                    button.label = "No modlog found"
+                    await ctx.response.edit_message(view=self)
+                    return
+                button.style = ButtonStyle.green
+                button.label = "Modlog Removed"
+                await Manage(ctx.guild).remove_modloger()
                 await ctx.response.edit_message(view=self)
-                return
-            button.style = ButtonStyle.green
-            button.label = "Modlog Removed"
-            await Manage(ctx.guild).remove_modloger()
-            await ctx.response.edit_message(view=self)
-        elif ctx.locale.value == "fr":
-            if check == None:
-                button.style = ButtonStyle.danger
-                button.label = "Aucun modlog trouvé"
+            elif ctx.locale.value == "fr":
+                if check == None:
+                    button.style = ButtonStyle.danger
+                    button.label = "Aucun modlog trouvé"
+                    await ctx.response.edit_message(view=self)
+                    return
+                button.style = ButtonStyle.green
+                button.label = "Modlog supprimé"
+                await Manage(ctx.guild).remove_modloger()
                 await ctx.response.edit_message(view=self)
-                return
-            button.style = ButtonStyle.green
-            button.label = "Modlog supprimé"
-            await Manage(ctx.guild).remove_modloger()
-            await ctx.response.edit_message(view=self)
+
+
 
     async def interaction_check(self, ctx: Interaction):
         return ctx.user.id == self.author.id
@@ -1005,6 +1177,8 @@ class RolesButton(ui.View):
         self.member = member
         self.Roles = Roles
         self.Uinfo = Uinfo
+
+        roles_button=...
 
     @ui.button(label="Roles", style=ButtonStyle.blurple)
     async def roles(self, ctx: Interaction, button: ui.Button):
@@ -1146,7 +1320,7 @@ async def buy_function_app(bot: Bot, ctx: Interaction, name: str):
             .add_field(name="Cost", value="1000 <:quantumpiece:1161010445205905418>")
             .set_footer(text="Is this the background you wanted?")
         )
-        view = Confirmation(ctx.user)
+        view = Confirmation(ctx, ctx.user)
         await ctx.edit_original_response(
             content=None, attachments=[file], embed=preview, view=view
         )
@@ -1181,7 +1355,7 @@ async def buy_function_app(bot: Bot, ctx: Interaction, name: str):
             .add_field(name="Coût", value="1000 <:quantumpiece:1161010445205905418>")
             .set_footer(text="Est-ce le fond que vous vouliez ?")
         )
-        view = Confirmation(ctx.user)
+        view = Confirmation(ctx, ctx.user)
         await ctx.edit_original_response(
             content=None, attachments=[file], embed=preview, view=view
         )
@@ -1341,9 +1515,9 @@ class DevWarningMenu(ui.Select):
             options=options,
         )
 
-    async def callback(self, ctx: Interaction):
+    async def callback(self, ctx: Interaction, user:User):
 
-        await ctx.response.send_modal(DevWarningReasonM(self.options[0].label))
+        await ctx.response.send_modal(DevWarningReasonM(user, self.options[0].label))
         try:
             await ctx.message.delete()
         except:
