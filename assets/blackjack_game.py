@@ -1,3 +1,4 @@
+from functools import partial
 from random import randint
 from typing import Optional
 from discord import ButtonStyle, Color, Embed, Interaction, ui
@@ -38,8 +39,15 @@ def deal_card(deck: list[tuple[str, str]]) -> tuple[str, str]:
 
 
 class BlackjackView(ui.View):
+
     def __init__(
-        self, bot: Bot, deck, player_hand, dealer_hand, bet: Optional[int] = None
+        self,
+        bot: Bot,
+        ctx: Interaction,
+        deck,
+        player_hand,
+        dealer_hand,
+        bet: Optional[int] = None,
     ):
         super().__init__(timeout=60)
         self.deck = deck
@@ -47,11 +55,35 @@ class BlackjackView(ui.View):
         self.dealer_hand = dealer_hand
         self.player_value = calculate_hand(player_hand)
         self.dealer_value = calculate_hand(dealer_hand)
-        self.embed = self.create_embed()
+        self.embed = self.create_embed(ctx)
         self.bet = bet
         self.value = None
         self.bot = bot
         self.topggpy = DBLClient(bot=self.bot, token=TOPGG)
+
+        hit_button = ui.Button(
+            label="Hit" if ctx.locale.value in ["en-GB", "en-US"] else "Tirer",
+            style=ButtonStyle.primary,
+            custom_id="blackjack_hit"
+        )
+        stand_button = ui.Button(
+            label="Stand" if ctx.locale.value in ["en-GB", "en-US"] else "Rester",
+            style=ButtonStyle.danger,
+            custom_id="blackjack_stand"
+        )
+
+        async def hit_callback(ctx: Interaction):
+            await self.hit(ctx, hit_button)
+
+        async def stand_callback(ctx: Interaction):
+            await self.stand(ctx, stand_button)
+
+        hit_button.callback = hit_callback
+        stand_button.callback = stand_callback
+
+        self.add_item(hit_button)
+        self.add_item(stand_button)
+        
 
     def create_embed(self, ctx: Interaction):
         if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
@@ -87,7 +119,7 @@ class BlackjackView(ui.View):
     def hand_value_string(self, hand, value):
         return f"**{value}** ({self.hand_to_string(hand)})"
 
-    @ui.button(label="Hit", style=ButtonStyle.primary)
+    
     async def hit(
         self,
         ctx: Interaction,
@@ -122,7 +154,6 @@ class BlackjackView(ui.View):
 
         await ctx.response.edit_message(embed=self.embed, view=self)
 
-    @ui.button(label="Stand", style=ButtonStyle.danger)
     async def stand(
         self,
         ctx: Interaction,

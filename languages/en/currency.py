@@ -270,7 +270,7 @@ class Flip_Group():
         await ctx.response.defer()
         picks = ["Heads", "Tails"]
         jeannes_pick = choice(picks)
-        view = Heads_or_Tails(ctx.user)
+        view = Heads_or_Tails(ctx, ctx.user)
         ask = Embed(description="Heads or Tails?", color=Color.random())
         await ctx.followup.send(embed=ask, view=view)
         await view.wait()
@@ -326,7 +326,7 @@ class Flip_Group():
             )
             await ctx.followup.send(embed=zerobal)
             return
-        view = Heads_or_Tails(ctx.user)
+        view = Heads_or_Tails(ctx, ctx.user)
         ask = Embed(description="Heads or Tails?")
         await ctx.followup.send(embed=ask, view=view)
         await view.wait()
@@ -407,7 +407,7 @@ class Blackjack_Group():
         player_hand = [deal_card(deck), deal_card(deck)]
         dealer_hand = [deal_card(deck), deal_card(deck)]
 
-        view = BlackjackView(self.bot, deck, player_hand, dealer_hand)
+        view = BlackjackView(self.bot, ctx, deck, player_hand, dealer_hand)
         await ctx.followup.send(embed=view.embed, view=view)
 
         await view.wait()
@@ -449,7 +449,7 @@ class Blackjack_Group():
         player_hand = [deal_card(deck), deal_card(deck)]
         dealer_hand = [deal_card(deck), deal_card(deck)]
 
-        view = BlackjackView(self.bot, deck, player_hand, dealer_hand, bet)
+        view = BlackjackView(self.bot, ctx, deck, player_hand, dealer_hand, bet)
         await ctx.followup.send(embed=view.embed, view=view)
 
         await view.wait()

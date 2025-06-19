@@ -180,7 +180,6 @@ class Dice_Group():
         embed = Embed(description=f"Oh non. Il a roulé un **{rolled}**", color=Color.red())
         await ctx.edit_original_response(embed=embed, view=None)
 
-
     async def bet(
         self,
         ctx: Interaction,
@@ -242,126 +241,6 @@ class Dice_Group():
                       color=Color.red())
         await ctx.edit_original_response(embed=embed, view=None)
 
-
-    async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-            reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
-            reset_hour = round(reset_hour_time.timestamp())
-            cooldown = Embed(
-                description=f"Vous avez déjà utilisé votre chance gratuite\nEssayez à nouveau après <t:{reset_hour}:R>",
-                color=Color.red(),
-            )
-            await ctx.response.send_message(embed=cooldown)
-
-    async def bet_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-            cooldown = Embed(
-                description=f"WOAH! Calmez-vous!\nEssayez à nouveau après `{round(error.retry_after, 2)} secondes`",
-                color=Color.red(),
-            )
-            await ctx.response.send_message(embed=cooldown)
-
-
-class Flip_Group():
-    def __init__(self, bot: Bot) -> None:
-        self.bot = bot
-        self.topggpy = DBLClient(bot=self.bot, token=TOPGG)
-
-    async def free(self, ctx: Interaction):
-        await ctx.response.defer()
-        picks = ["Heads", "Tails"]
-        jeannes_pick = choice(picks)
-        view = Heads_or_Tails(ctx.user)
-        ask = Embed(description="Heads or Tails?", color=Color.random())
-        await ctx.followup.send(embed=ask, view=view)
-        await view.wait()
-        if view.value == jeannes_pick:
-            await Currency(ctx.user).add_qp(20)
-            embed = Embed(
-                description="YAY ! Vous avez réussi!\n20 <:quantumpiece:1161010445205905418> a été ajouté",
-                color=Color.random(),
-            )
-            if await self.topggpy.get_user_vote(ctx.user.id) == True:
-                await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
-                embed.add_field(
-                    name="TopGG Bonus",
-                    value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>",
-                )
-                if await BetaTest(self.bot).check(ctx.user) == True:
-                    await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
-                    embed.add_field(
-                        name="Beta User Bonus",
-                        value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>",
-                    )
-            await ctx.edit_original_response(embed=embed, view=None)
-            return
-        if view.value != jeannes_pick:
-            embed = Embed(description="Oh non, c'était {}".format(jeannes_pick),
-                color=Color.red(),
-            )
-            await ctx.edit_original_response(embed=embed, view=None)
-            return
-        timeout = Embed(
-            description=f"Désolé, mais vous avez été trop long. C'était {jeannes_pick}",
-            color=Color.red(),
-        )
-        await ctx.edit_original_response(embed=timeout, view=None)
-
-    async def bet(self, ctx: Interaction, bet: int):
-        await ctx.response.defer()
-        picks = ["Heads", "Tails"]
-        jeannes_pick = choice(picks)
-        balance = Currency(ctx.user).get_balance
-        if balance < bet:
-            betlower = Embed(
-                description=f"Votre solde est trop bas!\nVeuillez parier moins de {balance} <:quantumpiece:1161010445205905418>"
-            )
-            await ctx.followup.send(embed=betlower)
-            return
-        if balance == 0:
-            zerobal = Embed(
-                description="Malheureusement, vous avez 0 <:quantumpiece:1161010445205905418>."
-            )
-            await ctx.followup.send(embed=zerobal)
-            return
-        view = Heads_or_Tails(ctx.user)
-        ask = Embed(description="Heads or Tails?")
-        await ctx.followup.send(embed=ask, view=view)
-        await view.wait()
-        if view.value == jeannes_pick:
-            await Currency(ctx.user).add_qp(bet)
-            embed = Embed(
-                description="YAY ! Vous avez réussi!\n{} <:quantumpiece:1161010445205905418> a été ajouté".format(
-                    bet
-                ),
-            )
-            if await self.topggpy.get_user_vote(ctx.user.id) == True:
-                await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
-                embed.add_field(
-                    name="TopGG Bonus",
-                    value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
-                )
-                if await BetaTest(self.bot).check(ctx.user) == True:
-                    await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
-                    embed.add_field(
-                        name="Beta User Bonus",
-                        value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
-                    )
-            await ctx.edit_original_response(embed=embed, view=None)
-            return
-        if view.value != jeannes_pick:
-            await Currency(ctx.user).remove_qp(int(bet))
-            embed = Embed(color=Color.red())
-            embed = Embed(
-                description=f"Oh non. C'était {jeannes_pick}\nJe suis désolé mais je dois vous prendre {bet} <:quantumpiece:1161010445205905418>",
-                color=Color.red(),
-            )
-            await ctx.edit_original_response(embed=embed, view=None)
-            return
-        timeout = Embed(
-            description=f"Désolé, mais vous avez été trop long. C'était {jeannes_pick}",
-            color=Color.red(),
-        )
-        await ctx.edit_original_response(embed=timeout, view=None)
-
     async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
         reset_hour = round(reset_hour_time.timestamp())
@@ -371,11 +250,129 @@ class Flip_Group():
             )
         await ctx.response.send_message(embed=cooldown)
 
-    async def bet_error(self, ctx: Interaction, error: Jeanne.errors.AppCommandError):
+    async def bet_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         cooldown = Embed(
                 description=f"WOAH! Calmez-vous!\nEssayez à nouveau après `{round(error.retry_after, 2)} secondes`",
                 color=Color.red(),
             )
+        await ctx.response.send_message(embed=cooldown)
+
+
+class Flip_Group:
+    def __init__(self, bot: Bot) -> None:
+        self.bot = bot
+        super().__init__()
+        self.topggpy = DBLClient(bot=self.bot, token=TOPGG)
+
+    async def free(self, ctx: Interaction):
+        await ctx.response.defer()
+        picks = ["Pile", "Face"]
+        jeannes_pick = choice(picks)
+        view = Heads_or_Tails(ctx, ctx.user)
+        ask = Embed(description="Pile ou Face ?", color=Color.random())
+        await ctx.followup.send(embed=ask, view=view)
+        await view.wait()
+        if view.value == jeannes_pick:
+            await Currency(ctx.user).add_qp(20)
+            embed = Embed(
+                description="YAY! Vous avez trouvé !\n20 <:quantumpiece:1161010445205905418> ont été ajoutés",
+                color=Color.random(),
+            )
+            if await self.topggpy.get_user_vote(ctx.user.id) == True:
+                await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
+                embed.add_field(
+                    name="Bonus TopGG",
+                    value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>",
+                )
+                if await BetaTest(self.bot).check(ctx.user) == True:
+                    await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
+                    embed.add_field(
+                        name="Bonus Utilisateur Beta",
+                        value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>",
+                    )
+            await ctx.edit_original_response(embed=embed, view=None)
+            return
+        if view.value != jeannes_pick:
+            embed = Embed(
+                description=f"Oh non, c'était {jeannes_pick}",
+                color=Color.red(),
+            )
+            await ctx.edit_original_response(embed=embed, view=None)
+            return
+        timeout = Embed(
+            description=f"Désolé, mais vous avez mis trop de temps. C'était {jeannes_pick}",
+            color=Color.red(),
+        )
+        await ctx.edit_original_response(embed=timeout, view=None)
+
+    async def bet(self, ctx: Interaction, bet: int):
+        await ctx.response.defer()
+        picks = ["Pile", "Face"]
+        jeannes_pick = choice(picks)
+        balance = Currency(ctx.user).get_balance
+        if balance < bet:
+            betlower = Embed(
+                description=f"Votre solde est trop bas !\nVeuillez parier moins de {balance} <:quantumpiece:1161010445205905418>"
+            )
+            await ctx.followup.send(embed=betlower)
+            return
+        if balance == 0:
+            zerobal = Embed(
+                description="Malheureusement, vous avez 0 <:quantumpiece:1161010445205905418>."
+            )
+            await ctx.followup.send(embed=zerobal)
+            return
+        view = Heads_or_Tails(ctx, ctx.user)
+        ask = Embed(description="Pile ou Face ?")
+        await ctx.followup.send(embed=ask, view=view)
+        await view.wait()
+        if view.value == jeannes_pick:
+            await Currency(ctx.user).add_qp(bet)
+            embed = Embed(
+                description=f"YAY! Vous avez trouvé !\n{bet} <:quantumpiece:1161010445205905418> ont été ajoutés"
+            )
+            if await self.topggpy.get_user_vote(ctx.user.id) == True:
+                await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
+                embed.add_field(
+                    name="Bonus TopGG",
+                    value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
+                )
+                if await BetaTest(self.bot).check(ctx.user) == True:
+                    await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
+                    embed.add_field(
+                        name="Bonus Utilisateur Beta",
+                        value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
+                    )
+            await ctx.edit_original_response(embed=embed, view=None)
+            return
+        if view.value != jeannes_pick:
+            await Currency(ctx.user).remove_qp(int(bet))
+            embed = Embed(
+                description=f"Oh non, c'était {jeannes_pick}\nJe suis désolé mais je dois vous prendre {bet} <:quantumpiece:1161010445205905418>",
+                color=Color.red(),
+            )
+            await ctx.edit_original_response(embed=embed, view=None)
+            return
+        timeout = Embed(
+            description=f"Désolé, mais vous avez mis trop de temps. C'était {jeannes_pick}",
+            color=Color.red(),
+        )
+        await ctx.edit_original_response(embed=timeout, view=None)
+
+    async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+        reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
+        reset_hour = round(reset_hour_time.timestamp())
+        cooldown = Embed(
+            description=f"Vous avez déjà utilisé votre chance gratuite\nEssayez à nouveau après <t:{reset_hour}:R>",
+            color=Color.red(),
+        )
+        await ctx.response.send_message(embed=cooldown)
+
+    async def bet_error(self, ctx: Interaction, error: Jeanne.errors.AppCommandError):
+        cooldown = Embed(
+            description=f"WOAH! Calmez-vous !\nEssayez à nouveau après `{round(error.retry_after, 2)} secondes`",
+            color=Color.red(),
+        )
         await ctx.response.send_message(embed=cooldown)
 
 
@@ -400,7 +397,7 @@ class Blackjack_Group():
         player_hand = [deal_card(deck), deal_card(deck)]
         dealer_hand = [deal_card(deck), deal_card(deck)]
 
-        view = BlackjackView(self.bot, deck, player_hand, dealer_hand)
+        view = BlackjackView(self.bot, ctx, deck, player_hand, dealer_hand)
         await ctx.followup.send(embed=view.embed, view=view)
 
         await view.wait()
@@ -442,7 +439,7 @@ class Blackjack_Group():
         player_hand = [deal_card(deck), deal_card(deck)]
         dealer_hand = [deal_card(deck), deal_card(deck)]
 
-        view = BlackjackView(self.bot, deck, player_hand, dealer_hand, bet)
+        view = BlackjackView(self.bot, ctx, deck, player_hand, dealer_hand, bet)
         await ctx.followup.send(embed=view.embed, view=view)
 
         await view.wait()
