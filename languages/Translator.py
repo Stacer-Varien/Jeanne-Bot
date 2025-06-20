@@ -997,6 +997,11 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Unbans a user",
                 "fr": "Débannir un utilisateur",
             },
+            "unban_reason_parm": {
+                "en-GB": "Why are they being unbanned?",
+                "en-US": "Why are they being unbanned?",
+                "fr": "Why are they being unbanned?",
+            },
             "timeout_desc": {
                 "en-GB": "Timeout a member",
                 "en-US": "Timeout a member",
@@ -1028,7 +1033,7 @@ class MyTranslator(Jeanne.Translator):
             "warn_id_param_name": {
                 "en-GB": "warn_id",
                 "en-US": "warn_id",
-                "fr": "id_avertissement",
+                "fr": "warn_id",
             },
             "limit_param_name": {"en-GB": "limit", "en-US": "limit", "fr": "limite"},
             "nickname_param_name": {
@@ -1039,12 +1044,12 @@ class MyTranslator(Jeanne.Translator):
             "user_id_param_name": {
                 "en-GB": "user_id",
                 "en-US": "user_id",
-                "fr": "id_utilisateur",
+                "fr": "user_id",
             },
             "user_ids_param_name": {
                 "en-GB": "user_ids",
                 "en-US": "user_ids",
-                "fr": "ids_utilisateurs",
+                "fr": "user_ids",
             },
             "member_param_desc": {
                 "en-GB": "What is the member or user ID?",

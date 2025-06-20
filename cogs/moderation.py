@@ -1,28 +1,21 @@
-import asyncio
-from random import randint
 from discord import (
     Color,
     Embed,
     HTTPException,
     Interaction,
     User,
-    Message,
     NotFound,
     Member,
     app_commands as Jeanne,
 )
 from discord.ext.commands import Cog, Bot
-from datetime import datetime, timedelta
-from humanfriendly import InvalidTimespan, format_timespan, parse_timespan
-from reactionmenu import ViewButton, ViewMenu
+from humanfriendly import InvalidTimespan
 from functions import (
     AutoCompleteChoices,
-    Moderation,
     check_botbanned_app_command,
     check_disabled_app_command,
     is_suspended,
 )
-from assets.components import Confirmation
 from typing import Optional
 from discord.app_commands import locale_str as T
 import languages.en.moderation as en
@@ -59,7 +52,62 @@ class moderation(Cog):
     @Jeanne.command(
         name=T("ban_name"),
         description=T("ban_desc"),
-        extras={"bot_perms": "Ban Members", "member_perms": "Ban Members"},
+        extras={
+            "bot_perms": "Ban Members",
+            "member_perms": "Ban Members",
+            "en": {
+                "name": "ban",
+                "description": "Ban someone from or outside the server",
+                "parameters": [
+                    {
+                        "name": "member",
+                        "description": "What is the member or user ID?",
+                        "required": True,
+                    },
+                    {
+                        "name": "reason",
+                        "description": "What did they do? You can also make a custom reason",
+                        "required": False,
+                    },
+                    {
+                        "name": "delete_message_history",
+                        "description": "Delete messages from past 7 days?",
+                        "required": False,
+                    },
+                    {
+                        "name": "time",
+                        "description": "How long should they be tempbanned? (1m, 1h30m, etc)",
+                        "required": False,
+                    },
+                ],
+            },
+            "fr": {
+                "name": "ban",
+                "description": "Bannir quelqu'un du serveur ou en dehors",
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "description": "Quel est le membre ou l'identifiant utilisateur ?",
+                        "required": True,
+                    },
+                    {
+                        "name": "raison",
+                        "description": "Qu'a-t-il fait ? Vous pouvez aussi donner une raison personnalisée",
+                        "required": False,
+                    },
+                    {
+                        "name": "supprimer_historique_messages",
+                        "description": "Supprimer les messages des 7 derniers jours ?",
+                        "required": False,
+                    },
+                    {
+                        "name": "temps",
+                        "description": "Combien de temps doivent-ils être temporairement bannis ? (1m, 1h30m, etc)",
+                        "required": False,
+                    },
+                ],
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.autocomplete(reason=AutoCompleteChoices.default_ban_options)
@@ -109,7 +157,42 @@ class moderation(Cog):
     @Jeanne.command(
         name=T("warn_name"),
         description=T("warn_desc"),
-        extras={"bot_perms": "Kick Members", "member_perms": "Kick Members"},
+        extras={
+            "bot_perms": "Kick Members",
+            "member_perms": "Kick Members",
+            "en": {
+                "name": "warn",
+                "description": "Warn a member",
+                "parameters": [
+                    {
+                        "name": "member",
+                        "description": "Which member?",
+                        "required": True,
+                    },
+                    {
+                        "name": "reason",
+                        "description": "What did they do? You can also make a custom reason",
+                        "required": False,
+                    },
+                ],
+            },
+            "fr": {
+                "name": "avertir",
+                "description": "Avertir un membre",
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "description": "Quel membre?",
+                        "required": True,
+                    },
+                    {
+                        "name": "raison",
+                        "description": "Qu'a-t-il fait ? Vous pouvez aussi donner une raison personnalisée",
+                        "required": False,
+                    },
+                ],
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.describe(
@@ -137,6 +220,30 @@ class moderation(Cog):
     @Jeanne.command(
         name=T("list_warns_name"),
         description=T("list_warns_desc"),
+        extras={
+            "en": {
+                "name": "list-warns",
+                "description": "View warnings in the server or a member",
+                "parameters": [
+                    {
+                        "name": "member",
+                        "description": "Which member?",
+                        "required": False,
+                    },
+                ],
+            },
+            "fr": {
+                "name": "liste-avertissements",
+                "description": "View warnings in the server or a member",
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "description": "Quel membre?",
+                        "required": False,
+                    },
+                ],
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.describe(
@@ -167,7 +274,42 @@ class moderation(Cog):
     @Jeanne.command(
         name=T("clear_warn_name"),
         description=T("clear_warn_desc"),
-        extras={"bot_perms": "Kick Members", "member_perms": "Kick Members"},
+        extras={
+            "bot_perms": "Kick Members",
+            "member_perms": "Kick Members",
+            "en": {
+                "name": "clear-warn",
+                "description": "Révoquer un avertissement par ID d'avertissement",
+                "parameters": [
+                    {
+                        "name": "member",
+                        "description": "Quel membre ?",
+                        "required": True,
+                    },
+                    {
+                        "name": "warn_id",
+                        "description": "Quel est l'ID d'avertissement que vous souhaitez supprimer ?",
+                        "required": True,
+                    },
+                ],
+            },
+            "fr": {
+                "name": "clear-warn",
+                "description": "Révoquer un avertissement par ID d'avertissement",
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "description": "Quel membre ?",
+                        "required": True,
+                    },
+                    {
+                        "name": "warn_id",
+                        "description": "Quel est l'ID d'avertissement que vous souhaitez supprimer ?",
+                        "required": True,
+                    },
+                ],
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.describe(
@@ -190,7 +332,42 @@ class moderation(Cog):
     @Jeanne.command(
         name=T("kick_name"),
         description=T("kick_desc"),
-        extras={"bot_perms": "Kick Members", "member_perms": "Kick Members"},
+        extras={
+            "bot_perms": "Kick Members",
+            "member_perms": "Kick Members",
+            "en": {
+                "name": "kick",
+                "description": "Kick a member out of the server",
+                "parameters": [
+                    {
+                        "name": "member",
+                        "description": "Which member?",
+                        "required": True,
+                    },
+                    {
+                        "name": "reason",
+                        "description": "What did they do? You can also make a custom reason",
+                        "required": False,
+                    },
+                ],
+            },
+            "fr": {
+                "name": "expulser",
+                "description": "Avertir un membre",
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "description": "Quel membre?",
+                        "required": True,
+                    },
+                    {
+                        "name": "raison",
+                        "description": "Qu'a-t-il fait ? Vous pouvez aussi donner une raison personnalisée",
+                        "required": False,
+                    },
+                ],
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.describe(
@@ -222,6 +399,38 @@ class moderation(Cog):
         extras={
             "bot_perms": "Manage Messages, Read Message History",
             "member_perms": "Manage Messages, Read Message History",
+            "en": {
+                "name": "prune",
+                "description": "Bulk delete messages",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "description": "How many messages? (max is 100)",
+                        "required": False,
+                    },
+                    {
+                        "name": "member",
+                        "description": "Which member?",
+                        "required": False,
+                    },
+                ],
+            },
+            "fr": {
+                "name": "purger",
+                "description": "Supprimer en masse des messages",
+                "parameters": [
+                    {
+                        "name": "limite",
+                        "description": "Combien de messages ? (max est 100)",
+                        "required": False,
+                    },
+                    {
+                        "name": "membre",
+                        "description": "Quel membre?",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.check(is_suspended)
@@ -251,16 +460,51 @@ class moderation(Cog):
     @Jeanne.command(
         name=T("change_nickname_name"),
         description=T("change_nickname_desc"),
-        extras={"bot_perms": "Manage Nicknames", "member_perms": "Manage Nicknames"},
+        extras={
+            "bot_perms": "Manage Nicknames",
+            "member_perms": "Manage Nicknames",
+            "en": {
+                "name": "change-nickname",
+                "description": "Change someone's nickname",
+                "parameters": [
+                    {
+                        "name": "member",
+                        "description": "Which member?",
+                        "required": False,
+                    },
+                    {
+                        "name": "nickname",
+                        "description": "What is their new nickname?",
+                        "required": False,
+                    },
+                ],
+            },
+            "fr": {
+                "name": "changer-pseudo",
+                "description": "Changer le pseudo de quelqu'un",
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "description": "Quel membre ?",
+                        "required": False,
+                    },
+                    {
+                        "name": "pseudo",
+                        "description": "Quel est son nouveau pseudo ?",
+                        "required": False,
+                    },
+                ],
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.describe(
-        member=T("member_param_desc"),
-        nickname=T("nickname_param_desc"),
+        member=T("member_param_desc_fr"),
+        nickname=T("nickname_param_desc_fr"),
     )
     @Jeanne.rename(
-        member=T("member_param_name"),
-        nickname=T("nickname_param_name"),
+        member=T("member_param_name_fr"),
+        nickname=T("nickname_param_name_fr"),
     )
     @Jeanne.checks.has_permissions(manage_nicknames=True)
     @Jeanne.checks.bot_has_permissions(manage_nicknames=True)
@@ -270,7 +514,7 @@ class moderation(Cog):
         self,
         ctx: Interaction,
         member: Member,
-        nickname: Optional[Jeanne.Range[str, 1, 32]],
+        nickname: Optional[Jeanne.Range[str, 1, 32]]=None,
     ):
         if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.moderation(self.bot).changenickname(ctx, member, nickname)
@@ -280,12 +524,47 @@ class moderation(Cog):
     @Jeanne.command(
         name=T("unban_name"),
         description=T("unban_desc"),
-        extras={"bot_perms": "Ban Members", "member_perms": "Ban Members"},
+        extras={
+            "bot_perms": "Ban Members",
+            "member_perms": "Ban Members",
+            "en": {
+                "name": "unban",
+                "description": "Unbans a user",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "description": "Which user do you want to unban?",
+                        "required": True,
+                    },
+                    {
+                        "name": "reason",
+                        "description": "What did they do? You can also make a custom reason",
+                        "required": False,
+                    },
+                ],
+            },
+            "fr": {
+                "name": "ban",
+                "description": "Bannir quelqu'un du serveur ou en dehors",
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "description": "Quel est le membre ou l'identifiant utilisateur ?",
+                        "required": True,
+                    },
+                    {
+                        "name": "raison",
+                        "description": "Qu'a-t-il fait ? Vous pouvez aussi donner une raison personnalisée",
+                        "required": False,
+                    },
+                ],
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.describe(
         user_id=T("user_id_param_desc"),
-        reason=T("reason_param_desc"),
+        reason=T("unban_reason_parm"),
     )
     @Jeanne.rename(
         user_id=T("user_id_param_name"),
