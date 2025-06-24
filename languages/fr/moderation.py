@@ -88,7 +88,7 @@ class moderation():
         self,
         ctx: Interaction,
         member: User,
-        reason: Optional[str] = "Unspecified",
+        reason: Optional[str] = "Non spécifié",
         delete_message_history: Optional[bool] = None,
         time: Optional[str] = None,
     ) -> None:
@@ -170,7 +170,7 @@ class moderation():
             failed = Embed(description="Vous ne pouvez pas vous avertir vous-même")
             await ctx.followup.send(embed=failed)
             return
-        reason = reason if reason else "Unspecified"
+        reason = reason if reason else "Non spécifié"
         warn_id = randint(0, 100000)
         date = round(datetime.now().timestamp())
         await Moderation(ctx.guild).warn_user(
@@ -321,7 +321,7 @@ class moderation():
             failed = Embed(description="Vous ne pouvez pas vous expulser vous-même")
             await ctx.followup.send(embed=failed)
             return
-        reason = reason if reason else "Unspecified"
+        reason = reason if reason else "Non spécifié"
         try:
             kickmsg = Embed(
                 description=f"Vous êtes expulsé de **{ctx.guild.name}** pour **{reason}**"
@@ -403,7 +403,7 @@ class moderation():
         reason: Optional[Jeanne.Range[str, None, 470]] = None,
     ) -> None:
         await ctx.response.defer()
-        reason = reason if reason else "Unspecified"
+        reason = reason if reason else "Non spécifié"
         user = await self.bot.fetch_user(int(user_id))
         await ctx.guild.unban(user, reason="{} | {}".format(reason, ctx.user))
         unban = Embed(title="Utilisateur débanni", color=0xFF0000)
@@ -446,7 +446,7 @@ class moderation():
             failed = Embed(description="Cette personne n'est pas dans ce serveur")
             await ctx.followup.send(embed=failed)
             return
-        reason = reason if reason else "Unspecified"
+        reason = reason if reason else "Non spécifié"
         if not time or (parse_timespan(time) > 2332800.0):
             time = 2332800.0
         timed = parse_timespan(str(time))
@@ -486,7 +486,7 @@ class moderation():
         reason: Optional[str] = None,
     ) -> None:
         await ctx.response.defer()
-        reason = reason if reason else "Unspecified"
+        reason = reason if reason else "Non spécifié"
         if member == ctx.user:
             failed = Embed(
                 description="Vous ne pouvez pas vous retirer du timeout", color=Color.red()

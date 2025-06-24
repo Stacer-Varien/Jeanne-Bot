@@ -131,7 +131,7 @@ class moderation(Cog):
         self,
         ctx: Interaction,
         member: User,
-        reason: Optional[Jeanne.Range[str, None, 470]] = "Unspecified",
+        reason: Optional[Jeanne.Range[str, None, 470]] = None,
         delete_message_history: Optional[bool] = None,
         time: Optional[str] = None,
     ) -> None:
