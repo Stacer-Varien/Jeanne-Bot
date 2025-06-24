@@ -229,7 +229,7 @@ class MyTranslator(Jeanne.Translator):
             "support_desc": {
                 "en-GB": "Need help? Visit the website or join the server for further assistance.",
                 "en-US": "Need help? Visit the website or join the server for further assistance.",
-                "fr": "Besoin d'aide ? Visitez le site web ou rejoignez le serveur pour plus d'assistance.",
+                "fr": "Besoin d'aide? Visitez le site web ou rejoignez le serveur pour plus d'assistance.",
             },
             # hentai commands
             "hentai_name": {"en-GB": "hentai", "en-US": "hentai", "fr": "hentai"},
@@ -643,7 +643,11 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Remove a role from a member",
                 "fr": "Supprimer un rôle d'un membre",
             },
-            "remove_description":{"en-GB": "remove", "en-US": "remove", "fr": "supprimer"},
+            "remove_description": {
+                "en-GB": "remove",
+                "en-US": "remove",
+                "fr": "supprimer",
+            },
             "list_disabled_commands_name": {
                 "en-GB": "list-disabled",
                 "en-US": "list-disabled",
@@ -940,7 +944,7 @@ class MyTranslator(Jeanne.Translator):
             "timeout_name": {
                 "en-GB": "timeout",
                 "en-US": "timeout",
-                "fr": "mettre-en-sourdine",
+                "fr": "délai",
             },
             "timeout_remove_name": {
                 "en-GB": "timeout-remove",
@@ -950,12 +954,12 @@ class MyTranslator(Jeanne.Translator):
             "massban_name": {
                 "en-GB": "massban",
                 "en-US": "massban",
-                "fr": "bannissement-massif",
+                "fr": "massban",
             },
             "massunban_name": {
                 "en-GB": "massunban",
                 "en-US": "massunban",
-                "fr": "débannissement-massif",
+                "fr": "massunban",
             },
             "ban_desc": {
                 "en-GB": "Ban someone from or outside the server",
@@ -1008,9 +1012,14 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Mettre un membre en sourdine",
             },
             "timeout_remove_desc": {
-                "en-GB": "Removes a timeout from a member",
-                "en-US": "Removes a timeout from a member",
-                "fr": "Retirer une sourdine d'un membre",
+                "en-GB": "Removes a member from timeout",
+                "en-US": "Removes a member from timeout",
+                "fr": "Supprime un membre du délai d'attente",
+            },
+            "timeout_remove_reason_desc": {
+                "en-GB": "Why are you removing them from timeout?",
+                "en-US": "Why are you removing them from timeout?",
+                "fr": "Pourquoi les retirer du délai d'attente?",
             },
             "massban_desc": {
                 "en-GB": "Ban multiple members at once",
@@ -1054,47 +1063,52 @@ class MyTranslator(Jeanne.Translator):
             "member_param_desc": {
                 "en-GB": "What is the member or user ID?",
                 "en-US": "What is the member or user ID?",
-                "fr": "Quel est le membre ou l'ID utilisateur ?",
+                "fr": "Quel est le membre ou l'ID utilisateur?",
             },
             "reason_param_desc": {
                 "en-GB": "What did they do? You can also make a custom reason",
                 "en-US": "What did they do? You can also make a custom reason",
-                "fr": "Qu'ont-ils fait ? Vous pouvez également créer une raison personnalisée",
+                "fr": "Qu'ont-ils fait? Vous pouvez également créer une raison personnalisée",
             },
             "delete_msg_history_param_desc": {
                 "en-GB": "Delete messages from past 7 days?",
                 "en-US": "Delete messages from past 7 days?",
-                "fr": "Supprimer les messages des 7 derniers jours ?",
+                "fr": "Supprimer les messages des 7 derniers jours?",
             },
             "time_param_desc": {
                 "en-GB": "How long should they be tempbanned? (1m, 1h30m, etc)",
                 "en-US": "How long should they be tempbanned? (1m, 1h30m, etc)",
-                "fr": "Combien de temps doivent-ils être temporairement bannis ? (1m, 1h30m, etc)",
+                "fr": "Combien de temps doivent-ils être temporairement bannis? (1m, 1h30m, etc)",
+            },
+            "timeout_time_desc": {
+                "en-GB": "How long should they be on timeout? (1m, 1h30m, etc)",
+                "en-US": "How long should they be on timeout? (1m, 1h30m, etc)",
+                "fr": "Combien de temps doivent-ils être temporairement bannis? (1m, 1h30m, etc)",
             },
             "warn_id_param_desc": {
                 "en-GB": "What is their warn ID you want to remove?",
                 "en-US": "What is their warn ID you want to remove?",
-                "fr": "Quel est leur ID d'avertissement que vous souhaitez supprimer ?",
+                "fr": "Quel est leur ID d'avertissement que vous souhaitez supprimer?",
             },
             "limit_param_desc": {
                 "en-GB": "How many messages? (max is 100)",
                 "en-US": "How many messages? (max is 100)",
-                "fr": "Combien de messages ? (max est 100)",
+                "fr": "Combien de messages? (max est 100)",
             },
             "nickname_param_desc": {
                 "en-GB": "What is their new nickname?",
                 "en-US": "What is their new nickname?",
-                "fr": "Quel est leur nouveau surnom ?",
+                "fr": "Quel est leur nouveau surnom?",
             },
             "user_id_param_desc": {
                 "en-GB": "Which user do you want to unban?",
                 "en-US": "Which user do you want to unban?",
-                "fr": "Quel utilisateur voulez-vous débannir ?",
+                "fr": "Quel utilisateur voulez-vous débannir?",
             },
             "user_ids_param_desc": {
                 "en-GB": "How many user IDs? Leave a space after each ID (min is 5 and max is 25)",
                 "en-US": "How many user IDs? Leave a space after each ID (min is 5 and max is 25)",
-                "fr": "Combien d'IDs utilisateur ? Laissez un espace après chaque ID (min est 5 et max est 25)",
+                "fr": "Combien d'IDs utilisateur? Laissez un espace après chaque ID (min est 5 et max est 25)",
             },
             "hug_name": {"en-GB": "hug", "en-US": "hug", "fr": "câlin"},
             "slap_name": {"en-GB": "slap", "en-US": "slap", "fr": "gifler"},
@@ -1184,57 +1198,57 @@ class MyTranslator(Jeanne.Translator):
             "hug_member_parm_desc": {
                 "en-GB": "Who are you hugging?",
                 "en-US": "Who are you hugging?",
-                "fr": "Qui câlinez-vous ?",
+                "fr": "Qui câlinez-vous?",
             },
             "slap_member_parm_desc": {
                 "en-GB": "Who are you slapping?",
                 "en-US": "Who are you slapping?",
-                "fr": "Qui giflez-vous ?",
+                "fr": "Qui giflez-vous?",
             },
             "poke_member_parm_desc": {
                 "en-GB": "Who are you poking?",
                 "en-US": "Who are you poking?",
-                "fr": "Qui poussez-vous ?",
+                "fr": "Qui poussez-vous?",
             },
             "pat_member_parm_desc": {
                 "en-GB": "Who are you patting?",
                 "en-US": "Who are you patting?",
-                "fr": "Qui tapotez-vous ?",
+                "fr": "Qui tapotez-vous?",
             },
             "kiss_member_parm_desc": {
                 "en-GB": "Who are you kissing?",
                 "en-US": "Who are you kissing?",
-                "fr": "Qui embrassez-vous ?",
+                "fr": "Qui embrassez-vous?",
             },
             "tickle_member_parm_desc": {
                 "en-GB": "Who are you tickling?",
                 "en-US": "Who are you tickling?",
-                "fr": "Qui chatouillez-vous ?",
+                "fr": "Qui chatouillez-vous?",
             },
             "baka_member_parm_desc": {
                 "en-GB": "Who are you calling a baka?",
                 "en-US": "Who are you calling a baka?",
-                "fr": "Qui traitez-vous de baka ?",
+                "fr": "Qui traitez-vous de baka?",
             },
             "feed_member_parm_desc": {
                 "en-GB": "Who are you feeding?",
                 "en-US": "Who are you feeding?",
-                "fr": "Qui nourrissez-vous ?",
+                "fr": "Qui nourrissez-vous?",
             },
             "bite_member_parm_desc": {
                 "en-GB": "Who are you biting?",
                 "en-US": "Who are you biting?",
-                "fr": "Qui mordez-vous ?",
+                "fr": "Qui mordez-vous?",
             },
             "cuddle_member_parm_desc": {
                 "en-GB": "Who are you cuddling with?",
                 "en-US": "Who are you cuddling with?",
-                "fr": "Avec qui câlinez-vous ?",
+                "fr": "Avec qui câlinez-vous?",
             },
             "dance_member_parm_desc": {
                 "en-GB": "Who are you dancing with?",
                 "en-US": "Who are you dancing with?",
-                "fr": "Avec qui dansez-vous ?",
+                "fr": "Avec qui dansez-vous?",
             },
             "generate_name": {
                 "en-GB": "generate",
@@ -1394,7 +1408,7 @@ class MyTranslator(Jeanne.Translator):
             "weather_units_parm_desc": {
                 "en-GB": "Metric or Imperial? (Default is metric)",
                 "en-US": "Metric or Imperial? (Default is metric)",
-                "fr": "Métrique ou Impérial ? (Par défaut métrique)",
+                "fr": "Métrique ou Impérial? (Par défaut métrique)",
             },
             "weather_three_day_parm_name": {
                 "en-GB": "three_day",
@@ -1404,7 +1418,7 @@ class MyTranslator(Jeanne.Translator):
             "weather_three_day_parm_desc": {
                 "en-GB": "Show 3 day forecast?",
                 "en-US": "Show 3 day forecast?",
-                "fr": "Afficher la prévision sur 3 jours ?",
+                "fr": "Afficher la prévision sur 3 jours?",
             },
             "calculator_name": {
                 "en-GB": "calculator",

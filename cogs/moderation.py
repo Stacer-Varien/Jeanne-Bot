@@ -87,22 +87,22 @@ class moderation(Cog):
                 "parameters": [
                     {
                         "name": "membre",
-                        "description": "Quel est le membre ou l'identifiant utilisateur ?",
+                        "description": "Quel est le membre ou l'identifiant utilisateur?",
                         "required": True,
                     },
                     {
                         "name": "raison",
-                        "description": "Qu'a-t-il fait ? Vous pouvez aussi donner une raison personnalisée",
+                        "description": "Qu'a-t-il fait? Vous pouvez aussi donner une raison personnalisée",
                         "required": False,
                     },
                     {
                         "name": "supprimer_historique_messages",
-                        "description": "Supprimer les messages des 7 derniers jours ?",
+                        "description": "Supprimer les messages des 7 derniers jours?",
                         "required": False,
                     },
                     {
                         "name": "temps",
-                        "description": "Combien de temps doivent-ils être temporairement bannis ? (1m, 1h30m, etc)",
+                        "description": "Combien de temps doivent-ils être temporairement bannis? (1m, 1h30m, etc)",
                         "required": False,
                     },
                 ],
@@ -187,7 +187,7 @@ class moderation(Cog):
                     },
                     {
                         "name": "raison",
-                        "description": "Qu'a-t-il fait ? Vous pouvez aussi donner une raison personnalisée",
+                        "description": "Qu'a-t-il fait? Vous pouvez aussi donner une raison personnalisée",
                         "required": False,
                     },
                 ],
@@ -283,12 +283,12 @@ class moderation(Cog):
                 "parameters": [
                     {
                         "name": "member",
-                        "description": "Quel membre ?",
+                        "description": "Quel membre?",
                         "required": True,
                     },
                     {
                         "name": "warn_id",
-                        "description": "Quel est l'ID d'avertissement que vous souhaitez supprimer ?",
+                        "description": "Quel est l'ID d'avertissement que vous souhaitez supprimer?",
                         "required": True,
                     },
                 ],
@@ -299,12 +299,12 @@ class moderation(Cog):
                 "parameters": [
                     {
                         "name": "membre",
-                        "description": "Quel membre ?",
+                        "description": "Quel membre?",
                         "required": True,
                     },
                     {
                         "name": "warn_id",
-                        "description": "Quel est l'ID d'avertissement que vous souhaitez supprimer ?",
+                        "description": "Quel est l'ID d'avertissement que vous souhaitez supprimer?",
                         "required": True,
                     },
                 ],
@@ -362,7 +362,7 @@ class moderation(Cog):
                     },
                     {
                         "name": "raison",
-                        "description": "Qu'a-t-il fait ? Vous pouvez aussi donner une raison personnalisée",
+                        "description": "Qu'a-t-il fait? Vous pouvez aussi donner une raison personnalisée",
                         "required": False,
                     },
                 ],
@@ -421,7 +421,7 @@ class moderation(Cog):
                 "parameters": [
                     {
                         "name": "limite",
-                        "description": "Combien de messages ? (max est 100)",
+                        "description": "Combien de messages? (max est 100)",
                         "required": False,
                     },
                     {
@@ -485,12 +485,12 @@ class moderation(Cog):
                 "parameters": [
                     {
                         "name": "membre",
-                        "description": "Quel membre ?",
+                        "description": "Quel membre?",
                         "required": False,
                     },
                     {
                         "name": "pseudo",
-                        "description": "Quel est son nouveau pseudo ?",
+                        "description": "Quel est son nouveau pseudo?",
                         "required": False,
                     },
                 ],
@@ -549,12 +549,12 @@ class moderation(Cog):
                 "parameters": [
                     {
                         "name": "membre",
-                        "description": "Quel est le membre ou l'identifiant utilisateur ?",
+                        "description": "Quel est le membre ou l'identifiant utilisateur?",
                         "required": True,
                     },
                     {
                         "name": "raison",
-                        "description": "Qu'a-t-il fait ? Vous pouvez aussi donner une raison personnalisée",
+                        "description": "Qu'a-t-il fait? Vous pouvez aussi donner une raison personnalisée",
                         "required": False,
                     },
                 ],
@@ -597,18 +597,63 @@ class moderation(Cog):
     @Jeanne.command(
         name=T("timeout_name"),
         description=T("timeout_desc"),
-        extras={"bot_perms": "Moderate Members", "member_perms": "Moderate Members"},
+        extras={
+            "bot_perms": "Moderate Members",
+            "member_perms": "Moderate Members",
+            "en": {
+                "name": "timeout",
+                "description": "Timeout a member",
+                "parameters": [
+                    {
+                        "name": "member",
+                        "description": "Which member?",
+                        "required": True,
+                    },
+                    {
+                        "name": "time",
+                        "description": "How long should they be on timeout? (1m, 1h30m, etc)",
+                        "required": False,
+                    },
+                    {
+                        "name": "reason",
+                        "description": "What did they do? You can also make a custom reason",
+                        "required": False,
+                    },
+                ],
+            },
+            "fr": {
+                "name": "délai",
+                "description": "Mettre un membre en sourdine",
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "description": "Quel membre?",
+                        "required": True,
+                    },
+                    {
+                        "name": "temps",
+                        "description": "Combien de temps doivent-ils être en sourdine? (1m, 1h30m, etc)",
+                        "required": False,
+                    },
+                    {
+                        "name": "raison",
+                        "description": "Qu'a-t-il fait? Vous pouvez aussi donner une raison personnalisée",
+                        "required": False,
+                    },
+                ],
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.describe(
-        member=T("member_param_desc"),
-        time=T("time_param_desc"),
-        reason=T("reason_param_desc"),
+        member=T("member_param_desc_fr"),
+        time=T("timeout_time_desc"),
+        reason=T("reason_param_desc_fr"),
     )
     @Jeanne.rename(
-        member=T("member_param_name"),
-        time=T("time_param_name"),
-        reason=T("reason_param_name"),
+        member=T("member_param_name_fr"),
+        time=T("time_param_name_fr"),
+        reason=T("reason_param_name_fr"),
     )
     @Jeanne.checks.has_permissions(moderate_members=True)
     @Jeanne.checks.bot_has_permissions(moderate_members=True)
@@ -639,12 +684,47 @@ class moderation(Cog):
     @Jeanne.command(
         name=T("timeout_remove_name"),
         description=T("timeout_remove_desc"),
-        extras={"bot_perms": "Moderate Members", "member_perms": "Moderate Members"},
+        extras={
+            "bot_perms": "Moderate Members",
+            "member_perms": "Moderate Members",
+            "en": {
+                "name": "timeout-remove",
+                "description": "Removes a member from timeout",
+                "parameters": [
+                    {
+                        "name": "member",
+                        "description": "Which member?",
+                        "required": True,
+                    },
+                    {
+                        "name": "reason",
+                        "description": "What did they do? You can also make a custom reason",
+                        "required": False,
+                    },
+                ],
+            },
+            "fr": {
+                "name": "retirer-sourdine",
+                "description": "Supprime un membre du délai d'attente",
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "description": "Quel membre?",
+                        "required": True,
+                    },
+                    {
+                        "name": "raison",
+                        "description": "Pourquoi les retirer du délai d'attente?",
+                        "required": False,
+                    },
+                ],
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.describe(
         member=T("member_param_desc"),
-        reason=T("reason_param_desc"),
+        reason=T("timeout_remove_reason_desc"),
     )
     @Jeanne.rename(
         member=T("member_param_name"),
@@ -668,7 +748,42 @@ class moderation(Cog):
     @Jeanne.command(
         name=T("massban_name"),
         description=T("massban_desc"),
-        extras={"bot_perms": "Ban Members", "member_perms": "Administrator"},
+        extras={
+            "bot_perms": "Ban Members",
+            "member_perms": "Administrator",
+            "en": {
+                "name": "massban",
+                "description": "Ban multiple members at once",
+                "parameters": [
+                    {
+                        "name": "user_ids",
+                        "description": "How many user IDs? Leave a space after each ID (min is 5 and max is 25)",
+                        "required": True,
+                    },
+                    {
+                        "name": "reason",
+                        "description": "What did they do? You can also make a custom reason",
+                        "required": True,
+                    },
+                ],
+            },
+            "fr": {
+                "name": "massban",
+                "description": "Bannir plusieurs membres à la fois",
+                "parameters": [
+                    {
+                        "name": "user_ids",
+                        "description": "Combien d'IDs utilisateur? Laissez un espace après chaque ID (min est 5 et max est 25)",
+                        "required": True,
+                    },
+                    {
+                        "name": "raison",
+                        "description": "Pourquoi les retirer du délai d'attente?",
+                        "required": True,
+                    },
+                ],
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.describe(
@@ -701,7 +816,42 @@ class moderation(Cog):
     @Jeanne.command(
         name=T("massunban_name"),
         description=T("massunban_desc"),
-        extras={"bot_perms": "Ban Members", "member_perms": "Administrator"},
+        extras={
+            "bot_perms": "Ban Members",
+            "member_perms": "Administrator",
+            "en": {
+                "name": "massunban",
+                "description": "Unban multiple users at once",
+                "parameters": [
+                    {
+                        "name": "user_ids",
+                        "description": "How many user IDs? Leave a space after each ID (min is 5 and max is 25)",
+                        "required": True,
+                    },
+                    {
+                        "name": "reason",
+                        "description": "What did they do? You can also make a custom reason",
+                        "required": True,
+                    },
+                ],
+            },
+            "fr": {
+                "name": "massunban",
+                "description": "Débannir plusieurs membres à la fois",
+                "parameters": [
+                    {
+                        "name": "user_ids",
+                        "description": "Combien d'IDs utilisateur? Laissez un espace après chaque ID (min est 5 et max est 25)",
+                        "required": True,
+                    },
+                    {
+                        "name": "raison",
+                        "description": "Pourquoi les retirer du délai d'attente?",
+                        "required": True,
+                    },
+                ],
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.describe(
