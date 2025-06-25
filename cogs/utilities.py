@@ -22,14 +22,48 @@ class EmbedGroup(GroupCog, name="embed"):
     @Jeanne.command(
         name=T("generate_name"),
         description=T("generate_desc"),
-        extras={"member_perms": "Administrator"},
+        extras={
+            "member_perms": "Administrator",
+            "en": {
+                "name": "generate",
+                "description": "Generates an embed message. Use [Discohook](https://discohook.app) for JSON generation.",
+                "parameters": [
+                    {
+                        "name": "channel",
+                        "description": "Which channel?",
+                        "required": True,
+                    },
+                    {
+                        "name": "jsonscript",
+                        "description": "Insert JSON script",
+                        "required": True,
+                    },
+                ],
+            },
+            "fr": {
+                "name": "générer",
+                "description": "Génère un message embed. Utilisez [Discohook](https://discohook.app) pour générer le JSON.",
+                "parameters": [
+                    {
+                        "name": "canal",
+                        "description": "Que canal?",
+                        "required": True,
+                    },
+                    {
+                        "name": "jsonscript",
+                        "description": "Insérer un script JSON",
+                        "required": True,
+                    },
+                ],
+            },
+        },
     )
     @Jeanne.checks.has_permissions(administrator=True)
     @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.describe(
-        channel=T("generate_channel_parm_desc"),
+        channel=T("channel_parm_desc"),
         jsonscript=T("generate_jsonscript_parm_desc"),
     )
     @Jeanne.rename(
@@ -46,7 +80,51 @@ class EmbedGroup(GroupCog, name="embed"):
     @Jeanne.command(
         name=T("edit_name"),
         description=T("edit_desc"),
-        extras={"member_perms": "Administrator"},
+        extras={
+            "member_perms": "Administrator",
+            "en": {
+                "name": "edit",
+                "description": "Edits an embed message. Use [Discohook](https://discohook.app) for JSON generation.",
+                "parameters": [
+                    {
+                        "name": "channel",
+                        "description": "Which channel?",
+                        "required": True,
+                    },
+                    {
+                        "name": "Message ID",
+                        "description": "Message ID of the embed",
+                        "required": True,
+                    },
+                    {
+                        "name": "jsonscript",
+                        "description": "Insert JSON script",
+                        "required": True,
+                    },
+                ],
+            },
+            "fr": {
+                "name": "éditer",
+                "description": "Génère un message embed. Utilisez [Discohook](https://discohook.app) pour générer le JSON.",
+                "parameters": [
+                    {
+                        "name": "canal",
+                        "description": "Que canal?",
+                        "required": True,
+                    },
+                    {
+                        "name": "ID du message",
+                        "description": "ID du message de l'embed",
+                        "required": True,
+                    },
+                    {
+                        "name": "jsonscript",
+                        "description": "Insérer un script JSON",
+                        "required": True,
+                    },
+                ],
+            },
+        },
     )
     @Jeanne.checks.has_permissions(administrator=True)
     @Jeanne.check(is_suspended)
@@ -87,6 +165,15 @@ class ReminderCog(GroupCog, name="reminder"):
     @Jeanne.command(
         name=T("reminder_add_name"),
         description=T("reminder_add_desc"),
+        extras={
+            "en": {
+                "name": "add",
+                "description": "Add a reminder",
+                "parameters": [
+                    {"name": "reason", "description": "Reason for the reminder"}
+                ],
+            }
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)

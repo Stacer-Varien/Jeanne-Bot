@@ -1256,19 +1256,14 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "générer",
             },
             "generate_desc": {
-                "en-GB": "Generates an embed message. Use Discohook.org for JSON generation.",
-                "en-US": "Generates an embed message. Use Discohook.org for JSON generation.",
-                "fr": "Génère un message embed. Utilisez Discohook.org pour générer le JSON.",
+                "en-GB": "Generates an embed message. Use Discohook.app for JSON generation.",
+                "en-US": "Generates an embed message. Use Discohook.app for JSON generation.",
+                "fr": "Génère un message embed. Utilisez Discohook.app pour générer le JSON.",
             },
             "generate_channel_parm_name": {
                 "en-GB": "channel",
                 "en-US": "channel",
                 "fr": "canal",
-            },
-            "generate_channel_parm_desc": {
-                "en-GB": "Target channel",
-                "en-US": "Target channel",
-                "fr": "Canal cible",
             },
             "generate_jsonscript_parm_name": {
                 "en-GB": "jsonscript",
@@ -1276,9 +1271,9 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "jsonscript",
             },
             "generate_jsonscript_parm_desc": {
-                "en-GB": "JSON script",
-                "en-US": "JSON script",
-                "fr": "Script JSON",
+                "en-GB": "Insert JSON script",
+                "en-US": "Insert JSON script",
+                "fr": "Insérer un script JSON",
             },
             "generate_jsonfile_parm_name": {
                 "en-GB": "jsonfile",
@@ -1291,30 +1286,28 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Fichier JSON",
             },
             "edit_name": {"en-GB": "edit", "en-US": "edit", "fr": "éditer"},
-            "edit_desc": {
+            "edit_embed_desc": {
                 "en-GB": "Edits an embed message. Use Discohook.org for JSON generation.",
                 "en-US": "Edits an embed message. Use Discohook.org for JSON generation.",
                 "fr": "Modifie un message embed. Utilisez Discohook.org pour générer le JSON.",
             },
-            "edit_channel_parm_name": {
-                "en-GB": "channel",
-                "en-US": "channel",
-                "fr": "canal",
-            },
+            
+            "channel_parm_desc": {"en-US": "Which channel?","en-GB": "Which channel?", "fr": "Quel canal?" },
+           
             "edit_channel_parm_desc": {
                 "en-GB": "Channel of the message",
                 "en-US": "Channel of the message",
                 "fr": "Canal du message",
             },
             "edit_messageid_parm_name": {
-                "en-GB": "messageid",
-                "en-US": "messageid",
-                "fr": "idmessage",
-            },
-            "edit_messageid_parm_desc": {
                 "en-GB": "Message ID",
                 "en-US": "Message ID",
                 "fr": "ID du message",
+            },
+            "edit_messageid_parm_desc": {
+                "en-GB": "Message ID of the embed",
+                "en-US": "Message ID of the embed",
+                "fr": "ID du message de l'embed",
             },
             "edit_jsonscript_parm_name": {
                 "en-GB": "jsonscript",
