@@ -5,20 +5,6 @@ from functions import (
 )
 from discord import Interaction, Member, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
-from config import (
-    smug,
-    poke,
-    cry,
-    pat,
-    kiss,
-    tickle,
-    baka,
-    feed,
-    bite,
-    blush,
-    cuddle,
-    dance,
-)
 from typing import Optional
 from discord.app_commands import locale_str as T
 import languages.en.reactions as en
@@ -32,6 +18,30 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.command(
         name=T("hug_name"),
         description=T("hug_desc"),
+        extras={
+            "en": {
+                "name": "hug",
+                "description": "Hug someone or yourself",
+                "parameters": [
+                    {
+                        "name": "member",
+                        "description": "Who are you hugging?",
+                        "required": False,
+                    }
+                ],
+            },
+            "fr": {
+                "name": "câlin",
+                "description": "Faites un câlin à quelqu'un ou à vous-même",
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "description": "Qui câlinez-vous?",
+                        "required": False,
+                    }
+                ],
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.rename(member=T("hug_member_parm_name"))
@@ -47,6 +57,30 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.command(
         name=T("slap_name"),
         description=T("slap_desc"),
+        extras={
+            "en": {
+                "name": "slap",
+                "description": "Slap someone or yourself",
+                "parameters": [
+                    {
+                        "name": "member",
+                        "description": "Who are you slapping?",
+                        "required": False,
+                    }
+                ],
+            },
+            "fr": {
+                "name": "gifler",
+                "description": "Gifle quelqu'un ou vous-même",
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "description": "Qui giflez-vous?",
+                        "required": False,
+                    }
+                ],
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.rename(member=T("slap_member_parm_name"))
@@ -62,6 +96,17 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.command(
         name=T("smug_name"),
         description=T("smug_desc"),
+        extras={
+            "en": {
+                "name": "smug",
+                "description": "Show a smug expression",
+            },
+            "fr": {
+                "name": "suffisant",
+                "description": "Affichez une expression suffisante",
+                
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
@@ -75,6 +120,30 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.command(
         name=T("poke_name"),
         description=T("poke_desc"),
+        extras={
+            "en": {
+                "name": "poke",
+                "description": "Poke someone or yourself",
+                "parameters": [
+                    {
+                        "name": "member",
+                        "description": "Who are you poking?",
+                        "required": False,
+                    }
+                ],
+            },
+            "fr": {
+                "name": "pousser",
+                "description": "Poussez quelqu'un ou vous-même",
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "description": "Qui poussez-vous?",
+                        "required": False,
+                    }
+                ],
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.rename(member=T("poke_member_parm_name"))
@@ -90,6 +159,30 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.command(
         name=T("pat_name"),
         description=T("pat_desc"),
+        extras={
+            "en": {
+                "name": "pat",
+                "description": "Pat someone or yourself",
+                "parameters": [
+                    {
+                        "name": "member",
+                        "description": "Who are you patting?",
+                        "required": False,
+                    }
+                ],
+            },
+            "fr": {
+                "name": "tapoter",
+                "description": "Tapotez quelqu'un ou vous-même",
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "description": "Qui tapotez-vous?",
+                        "required": False,
+                    }
+                ],
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.rename(member=T("pat_member_parm_name"))
@@ -105,6 +198,30 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.command(
         name=T("kiss_name"),
         description=T("kiss_desc"),
+        extras={
+            "en": {
+                "name": "Kiss",
+                "description": "Kiss someone or yourself",
+                "parameters": [
+                    {
+                        "name": "member",
+                        "description": "Who are you patting?",
+                        "required": False,
+                    }
+                ],
+            },
+            "fr": {
+                "name": "embrasser",
+                "description": "Embrassez quelqu'un ou vous-même",
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "description": "Qui embrassez-vous?",
+                        "required": False,
+                    }
+                ],
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.rename(member=T("kiss_member_parm_name"))
@@ -120,6 +237,30 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.command(
         name=T("tickle_name"),
         description=T("tickle_desc"),
+        extras={
+            "en": {
+                "name": "tickle",
+                "description": "Tickle someone or yourself",
+                "parameters": [
+                    {
+                        "name": "member",
+                        "description": "Who are you tickling?",
+                        "required": False,
+                    }
+                ],
+            },
+            "fr": {
+                "name": "chatouiller",
+                "description": "Chatouillez quelqu'un ou vous-même",
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "description": "Qui chatouillez-vous?",
+                        "required": False,
+                    }
+                ],
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.rename(member=T("tickle_member_parm_name"))
@@ -135,6 +276,30 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.command(
         name=T("baka_name"),
         description=T("baka_desc"),
+        extras={
+            "en": {
+                "name": "baka",
+                "description": "Call someone or yourself a baka!",
+                "parameters": [
+                    {
+                        "name": "member",
+                        "description": "Who are you calling a baka?",
+                        "required": False,
+                    }
+                ],
+            },
+            "fr": {
+                "name": "baka",
+                "description": "Traitez quelqu'un ou vous-même de baka!",
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "description": "Qui traitez-vous de baka?",
+                        "required": False,
+                    }
+                ],
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.rename(member=T("baka_member_parm_name"))
@@ -150,6 +315,30 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.command(
         name=T("feed_name"),
         description=T("feed_desc"),
+        extras={
+            "en": {
+                "name": "feed",
+                "description": "Feed someone or yourself",
+                "parameters": [
+                    {
+                        "name": "member",
+                        "description": "Who are you feeding?",
+                        "required": False,
+                    }
+                ],
+            },
+            "fr": {
+                "name": "nourrir",
+                "description": "Nourrissez quelqu'un ou vous-même",
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "description": "Qui chatouillez-vous?",
+                        "required": False,
+                    }
+                ],
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.rename(member=T("feed_member_parm_name"))
@@ -165,6 +354,16 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.command(
         name=T("cry_name"),
         description=T("cry_desc"),
+        extras={
+            "en": {
+                "name": "cry",
+                "description": "Show a crying expression",
+            },
+            "fr": {
+                "name": "pleurer",
+                "description": "Affichez une expression de pleurs",
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
@@ -178,6 +377,30 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.command(
         name=T("bite_name"),
         description=T("bite_desc"),
+        extras={
+            "en": {
+                "name": "bite",
+                "description": "Bite someone or yourself",
+                "parameters": [
+                    {
+                        "name": "member",
+                        "description": "Who are you biting?",
+                        "required": False,
+                    }
+                ],
+            },
+            "fr": {
+                "name": "mordre",
+                "description": "Nourrissez quelqu'un ou vous-même",
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "description": "Qui mordez-vous?",
+                        "required": False,
+                    }
+                ],
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.rename(member=T("bite_member_parm_name"))
@@ -193,6 +416,16 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.command(
         name=T("blush_name"),
         description=T("blush_desc"),
+        extras={
+            "en": {
+                "name": "blush",
+                "description": "Show a blushing expression",
+            },
+            "fr": {
+                "name": "rougir",
+                "description": "Affichez une expression rougissante",
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
@@ -206,6 +439,30 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.command(
         name=T("cuddle_name"),
         description=T("cuddle_desc"),
+        extras={
+            "en": {
+                "name": "cuddle",
+                "description": "Cuddle with someone or yourself",
+                "parameters": [
+                    {
+                        "name": "member",
+                        "description": "Who are you cuddling with?",
+                        "required": False,
+                    }
+                ],
+            },
+            "fr": {
+                "name": "câliner",
+                "description": "Câlinez quelqu'un ou vous-même",
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "description": "Avec qui câlinez-vous?",
+                        "required": False,
+                    }
+                ],
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.rename(member=T("cuddle_member_parm_name"))
@@ -221,6 +478,30 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.command(
         name=T("dance_name"),
         description=T("dance_desc"),
+        extras={
+            "en": {
+                "name": "dance",
+                "description": "Dance with someone or yourself",
+                "parameters": [
+                    {
+                        "name": "member",
+                        "description": "Who are you dancing with?",
+                        "required": False,
+                    }
+                ],
+            },
+            "fr": {
+                "name": "danser",
+                "description": "Dansez avec quelqu'un ou vous-même",
+                "parameters": [
+                    {
+                        "name": "membre",
+                        "description": "Avec qui dansez-vous?",
+                        "required": False,
+                    }
+                ],
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.rename(member=T("dance_member_parm_name"))
