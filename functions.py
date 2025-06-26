@@ -538,8 +538,6 @@ class Levelling:
         db.commit()
         return 0 if xp is None else int(xp[0])
 
-
-
     @property
     def get_member_level(self) -> int:
         level = db.execute(
@@ -1304,6 +1302,7 @@ class Welcomer:
         db.commit()
         return data[0] if data is not None else None
 
+
 def get_richest(member: Member) -> int:
     try:
         result = db.execute(
@@ -1566,14 +1565,14 @@ class AutoCompleteChoices:
     async def default_ban_options(
         self, ctx: Interaction, current: str
     ) -> List[Jeanne.Choice[str]]:
-        if ctx.locale.value=="en-GB" or ctx.locale.value=="en-US":
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             default_options = [
                 "Suspicious or spam account",
                 "Compromised or hacked account",
                 "Breaking server rules",
                 "Botting account",
             ]
-        elif ctx.locale.value=="fr":
+        elif ctx.locale.value == "fr":
             default_options = [
                 "Compte suspect ou spam",
                 "Compte compromis ou piraté",
@@ -1637,6 +1636,33 @@ class AutoCompleteChoices:
                 break
 
         return choices
+
+    async def report_types(
+        self, ctx: Interaction, current: str
+    ) -> List[Jeanne.Choice[str]]:
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            report_types = [
+                "Fault",
+                "Bug",
+                "ToS Violator",
+                "Exploit",
+                "Translation Error",
+                "Other",
+            ]
+        elif ctx.locale.value == "fr":
+            report_types = [
+                "Défaillance",
+                "Bogue",
+                "Violation des CGU",
+                "Exploitation",
+                "Erreur de traduction",
+                "Autre",
+            ]
+        return [
+            Jeanne.Choice(name=option, value=option)
+            for option in report_types
+            if current.lower() in option.lower()
+        ]
 
 
 class Partner:
