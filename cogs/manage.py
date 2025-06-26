@@ -25,7 +25,7 @@ import languages.en.manage as en
 import languages.en.manage as fr
 
 
-class Create_Group(GroupCog, name="create"):
+class Create_Group(GroupCog, name=T("create")):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()

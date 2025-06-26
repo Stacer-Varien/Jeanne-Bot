@@ -23,10 +23,10 @@ class EmbedGroup(GroupCog, name="embed"):
         name=T("generate_name"),
         description=T("generate_desc"),
         extras={
-            "member_perms": "Administrator",
             "en": {
                 "name": "generate",
                 "description": "Generates an embed message. Use [Discohook](https://discohook.app) for JSON generation.",
+                "member_perms": "Administrator",
                 "parameters": [
                     {
                         "name": "channel",
@@ -43,10 +43,11 @@ class EmbedGroup(GroupCog, name="embed"):
             "fr": {
                 "name": "générer",
                 "description": "Génère un message embed. Utilisez [Discohook](https://discohook.app) pour générer le JSON.",
+                "member_perms": "Administrateur",
                 "parameters": [
                     {
                         "name": "canal",
-                        "description": "Que canal?",
+                        "description": "Quel canal ?",
                         "required": True,
                     },
                     {
@@ -81,10 +82,10 @@ class EmbedGroup(GroupCog, name="embed"):
         name=T("edit_name"),
         description=T("edit_desc"),
         extras={
-            "member_perms": "Administrator",
             "en": {
                 "name": "edit",
                 "description": "Edits an embed message. Use [Discohook](https://discohook.app) for JSON generation.",
+                "member_perms": "Administrator",
                 "parameters": [
                     {
                         "name": "channel",
@@ -105,15 +106,16 @@ class EmbedGroup(GroupCog, name="embed"):
             },
             "fr": {
                 "name": "éditer",
-                "description": "Génère un message embed. Utilisez [Discohook](https://discohook.app) pour générer le JSON.",
+                "description": "Édite un message embed. Utilisez [Discohook](https://discohook.app) pour générer le JSON.",
+                "member_perms": "Administrateur",
                 "parameters": [
                     {
                         "name": "canal",
-                        "description": "Que canal?",
+                        "description": "Quel canal ?",
                         "required": True,
                     },
                     {
-                        "name": "messageid",
+                        "name": "idmessage",
                         "description": "ID du message de l'embed",
                         "required": True,
                     },

@@ -45,11 +45,11 @@ class HelpGroup:
         )
         command = cmd["en"]
         try:
-            bot_perms = cmd["bot_perms"]
+            bot_perms = command["bot_perms"]
         except:
             bot_perms = None
         try:
-            member_perms = cmd["member_perms"]
+            member_perms = command["member_perms"]
         except:
             member_perms = None
         try:

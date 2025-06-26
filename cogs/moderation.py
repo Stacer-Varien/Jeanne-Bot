@@ -53,11 +53,11 @@ class moderation(Cog):
         name=T("ban_name"),
         description=T("ban_desc"),
         extras={
-            "bot_perms": "Ban Members",
-            "member_perms": "Ban Members",
             "en": {
                 "name": "ban",
                 "description": "Ban someone from or outside the server",
+                "bot_perms": "Ban Members",
+                "member_perms": "Ban Members",
                 "parameters": [
                     {
                         "name": "member",
@@ -84,10 +84,12 @@ class moderation(Cog):
             "fr": {
                 "name": "ban",
                 "description": "Bannir quelqu'un du serveur ou en dehors",
+                "bot_perms": "Bannir des membres",
+                "member_perms": "Bannir des membres",
                 "parameters": [
                     {
                         "name": "membre",
-                        "description": "Quel est le membre ou l'identifiant utilisateur?",
+                        "description": "Quel est le membre ou l'identifiant utilisateur ?",
                         "required": True,
                     },
                     {
@@ -97,12 +99,12 @@ class moderation(Cog):
                     },
                     {
                         "name": "supprimer_historique_messages",
-                        "description": "Supprimer les messages des 7 derniers jours?",
+                        "description": "Supprimer les messages des 7 derniers jours ?",
                         "required": False,
                     },
                     {
                         "name": "temps",
-                        "description": "Combien de temps doivent-ils être temporairement bannis? (1m, 1h30m, etc)",
+                        "description": "Combien de temps doivent-ils être temporairement bannis ? (1m, 1h30m, etc)",
                         "required": False,
                     },
                 ],
@@ -158,11 +160,11 @@ class moderation(Cog):
         name=T("warn_name"),
         description=T("warn_desc"),
         extras={
-            "bot_perms": "Kick Members",
-            "member_perms": "Kick Members",
             "en": {
                 "name": "warn",
                 "description": "Warn a member",
+                "bot_perms": "Kick Members",
+                "member_perms": "Kick Members",
                 "parameters": [
                     {
                         "name": "member",
@@ -179,15 +181,17 @@ class moderation(Cog):
             "fr": {
                 "name": "avertir",
                 "description": "Avertir un membre",
+                "bot_perms": "Expulser des membres",
+                "member_perms": "Expulser des membres",
                 "parameters": [
                     {
                         "name": "membre",
-                        "description": "Quel membre?",
+                        "description": "Quel membre ?",
                         "required": True,
                     },
                     {
                         "name": "raison",
-                        "description": "Qu'a-t-il fait? Vous pouvez aussi donner une raison personnalisée",
+                        "description": "Qu'a-t-il fait ? Vous pouvez aussi donner une raison personnalisée",
                         "required": False,
                     },
                 ],
@@ -196,12 +200,12 @@ class moderation(Cog):
     )
     @Jeanne.check(is_suspended)
     @Jeanne.describe(
-        member=T("member_param_desc"),
-        reason=T("reason_param_desc"),
+        member=T("member_param_desc_fr"),
+        reason=T("reason_param_desc_fr"),
     )
     @Jeanne.rename(
-        member=T("member_param_name"),
-        reason=T("reason_param_name"),
+        member=T("member_param_name_fr"),
+        reason=T("reason_param_name_fr"),
     )
     @Jeanne.checks.has_permissions(kick_members=True)
     @Jeanne.check(check_botbanned_app_command)
@@ -275,20 +279,20 @@ class moderation(Cog):
         name=T("clear_warn_name"),
         description=T("clear_warn_desc"),
         extras={
-            "bot_perms": "Kick Members",
-            "member_perms": "Kick Members",
             "en": {
                 "name": "clear-warn",
-                "description": "Révoquer un avertissement par ID d'avertissement",
+                "description": "Revoke a warn by warn ID",
+                "bot_perms": "Kick Members",
+                "member_perms": "Kick Members",
                 "parameters": [
                     {
                         "name": "member",
-                        "description": "Quel membre?",
+                        "description": "Which member?",
                         "required": True,
                     },
                     {
                         "name": "warn_id",
-                        "description": "Quel est l'ID d'avertissement que vous souhaitez supprimer?",
+                        "description": "What is the warning ID you want to remove?",
                         "required": True,
                     },
                 ],
@@ -296,15 +300,17 @@ class moderation(Cog):
             "fr": {
                 "name": "clear-warn",
                 "description": "Révoquer un avertissement par ID d'avertissement",
+                "bot_perms": "Expulser des membres",
+                "member_perms": "Expulser des membres",
                 "parameters": [
                     {
                         "name": "membre",
-                        "description": "Quel membre?",
+                        "description": "Quel membre ?",
                         "required": True,
                     },
                     {
                         "name": "warn_id",
-                        "description": "Quel est l'ID d'avertissement que vous souhaitez supprimer?",
+                        "description": "Quel est l'ID d'avertissement que vous souhaitez supprimer ?",
                         "required": True,
                     },
                 ],
@@ -313,12 +319,12 @@ class moderation(Cog):
     )
     @Jeanne.check(is_suspended)
     @Jeanne.describe(
-        member=T("member_param_desc"),
-        warn_id=T("warn_id_param_desc"),
+        member=T("member_param_desc_fr"),
+        warn_id=T("warn_id_param_desc_fr"),
     )
     @Jeanne.rename(
-        member=T("member_param_name"),
-        warn_id=T("warn_id_param_name"),
+        member=T("member_param_name_fr"),
+        warn_id=T("warn_id_param_name_fr"),
     )
     @Jeanne.checks.has_permissions(kick_members=True)
     @Jeanne.check(check_botbanned_app_command)
@@ -333,11 +339,11 @@ class moderation(Cog):
         name=T("kick_name"),
         description=T("kick_desc"),
         extras={
-            "bot_perms": "Kick Members",
-            "member_perms": "Kick Members",
             "en": {
                 "name": "kick",
                 "description": "Kick a member out of the server",
+                "bot_perms": "Kick Members",
+                "member_perms": "Kick Members",
                 "parameters": [
                     {
                         "name": "member",
@@ -353,16 +359,18 @@ class moderation(Cog):
             },
             "fr": {
                 "name": "expulser",
-                "description": "Avertir un membre",
+                "description": "Expulser un membre du serveur",
+                "bot_perms": "Expulser des membres",
+                "member_perms": "Expulser des membres",
                 "parameters": [
                     {
                         "name": "membre",
-                        "description": "Quel membre?",
+                        "description": "Quel membre ?",
                         "required": True,
                     },
                     {
                         "name": "raison",
-                        "description": "Qu'a-t-il fait? Vous pouvez aussi donner une raison personnalisée",
+                        "description": "Qu'a-t-il fait ? Vous pouvez aussi donner une raison personnalisée",
                         "required": False,
                     },
                 ],
@@ -371,12 +379,12 @@ class moderation(Cog):
     )
     @Jeanne.check(is_suspended)
     @Jeanne.describe(
-        member=T("member_param_desc"),
-        reason=T("reason_param_desc"),
+        member=T("member_param_desc_fr"),
+        reason=T("reason_param_desc_fr"),
     )
     @Jeanne.rename(
-        member=T("member_param_name"),
-        reason=T("reason_param_name"),
+        member=T("member_param_name_fr"),
+        reason=T("reason_param_name_fr"),
     )
     @Jeanne.checks.has_permissions(kick_members=True)
     @Jeanne.checks.bot_has_permissions(kick_members=True)
@@ -397,11 +405,11 @@ class moderation(Cog):
         name=T("prune_name"),
         description=T("prune_desc"),
         extras={
-            "bot_perms": "Manage Messages, Read Message History",
-            "member_perms": "Manage Messages, Read Message History",
             "en": {
                 "name": "prune",
                 "description": "Bulk delete messages",
+                "bot_perms": "Manage Messages, Read Message History",
+                "member_perms": "Manage Messages, Read Message History",
                 "parameters": [
                     {
                         "name": "limit",
@@ -418,15 +426,17 @@ class moderation(Cog):
             "fr": {
                 "name": "purger",
                 "description": "Supprimer en masse des messages",
+                "bot_perms": "Gérer les messages, Lire l'historique des messages",
+                "member_perms": "Gérer les messages, Lire l'historique des messages",
                 "parameters": [
                     {
                         "name": "limite",
-                        "description": "Combien de messages? (max est 100)",
+                        "description": "Combien de messages ? (max est 100)",
                         "required": False,
                     },
                     {
                         "name": "membre",
-                        "description": "Quel membre?",
+                        "description": "Quel membre ?",
                         "required": False,
                     },
                 ],
@@ -435,12 +445,12 @@ class moderation(Cog):
     )
     @Jeanne.check(is_suspended)
     @Jeanne.describe(
-        limit=T("limit_param_desc"),
-        member=T("member_param_desc"),
+        limit=T("limit_param_desc_fr"),
+        member=T("member_param_desc_fr"),
     )
     @Jeanne.rename(
-        limit=T("limit_param_name"),
-        member=T("member_param_name"),
+        limit=T("limit_param_name_fr"),
+        member=T("member_param_name_fr"),
     )
     @Jeanne.checks.has_permissions(manage_messages=True, read_message_history=True)
     @Jeanne.checks.bot_has_permissions(manage_messages=True, read_message_history=True)
@@ -461,11 +471,11 @@ class moderation(Cog):
         name=T("change_nickname_name"),
         description=T("change_nickname_desc"),
         extras={
-            "bot_perms": "Manage Nicknames",
-            "member_perms": "Manage Nicknames",
             "en": {
                 "name": "change-nickname",
                 "description": "Change someone's nickname",
+                "bot_perms": "Manage Nicknames",
+                "member_perms": "Manage Nicknames",
                 "parameters": [
                     {
                         "name": "member",
@@ -482,15 +492,17 @@ class moderation(Cog):
             "fr": {
                 "name": "changer-pseudo",
                 "description": "Changer le pseudo de quelqu'un",
+                "bot_perms": "Gérer les pseudos",
+                "member_perms": "Gérer les pseudos",
                 "parameters": [
                     {
                         "name": "membre",
-                        "description": "Quel membre?",
+                        "description": "Quel membre ?",
                         "required": False,
                     },
                     {
                         "name": "pseudo",
-                        "description": "Quel est son nouveau pseudo?",
+                        "description": "Quel est son nouveau pseudo ?",
                         "required": False,
                     },
                 ],
@@ -514,22 +526,22 @@ class moderation(Cog):
         self,
         ctx: Interaction,
         member: Member,
-        nickname: Optional[Jeanne.Range[str, 1, 32]]=None,
+        nickname: Optional[Jeanne.Range[str, 1, 32]] = None,
     ):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            await en.moderation(self.bot).changenickname(ctx, member, nickname)
-        elif ctx.locale.value == "fr":
+        if ctx.locale.value == "fr":
             await fr.moderation(self.bot).changenickname(ctx, member, nickname)
+        else:
+            await en.moderation(self.bot).changenickname(ctx, member, nickname)
 
     @Jeanne.command(
         name=T("unban_name"),
         description=T("unban_desc"),
         extras={
-            "bot_perms": "Ban Members",
-            "member_perms": "Ban Members",
             "en": {
                 "name": "unban",
                 "description": "Unbans a user",
+                "bot_perms": "Ban Members",
+                "member_perms": "Ban Members",
                 "parameters": [
                     {
                         "name": "user_id",
@@ -544,17 +556,19 @@ class moderation(Cog):
                 ],
             },
             "fr": {
-                "name": "ban",
-                "description": "Bannir quelqu'un du serveur ou en dehors",
+                "name": "déban",
+                "description": "Débannir un utilisateur",
+                "bot_perms": "Bannir des membres",
+                "member_perms": "Bannir des membres",
                 "parameters": [
                     {
-                        "name": "membre",
-                        "description": "Quel est le membre ou l'identifiant utilisateur?",
+                        "name": "utilisateur_id",
+                        "description": "Quel utilisateur souhaitez-vous débannir ?",
                         "required": True,
                     },
                     {
                         "name": "raison",
-                        "description": "Qu'a-t-il fait? Vous pouvez aussi donner une raison personnalisée",
+                        "description": "Qu'a-t-il fait ? Vous pouvez aussi donner une raison personnalisée",
                         "required": False,
                     },
                 ],
@@ -598,11 +612,11 @@ class moderation(Cog):
         name=T("timeout_name"),
         description=T("timeout_desc"),
         extras={
-            "bot_perms": "Moderate Members",
-            "member_perms": "Moderate Members",
             "en": {
                 "name": "timeout",
                 "description": "Timeout a member",
+                "bot_perms": "Moderate Members",
+                "member_perms": "Moderate Members",
                 "parameters": [
                     {
                         "name": "member",
@@ -624,15 +638,17 @@ class moderation(Cog):
             "fr": {
                 "name": "délai",
                 "description": "Mettre un membre en sourdine",
+                "bot_perms": "Modérer les membres",
+                "member_perms": "Modérer les membres",
                 "parameters": [
                     {
                         "name": "membre",
-                        "description": "Quel membre?",
+                        "description": "Quel membre ?",
                         "required": True,
                     },
                     {
                         "name": "temps",
-                        "description": "Combien de temps doivent-ils être en sourdine? (1m, 1h30m, etc)",
+                        "description": "Combien de temps doivent-ils être en sourdine ? (1m, 1h30m, etc)",
                         "required": False,
                     },
                     {
@@ -685,11 +701,11 @@ class moderation(Cog):
         name=T("timeout_remove_name"),
         description=T("timeout_remove_desc"),
         extras={
-            "bot_perms": "Moderate Members",
-            "member_perms": "Moderate Members",
             "en": {
                 "name": "timeout-remove",
                 "description": "Removes a member from timeout",
+                "bot_perms": "Moderate Members",
+                "member_perms": "Moderate Members",
                 "parameters": [
                     {
                         "name": "member",
@@ -705,16 +721,18 @@ class moderation(Cog):
             },
             "fr": {
                 "name": "retirer-sourdine",
-                "description": "Supprime un membre du délai d'attente",
+                "description": "Retirer un membre du délai d'attente",
+                "bot_perms": "Modérer les membres",
+                "member_perms": "Modérer les membres",
                 "parameters": [
                     {
                         "name": "membre",
-                        "description": "Quel membre?",
+                        "description": "Quel membre ?",
                         "required": True,
                     },
                     {
                         "name": "raison",
-                        "description": "Pourquoi les retirer du délai d'attente?",
+                        "description": "Pourquoi les retirer du délai d'attente ?",
                         "required": False,
                     },
                 ],
@@ -723,12 +741,12 @@ class moderation(Cog):
     )
     @Jeanne.check(is_suspended)
     @Jeanne.describe(
-        member=T("member_param_desc"),
-        reason=T("timeout_remove_reason_desc"),
+        member=T("member_param_desc_fr"),
+        reason=T("timeout_remove_reason_desc_fr"),
     )
     @Jeanne.rename(
-        member=T("member_param_name"),
-        reason=T("reason_param_name"),
+        member=T("member_param_name_fr"),
+        reason=T("reason_param_name_fr"),
     )
     @Jeanne.checks.has_permissions(moderate_members=True)
     @Jeanne.checks.bot_has_permissions(moderate_members=True)
@@ -749,11 +767,11 @@ class moderation(Cog):
         name=T("massban_name"),
         description=T("massban_desc"),
         extras={
-            "bot_perms": "Ban Members",
-            "member_perms": "Administrator",
             "en": {
                 "name": "massban",
                 "description": "Ban multiple members at once",
+                "bot_perms": "Ban Members",
+                "member_perms": "Administrator",
                 "parameters": [
                     {
                         "name": "user_ids",
@@ -817,11 +835,11 @@ class moderation(Cog):
         name=T("massunban_name"),
         description=T("massunban_desc"),
         extras={
-            "bot_perms": "Ban Members",
-            "member_perms": "Administrator",
             "en": {
                 "name": "massunban",
                 "description": "Unban multiple users at once",
+                "bot_perms": "Ban Members",
+                "member_perms": "Administrator",
                 "parameters": [
                     {
                         "name": "user_ids",
@@ -838,15 +856,17 @@ class moderation(Cog):
             "fr": {
                 "name": "massunban",
                 "description": "Débannir plusieurs membres à la fois",
+                "bot_perms": "Bannir des membres",
+                "member_perms": "Administrateur",
                 "parameters": [
                     {
                         "name": "user_ids",
-                        "description": "Combien d'IDs utilisateur? Laissez un espace après chaque ID (min est 5 et max est 25)",
+                        "description": "Combien d'IDs utilisateur ? Laissez un espace après chaque ID (min est 5 et max est 25)",
                         "required": True,
                     },
                     {
                         "name": "raison",
-                        "description": "Pourquoi les retirer du délai d'attente?",
+                        "description": "Pourquoi les débannir ? Vous pouvez aussi donner une raison personnalisée",
                         "required": True,
                     },
                 ],
