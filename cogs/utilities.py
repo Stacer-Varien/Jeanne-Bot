@@ -5,7 +5,7 @@ from discord import (
 from discord.ext.commands import Cog, Bot, GroupCog
 from assets.dictionary import dictionary
 from functions import (
-    check_botbanned_app_command, check_disabled_app_command, is_suspended
+    check_botbanned_app_command, check_disabled_app_command, is_suspended, AutoCompleteChoices
 )
 from py_expression_eval import Parser
 from typing import Literal, Optional
@@ -92,7 +92,7 @@ class EmbedGroup(GroupCog, name="embed"):
                         "required": True,
                     },
                     {
-                        "name": "Message ID",
+                        "name": "messageid",
                         "description": "Message ID of the embed",
                         "required": True,
                     },
@@ -113,7 +113,7 @@ class EmbedGroup(GroupCog, name="embed"):
                         "required": True,
                     },
                     {
-                        "name": "ID du message",
+                        "name": "messageid",
                         "description": "ID du message de l'embed",
                         "required": True,
                     },
@@ -170,9 +170,34 @@ class ReminderCog(GroupCog, name="reminder"):
                 "name": "add",
                 "description": "Add a reminder",
                 "parameters": [
-                    {"name": "reason", "description": "Reason for the reminder"}
+                    {
+                        "name": "reason",
+                        "description": "Reason for the reminder",
+                        "required": True,
+                    },
+                    {
+                        "name": "time",
+                        "description": "Time (e.g., 1h, 30m)",
+                        "required": True,
+                    },
                 ],
-            }
+            },
+            "fr": {
+                "name": "ajouter",
+                "description": "Ajouter un rappel",
+                "parameters": [
+                    {
+                        "name": "raison",
+                        "description": "Raison du rappel",
+                        "required": True,
+                    },
+                    {
+                        "name": "temps",
+                        "description": "Temps (ex : 1h, 30m)",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.check(is_suspended)
@@ -203,6 +228,16 @@ class ReminderCog(GroupCog, name="reminder"):
     @Jeanne.command(
         name=T("reminder_list_name"),
         description=T("reminder_list_desc"),
+        extras={
+            "en": {
+                "name": "list",
+                "description": "List all the reminders you have",
+            },
+            "fr": {
+                "name": "liste",
+                "description": "Liste tous les rappels que vous avez",
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
@@ -216,6 +251,30 @@ class ReminderCog(GroupCog, name="reminder"):
     @Jeanne.command(
         name=T("reminder_cancel_name"),
         description=T("reminder_cancel_desc"),
+        extras={
+            "en": {
+                "name": "cancel",
+                "description": "Cancel a reminder",
+                "parameters": [
+                    {
+                        "name": "reminderid",
+                        "description": "Reminder ID",
+                        "required": True,
+                    }
+                ],
+            },
+            "fr": {
+                "name": "annuler",
+                "description": "Annuler un rappel",
+                "parameters": [
+                    {
+                        "name": "idrappel",
+                        "description": "ID du rappel",
+                        "required": True,
+                    }
+                ],
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
@@ -236,6 +295,50 @@ class SlashUtilities(Cog):
     @Jeanne.command(
         name=T("weather_name"),
         description=T("weather_desc"),
+        extras={
+            "en": {
+                "name": "weather",
+                "description": "Get weather information on a city",
+                "parameters": [
+                    {
+                        "name": "city",
+                        "description": "Add a city",
+                        "required": True,
+                    },
+                    {
+                        "name": "units",
+                        "description": "Metric or Imperial? (Default is metric)",
+                        "required": False,
+                    },
+                    {
+                        "name": "three_day",
+                        "description": "Show 3 day forecast?",
+                        "required": False,
+                    },
+                ],
+            },
+            "fr": {
+                "name": "météo",
+                "description": "Obtenez des informations météorologiques sur une ville",
+                "parameters": [
+                    {
+                        "name": "ville",
+                        "description": "Ajouter une ville",
+                        "required": True,
+                    },
+                    {
+                        "name": "unités",
+                        "description": "Métrique ou Impérial ? (Par défaut : métrique)",
+                        "required": False,
+                    },
+                    {
+                        "name": "trois_jours",
+                        "description": "Afficher les prévisions sur 3 jours ?",
+                        "required": False,
+                    },
+                ],
+            }
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.checks.cooldown(3, 14400, key=lambda i: (i.user.id))
@@ -258,9 +361,9 @@ class SlashUtilities(Cog):
         units: Optional[Literal["Metric", "Imperial"]] = None,
         three_day: Optional[bool] = False,
     ):
-        if ctx.locale.value=="en-GB" or ctx.locale.value=="en-US":
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Utilities(self.bot).weather(ctx, city, units, three_day)
-        elif ctx.locale.value=="fr":
+        elif ctx.locale.value == "fr":
             await fr.Utilities(self.bot).weather(ctx, city, units, three_day)
 
     @weather.error
@@ -281,6 +384,30 @@ class SlashUtilities(Cog):
     @Jeanne.command(
         name=T("calculator_name"),
         description=T("calculator_desc"),
+        extras={
+            "en": {
+                "name": "calculator",
+                "description": "Do a calculation",
+                "parameters": [
+                    {
+                        "name": "calculation",
+                        "description": "Add a calculation",
+                        "required": True,
+                    },
+                ],
+            },
+            "fr": {
+                "name": "calculatrice",
+                "description": "Effectuer un calcul",
+                "parameters": [
+                    {
+                        "name": "calcul",
+                        "description": "Ajouter un calcul",
+                        "required": True,
+                    },
+                ],
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.describe(calculate=T("calculator_calculate_parm_desc"))
@@ -313,6 +440,16 @@ class SlashUtilities(Cog):
     @Jeanne.command(
         name=T("invite_name"),
         description=T("invite_desc"),
+        extras={
+            "en": {
+                "name": "invite",
+                "description": "Invite me to your server or join the support server",
+            },
+            "fr": {
+                "name": "inviter",
+                "description": "Invitez-moi sur votre serveur ou rejoignez le serveur de support",
+            },
+        },
     )
     @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
@@ -326,14 +463,25 @@ class SlashUtilities(Cog):
     @Jeanne.command(
         name=T("botreport_name"),
         description=T("botreport_desc"),
+        extras={
+            "en": {
+                "name": "botreport",
+                "description": "Submit a bot report if you found something wrong",
+            },
+            "fr": {
+                "name": "rapportbot",
+                "description": "Soumettez un rapport sur le bot si vous avez trouvé un problème",
+            },
+        },
     )
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     @Jeanne.describe(report_type=T("botreport_type_parm_desc"))
     @Jeanne.rename(report_type=T("botreport_type_parm_name"))
+    @Jeanne.autocomplete(report_types=AutoCompleteChoices.report_types)
     @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
-    async def botreport(self, ctx: Interaction, report_type: Literal["Fault", "Bug", "ToS Violator", "Exploit", "Translation Error","Other"]):
+    async def botreport(self, ctx: Interaction, report_type:str):
         if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Utilities(self.bot).botreport(ctx, report_type)
         elif ctx.locale.value == "fr":

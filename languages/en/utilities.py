@@ -388,5 +388,5 @@ class Utilities():
         )
         await ctx.followup.send(embed=invite, view=InviteButton())
 
-    async def botreport(self, ctx: Interaction, report_type: Literal["Fault", "Bug", "ToS Violator", "Exploit", "Translation Error","Other"]):
+    async def botreport(self, ctx: Interaction, report_type: str):
         await ctx.response.send_modal(ReportModal(report_type))

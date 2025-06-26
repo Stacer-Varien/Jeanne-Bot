@@ -1291,18 +1291,20 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Edits an embed message. Use Discohook.org for JSON generation.",
                 "fr": "Modifie un message embed. Utilisez Discohook.org pour générer le JSON.",
             },
-            
-            "channel_parm_desc": {"en-US": "Which channel?","en-GB": "Which channel?", "fr": "Quel canal?" },
-           
+            "channel_parm_desc": {
+                "en-US": "Which channel?",
+                "en-GB": "Which channel?",
+                "fr": "Quel canal?",
+            },
             "edit_channel_parm_desc": {
                 "en-GB": "Channel of the message",
                 "en-US": "Channel of the message",
                 "fr": "Canal du message",
             },
             "edit_messageid_parm_name": {
-                "en-GB": "Message ID",
-                "en-US": "Message ID",
-                "fr": "ID du message",
+                "en-GB": "messageid",
+                "en-US": "messageid",
+                "fr": "messageid",
             },
             "edit_messageid_parm_desc": {
                 "en-GB": "Message ID of the embed",
@@ -1372,8 +1374,8 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Annuler un rappel",
             },
             "reminder_cancel_reminder_id_parm_name": {
-                "en-GB": "reminder_id",
-                "en-US": "reminder_id",
+                "en-GB": "reminder id",
+                "en-US": "reminder id",
                 "fr": "id_rappel",
             },
             "reminder_cancel_rmd_id_parm_desc": {
@@ -1442,7 +1444,7 @@ class MyTranslator(Jeanne.Translator):
             "botreport_name": {
                 "en-GB": "botreport",
                 "en-US": "botreport",
-                "fr": "rapportbot",
+                "fr": "botreport",
             },
             "botreport_desc": {
                 "en-GB": "Submit a bot report if you found something wrong",
