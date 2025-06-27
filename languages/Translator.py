@@ -37,6 +37,41 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "guess free",
                 "fr": "deviner libre",
             },
+            "guess_group_name bet_name": {
+                "en-GB": "guess bet",
+                "en-US": "guess bet",
+                "fr": "deviner pari",
+            },
+            "dice_group_name free_name": {
+                "en-GB": "dice free",
+                "en-US": "dice free",
+                "fr": "dé libre",
+            },
+            "dice_group_name bet_name": {
+                "en-GB": "dice bet",
+                "en-US": "dice bet",
+                "fr": "dé pari",
+            },
+            "flip_group_name free_name": {
+                "en-GB": "flip free",
+                "en-US": "flip free",
+                "fr": "lancer libre",
+            },
+            "flip_group_name bet_name": {
+                "en-GB": "flip bet",
+                "en-US": "flip bet",
+                "fr": "lancer pari",
+            },
+            "blackjack_group_name free_name": {
+                "en-GB": "blackjack free",
+                "en-US": "blackjack free",
+                "fr": "blackjack libre",
+            },
+            "blackjack_group_name bet_name": {
+                "en-GB": "blackjack bet",
+                "en-US": "blackjack bet",
+                "fr": "blackjack pari",
+            },
             "guess_group_name": {"en-GB": "guess", "en-US": "guess", "fr": "deviner"},
             "dice_group_name": {"en-GB": "dice", "en-US": "dice", "fr": "dé"},
             "flip_group_name": {"en-GB": "flip", "en-US": "flip", "fr": "lancer"},
@@ -1481,5 +1516,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Word to check",
                 "fr": "Mot à vérifier",
             },
+            
         }
         return translations.get(string.message, {}).get(locale.value)
