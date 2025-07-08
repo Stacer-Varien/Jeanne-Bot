@@ -476,6 +476,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "textchannel",
                 "fr": "canal_texte",
             },
+            "create_group_name":{"en-GB": "create", "en-US": "create", "fr": "créer"},
             "textchannel_description": {
                 "en-GB": "Create a text channel",
                 "en-US": "Create a text channel",
@@ -506,7 +507,7 @@ class MyTranslator(Jeanne.Translator):
             "slowmode_parm_name": {
                 "en-GB": "slowmode",
                 "en-US": "slowmode",
-                "fr": "mode_lent",
+                "fr": "slowmode",
             },
             "slowmode_parm_desc": {
                 "en-GB": "What is the slowmode (1h, 30m, etc) (Max is 6 hours)",
