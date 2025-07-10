@@ -25,7 +25,7 @@ import languages.en.manage as en
 import languages.en.manage as fr
 
 
-class Create_Group(GroupCog, name=T("create_group_name")):
+class Create_Group(GroupCog, name=T("create")):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()
@@ -444,7 +444,7 @@ class Create_Group(GroupCog, name=T("create_group_name")):
         elif ctx.locale.value == "fr":
             await fr.Create_Group(self.bot).role(ctx, name, color, hoisted, mentionable)
 
-    thread_group = Jeanne.Group(name="thread", description="...")
+    thread_group = Jeanne.Group(name=T("thread"), description="...")
 
     @thread_group.command(
         name=T("public_thread_name"),
@@ -828,7 +828,7 @@ class Create_Group(GroupCog, name=T("create_group_name")):
             await fr.Delete_Group(self.bot).sticker_error(ctx)
 
 
-class Delete_Group(GroupCog, name=T("delete_group_name")):
+class Delete_Group(GroupCog, name=T("delete")):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()
@@ -2088,7 +2088,7 @@ class Command_Group(GroupCog, name="command"):
             await fr.Command_Group(self.bot).listdisabled(ctx)
 
 
-class Level_Group(GroupCog, name="level"):
+class Level_Group(GroupCog, name=T("level")):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()
@@ -2232,7 +2232,7 @@ class Level_Group(GroupCog, name="level"):
             await fr.Level_Group(self.bot).add(ctx, channel)
 
     @channel_blacklist.command(
-        name=T("remove_blacklist_channel_name"),
+        name=T("remove"),
         description=T("remove_blacklist_ch_description"),
         extras={
             "member_perms": "Manage Server",
