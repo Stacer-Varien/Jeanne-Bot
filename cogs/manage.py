@@ -34,9 +34,9 @@ class Create_Group(GroupCog, name=T("create")):
         name=T("textchannel_name"),
         description=T("textchannel_description"),
         extras={
-            "bot_perms": "Manage Channels",
-            "member_perms": "Manage Channels",
             "en": {
+                "bot_perms": "Manage Channels",
+                "member_perms": "Manage Channels",
                 "name": "Create Text Channel",
                 "description": "Create a text channel",
                 "parameters": [
@@ -68,6 +68,8 @@ class Create_Group(GroupCog, name=T("create")):
                 ],
             },
             "fr": {
+                "bot_perms": "Gérer les salons",
+                "member_perms": "Gérer les salons",
                 "name": "Créer un salon textuel",
                 "description": "Créer un salon textuel",
                 "parameters": [
@@ -141,9 +143,10 @@ class Create_Group(GroupCog, name=T("create")):
         name=T("voicechannel_name"),
         description=T("voicechannel_description"),
         extras={
-            "bot_perms": "Manage Channels",
-            "member_perms": "Manage Channels",
+
             "en": {
+                            "bot_perms": "Manage Channels",
+            "member_perms": "Manage Channels",
                 "name": "Create Voice Channel",
                 "description": "Create a voice channel",
                 "parameters": [
@@ -165,6 +168,8 @@ class Create_Group(GroupCog, name=T("create")):
                 ],
             },
             "fr": {
+                            "bot_perms": "Gérer les salons",
+            "member_perms": "Gérer les salons",
                 "name": "Créer un salon textuel",
                 "description": "Créer un salon textuel",
                 "parameters": [
@@ -218,9 +223,10 @@ class Create_Group(GroupCog, name=T("create")):
         name=T("category_name"),
         description=T("category_description"),
         extras={
-            "bot_perms": "Manage Channels",
-            "member_perms": "Manage Channels",
+
             "en": {
+                            "bot_perms": "Manage Channels",
+            "member_perms": "Manage Channels",
                 "name": "Create Category",
                 "description": "Create a category",
                 "parameters": [
@@ -232,6 +238,8 @@ class Create_Group(GroupCog, name=T("create")):
                 ],
             },
             "fr": {
+                            "bot_perms": "Gérer les salons",
+            "member_perms": "Gérer les salons",
                 "name": "Créer une catégorie",
                 "description": "Créer une catégorie",
                 "parameters": [
@@ -261,9 +269,9 @@ class Create_Group(GroupCog, name=T("create")):
         name=T("stagechannel_name"),
         description=T("stagechannel_description"),
         extras={
-            "bot_perms": "Manage Channels",
-            "member_perms": "Manage Channels",
             "en": {
+                "bot_perms": "Manage Channels",
+                "member_perms": "Manage Channels",
                 "name": "Create Stage Channel",
                 "description": "Create a stage channel",
                 "parameters": [
@@ -285,6 +293,8 @@ class Create_Group(GroupCog, name=T("create")):
                 ],
             },
             "fr": {
+                            "bot_perms": "Gérer les salons",
+            "member_perms": "Gérer les salons",
                 "name": "Créer un salon de scène",
                 "description": "Créer un salon de scène",
                 "parameters": [
@@ -336,9 +346,9 @@ class Create_Group(GroupCog, name=T("create")):
         name=T("forum_name"),
         description=T("forum_description"),
         extras={
-            "bot_perms": "Manage Channels",
+
+            "en": {            "bot_perms": "Manage Channels",
             "member_perms": "Manage Channels",
-            "en": {
                 "name": "Create Forum Channel",
                 "description": "Create a forum channel",
                 "parameters": [
@@ -359,7 +369,8 @@ class Create_Group(GroupCog, name=T("create")):
                     },
                 ],
             },
-            "fr": {
+            "fr": {            "bot_perms": "Gérer les salons",
+            "member_perms": "Gérer les salons",
                 "name": "Créer un salon forum",
                 "description": "Créer un salon forum",
                 "parameters": [
@@ -412,7 +423,64 @@ class Create_Group(GroupCog, name=T("create")):
     @Jeanne.command(
         name=T("role_name"),
         description=T("role_description"),
-        extras={"bot_perms": "Manage Roles", "member_perms": "Manage Roles"},
+        extras={
+            "en": {
+                "bot_perms": "Manage Roles",
+                "member_perms": "Manage Roles",
+                "name": "Create Role",
+                "description": "Creates a new role",
+                "parameters": [
+                    {
+                        "name": "Name",
+                        "description": "What will you name it?",
+                        "required": True,
+                    },
+                    {
+                        "name": "Color",
+                        "description": "What color will it be? (Hex code without #)",
+                        "required": False,
+                    },
+                    {
+                        "name": "hoisted",
+                        "description": "Should it be shown separately in the member list?",
+                        "required": False,
+                    },
+                    {
+                        "name": "mentionable",
+                        "description": "Should it be mentionable?",
+                        "required": False,
+                    },
+                ],
+            },
+        
+        "fr": {
+                "bot_perms": "Gérer les rôles",
+                "member_perms": "Gérer les rôles",
+                "name": "Créer un rôle",
+                "description": "Crée un nouveau rôle",
+                "parameters": [
+                    {
+                        "name": "Nom",
+                        "description": "Quel nom lui donner ?",
+                        "required": True,
+                    },
+                    {
+                        "name": "Couleur",
+                        "description": "Quelle couleur aura-t-il ? (Code hex sans #)",
+                        "required": False,
+                    },
+                    {
+                        "name": "Affiché séparément",
+                        "description": "Doit-il être affiché séparément dans la liste des membres ?",
+                        "required": False,
+                    },
+                    {
+                        "name": "Mentionnable",
+                        "description": "Doit-il être mentionnable ?",
+                        "required": False,
+                    },
+                ],
+            }}
     )
     @Jeanne.describe(
         name=T("name_parm_desc"),
@@ -450,9 +518,9 @@ class Create_Group(GroupCog, name=T("create")):
         name=T("public_thread_name"),
         description=T("public_thread_description"),
         extras={
-            "bot_perms": "Create Public Threads\nManage Threads",
-            "member_perms": "Create Public Threads",
             "en": {
+                "bot_perms": "Create Public Threads\nManage Threads",
+                "member_perms": "Create Public Threads",
                 "name": "Create Public Thread",
                 "description": "Create a public thread",
                 "parameters": [
@@ -479,7 +547,9 @@ class Create_Group(GroupCog, name=T("create")):
                 ],
             },
             "fr": {
-                "name": "Créer un fil public",
+                "bot_perms": "Gérer les fils publics\nGérer les fils",
+                "member_perms": "Gérer les fils publics",
+                "name": "Créer public thread",
                 "description": "Créer un fil public",
                 "parameters": [
                     {
@@ -574,9 +644,9 @@ class Create_Group(GroupCog, name=T("create")):
         name=T("private_thread_name"),
         description=T("private_thread_description"),
         extras={
-            "bot_perms": "Create Private Threads\nManage Threads",
-            "member_perms": "Create Private Threads",
             "en": {
+                "bot_perms": "Create Private Threads\nManage Threads",
+                "member_perms": "Create Private Threads",
                 "name": "Create Private Thread",
                 "description": "Create a private thread",
                 "parameters": [
@@ -598,6 +668,8 @@ class Create_Group(GroupCog, name=T("create")):
                 ],
             },
             "fr": {
+                "bot_perms": "Créer des fils privés\nGérer les fils",
+                "member_perms": "Créer des fils privés",
                 "name": "Créer un fil privé",
                 "description": "Créer un fil privé",
                 "parameters": [
@@ -642,7 +714,7 @@ class Create_Group(GroupCog, name=T("create")):
         channel: TextChannel,
         slowmode: Optional[str] = None,
     ):
-        if ctx.local.value == "en-GB" or ctx.local.value == "en-US":
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Create_Group(self.bot).private(ctx, name, channel, slowmode)
         elif ctx.locale.value == "fr":
             await fr.Create_Group(self.bot).private(ctx, name, channel, slowmode)
@@ -663,9 +735,9 @@ class Create_Group(GroupCog, name=T("create")):
         name=T("emoji_name"),
         description=T("emoji_description"),
         extras={
-            "bot_perms": "Manage Expressions, Create Expressions",
-            "member_perms": "Manage Expressions,Create Expressions",
             "en": {
+                "bot_perms": "Manage Expressions\nCreate Expressions",
+                "member_perms": "Manage Expressions\nCreate Expressions",
                 "name": "Create Emoji",
                 "description": "Create a custom emoji",
                 "parameters": [
@@ -682,6 +754,8 @@ class Create_Group(GroupCog, name=T("create")):
                 ],
             },
             "fr": {
+                "bot_perms": "Gérer les expressions\nCréer des expressions",
+                "member_perms": "Gérer les expressions\nCréer des expressions",
                 "name": "Créer emoji",
                 "description": "Créer un emoji personnalisé",
                 "parameters": [
@@ -721,7 +795,7 @@ class Create_Group(GroupCog, name=T("create")):
         emoji_link: Optional[str] = None,
         emoji_image: Optional[Attachment] = None,
     ):
-        if ctx.local.value == "en-GB" or ctx.local.value == "en-US":
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Create_Group(self.bot).emoji(ctx, name, emoji_link, emoji_image)
         elif ctx.locale.value == "fr":
             await fr.Create_Group(self.bot).emoji(ctx, name, emoji_link, emoji_image)
@@ -738,8 +812,8 @@ class Create_Group(GroupCog, name=T("create")):
         name=T("sticker_name"),
         description=T("sticker_description"),
         extras={
-            "bot_perms": "Manage Expressions, Create Expressions",
-            "member_perms": "Manage Expressions,Create Expressions",
+            "bot_perms": "Manage Expressions\nCreate Expressions",
+            "member_perms": "Manage Expressions\nCreate Expressions",
             "en": {
                 "name": "Create Sticker",
                 "description": "Create a custom sticker",
@@ -762,6 +836,8 @@ class Create_Group(GroupCog, name=T("create")):
                 ],
             },
             "fr": {
+                "bot_perms": "Gérer les expressions\nCréer des expressions",
+                "member_perms": "Gérer les expressions\nCréer des expressions",
                 "name": "Créer sticker",
                 "description": "Créer un autocollant personnalisé",
                 "parameters": [
@@ -782,7 +858,7 @@ class Create_Group(GroupCog, name=T("create")):
                     },
                 ],
             },
-        }
+        },
     )
     @Jeanne.describe(
         name=T("name_parm_desc"),
@@ -837,9 +913,10 @@ class Delete_Group(GroupCog, name=T("delete")):
         name=T("delete_channel_name"),
         description=T("delete_channel_description"),
         extras={
-            "bot_perms": "Manage Channels",
-            "member_perms": "Manage Channels",
+            
             "en": {
+                "bot_perms": "Manage Channels",
+            "member_perms": "Manage Channels",
                 "name": "Delete Channel",
                 "description": "Delete a channel",
                 "parameters": [
@@ -851,6 +928,8 @@ class Delete_Group(GroupCog, name=T("delete")):
                 ],
             },
             "fr": {
+                "bot_perms": "Gérer les salons",
+            "member_perms": "Gérer les salons",
                 "name": "Supprimer emoji",
                 "description": "Supprimer un salon",
                 "parameters": [
@@ -880,9 +959,9 @@ class Delete_Group(GroupCog, name=T("delete")):
         name=T("delete_role_name"),
         description=T("delete_role_description"),
         extras={
-            "bot_perms": "Manage Roles",
-            "member_perms": "Manage Roles",
             "en": {
+                "bot_perms": "Manage Roles",
+                "member_perms": "Manage Roles",
                 "name": "Delete Role",
                 "description": "Delete a role",
                 "parameters": [
@@ -894,6 +973,8 @@ class Delete_Group(GroupCog, name=T("delete")):
                 ],
             },
             "fr": {
+                "bot_perms": "Gérer les rôles",
+                "member_perms": "Gérer les rôles",
                 "name": "Supprimer un rôle",
                 "description": "Supprimer un rôle",
                 "parameters": [
@@ -923,9 +1004,10 @@ class Delete_Group(GroupCog, name=T("delete")):
         name=T("delete_emoji_name"),
         description=T("delete_emoji_description"),
         extras={
-            "bot_perms": "Manage Expressions",
-            "member_perms": "Manage Expressions",
+            
             "en": {
+                "bot_perms": "Manage Expressions",
+            "member_perms": "Manage Expressions",
                 "name": "Delete Emoji",
                 "description": "Delete a custom emoji",
                 "parameters": [
@@ -937,6 +1019,8 @@ class Delete_Group(GroupCog, name=T("delete")):
                 ],
             },
             "fr": {
+                "bot_perms": "Gérer les expressions",
+            "member_perms": "Gérer les expressions",
                 "name": "Supprimer un emoji",
                 "description": "Supprimer un emoji personnalisé",
                 "parameters": [
@@ -973,9 +1057,10 @@ class Delete_Group(GroupCog, name=T("delete")):
         name=T("delete_sticker_name"),
         description=T("delete_sticker_description"),
         extras={
-            "bot_perms": "Manage Expressions",
-            "member_perms": "Manage Expressions",
+            
             "en": {
+                "bot_perms": "Manage Expressions",
+            "member_perms": "Manage Expressions",
                 "name": "Delete Sticker",
                 "description": "Delete a custom sticker",
                 "parameters": [
@@ -987,6 +1072,8 @@ class Delete_Group(GroupCog, name=T("delete")):
                 ],
             },
             "fr": {
+                "bot_perms": "Gérer les expressions",
+            "member_perms": "Gérer les expressions",
                 "name": "Supprimer un sticker",
                 "description": "Supprimer un autocollant personnalisé",
                 "parameters": [
@@ -1023,7 +1110,7 @@ class Edit_Group(GroupCog, name="edit"):
     @Jeanne.command(
         name=T("edit_textchannel_name"),
         description=T("edit_textchannel_description"),
-        extras={
+        extras={ #will continue later
             "bot_perms": "Manage Channels",
             "member_perms": "Manage Channels",
             "en": {
@@ -2202,8 +2289,9 @@ class Level_Group(GroupCog, name=T("level")):
         name=T("add_blacklist_channel_name"),
         description=T("add_blacklist_ch_description"),
         extras={
-            "member_perms": "Manage Server",
+            
             "en": {
+                "member_perms": "Manage Server",
                 "name": "Add Blacklist Channel",
                 "description": "Add a channel to the level blacklist",
                 "parameters": [
@@ -2211,6 +2299,7 @@ class Level_Group(GroupCog, name=T("level")):
                 ],
             },
             "fr": {
+                "member_perms": "Gérer le serveur",
                 "name": "Ajouter un salon à la liste noire",
                 "description": "Ajouter un salon à la liste noire des niveaux",
                 "parameters": [
