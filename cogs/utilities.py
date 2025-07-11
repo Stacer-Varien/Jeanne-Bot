@@ -479,7 +479,7 @@ class SlashUtilities(Cog):
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     @Jeanne.describe(report_type=T("botreport_type_parm_desc"))
     @Jeanne.rename(report_type=T("botreport_type_parm_name"))
-    @Jeanne.autocomplete(report_types=AutoCompleteChoices.report_types)
+    @Jeanne.autocomplete(report_type=AutoCompleteChoices.report_types)
     @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
