@@ -505,6 +505,111 @@ class SlashUtilities(Cog):
     ):
         await dictionary(ctx, word.lower())
 
+    @Jeanne.command(
+        name=T("confess_name"),
+        description=T("confess_desc"),
+        extras={
+            "en": {
+                "name": "confess",
+                "description": "Confess something anonymously or not",
+                "parameters": [
+                    {
+                        "name": "confession",
+                        "description": "What do you want to confess?",
+                        "required": True,
+                    },
+                    {
+                        "name": "anonymous",
+                        "description": "Do you want to confess anonymously?",
+                        "required": False,
+                    },
+                ],
+            },
+            "fr": {
+                "name": "confesser",
+                "description": "Confessez quelque chose de manière anonyme ou non",
+                "parameters": [
+                    {
+                        "name": "confession",
+                        "description": "Que voulez-vous confesser ?",
+                        "required": True,
+                    },
+                    {
+                        "name": "anonyme",
+                        "description": "Voulez-vous confesser anonymement ?",
+                        "required": False,
+                    },
+                ],
+            },
+        },
+    )
+    @Jeanne.describe(confession=T("confession_parm_desc"), anonymous=T("anonymous_parm_desc"))
+    @Jeanne.rename(confession=T("confession_parm_name"), anonymous=T("anonymous_parm_name"))
+    @Jeanne.check(is_suspended)
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
+    async def confess(self, ctx:Interaction, confession: Jeanne.Range[str, 1, 4096], anonymous: Optional[bool] = False):
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            await en.Utilities(self.bot).confess(ctx, confession, anonymous)
+        elif ctx.locale.value == "fr":
+            await fr.Utilities(self.bot).confess(ctx, confession, anonymous)
+
+    @Jeanne.command(name=T("reportconfession_name"),
+        description=T("reportconfession_desc"),
+        extras={
+            "en": {
+                "name": "reportconfession",
+                "description": "Report a confession",
+                "parameters": [
+                    {
+                        "name": "confession_id",
+                        "description": "ID of the confession to report",
+                        "required": True,
+                    },
+                    {
+                        "name": "reason",
+                        "description": "Reason for reporting the confession",
+                        "required": True,
+                    },
+                ],
+            },
+            "fr": {
+                "name": "rapportconfession",
+                "description": "Signaler une confession",
+                "parameters": [
+                    {
+                        "name": "id_confession",
+                        "description": "ID de la confession à signaler",
+                        "required": True,
+                    },
+                    {
+                        "name": "raison",
+                        "description": "Raison du signalement de la confession",
+                        "required": True,
+                    },
+                ],
+            },
+        },
+    )
+    @Jeanne.describe(
+        confession_id=T("reportconfession_id_parm_desc"),
+        reason=T("reportconfession_reason_parm_desc")
+    )
+    @Jeanne.rename(
+        confession_id=T("reportconfession_id_parm_name"),
+        reason=T("reportconfession_reason_parm_name")
+    )
+    @Jeanne.check(is_suspended)
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
+    @Jeanne.autocomplete(reason=AutoCompleteChoices.confessions)
+    async def reportconfession(self, ctx: Interaction, confession_id: int, reason: Jeanne.Range[str, 1, 512]):
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            await en.Utilities(self.bot).reportconfession(ctx, confession_id, reason)
+        elif ctx.locale.value == "fr":
+            await fr.Utilities(self.bot).reportconfession(
+                ctx, ctx, confession_id, reason
+            )
 
 async def setup(bot: Bot):
     await bot.add_cog(EmbedGroup(bot))

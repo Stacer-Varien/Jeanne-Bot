@@ -1,4 +1,5 @@
 from datetime import timedelta, datetime
+from random import randint
 import re
 import aiohttp
 from discord import (
@@ -9,6 +10,7 @@ from discord.ext.commands import Bot
 from reactionmenu import ViewButton, ViewMenu
 from assets.components import ReportModal
 from functions import (
+    Confess,
     Reminder
 )
 from config import WEATHER
@@ -389,3 +391,42 @@ class Utilities():
     async def botreport(self, ctx: Interaction, report_type: str):
         await ctx.response.send_modal(ReportModal(report_type))
 
+
+async def confession(
+    self,
+    ctx: Interaction,
+    confession: Jeanne.Range[str, 1],
+    anonymous: Optional[bool] = False,
+):
+    channel = Confess(ctx.guild).get_confession_channel
+    if not channel:
+        await ctx.response.send_message(
+            embed=Embed(
+                description="Le salon de confessions n'est pas configuré. Veuillez contacter les gestionnaires du serveur.",
+                color=Color.red(),
+            ),
+            ephemeral=True,
+        )
+        return
+
+    confession_id = randint(1, 999999)
+    embed = Embed(color=Color.random())
+
+    if anonymous == True:
+        embed.title = "Confession anonyme"
+    else:
+        embed.title = f"Confession de {ctx.user.name}"
+
+    embed.description = confession
+    embed.set_footer(
+        text=f"ID de confession : {confession_id}\nSi cette confession est inappropriée, veuillez la signaler aux modérateurs ou au développeur avec l'ID de confession via `/report_confession`."
+    )
+    await Confess(ctx.guild).add_confession(ctx.user, confession_id, confession)
+    await channel.send(embed=embed)
+    await ctx.response.send_message(
+        embed=Embed(
+            description=f"Votre confession a été envoyée dans {channel.mention} avec l'ID : {confession_id}",
+            color=Color.green(),
+        ),
+        ephemeral=True,
+    )
