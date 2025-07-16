@@ -12,6 +12,7 @@ from assets.components import ReportModal
 from functions import (
     Confess,
     Manage,
+    Moderation,
     Reminder
 )
 from config import WEATHER
@@ -405,17 +406,19 @@ class Utilities():
                 ephemeral=True
             )
             return
-        
+
         confession_id=randint(1, 999999)
         embed = Embed(color=Color.random())
-        
+
         if anonymous==True:
             embed.title="Anonymous Confession"
         else:
             embed.title=f"Confession by {ctx.user.name}"
-        
+
         embed.description=confession
-        embed.set_footer(text=f"Confession ID: {confession_id}\nIf this confession is inappropriate, please report it to the moderators or the developer with the Confession ID using `/report_confession`.")
+        embed.set_footer(
+            text=f"Confession ID: {confession_id}\nIf this confession is inappropriate, please report it to the moderators with the Confession ID using `/reportconfession`. If the confession is very serious, please report to the developer with `/botreport` and attach the Confession ID."
+        )
         await Confess(ctx.guild).add_confession(ctx.user, confession_id, confession)
         await channel.send(embed=embed)
         await ctx.response.send_message(
@@ -426,5 +429,29 @@ class Utilities():
             ephemeral=True
         )
 
-    async def reportconfession(self): #work in progress
-        ...
+    async def reportconfession(self, ctx:Interaction, confession_id: int, reason: Optional[str] = None):
+        confession=Confess(ctx.guild).get_confession(confession_id)
+        modlog=Moderation(ctx.guild).get_modlog_channel
+        if confession is None:
+            await ctx.response.send_message(
+                embed=Embed(
+                    description="No confession found with that ID.",
+                    color=Color.red()
+                ),
+                ephemeral=True
+            )
+            return
+        embed = Embed()
+        embed.title="Report Confession"
+        embed.add_field(name="Confession ID", value=confession_id, inline=False)
+        embed.add_field(name="Reason", value=reason, inline=False)
+        await modlog.send(embed=embed)
+        await ctx.response.send_message(
+            embed=Embed(
+                description=f"Confession with ID: {confession_id} has been reported to the moderators.",
+                color=Color.green()
+            ),
+            ephemeral=True
+        )
+        
+        

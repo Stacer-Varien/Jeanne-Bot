@@ -1124,6 +1124,14 @@ class Confess:
         data = db.execute("SELECT * FROM confessData WHERE server_id = ?", (self.server.id)).fetchall()
         db.commit()
         return data if data else None
+    
+    async def get_confession(self, confession_id: int) -> tuple | None:
+        data = db.execute(
+            "SELECT * FROM confessData WHERE server_id = ? AND id = ?",
+            (self.server.id, confession_id),
+        ).fetchone()
+        db.commit()
+        return data if data else None
 
 
 class Command:
