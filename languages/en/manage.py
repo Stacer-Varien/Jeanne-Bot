@@ -870,6 +870,7 @@ class Set_Group():
 
     async def confessionchannel(self, ctx: Interaction, channel: TextChannel) -> None:
         await ctx.response.defer()
+        await Manage(ctx.guild).add_confession_channel(channel)
         embed = Embed(
             description=f"{channel.mention} will recieve anonymous confessions from members",
             color=Color.random(),

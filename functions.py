@@ -1110,7 +1110,7 @@ class Confess:
 
     async def add_confession(self, user: User, confession_id:int, confession: str):
         db.execute(
-            "INSERT OR IGNORE INTO confessData (user_id, server_id, id, confession,) VALUES (?,?,?)",
+            "INSERT OR IGNORE INTO confessData (user_id, server_id, id, confession) VALUES (?,?,?,?)",
             (
                 user.id,
                 self.server.id,
@@ -1121,7 +1121,7 @@ class Confess:
         db.commit()
     
     async def get_confessions(self) -> list | None:
-        data = db.execute("SELECT * FROM confessData WHERE server_id = ?", (self.server.id)).fetchall()
+        data = db.execute("SELECT * FROM confessData WHERE server_id = ?", (self.server.id)).fetchall() #needs attention
         db.commit()
         return data if data else None
     
@@ -1695,7 +1695,7 @@ class AutoCompleteChoices:
         ]
 
     async def confessions(self, ctx: Interaction, current: int) -> List[Jeanne.Choice[int]]:
-        confessions = Confess(ctx.guild).get_confessions()
+        confessions = await Confess(ctx.guild).get_confessions()
         if not confessions:
             return []
         choices = []
