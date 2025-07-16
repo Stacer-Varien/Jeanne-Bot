@@ -677,6 +677,11 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "confession-channel",
                 "fr": "canal-confession",
             },
+            "set_confessionchannel_desc": {
+                "en-GB": "Set the channel for confessions",
+                "en-US": "Set the channel for confessions",
+                "fr": "Définir le canal pour les confessions",
+            },
             "set_brightness_name": {
                 "en-GB": "brightness",
                 "en-US": "brightness",
@@ -831,6 +836,16 @@ class MyTranslator(Jeanne.Translator):
                 "en-GB": "set brightness",
                 "en-US": "set brightness",
                 "fr": "définir luminosité",
+            },
+            "set_bio_description": {
+                "en-GB": "Set your bio",
+                "en-US": "Set your bio",
+                "fr": "Définir votre bio",
+            },
+            "set_color_description": {
+                "en-GB": "Set your color",
+                "en-US": "Set your color",
+                "fr": "Définir votre couleur",
             },
             "set set_bio_name": {
                 "en-GB": "set bio",
@@ -1580,6 +1595,11 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "channel",
                 "fr": "canal",
             },
+            "channel_parm_name": {
+                "en-GB": "channel",
+                "en-US": "channel",
+                "fr": "canal",
+            },
             "generate_jsonscript_parm_name": {
                 "en-GB": "jsonscript",
                 "en-US": "jsonscript",
@@ -1824,6 +1844,31 @@ class MyTranslator(Jeanne.Translator):
                 "en-GB": "Do you want to confess anonymously?",
                 "en-US": "Do you want to confess anonymously?",
                 "fr": "Voulez-vous confesser anonymement?",
+            },
+            "reportconfession_id_parm_desc": {
+                "en-GB": "What is the confession ID you want to report?",
+                "en-US": "What is the confession ID you want to report?",
+                "fr": "Quel est l'ID de la confession que vous souhaitez signaler?",
+            },
+            "reportconfession_name": {
+                "en-GB": "report-confession",
+                "en-US": "report-confession",
+                "fr": "rapport-confession",}
+                ,
+            "reportconfession_desc": {
+                "en-GB": "Report a confession",
+                "en-US": "Report a confession",
+                "fr": "Signaler une confession",
+            },
+            "reportconfession_id_parm_name": {
+                "en-GB": "confession_id",
+                "en-US": "confession_id",
+                "fr": "id_confession",
+            },
+            "reportconfession_rsn_parm_desc": {
+                "en-GB": "Why are you reporting this confession?",
+                "en-US": "Why are you reporting this confession?",
+                "fr": "Pourquoi signalez-vous cette confession?",
             },
         }
         return translations.get(string.message, {}).get(locale.value)

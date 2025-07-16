@@ -11,7 +11,6 @@ from reactionmenu import ViewButton, ViewMenu
 from assets.components import ReportModal
 from functions import (
     Confess,
-    Manage,
     Moderation,
     Reminder
 )
@@ -396,7 +395,7 @@ class Utilities():
         await ctx.response.send_modal(ReportModal(report_type))
 
     async def confession(self, ctx: Interaction, confession: Jeanne.Range[str, 1], anonymous: Optional[bool] = False):
-        channel=Manage(ctx.guild).get_confession_channel
+        channel=Confess(ctx.guild).get_confession_channel
         if not channel:
             await ctx.response.send_message(
                 embed=Embed(
