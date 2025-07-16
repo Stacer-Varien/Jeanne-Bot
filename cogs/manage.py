@@ -2668,10 +2668,4 @@ async def setup(bot: Bot):
     await bot.add_cog(Rename_Group(bot))
     await bot.add_cog(Command_Group(bot))
     await bot.add_cog(Level_Group(bot))
-    await bot.add_cog(Command_Group(bot))
-    await bot.add_cog(Level_Group(bot))
-    await bot.add_cog(Rename_Group(bot))
-    await bot.add_cog(Command_Group(bot))
-    await bot.add_cog(Level_Group(bot))
-    await bot.add_cog(Command_Group(bot))
-    await bot.add_cog(Level_Group(bot))
+
