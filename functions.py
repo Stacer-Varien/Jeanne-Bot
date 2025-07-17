@@ -1121,7 +1121,7 @@ class Confess:
         db.commit()
     
     async def get_confessions(self) -> list | None:
-        data = db.execute("SELECT * FROM confessData WHERE server_id = ?", (self.server.id)).fetchall() #needs attention
+        data = db.execute("SELECT * FROM confessData WHERE server_id = ?", (self.server.id,)).fetchall() #needs attention
         db.commit()
         return data if data else None
     
@@ -1698,16 +1698,7 @@ class AutoCompleteChoices:
         confessions = await Confess(ctx.guild).get_confessions()
         if not confessions:
             return []
-        choices = []
-        for confession in confessions:
-            confession_id = int(confession[2])
-            if current in confession_id:
-                choices.append(
-                    Jeanne.Choice(name=confession_id, value=int(confession[2]))
-                )
-            if len(choices) >= 25:
-                break
-        return choices
+        return [Jeanne.Choice(name=str(c[2]), value=c[2]) for c in confessions if str(c[2]).startswith(str(current))][:25]
 
 
 class Partner:
