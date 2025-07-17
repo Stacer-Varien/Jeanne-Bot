@@ -31,25 +31,10 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Which member?",
                 "fr": "Quel membre?",
             },
-            "shop country_name": {
-                "en-GB": "shop country",
-                "en-US": "shop country",
-                "fr": "shop country",
-            },
-            "shop backgrounds_name": {
-                "en-GB": "shop backgrounds",
-                "en-US": "shop backgrounds",
-                "fr": "shop backgrounds",
-            },
-            "background buycustom_name": {
-                "en-GB": "background buy-custom",
-                "en-US": "background buy-custom",
-                "fr": "background buy-custom",
-            },
             "background list_name": {
                 "en-GB": "background list",
                 "en-US": "background list",
-                "fr": "background list",
+                "fr": "background liste",
             },
             "guess_group_name free_name": {
                 "en-GB": "guess free",
@@ -108,6 +93,11 @@ class MyTranslator(Jeanne.Translator):
                 "en-GB": "help support",
                 "en-US": "help support",
                 "fr": "aide soutien",
+            },
+            "help_group_name": {
+                "en-GB": "help",
+                "en-US": "help",
+                "fr": "aide",
             },
             "free_name": {"en-GB": "free", "en-US": "free", "fr": "libre"},
             "bet_name": {"en-GB": "bet", "en-US": "bet", "fr": "parier"},
@@ -176,7 +166,6 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Votez pour Jeanne sur Top.gg",
             },
             # fun commands
-            "8ball_name": {"en-GB": "8ball", "en-US": "8ball", "fr": "8ball"},
             "8ball_desc": {
                 "en-GB": "Ask 8 ball anything and you will get your answer",
                 "en-US": "Ask 8 ball anything and you will get your answer",
@@ -246,7 +235,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Add your choices here. Separate them with ','",
                 "fr": "Ajoutez vos choix ici. Séparez-les par ','",
             },
-            "animeme_name": {"en-GB": "animeme", "en-US": "animeme", "fr": "animeme"},
             "animeme_desc": {
                 "en-GB": "Get a random animeme",
                 "en-US": "Get a random animeme",
@@ -296,7 +284,6 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Besoin d'aide? Visitez le site web ou rejoignez le serveur pour plus d'assistance.",
             },
             # hentai commands
-            "hentai_name": {"en-GB": "hentai", "en-US": "hentai", "fr": "hentai"},
             "hentai_desc": {
                 "en-GB": "Get a random hentai from Jeanne",
                 "en-US": "Get a random hentai from Jeanne",
@@ -402,27 +389,18 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Get the server banner",
                 "fr": "Obtenez la bannière du serveur",
             },
-            "avatar_name": {
-                "en-GB": "avatar",
-                "en-US": "avatar",
-                "fr": "avatar",
-            },
             "avatar_desc": {
                 "en-GB": "See your avatar or another member's avatar",
                 "en-US": "See your avatar or another member's avatar",
                 "fr": "Voir votre avatar ou l'avatar d'un autre membre",
             },
-            "ping_name": {"en-GB": "ping", "en-US": "ping", "fr": "ping"},
+            
             "ping_desc": {
                 "en-GB": "Check how fast I respond to a command",
                 "en-US": "Check how fast I respond to a command",
                 "fr": "Vérifiez la rapidité de ma réponse à une commande",
             },
-            "sticker_name": {
-                "en-GB": "sticker",
-                "en-US": "sticker",
-                "fr": "sticker",
-            },
+
             "sticker_desc": {
                 "en-GB": "Views a sticker",
                 "en-US": "Views a sticker",

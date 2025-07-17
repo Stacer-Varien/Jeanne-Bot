@@ -431,6 +431,15 @@ class Utilities():
     async def reportconfession(self, ctx:Interaction, confession_id: int, reason: Optional[str] = None):
         confession=Confess(ctx.guild).get_confession(confession_id)
         modlog=Moderation(ctx.guild).get_modlog_channel
+        if modlog == None:
+            await ctx.response.send_message(
+                embed=Embed(
+                    description="Moderation log channel is not set up. Please contact the server managers.",
+                    color=Color.red(),
+                ),
+                ephemeral=True,
+            )
+            return
         if confession is None:
             await ctx.response.send_message(
                 embed=Embed(
@@ -444,6 +453,7 @@ class Utilities():
         embed.title="Report Confession"
         embed.add_field(name="Confession ID", value=confession_id, inline=False)
         embed.add_field(name="Reason", value=reason, inline=False)
+
         await modlog.send(embed=embed)
         await ctx.response.send_message(
             embed=Embed(
@@ -452,5 +462,3 @@ class Utilities():
             ),
             ephemeral=True
         )
-        
-        

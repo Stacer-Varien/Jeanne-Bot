@@ -143,10 +143,9 @@ class Create_Group(GroupCog, name=T("create")):
         name=T("voicechannel_name"),
         description=T("voicechannel_description"),
         extras={
-
             "en": {
-                            "bot_perms": "Manage Channels",
-            "member_perms": "Manage Channels",
+                "bot_perms": "Manage Channels",
+                "member_perms": "Manage Channels",
                 "name": "Create Voice Channel",
                 "description": "Create a voice channel",
                 "parameters": [
@@ -168,8 +167,8 @@ class Create_Group(GroupCog, name=T("create")):
                 ],
             },
             "fr": {
-                            "bot_perms": "Gérer les canels",
-            "member_perms": "Gérer les canels",
+                "bot_perms": "Gérer les canels",
+                "member_perms": "Gérer les canels",
                 "name": "Créer un canel textuel",
                 "description": "Créer un canel textuel",
                 "parameters": [
@@ -223,10 +222,9 @@ class Create_Group(GroupCog, name=T("create")):
         name=T("category_name"),
         description=T("category_description"),
         extras={
-
             "en": {
-                            "bot_perms": "Manage Channels",
-            "member_perms": "Manage Channels",
+                "bot_perms": "Manage Channels",
+                "member_perms": "Manage Channels",
                 "name": "Create Category",
                 "description": "Create a category",
                 "parameters": [
@@ -238,8 +236,8 @@ class Create_Group(GroupCog, name=T("create")):
                 ],
             },
             "fr": {
-                            "bot_perms": "Gérer les canels",
-            "member_perms": "Gérer les canels",
+                "bot_perms": "Gérer les canels",
+                "member_perms": "Gérer les canels",
                 "name": "Créer une catégorie",
                 "description": "Créer une catégorie",
                 "parameters": [
@@ -293,8 +291,8 @@ class Create_Group(GroupCog, name=T("create")):
                 ],
             },
             "fr": {
-                            "bot_perms": "Gérer les canels",
-            "member_perms": "Gérer les canels",
+                "bot_perms": "Gérer les canels",
+                "member_perms": "Gérer les canels",
                 "name": "Créer un canel de scène",
                 "description": "Créer un canel de scène",
                 "parameters": [
@@ -346,9 +344,9 @@ class Create_Group(GroupCog, name=T("create")):
         name=T("forum_name"),
         description=T("forum_description"),
         extras={
-
-            "en": {            "bot_perms": "Manage Channels",
-            "member_perms": "Manage Channels",
+            "en": {
+                "bot_perms": "Manage Channels",
+                "member_perms": "Manage Channels",
                 "name": "Create Forum Channel",
                 "description": "Create a forum channel",
                 "parameters": [
@@ -369,8 +367,9 @@ class Create_Group(GroupCog, name=T("create")):
                     },
                 ],
             },
-            "fr": {            "bot_perms": "Gérer les canels",
-            "member_perms": "Gérer les canels",
+            "fr": {
+                "bot_perms": "Gérer les canels",
+                "member_perms": "Gérer les canels",
                 "name": "Créer un canel forum",
                 "description": "Créer un canel forum",
                 "parameters": [
@@ -452,8 +451,7 @@ class Create_Group(GroupCog, name=T("create")):
                     },
                 ],
             },
-        
-        "fr": {
+            "fr": {
                 "bot_perms": "Gérer les rôles",
                 "member_perms": "Gérer les rôles",
                 "name": "Créer un rôle",
@@ -480,7 +478,8 @@ class Create_Group(GroupCog, name=T("create")):
                         "required": False,
                     },
                 ],
-            }}
+            },
+        },
     )
     @Jeanne.describe(
         name=T("name_parm_desc"),
@@ -732,7 +731,6 @@ class Create_Group(GroupCog, name=T("create")):
                 await fr.Create_Group(self.bot).private_thread_error(ctx)
 
     @Jeanne.command(
-        name=T("emoji_name"),
         description=T("emoji_description"),
         extras={
             "en": {
@@ -809,7 +807,6 @@ class Create_Group(GroupCog, name=T("create")):
                 await fr.Create_Group(self.bot).emoji_error(ctx, error)
 
     @Jeanne.command(
-        name=T("sticker_name"),
         description=T("sticker_description"),
         extras={
             "bot_perms": "Manage Expressions\nCreate Expressions",
@@ -858,7 +855,7 @@ class Create_Group(GroupCog, name=T("create")):
                     },
                 ],
             },
-        }
+        },
     )
     @Jeanne.describe(
         name=T("name_parm_desc"),
@@ -868,7 +865,6 @@ class Create_Group(GroupCog, name=T("create")):
     )
     @Jeanne.rename(
         name=T("name_parm_name"),
-        emoji=T("emoji_parm_name"),
         sticker_link=T("sticker_link_parm_name"),
         sticker_image=T("sticker_image_parm_name"),
     )
@@ -895,9 +891,7 @@ class Create_Group(GroupCog, name=T("create")):
             )
 
     @sticker.error
-    async def sticker_error(
-        self, ctx: Interaction, error: Jeanne.AppCommandError
-    ):
+    async def sticker_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Delete_Group(self.bot).sticker_error(ctx)
         elif ctx.locale.value == "fr":
@@ -913,10 +907,9 @@ class Delete_Group(GroupCog, name=T("delete")):
         name=T("delete_channel_name"),
         description=T("delete_channel_description"),
         extras={
-            
             "en": {
                 "bot_perms": "Manage Channels",
-            "member_perms": "Manage Channels",
+                "member_perms": "Manage Channels",
                 "name": "Delete Channel",
                 "description": "Delete a channel",
                 "parameters": [
@@ -929,7 +922,7 @@ class Delete_Group(GroupCog, name=T("delete")):
             },
             "fr": {
                 "bot_perms": "Gérer les canels",
-            "member_perms": "Gérer les canels",
+                "member_perms": "Gérer les canels",
                 "name": "Supprimer emoji",
                 "description": "Supprimer un canel",
                 "parameters": [
@@ -1001,13 +994,11 @@ class Delete_Group(GroupCog, name=T("delete")):
             await fr.Delete_Group(self.bot).role(ctx, role)
 
     @Jeanne.command(
-        name=T("delete_emoji_name"),
         description=T("delete_emoji_description"),
         extras={
-            
             "en": {
                 "bot_perms": "Manage Expressions",
-            "member_perms": "Manage Expressions",
+                "member_perms": "Manage Expressions",
                 "name": "Delete Emoji",
                 "description": "Delete a custom emoji",
                 "parameters": [
@@ -1020,7 +1011,7 @@ class Delete_Group(GroupCog, name=T("delete")):
             },
             "fr": {
                 "bot_perms": "Gérer les expressions",
-            "member_perms": "Gérer les expressions",
+                "member_perms": "Gérer les expressions",
                 "name": "Supprimer un emoji",
                 "description": "Supprimer un emoji personnalisé",
                 "parameters": [
@@ -1034,7 +1025,6 @@ class Delete_Group(GroupCog, name=T("delete")):
         },
     )
     @Jeanne.describe(emoji=T("emoji_parm_desc"))
-    @Jeanne.rename(emoji=T("emoji_parm_name"))
     @Jeanne.checks.bot_has_permissions(manage_expressions=True)
     @Jeanne.checks.has_permissions(manage_expressions=True)
     @Jeanne.check(check_botbanned_app_command)
@@ -1054,13 +1044,11 @@ class Delete_Group(GroupCog, name=T("delete")):
             await fr.Delete_Group(self.bot).emoji_error(ctx)
 
     @Jeanne.command(
-        name=T("delete_sticker_name"),
         description=T("delete_sticker_description"),
         extras={
-            
             "en": {
                 "bot_perms": "Manage Expressions",
-            "member_perms": "Manage Expressions",
+                "member_perms": "Manage Expressions",
                 "name": "Delete Sticker",
                 "description": "Delete a custom sticker",
                 "parameters": [
@@ -1073,7 +1061,7 @@ class Delete_Group(GroupCog, name=T("delete")):
             },
             "fr": {
                 "bot_perms": "Gérer les expressions",
-            "member_perms": "Gérer les expressions",
+                "member_perms": "Gérer les expressions",
                 "name": "Supprimer un sticker",
                 "description": "Supprimer un autocollant personnalisé",
                 "parameters": [
@@ -1084,7 +1072,7 @@ class Delete_Group(GroupCog, name=T("delete")):
                     },
                 ],
             },
-        }
+        },
     )
     @Jeanne.describe(sticker=T("sticker_parm_desc"))
     @Jeanne.rename(sticker=T("sticker_parm_name"))
@@ -1117,11 +1105,31 @@ class Edit_Group(GroupCog, name="edit"):
                 "name": "Edit Text Channel",
                 "description": "Edit a text channel",
                 "parameters": [
-                    {"name": "Channel", "description": "Which channel to edit?", "required": True},
-                    {"name": "Name", "description": "New name for the channel", "required": False},
-                    {"name": "Topic", "description": "New topic for the channel", "required": False},
-                    {"name": "Slowmode", "description": "New slowmode (optional)", "required": False},
-                    {"name": "Category", "description": "Move to which category?", "required": False},
+                    {
+                        "name": "Channel",
+                        "description": "Which channel to edit?",
+                        "required": True,
+                    },
+                    {
+                        "name": "Name",
+                        "description": "New name for the channel",
+                        "required": False,
+                    },
+                    {
+                        "name": "Topic",
+                        "description": "New topic for the channel",
+                        "required": False,
+                    },
+                    {
+                        "name": "Slowmode",
+                        "description": "New slowmode (optional)",
+                        "required": False,
+                    },
+                    {
+                        "name": "Category",
+                        "description": "Move to which category?",
+                        "required": False,
+                    },
                     {"name": "NSFW", "description": "Set as NSFW?", "required": False},
                 ],
             },
@@ -1131,12 +1139,36 @@ class Edit_Group(GroupCog, name="edit"):
                 "name": "Modifier canel textuel",
                 "description": "Modifier un canel textuel",
                 "parameters": [
-                    {"name": "Canel", "description": "Quel canel modifier ?", "required": True},
-                    {"name": "Nom", "description": "Nouveau nom du canel", "required": False},
-                    {"name": "Sujet", "description": "Nouveau sujet du canel", "required": False},
-                    {"name": "Mode lent", "description": "Nouveau mode lent (optionnel)", "required": False},
-                    {"name": "Catégorie", "description": "Déplacer dans quelle catégorie ?", "required": False},
-                    {"name": "NSFW", "description": "Définir comme NSFW ?", "required": False},
+                    {
+                        "name": "Canel",
+                        "description": "Quel canel modifier ?",
+                        "required": True,
+                    },
+                    {
+                        "name": "Nom",
+                        "description": "Nouveau nom du canel",
+                        "required": False,
+                    },
+                    {
+                        "name": "Sujet",
+                        "description": "Nouveau sujet du canel",
+                        "required": False,
+                    },
+                    {
+                        "name": "Mode lent",
+                        "description": "Nouveau mode lent (optionnel)",
+                        "required": False,
+                    },
+                    {
+                        "name": "Catégorie",
+                        "description": "Déplacer dans quelle catégorie ?",
+                        "required": False,
+                    },
+                    {
+                        "name": "NSFW",
+                        "description": "Définir comme NSFW ?",
+                        "required": False,
+                    },
                 ],
             },
         },
@@ -1281,18 +1313,37 @@ class Edit_Group(GroupCog, name="edit"):
         name=T("edit_role_name"),
         description=T("edit_role_description"),
         extras={
-            
             "en": {
                 "bot_perms": "Manage Roles",
                 "member_perms": "Manage Roles",
                 "name": "Edit Role",
                 "description": "Edit a role",
                 "parameters": [
-                    {"name": "Role", "description": "Which role to edit?", "required": True},
-                    {"name": "Name", "description": "New name for the role", "required": False},
-                    {"name": "Color", "description": "New color (hex)", "required": False},
-                    {"name": "Hoisted", "description": "Display role separately?", "required": False},
-                    {"name": "Mentionable", "description": "Make role mentionable?", "required": False},
+                    {
+                        "name": "Role",
+                        "description": "Which role to edit?",
+                        "required": True,
+                    },
+                    {
+                        "name": "Name",
+                        "description": "New name for the role",
+                        "required": False,
+                    },
+                    {
+                        "name": "Color",
+                        "description": "New color (hex)",
+                        "required": False,
+                    },
+                    {
+                        "name": "Hoisted",
+                        "description": "Display role separately?",
+                        "required": False,
+                    },
+                    {
+                        "name": "Mentionable",
+                        "description": "Make role mentionable?",
+                        "required": False,
+                    },
                 ],
             },
             "fr": {
@@ -1301,11 +1352,31 @@ class Edit_Group(GroupCog, name="edit"):
                 "name": "Modifier rôle",
                 "description": "Modifier un rôle",
                 "parameters": [
-                    {"name": "Rôle", "description": "Quel rôle modifier ?", "required": True},
-                    {"name": "Nom", "description": "Nouveau nom du rôle", "required": False},
-                    {"name": "Couleur", "description": "Nouvelle couleur (hex)", "required": False},
-                    {"name": "Séparé", "description": "Afficher séparément ?", "required": False},
-                    {"name": "Mentionnable", "description": "Rendre le rôle mentionnable ?", "required": False},
+                    {
+                        "name": "Rôle",
+                        "description": "Quel rôle modifier ?",
+                        "required": True,
+                    },
+                    {
+                        "name": "Nom",
+                        "description": "Nouveau nom du rôle",
+                        "required": False,
+                    },
+                    {
+                        "name": "Couleur",
+                        "description": "Nouvelle couleur (hex)",
+                        "required": False,
+                    },
+                    {
+                        "name": "Séparé",
+                        "description": "Afficher séparément ?",
+                        "required": False,
+                    },
+                    {
+                        "name": "Mentionnable",
+                        "description": "Rendre le rôle mentionnable ?",
+                        "required": False,
+                    },
                 ],
             },
         },
@@ -1557,7 +1628,11 @@ class Set_Group(GroupCog, name="set"):
                 "name": "Set Modlog",
                 "description": "Configure moderation log channel",
                 "parameters": [
-                    {"name": "Channel", "description": "Channel for moderation logs", "required": True},
+                    {
+                        "name": "Channel",
+                        "description": "Channel for moderation logs",
+                        "required": True,
+                    },
                 ],
             },
             "fr": {
@@ -1565,7 +1640,11 @@ class Set_Group(GroupCog, name="set"):
                 "name": "Configurer modlog",
                 "description": "Configurer le canel de logs de modération",
                 "parameters": [
-                    {"name": "Canel", "description": "Canel pour les logs de modération", "required": True},
+                    {
+                        "name": "Canel",
+                        "description": "Canel pour les logs de modération",
+                        "required": True,
+                    },
                 ],
             },
         },
@@ -1679,7 +1758,11 @@ class Set_Group(GroupCog, name="set"):
                 "name": "Set Role Reward Message",
                 "description": "Set the role reward message",
                 "parameters": [
-                    {"name": "Message", "description": "Enable/disable role reward message", "required": False},
+                    {
+                        "name": "Message",
+                        "description": "Enable/disable role reward message",
+                        "required": False,
+                    },
                 ],
             },
             "fr": {
@@ -1687,7 +1770,11 @@ class Set_Group(GroupCog, name="set"):
                 "name": "Configurer message de récompense de rôle",
                 "description": "Définir le message de récompense de rôle",
                 "parameters": [
-                    {"name": "Message", "description": "Activer/désactiver le message de récompense de rôle", "required": False},
+                    {
+                        "name": "Message",
+                        "description": "Activer/désactiver le message de récompense de rôle",
+                        "required": False,
+                    },
                 ],
             },
         },
@@ -1816,14 +1903,22 @@ class Set_Group(GroupCog, name="set"):
                 "name": "Set Brightness",
                 "description": "Set the brightness value",
                 "parameters": [
-                    {"name": "Brightness", "description": "Brightness value (10-150)", "required": True},
+                    {
+                        "name": "Brightness",
+                        "description": "Brightness value (10-150)",
+                        "required": True,
+                    },
                 ],
             },
             "fr": {
                 "name": "Définir la luminosité",
                 "description": "Définir la valeur de luminosité",
                 "parameters": [
-                    {"name": "Luminosité", "description": "Valeur de luminosité (10-150)", "required": True},
+                    {
+                        "name": "Luminosité",
+                        "description": "Valeur de luminosité (10-150)",
+                        "required": True,
+                    },
                 ],
             },
         },
@@ -1856,7 +1951,11 @@ class Set_Group(GroupCog, name="set"):
                 "name": "Définir la bio",
                 "description": "Définir votre bio",
                 "parameters": [
-                    {"name": "Bio", "description": "Votre texte de bio", "required": True},
+                    {
+                        "name": "Bio",
+                        "description": "Votre texte de bio",
+                        "required": True,
+                    },
                 ],
             },
         },
@@ -1880,14 +1979,22 @@ class Set_Group(GroupCog, name="set"):
                 "name": "Set Color",
                 "description": "Set your color",
                 "parameters": [
-                    {"name": "Color", "description": "Color value (hex or name)", "required": True},
+                    {
+                        "name": "Color",
+                        "description": "Color value (hex or name)",
+                        "required": True,
+                    },
                 ],
             },
             "fr": {
                 "name": "Définir la couleur",
                 "description": "Définir votre couleur",
                 "parameters": [
-                    {"name": "Couleur", "description": "Valeur de la couleur (hex ou nom)", "required": True},
+                    {
+                        "name": "Couleur",
+                        "description": "Valeur de la couleur (hex ou nom)",
+                        "required": True,
+                    },
                 ],
             },
         },
@@ -1965,14 +2072,17 @@ class manage(Cog):
         name=T("remove_role_name"),
         description=T("remove_role_description"),
         extras={
-            
             "en": {
                 "bot_perms": "Manage Roles",
-            "member_perms": "Manage Roles",
+                "member_perms": "Manage Roles",
                 "name": "Remove Role",
                 "description": "Remove a role from a member",
                 "parameters": [
-                    {"name": "Member", "description": "Member to remove the role from", "required": True},
+                    {
+                        "name": "Member",
+                        "description": "Member to remove the role from",
+                        "required": True,
+                    },
                     {"name": "Role", "description": "Role to remove", "required": True},
                 ],
             },
@@ -1982,7 +2092,11 @@ class manage(Cog):
                 "name": "Retirer un rôle",
                 "description": "Retirer un rôle d'un membre",
                 "parameters": [
-                    {"name": "Membre", "description": "Membre à qui retirer le rôle", "required": True},
+                    {
+                        "name": "Membre",
+                        "description": "Membre à qui retirer le rôle",
+                        "required": True,
+                    },
                     {"name": "Rôle", "description": "Rôle à retirer", "required": True},
                 ],
             },
@@ -2126,18 +2240,24 @@ class Rename_Group(GroupCog, name="rename"):
         super().__init__()
 
     @Jeanne.command(
-        name=T("rename_emoji_name"),
         description=T("rename_emoji_description"),
         extras={
-            
             "en": {
                 "bot_perms": "Manage Expressions",
-            "member_perms": "Manage Expressions",
+                "member_perms": "Manage Expressions",
                 "name": "Rename Emoji",
                 "description": "Rename a custom emoji",
                 "parameters": [
-                    {"name": "Emoji", "description": "Emoji to rename", "required": True},
-                    {"name": "Name", "description": "New name for the emoji", "required": True},
+                    {
+                        "name": "Emoji",
+                        "description": "Emoji to rename",
+                        "required": True,
+                    },
+                    {
+                        "name": "Name",
+                        "description": "New name for the emoji",
+                        "required": True,
+                    },
                 ],
             },
             "fr": {
@@ -2146,8 +2266,16 @@ class Rename_Group(GroupCog, name="rename"):
                 "name": "Renommer un emoji",
                 "description": "Renommer un emoji personnalisé",
                 "parameters": [
-                    {"name": "Emoji", "description": "Emoji à renommer", "required": True},
-                    {"name": "Nom", "description": "Nouveau nom de l'emoji", "required": True},
+                    {
+                        "name": "Emoji",
+                        "description": "Emoji à renommer",
+                        "required": True,
+                    },
+                    {
+                        "name": "Nom",
+                        "description": "Nouveau nom de l'emoji",
+                        "required": True,
+                    },
                 ],
             },
         },
@@ -2157,7 +2285,6 @@ class Rename_Group(GroupCog, name="rename"):
         name=T("rename_emoji_name_desc"),
     )
     @Jeanne.rename(
-        emoji=T("rename_emoji_emoji_name"),
         name=T("rename_emoji_name_name"),
     )
     @Jeanne.checks.bot_has_permissions(manage_expressions=True)
@@ -2165,8 +2292,7 @@ class Rename_Group(GroupCog, name="rename"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
-    async def emoji(self, ctx: Interaction, emoji: str, name: Jeanne.Range[str, 2, 30]
-    ):
+    async def emoji(self, ctx: Interaction, emoji: str, name: Jeanne.Range[str, 2, 30]):
         if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Rename_Group(self.bot).emoji(ctx, emoji, name)
         elif ctx.locale.value == "fr":
@@ -2239,7 +2365,6 @@ class Rename_Group(GroupCog, name="rename"):
             await fr.Rename_Group(self.bot).category(ctx, category, name)
 
     @Jeanne.command(
-        name=T("rename_sticker_name"),
         description=T("rename_sticker_description"),
         extras={
             "en": {
@@ -2560,13 +2685,16 @@ class Level_Group(GroupCog, name=T("level")):
         name=T("add_blacklist_channel_name"),
         description=T("add_blacklist_ch_description"),
         extras={
-            
             "en": {
                 "member_perms": "Manage Server",
                 "name": "Add Blacklist Channel",
                 "description": "Add a channel to the level blacklist",
                 "parameters": [
-                    {"name": "Channel", "description": "Channel to blacklist", "required": True},
+                    {
+                        "name": "Channel",
+                        "description": "Channel to blacklist",
+                        "required": True,
+                    },
                 ],
             },
             "fr": {
@@ -2574,7 +2702,11 @@ class Level_Group(GroupCog, name=T("level")):
                 "name": "Ajouter un canel à la liste noire",
                 "description": "Ajouter un canel à la liste noire des niveaux",
                 "parameters": [
-                    {"name": "Canel", "description": "Canel à mettre sur liste noire", "required": True},
+                    {
+                        "name": "Canel",
+                        "description": "Canel à mettre sur liste noire",
+                        "required": True,
+                    },
                 ],
             },
         },
@@ -2668,4 +2800,3 @@ async def setup(bot: Bot):
     await bot.add_cog(Rename_Group(bot))
     await bot.add_cog(Command_Group(bot))
     await bot.add_cog(Level_Group(bot))
-

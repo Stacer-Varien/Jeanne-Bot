@@ -19,7 +19,6 @@ class nsfw(Cog):
         self.bot = bot
 
     @Jeanne.command(
-        name=T("hentai_name"),
         description=T("hentai_desc"),
         nsfw=True,
         extras={

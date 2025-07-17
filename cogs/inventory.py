@@ -16,7 +16,6 @@ class Shop_Group(GroupCog, name="shop"):
         super().__init__()
 
     @Jeanne.command(
-        name=T("country_name"),
         description=T("country_desc"),
         extras={
             "en": {"name": "country", "description": "Buy a country badge"},
@@ -34,7 +33,6 @@ class Shop_Group(GroupCog, name="shop"):
             await fr.Shop_Group(self.bot).country(ctx)
 
     @Jeanne.command(
-        name=T("backgrounds_name"),
         description=T("backgrounds_desc"),
         extras={
             "en": {
@@ -71,7 +69,7 @@ class Background_Group(GroupCog, name="background"):
         super().__init__()
 
     @Jeanne.command(
-        name=T("buycustom_name"),
+        name="buy-custom",
         description=T("buycustom_desc"),
         extras={
             "en": {
@@ -156,7 +154,7 @@ class Background_Group(GroupCog, name="background"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
-    async def list(self, ctx: Interaction):
+    async def _list(self, ctx: Interaction):
         if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Background_Group(self.bot).list(ctx)
         elif ctx.locale.value == "fr":

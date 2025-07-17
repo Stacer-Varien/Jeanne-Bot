@@ -18,7 +18,7 @@ class fun(Cog, name="FunSlash"):
         self.bot = bot
 
     @Jeanne.command(
-        name=T("8ball_name"),
+        name="8ball",
         description=T("8ball_desc"),
         extras={
             "en": {
@@ -72,7 +72,7 @@ class fun(Cog, name="FunSlash"):
                 ],
             },
             "fr": {
-                "name": "reverse",
+                "name": "inverse",
                 "description": "Dites quelque chose et je le dirai dans un texte inversé",
                 "parameters": [
                     {
@@ -134,7 +134,7 @@ class fun(Cog, name="FunSlash"):
                 ],
             },
             "fr": {
-                "name": "combine",
+                "name": "combiner",
                 "description": "Combinez deux mots en un seul",
                 "parameters": [
                     {
@@ -206,7 +206,6 @@ class fun(Cog, name="FunSlash"):
             await fr.fun(self.bot).choose(ctx, choices)
 
     @Jeanne.command(
-        name=T("simprate_name"),
         description=T("simprate_desc"),
         extras={
             "en": {
@@ -245,7 +244,6 @@ class fun(Cog, name="FunSlash"):
             await fr.fun(self.bot).simprate(ctx, member)
 
     @Jeanne.command(
-        name=T("gayrate_name"),
         description=T("gayrate_desc"),
         extras={
             "en": {

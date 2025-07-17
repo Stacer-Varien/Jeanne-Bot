@@ -118,7 +118,6 @@ class InfoCog(Cog, name="InfoSlash"):
             await fr.Info(self.bot).serverinfo(ctx)
 
     @Jeanne.command(
-        name=T("ping_name"),
         description=T("ping_desc"),
         extras={
             "en": {
