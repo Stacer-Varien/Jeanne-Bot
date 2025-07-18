@@ -159,7 +159,7 @@ class EmbedGroup(GroupCog, name="embed"):
                 await fr.EmbedGroup(self.bot).edit_error(ctx, error)
 
 
-class ReminderCog(GroupCog, name="reminder"):
+class ReminderCog(GroupCog, name=T("reminder")):
     def __init__(self, bot: Bot):
         self.bot = bot
         super().__init__()
@@ -490,7 +490,6 @@ class SlashUtilities(Cog):
             await fr.Utilities(self.bot).botreport(ctx, report_type)
 
     @Jeanne.command(
-        name=T("dictionary_name"),
         description=T("dictionary_desc"),
     )
     @Jeanne.check(is_suspended)

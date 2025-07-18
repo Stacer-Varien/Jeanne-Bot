@@ -394,13 +394,11 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "See your avatar or another member's avatar",
                 "fr": "Voir votre avatar ou l'avatar d'un autre membre",
             },
-            
             "ping_desc": {
                 "en-GB": "Check how fast I respond to a command",
                 "en-US": "Check how fast I respond to a command",
                 "fr": "Vérifiez la rapidité de ma réponse à une commande",
             },
-
             "sticker_desc": {
                 "en-GB": "Views a sticker",
                 "en-US": "Views a sticker",
@@ -477,13 +475,67 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "See your profile or someone else's profile",
                 "fr": "Voir votre profil ou celui de quelqu'un d'autre",
             },
-            # manage commands. will continue later
             "textchannel_name": {
                 "en-GB": "textchannel",
                 "en-US": "textchannel",
                 "fr": "canal_texte",
             },
-            "create_group_name": {"en-GB": "create", "en-US": "create", "fr": "créer"},
+            "create": {"en-GB": "create", "en-US": "create", "fr": "créer"},
+            "create textchannel_name": {
+                "en-GB": "create textchannel",
+                "en-US": "create textchannel",
+                "fr": "créer un canal texte",
+            },
+            "create voicechannel_name": {
+                "en-GB": "create voicechannel",
+                "en-US": "create voicechannel",
+                "fr": "créer un canal vocal",
+            },
+            "create category_name": {
+                "en-GB": "create category",
+                "en-US": "create category",
+                "fr": "créer une catégorie",
+            },
+            "create stagechannel_name": {
+                "en-GB": "create stagechannel",
+                "en-US": "create stagechannel",
+                "fr": "créer stagechannel",
+            },
+            "create forum_name": {
+                "en-GB": "create forum",
+                "en-US": "create forum",
+                "fr": "créer forum",
+            },
+            "create role_name": {
+                "en-GB": "create role",
+                "en-US": "create role",
+                "fr": "créer rôle",
+            },
+            "create thread": {
+                "en-GB": "create thread",
+                "en-US": "create thread",
+                "fr": "créer thread",
+            },
+            "create thread public_thread_name": {
+                "en-GB": "create thread public",
+                "en-US": "create thread public",
+                "fr": "créer thread public",
+            },
+            "create thread private_thread_name": {
+                "en-GB": "create thread private",
+                "en-US": "create thread private",
+                "fr": "créer thread privé",
+            },
+            "create emoji_name": {
+                "en-GB": "create emoji",
+                "en-US": "create emoji",
+                "fr": "créer emoji",
+            },
+            "create sticker_name": {
+                "en-GB": "create sticker",
+                "en-US": "create sticker",
+                "fr": "créer sticker",
+            },
             "textchannel_description": {
                 "en-GB": "Create a text channel",
                 "en-US": "Create a text channel",
@@ -775,6 +827,11 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "delete sticker",
                 "fr": "supprimer sticker",
             },
+            "set": {
+                "en-GB": "set",
+                "en-US": "set",
+                "fr": "définir",
+            },
             "set set_welcomer_name": {
                 "en-GB": "set welcomer",
                 "en-US": "set welcomer",
@@ -835,6 +892,11 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "set color",
                 "fr": "définir couleur",
             },
+            "rename": {
+                "en-GB": "rename",
+                "en-US": "rename",
+                "fr": "renommer",
+            },
             "rename rename_emoji_name": {
                 "en-GB": "rename emoji",
                 "en-US": "rename emoji",
@@ -849,6 +911,11 @@ class MyTranslator(Jeanne.Translator):
                 "en-GB": "rename sticker",
                 "en-US": "rename sticker",
                 "fr": "renommer sticker",
+            },
+            "command": {
+                "en-GB": "command",
+                "en-US": "command",
+                "fr": "commande",
             },
             "command disable_command_name": {
                 "en-GB": "disable command",
@@ -865,6 +932,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "list disabled commands",
                 "fr": "lister commandes désactivées",
             },
+            
             "level role_reward_group_name add_role_reward_name": {
                 "en-GB": "add role reward",
                 "en-US": "add role reward",
@@ -896,14 +964,14 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "lister canaux liste noire",
             },
             "embed generate_name": {
-                "en-GB": "generate embed",
-                "en-US": "generate embed",
-                "fr": "générer embed",
+                "en-GB": "embed generate",
+                "en-US": "embed generate",
+                "fr": "embed générer",
             },
             "embed edit_name": {
-                "en-GB": "edit embed",
-                "en-US": "edit embed",
-                "fr": "modifier embed",
+                "en-GB": "embed edit",
+                "en-US": "embed edit",
+                "fr": "embed modifier",
             },
             "weather_name": {
                 "en-GB": "weather",
@@ -925,25 +993,30 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "botreport",
                 "fr": "rapportbot",
             },
-            "dictionary_name": {
-                "en-GB": "dictionary",
-                "en-US": "dictionary",
-                "fr": "dictionnaire",
+            "reminder": {
+                "en-GB": "reminder",
+                "en-US": "reminder",
+                "fr": "rappel",
             },
             "reminder reminder_add_name": {
                 "en-GB": "reminder add",
                 "en-US": "reminder add",
-                "fr": "ajouter rappel",
+                "fr": "rappel ajouter",
             },
             "reminder reminder_list_name": {
                 "en-GB": "reminder list",
                 "en-US": "reminder list",
-                "fr": "liste rappels",
+                "fr": "rappels liste",
             },
             "reminder reminder_cancel_name": {
                 "en-GB": "reminder cancel",
                 "en-US": "reminder cancel",
-                "fr": "annuler rappel",
+                "fr": "rappel annuler",
+            },
+            "clone_name": {
+                "en-GB": "clone",
+                "en-US": "clone",
+                "fr": "cloner",
             },
             "remove_name": {"en-GB": "remove", "en-US": "remove", "fr": "supprimer"},
             "remove_role_description": {
@@ -1294,6 +1367,31 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Kick a member out of the server",
                 "fr": "Expulser un membre du serveur",
             },
+            "delete": {
+                "en-GB": "delete",
+                "en-US": "delete",
+                "fr": "supprimer",
+            },
+            "delete delete_channel_name": {
+                "en-GB": "delete channel",
+                "en-US": "delete channel",
+                "fr": "supprimer canal",
+            },
+            "delete delete_role_name": {
+                "en-GB": "delete role",
+                "en-US": "delete role",
+                "fr": "supprimer rôle",
+            },
+            "delete delete_emoji_name": {
+                "en-GB": "delete emoji",
+                "en-US": "delete emoji",
+                "fr": "supprimer emoji",
+            },
+            "delete delete_sticker_name": {
+                "en-GB": "delete sticker",
+                "en-US": "delete sticker",
+                "fr": "supprimer sticker",
+            },
             "prune_desc": {
                 "en-GB": "Bulk delete messages",
                 "en-US": "Bulk delete messages",
@@ -1598,7 +1696,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "JSON file",
                 "fr": "Fichier JSON",
             },
-            "edit_name": {"en-GB": "edit", "en-US": "edit", "fr": "éditer"},
+            "edit": {"en-GB": "edit", "en-US": "edit", "fr": "éditer"},
             "edit_embed_desc": {
                 "en-GB": "Edits an embed message. Use Discohook.org for JSON generation.",
                 "en-US": "Edits an embed message. Use Discohook.org for JSON generation.",
@@ -1782,7 +1880,7 @@ class MyTranslator(Jeanne.Translator):
             "dictionary_desc": {
                 "en-GB": "Check the meaning of a word",
                 "en-US": "Check the meaning of a word",
-                "fr": "Vérifiez la signification d'un mot",
+                "fr": "Vérifiez la signification d'un mot (Anglais seulement)",
             },
             "dictionary_word_parm_name": {
                 "en-GB": "word",
@@ -1802,7 +1900,8 @@ class MyTranslator(Jeanne.Translator):
             "confess_desc": {
                 "en-GB": "Confess something anonymously or not",
                 "en-US": "Confess something anonymously or not",
-                "fr": "Confessez quelque chose de manière anonyme ou non",},
+                "fr": "Confessez quelque chose de manière anonyme ou non",
+            },
             "confession_parm_name": {
                 "en-GB": "confession",
                 "en-US": "confession",
@@ -1831,8 +1930,8 @@ class MyTranslator(Jeanne.Translator):
             "reportconfession_name": {
                 "en-GB": "report-confession",
                 "en-US": "report-confession",
-                "fr": "rapport-confession",}
-                ,
+                "fr": "rapport-confession",
+            },
             "reportconfession_desc": {
                 "en-GB": "Report a confession",
                 "en-US": "Report a confession",

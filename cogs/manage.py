@@ -2127,15 +2127,13 @@ class manage(Cog):
         extras={
             "en": {
                 "member_perms": "Manage Server",
-                "name": "Remove Server Data",
+                "name": "Remove",
                 "description": "Remove all server data",
-                "parameters": [],
             },
             "fr": {
                 "member_perms": "Gérer le serveur",
-                "name": "Supprimer les données du serveur",
+                "name": "Supprimer",
                 "description": "Supprimer toutes les données du serveur",
-                "parameters": [],
             },
         },
     )
@@ -2156,7 +2154,7 @@ class manage(Cog):
             "en": {
                 "bot_perms": "Manage Channel",
                 "member_perms": "Manage Channel",
-                "name": "Clone Channel",
+                "name": "Clone",
                 "description": "Clone a channel",
                 "parameters": [
                     {
@@ -2180,7 +2178,7 @@ class manage(Cog):
             "fr": {
                 "bot_perms": "Gérer les canels",
                 "member_perms": "Gérer les canels",
-                "name": "Cloner un canel",
+                "name": "Cloner",
                 "description": "Cloner un canel",
                 "parameters": [
                     {
@@ -2549,7 +2547,7 @@ class Command_Group(GroupCog, name="command"):
             await fr.Command_Group(self.bot).listdisabled(ctx)
 
 
-class Level_Group(GroupCog, name=T("level")):
+class Level_Group(GroupCog, name="level"):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()
