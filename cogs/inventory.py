@@ -107,7 +107,7 @@ class Background_Group(GroupCog, name="background"):
         },
     )
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
-    @Jeanne.describe(name=T("buycustom_name_desc"), link=T("buycustom_link_desc"))
+    @Jeanne.describe(name=T("name_parm_desc"), link=T("link_parm_desc"))
     @Jeanne.rename(name="name_parm_name", link="link_parm_name")
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)

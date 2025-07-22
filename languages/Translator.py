@@ -436,11 +436,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Check all the wallpapers available",
                 "fr": "Vérifiez tous les fonds d'écran disponibles",
             },
-            "buy-custom_name": {
-                "en-GB": "buy-custom",
-                "en-US": "buy-custom",
-                "fr": "buy-custom",
-            },
             "buy-custom_desc": {
                 "en-GB": "Buy a custom background pic for your level card",
                 "en-US": "Buy a custom background pic for your level card",
@@ -1597,6 +1592,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "How many user IDs? Leave a space after each ID (min is 5 and max is 25)",
                 "fr": "Combien d'IDs utilisateur? Laissez un espace après chaque ID (min est 5 et max est 25)",
             },
+            
             "hug_name": {"en-GB": "hug", "en-US": "hug", "fr": "câlin"},
             "slap_name": {"en-GB": "slap", "en-US": "slap", "fr": "gifler"},
             "smug_name": {"en-GB": "smug", "en-US": "smug", "fr": "suffisant"},
