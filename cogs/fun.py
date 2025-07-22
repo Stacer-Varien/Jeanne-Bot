@@ -194,7 +194,7 @@ class fun(Cog, name="FunSlash"):
             },
         },
     )
-    @Jeanne.describe(choices=T("choose_parm_desc"))
+    @Jeanne.describe(choices=T("choices_parm_desc"))
     @Jeanne.rename(choices=T("choices_parm_name"))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
