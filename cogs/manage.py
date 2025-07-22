@@ -1601,8 +1601,8 @@ class Set_Group(GroupCog, name="set"):
         leaving_channel=T("leaving_channel_parm_desc"),
     )
     @Jeanne.rename(
-        welcoming_channel=T("channel_parm_name"),
-        leaving_channel=T("channel_parm_name"),
+        welcoming_channel=T("welcomer_channel_parm_name"),
+        leaving_channel=T("leaving_channel_parm_name"),
     )
     @Jeanne.checks.bot_has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)

@@ -1761,6 +1761,16 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "channel",
                 "fr": "canal",
             },
+            "welcomer_channel_parm_name": {
+                "en-GB": "welcomer_channel",
+                "en-US": "welcomer_channel",
+                "fr": "canal_de_bienvenue",
+            },
+            "leaving_channel_parm_name": {
+                "en-GB": "leaving_channel",
+                "en-US": "leaving_channel",
+                "fr": "canal_de_depart",
+            },
             "generate_jsonscript_parm_name": {
                 "en-GB": "jsonscript",
                 "en-US": "jsonscript",
