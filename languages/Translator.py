@@ -106,7 +106,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Guess my number and you can win 20 QP",
                 "fr": "Devinez mon nombre et vous pouvez gagner 20 QP",
             },
-            "guess_bet_name": {
+            "guess_bet_desc": {
                 "en-GB": "Guess my number and you can win with betting",
                 "en-US": "Guess my number and you can win with betting",
                 "fr": "Devinez mon nombre et vous pouvez gagner avec des paris",
@@ -219,6 +219,11 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Add second word",
                 "fr": "Ajouter le deuxième mot",
             },
+            "simprate_desc": {
+                "en-GB": "Check how much of a simp you or a member is",
+                "en-US": "Check how much of a simp you or a member is",
+                "fr": "Vérifiez à quel point vous ou un membre êtes un simp",
+            },
             "choose_name": {"en-GB": "choose", "en-US": "choose", "fr": "choisir"},
             "choose_desc": {
                 "en-GB": "Give me a lot of choices and I will pick one for you",
@@ -240,11 +245,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Get a random animeme",
                 "fr": "Obtenez un animeme aléatoire",
             },
-            "gayrate_name": {
-                "en-GB": "gayrate",
-                "en-US": "gayrate",
-                "fr": "taux_de_gay",
-            },
             "gayrate_desc": {
                 "en-GB": "Get a random gay rate for you or someone else",
                 "en-US": "Get a random gay rate for you or someone else",
@@ -262,7 +262,7 @@ class MyTranslator(Jeanne.Translator):
             },
             "help_group_name": {"en-GB": "help", "en-US": "help", "fr": "aide"},
             "command_name": {"en-GB": "command", "en-US": "command", "fr": "commande"},
-            "command_desc": {
+            "help_command_desc": {
                 "en-GB": "Get help on a certain command",
                 "en-US": "Get help on a certain command",
                 "fr": "Obtenez de l'aide sur une certaine commande",
@@ -506,6 +506,13 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "create forum",
                 "fr": "créer forum",
             },
+            "role_parm_name": {
+                "en-GB": "role",
+                "en-US": "role",
+                "fr": "rôle",
+            },
+            "description_parm_name": {"en-GB": "description", "en-US": "description", "fr": "description"},
+            
             "create role_name": {
                 "en-GB": "create role",
                 "en-US": "create role",
@@ -625,12 +632,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-GB": "private-thread",
                 "en-US": "private-thread",
                 "fr": "fil-privé",
-            },
-            "emoji_name": {"en-GB": "emoji", "en-US": "emoji", "fr": "emoji"},
-            "sticker_name": {
-                "en-GB": "sticker",
-                "en-US": "sticker",
-                "fr": "autocollant",
             },
             "delete_channel_name": {
                 "en-GB": "channel",
@@ -917,6 +918,7 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "command",
                 "fr": "commande",
             },
+
             "command disable_command_name": {
                 "en-GB": "disable command",
                 "en-US": "disable command",
@@ -932,7 +934,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "list disabled commands",
                 "fr": "lister commandes désactivées",
             },
-            
             "level role_reward_group_name add_role_reward_name": {
                 "en-GB": "add role reward",
                 "en-US": "add role reward",
@@ -1025,9 +1026,14 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Supprimer un rôle d'un membre",
             },
             "remove_description": {
-                "en-GB": "remove",
-                "en-US": "remove",
-                "fr": "supprimer",
+                "en-GB": "Remove a feature from the server",
+                "en-US": "Remove a feature from the server",
+                "fr": "Supprimer une fonctionnalité du serveur",
+            },
+            "clone_description": {
+                "en-GB": "Clone a channel",
+                "en-US": "Clone a channel",
+                "fr": "Cloner un canal",
             },
             "list_disabled_commands_name": {
                 "en-GB": "list-disabled",
@@ -1038,6 +1044,16 @@ class MyTranslator(Jeanne.Translator):
                 "en-GB": "List all disabled commands in the server",
                 "en-US": "List all disabled commands in the server",
                 "fr": "Lister toutes les commandes désactivées sur le serveur",
+            },
+            "disable_command_description": {
+                "en-GB": "Disables a command",
+                "en-US": "Disables a command",
+                "fr": "Désactive une commande",
+            },
+            "enable_command_description": {
+                "en-GB": "Enables a command",
+                "en-US": "Enables a command",
+                "fr": "Active une commande",
             },
             "blacklist_channel_group_name": {
                 "en-GB": "blacklist-channel",
@@ -1230,7 +1246,72 @@ class MyTranslator(Jeanne.Translator):
             "delete_sticker_description": {
                 "en-GB": "Deletes a sticker",
                 "en-US": "Deletes a sticker",
-                "fr": "Supprime un autocollant",
+                "fr": "Supprime sticker",
+            },
+            "set_welcomer_description": {
+                "en-GB": "Sets a welcomer and/or leaver channel",
+                "en-US": "Sets a welcomer and/or leaver channel",
+                "fr": "Définit un canal d'accueil et/ou de départ",
+            },
+            "set_modlog_description": {
+                "en-GB": "Sets a modlog channel",
+                "en-US": "Sets a modlog channel",
+                "fr": "Définit un canal de journalisation des modérateurs",
+            },
+            "set_welcomingmsg_description": {
+                "en-GB": "Sets a welcoming message when someone joins the server",
+                "en-US": "Sets a welcoming message when someone joins the server",
+                "fr": "Définit un message d'accueil lorsqu'une personne rejoint le serveur",
+            },
+            "set_leavingmsg_description": {
+                "en-GB": "Sets a leaving message when someone leaves the server",
+                "en-US": "Sets a leaving message when someone leaves the server",
+                "fr": "Définit un message de départ lorsqu'une personne quitte le serveur",
+            },
+            "set_rolereward_message_description": {
+                "en-GB": "Sets a role reward message when a user levels up",
+                "en-US": "Sets a role reward message when a user levels up",
+                "fr": "Définit un message de récompense de rôle lorsqu'un utilisateur monte de niveau",
+            },
+            "set_levelupdate_description": {
+                "en-GB": "Sets a level up message when a user levels up",
+                "en-US": "Sets a level up message when a user levels up",
+                "fr": "Définit un message de montée de niveau lorsqu'un utilisateur monte de niveau",
+            },
+            "set_confessionchannel_description": {
+                "en-GB": "Sets a confession channel",
+                "en-US": "Sets a confession channel",
+                "fr": "Définit un canal de confession",
+            },
+            "set_brightness_description": {
+                "en-GB": "Sets the brightness of the bot's messages",
+                "en-US": "Sets the brightness of the bot's messages",
+                "fr": "Définit la luminosité des messages du bot",
+            },
+            "set_bio_description": {
+                "en-GB": "Sets the bot's bio",
+                "en-US": "Sets the bot's bio",
+                "fr": "Définit la bio du bot",
+            },
+            "set_color_description": {
+                "en-GB": "Sets the color of the bot's messages",
+                "en-US": "Sets the color of the bot's messages",
+                "fr": "Définit la couleur des messages du bot",
+            },
+            "rename_emoji_description": {
+                "en-GB": "Renames an emoji",
+                "en-US": "Renames an emoji",
+                "fr": "Renomme un emoji",
+            },
+            "rename_category_description": {
+                "en-GB": "Renames a category",
+                "en-US": "Renames a category",
+                "fr": "Renomme une catégorie",
+            },
+            "rename_sticker_description": {
+                "en-GB": "Renames a sticker",
+                "en-US": "Renames a sticker",
+                "fr": "Renomme sticker",
             },
             "edit_textchannel_description": {
                 "en-GB": "Edits a text/news channel",
@@ -1600,7 +1681,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Dance with someone or yourself",
                 "fr": "Dansez avec quelqu'un ou vous-même",
             },
-            "member_parm_name": {"en-GB": "member", "en-US": "member", "fr": "membre"},
             "hug_member_parm_desc": {
                 "en-GB": "Who are you hugging?",
                 "en-US": "Who are you hugging?",
@@ -1666,6 +1746,11 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Generates an embed message. Use Discohook.app for JSON generation.",
                 "fr": "Génère un message embed. Utilisez Discohook.app pour générer le JSON.",
             },
+            "edit_desc": {
+                "en-GB": "Edits an embed message. Use Discohook.org for JSON generation.",
+                "en-US": "Edits an embed message. Use Discohook.org for JSON generation.",
+                "fr": "Modifie un message embed. Utilisez Discohook.org pour générer le JSON.",
+            },
             "generate_channel_parm_name": {
                 "en-GB": "channel",
                 "en-US": "channel",
@@ -1712,10 +1797,10 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Channel of the message",
                 "fr": "Canal du message",
             },
-            "edit_messageid_parm_name": {
-                "en-GB": "messageid",
-                "en-US": "messageid",
-                "fr": "messageid",
+            "message_id_parm_name": {
+                "en-GB": "message_id",
+                "en-US": "message_id",
+                "fr": "message_id",
             },
             "edit_messageid_parm_desc": {
                 "en-GB": "Message ID of the embed",
@@ -1758,10 +1843,15 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Reason for the reminder",
                 "fr": "Raison du rappel",
             },
-            "reminder_add_time_parm_name": {
+            "time_parm_name": {
                 "en-GB": "time",
                 "en-US": "time",
                 "fr": "temps",
+            },
+            "reminder_cancel_rmd_id_parm_name": {
+                "en-GB": "reminder_id",
+                "en-US": "reminder_id",
+                "fr": "id_rappel",
             },
             "reminder_add_time_parm_desc": {
                 "en-GB": "Time (e.g., 1h, 30m)",
@@ -1946,6 +2036,11 @@ class MyTranslator(Jeanne.Translator):
                 "en-GB": "Why are you reporting this confession?",
                 "en-US": "Why are you reporting this confession?",
                 "fr": "Pourquoi signalez-vous cette confession?",
+            },
+            "add_role_description": {
+                "en-GB": "Adds a role to a member",
+                "en-US": "Adds a role to a member",
+                "fr": "Ajoute un rôle à un membre",
             },
         }
         return translations.get(string.message, {}).get(locale.value)

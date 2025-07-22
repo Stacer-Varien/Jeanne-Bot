@@ -138,8 +138,8 @@ class EmbedGroup(GroupCog, name="embed"):
         jsonscript=T("edit_jsonscript_parm_desc"),
     )
     @Jeanne.rename(
-        channel=T("edit_channel_parm_name"),
-        messageid=T("edit_messageid_parm_name"),
+        channel=T("channel_parm_name"),
+        messageid=T("message_id_parm_name"),
         jsonscript=T("edit_jsonscript_parm_name"),
     )
     async def edit(

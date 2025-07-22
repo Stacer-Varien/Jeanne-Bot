@@ -195,7 +195,7 @@ class fun(Cog, name="FunSlash"):
         },
     )
     @Jeanne.describe(choices=T("choose_parm_desc"))
-    @Jeanne.rename(choices=T("choose_parm_name"))
+    @Jeanne.rename(choices=T("choices_parm_name"))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
@@ -248,7 +248,7 @@ class fun(Cog, name="FunSlash"):
         extras={
             "en": {
                 "name": "gayrate",
-                "description": "Rate how gay a member is",
+                "description": "Rate how gay you or a member is",
                 "parameters": [
                     {
                         "name": "member",

@@ -322,6 +322,7 @@ class Create_Group(GroupCog, name=T("create")):
     @Jeanne.rename(
         name=T("name_parm_name"),
         category=T("category_parm_name"),
+        users=T("users_parm_name")
     )
     @Jeanne.checks.bot_has_permissions(manage_channels=True)
     @Jeanne.checks.has_permissions(manage_channels=True)
@@ -830,6 +831,7 @@ class Create_Group(GroupCog, name=T("create")):
                         "description": "The link to the sticker image",
                         "required": True,
                     },
+                    {"name": "Sticker", "description": "The image file for the sticker", "required": False},
                 ],
             },
             "fr": {
@@ -853,6 +855,11 @@ class Create_Group(GroupCog, name=T("create")):
                         "description": "Le lien vers l'image de l'autocollant",
                         "required": True,
                     },
+                    {
+                        "name": "Sticker Image",
+                        "description": "Le fichier image pour l'autocollant",
+                        "required": False,
+                    },
                 ],
             },
         },
@@ -865,8 +872,7 @@ class Create_Group(GroupCog, name=T("create")):
     )
     @Jeanne.rename(
         name=T("name_parm_name"),
-        sticker_link=T("sticker_link_parm_name"),
-        sticker_image=T("sticker_image_parm_name"),
+        sticker_link=T("link_parm_name"),
     )
     @Jeanne.checks.bot_has_permissions(manage_expressions=True)
     @Jeanne.checks.has_permissions(manage_expressions=True)
@@ -1511,8 +1517,6 @@ class Edit_Group(GroupCog, name="edit"):
     @Jeanne.rename(
         name=T("name_parm_name"),
         description=T("description_parm_name"),
-        avatar=T("avatar_parm_name"),
-        splash=T("splash_parm_name"),
         banner=T("banner_parm_name"),
         verification_level=T("verification_level_parm_name"),
     )
@@ -1597,8 +1601,8 @@ class Set_Group(GroupCog, name="set"):
         leaving_channel=T("leaving_channel_parm_desc"),
     )
     @Jeanne.rename(
-        welcoming_channel=T("welcoming_channel_parm_name"),
-        leaving_channel=T("leaving_channel_parm_name"),
+        welcoming_channel=T("channel_parm_name"),
+        leaving_channel=T("channel_parm_name"),
     )
     @Jeanne.checks.bot_has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)
@@ -2054,8 +2058,8 @@ class manage(Cog):
         role=T("add_role_role_desc"),
     )
     @Jeanne.rename(
-        member=T("add_role_member_name"),
-        role=T("add_role_role_name"),
+        member=T("member_parm_name"),
+        role=T("role_parm_name"),
     )
     @Jeanne.checks.bot_has_permissions(manage_roles=True)
     @Jeanne.checks.has_permissions(manage_roles=True)
@@ -2107,8 +2111,8 @@ class manage(Cog):
         role=T("remove_role_role_desc"),
     )
     @Jeanne.rename(
-        member=T("remove_role_member_name"),
-        role=T("remove_role_role_name"),
+        member=T("member_parm_name"),
+        role=T("role_parm_name"),
     )
     @Jeanne.checks.bot_has_permissions(manage_roles=True)
     @Jeanne.checks.has_permissions(manage_roles=True)
@@ -2210,8 +2214,9 @@ class manage(Cog):
         name=T("clone_name_desc"),
     )
     @Jeanne.rename(
-        channel=T("clone_channel_name"),
-        name=T("clone_name_name"),
+        channel=T("channel_parm_name"),
+        name=T("name_parm_name"),
+        category=T("category_parm_name"),
     )
     @Jeanne.checks.bot_has_permissions(manage_channels=True)
     @Jeanne.checks.has_permissions(manage_channels=True)
@@ -2283,7 +2288,7 @@ class Rename_Group(GroupCog, name="rename"):
         name=T("rename_emoji_name_desc"),
     )
     @Jeanne.rename(
-        name=T("rename_emoji_name_name"),
+        name=T("name_parm_name"),
     )
     @Jeanne.checks.bot_has_permissions(manage_expressions=True)
     @Jeanne.checks.has_permissions(manage_expressions=True)
@@ -2343,8 +2348,8 @@ class Rename_Group(GroupCog, name="rename"):
         name=T("rename_category_name_desc"),
     )
     @Jeanne.rename(
-        category=T("rename_category_category_name"),
-        name=T("rename_category_name_name"),
+        category=T("category_parm_name"),
+        name=T("name_parm_name"),
     )
     @Jeanne.checks.has_permissions(manage_channels=True)
     @Jeanne.checks.bot_has_permissions(manage_channels=True)
@@ -2409,7 +2414,7 @@ class Rename_Group(GroupCog, name="rename"):
     )
     @Jeanne.rename(
         sticker=T("rename_sticker_sticker_name"),
-        name=T("rename_sticker_name_name"),
+        name=T("name_parm_name"),
     )
     @Jeanne.checks.bot_has_permissions(manage_expressions=True)
     @Jeanne.checks.has_permissions(manage_expressions=True)
@@ -2462,7 +2467,7 @@ class Command_Group(GroupCog, name="command"):
     )
     @Jeanne.autocomplete(command=AutoCompleteChoices.command_choices)
     @Jeanne.describe(command=T("disable_command_param_desc"))
-    @Jeanne.rename(command=T("disable_command_param_name"))
+    @Jeanne.rename(command=T("command_param_name"))
     @Jeanne.checks.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(is_suspended)
@@ -2508,7 +2513,7 @@ class Command_Group(GroupCog, name="command"):
     )
     @Jeanne.autocomplete(command=AutoCompleteChoices.disabled_commands)
     @Jeanne.describe(command=T("enable_command_param_desc"))
-    @Jeanne.rename(command=T("enable_command_param_name"))
+    @Jeanne.rename(command=T("command_param_name"))
     @Jeanne.checks.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(is_suspended)
@@ -2595,7 +2600,7 @@ class Level_Group(GroupCog, name="level"):
         level=T("add_role_reward_level_desc"),
     )
     @Jeanne.rename(
-        role=T("add_role_reward_role_name"),
+        role=T("role_parm_name"),
         level=T("add_role_reward_level_name"),
     )
     @Jeanne.checks.has_permissions(manage_guild=True)
@@ -2639,7 +2644,7 @@ class Level_Group(GroupCog, name="level"):
         },
     )
     @Jeanne.describe(role=T("remove_role_reward_role_desc"))
-    @Jeanne.rename(role=T("remove_role_reward_role_name"))
+    @Jeanne.rename(role=T("role_parm_name"))
     @Jeanne.checks.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
@@ -2710,7 +2715,7 @@ class Level_Group(GroupCog, name="level"):
         },
     )
     @Jeanne.describe(channel=T("add_blacklist_ch_channel_desc"))
-    @Jeanne.rename(channel=T("add_blacklist_ch_channel_name"))
+    @Jeanne.rename(channel=T("channel_parm_name"))
     @Jeanne.checks.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
@@ -2752,7 +2757,7 @@ class Level_Group(GroupCog, name="level"):
         },
     )
     @Jeanne.describe(channel=T("remove_blacklist_ch_channel_desc"))
-    @Jeanne.rename(channel=T("remove_blcklist_ch_channel_name"))
+    @Jeanne.rename(channel=T("channel_parm_name"))
     @Jeanne.checks.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)

@@ -64,7 +64,7 @@ class Guess_Group(GroupCog, group_name=T("guess_group_name")):
 
     @Jeanne.command(
         name=T("bet_name"),
-        description=T("guess_bet_name"),
+        description=T("guess_bet_desc"),
         extras={  # for autocomplete help reasons
             "en": {
                 "name": "guess bet",
