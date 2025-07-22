@@ -117,7 +117,7 @@ class moderation(Cog):
         member=T("member_param_desc"),
         reason=T("reason_param_desc"),
         delete_message_history=T("delete_msg_history_param_desc"),
-        time=T("time_param_desc"),
+        time=T("temp_time_param_desc"),
     )
     @Jeanne.rename(
         member=T("member_param_name"),
@@ -201,7 +201,7 @@ class moderation(Cog):
     @Jeanne.check(is_suspended)
     @Jeanne.describe(
         member=T("member_param_desc"),
-        reason=T("reason_param_desc_fr"),
+        reason=T("reason_param_desc"),
     )
     @Jeanne.rename(
         member=T("member_param_name"),
@@ -320,11 +320,11 @@ class moderation(Cog):
     @Jeanne.check(is_suspended)
     @Jeanne.describe(
         member=T("member_param_desc"),
-        warn_id=T("warn_id_param_desc_fr"),
+        warn_id=T("warn_id_param_desc"),
     )
     @Jeanne.rename(
         member=T("member_param_name"),
-        warn_id=T("warn_id_param_name_fr"),
+        warn_id=T("warn_id_param_name"),
     )
     @Jeanne.checks.has_permissions(kick_members=True)
     @Jeanne.check(check_botbanned_app_command)
@@ -380,7 +380,7 @@ class moderation(Cog):
     @Jeanne.check(is_suspended)
     @Jeanne.describe(
         member=T("member_param_desc"),
-        reason=T("reason_param_desc_fr"),
+        reason=T("reason_param_desc"),
     )
     @Jeanne.rename(
         member=T("member_param_name"),
@@ -445,7 +445,7 @@ class moderation(Cog):
     )
     @Jeanne.check(is_suspended)
     @Jeanne.describe(
-        limit=T("limit_param_desc_fr"),
+        limit=T("limit_param_desc"),
         member=T("member_param_desc"),
     )
     @Jeanne.rename(
@@ -512,7 +512,7 @@ class moderation(Cog):
     @Jeanne.check(is_suspended)
     @Jeanne.describe(
         member=T("member_param_desc"),
-        nickname=T("nickname_param_desc_fr"),
+        nickname=T("nickname_param_desc"),
     )
     @Jeanne.rename(
         member=T("member_param_name"),
@@ -664,7 +664,7 @@ class moderation(Cog):
     @Jeanne.describe(
         member=T("member_param_desc"),
         time=T("timeout_time_desc"),
-        reason=T("reason_param_desc_fr"),
+        reason=T("reason_param_desc"),
     )
     @Jeanne.rename(
         member=T("member_param_name"),

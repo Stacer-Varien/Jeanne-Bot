@@ -1562,15 +1562,15 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Delete messages from past 7 days?",
                 "fr": "Supprimer les messages des 7 derniers jours?",
             },
-            "time_param_desc": {
+            "temp_time_param_desc": {
                 "en-GB": "How long should they be tempbanned? (1m, 1h30m, etc)",
                 "en-US": "How long should they be tempbanned? (1m, 1h30m, etc)",
                 "fr": "Combien de temps doivent-ils être temporairement bannis? (1m, 1h30m, etc)",
             },
             "timeout_time_desc": {
-                "en-GB": "How long should they be on timeout? (1m, 1h30m, etc)",
-                "en-US": "How long should they be on timeout? (1m, 1h30m, etc)",
-                "fr": "Combien de temps doivent-ils être temporairement bannis? (1m, 1h30m, etc)",
+                "en-GB": "How long should they be on timeout? (1m, 1h30m, etc) Max is 27 days",
+                "en-US": "How long should they be on timeout? (1m, 1h30m, etc) Max is 27 days",
+                "fr": "Combien de temps doivent-ils être en pause? (1m, 1h30m, etc) Max est 27 jours",
             },
             "warn_id_param_desc": {
                 "en-GB": "What is their warn ID you want to remove?",
