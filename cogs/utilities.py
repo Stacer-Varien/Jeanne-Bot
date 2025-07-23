@@ -65,7 +65,7 @@ class EmbedGroup(GroupCog, name="embed"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.describe(
         channel=T("channel_parm_desc"),
-        jsonscript=T("generate_jsonscript_parm_desc"),
+        jsonscript=T("jsonscript_parm_desc"),
     )
     @Jeanne.rename(
         channel=T("generate_channel_parm_name"),
@@ -133,14 +133,14 @@ class EmbedGroup(GroupCog, name="embed"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.describe(
-        channel=T("edit_channel_parm_desc"),
+        channel=T("channel_parm_desc"),
         messageid=T("edit_messageid_parm_desc"),
-        jsonscript=T("edit_jsonscript_parm_desc"),
+        jsonscript=T("jsonscript_parm_desc"),
     )
     @Jeanne.rename(
         channel=T("channel_parm_name"),
         messageid=T("message_id_parm_name"),
-        jsonscript=T("edit_jsonscript_parm_name"),
+        jsonscript=T("jsonscript_parm_name"),
     )
     async def edit(
         self, ctx: Interaction, channel: TextChannel, messageid: str, jsonscript: str):

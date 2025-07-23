@@ -774,8 +774,8 @@ class Create_Group(GroupCog, name=T("create")):
     )
     @Jeanne.describe(
         name=T("name_parm_desc"),
-        emoji_link=T("emoji_link_parm_desc"),
-        emoji_image=T("emoji_image_parm_desc"),
+        emoji_link=T("link_parm_desc"),
+        emoji_image=T("image_parm_desc"),
     )
     @Jeanne.rename(
         name=T("name_parm_name"),
@@ -2054,8 +2054,8 @@ class manage(Cog):
         },
     )
     @Jeanne.describe(
-        member=T("add_role_member_desc"),
-        role=T("add_role_role_desc"),
+        member=T("member_parm_desc"),
+        role=T("role_parm_desc"),
     )
     @Jeanne.rename(
         member=T("member_parm_name"),
@@ -2107,8 +2107,8 @@ class manage(Cog):
         },
     )
     @Jeanne.describe(
-        member=T("remove_role_member_desc"),
-        role=T("remove_role_role_desc"),
+        member=T("member_parm_desc"),
+        role=T("role_parm_desc"),
     )
     @Jeanne.rename(
         member=T("member_parm_name"),
@@ -2210,7 +2210,7 @@ class manage(Cog):
         },
     )
     @Jeanne.describe(
-        channel=T("clone_channel_desc"),
+        channel=T("channel_parm_desc"),
         name=T("clone_name_desc"),
     )
     @Jeanne.rename(
@@ -2284,8 +2284,8 @@ class Rename_Group(GroupCog, name="rename"):
         },
     )
     @Jeanne.describe(
-        emoji=T("rename_emoji_emoji_desc"),
-        name=T("rename_emoji_name_desc"),
+        emoji=T("emoji_parm_desc"),
+        name=T("rename_parm_desc"),
     )
     @Jeanne.rename(
         name=T("name_parm_name"),
@@ -2344,8 +2344,8 @@ class Rename_Group(GroupCog, name="rename"):
         },
     )
     @Jeanne.describe(
-        category=T("rename_category_category_desc"),
-        name=T("rename_category_name_desc"),
+        category=T("rename_category_parm_desc"),
+        name=T("rename_parm_desc"),
     )
     @Jeanne.rename(
         category=T("category_parm_name"),
@@ -2409,11 +2409,10 @@ class Rename_Group(GroupCog, name="rename"):
         },
     )
     @Jeanne.describe(
-        sticker=T("rename_sticker_sticker_desc"),
-        name=T("rename_sticker_name_desc"),
+        sticker=T("sticker_parm_desc"),
+        name=T("rename_parm_desc"),
     )
     @Jeanne.rename(
-        sticker=T("rename_sticker_sticker_name"),
         name=T("name_parm_name"),
     )
     @Jeanne.checks.bot_has_permissions(manage_expressions=True)
@@ -2596,12 +2595,12 @@ class Level_Group(GroupCog, name="level"):
         },
     )
     @Jeanne.describe(
-        role=T("add_role_reward_role_desc"),
-        level=T("add_role_reward_level_desc"),
+        role=T("role_parm_desc"),
+        level=T("level_parm_desc"),
     )
     @Jeanne.rename(
         role=T("role_parm_name"),
-        level=T("add_role_reward_level_name"),
+        level=T("level_parm_name"),
     )
     @Jeanne.checks.has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)

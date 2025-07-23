@@ -31,6 +31,36 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Which member?",
                 "fr": "Quel membre?",
             },
+            "role_parm_desc": {
+                "en-GB": "Which role?",
+                "en-US": "Which role?",
+                "fr": "Quel rôle?",
+            },
+            "level_parm_desc": {
+                "en-GB": "Which level?",
+                "en-US": "Which level?",
+                "fr": "Quel niveau?",
+            },
+            "level_parm_name": {
+                "en-GB": "level",
+                "en-US": "level",
+                "fr": "niveau",
+            },
+            "add_blacklist_ch_channel_desc": {
+                "en-GB": "Which channel do you want to blacklist?",
+                "en-US": "Which channel do you want to blacklist?",
+                "fr": "Quel canal voulez-vous mettre sur liste noire?",
+            },
+            "remove_blacklist_ch_channel_desc": {
+                "en-GB": "Which channel do you want to remove from the blacklist?",
+                "en-US": "Which channel do you want to remove from the blacklist?",
+                "fr": "Quel canal voulez-vous retirer de la liste noire?",
+            },
+            "clone_name_desc": {
+                "en-GB": "If you want to change the name, what will you name it?",
+                "en-US": "If you want to change the name, what will you name it?",
+                "fr": "Si vous voulez changer le nom, comment l'appellerez-vous ?",
+            },
             "background list_name": {
                 "en-GB": "background list",
                 "en-US": "background list",
@@ -277,6 +307,16 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Which command you need help with?",
                 "fr": "Avec quelle commande avez-vous besoin d'aide?",
             },
+            "disable_command_param_desc": {
+                "en-GB": "Which command do you want to disable?",
+                "en-US": "Which command do you want to disable?",
+                "fr": "Quelle commande voulez-vous désactiver?",
+            },
+            "enable_command_param_desc": {
+                "en-GB": "Which command do you want to enable?",
+                "en-US": "Which command do you want to enable?",
+                "fr": "Quelle commande voulez-vous activer?",
+            },
             "support_name": {"en-GB": "support", "en-US": "support", "fr": "soutien"},
             "support_desc": {
                 "en-GB": "Need help? Visit the website or join the server for further assistance.",
@@ -404,6 +444,16 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Views a sticker",
                 "fr": "Voir un sticker",
             },
+            "welcoming_channel_parm_desc": {
+                "en-GB": "Which channel should welcome new members?",
+                "en-US": "Which channel should welcome new members?",
+                "fr": "Quel canal devrait accueillir les nouveaux membres?",
+            },
+            "leaving_channel_parm_desc": {
+                "en-GB": "Which channel should say goodbye to members?",
+                "en-US": "Which channel should say goodbye to members?",
+                "fr": "Quel canal devrait dire au revoir aux membres?",
+            },
             "sticker_parm_desc": {
                 "en-GB": "Insert message ID with the sticker or name of the sticker in the server",
                 "en-US": "Insert message ID with the sticker or name of the sticker in the server",
@@ -506,8 +556,11 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "role",
                 "fr": "rôle",
             },
-            "description_parm_name": {"en-GB": "description", "en-US": "description", "fr": "description"},
-            
+            "description_parm_name": {
+                "en-GB": "description",
+                "en-US": "description",
+                "fr": "description",
+            },
             "create role_name": {
                 "en-GB": "create role",
                 "en-US": "create role",
@@ -564,6 +617,16 @@ class MyTranslator(Jeanne.Translator):
                 "en-GB": "Place in which category?",
                 "en-US": "Place in which category?",
                 "fr": "Dans quelle catégorie?",
+            },
+            "rename_category_parm_desc": {
+                "en-GB": "Which category?",
+                "en-US": "Which category?",
+                "fr": "Quelle catégorie?",
+            },
+            "sticker_parm_desc": {
+                "en-GB": "Which sticker?",
+                "en-US": "Which sticker?",
+                "fr": "Quel sticker?",
             },
             "slowmode_parm_name": {
                 "en-GB": "slowmode",
@@ -913,7 +976,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "command",
                 "fr": "commande",
             },
-
             "command disable_command_name": {
                 "en-GB": "disable command",
                 "en-US": "disable command",
@@ -1202,6 +1264,36 @@ class MyTranslator(Jeanne.Translator):
                 "en-GB": "Should it be mentioned?",
                 "en-US": "Should it be mentioned?",
                 "fr": "Doit-il être mentionné?",
+            },
+            "description_parm_desc": {
+                "en-GB": "What is the description for the server?",
+                "en-US": "What is the description for the server?",
+                "fr": "Quelle est la description du serveur?",
+            },
+            "avatar_parm_desc": {
+                "en-GB": "Insert an image for the avatar",
+                "en-US": "Insert an image for the avatar",
+                "fr": "Insérez une image pour l'avatar",
+            },
+            "splash_parm_desc": {
+                "en-GB": "Insert an image for the splash",
+                "en-US": "Insert an image for the splash",
+                "fr": "Insérez une image pour le splash",
+            },
+            "banner_parm_desc": {
+                "en-GB": "Insert an image for the banner",
+                "en-US": "Insert an image for the banner",
+                "fr": "Insérez une image pour la bannière",
+            },
+            "verification_level_parm_desc": {
+                "en-GB": "What is the verification level?",
+                "en-US": "What is the verification level?",
+                "fr": "Quel est le niveau de vérification?",
+            },
+            "message_id_parm_desc": {
+                "en-GB": "What is the message ID?",
+                "en-US": "What is the message ID?",
+                "fr": "Quel est l'ID du message?",
             },
             "public_thread_description": {
                 "en-GB": "Make a public thread",
@@ -1592,7 +1684,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "How many user IDs? Leave a space after each ID (min is 5 and max is 25)",
                 "fr": "Combien d'IDs utilisateur? Laissez un espace après chaque ID (min est 5 et max est 25)",
             },
-            
             "hug_name": {"en-GB": "hug", "en-US": "hug", "fr": "câlin"},
             "slap_name": {"en-GB": "slap", "en-US": "slap", "fr": "gifler"},
             "smug_name": {"en-GB": "smug", "en-US": "smug", "fr": "suffisant"},
@@ -1813,25 +1904,45 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Message ID of the embed",
                 "fr": "ID du message de l'embed",
             },
-            "edit_jsonscript_parm_name": {
-                "en-GB": "jsonscript",
-                "en-US": "jsonscript",
-                "fr": "jsonscript",
-            },
-            "edit_jsonscript_parm_desc": {
-                "en-GB": "JSON script",
-                "en-US": "JSON script",
-                "fr": "Script JSON",
-            },
-            "edit_jsonfile_parm_name": {
+            "jsonfile_parm_name": {
                 "en-GB": "jsonfile",
                 "en-US": "jsonfile",
                 "fr": "fichierjson",
             },
-            "edit_jsonfile_parm_desc": {
-                "en-GB": "JSON file",
-                "en-US": "JSON file",
-                "fr": "Fichier JSON",
+            "jsonfile_parm_desc": {
+                "en-GB": "Insert JSON file",
+                "en-US": "Insert JSON file",
+                "fr": "Insérer un fichier JSON",
+            },
+            "jsonscript_parm_desc": {
+                "en-GB": "Insert JSON script",
+                "en-US": "Insert JSON script",
+                "fr": "Insérer un script JSON",
+            },
+            "message_parm_desc": {
+                "en-GB": "What is the level reward message?",
+                "en-US": "What is the level reward message?",
+                "fr": "Quel est le message de récompense de niveau ?",
+            },
+            "levelmsg_parm_desc": {
+                "en-GB": "What is the level up message?",
+                "en-US": "What is the level up message?",
+                "fr": "Quel est le message de montée de niveau ?",
+            },
+            "brightness_parm_desc": {
+                "en-GB": "What is the brightness?",
+                "en-US": "What is the brightness?",
+                "fr": "Quelle est la luminosité ?",
+            },
+            "bio_parm_desc": {
+                "en-GB": "Your bio text",
+                "en-US": "Your bio text",
+                "fr": "Votre texte de bio",
+            },
+            "rename_parm_desc": {
+                "en-GB": "What is the new name?",
+                "en-US": "What is the new name?",
+                "fr": "Quel est le nouveau nom ?",
             },
             "reminder_add_name": {"en-GB": "add", "en-US": "add", "fr": "ajouter"},
             "reminder_add_desc": {
@@ -1984,9 +2095,9 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "mot",
             },
             "dictionary_word_parm_desc": {
-                "en-GB": "Word to check",
-                "en-US": "Word to check",
-                "fr": "Mot à vérifier",
+                "en-GB": "Word to look up",
+                "en-US": "Word to look up",
+                "fr": "Mot à rechercher",
             },
             "confess_name": {
                 "en-GB": "confess",
