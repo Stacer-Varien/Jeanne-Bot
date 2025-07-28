@@ -75,17 +75,17 @@ class Create_Group(GroupCog, name=T("create")):
                 "parameters": [
                     {
                         "name": "Nom",
-                        "description": "Comment le nommer ?",
+                        "description": "Comment le nommer?",
                         "required": False,
                     },
                     {
                         "name": "Sujet",
-                        "description": "Quel est le sujet du canel ?",
+                        "description": "Quel est le sujet du canel?",
                         "required": False,
                     },
                     {
                         "name": "catégorie",
-                        "description": "Dans quelle catégorie ?",
+                        "description": "Dans quelle catégorie?",
                         "required": False,
                     },
                     {
@@ -95,7 +95,7 @@ class Create_Group(GroupCog, name=T("create")):
                     },
                     {
                         "name": "nsfw_enabled",
-                        "description": "Doit-il être un canel NSFW ?",
+                        "description": "Doit-il être un canel NSFW?",
                         "required": False,
                     },
                 ],
@@ -174,17 +174,17 @@ class Create_Group(GroupCog, name=T("create")):
                 "parameters": [
                     {
                         "name": "Nom",
-                        "description": "Comment le nommer ?",
+                        "description": "Comment le nommer?",
                         "required": False,
                     },
                     {
                         "name": "catégorie",
-                        "description": "Dans quelle catégorie ?",
+                        "description": "Dans quelle catégorie?",
                         "required": False,
                     },
                     {
                         "name": "utilisateurs",
-                        "description": "Combien d'utilisateurs peuvent rejoindre ? (Max 99)",
+                        "description": "Combien d'utilisateurs peuvent rejoindre? (Max 99)",
                         "required": False,
                     },
                 ],
@@ -243,7 +243,7 @@ class Create_Group(GroupCog, name=T("create")):
                 "parameters": [
                     {
                         "name": "Nom",
-                        "description": "Comment la nommer ?",
+                        "description": "Comment la nommer?",
                         "required": True,
                     },
                 ],
@@ -298,17 +298,17 @@ class Create_Group(GroupCog, name=T("create")):
                 "parameters": [
                     {
                         "name": "Nom",
-                        "description": "Comment le nommer ?",
+                        "description": "Comment le nommer?",
                         "required": True,
                     },
                     {
                         "name": "catégorie",
-                        "description": "Dans quelle catégorie ?",
+                        "description": "Dans quelle catégorie?",
                         "required": False,
                     },
                     {
                         "name": "utilisateurs",
-                        "description": "Combien d'utilisateurs peuvent rejoindre ? (Max 10000)",
+                        "description": "Combien d'utilisateurs peuvent rejoindre? (Max 10000)",
                         "required": False,
                     },
                 ],
@@ -376,17 +376,17 @@ class Create_Group(GroupCog, name=T("create")):
                 "parameters": [
                     {
                         "name": "Nom",
-                        "description": "Comment le nommer ?",
+                        "description": "Comment le nommer?",
                         "required": True,
                     },
                     {
                         "name": "Sujet",
-                        "description": "Quel est le sujet du canel ?",
+                        "description": "Quel est le sujet du canel?",
                         "required": False,
                     },
                     {
                         "name": "catégorie",
-                        "description": "Dans quelle catégorie ?",
+                        "description": "Dans quelle catégorie?",
                         "required": False,
                     },
                 ],
@@ -460,22 +460,22 @@ class Create_Group(GroupCog, name=T("create")):
                 "parameters": [
                     {
                         "name": "Nom",
-                        "description": "Quel nom lui donner ?",
+                        "description": "Quel nom lui donner?",
                         "required": True,
                     },
                     {
                         "name": "Couleur",
-                        "description": "Quelle couleur aura-t-il ? (Code hex sans #)",
+                        "description": "Quelle couleur aura-t-il? (Code hex sans #)",
                         "required": False,
                     },
                     {
                         "name": "Affiché séparément",
-                        "description": "Doit-il être affiché séparément dans la liste des membres ?",
+                        "description": "Doit-il être affiché séparément dans la liste des membres?",
                         "required": False,
                     },
                     {
                         "name": "Mentionnable",
-                        "description": "Doit-il être mentionnable ?",
+                        "description": "Doit-il être mentionnable?",
                         "required": False,
                     },
                 ],
@@ -554,12 +554,12 @@ class Create_Group(GroupCog, name=T("create")):
                 "parameters": [
                     {
                         "name": "Nom",
-                        "description": "Comment nommer le fil ?",
+                        "description": "Comment nommer le fil?",
                         "required": True,
                     },
                     {
                         "name": "Cannel",
-                        "description": "Dans quel canel créer le fil ?",
+                        "description": "Dans quel canel créer le fil?",
                         "required": True,
                     },
                     {
@@ -569,7 +569,7 @@ class Create_Group(GroupCog, name=T("create")):
                     },
                     {
                         "name": "Slowmode",
-                        "description": "Quel est le mode lent (optionnel) ?",
+                        "description": "Quel est le mode lent (optionnel)?",
                         "required": False,
                     },
                 ],
@@ -675,17 +675,17 @@ class Create_Group(GroupCog, name=T("create")):
                 "parameters": [
                     {
                         "name": "Nom",
-                        "description": "Comment nommer le fil ?",
+                        "description": "Comment nommer le fil?",
                         "required": True,
                     },
                     {
                         "name": "Canel",
-                        "description": "Dans quel canel créer le fil ?",
+                        "description": "Dans quel canel créer le fil?",
                         "required": True,
                     },
                     {
                         "name": "Mode lent",
-                        "description": "Quel est le mode lent (optionnel) ?",
+                        "description": "Quel est le mode lent (optionnel)?",
                         "required": False,
                     },
                 ],
@@ -760,7 +760,7 @@ class Create_Group(GroupCog, name=T("create")):
                 "parameters": [
                     {
                         "name": "Nom",
-                        "description": "Comment le nommer ?",
+                        "description": "Comment le nommer?",
                         "required": True,
                     },
                     {
@@ -842,7 +842,7 @@ class Create_Group(GroupCog, name=T("create")):
                 "parameters": [
                     {
                         "name": "Nom",
-                        "description": "Comment le nommer ?",
+                        "description": "Comment le nommer?",
                         "required": True,
                     },
                     {
@@ -934,7 +934,7 @@ class Delete_Group(GroupCog, name=T("delete")):
                 "parameters": [
                     {
                         "name": "Emoji",
-                        "description": "Quel canel supprimer ?",
+                        "description": "Quel canel supprimer?",
                         "required": True,
                     },
                 ],
@@ -979,7 +979,7 @@ class Delete_Group(GroupCog, name=T("delete")):
                 "parameters": [
                     {
                         "name": "Rôle",
-                        "description": "Quel rôle supprimer ?",
+                        "description": "Quel rôle supprimer?",
                         "required": True,
                     },
                 ],
@@ -1023,7 +1023,7 @@ class Delete_Group(GroupCog, name=T("delete")):
                 "parameters": [
                     {
                         "name": "Emoji",
-                        "description": "Quel emoji supprimer ?",
+                        "description": "Quel emoji supprimer?",
                         "required": True,
                     },
                 ],
@@ -1073,7 +1073,7 @@ class Delete_Group(GroupCog, name=T("delete")):
                 "parameters": [
                     {
                         "name": "Sticker",
-                        "description": "Quel sticker supprimer ?",
+                        "description": "Quel sticker supprimer?",
                         "required": True,
                     },
                 ],
@@ -1147,7 +1147,7 @@ class Edit_Group(GroupCog, name="edit"):
                 "parameters": [
                     {
                         "name": "Canel",
-                        "description": "Quel canel modifier ?",
+                        "description": "Quel canel modifier?",
                         "required": True,
                     },
                     {
@@ -1167,12 +1167,12 @@ class Edit_Group(GroupCog, name="edit"):
                     },
                     {
                         "name": "Catégorie",
-                        "description": "Déplacer dans quelle catégorie ?",
+                        "description": "Déplacer dans quelle catégorie?",
                         "required": False,
                     },
                     {
                         "name": "NSFW",
-                        "description": "Définir comme NSFW ?",
+                        "description": "Définir comme NSFW?",
                         "required": False,
                     },
                 ],
@@ -1259,7 +1259,7 @@ class Edit_Group(GroupCog, name="edit"):
                 "parameters": [
                     {
                         "name": "Canel",
-                        "description": "Quel canel modifier ?",
+                        "description": "Quel canel modifier?",
                         "required": True,
                     },
                     {
@@ -1269,7 +1269,7 @@ class Edit_Group(GroupCog, name="edit"):
                     },
                     {
                         "name": "Catégorie",
-                        "description": "Déplacer dans quelle catégorie ?",
+                        "description": "Déplacer dans quelle catégorie?",
                         "required": False,
                     },
                     {
@@ -1360,7 +1360,7 @@ class Edit_Group(GroupCog, name="edit"):
                 "parameters": [
                     {
                         "name": "Rôle",
-                        "description": "Quel rôle modifier ?",
+                        "description": "Quel rôle modifier?",
                         "required": True,
                     },
                     {
@@ -1375,12 +1375,12 @@ class Edit_Group(GroupCog, name="edit"):
                     },
                     {
                         "name": "Séparé",
-                        "description": "Afficher séparément ?",
+                        "description": "Afficher séparément?",
                         "required": False,
                     },
                     {
                         "name": "Mentionnable",
-                        "description": "Rendre le rôle mentionnable ?",
+                        "description": "Rendre le rôle mentionnable?",
                         "required": False,
                     },
                 ],
@@ -1904,23 +1904,23 @@ class Set_Group(GroupCog, name="set"):
         description=T("set_brightness_description"),
         extras={
             "en": {
-                "name": "Set Brightness",
-                "description": "Set the brightness value",
+                "name": "Set Profile Brightness",
+                "description": "Set the your profile brightness",
                 "parameters": [
                     {
                         "name": "Brightness",
-                        "description": "Brightness value (10-150)",
+                        "description": "Brightness value (50-150)",
                         "required": True,
                     },
                 ],
             },
             "fr": {
-                "name": "Définir la luminosité",
-                "description": "Définir la valeur de luminosité",
+                "name": "Définir la profile luminosité",
+                "description": "Définir la profile luminosité",
                 "parameters": [
                     {
                         "name": "Luminosité",
-                        "description": "Valeur de luminosité (10-150)",
+                        "description": "Valeur de luminosité (50-150)",
                         "required": True,
                     },
                 ],
@@ -1945,15 +1945,15 @@ class Set_Group(GroupCog, name="set"):
         description=T("set_bio_description"),
         extras={
             "en": {
-                "name": "Set Bio",
-                "description": "Set your bio",
+                "name": "Set Profile Bio",
+                "description": "Set your profile bio",
                 "parameters": [
                     {"name": "Bio", "description": "Your bio text", "required": True},
                 ],
             },
             "fr": {
-                "name": "Définir la bio",
-                "description": "Définir votre bio",
+                "name": "Définir la profile-bio",
+                "description": "Définir votre profile-bio",
                 "parameters": [
                     {
                         "name": "Bio",
@@ -1980,8 +1980,8 @@ class Set_Group(GroupCog, name="set"):
         description=T("set_color_description"),
         extras={
             "en": {
-                "name": "Set Color",
-                "description": "Set your color",
+                "name": "Set Profile-Color",
+                "description": "Set your profile color",
                 "parameters": [
                     {
                         "name": "Color",
@@ -1991,8 +1991,8 @@ class Set_Group(GroupCog, name="set"):
                 ],
             },
             "fr": {
-                "name": "Définir la couleur",
-                "description": "Définir votre couleur",
+                "name": "Définir la profile-couleur",
+                "description": "Définir votre profile-couleur",
                 "parameters": [
                     {
                         "name": "Couleur",
@@ -2202,7 +2202,7 @@ class manage(Cog):
                     },
                     {
                         "name": "NSFW",
-                        "description": "Définir comme NSFW ?",
+                        "description": "Définir comme NSFW?",
                         "required": False,
                     },
                 ],
