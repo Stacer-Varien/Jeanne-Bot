@@ -458,7 +458,7 @@ class currency(Cog, name="CurrencySlash"):
                 "name": "solde",
                 "description": "Vérifiez votre solde ou celui d'un autre utilisateur",
                 "parameters": [
-                    {"name": "member", "description": "Quel membre ?", "required": 1}
+                    {"name": "member", "description": "Quel membre?", "required": 1}
                 ],
             },
         },

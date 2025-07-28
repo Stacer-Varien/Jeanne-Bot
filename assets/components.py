@@ -180,7 +180,7 @@ class Welcomingmsg(ui.Modal, title="Welcoming Message"):
                 await ctx.edit_original_response(content=None, embeds=[embed], view=None)
         elif ctx.locale.value=="fr":
             confirm = Embed(
-                description="Ceci est l'aperçu du message de bienvenue.\nÊtes-vous satisfait ?"
+                description="Ceci est l'aperçu du message de bienvenue.\nÊtes-vous satisfait?"
             )
             view = Confirmation(ctx, ctx.user)
             try:
@@ -279,7 +279,7 @@ class Leavingmsg(ui.Modal, title="Leaving Message"):
                 await ctx.edit_original_response(content=None, embeds=[embed], view=None)
         elif ctx.locale.value=="fr":
             confirm = Embed(
-                description="Ceci est l'aperçu du message de départ.\nÊtes-vous satisfait ?"
+                description="Ceci est l'aperçu du message de départ.\nÊtes-vous satisfait?"
             )
             view = Confirmation(ctx, ctx.user)
             try:
@@ -389,7 +389,7 @@ class Levelmsg(ui.Modal, title="Level Update Message"):
                 await ctx.edit_original_response(content=None, embeds=[embed], view=None)
         elif ctx.locale.value == "fr":
             confirm = Embed(
-                description="Ceci est l'aperçu du message de mise à jour de niveau chaque fois que quelqu'un monte de niveau dans le serveur et il sera envoyé dans {}.\nÊtes-vous satisfait ?".format(
+                description="Ceci est l'aperçu du message de mise à jour de niveau chaque fois que quelqu'un monte de niveau dans le serveur et il sera envoyé dans {}.\nÊtes-vous satisfait?".format(
                     self.channel.mention
                 )
             )
@@ -499,7 +499,7 @@ class RankUpmsg(ui.Modal, title="Role Reward Message"):
                 await ctx.edit_original_response(content=None, embeds=[embed], view=None)
         elif ctx.locale.value=="fr":
             confirm = Embed(
-                description="Ceci est l'aperçu du message de récompense de rôle chaque fois que quelqu'un reçoit une récompense de rôle après avoir monté en niveau dans le serveur et sera envoyé au canal de mise à jour de niveau actuel\nÊtes-vous satisfait ?"
+                description="Ceci est l'aperçu du message de récompense de rôle chaque fois que quelqu'un reçoit une récompense de rôle après avoir monté en niveau dans le serveur et sera envoyé au canal de mise à jour de niveau actuel\nÊtes-vous satisfait?"
             )
             view = Confirmation(ctx, ctx.user)
             try:
@@ -554,8 +554,8 @@ class ModuleMenu(ui.Select):
         await ctx.message.edit(content="User has been suspended from the following modules: {}".format(", ".join(selected_modules)), view=None, embed=None, delete_after=5)
 
 class ModuleSelect(ui.View):
-    def __init__(self, user: User, reason: str, duration:int, timeout: int = 60):
-        super().__init__(timeout=timeout)
+    def __init__(self, user: User, reason: str, duration:int):
+        super().__init__(timeout=60)
         self.add_item(ModuleMenu(user, reason, duration))
 
 
@@ -1281,7 +1281,7 @@ async def buy_function_context(bot: Bot, ctx: Context, name: str, message: Messa
                 color=Color.random(),
             )
             .add_field(name="Coût", value="1000 <:quantumpiece:1161010445205905418>")
-            .set_footer(text="Est-ce le fond que vous vouliez ?")
+            .set_footer(text="Est-ce le fond que vous vouliez?")
         )
         view = Confirmation(ctx.author)
         m = await m.edit(attachments=[file], embed=preview, view=view)
@@ -1353,7 +1353,7 @@ async def buy_function_app(bot: Bot, ctx: Interaction, name: str):
                 color=Color.random(),
             )
             .add_field(name="Coût", value="1000 <:quantumpiece:1161010445205905418>")
-            .set_footer(text="Est-ce le fond que vous vouliez ?")
+            .set_footer(text="Est-ce le fond que vous vouliez?")
         )
         view = Confirmation(ctx, ctx.user)
         await ctx.edit_original_response(

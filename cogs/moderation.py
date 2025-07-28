@@ -89,7 +89,7 @@ class moderation(Cog):
                 "parameters": [
                     {
                         "name": "membre",
-                        "description": "Quel est le membre ou l'identifiant utilisateur ?",
+                        "description": "Quel est le membre ou l'identifiant utilisateur?",
                         "required": True,
                     },
                     {
@@ -99,12 +99,12 @@ class moderation(Cog):
                     },
                     {
                         "name": "supprimer_historique_messages",
-                        "description": "Supprimer les messages des 7 derniers jours ?",
+                        "description": "Supprimer les messages des 7 derniers jours?",
                         "required": False,
                     },
                     {
                         "name": "temps",
-                        "description": "Combien de temps doivent-ils être temporairement bannis ? (1m, 1h30m, etc)",
+                        "description": "Combien de temps doivent-ils être temporairement bannis? (1m, 1h30m, etc)",
                         "required": False,
                     },
                 ],
@@ -186,12 +186,12 @@ class moderation(Cog):
                 "parameters": [
                     {
                         "name": "membre",
-                        "description": "Quel membre ?",
+                        "description": "Quel membre?",
                         "required": True,
                     },
                     {
                         "name": "raison",
-                        "description": "Qu'a-t-il fait ? Vous pouvez aussi donner une raison personnalisée",
+                        "description": "Qu'a-t-il fait? Vous pouvez aussi donner une raison personnalisée",
                         "required": False,
                     },
                 ],
@@ -305,12 +305,12 @@ class moderation(Cog):
                 "parameters": [
                     {
                         "name": "membre",
-                        "description": "Quel membre ?",
+                        "description": "Quel membre?",
                         "required": True,
                     },
                     {
                         "name": "warn_id",
-                        "description": "Quel est l'ID d'avertissement que vous souhaitez supprimer ?",
+                        "description": "Quel est l'ID d'avertissement que vous souhaitez supprimer?",
                         "required": True,
                     },
                 ],
@@ -365,12 +365,12 @@ class moderation(Cog):
                 "parameters": [
                     {
                         "name": "membre",
-                        "description": "Quel membre ?",
+                        "description": "Quel membre?",
                         "required": True,
                     },
                     {
                         "name": "raison",
-                        "description": "Qu'a-t-il fait ? Vous pouvez aussi donner une raison personnalisée",
+                        "description": "Qu'a-t-il fait? Vous pouvez aussi donner une raison personnalisée",
                         "required": False,
                     },
                 ],
@@ -431,12 +431,12 @@ class moderation(Cog):
                 "parameters": [
                     {
                         "name": "limite",
-                        "description": "Combien de messages ? (max est 100)",
+                        "description": "Combien de messages? (max est 100)",
                         "required": False,
                     },
                     {
                         "name": "membre",
-                        "description": "Quel membre ?",
+                        "description": "Quel membre?",
                         "required": False,
                     },
                 ],
@@ -497,12 +497,12 @@ class moderation(Cog):
                 "parameters": [
                     {
                         "name": "membre",
-                        "description": "Quel membre ?",
+                        "description": "Quel membre?",
                         "required": False,
                     },
                     {
                         "name": "pseudo",
-                        "description": "Quel est son nouveau pseudo ?",
+                        "description": "Quel est son nouveau pseudo?",
                         "required": False,
                     },
                 ],
@@ -563,12 +563,12 @@ class moderation(Cog):
                 "parameters": [
                     {
                         "name": "utilisateur_id",
-                        "description": "Quel utilisateur souhaitez-vous débannir ?",
+                        "description": "Quel utilisateur souhaitez-vous débannir?",
                         "required": True,
                     },
                     {
                         "name": "raison",
-                        "description": "Qu'a-t-il fait ? Vous pouvez aussi donner une raison personnalisée",
+                        "description": "Qu'a-t-il fait? Vous pouvez aussi donner une raison personnalisée",
                         "required": False,
                     },
                 ],
@@ -643,12 +643,12 @@ class moderation(Cog):
                 "parameters": [
                     {
                         "name": "membre",
-                        "description": "Quel membre ?",
+                        "description": "Quel membre?",
                         "required": True,
                     },
                     {
                         "name": "temps",
-                        "description": "Combien de temps doivent-ils être en sourdine ? (1m, 1h30m, etc)",
+                        "description": "Combien de temps doivent-ils être en sourdine? (1m, 1h30m, etc)",
                         "required": False,
                     },
                     {
@@ -727,12 +727,12 @@ class moderation(Cog):
                 "parameters": [
                     {
                         "name": "membre",
-                        "description": "Quel membre ?",
+                        "description": "Quel membre?",
                         "required": True,
                     },
                     {
                         "name": "raison",
-                        "description": "Pourquoi les retirer du délai d'attente ?",
+                        "description": "Pourquoi les retirer du délai d'attente?",
                         "required": False,
                     },
                 ],
@@ -861,12 +861,12 @@ class moderation(Cog):
                 "parameters": [
                     {
                         "name": "user_ids",
-                        "description": "Combien d'IDs utilisateur ? Laissez un espace après chaque ID (min est 5 et max est 25)",
+                        "description": "Combien d'IDs utilisateur? Laissez un espace après chaque ID (min est 5 et max est 25)",
                         "required": True,
                     },
                     {
                         "name": "raison",
-                        "description": "Pourquoi les débannir ? Vous pouvez aussi donner une raison personnalisée",
+                        "description": "Pourquoi les débannir? Vous pouvez aussi donner une raison personnalisée",
                         "required": True,
                     },
                 ],

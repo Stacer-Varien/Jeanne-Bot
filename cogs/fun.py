@@ -225,7 +225,7 @@ class fun(Cog, name="FunSlash"):
                 "parameters": [
                     {
                         "name": "membre",
-                        "description": "Quel membre ?",
+                        "description": "Quel membre?",
                         "required": False,
                     }
                 ],
@@ -263,7 +263,7 @@ class fun(Cog, name="FunSlash"):
                 "parameters": [
                     {
                         "name": "membre",
-                        "description": "Quel membre ?",
+                        "description": "Quel membre?",
                         "required": False,
                     }
                 ],

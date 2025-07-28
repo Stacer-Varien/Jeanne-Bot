@@ -72,7 +72,7 @@ class HelpGroup(GroupCog, name=T("help_group_name")):
             },
             "fr": {
                 "name": "aide",
-                "description": "Besoin d'aide ? Visitez le site web ou rejoignez le serveur pour plus d'assistance.",
+                "description": "Besoin d'aide? Visitez le site web ou rejoignez le serveur pour plus d'assistance.",
             },
         },
     )
