@@ -1,5 +1,3 @@
-from asyncio import sleep
-import asyncio
 from discord import Color, Embed
 from functions import DevPunishment, Moderation, Reminder
 from discord.ext import tasks

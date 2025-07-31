@@ -57,7 +57,7 @@ class Create_Group():
         nsfw_enabled: Optional[bool] = None,
     ) -> None:
         await ctx.response.defer()
-        name = "new-channel" if name == None else name
+        name = "new-channel" if name is None else name
         channel = await ctx.guild.create_text_channel(name=name)
         embed = Embed()
         embed.color = Color.random()
@@ -94,7 +94,7 @@ class Create_Group():
         users: Optional[Jeanne.Range[int, None, 99]] = None,
     ) -> None:
         await ctx.response.defer()
-        name = "new-channel" if name == None else name
+        name = "new-channel" if name is None else name
         channel = await ctx.guild.create_voice_channel(name=name)
         embed = Embed()
         embed.description = "{} a été créé".format(channel.jump_url)
@@ -191,7 +191,7 @@ class Create_Group():
         role = await ctx.guild.create_role(name=name)
         embed = Embed()
         embed.description = "Le rôle `{}` a été créé".format(name)
-        if color != None:
+        if color is not None:
             try:
                 await role.edit(color=int(color, 16))
                 embed.add_field(name="Couleur", value=color, inline=True)
@@ -301,7 +301,7 @@ class Create_Group():
     ):
         await ctx.response.defer()
         embed = Embed()
-        if emoji_link == None and emoji_image == None:
+        if emoji_link is None and emoji_image is None:
             embed.description = "Veuillez ajouter soit une URL d'emoji, soit une image d'emoji"
             embed.color = Color.red()
         elif emoji_link and emoji_image:
@@ -441,7 +441,7 @@ class Edit_Group():
         nsfw_enabled: Optional[bool] = None,
     ) -> None:
         await ctx.response.defer()
-        channel = ctx.channel if channel == None else channel
+        channel = ctx.channel if channel is None else channel
         embed = Embed()
         embed.description = "Le salon `{}` a été modifié".format(channel.name)
         embed.color = Color.green()
@@ -482,7 +482,7 @@ class Edit_Group():
         users: Optional[Jeanne.Range[int, None, 99]] = None,
     ) -> None:
         await ctx.response.defer()
-        channel = ctx.channel if channel == None else channel
+        channel = ctx.channel if channel is None else channel
         embed = Embed()
         embed.description = "Le salon `{}` a été modifié".format(channel.name)
         embed.color = Color.green()
@@ -515,7 +515,7 @@ class Edit_Group():
         if name:
             await role.edit(name=name)
             embed.add_field(name="Nom", value=name, inline=True)
-        if color != None:
+        if color is not None:
             try:
                 await role.edit(color=int(color, 16))
                 embed.add_field(name="Couleur", value=color, inline=True)
@@ -682,7 +682,7 @@ class Set_Group:
         leaving_channel: Optional[TextChannel] = None,
     ) -> None:
         await ctx.response.defer()
-        if (welcoming_channel == None) and (leaving_channel == None):
+        if (welcoming_channel is None) and (leaving_channel is None):
             error = Embed(
                 description="Les deux options sont vides. Veuillez définir au moins un canal de bienvenue ou de départ.",
                 color=Color.red(),
@@ -716,10 +716,10 @@ class Set_Group:
     async def welcomingmsg(
         self, ctx: Interaction, jsonfile: Optional[Attachment] = None
     ) -> None:
-        if jsonfile == None:
+        if jsonfile is None:
             await ctx.response.send_modal(Welcomingmsg(ctx))
             return
-        if jsonfile != None:
+        if jsonfile is not None:
             await ctx.response.defer()
             humans = str(
                 len([member for member in ctx.guild.members if not member.bot])
@@ -779,10 +779,10 @@ class Set_Group:
     async def leavingmsg(
         self, ctx: Interaction, jsonfile: Optional[Attachment] = None
     ) -> None:
-        if jsonfile == None:
+        if jsonfile is None:
             await ctx.response.send_modal(Leavingmsg(ctx))
             return
-        if jsonfile != None:
+        if jsonfile is not None:
             await ctx.response.defer()
             humans = str(
                 len([member for member in ctx.guild.members if not member.bot])
@@ -952,7 +952,7 @@ class manage:
         view = RemoveManage(ctx, ctx.user)
         await ctx.followup.send(embed=embed, view=view)
         await view.wait()
-        if view.value == None:
+        if view.value is None:
             embed.description = (
                 "Tous les boutons ont été supprimés en raison du délai d'attente"
             )
@@ -967,8 +967,8 @@ class manage:
         nsfw_enabled: Optional[bool] = None,
     ) -> None:
         await ctx.response.defer()
-        channel = ctx.channel if channel == None else channel
-        name = channel.name if (name == None) else name
+        channel = ctx.channel if channel is None else channel
+        name = channel.name if (name is None) else name
         c = await channel.clone(name=name)
         cloned = Embed(
             description="{} a été cloné en {}".format(channel.jump_url, c.jump_url)
@@ -1097,7 +1097,7 @@ class Command_Group:
         ]:
             embed.color = Color.red()
             embed.description = "Il n'existe aucune commande avec ce nom..."
-        elif cmd.check_disabled(command) == None:
+        elif cmd.check_disabled(command) is None:
             embed.color = Color.red()
             embed.description = "Cette commande est déjà activée"
         else:
@@ -1111,7 +1111,7 @@ class Command_Group:
         await ctx.response.defer()
         cmd = Command(ctx.guild)
         embed = Embed()
-        if cmd.list_all_disabled() == None:
+        if cmd.list_all_disabled() is None:
             embed.description = "Aucune commande n'est désactivée actuellement"
             embed.color = Color.red()
         else:
@@ -1201,7 +1201,7 @@ class Level_Group:
         await ctx.response.defer()
         embed = Embed()
         channels = Levelling(server=ctx.guild).get_blacklisted_channels
-        if channels == None:
+        if channels is None:
             embed.description = "Aucun salon n'est actuellement blacklisté pour l'XP"
             embed.color = Color.red()
         else:

@@ -1,12 +1,12 @@
 from random import choice
-from discord import Color, Embed, File
+from discord import Color, Embed, File, Interaction
 import requests
 from config import ANIMEME, JEANNE, KITSUNE, MEDUSA, MORGAN, SABER, WALLPAPER, NEKO
 import lxml.etree as ET
 from os import listdir, path
 
 
-def get_saber_pic(ctx) -> tuple[Embed, File]:
+def get_saber_pic(ctx: Interaction) -> tuple[Embed, File]:
     folder_path = SABER
     files = listdir(folder_path)
 
@@ -26,7 +26,7 @@ def get_saber_pic(ctx) -> tuple[Embed, File]:
     return embed, file
 
 
-def get_jeanne_pic(ctx) -> tuple[Embed, File]:
+def get_jeanne_pic(ctx: Interaction) -> tuple[Embed, File]:
     folder_path = JEANNE
     files = listdir(folder_path)
 
@@ -47,7 +47,7 @@ def get_jeanne_pic(ctx) -> tuple[Embed, File]:
     return embed, file
 
 
-def get_wallpaper_pic(ctx) -> tuple[Embed, File]:
+def get_wallpaper_pic(ctx: Interaction) -> tuple[Embed, File]:
     folder_path = WALLPAPER
     files = listdir(folder_path)
 
@@ -67,7 +67,7 @@ def get_wallpaper_pic(ctx) -> tuple[Embed, File]:
     return embed, file
 
 
-def get_medusa_pic(ctx) -> tuple[Embed, File]:
+def get_medusa_pic(ctx: Interaction) -> tuple[Embed, File]:
     folder_path = MEDUSA
     files = listdir(folder_path)
 
@@ -87,7 +87,7 @@ def get_medusa_pic(ctx) -> tuple[Embed, File]:
     return embed, file
 
 
-def get_animeme_pic(ctx) -> tuple[Embed, File]:
+def get_animeme_pic(ctx:Interaction) -> tuple[Embed, File]:
     folder_path = ANIMEME
     files = listdir(folder_path)
 
@@ -107,7 +107,7 @@ def get_animeme_pic(ctx) -> tuple[Embed, File]:
     return embed, file
 
 
-def get_neko_pic(ctx) -> tuple[Embed, File]:
+def get_neko_pic(ctx: Interaction) -> tuple[Embed, File]:
     folder_path = NEKO
     files = listdir(folder_path)
 
@@ -128,7 +128,7 @@ def get_neko_pic(ctx) -> tuple[Embed, File]:
     return embed, file
 
 
-def get_morgan_pic(ctx) -> tuple[Embed, File]:
+def get_morgan_pic(ctx: Interaction) -> tuple[Embed, File]:
     folder_path = MORGAN
     files = listdir(folder_path)
 
@@ -149,7 +149,7 @@ def get_morgan_pic(ctx) -> tuple[Embed, File]:
     return embed, file
 
 
-def get_kistune_pic(ctx) -> tuple[Embed, File]:
+def get_kistune_pic(ctx: Interaction) -> tuple[Embed, File]:
     folder_path = KITSUNE
     files = listdir(folder_path)
 

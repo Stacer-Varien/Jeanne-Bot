@@ -13,13 +13,6 @@ class CommandLog(Cog, name="CommandLogSlash"):
     async def on_app_command_completion(
         self, ctx: Interaction, command: Union[Jeanne.Command, Jeanne.ContextMenu]
     ):
-        fields = ["Date and Time", "User", "Command Used", "Command Usage"]
-        command_dict = {
-            "Date and Time": datetime.now(),
-            "User": f"{ctx.user} | {ctx.user.id}",
-            "Command Used": command.qualified_name,
-            "Command Usage": str(ctx.data),
-        }
 
         existing_file = "commands.xlsx"
         new_data = {

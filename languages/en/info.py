@@ -115,7 +115,7 @@ class Info:
         await ctx.response.defer()
         emojis = [str(x) for x in ctx.guild.emojis]
         humans = len([member for member in ctx.guild.members if not member.bot])
-        bots = len([bot for bot in ctx.guild.members if bot.bot == True])
+        bots = len([bot for bot in ctx.guild.members if bot.bot])
         date = round(ctx.guild.created_at.timestamp())
         serverinfo = Embed(color=Color.random())
         serverinfo.add_field(name="ID", value=ctx.guild.id, inline=True)
@@ -154,10 +154,10 @@ class Info:
         for i in ctx.guild.features:
             f.append(i.replace("_", " ").title())
         serverinfo.add_field(name="Features", value=" | ".join(f), inline=False)
-        icon = ctx.guild.icon.url if ctx.guild.icon != None else None
+        icon = ctx.guild.icon.url if ctx.guild.icon is not None else None
         splash = (
             ctx.guild.splash.url
-            if ctx.guild.splash != None and ctx.guild.premium_tier == 1
+            if ctx.guild.splash is not None and ctx.guild.premium_tier == 1
             else None
         )
         serverinfo.set_thumbnail(url=icon)
@@ -199,7 +199,7 @@ class Info:
             )
             await ctx.followup.send(embed=nobanner)
             return
-        if ctx.guild.banner == None:
+        if ctx.guild.banner is None:
             embed = Embed(description="Server has no banner", color=Color.red())
             await ctx.followup.send(embed=embed)
             return

@@ -124,7 +124,7 @@ class Guess_Group():
                         value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
                     )
             correct.set_image(url="https://files.catbox.moe/phqnb1.gif")
-            await ctx.followup.send(embed=wrong, view=view)
+            await ctx.followup.send(embed=correct, view=view)
             return
         await Currency(ctx.user).remove_qp(bet)
         wrong = Embed(

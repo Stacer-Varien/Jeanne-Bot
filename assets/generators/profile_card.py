@@ -85,7 +85,7 @@ class Profile:
         profile_pic_holder = Image.new("RGBA", card.size, (255, 255, 255, 0))
         profile_pic_holder.paste(profile, (30, 250), mask)
 
-        font_small = ImageFont.truetype(self.font1, 30)
+        
         font_color = inventory_instance.get_color
         color = (
             tuple(ImageColor.getcolor(font_color, "RGB"))
@@ -329,7 +329,7 @@ class Profile:
         )
 
         bio = inventory_instance.get_bio
-        bio = no_bio_text if bio == None else bio
+        bio = no_bio_text if bio is None else bio
 
         draw.rounded_rectangle(
             (10, 780, 890, 890), radius=7, width=2, outline=color, fill=(59, 59, 59)

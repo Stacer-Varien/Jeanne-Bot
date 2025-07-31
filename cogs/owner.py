@@ -22,7 +22,7 @@ from discord import (
 from os import execv
 from sys import executable, argv
 
-from humanfriendly import format_timespan, parse_timespan
+from humanfriendly import parse_timespan
 from assets.components import ModuleSelect
 from functions import BetaTest, DevPunishment, Hentai, Partner
 from typing import Literal, Optional
@@ -139,7 +139,7 @@ class OwnerCog(Cog, name="Owner"):
         if DevPunishment(ctx.author).check_botbanned_user:
             return
         await self.bot.change_presence(activity=None)
-        await ctx.send(f"I have removed my activity")
+        await ctx.send("I have removed my activity")
 
     @command(aliases=["fuser"], description="Finds a user (Developer Only)")
     @is_owner()
@@ -158,7 +158,7 @@ class OwnerCog(Cog, name="Owner"):
         fuser.add_field(name="Mutuals", value=len(user.mutual_guilds), inline=True)
         fuser.add_field(name="Bot?", value=botr, inline=True)
         fuser.set_image(url=user.display_avatar)
-        if user.banner == None:
+        if user.banner is None:
             await ctx.send(embed=fuser)
             return
         userbanner = Embed(title="User Banner", color=0xCCFF33)

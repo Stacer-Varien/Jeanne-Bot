@@ -1,6 +1,5 @@
 from discord import Color, Embed, Interaction
 import requests
-from typing import Optional
 from reactionmenu import ViewMenu, ViewButton
 
 

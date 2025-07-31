@@ -285,12 +285,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "gayrate",
                 "fr": "taux_de_gay",
             },
-            "gayrate_desc": {
-                "en-GB": "Get a random gay rate for you or someone else",
-                "en-US": "Get a random gay rate for you or someone else",
-                "fr": "Obtenez un taux de gay aléatoire pour vous ou quelqu'un d'autre",
-            },
-            "help_group_name": {"en-GB": "help", "en-US": "help", "fr": "aide"},
             "command_name": {"en-GB": "command", "en-US": "command", "fr": "commande"},
             "help_command_desc": {
                 "en-GB": "Get help on a certain command",
@@ -596,12 +590,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Create a text channel",
                 "fr": "Créer un canal texte",
             },
-            "name_parm_name": {"en-GB": "name", "en-US": "name", "fr": "nom"},
-            "name_parm_desc": {
-                "en-GB": "What will you name it?",
-                "en-US": "What will you name it?",
-                "fr": "Quel nom lui donnerez-vous?",
-            },
             "topic_parm_name": {"en-GB": "topic", "en-US": "topic", "fr": "sujet"},
             "topic_parm_desc": {
                 "en-GB": "What is the channel topic?",
@@ -622,11 +610,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-GB": "Which category?",
                 "en-US": "Which category?",
                 "fr": "Quelle catégorie?",
-            },
-            "sticker_parm_desc": {
-                "en-GB": "Which sticker?",
-                "en-US": "Which sticker?",
-                "fr": "Quel sticker?",
             },
             "slowmode_parm_name": {
                 "en-GB": "slowmode",
@@ -796,56 +779,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "remove-role",
                 "fr": "supprimer-rôle",
             },
-            "create textchannel_name": {
-                "en-GB": "create textchannel",
-                "en-US": "create textchannel",
-                "fr": "créer canaltexte",
-            },
-            "create voicechannel_name": {
-                "en-GB": "create voicechannel",
-                "en-US": "create voicechannel",
-                "fr": "créer canalvocal",
-            },
-            "create category_name": {
-                "en-GB": "create category",
-                "en-US": "create category",
-                "fr": "créer catégorie",
-            },
-            "create stagechannel_name": {
-                "en-GB": "create stagechannel",
-                "en-US": "create stagechannel",
-                "fr": "créer canalscène",
-            },
-            "create forum_name": {
-                "en-GB": "create forum",
-                "en-US": "create forum",
-                "fr": "créer forum",
-            },
-            "create role_name": {
-                "en-GB": "create role",
-                "en-US": "create role",
-                "fr": "créer rôle",
-            },
-            "create thread public_thread_name": {
-                "en-GB": "create public thread",
-                "en-US": "create public thread",
-                "fr": "créer fil public",
-            },
-            "create thread private_thread_name": {
-                "en-GB": "create private thread",
-                "en-US": "create private thread",
-                "fr": "créer fil privé",
-            },
-            "create emoji_name": {
-                "en-GB": "create emoji",
-                "en-US": "create emoji",
-                "fr": "créer emoji",
-            },
-            "create sticker_name": {
-                "en-GB": "create sticker",
-                "en-US": "create sticker",
-                "fr": "créer sticker",
-            },
             "edit edit_textchannel_name": {
                 "en-GB": "edit textchannel",
                 "en-US": "edit textchannel",
@@ -930,11 +863,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-GB": "set profile-brightness",
                 "en-US": "set profile-brightness",
                 "fr": "définir profile-luminosité",
-            },
-            "set_bio_description": {
-                "en-GB": "Set your profile bio",
-                "en-US": "Set your profile bio",
-                "fr": "Définir votre profile bio",
             },
             "set_color_description": {
                 "en-GB": "Set your profile color",
@@ -1199,11 +1127,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Remove a channel from the blacklist for gaining XP",
                 "fr": "Supprimer un canal de la liste noire pour gagner de l'XP",
             },
-            "remove_blacklist_ch_channel_desc": {
-                "en-GB": "What channel do you want to remove?",
-                "en-US": "What channel do you want to remove?",
-                "fr": "Quel canal voulez-vous supprimer?",
-            },
             "remove_blcklist_ch_channel_name": {
                 "en-GB": "channel",
                 "en-US": "channel",
@@ -1380,11 +1303,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Set your profile bio",
                 "fr": "Définit la profile-bio",
             },
-            "set_color_description": {
-                "en-GB": "Set your profile color",
-                "en-US": "Set your profile color",
-                "fr": "Définit la profile-couleur",
-            },
             "rename_emoji_description": {
                 "en-GB": "Renames an emoji",
                 "en-US": "Renames an emoji",
@@ -1539,26 +1457,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-GB": "delete",
                 "en-US": "delete",
                 "fr": "supprimer",
-            },
-            "delete delete_channel_name": {
-                "en-GB": "delete channel",
-                "en-US": "delete channel",
-                "fr": "supprimer canal",
-            },
-            "delete delete_role_name": {
-                "en-GB": "delete role",
-                "en-US": "delete role",
-                "fr": "supprimer rôle",
-            },
-            "delete delete_emoji_name": {
-                "en-GB": "delete emoji",
-                "en-US": "delete emoji",
-                "fr": "supprimer emoji",
-            },
-            "delete delete_sticker_name": {
-                "en-GB": "delete sticker",
-                "en-US": "delete sticker",
-                "fr": "supprimer sticker",
             },
             "prune_desc": {
                 "en-GB": "Bulk delete messages",
@@ -2001,7 +1899,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Reminder ID",
                 "fr": "ID du rappel",
             },
-            "weather_name": {"en-GB": "weather", "en-US": "weather", "fr": "météo"},
             "weather_desc": {
                 "en-GB": "Get weather information on a city",
                 "en-US": "Get weather information on a city",
@@ -2033,11 +1930,6 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Show 3 day forecast?",
                 "fr": "Afficher la prévision sur 3 jours?",
             },
-            "calculator_name": {
-                "en-GB": "calculator",
-                "en-US": "calculator",
-                "fr": "calculatrice",
-            },
             "calculator_desc": {
                 "en-GB": "Do a calculation",
                 "en-US": "Do a calculation",
@@ -2053,16 +1945,10 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Add a calculation",
                 "fr": "Ajouter un calcul",
             },
-            "invite_name": {"en-GB": "invite", "en-US": "invite", "fr": "inviter"},
             "invite_desc": {
                 "en-GB": "Invite me to your server or join the support server",
                 "en-US": "Invite me to your server or join the support server",
                 "fr": "Invitez-moi sur votre serveur ou rejoignez le serveur de support",
-            },
-            "botreport_name": {
-                "en-GB": "botreport",
-                "en-US": "botreport",
-                "fr": "botreport",
             },
             "botreport_desc": {
                 "en-GB": "Submit a bot report if you found something wrong",

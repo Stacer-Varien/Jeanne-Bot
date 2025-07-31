@@ -127,7 +127,7 @@ class ReminderCog():
         await ctx.response.defer(ephemeral=True)
         embed = Embed()
         reminders = Reminder(ctx.user).get_all_user_reminders
-        if reminders == None:
+        if reminders is None:
             embed.description = "Aucun rappel"
         else:
             for i in reminders:

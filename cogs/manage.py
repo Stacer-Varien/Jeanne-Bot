@@ -507,7 +507,7 @@ class Create_Group(GroupCog, name=T("create")):
         hoisted: Optional[bool] = None,
         mentionable: Optional[bool] = None,
     ) -> None:
-        if ctx.local.value == "en-GB" or ctx.local.value == "en-US":
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Create_Group(self.bot).role(ctx, name, color, hoisted, mentionable)
         elif ctx.locale.value == "fr":
             await fr.Create_Group(self.bot).role(ctx, name, color, hoisted, mentionable)

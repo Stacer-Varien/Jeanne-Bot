@@ -1,5 +1,4 @@
-from random import choice
-from discord import Color, Embed, Interaction, Member, app_commands as Jeanne
+from discord import Interaction, Member, app_commands as Jeanne
 from discord.ext.commands import Cog, Bot
 from functions import (
     check_botbanned_app_command,
@@ -110,7 +109,7 @@ class fun(Cog, name="FunSlash"):
     @Jeanne.check(is_suspended)
     async def animeme(self, ctx: Interaction):
         await ctx.response.defer()
-        embed, file = get_animeme_pic()
+        embed, file = get_animeme_pic(ctx)
         await ctx.followup.send(embed=embed, file=file)
 
     @Jeanne.command(

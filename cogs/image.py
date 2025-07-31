@@ -38,7 +38,7 @@ class images(GroupCog, name="image"):
     @Jeanne.check(is_suspended)
     async def kitsune(self, ctx: Interaction):
         await ctx.response.defer()
-        embed, file = get_kistune_pic()
+        embed, file = get_kistune_pic(ctx)
         await ctx.followup.send(embed=embed, file=file)
 
     @Jeanne.command(
@@ -59,7 +59,7 @@ class images(GroupCog, name="image"):
     @Jeanne.check(is_suspended)
     async def wallpaper(self, ctx: Interaction):
         await ctx.response.defer()
-        embed, file = get_wallpaper_pic()
+        embed, file = get_wallpaper_pic(ctx)
         await ctx.followup.send(embed=embed, file=file)
 
     @Jeanne.command(
@@ -80,7 +80,7 @@ class images(GroupCog, name="image"):
     @Jeanne.check(is_suspended)
     async def jeanne(self, ctx: Interaction):
         await ctx.response.defer()
-        embed, file = get_jeanne_pic()
+        embed, file = get_jeanne_pic(ctx)
         await ctx.followup.send(embed=embed, file=file)
 
     @Jeanne.command(
@@ -98,7 +98,7 @@ class images(GroupCog, name="image"):
     @Jeanne.check(is_suspended)
     async def saber(self, ctx: Interaction):
         await ctx.response.defer()
-        embed, file = get_saber_pic()
+        embed, file = get_saber_pic(ctx)
         await ctx.followup.send(embed=embed, file=file)
 
     @Jeanne.command(
@@ -116,7 +116,7 @@ class images(GroupCog, name="image"):
     @Jeanne.check(is_suspended)
     async def neko(self, ctx: Interaction):
         await ctx.response.defer()
-        embed, file = get_neko_pic()
+        embed, file = get_neko_pic(ctx)
         await ctx.followup.send(embed=embed, file=file)
 
     @Jeanne.command(
@@ -137,7 +137,7 @@ class images(GroupCog, name="image"):
     @Jeanne.check(is_suspended)
     async def morgan(self, ctx: Interaction):
         await ctx.response.defer()
-        embed, file = get_morgan_pic()
+        embed, file = get_morgan_pic(ctx)
         await ctx.followup.send(embed=embed, file=file)
 
     @Jeanne.command(
@@ -155,7 +155,7 @@ class images(GroupCog, name="image"):
     @Jeanne.check(is_suspended)
     async def medusa(self, ctx: Interaction):
         await ctx.response.defer()
-        embed, file = get_medusa_pic()
+        embed, file = get_medusa_pic(ctx)
         await ctx.followup.send(embed=embed, file=file)
 
     @Jeanne.command(

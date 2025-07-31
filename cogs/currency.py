@@ -470,7 +470,7 @@ class currency(Cog, name="CurrencySlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def balance(self, ctx: Interaction, member: Optional[Member] = None):
-        member = ctx.user if (member == None) else member
+        member = ctx.user if (member is None) else member
         await self.get_balance(ctx, member)
 
     @balance.error

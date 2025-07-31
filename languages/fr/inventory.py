@@ -126,7 +126,7 @@ class Background_Group():
             )
             await ctx.edit_original_response(embed=size_error)
             return
-        file = File(fp=image, filename=f"preview_profile_card.png")
+        file = File(fp=image, filename="preview_profile_card.png")
         preview = (
             Embed(
                 description="Voici la prévisualisation de la carte de profil.",
@@ -168,7 +168,7 @@ class Background_Group():
  
     async def list(self, ctx: Interaction):
         await ctx.response.defer()
-        if Inventory(ctx.user).get_user_inventory == None:
+        if Inventory(ctx.user).get_user_inventory is None:
             embed = Embed(description="Votre inventaire est vide", color=Color.red())
             await ctx.followup.send(embed=embed)
             return

@@ -40,9 +40,9 @@ class nsfw(Cog):
         ctx: Interaction,
     ) -> None:
         if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            await en.nsfw(self.bot).nsfw(ctx)
+            await en.nsfw(self.bot).hentai(ctx)
         elif ctx.locale.value == "fr":
-            await fr.nsfw(self.bot).nsfw(ctx)
+            await fr.nsfw(self.bot).hentai(ctx)
 
     @Jeanne.command(
         description=T("gelbooru_desc"),

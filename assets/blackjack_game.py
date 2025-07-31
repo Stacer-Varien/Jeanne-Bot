@@ -1,4 +1,3 @@
-from functools import partial
 from random import randint
 from typing import Optional
 from discord import ButtonStyle, Color, Embed, Interaction, ui
@@ -205,7 +204,7 @@ class BlackjackView(ui.View):
                         )
                 else:
                     result_embed.description = (
-                        f"You have won 20 <:quantumpiece:1161010445205905418>"
+                        "You have won 20 <:quantumpiece:1161010445205905418>"
                     )
                     await Currency(ctx.user).add_qp(20)
                     if await self.topggpy.get_user_vote(ctx.user.id) == True:
@@ -259,7 +258,7 @@ class BlackjackView(ui.View):
                         )
                 else:
                     result_embed.description = (
-                        f"Vous avez gagné 20 <:quantumpiece:1161010445205905418>"
+                        "Vous avez gagné 20 <:quantumpiece:1161010445205905418>"
                     )
                     await Currency(ctx.user).add_qp(20)
                     if await self.topggpy.get_user_vote(ctx.user.id) == True:

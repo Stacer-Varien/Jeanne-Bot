@@ -45,7 +45,7 @@ class nsfw(Cog):
         view = ReportContent(ctx, shorten_url(hentai))
         await ctx.followup.send(embed=embed, view=view)
         await view.wait()
-        if view.value == None:
+        if view.value is None:
             try:
                 await ctx.edit_original_response(view=None)
             except (NotFound, HTTPException):
@@ -164,7 +164,7 @@ class nsfw(Cog):
             try:
                 await ctx.followup.send(embeds=embeds, view=view)
                 await view.wait()
-                if view.value == None:
+                if view.value is None:
                     try:
                         await ctx.edit_original_response(view=None)
                     except (NotFound, HTTPException):
@@ -186,7 +186,7 @@ class nsfw(Cog):
             embed.set_footer(text=footer_text)
             await ctx.followup.send(embed=embed, view=view)
             await view.wait()
-            if view.value == None:
+            if view.value is None:
                 try:
                     await ctx.edit_original_response(view=None)
                 except (NotFound, HTTPException):
@@ -222,7 +222,7 @@ class nsfw(Cog):
                 footer_text = "Récupéré depuis Konachan • Les crédits doivent revenir à l'artiste"
                 await ctx.followup.send(embeds=embeds, view=view)
                 await view.wait()
-                if view.value == None:
+                if view.value is None:
                     try:
                         await ctx.edit_original_response(view=None)
                     except (NotFound, HTTPException):
@@ -252,7 +252,7 @@ class nsfw(Cog):
             embed.set_footer(text=footer_text)
             await ctx.followup.send(embed=embed, view=view)
             await view.wait()
-            if view.value == None:
+            if view.value is None:
                 try:
                     await ctx.edit_original_response(view=None)
                 except (NotFound, HTTPException):
@@ -279,7 +279,7 @@ class nsfw(Cog):
             if media:
                 await ctx.followup.send("\n".join(media), view=view)
                 await view.wait()
-                if view.value == None:
+                if view.value is None:
                     try:
                         await ctx.edit_original_response(view=None)
                     except (NotFound, HTTPException):
@@ -310,7 +310,7 @@ class nsfw(Cog):
             )
             await ctx.followup.send(embed=embed, view=view)
             await view.wait()
-            if view.value == None:
+            if view.value is None:
                 try:
                     await ctx.edit_original_response(view=None)
                 except (NotFound, HTTPException):

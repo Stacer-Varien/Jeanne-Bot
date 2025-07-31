@@ -35,7 +35,7 @@ class Reactions():
     ) -> None:
         reaction_api = get(api_url)
         reaction_embed = Embed(color=Color.random())
-        reaction_embed.set_footer(text="Fetched from Tenor")
+        reaction_embed.set_footer(text="Tiré de Ténor")
         random_gif = random.choice(json.loads(reaction_api.content)["results"])
         reaction_url = random_gif["media_formats"]["gif"]["url"]
         reaction_embed.set_image(url=reaction_url)
@@ -113,34 +113,26 @@ class Reactions():
     async def smug(self, ctx: Interaction):
         await self._send_reaction(ctx, "smug", api_url=smug)
 
-
     async def poke(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "poke", member, poke)
-
 
     async def pat(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "pat", member, pat)
 
-
     async def kiss(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "kiss", member, kiss)
-
 
     async def tickle(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "tickle", member, tickle)
 
-
     async def baka(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "baka", member, baka)
-
 
     async def feed(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "feed", member, feed)
 
-
     async def cry(self, ctx: Interaction):
         await self._send_reaction(ctx, "cry", api_url=cry)
-
 
     async def bite(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "bite", member, bite)
@@ -151,7 +143,5 @@ class Reactions():
     async def cuddle(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "cuddle", member, cuddle)
 
-
     async def dance(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         await self._send_reaction(ctx, "dance", member, dance)
-

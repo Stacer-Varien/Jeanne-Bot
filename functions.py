@@ -222,7 +222,7 @@ class Currency:
             "SELECT amount FROM bankData WHERE user_id = ?", (self.user.id,)
         ).fetchone()
         db.commit()
-        return 0 if data == None else data[0]
+        return 0 if data is None else data[0]
 
     async def add_qp(self, amount: int):
         previous_day = round((datetime.now() - timedelta(days=1)).timestamp())
@@ -284,7 +284,7 @@ class Currency:
             "SELECT claimed_date FROM bankData WHERE user_id = ?", (self.user.id,)
         ).fetchone()
         db.commit()
-        if (data == None) or (int(data[0]) < round(datetime.now().timestamp())):
+        if (data is None) or (int(data[0]) < round(datetime.now().timestamp())):
             return True
         return int(data[0])
 
@@ -329,7 +329,7 @@ class Inventory:
             ),
         ).fetchone()
         db.commit()
-        return None if data == None else data[0]
+        return None if data is None else data[0]
 
     @staticmethod
     def fetch_wallpapers() -> list:
@@ -354,7 +354,7 @@ class Inventory:
             ),
         ).fetchone()
         db.commit()
-        if wallpaper == None:
+        if wallpaper is None:
             return None
         db.execute(
             "UPDATE userWallpaperInventory SET selected = ? WHERE user_id = ? AND wallpaper = ?",
@@ -408,7 +408,7 @@ class Inventory:
             ),
         ).fetchone()
         db.commit()
-        return None if (wallpaper == None) else str(wallpaper[0])
+        return None if (wallpaper is None) else str(wallpaper[0])
 
     async def use_wallpaper(self, name: str):
         await self.deselect_wallpaper()
@@ -438,7 +438,7 @@ class Inventory:
                 1,
             ),
         ).fetchone()
-        return 100 if (data == None) else int(data[0])
+        return 100 if (data is None) else int(data[0])
 
     async def set_brightness(self, brightness: int) -> Literal[False] | None:
         try:
@@ -556,7 +556,6 @@ class Levelling:
         return int(level[0]) if level is not None else 0
 
     async def add_xp(self, xp: int):
-        now_time = round(datetime.now().timestamp())
         global_cursor = db.execute(
             "INSERT OR IGNORE INTO globalxpData (user_id, lvl, exp) VALUES (?, ?, ?)",
             (self.member.id, 0, xp),
@@ -896,7 +895,7 @@ class Manage:
             "SELECT role FROM levelRewardData WHERE server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
-        if data == None:
+        if data is None:
             return None
         db.execute(
             "DELETE FROM levelRewardData WHERE server = ? AND role = ?",
@@ -959,7 +958,7 @@ class Manage:
         db.commit()
         if cursor.rowcount == 0:
             db.execute(
-                f"UPDATE serverData SET welcoming_channel = ? WHERE server = ?",
+                "UPDATE serverData SET welcoming_channel = ? WHERE server = ?",
                 (
                     channel.id,
                     self.server.id,
@@ -978,7 +977,7 @@ class Manage:
         db.commit()
         if cursor.rowcount == 0:
             db.execute(
-                f"UPDATE serverData SET leaving_channel = ? WHERE server = ?",
+                "UPDATE serverData SET leaving_channel = ? WHERE server = ?",
                 (
                     channel.id,
                     self.server.id,
@@ -997,7 +996,7 @@ class Manage:
         db.commit()
         if cursor.rowcount == 0:
             db.execute(
-                f"UPDATE serverData SET modlog = ? WHERE server = ?",
+                "UPDATE serverData SET modlog = ? WHERE server = ?",
                 (
                     channel.id,
                     self.server.id,
@@ -1106,7 +1105,7 @@ class Confess:
             "SELECT confess_channel FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
-        return None if data == None else self.server.get_channel(data[0])
+        return None if data is None else self.server.get_channel(data[0])
 
     async def add_confession(self, user: User, confession_id:int, confession: str):
         db.execute(
@@ -1208,7 +1207,7 @@ class Moderation:
             "SELECT * FROM warnDATA WHERE guild_id = ?", (self.server.id,)
         ).fetchall()
         db.commit()
-        if len(warnings) == 0 or warnings == None:
+        if len(warnings) == 0 or warnings is None:
             return None
         return warnings
 
@@ -1222,7 +1221,7 @@ class Moderation:
             ),
         ).fetchall()
         db.commit()
-        if len(warnings) == 0 or warnings == None:
+        if len(warnings) == 0 or warnings is None:
             return None
         return warnings
 
@@ -1260,7 +1259,7 @@ class Moderation:
         return data
 
     async def softban_member(self, member: Member, ends: int = None):
-        if ends == None:
+        if ends is None:
             ends = 99999999999  # infinite value for now
         else:
             seconds = parse_timespan(ends)
@@ -1291,7 +1290,7 @@ class Moderation:
             "SELECT modlog FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
         db.commit()
-        return self.server.get_channel(data[0]) if data != None else None
+        return self.server.get_channel(data[0]) if data is not None else None
 
 
 class Welcomer:
@@ -1404,7 +1403,7 @@ class Hentai:
         else:
             nsfw_images_list = list(nsfw_images)
         shuffle(nsfw_images_list)
-        if (not tags) or (tags == None):
+        if (not tags) or (tags is None):
             tags = ""
         tags_list = [
             tag.strip().replace(" ", "_")
@@ -1528,7 +1527,7 @@ class Reminder:
             ),
         ).fetchone()
         db.commit()
-        if data == None:
+        if data is None:
             return False
         db.execute(
             "DELETE FROM reminderData WHERE userid = ? AND id = ?",

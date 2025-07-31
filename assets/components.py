@@ -712,7 +712,7 @@ class ReportModal(ui.Modal, title="Bot Report"):
         else:
             report = Embed(title=self.type, color=Color.brand_red())
             report.description = self.report.value
-            if self.steps.value != None or self.steps.value == "":
+            if self.steps.value is not None or self.steps.value == "":
                 report.add_field(name="Steps", value=self.steps.value, inline=False)
         report.set_footer(text="Reporter {}| `{}`".format(ctx.user, ctx.user.id))
         SyncWebhook.from_url(WEBHOOK).send(embed=report)
@@ -976,7 +976,7 @@ class RemoveManage(ui.View):
             Embed()
             check = Welcomer(ctx.guild).get_welcomer
             if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-                if check == None:
+                if check is None:
                     button.label = "No welcoming channel found"
                     button.style = ButtonStyle.danger
                     await ctx.response.edit_message(view=self)
@@ -986,7 +986,7 @@ class RemoveManage(ui.View):
                 button.label = "Welcomer Channel Removed"
                 await ctx.response.edit_message(view=self)
             elif ctx.locale.value == "fr":
-                if check == None:
+                if check is None:
                     button.label = "Aucun canal de bienvenue trouvé"
                     button.style = ButtonStyle.danger
                     await ctx.response.edit_message(view=self)
@@ -1000,7 +1000,7 @@ class RemoveManage(ui.View):
             self.value = "welcomemsg"
             check = Welcomer(ctx.guild).get_welcoming_msg
             if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-                if check == None:
+                if check is None:
                     button.style = ButtonStyle.danger
                     button.label = "No welcoming message set"
                     await ctx.response.edit_message(view=self)
@@ -1010,7 +1010,7 @@ class RemoveManage(ui.View):
                 await Manage(ctx.guild).remove_welcomemsg()
                 await ctx.response.edit_message(view=self)
             elif ctx.locale.value == "fr":
-                if check == None:
+                if check is None:
                     button.style = ButtonStyle.danger
                     button.label = "Aucun message de bienvenue défini"
                     await ctx.response.edit_message(view=self)
@@ -1024,7 +1024,7 @@ class RemoveManage(ui.View):
             self.value = "leaver"
             check = Welcomer(ctx.guild).get_leaver
             if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-                if check == None:
+                if check is None:
                     button.style = ButtonStyle.danger
                     button.label = "No leaving channel found"
                     await ctx.response.edit_message(view=self)
@@ -1034,7 +1034,7 @@ class RemoveManage(ui.View):
                     await Manage(ctx.guild).remove_leaver()
                     await ctx.response.edit_message(view=self)
             elif ctx.locale.value == "fr":
-                if check == None:
+                if check is None:
                     button.style = ButtonStyle.danger
                     button.label = "Aucun canal de départ trouvé"
                     await ctx.response.edit_message(view=self)
@@ -1048,7 +1048,7 @@ class RemoveManage(ui.View):
             self.value = "leavingmsg"
             check = Welcomer(ctx.guild).get_leaving_msg
             if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-                if check == None:
+                if check is None:
                     button.style = ButtonStyle.danger
                     button.label = "No leaving message set"
                     await ctx.response.edit_message(view=self)
@@ -1058,7 +1058,7 @@ class RemoveManage(ui.View):
                 await Manage(ctx.guild).remove_leavingmsg()
                 await ctx.response.edit_message(view=self)
             elif ctx.locale.value == "fr":
-                if check == None:
+                if check is None:
                     button.style = ButtonStyle.danger
                     button.label = "Aucun message de départ défini"
                     await ctx.response.edit_message(view=self)
@@ -1072,7 +1072,7 @@ class RemoveManage(ui.View):
             self.value = "levelup"
             check = Levelling(server=ctx.guild).get_levelup_channel
             if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-                if check == None:
+                if check is None:
                     button.style = ButtonStyle.danger
                     button.label = "No level update channel found"
                     await ctx.response.edit_message(view=self)
@@ -1082,7 +1082,7 @@ class RemoveManage(ui.View):
                 await Manage(ctx.guild).remove_levelup()
                 await ctx.response.edit_message(view=self)
             elif ctx.locale.value == "fr":
-                if check == None:
+                if check is None:
                     button.style = ButtonStyle.danger
                     button.label = "Aucun canal de mise à jour de niveau trouvé"
                     await ctx.response.edit_message(view=self)
@@ -1096,7 +1096,7 @@ class RemoveManage(ui.View):
             self.value = "levelnotif"
             check = Levelling(server=ctx.guild).get_levelup_msg
             if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-                if check == None:
+                if check is None:
                     button.style = ButtonStyle.danger
                     button.label = "No level update message set"
                     await ctx.response.edit_message(view=self)
@@ -1106,7 +1106,7 @@ class RemoveManage(ui.View):
                 await Manage(ctx.guild).remove_levelup_msg()
                 await ctx.response.edit_message(view=self)
             elif ctx.locale.value == "fr":
-                if check == None:
+                if check is None:
                     button.style = ButtonStyle.danger
                     button.label = "Aucun message de mise à jour de niveau défini"
                     await ctx.response.edit_message(view=self)
@@ -1120,7 +1120,7 @@ class RemoveManage(ui.View):
             self.value = "rolereward"
             check = Levelling(server=ctx.guild).get_rank_up_update
             if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-                if check == None:
+                if check is None:
                     button.style = ButtonStyle.danger
                     button.label = "No role reward message set"
                     await ctx.response.edit_message(view=self)
@@ -1130,7 +1130,7 @@ class RemoveManage(ui.View):
                 await Manage(ctx.guild).remove_rolereward_msg()
                 await ctx.response.edit_message(view=self)
             elif ctx.locale.value == "fr":
-                if check == None:
+                if check is None:
                     button.style = ButtonStyle.danger
                     button.label = "Aucun message de récompense de rôle défini"
                     await ctx.response.edit_message(view=self)
@@ -1144,7 +1144,7 @@ class RemoveManage(ui.View):
             self.value = "modlog"
             check = Moderation(ctx.guild).get_modlog_channel
             if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-                if check == None:
+                if check is None:
                     button.style = ButtonStyle.danger
                     button.label = "No modlog found"
                     await ctx.response.edit_message(view=self)
@@ -1154,7 +1154,7 @@ class RemoveManage(ui.View):
                 await Manage(ctx.guild).remove_modloger()
                 await ctx.response.edit_message(view=self)
             elif ctx.locale.value == "fr":
-                if check == None:
+                if check is None:
                     button.style = ButtonStyle.danger
                     button.label = "Aucun modlog trouvé"
                     await ctx.response.edit_message(view=self)
@@ -1244,7 +1244,7 @@ async def buy_function_context(bot: Bot, ctx: Context, name: str, message: Messa
             view=None,
         )
         image = await Profile(bot).generate_profile(ctx, ctx.author, image_url, True, True, "southafrica")
-        file = File(fp=image, filename=f"preview_profile_card.png")
+        file = File(fp=image, filename="preview_profile_card.png")
         preview = (
             Embed(
                 description="This is the preview of the profile card.",
@@ -1260,7 +1260,7 @@ async def buy_function_context(bot: Bot, ctx: Context, name: str, message: Messa
         if view.value == True:
             await Inventory(ctx.author).add_user_wallpaper(name)
             embed1 = Embed(
-                description=f"Background wallpaper bought and selected",
+                description="Background wallpaper bought and selected",
                 color=Color.random(),
             )
             await m.edit(embed=embed1, view=None)
@@ -1274,7 +1274,7 @@ async def buy_function_context(bot: Bot, ctx: Context, name: str, message: Messa
             view=None,
         )
         image = await Profile(bot).generate_profile(ctx, ctx.author, image_url, True, True, "southafrica")
-        file = File(fp=image, filename=f"preview_profile_card.png")
+        file = File(fp=image, filename="preview_profile_card.png")
         preview = (
             Embed(
                 description="Ceci est l'aperçu de la carte de profil.",
@@ -1290,7 +1290,7 @@ async def buy_function_context(bot: Bot, ctx: Context, name: str, message: Messa
         if view.value == True:
             await Inventory(ctx.author).add_user_wallpaper(name)
             embed1 = Embed(
-                description=f"Fond d'écran acheté et sélectionné",
+                description="Fond d'écran acheté et sélectionné",
                 color=Color.random(),
             )
             await m.edit(embed=embed1, view=None)
@@ -1311,7 +1311,7 @@ async def buy_function_app(bot: Bot, ctx: Interaction, name: str):
             "Creating preview... This will take some time <a:loading:1161038734620373062>"
         )
         image = await Profile(bot).generate_profile(ctx, ctx.user, image_url, True, True, "southafrica")
-        file = File(fp=image, filename=f"preview_profile_card.png")
+        file = File(fp=image, filename="preview_profile_card.png")
         preview = (
             Embed(
                 description="This is the preview of the profile card.",
@@ -1325,7 +1325,7 @@ async def buy_function_app(bot: Bot, ctx: Interaction, name: str):
             content=None, attachments=[file], embed=preview, view=view
         )
         await view.wait()
-        if view.value == None:
+        if view.value is None:
             await ctx.edit_original_response(
                 content="Timeout", view=None, embed=None, attachments=[]
             )
@@ -1333,7 +1333,7 @@ async def buy_function_app(bot: Bot, ctx: Interaction, name: str):
         if view.value == True:
             await Inventory(ctx.user).add_user_wallpaper(name)
             embed1 = Embed(
-                description=f"Background wallpaper bought and selected",
+                description="Background wallpaper bought and selected",
                 color=Color.random(),
             )
             await ctx.edit_original_response(embed=embed1, view=None)
@@ -1346,7 +1346,7 @@ async def buy_function_app(bot: Bot, ctx: Interaction, name: str):
             "Création de l'aperçu... Cela prendra un certain temps <a:loading:1161038734620373062>"
         )
         image = await Profile(bot).generate_profile(ctx, ctx.user, image_url, True, True, "southafrica")
-        file = File(fp=image, filename=f"preview_profile_card.png")
+        file = File(fp=image, filename="preview_profile_card.png")
         preview = (
             Embed(
                 description="Ceci est l'aperçu de la carte de profil.",
@@ -1360,7 +1360,7 @@ async def buy_function_app(bot: Bot, ctx: Interaction, name: str):
             content=None, attachments=[file], embed=preview, view=view
         )
         await view.wait()
-        if view.value == None:
+        if view.value is None:
             await ctx.edit_original_response(
                 content="Temps écoulé", view=None, embed=None, attachments=[]
             )
@@ -1368,7 +1368,7 @@ async def buy_function_app(bot: Bot, ctx: Interaction, name: str):
         if view.value == True:
             await Inventory(ctx.user).add_user_wallpaper(name)
             embed1 = Embed(
-                description=f"Fond d'écran acheté et sélectionné",
+                description="Fond d'écran acheté et sélectionné",
                 color=Color.random(),
             )
             await ctx.edit_original_response(embed=embed1, view=None)
