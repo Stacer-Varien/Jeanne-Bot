@@ -1,9 +1,5 @@
-from asyncio import sleep
-from collections import defaultdict
 from datetime import datetime, timedelta
 from enum import Enum
-import json
-from pathlib import Path
 from random import choice, randint, shuffle
 import aiohttp
 from humanfriendly import parse_timespan
@@ -22,7 +18,7 @@ from discord import (
 
 from discord.ext.commands import Bot, Context
 from requests import get
-from config import db, BB_WEBHOOK, CATBOX_HASH, LVLCOOLDOWNS
+from config import db, BB_WEBHOOK, CATBOX_HASH
 from typing import Literal, Optional, List
 from discord.app_commands import locale_str as T
 
@@ -515,11 +511,6 @@ class Levelling:
     ) -> None:
         self.member = member
         self.server = server
-        self.COOLDOWNS_FILE = Path(LVLCOOLDOWNS)
-
-    cooldowns = defaultdict(
-        lambda: {"global": {"next_time": datetime.min}, "servers": {}}
-    )
 
     @property
     def get_member_xp(self) -> int:
@@ -539,6 +530,41 @@ class Levelling:
         return 0 if xp is None else int(xp[0])
 
     @property
+    def get_member_cumulated_xp(self) -> int:
+        cumulated_exp = db.execute(
+            "SELECT cumulative_exp FROM serverxpData WHERE user_id = ? AND guild_id = ?",
+            (self.member.id, self.server.id),
+        ).fetchone()
+        db.commit()
+        return 0 if cumulated_exp is None else int(cumulated_exp[0])
+
+    @property
+    def get_user_cumulated_xp(self) -> int:
+        cumulated_exp = db.execute(
+            "SELECT cumulative_exp FROM globalxpData WHERE user_id = ?",
+            (self.member.id,),
+        ).fetchone()
+        db.commit()
+        return 0 if cumulated_exp is None else int(cumulated_exp[0])
+
+    @property
+    def get_next_time_server(self) -> int:
+        next_time = db.execute(
+            "SELECT next_time FROM serverxpData WHERE user_id = ? AND guild_id = ?",
+            (self.member.id, self.server.id),
+        ).fetchone()
+        db.commit()
+        return int(next_time[0]) if next_time is not None else 0
+
+    @property
+    def get_next_time_global(self) -> int:
+        next_time = db.execute(
+            "SELECT next_time FROM globalxpData WHERE user_id = ?", (self.member.id,)
+        ).fetchone()
+        db.commit()
+        return int(next_time[0]) if next_time is not None else 0
+
+    @property
     def get_member_level(self) -> int:
         level = db.execute(
             "SELECT lvl FROM serverxpData WHERE user_id = ? AND guild_id = ?",
@@ -556,65 +582,76 @@ class Levelling:
         return int(level[0]) if level is not None else 0
 
     async def add_xp(self, xp: int):
+        now_time = round(datetime.now().timestamp())
+        next_time = round((datetime.now() + timedelta(minutes=2)).timestamp())
+
         global_cursor = db.execute(
-            "INSERT OR IGNORE INTO globalxpData (user_id, lvl, exp) VALUES (?, ?, ?)",
-            (self.member.id, 0, xp),
+            "INSERT OR IGNORE INTO globalxpData (user_id, lvl, exp, next_time) VALUES (?, ?, ?, ?)",
+            (self.member.id, 0, xp, next_time),
         )
         db.commit()
         if global_cursor.rowcount == 0:
-            global_exp = self.get_user_xp
-            global_updated_exp = global_exp + xp
-            db.execute(
-                "UPDATE globalxpData SET exp = ? WHERE user_id = ?",
-                (
-                    global_updated_exp,
-                    self.member.id,
-                ),
-            )
-            db.commit()
-
-            global_level = self.get_user_level
-            global_next_lvl_exp = (global_level * 50) + ((global_level - 1) * 25) + 50
-            if global_updated_exp >= global_next_lvl_exp:
+            if now_time >= self.get_next_time_global:
+                global_exp = self.get_user_xp
+                global_updated_exp = global_exp + xp
                 db.execute(
-                    "UPDATE globalxpData SET lvl = lvl + ?, exp = ? WHERE user_id = ?",
-                    (1, 0, self.member.id),
+                    "UPDATE globalxpData SET exp = ?, next_time = ? WHERE user_id = ?",
+                    (
+                        global_updated_exp,
+                        next_time,
+                        self.member.id,
+                    ),
                 )
                 db.commit()
 
+                global_level = self.get_user_level
+                global_next_lvl_exp = (
+                    (global_level * 50) + ((global_level - 1) * 25) + 50
+                )
+                if global_updated_exp >= global_next_lvl_exp:
+                    db.execute(
+                        "UPDATE globalxpData SET lvl = lvl + ?, exp = ? WHERE user_id = ?",
+                        (1, 0, self.member.id),
+                    )
+                    db.commit()
+
         server_cursor = db.execute(
-            "INSERT OR IGNORE INTO serverxpData (guild_id, user_id, lvl, exp) VALUES (?, ?, ?, ?)",
-            (self.server.id, self.member.id, 0, xp),
+            "INSERT OR IGNORE INTO serverxpData (guild_id, user_id, lvl, exp, next_time) VALUES (?, ?, ?, ?, ?)",
+            (self.server.id, self.member.id, 0, xp, next_time),
         )
         db.commit()
 
         if server_cursor.rowcount == 0:
-            server_exp = self.get_member_xp
-            server_updated_exp = server_exp + xp
-            db.execute(
-                "UPDATE serverxpData SET exp = ? WHERE guild_id = ? AND user_id = ?",
-                (
-                    server_updated_exp,
-                    self.server.id,
-                    self.member.id,
-                ),
-            )
-            db.commit()
-
-            server_level = self.get_member_level
-            server_next_lvl_exp = (server_level * 50) + ((server_level - 1) * 25) + 50
-            if server_updated_exp >= server_next_lvl_exp:
+            if now_time > self.get_next_time_server:
+                server_exp = self.get_member_xp
+                server_updated_exp = server_exp + xp
                 db.execute(
-                    "UPDATE serverxpData SET lvl = lvl + ?, exp = ? WHERE guild_id = ? AND user_id = ?",
+                    "UPDATE serverxpData SET exp = ?, next_time = ? WHERE guild_id = ? AND user_id = ?",
                     (
-                        1,
-                        0,
+                        server_updated_exp,
+                        next_time,
                         self.server.id,
                         self.member.id,
                     ),
                 )
                 db.commit()
-                return self.get_level_channel
+
+                server_level = self.get_member_level
+                server_next_lvl_exp = (
+                    (server_level * 50) + ((server_level - 1) * 25) + 50
+                )
+                if server_updated_exp >= server_next_lvl_exp:
+                    db.execute(
+                        "UPDATE serverxpData SET lvl = lvl + ?, exp = ? WHERE guild_id = ? AND user_id = ?",
+                        (
+                            1,
+                            0,
+                            self.server.id,
+                            self.member.id,
+                        ),
+                    )
+                    db.commit()
+                    return self.get_level_channel
 
     @property
     def get_level_channel(
@@ -717,78 +754,6 @@ class Levelling:
         ).fetchall()
         db.commit()
         return [i for i in data] if data else None
-
-    def load_cooldowns(self):
-        if self.COOLDOWNS_FILE.exists():
-            with open(self.COOLDOWNS_FILE, "r") as file:
-                try:
-                    data = json.load(file)
-                except json.JSONDecodeError:
-                    data = {}
-                for user_id, user_data in data.items():
-                    self.cooldowns[int(user_id)] = {
-                        "global": {
-                            "next_time": datetime.fromisoformat(
-                                user_data["global"]["next_time"]
-                            )
-                        },
-                        "servers": {
-                            int(server_id): {
-                                "next_time": datetime.fromisoformat(
-                                    server_data["next_time"]
-                                )
-                            }
-                            for server_id, server_data in user_data["servers"].items()
-                        },
-                    }
-
-    def save_cooldowns(self):
-        with open(self.COOLDOWNS_FILE, "w") as file:
-            json.dump(
-                {
-                    user_id: {
-                        "global": {
-                            "next_time": data["global"]["next_time"].isoformat()
-                        },
-                        "servers": {
-                            server_id: {
-                                "next_time": server_data["next_time"].isoformat()
-                            }
-                            for server_id, server_data in data["servers"].items()
-                        },
-                    }
-                    for user_id, data in self.cooldowns.items()
-                },
-                file,
-                indent=4,
-            )
-
-    async def cleanup_cooldowns(self):
-        while True:
-            now_time = datetime.now()
-            expired_users = []
-
-            for user_id, data in list(self.cooldowns.items()):
-                if now_time >= data["global"]["next_time"]:
-                    data["global"]["next_time"] = datetime.min
-
-                expired_servers = [
-                    server_id
-                    for server_id, server_data in data["servers"].items()
-                    if now_time >= server_data["next_time"]
-                ]
-                for server_id in expired_servers:
-                    del data["servers"][server_id]
-
-                if data["global"]["next_time"] == datetime.min and not data["servers"]:
-                    expired_users.append(user_id)
-
-            for user_id in expired_users:
-                del self.cooldowns[user_id]
-
-            self.save_cooldowns()
-
-            await sleep(60)
 
 
 class Manage:

@@ -130,7 +130,7 @@ class Create_Group(GroupCog, name=T("create")):
         slowmode: str = None,
         nsfw_enabled: Optional[bool] = None,
     ) -> None:
-        if ctx.local.value == "en-GB" or ctx.local.value == "en-US":
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Create_Group(self.bot).textchannel(
                 ctx, name, topic, category, slowmode, nsfw_enabled
             )
@@ -213,7 +213,7 @@ class Create_Group(GroupCog, name=T("create")):
         category: Optional[CategoryChannel] = None,
         users: Optional[Jeanne.Range[int, None, 99]] = None,
     ) -> None:
-        if ctx.local.value == "en-GB" or ctx.local.value == "en-US":
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Create_Group(self.bot).voicechannel(ctx, name, category, users)
         elif ctx.locale.value == "fr":
             await fr.Create_Group(self.bot).voicechannel(ctx, name, category, users)
@@ -258,7 +258,7 @@ class Create_Group(GroupCog, name=T("create")):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def category(self, ctx: Interaction, name: Jeanne.Range[str, 1, 100]):
-        if ctx.local.value == "en-GB" or ctx.local.value == "en-US":
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Create_Group(self.bot).category(ctx, name)
         elif ctx.locale.value == "fr":
             await fr.Create_Group(self.bot).category(ctx, name)
@@ -336,7 +336,7 @@ class Create_Group(GroupCog, name=T("create")):
         category: Optional[CategoryChannel] = None,
         users: Optional[Jeanne.Range[int, None, 10000]] = None,
     ):
-        if ctx.local.value == "en-GB" or ctx.local.value == "en-US":
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Create_Group(self.bot).stagechannel(ctx, name, category, users)
         elif ctx.locale.value == "fr":
             await fr.Create_Group(self.bot).stagechannel(ctx, name, category, users)
@@ -415,7 +415,7 @@ class Create_Group(GroupCog, name=T("create")):
         category: Optional[CategoryChannel] = None,
         topic: Optional[bool] = None,
     ):
-        if ctx.local.value == "en-GB" or ctx.local.value == "en-US":
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Create_Group(self.bot).forum(ctx, name, category, topic)
         elif ctx.locale.value == "fr":
             await fr.Create_Group(self.bot).forum(ctx, name, category, topic)
@@ -603,7 +603,7 @@ class Create_Group(GroupCog, name=T("create")):
         message_id: str,
         slowmode: Optional[str] = None,
     ):
-        if ctx.local.value == "en-GB" or ctx.local.value == "en-US":
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Create_Group(self.bot).public(
                 ctx, name, channel, message_id, slowmode
             )
@@ -726,7 +726,7 @@ class Create_Group(GroupCog, name=T("create")):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
         ):
-            if ctx.locale.value == "en-GB" or ctx.local.value == "en-US":
+            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
                 await en.Create_Group(self.bot).private_thread_error(ctx)
             elif ctx.locale.value == "fr":
                 await fr.Create_Group(self.bot).private_thread_error(ctx)
@@ -802,7 +802,7 @@ class Create_Group(GroupCog, name=T("create")):
     @emoji.error
     async def emoji_error(self, ctx: Interaction, error: Jeanne.errors.AppCommandError):
         if isinstance(error, Jeanne.errors.CommandInvokeError):
-            if ctx.locale.value == "en-GB" or ctx.local.value == "en-US":
+            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
                 await en.Create_Group(self.bot).emoji_error(ctx, error)
             elif ctx.locale.value == "fr":
                 await fr.Create_Group(self.bot).emoji_error(ctx, error)
@@ -887,7 +887,7 @@ class Create_Group(GroupCog, name=T("create")):
         sticker_link: Optional[str] = None,
         sticker_image: Optional[Attachment] = None,
     ):
-        if ctx.local.value == "en-GB" or ctx.local.value == "en-US":
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Create_Group(self.bot).sticker(
                 ctx, name, emoji, sticker_link, sticker_image
             )
@@ -1037,7 +1037,7 @@ class Delete_Group(GroupCog, name=T("delete")):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def emoji(self, ctx: Interaction, emoji: str):
-        if ctx.locale.value == "en-GB" or ctx.local.value == "en-US":
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Delete_Group(self.bot).emoji(ctx, emoji)
         elif ctx.locale.value == "fr":
             await fr.Delete_Group(self.bot).emoji(ctx, emoji)
@@ -1090,7 +1090,7 @@ class Delete_Group(GroupCog, name=T("delete")):
     async def sticker(
         self, ctx: Interaction, sticker: str, name: Jeanne.Range[str, 2, 30]
     ):
-        if ctx.local.value == "en-GB" or ctx.local.value == "en-US":
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Delete_Group(self.bot).sticker(ctx, sticker, name)
         elif ctx.locale.value == "fr":
             await fr.Delete_Group(self.bot).sticker(ctx, sticker, name)
@@ -1415,7 +1415,7 @@ class Edit_Group(GroupCog, name="edit"):
         hoisted: Optional[bool] = None,
         mentionable: Optional[bool] = None,
     ) -> None:
-        if ctx.local.value == "en-GB" or ctx.local.value == "en-US":
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Edit_Group(self.bot).role(
                 ctx, role, name, color, hoisted, mentionable
             )
@@ -1614,7 +1614,7 @@ class Set_Group(GroupCog, name="set"):
         welcoming_channel: Optional[TextChannel] = None,
         leaving_channel: Optional[TextChannel] = None,
     ) -> None:
-        if ctx.locale.value == "en-GB" or ctx.local.value == "en-US":
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Set_Group(self.bot).welcomer(
                 ctx, welcoming_channel, leaving_channel
             )
@@ -1660,7 +1660,7 @@ class Set_Group(GroupCog, name="set"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def modlog(self, ctx: Interaction, channel: TextChannel):
-        if ctx.locale.value == "en-GB" or ctx.local.value == "en-US":
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Set_Group(self.bot).modlog(ctx, channel)
         elif ctx.locale.value == "fr":
             await fr.Set_Group(self.bot).modlog(ctx, channel)
@@ -1935,7 +1935,7 @@ class Set_Group(GroupCog, name="set"):
     async def brightness(
         self, ctx: Interaction, brightness: Jeanne.Range[int, 10, 150]
     ):
-        if ctx.locale.value == "en-GB" or ctx.local.value == "en-US":
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Set_Group(self.bot).brightness(ctx, brightness)
         elif ctx.locale.value == "fr":
             await fr.Set_Group(self.bot).brightness(ctx, brightness)
@@ -1970,7 +1970,7 @@ class Set_Group(GroupCog, name="set"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def bio(self, ctx: Interaction, bio: Jeanne.Range[str, 1, 120]):
-        if ctx.locale.value == "en-GB" or ctx.local.value == "en-US":
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Set_Group(self.bot).bio(ctx, bio)
         elif ctx.locale.value == "fr":
             await fr.Set_Group(self.bot).bio(ctx, bio)
@@ -2009,7 +2009,7 @@ class Set_Group(GroupCog, name="set"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def color(self, ctx: Interaction, color: Jeanne.Range[str, 1]):
-        if ctx.locale.value == "en-GB" or ctx.local.value == "en-US":
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Set_Group(self.bot).color(ctx, color)
         elif ctx.locale.value == "fr":
             await fr.Set_Group(self.bot).color(ctx, color)
@@ -2423,7 +2423,7 @@ class Rename_Group(GroupCog, name="rename"):
     async def sticker(
         self, ctx: Interaction, sticker: str, name: Jeanne.Range[str, 2, 30]
     ):
-        if ctx.local.value == "en-GB" or ctx.local.value == "en-US":
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.Rename_Group(self.bot).sticker(ctx, sticker, name)
         elif ctx.locale.value == "fr":
             await fr.Rename_Group(self.bot).sticker(ctx, sticker, name)
