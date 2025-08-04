@@ -1822,6 +1822,11 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "What is the level reward message?",
                 "fr": "Quel est le message de récompense de niveau ?",
             },
+            "levelmsg_parm_name": {
+                "en-GB": "levelmsg",
+                "en-US": "levelmsg",
+                "fr": "message_niveau",
+            },
             "levelmsg_parm_desc": {
                 "en-GB": "What is the level up message?",
                 "en-US": "What is the level up message?",
