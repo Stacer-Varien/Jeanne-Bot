@@ -51,88 +51,7 @@ class nsfw(Cog):
             except (NotFound, HTTPException):
                 return
 
-    async def gelbooru(
-        self,
-        ctx: Interaction,
-        tag: Optional[str] = None,
-        plus: Optional[bool] = None,
-    ) -> None:
-        await ctx.response.defer()
-        image = await Hentai(plus).gelbooru(tag)
 
-        if plus:
-            images = [image[randint(1, len(image)) - 1] for _ in range(4)]
-            view = ReportContentPlus(ctx, *[img["file_url"] for img in images])
-            vids = [i for i in images if "mp4" in i["file_url"] or "webm" in i["file_url"]]
-            media = [j["file_url"] for j in vids]
-
-            if media:
-                await ctx.followup.send("\n".join(media), view=view)
-                await view.wait()
-                if view.value is None:
-                    try:
-                        await ctx.edit_original_response(view=None)
-                    except (NotFound, HTTPException):
-                        return
-                return
-
-            color = Color.random()
-            embeds = [
-                Embed(color=color, url="https://gelbooru.com")
-                .set_image(url=img["file_url"])
-                .set_footer(
-                    text="Récupéré depuis Gelbooru • Les crédits doivent revenir à l'artiste"
-                )
-                for img in images
-            ]
-            await ctx.followup.send(embeds=embeds, view=view)
-            await view.wait()
-            if view.value is None:
-                try:
-                    await ctx.edit_original_response(view=None)
-                except (NotFound, HTTPException):
-                    return
-            return
-
-        try:
-            view = ReportContent(ctx, image)
-            if str(image).endswith(("mp4", "webm")):
-                await ctx.followup.send(image, view=view)
-                await view.wait()
-                if view.value is None:
-                    try:
-                        await ctx.edit_original_response(view=None)
-                    except (NotFound, HTTPException):
-                        return
-                return
-
-            embed = (
-                Embed(color=Color.purple())
-                .set_image(url=image)
-                .set_footer(
-                    text="Récupéré depuis Gelbooru • Les crédits doivent revenir à l'artiste"
-                )
-            )
-            await ctx.followup.send(embed=embed, view=view)
-            await view.wait()
-            if view.value is None:
-                try:
-                    await ctx.edit_original_response(view=None)
-                except (NotFound, HTTPException):
-                    return
-            return
-        except:
-            if str(image).endswith(("mp4", "webm")):
-                await ctx.followup.send(image)
-                return
-            embed = (
-                Embed(color=Color.purple())
-                .set_image(url=image)
-                .set_footer(
-                    text="Récupéré depuis Gelbooru • Les crédits doivent revenir à l'artiste\nSi vous voyez un contenu illégal, veuillez utiliser /botreport et joindre le lien lors du signalement"
-                )
-            )
-            await ctx.followup.send(embed=embed)
 
     async def yandere(
         self,
@@ -170,7 +89,7 @@ class nsfw(Cog):
                     except (NotFound, HTTPException):
                         return
                 return
-            except:
+            except Exception:
                 footer_text += "\nSi vous voyez un contenu illégal, veuillez utiliser /botreport et joindre le lien lors du signalement"
                 for embed in embeds:
                     embed.set_footer(text=footer_text)
@@ -228,7 +147,7 @@ class nsfw(Cog):
                     except (NotFound, HTTPException):
                         return
                 return
-            except:
+            except Exception:
                 color = Color.random()
                 embeds = [
                     Embed(color=color, url="https://konachan.com")
@@ -316,7 +235,7 @@ class nsfw(Cog):
                 except (NotFound, HTTPException):
                     return
             return
-        except:
+        except Exception:
             if str(image).endswith(("mp4", "webm")):
                 await ctx.followup.send(image)
                 return

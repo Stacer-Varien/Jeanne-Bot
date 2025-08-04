@@ -57,7 +57,7 @@ class Confirmation(ui.View):
         cancel_button.callback = cancel_callback
 
         self.add_item(confirm_button)
-        self.add_item(cancel_callback)
+        self.add_item(cancel_button)
         
     
     async def confirm(self, ctx: Interaction, button: ui.Button):
@@ -780,7 +780,7 @@ class ForumGuildlines(ui.Modal, title=str):
 
 
 class ReportContentM(ui.Modal, title="Illicit Content Report"):
-    def __init__(self, ctx:Interaction,link: str):
+    def __init__(self, ctx:Interaction, link: str):
         self.link = link
         super().__init__()
         
@@ -788,7 +788,7 @@ class ReportContentM(ui.Modal, title="Illicit Content Report"):
             self.illegalcontent = ui.TextInput(
                 label="Reason",
                 style=TextStyle.short,
-                placeholder="Why are you reporting this link? (e.g., inappropriate content)",
+                placeholder="Why are you reporting this link?",
                 required=True,
                 min_length=4,
                 max_length=256,
@@ -797,12 +797,13 @@ class ReportContentM(ui.Modal, title="Illicit Content Report"):
             self.illegalcontent = ui.TextInput(
                 label="Raison",
                 style=TextStyle.short,
-                placeholder="Pourquoi signalez-vous ce lien? (par exemple, contenu inapproprié)",
+                placeholder="Pourquoi signalez-vous ce lien?",
                 required=True,
                 min_length=4,
                 max_length=256,
             )
-    
+
+        self.add_item(self.illegalcontent)
 
     async def on_submit(self, ctx: Interaction) -> None:
         report = Embed(title="Illicit Content Reported", color=Color.brand_red())
@@ -814,10 +815,7 @@ class ReportContentM(ui.Modal, title="Illicit Content Report"):
             embed = Embed(
             description="Thank you for submitting the report. Your user ID has been logged for accountability."
         )
-        elif ctx.locale.value=="f":
-            embed = Embed(
-            description="Thank you for submitting the report. Your user ID has been logged for accountability."
-        )
+
         elif ctx.locale.value=="fr":
             embed = Embed(
             description="Merci d'avoir soumis le rapport. Votre identifiant utilisateur a été enregistré à des fins de responsabilité."
@@ -858,12 +856,12 @@ class ReportContentPlus(ui.View):
                 self.add_item(button)
 
     def _make_callback(self, idx):
-        async def callback(ctx: Interaction, button: ui.Button = None):
+        async def callback(interaction: Interaction):
             self.value = f"report{idx+1}"
-            await ctx.response.send_modal(ReportContentM(ctx, self.links[idx]))
-            if button:
-                button.disabled = True
-                await ctx.edit_original_response(view=self)
+            for child in self.children:
+                child.disabled = True
+            await interaction.response.send_modal(ReportContentM(interaction, self.links[idx]))
+            await interaction.edit_original_response(view=self)
         return callback
 
 
@@ -873,19 +871,18 @@ class ReportContent(ui.View):
         self.link = link
         self.value = None
 
-        if ctx.locale.value=="en-GB" or ctx.locale.value=="en-US":
-            label="Report Content"
-        
-        if ctx.locale.value=="fr":
-            label="Signaler le contenu"
+        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            label = "Report Content"
+        elif ctx.locale.value == "fr":
+            label = "Signaler le contenu"
 
-        report_button=ui.Button(label=label, style=ButtonStyle.grey)
-        
-        async def report1(self, ctx: Interaction):
+        report_button = ui.Button(label=label, style=ButtonStyle.grey)
+
+        async def report1(interaction: Interaction):
             self.value = "report"
-            await ctx.response.send_modal(ReportContentM(ctx, self.link))
-        
-        report_button.callback=report1
+            await interaction.response.send_modal(ReportContentM(interaction, self.link))
+
+        report_button.callback = report1
 
         self.add_item(report_button)
 

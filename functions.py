@@ -562,7 +562,7 @@ class Levelling:
             "SELECT next_time FROM globalxpData WHERE user_id = ?", (self.member.id,)
         ).fetchone()
         db.commit()
-        return int(next_time[0]) if next_time is not None else 0
+        return 0 if (next_time is None) else int(next_time[0])
 
     @property
     def get_member_level(self) -> int:
@@ -1315,7 +1315,7 @@ def get_richest(member: Member) -> int:
 class NsfwApis(Enum):
     KonachanApi = "https://konachan.com/post.json?s=post&q=index&limit=100&tags=score:>10+rating:explicit+"
     YandereApi = "https://yande.re/post.json?limit=100&tags=score:>10+rating:explicit+"
-    GelbooruApi = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=100&tags=score:>10+rating:explicit+"
+    
     DanbooruApi = (
         "https://danbooru.donmai.us/posts.json?limit=100&tags=rating:explicit+"
     )
@@ -1340,6 +1340,8 @@ class Hentai:
             "child_on_child",
             "small_breasts",
             "short_stack",
+            "cunny",
+            "lxli",
         ]
 
     def format_tags(self, tags: str = None) -> str:
@@ -1363,8 +1365,7 @@ class Hentai:
                 nsfw_images: dict = await resp.json()
         if not nsfw_images:
             return None
-        if provider.value == provider.GelbooruApi.value:
-            nsfw_images_list = list(nsfw_images.get("post", []))
+
         else:
             nsfw_images_list = list(nsfw_images)
         shuffle(nsfw_images_list)
@@ -1403,14 +1404,6 @@ class Hentai:
         db.commit()
         return [str(link[0]) for link in data] if data else None
 
-    async def gelbooru(self, tag: Optional[str] = None):
-
-        if not tag or tag is None:
-            tag = None
-        images = await self.get_nsfw_image(NsfwApis.GelbooruApi, tag)
-        if self.plus:
-            return images
-        return choice(images)["file_url"]
 
     async def yandere(self, tag: Optional[str] = None):
         images = await self.get_nsfw_image(NsfwApis.YandereApi, tag)
@@ -1437,14 +1430,11 @@ class Hentai:
         return choice(images)["file_url"]
 
     async def hentai(self):
-        gelbooru_image = await self.gelbooru()
         yandere_image = await self.yandere()
         konachan_image = await self.konachan()
         danbooru_image = await self.danbooru()
-        h = [gelbooru_image, yandere_image, konachan_image, danbooru_image]
+        h = [yandere_image, konachan_image, danbooru_image]
         hentai: str = choice(h)
-        if hentai == gelbooru_image:
-            return hentai, "Gelbooru"
         if hentai == yandere_image:
             return hentai, "Yande.re"
         if hentai == konachan_image:
