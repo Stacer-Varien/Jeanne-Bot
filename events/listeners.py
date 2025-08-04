@@ -5,14 +5,14 @@ from typing import Optional
 from discord import AllowedMentions, DMChannel, Embed, Message, TextChannel
 from discord.ext.commands import Bot, Cog
 from functions import BetaTest, DevPunishment, Levelling
-from topgg import DBLClient
-from config import TOPGG
+# from topgg import DBLClient
+# from config import TOPGG
 
 
 class listenersCog(Cog):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
-        self.topggpy = DBLClient(bot=self.bot, token=TOPGG)
+        # self.topggpy = DBLClient(bot=self.bot, token=TOPGG)
 
     @staticmethod
     def replace_all(text: str, dic: dict):
@@ -32,15 +32,15 @@ class listenersCog(Cog):
                     try:
                         now_time = round(datetime.now().timestamp())
                         if now_time > level_instance.get_next_time_global:
-                            get_vote = await self.topggpy.get_user_vote(
-                                message.author.id
-                            )
+                            # get_vote = await self.topggpy.get_user_vote(
+                            #    int(message.author.id)
+                            # )
 
                             check = await BetaTest(self.bot).check(message.author)
                             weekend_check = datetime.now().isoweekday() >= 6
                             xp = 15 if weekend_check else 10
-                            if not get_vote:
-                                xp = 10 if weekend_check else 5
+                            # if not get_vote:
+                            #    xp = 10 if weekend_check else 5
                             if check:
                                 xp += 5
 
@@ -84,20 +84,50 @@ class listenersCog(Cog):
                                     ),
                                 ]
                             )
-                            try:
-                                if role_reward:
-                                    await message.author.add_roles(role_reward)
-                                if levelup == "0":
-                                    msg = (
-                                        "CONGRATS {}! You were role awarded {}".format(
-                                            message.author,
-                                            (role_reward.name if role_reward else None),
-                                        )
-                                    ) if message.guild.preferred_locale.value in ["en-GB", "en-US"] else (
-                                        "FELICITACIONES {}! Has sido premiado con el rol {}".format(
-                                            message.author,
-                                            (role_reward.name if role_reward else None)),
+                            
+                            if update == "0" or update is None:
+                                # Separate English and French messages
+                                if message.guild.preferred_locale.value in ["en-GB", "en-US"]:
+                                    msg = "{} has leveled up to `{}`".format(
+                                        message.author,
+                                        Levelling(
+                                            message.author, message.guild
+                                        ).get_member_level,
                                     )
+                                else:
+                                    msg = "{} a atteint le niveau `{}`".format(
+                                        message.author,
+                                        Levelling(
+                                            message.author, message.guild
+                                        ).get_member_level,
+                                    )
+
+                                await channel.send(
+                                    msg,
+                                    allowed_mentions=AllowedMentions(
+                                        roles=False, everyone=False, users=True
+                                    ),
+                                )
+                            else:
+                                json = loads(self.replace_all(update, parameters))
+                                msg = json["content"]
+                                embed = Embed.from_dict(json["embeds"][0])
+
+                                await channel.send(content=msg, embed=embed)
+                            if role_reward:
+                                await message.author.add_roles(role_reward)
+                                if levelup == "0" or levelup is None:
+                                    # Separate English and French messages
+                                    if message.guild.preferred_locale.value in ["en-GB", "en-US"]:
+                                        msg = "CONGRATS {}! You were role awarded {}".format(
+                                            message.author,
+                                            role_reward.name,
+                                        )
+                                    else:
+                                        msg = "FÉLICITATIONS {}! Tu as reçu le rôle {}".format(
+                                            message.author,
+                                            role_reward.name,
+                                        )
 
                                     await channel.send(
                                         msg,
@@ -105,46 +135,8 @@ class listenersCog(Cog):
                                             roles=False, everyone=False, users=True
                                         ),
                                     )
-                                elif levelup is None:
-                                    pass
                                 else:
                                     json = loads(self.replace_all(levelup, parameters))
-                                    msg = json["content"]
-                                    embed = Embed.from_dict(json["embeds"][0])
-
-                                    await channel.send(content=msg, embed=embed)
-                            except Exception as e:
-                                print(f"Error sending level-up message: {e}")
-                                if update == "0":
-                                    msg = (
-                                        "{} a atteint le niveau `niveau {}`".format(
-                                            message.author,
-                                            Levelling(
-                                                message.author, message.guild
-                                            ).get_member_level,
-                                        )
-                                        if message.guild.preferred_locale.value
-                                        in ["en-GB", "en-US"]
-                                        else (
-                                            "{} a atteint le niveau `niveau {}`".format(
-                                                message.author,
-                                                Levelling(
-                                                    message.author, message.guild
-                                                ).get_member_level,
-                                            ),
-                                        )
-                                    )
-
-                                    await channel.send(
-                                        msg,
-                                        allowed_mentions=AllowedMentions(
-                                            roles=False, everyone=False, users=True
-                                        ),
-                                    )
-                                elif update is None:
-                                    pass
-                                else:
-                                    json = loads(self.replace_all(update, parameters))
                                     msg = json["content"]
                                     embed = Embed.from_dict(json["embeds"][0])
 
@@ -166,3 +158,4 @@ class listenersCog(Cog):
 
 async def setup(bot: Bot):
     await bot.add_cog(listenersCog(bot))
+
