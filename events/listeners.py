@@ -32,6 +32,7 @@ class listenersCog(Cog):
                     try:
                         now_time = round(datetime.now().timestamp())
                         if now_time > level_instance.get_next_time_global:
+                            #temporary paused voting rewards
                             # get_vote = await self.topggpy.get_user_vote(
                             #    int(message.author.id)
                             # )
