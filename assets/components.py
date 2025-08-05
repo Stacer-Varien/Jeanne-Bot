@@ -129,6 +129,7 @@ class Welcomingmsg(ui.Modal, title="Welcoming Message"):
                 min_length=1,
                 max_length=4000,
             )
+        self.add_item(self.jsonscript)
     
 
     async def on_submit(self, ctx: Interaction) -> None:
@@ -229,6 +230,7 @@ class Leavingmsg(ui.Modal, title="Leaving Message"):
                 min_length=1,
                 max_length=4000,
             )
+        self.add_item(self.jsonscript)
 
     async def on_submit(self, ctx: Interaction) -> None:
         humans = str(len([member for member in ctx.guild.members if not member.bot]))
@@ -338,6 +340,7 @@ class Levelmsg(ui.Modal, title="Level Update Message"):
                 min_length=1,
                 max_length=4000,
             )
+        self.add_item(self.jsonscript)
 
     async def on_submit(self, ctx: Interaction) -> None:
         parameters = OrderedDict(
@@ -450,6 +453,7 @@ class RankUpmsg(ui.Modal, title="Role Reward Message"):
                 min_length=1,
                 max_length=4000,
             )
+        self.add_item(self.jsonscript)
 
     async def on_submit(self, ctx: Interaction) -> None:
         parameters = OrderedDict(
@@ -753,6 +757,7 @@ class ForumGuildlines(ui.Modal, title=str):
                 max_length=4000,
                 style=TextStyle.paragraph,
             )
+        self.add_item(self.guidelines)
 
     async def on_submit(self, ctx: Interaction) -> None:
         embed = Embed()
