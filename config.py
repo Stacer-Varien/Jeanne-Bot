@@ -25,9 +25,8 @@ KITSUNE = str(getenv("kitsune_album"))
 CATBOX_HASH = str(getenv("catbox_hash"))
 BADGES = str(getenv("badges_album"))
 STATUS_WEBHOOK=str(getenv("status"))
-LVLCOOLDOWNS=str(getenv("lvlcooldowns"))
 
-db = connect("database.db", check_same_thread=False)
+db = connect("database.db")
 
 hug = f"https://tenor.googleapis.com/v2/search?q=hug%20anime&key={TENOR}&client_key={CLIENTKEY}&limit=35"
 slap = f"https://tenor.googleapis.com/v2/search?q=slap%20anime&key={TENOR}&client_key={CLIENTKEY}&limit=35"
