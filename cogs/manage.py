@@ -2675,9 +2675,9 @@ class Level_Group(GroupCog, name="level"):
     @Jeanne.check(is_suspended)
     async def _list(self, ctx: Interaction):
         if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            await en.Level_Group(self.bot)._list(ctx)
+            await en.Level_Group(self.bot).listrolerewards(ctx)
         elif ctx.locale.value == "fr":
-            await fr.Level_Group(self.bot)._list(ctx)
+            await fr.Level_Group(self.bot).listrolerewards(ctx)
 
     channel_blacklist = Jeanne.Group(
         name=T("blacklist_channel_group_name"), description="..."
@@ -2788,9 +2788,9 @@ class Level_Group(GroupCog, name="level"):
     @Jeanne.check(is_suspended)
     async def _list(self, ctx: Interaction) -> None:
         if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            await en.Level_Group(self.bot)._list(ctx)
+            await en.Level_Group(self.bot).listblacklistedchannels(ctx)
         elif ctx.locale.value == "fr":
-            await fr.Level_Group(self.bot)._list(ctx)
+            await fr.Level_Group(self.bot).listblacklistedchannels(ctx)
 
 
 async def setup(bot: Bot):

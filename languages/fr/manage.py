@@ -1151,7 +1151,7 @@ class Level_Group:
         )
         await ctx.followup.send(embed=embed)
 
-    async def _list(self, ctx: Interaction):
+    async def listrolerewards(self, ctx: Interaction):
         await ctx.response.defer()
         roles = Levelling(server=ctx.guild).list_all_roles
         data = []
@@ -1197,7 +1197,7 @@ class Level_Group:
         )
         await ctx.followup.send(embed=embed)
 
-    async def _list(self, ctx: Interaction) -> None:
+    async def listblacklistedchannels(self, ctx: Interaction) -> None:
         await ctx.response.defer()
         embed = Embed()
         channels = Levelling(server=ctx.guild).get_blacklisted_channels
