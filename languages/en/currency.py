@@ -569,11 +569,6 @@ class currency():
 - 100 QP
 - 5XP times their global level
 - - Rewards are double on weekends
-- - Beta users receive 25% extra of the nearest 5 
-
-- 25% QP boost when winning
-- 10XP per message on weekdays, 15XP per message on weekends
-- - Beta users receive an extra 5XP per message and extra 25% QP boost when winning
 """
         embed.add_field(name="Voting perks", value=topgg_perks, inline=True)
         await ctx.response.send_message(

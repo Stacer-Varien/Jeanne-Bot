@@ -543,11 +543,6 @@ class currency():
 - 100 QP
 - 5XP multipliés par leur niveau global
 - - Les récompenses sont doublées le week-end
-- - Les utilisateurs bêta reçoivent 25% supplémentaires arrondis au multiple de 5 le plus proche
-
-- Boost de 25% QP lors des victoires
-- 10XP par message en semaine, 15XP par message le week-end
-- - Les utilisateurs bêta reçoivent 5XP supplémentaires par message et un boost de 25% QP supplémentaire lors des victoires
 """
         embed.add_field(name="Avantages du vote", value=topgg_perks, inline=True)
         await ctx.response.send_message(
