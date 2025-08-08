@@ -17,6 +17,7 @@ class MyTranslator(Jeanne.Translator):
         locale: Locale,
         context: Jeanne.TranslationContext,
     ) -> Optional[str]:
+        
         translations = {
             # global
             "name_parm_name": {"en-GB": "name", "en-US": "name", "fr": "nom"},
@@ -1832,6 +1833,11 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "What is the level up message?",
                 "fr": "Quel est le message de montée de niveau ?",
             },
+            "brightness_parm_name": {
+                "en-GB": "brightness",
+                "en-US": "brightness",
+                "fr": "luminosité",
+            },
             "brightness_parm_desc": {
                 "en-GB": "What is the brightness?",
                 "en-US": "What is the brightness?",
@@ -2051,4 +2057,4 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Ajoute un rôle à un membre",
             },
         }
-        return translations.get(string.message, {}).get(locale.value)
+        return translations.get(string.message, {}).get((locale.value if locale.value in ["en-GB", "en-US", "fr"] else "en-US"))
