@@ -50,10 +50,10 @@ class fun(Cog, name="FunSlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def _8ball(self, ctx: Interaction, question: str):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value == "fr":
+            await fr.fun(self.bot)._8ball(ctx, question)        
+        else:
             await en.fun(self.bot)._8ball(ctx, question)
-        elif ctx.locale.value == "fr":
-            await fr.fun(self.bot)._8ball(ctx, question)
 
     @Jeanne.command(
         name=T("reverse_name"),
@@ -89,10 +89,10 @@ class fun(Cog, name="FunSlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def reverse(self, ctx: Interaction, text: str):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            await en.fun(self.bot).reverse(ctx, text)
         if ctx.locale.value == "fr":
             await fr.fun(self.bot).reverse(ctx, text)
+        else:
+            await en.fun(self.bot).reverse(ctx, text)
 
     @Jeanne.command(
         description=T("animeme_desc"),
@@ -160,10 +160,10 @@ class fun(Cog, name="FunSlash"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def combine(self, ctx: Interaction, first_word: str, second_word: str):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            await en.fun(self.bot).combine(ctx, first_word, second_word)
-        if ctx.locale.value == "fr-FR":
+        if ctx.locale.value == "fr":
             await fr.fun(self.bot).combine(ctx, first_word, second_word)
+        else:
+            await en.fun(self.bot).combine(ctx, first_word, second_word)
 
     @Jeanne.command(
         name=T("choose_name"),
@@ -199,10 +199,10 @@ class fun(Cog, name="FunSlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def choose(self, ctx: Interaction, choices: str):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            await en.fun(self.bot).choose(ctx, choices)
         if ctx.locale.value == "fr":
             await fr.fun(self.bot).choose(ctx, choices)
+        else:
+            await en.fun(self.bot).choose(ctx, choices)
 
     @Jeanne.command(
         description=T("simprate_desc"),
@@ -237,10 +237,10 @@ class fun(Cog, name="FunSlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def simprate(self, ctx: Interaction, member: Optional[Member] = None):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            await en.fun(self.bot).simprate(ctx, member)
         if ctx.locale.value == "fr":
             await fr.fun(self.bot).simprate(ctx, member)
+        else:
+            await en.fun(self.bot).simprate(ctx, member)
 
     @Jeanne.command(
         description=T("gayrate_desc"),
@@ -275,10 +275,10 @@ class fun(Cog, name="FunSlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def gayrate(self, ctx: Interaction, member: Optional[Member] = None):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            await en.fun(self.bot).gayrate(ctx, member)
         if ctx.locale.value == "fr":
             await fr.fun(self.bot).gayrate(ctx, member)
+        else:
+            await en.fun(self.bot).gayrate(ctx, member)
 
 
 async def setup(bot: Bot):

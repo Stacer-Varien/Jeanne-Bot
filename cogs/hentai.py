@@ -39,10 +39,11 @@ class nsfw(Cog):
         self,
         ctx: Interaction,
     ) -> None:
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            await en.nsfw(self.bot).hentai(ctx)
-        elif ctx.locale.value == "fr":
+        if ctx.locale.value == "fr":
             await fr.nsfw(self.bot).hentai(ctx)
+        else:
+            await en.nsfw(self.bot).hentai(ctx)
+
 
 
     @Jeanne.command(
@@ -92,10 +93,11 @@ class nsfw(Cog):
         tag: Optional[str] = None,
         plus: Optional[bool] = None,
     ) -> None:
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            await en.nsfw(self.bot).yandere(ctx, tag, plus)
-        elif ctx.locale.value == "fr":
+        if ctx.locale.value == "fr":
             await fr.nsfw(self.bot).yandere(ctx, tag, plus)
+        else:
+            await en.nsfw(self.bot).yandere(ctx, tag, plus)
+
 
     @Jeanne.command(
         description=T("konachan_desc"),
@@ -150,10 +152,11 @@ class nsfw(Cog):
         tag: Optional[str] = None,
         plus: Optional[bool] = None,
     ) -> None:
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            await en.nsfw(self.bot).konachan(ctx, tag, plus)
-        elif ctx.locale.value == "fr":
+        if ctx.locale.value == "fr":
             await fr.nsfw(self.bot).konachan(ctx, tag, plus)
+        else:
+            await en.nsfw(self.bot).konachan(ctx, tag, plus)
+
 
     @Jeanne.command(
         description=T("danbooru_desc"),
@@ -208,10 +211,11 @@ class nsfw(Cog):
         tag: Optional[str] = None,
         plus: Optional[bool] = None,
     ) -> None:
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            await en.nsfw(self.bot).danbooru(ctx, tag, plus)
-        elif ctx.locale.value == "fr":
+        if ctx.locale.value == "fr":
             await fr.nsfw(self.bot).danbooru(ctx, tag, plus)
+        else:
+            await en.nsfw(self.bot).danbooru(ctx, tag, plus)
+
 
     @hentai.error
     @konachan.error
@@ -221,15 +225,17 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (IndexError, KeyError, TypeError)
         ):
-            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-                await en.nsfw(self.bot).Hentai_error(ctx, error, "NotFound ")
-            elif ctx.locale.value == "fr":
+            if ctx.locale.value == "fr":
                 await fr.nsfw(self.bot).Hentai_error(ctx, error, "NotFound")
+            else:
+                await en.nsfw(self.bot).Hentai_error(ctx, error, "NotFound")
+
         if isinstance(error, Jeanne.errors.CommandOnCooldown):
-            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-                await en.nsfw(self.bot).Hentai_error(ctx, error, "Cooldown")
-            elif ctx.locale.value == "fr":
+            if ctx.locale.value == "fr":
                 await fr.nsfw(self.bot).Hentai_error(ctx, error, "Cooldown")
+            else:
+                await en.nsfw(self.bot).Hentai_error(ctx, error, "Cooldown")
+
 
 
 async def setup(bot: Bot):

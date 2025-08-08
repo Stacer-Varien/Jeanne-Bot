@@ -36,10 +36,11 @@ class InfoCog(Cog, name="InfoSlash"):
         await self.get_userinfo(ctx, member)
 
     async def get_userinfo(self, ctx: Interaction, member: Member):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value == "fr":
+            await fr.Info(self.bot).get_userinfo(ctx, member)        
+        else:
             await en.Info(self.bot).get_userinfo(ctx, member)
-        elif ctx.locale.value == "fr":
-            await fr.Info(self.bot).get_userinfo(ctx, member)
+
 
     @Jeanne.command(
         description=T("stats_desc"),
@@ -58,10 +59,11 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def stats(self, ctx: Interaction):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            await en.Info(self.bot).stats(ctx, self.bot_version)
-        elif ctx.locale.value == "fr":
+        if ctx.locale.value == "fr":
             await fr.Info(self.bot).stats(ctx, self.bot_version)
+        else:
+            await en.Info(self.bot).stats(ctx, self.bot_version)
+
 
     @Jeanne.command(
         description=T("userinfo_desc"),
@@ -112,10 +114,11 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def serverinfo(self, ctx: Interaction):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value == "fr":
+            await fr.Info(self.bot).serverinfo(ctx)        
+        else:
             await en.Info(self.bot).serverinfo(ctx)
-        elif ctx.locale.value == "fr":
-            await fr.Info(self.bot).serverinfo(ctx)
+
 
     @Jeanne.command(
         description=T("ping_desc"),
@@ -135,10 +138,11 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def ping(self, ctx: Interaction):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value == "fr":
+            await fr.Info(self.bot).ping(ctx)        
+        else:
             await en.Info(self.bot).ping(ctx)
-        elif ctx.locale.value == "fr":
-            await fr.Info(self.bot).ping(ctx)
+
 
     @Jeanne.command(
         description=T("serverbanner_desc"),
@@ -154,10 +158,11 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def serverbanner(self, ctx: Interaction):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value == "fr":
+            await fr.Info(self.bot).serverbanner(ctx)        
+        else:
             await en.Info(self.bot).serverbanner(ctx)
-        elif ctx.locale.value == "fr":
-            await fr.Info(self.bot).serverbanner(ctx)
+
 
     @Jeanne.command(
         description=T("avatar_desc"),
@@ -188,10 +193,11 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def avatar(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value == "fr":
+            await fr.Info(self.bot).avatar(ctx, member)        
+        else:
             await en.Info(self.bot).avatar(ctx, member)
-        elif ctx.locale.value == "fr":
-            await fr.Info(self.bot).avatar(ctx, member)
+
 
     @Jeanne.command(
         description=T("sticker_desc"),
@@ -227,10 +233,11 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def sticker(self, ctx: Interaction, sticker: str):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value == "fr":
+            await fr.Info(self.bot).sticker(ctx, sticker)        
+        else:
             await en.Info(self.bot).sticker(ctx, sticker)
-        elif ctx.locale.value == "fr":
-            await fr.Info(self.bot).sticker(ctx, sticker)
+
 
     @sticker.error
     async def sticker_error(self, ctx: Interaction, error: Jeanne.AppCommandError):

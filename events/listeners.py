@@ -1,8 +1,7 @@
 from collections import OrderedDict
 from datetime import datetime
 from json import loads
-from typing import Optional
-from discord import AllowedMentions, DMChannel, Embed, Message, TextChannel
+from discord import AllowedMentions, DMChannel, Embed, Message
 from discord.ext.commands import Bot, Cog
 from functions import BetaTest, DevPunishment, Levelling
 # from topgg import DBLClient
@@ -143,18 +142,11 @@ class listenersCog(Cog):
 
                                     await channel.send(content=msg, embed=embed)
                             return
-                    except AttributeError as e:
-                        print(f"AttributeError: {e}")
+                    except AttributeError:
+                        
                         return
-        except Exception as e:
-            print(f"Error in on_message: {e}")
+        except Exception:
             return
-
-    async def send_level_message(
-        self, channel: Optional[TextChannel], content: str, embed: Optional[Embed]
-    ):
-        if channel is not None:
-            await channel.send(content=content, embed=embed)
 
 
 async def setup(bot: Bot):

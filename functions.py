@@ -554,7 +554,7 @@ class Levelling:
             (self.member.id, self.server.id),
         ).fetchone()
         db.commit()
-        return int(next_time[0]) if next_time is not None else 0
+        return int(next_time[0]) if next_time is not None and next_time[0] is not None else 0
 
     @property
     def get_next_time_global(self) -> int:
@@ -562,7 +562,11 @@ class Levelling:
             "SELECT next_time FROM globalxpData WHERE user_id = ?", (self.member.id,)
         ).fetchone()
         db.commit()
-        return 0 if (next_time is None) else int(next_time[0])
+        return (
+            int(next_time[0])
+            if next_time is not None and next_time[0] is not None
+            else 0
+        )
 
     @property
     def get_member_level(self) -> int:
@@ -571,7 +575,7 @@ class Levelling:
             (self.member.id, self.server.id),
         ).fetchone()
         db.commit()
-        return int(level[0]) if level else 0
+        return int(level[0]) if level and level[0] is not None else 0
 
     @property
     def get_user_level(self) -> int:
@@ -579,7 +583,7 @@ class Levelling:
             "SELECT lvl FROM globalxpData WHERE user_id = ?", (self.member.id,)
         ).fetchone()
         db.commit()
-        return int(level[0]) if level is not None else 0
+        return int(level[0]) if level and level[0] is not None else 0
 
     async def add_xp(self, xp: int):
         now_time = round(datetime.now().timestamp())
@@ -664,21 +668,22 @@ class Levelling:
         data = db.execute(
             "SELECT levelup_message FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
-        return None if data is None else data[0]
+        
+        return str(data[0]) if data and data[0] is not None else None
 
     @property
     def get_levelup_channel(self) -> Optional[TextChannel]:
         data = db.execute(
             "SELECT levelup_channel FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
-        return None if data is None else self.server.get_channel(data[0])
+        return self.server.get_channel(data[0]) if data and data[0] is not None else None
 
     @property
     def get_rank_up_update(self) -> Optional[str]:
         data = db.execute(
             "SELECT rankup_message FROM serverData WHERE server = ?", (self.server.id,)
         ).fetchone()
-        return None if data is None else data[0]
+        return str(data[0]) if data and data[0] is not None else None
 
     @property
     def get_role_reward(self) -> Optional[Role]:
@@ -686,7 +691,8 @@ class Levelling:
             "SELECT role FROM levelRewardData WHERE server = ? AND level = ?",
             (self.server.id, self.get_member_level),
         ).fetchone()
-        return None if data is None else self.server.get_role(data[0])
+        
+        return self.server.get_role(data[0]) if data and data[0] is not None else None
 
     @property
     def get_server_rank(self) -> Optional[List]:

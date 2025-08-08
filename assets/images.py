@@ -18,10 +18,11 @@ def get_saber_pic(ctx: Interaction) -> tuple[Embed, File]:
     embed = Embed(color=Color.random())
     embed.set_image(url=f"attachment://{random_image}")
     
-    if ctx.locale.value in ["en-GB", "en-US"]:
-        embed.set_footer(text="Fetched from Saber_1936 • Credits must go to the artist")
-    elif ctx.locale.value == "fr":
+    if ctx.locale.value == "fr":
         embed.set_footer(text="Récupéré de Saber_1936 • Les crédits doivent aller à l'artiste")
+    else:
+        embed.set_footer(text="Fetched from Saber_1936 • Credits must go to the artist")
+    
 
     return embed, file
 
@@ -39,10 +40,11 @@ def get_jeanne_pic(ctx: Interaction) -> tuple[Embed, File]:
     embed = Embed(color=Color.random())
     embed.set_image(url=f"attachment://{random_image}")
     
-    if ctx.locale.value in ["en-GB", "en-US"]:
-        embed.set_footer(text="Fetched from Jeanne_1936 • Credits must go to the artist")
-    elif ctx.locale.value == "fr":
+    if ctx.locale.value == "fr":
         embed.set_footer(text="Récupéré de Jeanne_1936 • Les crédits doivent aller à l'artiste")
+    else:
+        embed.set_footer(text="Fetched from Jeanne_1936 • Credits must go to the artist")
+    
 
     return embed, file
 
@@ -59,10 +61,11 @@ def get_wallpaper_pic(ctx: Interaction) -> tuple[Embed, File]:
     embed = Embed(color=Color.random())
     embed.set_image(url=f"attachment://{random_image}")
     
-    if ctx.locale.value in ["en-GB", "en-US"]:
-        embed.set_footer(text="Fetched from Wallpaper_1936 • Credits must go to the artist")
-    elif ctx.locale.value == "fr":
+    if ctx.locale.value == "fr":
         embed.set_footer(text="Récupéré de Wallpaper_1936 • Les crédits doivent aller à l'artiste")
+    else:
+        embed.set_footer(text="Fetched from Wallpaper_1936 • Credits must go to the artist")
+
 
     return embed, file
 
@@ -77,11 +80,12 @@ def get_medusa_pic(ctx: Interaction) -> tuple[Embed, File]:
     random_image = choice(image_files)
     embed = Embed(color=Color.random())
     embed.set_image(url=f"attachment://{random_image}")
-    
-    if ctx.locale.value in ["en-GB", "en-US"]:
-        embed.set_footer(text="Fetched from Medusa_1936 • Credits must go to the artist")
-    elif ctx.locale.value == "fr":
+
+    if ctx.locale.value == "fr":
         embed.set_footer(text="Récupéré de Medusa_1936 • Les crédits doivent aller à l'artiste")
+    else:
+        embed.set_footer(text="Fetched from Medusa_1936 • Credits must go to the artist")
+    
 
     file = File(path.join(folder_path, random_image), random_image)
     return embed, file
@@ -98,10 +102,11 @@ def get_animeme_pic(ctx:Interaction) -> tuple[Embed, File]:
     embed = Embed(color=Color.random())
     embed.set_image(url=f"attachment://{random_image}")
     
-    if ctx.locale.value in ["en-GB", "en-US"]:
-        embed.set_footer(text="Fetched from Animeme_1936 • Credits must go to the artist")
-    elif ctx.locale.value == "fr":
+    if ctx.locale.value == "fr":
         embed.set_footer(text="Récupéré de Animeme_1936 • Les crédits doivent aller à l'artiste")
+    else:
+        embed.set_footer(text="Fetched from Animeme_1936 • Credits must go to the artist")
+    
 
     file = File(path.join(folder_path, random_image), random_image)
     return embed, file
@@ -120,10 +125,10 @@ def get_neko_pic(ctx: Interaction) -> tuple[Embed, File]:
     embed = Embed(color=Color.random())
     embed.set_image(url=f"attachment://{random_image}")
     
-    if ctx.locale.value in ["en-GB", "en-US"]:
-        embed.set_footer(text="Fetched from Neko_1936 • Credits must go to the artist")
-    elif ctx.locale.value == "fr":
+    if ctx.locale.value == "fr":
         embed.set_footer(text="Récupéré de Neko_1936 • Les crédits doivent aller à l'artiste")
+    else:
+        embed.set_footer(text="Fetched from Neko_1936 • Credits must go to the artist")    
 
     return embed, file
 
@@ -140,11 +145,12 @@ def get_morgan_pic(ctx: Interaction) -> tuple[Embed, File]:
     file = File(path.join(folder_path, random_image), random_image)
     embed = Embed(color=Color.random())
     embed.set_image(url=f"attachment://{random_image}")
-    
-    if ctx.locale.value in ["en-GB", "en-US"]:
+
+    if ctx.locale.value == "fr":
+        embed.set_footer(text="Récupéré de Morgan_le_Fay_1936 • Les crédits doivent aller à l'artiste")    
+    else:
         embed.set_footer(text="Fetched from Morgan_le_Fay_1936 • Credits must go to the artist")
-    elif ctx.locale.value == "fr":
-        embed.set_footer(text="Récupéré de Morgan_le_Fay_1936 • Les crédits doivent aller à l'artiste")
+
 
     return embed, file
 
@@ -162,10 +168,10 @@ def get_kistune_pic(ctx: Interaction) -> tuple[Embed, File]:
     embed = Embed(color=Color.random())
     embed.set_image(url=f"attachment://{random_image}")
     
-    if ctx.locale.value in ["en-GB", "en-US"]:
-        embed.set_footer(text="Fetched from Kitsune_1936 • Credits must go to the artist")
-    elif ctx.locale.value == "fr":
+    if ctx.locale.value == "fr":
         embed.set_footer(text="Récupéré de Kitsune_1936 • Les crédits doivent aller à l'artiste")
+    else:
+        embed.set_footer(text="Fetched from Kitsune_1936 • Credits must go to the artist")    
 
     return embed, file
 

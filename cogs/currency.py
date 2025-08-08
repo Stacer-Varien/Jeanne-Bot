@@ -57,10 +57,11 @@ class Guess_Group(GroupCog, group_name=T("guess_group_name")):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def free(self, ctx: Interaction):
-        if ctx.locale.value == "en-US" or ctx.locale.value == "en-GB":
-            await en.Guess_Group(self.bot).free(ctx)
-        elif ctx.locale.value == "fr":
+        if ctx.locale.value == "fr":
             await fr.Guess_Group(self.bot).free(ctx)
+        else:
+            await en.Guess_Group(self.bot).free(ctx)
+        
 
     @Jeanne.command(
         name=T("bet_name"),
@@ -101,26 +102,28 @@ class Guess_Group(GroupCog, group_name=T("guess_group_name")):
         ctx: Interaction,
         bet: Jeanne.Range[int, 5],
     ):
-        if ctx.locale.value == "en-US" or ctx.locale.value == "en-GB":
-            await en.Guess_Group(self.bot).bet(ctx, bet)
-        elif ctx.locale.value == "fr":
+        if ctx.locale.value == "fr":
             await fr.Guess_Group(self.bot).bet(ctx, bet)
+        else:
+            await en.Guess_Group(self.bot).bet(ctx, bet)
+        
 
     @free.error
     async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if ctx.locale.value == "en-US" or ctx.locale.value == "en-GB":
-                await en.Guess_Group(self.bot).free_error(ctx, error)
-            elif ctx.locale.value == "fr":
+            if ctx.locale.value == "fr":
                 await fr.Guess_Group(self.bot).free_error(ctx, error)
+            else:
+                await en.Guess_Group(self.bot).free_error(ctx, error)
+
 
     @bet.error
     async def bet_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if ctx.locale.value == "en-US" or ctx.locale.value == "en-GB":
-                await en.Guess_Group(self.bot).bet_error(ctx, error)
-            elif ctx.locale.value == "fr":
+            if ctx.locale.value == "fr":
                 await fr.Guess_Group(self.bot).bet_error(ctx, error)
+            else:
+                await en.Guess_Group(self.bot).bet_error(ctx, error)
 
 
 class Dice_Group(GroupCog, group_name=T("dice_group_name")):
@@ -148,10 +151,11 @@ class Dice_Group(GroupCog, group_name=T("dice_group_name")):
     @Jeanne.check(is_suspended)
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     async def free(self, ctx: Interaction):
-        if ctx.locale.value == "en-US" or ctx.locale.value == "en-GB":
-            await en.Dice_Group(self.bot).free(ctx)
-        elif ctx.locale.value == "fr":
+        if ctx.locale.value == "fr":
             await fr.Dice_Group(self.bot).free(ctx)
+        else:
+            await en.Dice_Group(self.bot).free(ctx)
+
 
     @Jeanne.command(
         name=T("bet_name"),
@@ -192,26 +196,28 @@ class Dice_Group(GroupCog, group_name=T("dice_group_name")):
         ctx: Interaction,
         bet: Jeanne.Range[int, 5],
     ):
-        if ctx.locale.value == "en-US" or ctx.locale.value == "en-GB":
-            await en.Dice_Group(self.bot).bet(ctx, bet)
-        elif ctx.locale.value == "fr":
+        if ctx.locale.value == "fr":
             await fr.Dice_Group(self.bot).bet(ctx, bet)
+        else:
+            await en.Dice_Group(self.bot).bet(ctx, bet)
+
 
     @free.error
     async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if ctx.locale.value == "en-US" or ctx.locale.value == "en-GB":
-                await en.Dice_Group(self.bot).free_error(ctx, error)
-            elif ctx.locale.value == "fr":
+            if ctx.locale.value == "fr":
                 await fr.Dice_Group(self.bot).free_error(ctx, error)
+            else:
+                await en.Dice_Group(self.bot).free_error(ctx, error)
+
 
     @bet.error
     async def bet_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if ctx.locale.value == "en-US" or ctx.locale.value == "en-GB":
+            if ctx.locale.value == "fr":
+                await fr.Dice_Group(self.bot).bet_error(ctx, error)            
+            else:
                 await en.Dice_Group(self.bot).bet_error(ctx, error)
-            elif ctx.locale.value == "fr":
-                await fr.Dice_Group(self.bot).bet_error(ctx, error)
 
 
 class Flip_Group(GroupCog, group_name=T("flip_group_name")):
@@ -239,10 +245,10 @@ class Flip_Group(GroupCog, group_name=T("flip_group_name")):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def free(self, ctx: Interaction):
-        if ctx.locale.value == "en-US" or ctx.locale.value == "en-GB":
+        if ctx.locale.value == "fr":
+            await fr.Flip_Group(self.bot).free(ctx)        
+        else:
             await en.Flip_Group(self.bot).free(ctx)
-        elif ctx.locale.value == "fr":
-            await fr.Flip_Group(self.bot).free(ctx)
 
     @Jeanne.command(
         name=T("bet_name"),
@@ -279,26 +285,28 @@ class Flip_Group(GroupCog, group_name=T("flip_group_name")):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def bet(self, ctx: Interaction, bet: Jeanne.Range[int, 5]):
-        if ctx.locale.value == "en-US" or ctx.locale.value == "en-GB":
-            await en.Flip_Group(self.bot).bet(ctx, bet)
-        elif ctx.locale.value == "fr":
+        if ctx.locale.value == "fr":
             await fr.Flip_Group(self.bot).bet(ctx, bet)
+        else:
+            await en.Flip_Group(self.bot).bet(ctx, bet)
 
     @free.error
     async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if ctx.locale.value == "en-US" or ctx.locale.value == "en-GB":
-                await en.Flip_Group(self.bot).free_error(ctx, error)
-            elif ctx.locale.value == "fr":
+            if ctx.locale.value == "fr":
                 await fr.Flip_Group(self.bot).free_error(ctx, error)
+            else:
+                await en.Flip_Group(self.bot).free_error(ctx, error)
+            
 
     @bet.error
     async def bet_error(self, ctx: Interaction, error: Jeanne.errors.AppCommandError):
         if isinstance(error, Jeanne.errors.CommandOnCooldown):
-            if ctx.locale.value == "en-US" or ctx.locale.value == "en-GB":
+            if ctx.locale.value == "fr":
+                await fr.Flip_Group(self.bot).bet_error(ctx, error)            
+            else:
                 await en.Flip_Group(self.bot).bet_error(ctx, error)
-        elif ctx.locale.value == "fr":
-            await fr.Flip_Group(self.bot).bet_error(ctx, error)
+        
 
 
 class Blackjack_Group(GroupCog, group_name=T("blackjack_group_name")):
@@ -365,26 +373,29 @@ class Blackjack_Group(GroupCog, group_name=T("blackjack_group_name")):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def bet(self, ctx: Interaction, bet: Jeanne.Range[int, 5]):
-        if ctx.locale.value == "en-US" or ctx.locale.value == "en-GB":
-            await en.Blackjack_Group(self.bot).bet(ctx, bet)
-        elif ctx.locale.value == "fr":
+        if ctx.locale.value == "fr":
             await fr.Blackjack_Group(self.bot).bet(ctx, bet)
+        else:
+            await en.Blackjack_Group(self.bot).bet(ctx, bet)
+        
 
     @free.error
     async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if ctx.locale.value == "en-US" or ctx.locale.value == "en-GB":
-                await en.Blackjack_Group(self.bot).free_error(ctx, error)
-            elif ctx.locale.value == "fr":
+            if ctx.locale.value == "fr":
                 await fr.Blackjack_Group(self.bot).free_error(ctx, error)
+            else:
+                await en.Blackjack_Group(self.bot).free_error(ctx, error)
+            
 
     @bet.error
     async def bet_error(self, ctx: Interaction, error: Jeanne.errors.AppCommandError):
         if isinstance(error, Jeanne.errors.CommandOnCooldown):
-            if ctx.locale.value == "en-US" or ctx.locale.value == "en-GB":
+            if ctx.locale.value == "fr":
+                await fr.Blackjack_Group(self.bot).bet_error(ctx, error)
+            else:
                 await en.Blackjack_Group(self.bot).bet_error(ctx, error)
-        elif ctx.locale.value == "fr":
-            await fr.Blackjack_Group(self.bot).bet_error(ctx, error)
+        
 
 
 class currency(Cog, name="CurrencySlash"):
@@ -412,16 +423,18 @@ class currency(Cog, name="CurrencySlash"):
 
     async def balance_callback_error(self, ctx: Interaction, error: Exception):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if ctx.locale.value == "en-US" or ctx.locale.value == "en-GB":
-                await en.currency(self.bot).balance_error(ctx, error)
-            elif ctx.locale.value == "fr":
+            if ctx.locale.value == "fr":
                 await fr.currency(self.bot).balance_error(ctx, error)
+            else:
+                await en.currency(self.bot).balance_error(ctx, error)
+            
 
     async def get_balance(self, ctx: Interaction, member: Member):
-        if ctx.locale.value == "en-US" or ctx.locale.value == "en-GB":
+        if ctx.locale.value == "fr":
+            await fr.currency(self.bot).get_balance(ctx, member)        
+        else:
             await en.currency(self.bot).get_balance(ctx, member)
-        elif ctx.locale.value == "fr":
-            await fr.currency(self.bot).get_balance(ctx, member)
+
 
     @Jeanne.command(
         name=T("daily_name"),
@@ -438,10 +451,11 @@ class currency(Cog, name="CurrencySlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def daily(self, ctx: Interaction):
-        if ctx.locale.value == "en-US" or ctx.locale.value == "en-GB":
+        if ctx.locale.value == "fr":
+            await fr.currency(self.bot).daily(ctx)        
+        else:
             await en.currency(self.bot).daily(ctx)
-        elif ctx.locale.value == "fr":
-            await fr.currency(self.bot).daily(ctx)
+
 
     @Jeanne.command(
         name=T("balance_name"),
@@ -493,10 +507,11 @@ class currency(Cog, name="CurrencySlash"):
     )
     @Jeanne.check(is_suspended)
     async def vote(self, ctx: Interaction):
-        if ctx.locale.value == "en-US" or ctx.locale.value == "en-GB":
+        if ctx.locale.value == "fr":
+            await fr.currency(self.bot).vote(ctx)        
+        else:
             await en.currency(self.bot).vote(ctx)
-        elif ctx.locale.value == "fr":
-            await fr.currency(self.bot).vote(ctx)
+
 
 
 async def setup(bot: Bot):

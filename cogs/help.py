@@ -47,20 +47,22 @@ class HelpGroup(GroupCog, name=T("help_group_name")):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(is_suspended)
     async def command(self, ctx: Interaction, command: Jeanne.Range[str, 3]):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value == "fr":
+            await fr.HelpGroup(self.bot).command(ctx, command)        
+        else:
             await en.HelpGroup(self.bot).command(ctx, command)
-        elif ctx.locale.value == "fr":
-            await fr.HelpGroup(self.bot).command(ctx, command)
+
 
     @command.error
     async def command_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, IndexError
         ):
-            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            if ctx.locale.value == "fr":
+                await fr.HelpGroup(self.bot).command_error(ctx)            
+            else:
                 await en.HelpGroup(self.bot).command_error(ctx)
-            elif ctx.locale.value == "fr":
-                await fr.HelpGroup(self.bot).command_error(ctx)
+
 
     @Jeanne.command(
         name=T("support_name"),
@@ -79,10 +81,11 @@ class HelpGroup(GroupCog, name=T("help_group_name")):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(is_suspended)
     async def support(self, ctx: Interaction):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value == "fr":
+            await fr.HelpGroup(self.bot).support(ctx)        
+        else:
             await en.HelpGroup(self.bot).support(ctx)
-        elif ctx.locale.value == "fr":
-            await fr.HelpGroup(self.bot).support(ctx)
+
 
 
 async def setup(bot: Bot):
