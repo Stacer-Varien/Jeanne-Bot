@@ -56,13 +56,8 @@ class Guess_Group():
                 description="YES! YOU GUESSED IT CORRECTLY!\nYou have been given 20 <:quantumpiece:1161010445205905418>!",
                 color=Color.random(),
             )
-            if await self.topggpy.get_user_vote(ctx.user.id) == True:
-                await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
-                correct.add_field(
-                    name="TopGG Bonus",
-                    value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>",
-                )
-                if await BetaTest(self.bot).check(ctx.user) == True:
+
+            if await BetaTest(self.bot).check(ctx.user):
                     await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
                     correct.add_field(
                         name="Beta User Bonus",
@@ -111,13 +106,8 @@ class Guess_Group():
                 description=f"YES! YOU GUESSED IT CORRECTLY!\nYou have been given {bet} <:quantumpiece:1161010445205905418>!",
                 color=Color.random(),
             )
-            if await self.topggpy.get_user_vote(ctx.user.id) == True:
-                await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
-                correct.add_field(
-                    name="TopGG Bonus",
-                    value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
-                )
-                if await BetaTest(self.bot).check(ctx.user) == True:
+            
+            if await BetaTest(self.bot).check(ctx.user):
                     await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
                     correct.add_field(
                         name="Beta User Bonus",
@@ -174,7 +164,7 @@ class Dice_Group():
             await Currency(ctx.user).add_qp(20)
             embed = Embed(color=Color.random())
             embed.add_field(
-                name=f"YAY! You got it!\n20 <:quantumpiece:1161010445205905418> has been added",
+                name="YAY! You got it!\n20 <:quantumpiece:1161010445205905418> has been added",
                 value=f"Dice rolled: **{rolled}**\nYou guessed: **{view.value}**!",
                 inline=False,
             )
@@ -223,13 +213,8 @@ class Dice_Group():
                 value=f"Dice rolled: **{rolled}**\nYou guessed: **{view.value}**!",
                 inline=False,
             )
-            if await self.topggpy.get_user_vote(ctx.user.id) == True:
-                await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
-                embed.add_field(
-                    name="TopGG Bonus",
-                    value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
-                )
-                if await BetaTest(self.bot).check(ctx.user) == True:
+
+            if await BetaTest(self.bot).check(ctx.user):
                     await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
                     embed.add_field(
                         name="Beta User Bonus",
@@ -280,13 +265,8 @@ class Flip_Group():
                 description="YAY! You got it!\n20 <:quantumpiece:1161010445205905418> has been added",
                 color=Color.random(),
             )
-            if await self.topggpy.get_user_vote(ctx.user.id) == True:
-                await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
-                embed.add_field(
-                    name="TopGG Bonus",
-                    value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>",
-                )
-                if await BetaTest(self.bot).check(ctx.user) == True:
+
+            if await BetaTest(self.bot).check(ctx.user):
                     await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
                     embed.add_field(
                         name="Beta User Bonus",
@@ -337,13 +317,8 @@ class Flip_Group():
                     bet
                 )
             )
-            if await self.topggpy.get_user_vote(ctx.user.id) == True:
-                await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
-                embed.add_field(
-                    name="TopGG Bonus",
-                    value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
-                )
-                if await BetaTest(self.bot).check(ctx.user) == True:
+
+            if await BetaTest(self.bot).check(ctx.user):
                     await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
                     embed.add_field(
                         name="Beta User Bonus",
@@ -412,9 +387,9 @@ class Blackjack_Group():
 
         await view.wait()
 
-        if view.value == None:
+        if view.value is None:
             timeout = Embed(
-                description=f"Sorry but you took too long. Please try again",
+                description="Sorry but you took too long. Please try again",
                 color=Color.red(),
             )
             await ctx.edit_original_response(embed=timeout, view=None)
@@ -454,9 +429,9 @@ class Blackjack_Group():
 
         await view.wait()
 
-        if view.value == None:
+        if view.value is None:
             timeout = Embed(
-                description=f"Sorry but you took too long. Please try again",
+                description="Sorry but you took too long. Please try again",
                 color=Color.red(),
             )
             await ctx.edit_original_response(embed=timeout, view=None)
@@ -497,7 +472,7 @@ class currency():
             color=Color.blue(),
         )
         balance.add_field(
-            name=f"If you want more <:quantumpiece:1161010445205905418>:",
+            name="If you want more <:quantumpiece:1161010445205905418>:",
             value="[Vote for me in TopGG](https://top.gg/bot/831993597166747679/vote)",
             inline=True,
         )
@@ -507,7 +482,7 @@ class currency():
         await ctx.response.defer()
         bank = Currency(ctx.user)
         tomorrow = round((datetime.now() + timedelta(days=1)).timestamp())
-        if bank.check_daily == True:
+        if bank.check_daily:
             await bank.give_daily()
             daily = Embed(
                 title="Daily",

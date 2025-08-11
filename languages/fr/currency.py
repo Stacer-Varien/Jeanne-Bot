@@ -55,13 +55,8 @@ class Guess_Group():
                 description="OUI! VOUS AVEZ DEVINEZ CORRECTEMENT!\nVous avez reçu 20 <:quantumpiece:1161010445205905418>!",
                 color=Color.random(),
             )
-            if await self.topggpy.get_user_vote(ctx.user.id) == True:
-                await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
-                correct.add_field(
-                    name="TopGG Bonus",
-                    value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>",
-                )
-                if await BetaTest(self.bot).check(ctx.user) == True:
+            
+            if await BetaTest(self.bot).check(ctx.user):
                     await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
                     correct.add_field(
                         name="Beta User Bonus",
@@ -109,13 +104,7 @@ class Guess_Group():
                 description=f"OUI! VOUS AVEZ DEVINEZ CORRECTEMENT!\n{bet} <:quantumpiece:1161010445205905418> a été ajouté",
                 color=Color.random(),
             )
-            if await self.topggpy.get_user_vote(ctx.user.id) == True:
-                await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
-                correct.add_field(
-                    name="TopGG Bonus",
-                    value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
-                )
-                if await BetaTest(self.bot).check(ctx.user) == True:
+            if await BetaTest(self.bot).check(ctx.user):
                     await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
                     correct.add_field(
                         name="Beta User Bonus",
@@ -221,13 +210,7 @@ class Dice_Group():
                 value=f"Le dé a roulé: **{rolled}**\nVous avez deviné: **{view.value}**!",
                 inline=False,
             )
-            if await self.topggpy.get_user_vote(ctx.user.id) == True:
-                await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
-                embed.add_field(
-                    name="TopGG Bonus",
-                    value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
-                )
-                if await BetaTest(self.bot).check(ctx.user) == True:
+            if await BetaTest(self.bot).check(ctx.user):
                     await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
                     embed.add_field(
                         name="Beta User Bonus",
@@ -278,13 +261,8 @@ class Flip_Group:
                 description="YAY! Vous avez trouvé !\n20 <:quantumpiece:1161010445205905418> ont été ajoutés",
                 color=Color.random(),
             )
-            if await self.topggpy.get_user_vote(ctx.user.id) == True:
-                await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
-                embed.add_field(
-                    name="Bonus TopGG",
-                    value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>",
-                )
-                if await BetaTest(self.bot).check(ctx.user) == True:
+
+            if await BetaTest(self.bot).check(ctx.user):
                     await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
                     embed.add_field(
                         name="Bonus Utilisateur Beta",
@@ -331,13 +309,8 @@ class Flip_Group:
             embed = Embed(
                 description=f"YAY! Vous avez trouvé !\n{bet} <:quantumpiece:1161010445205905418> ont été ajoutés"
             )
-            if await self.topggpy.get_user_vote(ctx.user.id) == True:
-                await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
-                embed.add_field(
-                    name="Bonus TopGG",
-                    value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
-                )
-                if await BetaTest(self.bot).check(ctx.user) == True:
+
+            if await BetaTest(self.bot).check(ctx.user):
                     await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
                     embed.add_field(
                         name="Bonus Utilisateur Beta",
@@ -481,7 +454,7 @@ class currency():
         await ctx.response.defer()
         bank = Currency(ctx.user)
         tomorrow = round((datetime.now() + timedelta(days=1)).timestamp())
-        if bank.check_daily == True:
+        if bank.check_daily:
             await bank.give_daily()
             daily = Embed(
                 title="Quotidien",
