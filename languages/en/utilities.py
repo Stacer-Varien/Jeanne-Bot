@@ -3,17 +3,18 @@ from random import randint
 import re
 import aiohttp
 from discord import (
-    ButtonStyle, Color, Embed, Interaction,
-    TextChannel, app_commands as Jeanne, ui
+    ButtonStyle,
+    Color,
+    Embed,
+    Interaction,
+    TextChannel,
+    app_commands as Jeanne,
+    ui,
 )
 from discord.ext.commands import Bot
 from reactionmenu import ViewButton, ViewMenu
 from assets.components import ReportModal
-from functions import (
-    Confess,
-    Moderation,
-    Reminder
-)
+from functions import Confess, Moderation, Reminder
 from config import WEATHER
 from discord.ui import View
 from py_expression_eval import Parser
@@ -21,7 +22,9 @@ from typing import Literal, Optional
 from json import loads
 from humanfriendly import parse_timespan, InvalidTimespan
 
-bot_invite_url = "https://canary.discord.com/oauth2/authorize?client_id=831993597166747679"
+bot_invite_url = (
+    "https://canary.discord.com/oauth2/authorize?client_id=831993597166747679"
+)
 topgg_invite = "https://top.gg/bot/831993597166747679"
 discordbots_url = "https://discord.bots.gg/bots/831993597166747679"
 orleans = "https://discord.gg/jh7jkuk2pp"
@@ -40,12 +43,11 @@ class InviteButton(View):
             self.add_item(ui.Button(style=ButtonStyle.url, label=label, url=url))
 
 
-class EmbedGroup():
+class EmbedGroup:
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
-    async def generate(
-        self, ctx: Interaction, channel: TextChannel, jsonscript: str):
+    async def generate(self, ctx: Interaction, channel: TextChannel, jsonscript: str):
         await ctx.response.defer()
         if not jsonscript:
             await ctx.followup.send(
@@ -59,14 +61,17 @@ class EmbedGroup():
         embeds = [Embed.from_dict(i) for i in json_data.get("embeds", [])]
 
         if len(embeds) > 10:
-            await ctx.followup.send(content="Too many embeds! Maximum is 10.", ephemeral=True)
+            await ctx.followup.send(
+                content="Too many embeds! Maximum is 10.", ephemeral=True
+            )
             return
 
         message = await channel.send(content=content, embeds=embeds or None)
         await ctx.followup.send(content=f"{message.jump_url} sent in {channel.mention}")
 
     async def edit(
-        self, ctx: Interaction, channel: TextChannel, messageid: str, jsonscript: str):
+        self, ctx: Interaction, channel: TextChannel, messageid: str, jsonscript: str
+    ):
         await ctx.response.defer()
         message = await channel.fetch_message(int(messageid))
 
@@ -75,17 +80,21 @@ class EmbedGroup():
         embeds = [Embed.from_dict(i) for i in json_data.get("embeds", [])]
 
         if len(embeds) > 10:
-            await ctx.followup.send(content="Too many embeds! Maximum is 10.", ephemeral=True)
+            await ctx.followup.send(
+                content="Too many embeds! Maximum is 10.", ephemeral=True
+            )
             return
 
         await message.edit(content=content, embeds=embeds or None)
-        await ctx.followup.send(content=f"{message.jump_url} edited in {channel.mention}")
+        await ctx.followup.send(
+            content=f"{message.jump_url} edited in {channel.mention}"
+        )
 
     async def edit_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         await ctx.followup.send(embed=Embed(description=str(error), color=Color.red()))
 
 
-class ReminderCog():
+class ReminderCog:
     def __init__(self, bot: Bot):
         self.bot = bot
 
@@ -94,7 +103,13 @@ class ReminderCog():
         user_reminders = Reminder(ctx.user).get_all_user_reminders
 
         if user_reminders and len(user_reminders) >= 10:
-            await ctx.followup.send(embed=Embed(description="Too many reminders! Cancel one or wait for one to expire.", color=Color.red()), ephemeral=True)
+            await ctx.followup.send(
+                embed=Embed(
+                    description="Too many reminders! Cancel one or wait for one to expire.",
+                    color=Color.red(),
+                ),
+                ephemeral=True,
+            )
             return
 
         try:
@@ -102,7 +117,13 @@ class ReminderCog():
             if reminder_time < 60:
                 raise InvalidTimespan
         except InvalidTimespan:
-            await ctx.followup.send(embed=Embed(description="Invalid time! Use a duration greater than 1 minute.", color=Color.red()), ephemeral=True)
+            await ctx.followup.send(
+                embed=Embed(
+                    description="Invalid time! Use a duration greater than 1 minute.",
+                    color=Color.red(),
+                ),
+                ephemeral=True,
+            )
             return
 
         date = datetime.now() + timedelta(seconds=reminder_time)
@@ -117,7 +138,9 @@ class ReminderCog():
         await ctx.followup.send(embed=embed, ephemeral=True)
 
     async def add_error(self, ctx: Interaction, error: Jeanne.errors.AppCommandError):
-        if isinstance(error, Jeanne.errors.CommandInvokeError) and isinstance(error.original, InvalidTimespan):
+        if isinstance(error, Jeanne.errors.CommandInvokeError) and isinstance(
+            error.original, InvalidTimespan
+        ):
             embed = Embed(
                 title="Invalid time",
                 description="Supported time units: ms, s, m, h, d, w, y.",
@@ -129,7 +152,7 @@ class ReminderCog():
         await ctx.response.defer(ephemeral=True)
         embed = Embed()
         reminders = Reminder(ctx.user).get_all_user_reminders
-        if reminders == None:
+        if reminders is None:
             embed.description = "No reminders"
         else:
             for i in reminders:
@@ -149,7 +172,7 @@ class ReminderCog():
         await ctx.response.defer(ephemeral=True)
         reminder = Reminder(ctx.user)
         embed = Embed()
-        if await reminder.remove(reminder_id) == False:
+        if not await reminder.remove(reminder_id):
             embed.color = Color.red()
             embed.description = "You don't have a reminder with that ID"
             await ctx.followup.send(embed=embed, ephemeral=True)
@@ -160,7 +183,7 @@ class ReminderCog():
         await ctx.followup.send(embed=embed, ephemeral=True)
 
 
-class Utilities():
+class Utilities:
     def __init__(self, bot: Bot):
         self.bot = bot
         self.parser = Parser()
@@ -185,7 +208,7 @@ class Utilities():
             "guste": "💨",
             "rain_chance": "💦",
         }
-        days = 1 if three_day == False else 3
+        days = 1 if not three_day else 3
         url = f"http://api.weatherapi.com/v1/forecast.json?key={WEATHER}&q={city.lower()}&days={days}&aqi=no&alerts=no"
 
         async with aiohttp.ClientSession() as session:
@@ -253,7 +276,7 @@ class Utilities():
             inline=True,
         )
         day1.set_footer(text="Fetched from weatherapi.com")
-        if three_day == True:
+        if three_day:
             menu = ViewMenu(
                 ctx,
                 menu_type=ViewMenu.TypeEmbed,
@@ -263,9 +286,12 @@ class Utilities():
             forecastday2 = weather_data["forecast"]["forecastday"][1]
             forecastday3 = weather_data["forecast"]["forecastday"][2]
             day2 = Embed(
-                title=f"{emoji_map['globe']} Weather details of {location['name']}, {location['region']}/{location['country']} for {forecastday2['date']}", color=Color.random()
+                title=f"{emoji_map['globe']} Weather details of {location['name']}, {location['region']}/{location['country']} for {forecastday2['date']}",
+                color=Color.random(),
             )
-            day3 = Embed(title=f"{emoji_map['globe']} Weather details of {location['name']}, {location['region']}/{location['country']} for {forecastday3['date']}", color=Color.random()
+            day3 = Embed(
+                title=f"{emoji_map['globe']} Weather details of {location['name']}, {location['region']}/{location['country']} for {forecastday3['date']}",
+                color=Color.random(),
             )
 
             if units == "Imperial":
@@ -340,8 +366,13 @@ class Utilities():
             return
         await ctx.followup.send(embed=day1)
 
-    async def weather_error(self, ctx: Interaction, error: Jeanne.AppCommandError, error_type:Literal["cooldown", "failed"]):
-        if error_type=="cooldown":
+    async def weather_error(
+        self,
+        ctx: Interaction,
+        error: Jeanne.AppCommandError,
+        error_type: Literal["cooldown", "failed"],
+    ):
+        if error_type == "cooldown":
             reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
             reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
@@ -350,7 +381,7 @@ class Utilities():
             )
             await ctx.response.send_message(embed=cooldown)
             return
-        if error_type=="failed":
+        if error_type == "failed":
             no_city = Embed(
                 description="Failed to get weather information on this city\nPlease note that ZIP/postal codes are only supported for Canada, the US, and the UK for this command.",
                 color=Color.red(),
@@ -371,12 +402,17 @@ class Utilities():
         calculation.add_field(name=f"`{calculate}`", value=answer)
         await ctx.followup.send(embed=calculation)
 
-    async def calculator_error(self, ctx: Interaction, error: Jeanne.AppCommandError, error_type:Literal["overflow", "failed"]):
-        if error_type=="overflow":
+    async def calculator_error(
+        self,
+        ctx: Interaction,
+        error: Jeanne.AppCommandError,
+        error_type: Literal["overflow", "failed"],
+    ):
+        if error_type == "overflow":
             failed = Embed(description=str(error))
             await ctx.followup.send(embed=failed)
             return
-        if error_type=="failed":
+        if error_type == "failed":
             failed = Embed(
                 description=f"{error}\nPlease refer to [Python Operators](https://www.geeksforgeeks.org/python-operators/?ref=lbp) if you don't know how to use the command"
             )
@@ -394,27 +430,32 @@ class Utilities():
     async def botreport(self, ctx: Interaction, report_type: str):
         await ctx.response.send_modal(ReportModal(report_type))
 
-    async def confession(self, ctx: Interaction, confession: Jeanne.Range[str, 1], anonymous: Optional[bool] = False):
-        channel=Confess(ctx.guild).get_confession_channel
+    async def confession(
+        self,
+        ctx: Interaction,
+        confession: Jeanne.Range[str, 1],
+        anonymous: Optional[bool] = False,
+    ):
+        channel = Confess(ctx.guild).get_confession_channel
         if not channel:
             await ctx.response.send_message(
                 embed=Embed(
                     description="Confession channel is not set up. Please contact the server admin.",
-                    color=Color.red()
+                    color=Color.red(),
                 ),
-                ephemeral=True
+                ephemeral=True,
             )
             return
 
-        confession_id=randint(1, 999999)
+        confession_id = randint(1, 999999)
         embed = Embed(color=Color.random())
 
-        if anonymous==True:
-            embed.title="Anonymous Confession"
+        if anonymous:
+            embed.title = "Anonymous Confession"
         else:
-            embed.title=f"Confession by {ctx.user.name}"
+            embed.title = f"Confession by {ctx.user.name}"
 
-        embed.description=confession
+        embed.description = confession
         embed.set_footer(
             text=f"Confession ID: {confession_id}\nIf this confession is inappropriate, please report it to the moderators with the Confession ID using `/reportconfession`. If the confession is very serious, please report to the developer with `/botreport` and attach the Confession ID."
         )
@@ -423,15 +464,17 @@ class Utilities():
         await ctx.response.send_message(
             embed=Embed(
                 description=f"Your confession has been sent to {channel.mention} with ID: {confession_id}",
-                color=Color.green()
+                color=Color.green(),
             ),
-            ephemeral=True
+            ephemeral=True,
         )
 
-    async def reportconfession(self, ctx:Interaction, confession_id: int, reason: Optional[str] = None):
-        confession=Confess(ctx.guild).get_confession(confession_id)
-        modlog=Moderation(ctx.guild).get_modlog_channel
-        if modlog == None:
+    async def reportconfession(
+        self, ctx: Interaction, confession_id: int, reason: Optional[str] = None
+    ):
+        confession = Confess(ctx.guild).get_confession(confession_id)
+        modlog = Moderation(ctx.guild).get_modlog_channel
+        if modlog is None:
             await ctx.response.send_message(
                 embed=Embed(
                     description="Moderation log channel is not set up. Please contact the server managers.",
@@ -443,14 +486,13 @@ class Utilities():
         if confession is None:
             await ctx.response.send_message(
                 embed=Embed(
-                    description="No confession found with that ID.",
-                    color=Color.red()
+                    description="No confession found with that ID.", color=Color.red()
                 ),
-                ephemeral=True
+                ephemeral=True,
             )
             return
         embed = Embed()
-        embed.title="Report Confession"
+        embed.title = "Report Confession"
         embed.add_field(name="Confession ID", value=confession_id, inline=False)
         embed.add_field(name="Reason", value=reason, inline=False)
 
@@ -458,7 +500,7 @@ class Utilities():
         await ctx.response.send_message(
             embed=Embed(
                 description=f"Confession with ID: {confession_id} has been reported to the moderators.",
-                color=Color.green()
+                color=Color.green(),
             ),
-            ephemeral=True
+            ephemeral=True,
         )

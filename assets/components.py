@@ -150,7 +150,7 @@ class Welcomingmsg(ui.Modal, title="Welcoming Message"):
             json = loads(replace_all(self.jsonscript.value, parameters))
             content = json["content"]
             embed = Embed.from_dict(json["embeds"][0])
-        except:
+        except Exception:
             content = replace_all(self.jsonscript.value, parameters)
         if ctx.locale.value=="en-GB" or ctx.locale.value=="en-US":
             confirm = Embed(
@@ -159,7 +159,7 @@ class Welcomingmsg(ui.Modal, title="Welcoming Message"):
             view = Confirmation(ctx, ctx.user)
             try:
                 embeds = [embed, confirm]
-            except:
+            except Exception:
                 embeds = [confirm]
             await ctx.response.send_message(
                 content=content,
@@ -169,11 +169,11 @@ class Welcomingmsg(ui.Modal, title="Welcoming Message"):
                 ephemeral=True,
             )
             await view.wait()
-            if view.value == True:
+            if view.value:
                 await Manage(ctx.guild).set_welcomer_msg(self.jsonscript.value)
                 embed = Embed(description="Welcoming message set")
                 await ctx.edit_original_response(content=None, embeds=[embed], view=None)
-            elif view.value == False:
+            elif not view.value:
                 embed = Embed(description="Action cancelled")
                 await ctx.edit_original_response(content=None, embeds=[embed], view=None)
             else:
@@ -186,7 +186,7 @@ class Welcomingmsg(ui.Modal, title="Welcoming Message"):
             view = Confirmation(ctx, ctx.user)
             try:
                 embeds = [embed, confirm]
-            except:
+            except Exception:
                 embeds = [confirm]
             await ctx.response.send_message(
                 content=content,
@@ -196,11 +196,11 @@ class Welcomingmsg(ui.Modal, title="Welcoming Message"):
                 ephemeral=True,
             )
             await view.wait()
-            if view.value == True:
+            if view.value:
                 await Manage(ctx.guild).set_welcomer_msg(self.jsonscript.value)
                 embed = Embed(description="Message de bienvenue défini")
                 await ctx.edit_original_response(content=None, embeds=[embed], view=None)
-            elif view.value == False:
+            elif not view.value:
                 embed = Embed(description="Action annulée")
                 await ctx.edit_original_response(content=None, embeds=[embed], view=None)
             else:
@@ -250,7 +250,7 @@ class Leavingmsg(ui.Modal, title="Leaving Message"):
             json = loads(replace_all(self.jsonscript.value, parameters))
             content = json["content"]
             embed = Embed.from_dict(json["embeds"][0])
-        except:
+        except Exception:
             content = replace_all(self.jsonscript.value, parameters)
         if ctx.locale.value=="en-GB" or ctx.locale.value=="en-US":
             confirm = Embed(
@@ -259,7 +259,7 @@ class Leavingmsg(ui.Modal, title="Leaving Message"):
             view = Confirmation(ctx, ctx.user)
             try:
                 embeds = [embed, confirm]
-            except:
+            except Exception:
                 embeds = [confirm]
             await ctx.response.send_message(
                 content=content,
@@ -269,11 +269,11 @@ class Leavingmsg(ui.Modal, title="Leaving Message"):
                 ephemeral=True,
             )
             await view.wait()
-            if view.value == True:
+            if view.value:
                 await Manage(ctx.guild).set_leaving_msg(self.jsonscript.value)
                 embed = Embed(description="Leaving message set")
                 await ctx.edit_original_response(content=None, embeds=[embed], view=None)
-            elif view.value == False:
+            elif not view.value:
                 embed = Embed(description="Action cancelled")
                 await ctx.edit_original_response(content=None, embeds=[embed], view=None)
             else:
@@ -286,7 +286,7 @@ class Leavingmsg(ui.Modal, title="Leaving Message"):
             view = Confirmation(ctx, ctx.user)
             try:
                 embeds = [embed, confirm]
-            except:
+            except Exception:
                 embeds = [confirm]
             await ctx.response.send_message(
                 content=content,
@@ -298,13 +298,13 @@ class Leavingmsg(ui.Modal, title="Leaving Message"):
                 ephemeral=True,
             )
             await view.wait()
-            if view.value == True:
+            if view.value:
                 await Manage(ctx.guild).set_leaving_msg(self.jsonscript.value)
                 embed = Embed(description="Message de départ défini")
                 await ctx.edit_original_response(
                     content=None, embeds=[embed], view=None
                 )
-            elif view.value == False:
+            elif not view.value:
                 embed = Embed(description="Action annulée")
                 await ctx.edit_original_response(
                     content=None, embeds=[embed], view=None
@@ -357,7 +357,7 @@ class Levelmsg(ui.Modal, title="Level Update Message"):
             json = loads(replace_all(self.jsonscript.value, parameters))
             content = json["content"]
             embed = Embed.from_dict(json["embeds"][0])
-        except:
+        except Exception:
             content = replace_all(self.jsonscript.value, parameters)
         if ctx.locale.value=="en-US" or ctx.locale.value=="en-GB":
             confirm = Embed(
@@ -368,7 +368,7 @@ class Levelmsg(ui.Modal, title="Level Update Message"):
             view = Confirmation(ctx, ctx.user)
             try:
                 embeds = [embed, confirm]
-            except:
+            except Exception:
                 embeds = [confirm]
             await ctx.response.send_message(
                 content=content,
@@ -378,13 +378,13 @@ class Levelmsg(ui.Modal, title="Level Update Message"):
                 ephemeral=True,
             )
             await view.wait()
-            if view.value == True:
+            if view.value:
                 await Manage(server=ctx.guild).add_level_channel(
                     self.channel, self.jsonscript.value
                 )
                 embed = Embed(description="Level update message set")
                 await ctx.edit_original_response(content=None, embeds=[embed], view=None)
-            elif view.value == False:
+            elif not view.value:
                 embed = Embed(description="Action cancelled")
                 await ctx.edit_original_response(content=None, embeds=[embed], view=None)
             else:
@@ -399,7 +399,7 @@ class Levelmsg(ui.Modal, title="Level Update Message"):
             view = Confirmation(ctx, ctx.user)
             try:
                 embeds = [embed, confirm]
-            except:
+            except Exception:
                 embeds = [confirm]
             await ctx.response.send_message(
                 content=content,
@@ -411,7 +411,7 @@ class Levelmsg(ui.Modal, title="Level Update Message"):
                 ephemeral=True,
             )
             await view.wait()
-            if view.value == True:
+            if view.value:
                 await Manage(server=ctx.guild).add_level_channel(
                     self.channel, self.jsonscript.value
                 )
@@ -419,7 +419,7 @@ class Levelmsg(ui.Modal, title="Level Update Message"):
                 await ctx.edit_original_response(
                     content=None, embeds=[embed], view=None
                 )
-            elif view.value == False:
+            elif not view.value:
                 embed = Embed(description="Action annulée")
                 await ctx.edit_original_response(
                     content=None, embeds=[embed], view=None
@@ -472,7 +472,7 @@ class RankUpmsg(ui.Modal, title="Role Reward Message"):
             json = loads(replace_all(self.jsonscript.value, parameters))
             content = json["content"]
             embed = Embed.from_dict(json["embeds"][0])
-        except:
+        except Exception:
             content = replace_all(self.jsonscript.value, parameters)
         if ctx.locale.value=="en-GB" or ctx.locale.value=="en-US":
             confirm = Embed(
@@ -481,7 +481,7 @@ class RankUpmsg(ui.Modal, title="Role Reward Message"):
             view = Confirmation(ctx, ctx.user)
             try:
                 embeds = [embed, confirm]
-            except:
+            except Exception:
                 embeds = [confirm]
             await ctx.response.send_message(
                 content=content,
@@ -491,11 +491,11 @@ class RankUpmsg(ui.Modal, title="Role Reward Message"):
                 ephemeral=True,
             )
             await view.wait()
-            if view.value == True:
+            if view.value:
                 await Manage(server=ctx.guild).add_rankup_rolereward(self.jsonscript.value)
                 embed = Embed(description="Level update message set")
                 await ctx.edit_original_response(content=None, embeds=[embed], view=None)
-            elif view.value == False:
+            elif not view.value:
                 embed = Embed(description="Action cancelled")
                 await ctx.edit_original_response(content=None, embeds=[embed], view=None)
             else:
@@ -508,7 +508,7 @@ class RankUpmsg(ui.Modal, title="Role Reward Message"):
             view = Confirmation(ctx, ctx.user)
             try:
                 embeds = [embed, confirm]
-            except:
+            except Exception:
                 embeds = [confirm]
             await ctx.response.send_message(
                 content=content,
@@ -518,11 +518,11 @@ class RankUpmsg(ui.Modal, title="Role Reward Message"):
                 ephemeral=True,
             )
             await view.wait()
-            if view.value == True:
+            if view.value:
                 await Manage(server=ctx.guild).add_rankup_rolereward(self.jsonscript.value)
                 embed = Embed(description="Message de mise à jour du niveau défini")
                 await ctx.edit_original_response(content=None, embeds=[embed], view=None)
-            elif view.value == False:
+            elif not view.value:
                 embed = Embed(description="Action annulée")
                 await ctx.edit_original_response(content=None, embeds=[embed], view=None)
             else:
@@ -596,7 +596,7 @@ class BotReportMenu(ui.Select):
         await ctx.response.send_modal(ReportModal(self.options[0].label))
         try:
             await ctx.message.delete()
-        except:
+        except Exception:
             pass
 
 
@@ -1180,8 +1180,6 @@ class RolesButton(ui.View):
         self.Roles = Roles
         self.Uinfo = Uinfo
 
-        roles_button=...
-
     @ui.button(label="Roles", style=ButtonStyle.blurple)
     async def roles(self, ctx: Interaction, button: ui.Button):
         self.value = "roles"
@@ -1259,7 +1257,7 @@ async def buy_function_context(bot: Bot, ctx: Context, name: str, message: Messa
         m = await m.edit(attachments=[file], embed=preview, view=view)
         await view.wait()
 
-        if view.value == True:
+        if view.value:
             await Inventory(ctx.author).add_user_wallpaper(name)
             embed1 = Embed(
                 description="Background wallpaper bought and selected",
@@ -1289,7 +1287,7 @@ async def buy_function_context(bot: Bot, ctx: Context, name: str, message: Messa
         m = await m.edit(attachments=[file], embed=preview, view=view)
         await view.wait()
 
-        if view.value == True:
+        if view.value:
             await Inventory(ctx.author).add_user_wallpaper(name)
             embed1 = Embed(
                 description="Fond d'écran acheté et sélectionné",
@@ -1332,7 +1330,7 @@ async def buy_function_app(bot: Bot, ctx: Interaction, name: str):
                 content="Timeout", view=None, embed=None, attachments=[]
             )
             return
-        if view.value == True:
+        if view.value:
             await Inventory(ctx.user).add_user_wallpaper(name)
             embed1 = Embed(
                 description="Background wallpaper bought and selected",
@@ -1367,7 +1365,7 @@ async def buy_function_app(bot: Bot, ctx: Interaction, name: str):
                 content="Temps écoulé", view=None, embed=None, attachments=[]
             )
             return
-        if view.value == True:
+        if view.value:
             await Inventory(ctx.user).add_user_wallpaper(name)
             embed1 = Embed(
                 description="Fond d'écran acheté et sélectionné",
@@ -1495,7 +1493,7 @@ class DevWarningReasonM(ui.Modal, title="Reason of Warn/Suspension"):
             description=f"Warning sent to {self.user} | `{self.user.id}`"
         )
             await ctx.response.send_message(embed=confirm, ephemeral=True)
-        except:
+        except Exception:
             confirm = Embed(
                 description=f"Warning given to {self.user} | `{self.user.id}` but not sent as their DMs are closed"
             )
@@ -1522,5 +1520,5 @@ class DevWarningMenu(ui.Select):
         await ctx.response.send_modal(DevWarningReasonM(user, self.options[0].label))
         try:
             await ctx.message.delete()
-        except:
+        except Exception:
             pass

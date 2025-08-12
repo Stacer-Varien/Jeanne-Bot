@@ -120,13 +120,13 @@ class Background_Group():
         image = await Profile(self.bot).generate_profile(ctx, 
             ctx.user, link, True, True, "southafrica"
         )
-        if image == False:
+        if not image:
             size_error = Embed(
                 description="The image is below the 900x500 size.\nPlease enlarge the image and try again"
             )
             await ctx.edit_original_response(embed=size_error)
             return
-        file = File(fp=image, filename=f"preview_profile_card.png")
+        file = File(fp=image, filename="preview_profile_card.png")
         preview = (
             Embed(
                 description="This is the preview of the profile card.",
@@ -168,7 +168,7 @@ class Background_Group():
  
     async def list(self, ctx: Interaction):
         await ctx.response.defer()
-        if Inventory(ctx.user).get_user_inventory == None:
+        if Inventory(ctx.user).get_user_inventory is None:
             embed = Embed(description="Your inventory is empty", color=Color.red())
             await ctx.followup.send(embed=embed)
             return

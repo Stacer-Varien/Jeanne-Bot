@@ -1,4 +1,4 @@
-from discord.ext.commands import Cog, Bot, GroupCog
+from discord.ext.commands import Cog, Bot
 from discord import (
     Color,
     Embed,
@@ -17,7 +17,7 @@ from assets.generators.profile_card import Profile
 from topgg import DBLClient
 
 
-class Rank_Group(GroupCog, name="rank"):
+class Rank_Group:
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
 

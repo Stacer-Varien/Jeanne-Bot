@@ -51,7 +51,6 @@ class nsfw(Cog):
             except (NotFound, HTTPException):
                 return
 
-
     async def yandere(
         self,
         ctx: Interaction,
@@ -190,9 +189,15 @@ class nsfw(Cog):
         await ctx.response.defer()
         image = await Hentai(plus).danbooru(tag)
         if plus:
-            images = [img for img in (image[randint(1, len(image)) - 1] for _ in range(4)) if ".zip" not in img["file_url"]]
+            images = [
+                img
+                for img in (image[randint(1, len(image)) - 1] for _ in range(4))
+                if ".zip" not in img["file_url"]
+            ]
             view = ReportContentPlus(ctx, *[img["file_url"] for img in images])
-            vids = [i for i in images if "mp4" in i["file_url"] or "webm" in i["file_url"]]
+            vids = [
+                i for i in images if "mp4" in i["file_url"] or "webm" in i["file_url"]
+            ]
             media = [j["file_url"] for j in vids]
             if media:
                 await ctx.followup.send("\n".join(media), view=view)
@@ -247,18 +252,18 @@ class nsfw(Cog):
             )
             await ctx.followup.send(embed=embed)
 
-    async def Hentai_error(self, ctx: Interaction, error: Jeanne.AppCommandError, type:str):
-        if type =="NotFound":
+    async def Hentai_error(
+        self, ctx: Interaction, error: Jeanne.AppCommandError, type: str
+    ):
+        if type == "NotFound":
             no_tag = Embed(
                 description="The hentai could not be found", color=Color.red()
             )
             await ctx.followup.send(embed=no_tag)
             return
-        if type=="cooldown":
+        if type == "cooldown":
             cooldown = Embed(
                 description=f"WOAH! Calm down! Give me a breather!\nTry again after `{round(error.retry_after, 2)} seconds`",
                 color=Color.red(),
             )
             await ctx.response.send_message(embed=cooldown)
-
-

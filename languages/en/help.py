@@ -46,15 +46,15 @@ class HelpGroup:
         command = cmd["en"]
         try:
             bot_perms = command["bot_perms"]
-        except:
+        except Exception:
             bot_perms = None
         try:
             member_perms = command["member_perms"]
-        except:
+        except Exception:
             member_perms = None
         try:
             nsfw = cmd["nsfw"]
-        except:
+        except Exception:
             nsfw = None
         name = command["name"]
         description = command["description"]
@@ -62,7 +62,7 @@ class HelpGroup:
         embed.description = description
         try:
             parms = [
-                f"[{i["name"]}]" if bool(i["required"])==True else f"<{i["name"]}>"
+                f"[{i["name"]}]" if bool(i["required"]) else f"<{i["name"]}>"
                 for i in command["parameters"]
             ]
             descs = [
@@ -70,7 +70,7 @@ class HelpGroup:
                 for i, parm in zip(command["parameters"], parms)
             ]
             embed.add_field(name="Parameters", value="\n".join(descs), inline=False)
-        except:
+        except Exception:
             parms = []
         if bot_perms:
             embed.add_field(name="Jeanne Permissions", value=bot_perms, inline=True)

@@ -33,7 +33,7 @@ class moderation():
         time: Optional[str] = None,
         delete_message_history: Optional[bool] = None,
     ):
-        if delete_message_history == True:
+        if delete_message_history :
             dmh = 604800
         else:
             dmh = 86400
@@ -53,7 +53,7 @@ class moderation():
                 a = round(parse_timespan(time))
                 await Moderation(ctx.guild).softban_member(member, a)
                 time = format_timespan(a)
-            except:
+            except Exception:
                 time = "Temps invalide ajouté. L'utilisateur est banni de façon permanente !"
             ban.add_field(name="Durée", value=time, inline=True)
         ban.set_thumbnail(url=member.display_avatar)
@@ -103,7 +103,7 @@ class moderation():
             return
 
         if member not in ctx.guild.members:
-            if await self.check_banned(ctx, member) == False:
+            if not await self.check_banned(ctx, member):
                 view = Confirmation(ctx.user)
                 confirm = Embed(
                     description="Est-ce que {} est la personne que vous voulez bannir de votre serveur ?".format(
@@ -117,13 +117,13 @@ class moderation():
                     cancelled = Embed(description="Bannissement annulé", color=Color.red())
                     await ctx.edit_original_response(embed=cancelled, view=None)
                     return
-                if view.value == True:
+                if view.value :
                     await self.commit_ban(
                         ctx, member, reason, None, delete_message_history
                     )
                     return
 
-                if view.value == False:
+                if not view.value:
                     cancelled = Embed(description="Bannissement annulé", color=Color.red())
                     await ctx.edit_original_response(embed=cancelled, view=None)
                     return
@@ -324,7 +324,7 @@ class moderation():
                 description=f"Vous êtes expulsé de **{ctx.guild.name}** pour **{reason}**"
             )
             await member.send(embed=kickmsg)
-        except:
+        except Exception:
             pass
         await ctx.guild.kick(member, reason="{} | {}".format(reason, ctx.user))
         kick = Embed(title="Membre expulsé", color=0xFF0000)
@@ -490,7 +490,7 @@ class moderation():
             )
             await ctx.followup.send(embed=failed)
             return
-        if member.is_timed_out() == False:
+        if not member.is_timed_out():
             failed = Embed(
                 description="Ce membre n'est pas en timeout", color=Color.red()
             )
@@ -554,7 +554,7 @@ class moderation():
         )
         await ctx.followup.send(embed=alert, view=view)
         await view.wait()
-        if view.value == True:
+        if view.value :
 
             em = Embed(
                 description="Bannissement des utilisateurs en cours <a:loading:1161038734620373062>",
@@ -565,7 +565,7 @@ class moderation():
                 try:
                     user = await self.bot.fetch_user(i)
                     to_ban.append(user)
-                except:
+                except Exception:
                     continue
             await ctx.edit_original_response(embed=em, view=None)
             ban_results = await ctx.guild.bulk_ban(to_ban, reason=reason)
@@ -605,7 +605,7 @@ class moderation():
                 )
             )
             await modlog.send(embed=embed)
-        elif (view.value == False) or (view.value is None):
+        elif (not view.value) or (view.value is None):
             cancelled = Embed(description="Massban annulé", color=Color.red())
             await ctx.edit_original_response(embed=cancelled, view=None)
 
@@ -649,7 +649,7 @@ class moderation():
         )
         await ctx.followup.send(embed=alert, view=view)
         await view.wait()
-        if view.value == True:
+        if view.value :
             em = Embed(
                 description="Débannissement des utilisateurs en cours <a:loading:1161038734620373062>",
                 color=Color.red(),
@@ -695,7 +695,7 @@ class moderation():
                 )
             )
             await modlog.send(embed=embed)
-        elif (view.value == False) or (view.value is None):
+        elif (not view.value) or (view.value is None):
             cancelled = Embed(description="Massunban annulé", color=Color.red())
             await ctx.edit_original_response(embed=cancelled, view=None)
 

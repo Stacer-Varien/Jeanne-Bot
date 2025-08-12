@@ -447,7 +447,7 @@ class Inventory:
                 ),
             )
             db.commit()
-        except:
+        except Exception:
             return False
 
     async def set_bio(self, bio: str):
@@ -1119,7 +1119,7 @@ class Command:
             ).fetchone()
             db.commit()
             return data is not None and command == data[0]
-        except:
+        except Exception:
             pass
 
     async def disable(self, command: str):
@@ -1312,9 +1312,9 @@ def get_richest(member: Member) -> int:
         try:
             rank = all_ids.index(member.id) + 1
             return rank
-        except:
+        except Exception:
             return 20
-    except:
+    except Exception:
         return 20
 
 
@@ -1392,7 +1392,7 @@ class Hentai:
                 img_tags = str(image["tags"]).lower().split(" ")
             try:
                 urls = str(image["file_url"])
-            except:
+            except Exception:
                 continue
             if any(tag in self.blacklisted_tags for tag in img_tags):
                 continue
@@ -1695,7 +1695,7 @@ class BetaTest:
             m = await server.fetch_member(user.id)
             await m.add_roles(betarole, reason="Added to the Beta Programme")
             await ctx.send(f"{user} has been added as a Beta Tester")
-        except:
+        except Exception:
             await ctx.send(
                 f"Member is not in {server}. This is required so they can be added in the Beta Programme"
             )
@@ -1707,7 +1707,7 @@ class BetaTest:
             member = await server.fetch_member(user.id)
             if beta_role in member.roles:
                 return True
-        except:
+        except Exception:
             return False
 
     async def remove(self, ctx: Context, user: User):
@@ -1716,7 +1716,7 @@ class BetaTest:
         try:
             m = await server.fetch_member(user.id)
             await m.remove_roles(betarole, reason="Removed from the Beta Programme")
-        except:
+        except Exception:
             await ctx.send(
                 f"Member is not in {server}. This is required so they can be added in the Beta Programme"
             )

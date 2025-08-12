@@ -47,7 +47,7 @@ async def dictionary(ctx: Interaction, word: str):
             definition = j["definition"]
             try:
                 example = j["example"]
-            except:
+            except Exception:
                 pass
 
             page_embed = Embed(color=embed.color, title=embed.title)
@@ -57,7 +57,7 @@ async def dictionary(ctx: Interaction, word: str):
             page_embed.add_field(name="Definition", value=definition, inline=False)
             try:
                 page_embed.add_field(name="Example", value=example, inline=False)
-            except:
+            except Exception:
                 pass
 
             menu.add_page(embed=page_embed)

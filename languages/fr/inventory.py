@@ -120,7 +120,7 @@ class Background_Group():
         image = await Profile(self.bot).generate_profile(ctx,
             ctx.user, link, True, True, "southafrica"
         )
-        if image == False:
+        if not image:
             size_error = Embed(
                 description="L'image est inférieure à la taille 900x500.\nVeuillez agrandir l'image et réessayer"
             )

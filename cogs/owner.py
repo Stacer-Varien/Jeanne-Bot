@@ -78,16 +78,21 @@ class OwnerCog(Cog, name="Owner"):
         )
         await ctx.send(embed=embed)
 
-    @beta.command(description="Add a user to the Beta Programme (Developer Only)")
+    @beta.command(
+        name="add", description="Add a user to the Beta Programme (Developer Only)"
+    )
     @is_owner()
-    async def add(self, ctx: Context, *, user: User):
+    async def _add(self, ctx: Context, *, user: User):
         if DevPunishment(ctx.author).check_botbanned_user:
             return
         await BetaTest(self.bot).add(ctx, user)
 
-    @beta.command(description="Removes a user from the Beta Programme (Developer Only)")
+    @beta.command(
+        name="remove",
+        description="Removes a user from the Beta Programme (Developer Only)",
+    )
     @is_owner()
-    async def remove(self, ctx: Context, *, user: User):
+    async def _remove(self, ctx: Context, *, user: User):
         if DevPunishment(ctx.author).check_botbanned_user:
             return
         await BetaTest(self.bot).remove(ctx, user)
@@ -216,7 +221,7 @@ class OwnerCog(Cog, name="Owner"):
         with open("database.db", "rb") as file:
             try:
                 await ctx.author.send(file=File(file))
-            except:
+            except Exception:
                 content = """
 # ERROR!
 ## Failed to send database! 
@@ -272,15 +277,13 @@ Make sure private messages between **me and you are opened** or check the host i
     @command(description="Suspend a user from a certain module/s")
     @guild_only()
     @is_owner()
-    async def suspend(self, ctx: Context, user: User, duration:str, *, reason: str):
+    async def suspend(self, ctx: Context, user: User, duration: str, *, reason: str):
         if DevPunishment(ctx.author).check_botbanned_user:
             return
-        seconds=parse_timespan(duration)
+        seconds = parse_timespan(duration)
         timestamp = round((datetime.now() + timedelta(seconds=seconds)).timestamp())
-        view=ModuleSelect(user, reason, duration=timestamp)
+        view = ModuleSelect(user, reason, duration=timestamp)
         await ctx.send(view=view)
-        
-
 
 
 async def setup(bot: Bot):

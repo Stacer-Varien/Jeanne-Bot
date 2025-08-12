@@ -33,7 +33,7 @@ class moderation():
         time: Optional[str] = None,
         delete_message_history: Optional[bool] = None,
     ):
-        if delete_message_history == True:
+        if delete_message_history :
             dmh = 604800
         else:
             dmh = 86400
@@ -48,17 +48,17 @@ class moderation():
         ban.add_field(name="ID", value=member.id, inline=True)
         ban.add_field(name="Moderator", value=ctx.user, inline=True)
         ban.add_field(name="Reason", value=reason, inline=False)
-        if time != None:
+        if time is not None:
             try:
                 a = round(parse_timespan(time))
                 await Moderation(ctx.guild).softban_member(member, a)
                 time = format_timespan(a)
-            except:
+            except Exception:
                 time = "Invalid time added. User is banned permanently!"
             ban.add_field(name="Duration", value=time, inline=True)
         ban.set_thumbnail(url=member.display_avatar)
         modlog = Moderation(ctx.guild).get_modlog_channel
-        if modlog == None:
+        if modlog is None:
             await ctx.edit_original_response(embed=ban, view=None)
             return
         banned = Embed(
@@ -103,7 +103,7 @@ class moderation():
             return
 
         if member not in ctx.guild.members:
-            if await self.check_banned(ctx, member) == False:
+            if not await self.check_banned(ctx, member):
                 view = Confirmation(ctx.user)
                 confirm = Embed(
                     description="Is {} the one you want to ban from your server?".format(
@@ -113,17 +113,17 @@ class moderation():
                 ).set_thumbnail(url=member.display_avatar)
                 await ctx.followup.send(embed=confirm, view=view)
                 await view.wait()
-                if view.value == None:
+                if view.value is None:
                     cancelled = Embed(description="Ban cancelled", color=Color.red())
                     await ctx.edit_original_response(embed=cancelled, view=None)
                     return
-                if view.value == True:
+                if view.value :
                     await self.commit_ban(
                         ctx, member, reason, None, delete_message_history
                     )
                     return
 
-                if view.value == False:
+                if not view.value:
                     cancelled = Embed(description="Ban cancelled", color=Color.red())
                     await ctx.edit_original_response(embed=cancelled, view=None)
                     return
@@ -182,7 +182,7 @@ class moderation():
         warn.add_field(name="Date", value="<t:{}:F>".format(date), inline=True)
         warn.set_thumbnail(url=member.display_avatar)
         modlog = Moderation(ctx.guild).get_modlog_channel
-        if modlog == None:
+        if modlog is None:
             await ctx.followup.send(embed=warn)
             return
 
@@ -195,15 +195,15 @@ class moderation():
 
     async def listwarns(self, ctx: Interaction, member: Optional[str]):
         await ctx.response.defer()
-        if member != None:
+        if member is not None:
             mem = ctx.guild.get_member(int(member))
         record = (
             Moderation(ctx.guild).fetch_warnings_user(mem)
             if member is not None
             else Moderation(ctx.guild).fetch_warnings_server
         )
-        if record == None:
-            await ctx.followup.send(f"No one has no warn IDs")
+        if record is None:
+            await ctx.followup.send("No one has no warn IDs")
             return
 
         menu = ViewMenu(
@@ -232,7 +232,7 @@ class moderation():
                 points = Moderation(ctx.guild).warnpoints(user)
                 date = f"<t:{j[5]}:F>"
 
-                if member == None:
+                if member is None:
                     if user not in unique_names:
                         unique_names.add(user)
                         embed.add_field(
@@ -270,7 +270,7 @@ class moderation():
         await ctx.response.defer()
         mod = Moderation(ctx.guild)
         result = mod.check_warn_id(member, warn_id)
-        if result == None:
+        if result is None:
             await ctx.followup.send("Invalid warn ID")
             return
         await mod.revoke_warn(member, warn_id)
@@ -279,7 +279,7 @@ class moderation():
             description=f"{ctx.user} has revoked warn ID ({warn_id})",
         )
         modlog = Moderation(ctx.guild).get_modlog_channel
-        if modlog == None:
+        if modlog is None:
             await ctx.followup.send(embed=revoked_warn)
             return
 
@@ -324,7 +324,7 @@ class moderation():
                 description=f"You are kicked from **{ctx.guild.name}** for **{reason}**"
             )
             await member.send(embed=kickmsg)
-        except:
+        except Exception:
             pass
         await ctx.guild.kick(member, reason="{} | {}".format(reason, ctx.user))
         kick = Embed(title="Member Kicked", color=0xFF0000)
@@ -334,7 +334,7 @@ class moderation():
         kick.add_field(name="Reason", value=reason, inline=True)
         kick.set_thumbnail(url=member.display_avatar)
         modlog = Moderation(ctx.guild).get_modlog_channel
-        if modlog == None:
+        if modlog is None:
             await ctx.followup.send(embed=kick)
             return
 
@@ -369,7 +369,7 @@ class moderation():
         nickname: Optional[str],
     ):
         await ctx.response.defer()
-        if (not nickname) or (nickname == None):
+        if (not nickname) or (nickname is None):
             await member.edit(nick=None)
             setnick = Embed(color=0x00FF68)
             setnick.add_field(
@@ -379,7 +379,7 @@ class moderation():
             )
             await ctx.followup.send(embed=setnick)
             return
-        if member.nick == None:
+        if member.nick is None:
             embed = Embed(color=Color.red())
             embed.description = f"{member} has no nickname"
             await ctx.followup.send(embed=embed)
@@ -410,7 +410,7 @@ class moderation():
         unban.add_field(name="Reason", value=reason, inline=False)
         unban.set_thumbnail(url=user.display_avatar)
         modlog = Moderation(ctx.guild).get_modlog_channel
-        if modlog == None:
+        if modlog is None:
             await ctx.followup.send(embed=unban)
             return
 
@@ -459,7 +459,7 @@ class moderation():
         mute.add_field(name="Reason", value=reason, inline=False)
         mute.set_thumbnail(url=member.display_avatar)
         modlog = Moderation(ctx.guild).get_modlog_channel
-        if modlog == None:
+        if modlog is None:
             await ctx.followup.send(embed=mute)
             return
 
@@ -490,7 +490,7 @@ class moderation():
             )
             await ctx.followup.send(embed=failed)
             return
-        if member.is_timed_out() == False:
+        if not member.is_timed_out():
             failed = Embed(
                 description="This member is not on timeout", color=Color.red()
             )
@@ -506,7 +506,7 @@ class moderation():
         unmute.add_field(name="Reason", value=reason, inline=False)
         unmute.set_thumbnail(url=member.display_avatar)
         modlog = Moderation(ctx.guild).get_modlog_channel
-        if modlog == None:
+        if modlog is None:
             await ctx.followup.send(embed=unmute)
             return
 
@@ -554,7 +554,7 @@ class moderation():
         )
         await ctx.followup.send(embed=alert, view=view)
         await view.wait()
-        if view.value == True:
+        if view.value :
 
             em = Embed(
                 description="Banning users now <a:loading:1161038734620373062>",
@@ -565,7 +565,7 @@ class moderation():
                 try:
                     user = await self.bot.fetch_user(i)
                     to_ban.append(user)
-                except:
+                except Exception:
                     continue
             await ctx.edit_original_response(embed=em, view=None)
             ban_results = await ctx.guild.bulk_ban(to_ban, reason=reason)
@@ -594,7 +594,7 @@ class moderation():
             else:
                 embed = Embed(description="No users were banned.", color=Color.red())
             modlog = Moderation(ctx.guild).get_modlog_channel
-            if modlog == None:
+            if modlog is None:
                 await ctx.edit_original_response(embed=embed)
                 return
 
@@ -605,7 +605,7 @@ class moderation():
                 )
             )
             await modlog.send(embed=embed)
-        elif (view.value == False) or (view.value == None):
+        elif (not view.value) or (view.value is None):
             cancelled = Embed(description="Massban cancelled", color=Color.red())
             await ctx.edit_original_response(embed=cancelled, view=None)
 
@@ -649,7 +649,7 @@ class moderation():
         )
         await ctx.followup.send(embed=alert, view=view)
         await view.wait()
-        if view.value == True:
+        if view.value :
             em = Embed(
                 description="Unbanning users now <a:loading:1161038734620373062>",
                 color=Color.red(),
@@ -684,7 +684,7 @@ class moderation():
             else:
                 embed = Embed(description="No users were unbanned.", color=Color.red())
             modlog = Moderation(ctx.guild).get_modlog_channel
-            if modlog == None:
+            if modlog is None:
                 await ctx.edit_original_response(embed=embed)
                 return
 
@@ -695,7 +695,7 @@ class moderation():
                 )
             )
             await modlog.send(embed=embed)
-        elif (view.value == False) or (view.value == None):
+        elif (not view.value) or (view.value is None):
             cancelled = Embed(description="Massunban cancelled", color=Color.red())
             await ctx.edit_original_response(embed=cancelled, view=None)
 
