@@ -1111,12 +1111,12 @@ class Command_Group:
         await ctx.response.defer()
         cmd = Command(ctx.guild)
         embed = Embed()
-        if cmd.list_all_disabled() is None:
+        if cmd.list_all_disabled is None:
             embed.description = "Aucune commande n'est désactivée actuellement"
             embed.color = Color.red()
         else:
             embed.title = "Commandes désactivées :"
-            embed.description = "\n".join(cmd.list_all_disabled())
+            embed.description = "\n".join(cmd.list_all_disabled)
             embed.color = Color.random()
         await ctx.followup.send(embed=embed)
 
