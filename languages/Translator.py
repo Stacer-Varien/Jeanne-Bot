@@ -17,7 +17,7 @@ class MyTranslator(Jeanne.Translator):
         locale: Locale,
         context: Jeanne.TranslationContext,
     ) -> Optional[str]:
-        
+
         translations = {
             # global
             "name_parm_name": {"en-GB": "name", "en-US": "name", "fr": "nom"},
@@ -27,7 +27,12 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Quel nom lui donnerez-vous?",
                 "de": "Wie werden Sie es nennen?",
             },
-            "member_parm_name": {"en-GB": "member", "en-US": "member", "fr": "membre", "de": "Mitglied"},
+            "member_parm_name": {
+                "en-GB": "member",
+                "en-US": "member",
+                "fr": "membre",
+                "de": "Mitglied",
+            },
             "member_parm_desc": {
                 "en-GB": "Which member?",
                 "en-US": "Which member?",
@@ -124,9 +129,24 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "blackjack pari",
                 "de": "blackjack Einsatz",
             },
-            "guess_group_name": {"en-GB": "guess", "en-US": "guess", "fr": "deviner", "de": "raten"},
-            "dice_group_name": {"en-GB": "dice", "en-US": "dice", "fr": "dé", "de": "würfeln"},
-            "flip_group_name": {"en-GB": "flip", "en-US": "flip", "fr": "lancer", "de": "flip"},
+            "guess_group_name": {
+                "en-GB": "guess",
+                "en-US": "guess",
+                "fr": "deviner",
+                "de": "raten",
+            },
+            "dice_group_name": {
+                "en-GB": "dice",
+                "en-US": "dice",
+                "fr": "dé",
+                "de": "würfeln",
+            },
+            "flip_group_name": {
+                "en-GB": "flip",
+                "en-US": "flip",
+                "fr": "lancer",
+                "de": "flip",
+            },
             "blackjack_group_name": {
                 "en-GB": "blackjack",
                 "en-US": "blackjack",
@@ -151,8 +171,18 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "aide",
                 "de": "hilfe",
             },
-            "free_name": {"en-GB": "free", "en-US": "free", "fr": "libre", "de": "frei"},
-            "bet_name": {"en-GB": "bet", "en-US": "bet", "fr": "parier", "de": "wetten"},
+            "free_name": {
+                "en-GB": "free",
+                "en-US": "free",
+                "fr": "libre",
+                "de": "frei",
+            },
+            "bet_name": {
+                "en-GB": "bet",
+                "en-US": "bet",
+                "fr": "parier",
+                "de": "wetten",
+            },
             "guess_free_desc": {
                 "en-GB": "Guess my number and you can win 20 QP",
                 "en-US": "Guess my number and you can win 20 QP",
@@ -165,7 +195,12 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Devinez mon nombre et vous pouvez gagner avec des paris",
                 "de": "Errate meine Zahl und du kannst mit Wetten gewinnen",
             },
-            "bet_parm_name": {"en-GB": "bet", "en-US": "bet", "fr": "parier", "de": "wetten"},
+            "bet_parm_name": {
+                "en-GB": "bet",
+                "en-US": "bet",
+                "fr": "parier",
+                "de": "wetten",
+            },
             "bet_parm_desc": {
                 "en-GB": "How much are you betting?",
                 "en-US": "How much are you betting?",
@@ -248,21 +283,36 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Ajoutez votre question",
                 "de": "Fügen Sie Ihre Frage hinzu",
             },
-            "reverse_name": {"en-GB": "reverse", "en-US": "reverse", "fr": "inverse", "de": "umkehren"},
+            "reverse_name": {
+                "en-GB": "reverse",
+                "en-US": "reverse",
+                "fr": "inverse",
+                "de": "umkehren",
+            },
             "reverse_desc": {
                 "en-GB": "Say something and I will say it in reversed text",
                 "en-US": "Say something and I will say it in reversed text",
                 "fr": "Dites quelque chose et je le dirai dans un texte inversé",
                 "de": "Sagen Sie etwas und ich werde es in umgekehrtem Text sagen",
             },
-            "text_parm_name": {"en-GB": "text", "en-US": "text", "fr": "texte", "de": "text"},
+            "text_parm_name": {
+                "en-GB": "text",
+                "en-US": "text",
+                "fr": "texte",
+                "de": "text",
+            },
             "text_parm_desc": {
                 "en-GB": "What are you reversing?",
                 "en-US": "What are you reversing?",
                 "fr": "Qu'est-ce que vous inversez?",
                 "de": "Was kehren Sie um?",
             },
-            "combine_name": {"en-GB": "combine", "en-US": "combine", "fr": "combiner", "de": "kombinieren"},
+            "combine_name": {
+                "en-GB": "combine",
+                "en-US": "combine",
+                "fr": "combiner",
+                "de": "kombinieren",
+            },
             "combine_desc": {
                 "en-GB": "Combine 2 words to get 2 combined words",
                 "en-US": "Combine 2 words to get 2 combined words",
@@ -299,7 +349,12 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Vérifiez à quel point vous ou un membre êtes un simp",
                 "de": "Überprüfen Sie, wie viel von einem Simp Sie oder ein Mitglied sind",
             },
-            "choose_name": {"en-GB": "choose", "en-US": "choose", "fr": "choisir", "de": "wählen"},
+            "choose_name": {
+                "en-GB": "choose",
+                "en-US": "choose",
+                "fr": "choisir",
+                "de": "wählen",
+            },
             "choose_desc": {
                 "en-GB": "Give me a lot of choices and I will pick one for you",
                 "en-US": "Give me a lot of choices and I will pick one for you",
@@ -336,7 +391,12 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "taux_de_gay",
                 "de": "schwulenrate",
             },
-            "command_name": {"en-GB": "command", "en-US": "command", "fr": "commande", "de": "befehl"},
+            "command_name": {
+                "en-GB": "command",
+                "en-US": "command",
+                "fr": "commande",
+                "de": "befehl",
+            },
             "help_command_desc": {
                 "en-GB": "Get help on a certain command",
                 "en-US": "Get help on a certain command",
@@ -367,7 +427,12 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Quelle commande voulez-vous activer?",
                 "de": "Welchen Befehl möchten Sie aktivieren?",
             },
-            "support_name": {"en-GB": "support", "en-US": "support", "fr": "soutien", "de": "unterstützung"},
+            "support_name": {
+                "en-GB": "support",
+                "en-US": "support",
+                "fr": "soutien",
+                "de": "unterstützung",
+            },
             "support_desc": {
                 "en-GB": "Need help? Visit the website or join the server for further assistance.",
                 "en-US": "Need help? Visit the website or join the server for further assistance.",
@@ -378,7 +443,8 @@ class MyTranslator(Jeanne.Translator):
             "hentai_desc": {
                 "en-GB": "Get a random hentai from Jeanne",
                 "en-US": "Get a random hentai from Jeanne",
-                "fr": "Obtenez un hentai aléatoire de Jeanne", "de": "Holen Sie sich ein zufälliges Hentai von Jeanne",
+                "fr": "Obtenez un hentai aléatoire de Jeanne",
+                "de": "Holen Sie sich ein zufälliges Hentai von Jeanne",
             },
             "yandere_desc": {
                 "en-GB": "Get a random media content from Yandere",
@@ -405,7 +471,12 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Ajoutez votre tags",
                 "de": "Fügen Sie Ihr Tag hinzu",
             },
-            "plus_parm_name": {"en-GB": "plus", "en-US": "plus", "fr": "plus", "de": "plus"},
+            "plus_parm_name": {
+                "en-GB": "plus",
+                "en-US": "plus",
+                "fr": "plus",
+                "de": "plus",
+            },
             "plus_parm_desc": {
                 "en-GB": "Need more content? (up to 4)",
                 "en-US": "Need more content? (up to 4)",
@@ -423,629 +494,797 @@ class MyTranslator(Jeanne.Translator):
                 "en-GB": "Get a random kitsune image",
                 "en-US": "Get a random kitsune image",
                 "fr": "Obtenez une image de kitsune aléatoire",
+                "de": "Holen Sie sich ein zufälliges Kitsune-Bild",
             },
             "wallpaper_desc": {
                 "en-GB": "Get a random wallpaper for your PC or phone",
                 "en-US": "Get a random wallpaper for your PC or phone",
                 "fr": "Obtenez un fond d'écran aléatoire pour votre PC ou votre téléphone",
+                "de": "Holen Sie sich ein zufälliges Wallpaper für Ihren PC oder Ihr Telefon",
             },
             "jeanne_desc": {
                 "en-GB": "Get a random Jeanne d'Arc image",
                 "en-US": "Get a random Jeanne d'Arc image",
                 "fr": "Obtenez une image de Jeanne d'Arc aléatoire",
+                "de": "Holen Sie sich ein zufälliges Bild von Jeanne d'Arc",
             },
             "saber_desc": {
                 "en-GB": "Get a random Saber image",
                 "en-US": "Get a random Saber image",
                 "fr": "Obtenez une image de Saber aléatoire",
+                "de": "Holen Sie sich ein zufälliges Bild von Saber",
             },
             "neko_desc": {
                 "en-GB": "Get a random neko image",
                 "en-US": "Get a random neko image",
                 "fr": "Obtenez une image de neko aléatoire",
+                "de": "Holen Sie sich ein zufälliges Bild von Neko",
             },
             "medusa_desc": {
                 "en-GB": "Get a random Medusa image",
                 "en-US": "Get a random Medusa image",
                 "fr": "Obtenez une image de Medusa aléatoire",
+                "de": "Holen Sie sich ein zufälliges Bild von Medusa",
             },
             "morgan_desc": {
                 "en-GB": "Get a random image of Morgan Le Fay",
                 "en-US": "Get a random image of Morgan Le Fay",
                 "fr": "Obtenez une image de Morgan Le Fay aléatoire",
+                "de": "Holen Sie sich ein zufälliges Bild von Morgan Le Fay",
             },
             "safebooru_desc": {
                 "en-GB": "Get a random image from Safebooru",
                 "en-US": "Get a random image from Safebooru",
                 "fr": "Obtenez une image aléatoire de Safebooru",
+                "de": "Holen Sie sich ein zufälliges Bild von Safebooru",
             },
             # info commands
-            "stats_name": {"en-GB": "stats", "en-US": "stats", "fr": "stats"},
+            "stats_name": {
+                "en-GB": "stats",
+                "en-US": "stats",
+                "fr": "stats",
+                "de": "stats",
+            },
             "stats_desc": {
                 "en-GB": "See the bot's status from development to now",
                 "en-US": "See the bot's status from development to now",
                 "fr": "Voir le statut du bot depuis le développement jusqu'à maintenant",
+                "de": "Sehen Sie den Status des Bots von der Entwicklung bis jetzt",
             },
             "userinfo_desc": {
                 "en-GB": "See the information of a member or yourself",
                 "en-US": "See the information of a member or yourself",
                 "fr": "Voir les informations d'un membre ou de vous-même",
+                "de": "Sehen Sie die Informationen eines Mitglieds oder von sich selbst",
             },
             "serverinfo_desc": {
                 "en-GB": "Get information about this server",
                 "en-US": "Get information about this server",
                 "fr": "Obtenez des informations sur ce serveur",
+                "de": "Holen Sie sich Informationen über diesen Server",
             },
             "serverbanner_desc": {
                 "en-GB": "Get the server banner",
                 "en-US": "Get the server banner",
                 "fr": "Obtenez la bannière du serveur",
+                "de": "Holen Sie sich die Serverbanner",
             },
             "avatar_desc": {
                 "en-GB": "See your avatar or another member's avatar",
                 "en-US": "See your avatar or another member's avatar",
                 "fr": "Voir votre avatar ou l'avatar d'un autre membre",
+                "de": "Sehen Sie Ihr Avatar oder das Avatar eines anderen Mitglieds",
             },
             "ping_desc": {
                 "en-GB": "Check how fast I respond to a command",
                 "en-US": "Check how fast I respond to a command",
                 "fr": "Vérifiez la rapidité de ma réponse à une commande",
+                "de": "Überprüfen Sie, wie schnell ich auf einen Befehl reagiere",
             },
             "sticker_desc": {
                 "en-GB": "Views a sticker",
                 "en-US": "Views a sticker",
                 "fr": "Voir un sticker",
+                "de": "Sieht sich einen Aufkleber an",
             },
             "welcoming_channel_parm_desc": {
                 "en-GB": "Which channel should welcome new members?",
                 "en-US": "Which channel should welcome new members?",
                 "fr": "Quel canal devrait accueillir les nouveaux membres?",
+                "de": "Welcher Kanal sollte neue Mitglieder willkommen heißen?",
             },
             "leaving_channel_parm_desc": {
                 "en-GB": "Which channel should say goodbye to members?",
                 "en-US": "Which channel should say goodbye to members?",
                 "fr": "Quel canal devrait dire au revoir aux membres?",
+                "de": "Welcher Kanal sollte sich von den Mitgliedern verabschieden?",
             },
             "sticker_parm_desc": {
                 "en-GB": "Insert message ID with the sticker or name of the sticker in the server",
                 "en-US": "Insert message ID with the sticker or name of the sticker in the server",
-                "fr": "Insérez l'ID du message avec l'autocollant ou le nom de l'autocollant dans le serveur",
+                "fr": "Insérez l'ID du message avec sticker ou le nom de sticker dans le serveur",
+                "de": "Fügen Sie die Nachrichten-ID mit dem Aufkleber oder dem Namen des Aufklebers im Server ein",
             },
             "emoji_desc": {
                 "en-GB": "View an emoji",
                 "en-US": "View an emoji",
                 "fr": "Voir un emoji",
+                "de": "Sehen Sie ein Emoji",
             },
             "emoji_parm_desc": {
                 "en-GB": "What is the name of the emoji?",
                 "en-US": "What is the name of the emoji?",
                 "fr": "Quel est le nom de l'emoji?",
+                "de": "Wie heißt das Emoji?",
             },
             # inventory commands
-            "country_name": {"en-GB": "country", "en-US": "country", "fr": "pays"},
+            "country_name": {
+                "en-GB": "country",
+                "en-US": "country",
+                "fr": "pays",
+                "de": "land",
+            },
             "country_desc": {
                 "en-GB": "Buy a country badge",
                 "en-US": "Buy a country badge",
                 "fr": "Acheter un badge de pays",
+                "de": "Kaufen Sie ein Länderabzeichen",
             },
             "backgrounds_name": {
                 "en-GB": "backgrounds",
                 "en-US": "backgrounds",
                 "fr": "backgrounds",
+                "de": "hintergründe",
             },
             "backgrounds_desc": {
                 "en-GB": "Check all the wallpapers available",
                 "en-US": "Check all the wallpapers available",
                 "fr": "Vérifiez tous les fonds d'écran disponibles",
+                "de": "Überprüfen Sie alle verfügbaren Hintergründe",
             },
             "buy-custom_desc": {
                 "en-GB": "Buy a custom background pic for your level card",
                 "en-US": "Buy a custom background pic for your level card",
                 "fr": "Acheter une image d'arrière-plan personnalisée pour votre carte de niveau",
+                "de": "Kaufen Sie ein benutzerdefiniertes Hintergrundbild für Ihre Levelkarte",
             },
-            "list_name": {"en-GB": "list", "en-US": "list", "fr": "liste"},
+            "list_name": {
+                "en-GB": "list",
+                "en-US": "list",
+                "fr": "liste",
+                "de": "liste",
+            },
             "list_desc": {
                 "en-GB": "Check which backgrounds you have",
                 "en-US": "Check which backgrounds you have",
                 "fr": "Vérifiez quels fonds d'écran vous avez",
+                "de": "Überprüfen Sie, welche Hintergründe Sie haben",
             },
-            "link_parm_name": {"en-GB": "link", "en-US": "link", "fr": "lien"},
+            "link_parm_name": {
+                "en-GB": "link",
+                "en-US": "link",
+                "fr": "lien",
+                "de": "link",
+            },
             "link_parm_desc": {
                 "en-GB": "Add an image link",
                 "en-US": "Add an image link",
                 "fr": "Ajouter un lien d'image",
+                "de": "Fügen Sie einen Bildlink hinzu",
             },
             # levelling commands
             "global_desc": {
                 "en-GB": "Check the users with the most XP globally",
                 "en-US": "Check the users with the most XP globally",
                 "fr": "Vérifiez les utilisateurs avec le plus d'XP au niveau mondial",
+                "de": "Überprüfen Sie die Benutzer mit den meisten XP weltweit",
             },
             "server_desc": {
                 "en-GB": "Check the users with the most XP in the server",
                 "en-US": "Check the users with the most XP in the server",
                 "fr": "Vérifiez les utilisateurs avec le plus d'XP sur le serveur",
+                "de": "Überprüfen Sie die Benutzer mit den meisten XP auf dem Server",
             },
-            "profile_name": {"en-GB": "profile", "en-US": "profile", "fr": "profil"},
+            "profile_name": {
+                "en-GB": "profile",
+                "en-US": "profile",
+                "fr": "profil",
+                "de": "profil",
+            },
             "profile_desc": {
                 "en-GB": "See your profile or someone else's profile",
                 "en-US": "See your profile or someone else's profile",
                 "fr": "Voir votre profil ou celui de quelqu'un d'autre",
+                "de": "Sehen Sie Ihr Profil oder das Profil eines anderen",
             },
             "textchannel_name": {
                 "en-GB": "textchannel",
                 "en-US": "textchannel",
-                "fr": "canal_texte",
+                "fr": "canaltexte",
+                "de": "textkanal",
             },
-            "create": {"en-GB": "create", "en-US": "create", "fr": "créer"},
+            "create": {
+                "en-GB": "create",
+                "en-US": "create",
+                "fr": "créer",
+                "de": "erstellen",
+            },
             "create textchannel_name": {
                 "en-GB": "create textchannel",
                 "en-US": "create textchannel",
-                "fr": "créer un canal texte",
+                "fr": "créer canal texte",
+                "de": "erstellen textkanal",
             },
             "create voicechannel_name": {
                 "en-GB": "create voicechannel",
                 "en-US": "create voicechannel",
-                "fr": "créer un canal vocal",
+                "fr": "créer canal vocal",
+                "de": "erstellen sprachkanal",
             },
             "create category_name": {
                 "en-GB": "create category",
                 "en-US": "create category",
                 "fr": "créer une catégorie",
+                "de": "erstellen kategorie",
             },
             "create stagechannel_name": {
                 "en-GB": "create stagechannel",
                 "en-US": "create stagechannel",
                 "fr": "créer stagechannel",
+                "de": "erstellen bühnenkanal",
             },
             "create forum_name": {
                 "en-GB": "create forum",
                 "en-US": "create forum",
                 "fr": "créer forum",
+                "de": "erstellen forum",
             },
             "role_parm_name": {
                 "en-GB": "role",
                 "en-US": "role",
                 "fr": "rôle",
+                "de": "rolle",
             },
             "description_parm_name": {
                 "en-GB": "description",
                 "en-US": "description",
                 "fr": "description",
+                "de": "beschreibung",
             },
             "create role_name": {
                 "en-GB": "create role",
                 "en-US": "create role",
                 "fr": "créer rôle",
+                "de": "rolle erstellen",
             },
             "create thread": {
                 "en-GB": "create thread",
                 "en-US": "create thread",
                 "fr": "créer thread",
+                "de": "thread erstellen",
             },
             "create thread public_thread_name": {
                 "en-GB": "create thread public",
                 "en-US": "create thread public",
                 "fr": "créer thread public",
+                "de": "öffentlichen thread erstellen",
             },
             "create thread private_thread_name": {
                 "en-GB": "create thread private",
                 "en-US": "create thread private",
                 "fr": "créer thread privé",
+                "de": "privaten thread erstellen",
             },
             "create emoji_name": {
                 "en-GB": "create emoji",
                 "en-US": "create emoji",
                 "fr": "créer emoji",
+                "de": "emoji erstellen",
             },
             "create sticker_name": {
                 "en-GB": "create sticker",
                 "en-US": "create sticker",
                 "fr": "créer sticker",
+                "de": "sticker erstellen",
             },
             "textchannel_description": {
                 "en-GB": "Create a text channel",
                 "en-US": "Create a text channel",
-                "fr": "Créer un canal texte",
+                "fr": "Créer canal texte",
+                "de": "Textkanal erstellen",
             },
             "topic_parm_name": {"en-GB": "topic", "en-US": "topic", "fr": "sujet"},
             "topic_parm_desc": {
                 "en-GB": "What is the channel topic?",
                 "en-US": "What is the channel topic?",
                 "fr": "Quel est le sujet du canal?",
+                "de": "Was ist das Kanalthema?",
             },
             "category_parm_name": {
                 "en-GB": "category",
                 "en-US": "category",
                 "fr": "catégorie",
+                "de": "kategorie",
             },
             "category_parm_desc": {
                 "en-GB": "Place in which category?",
                 "en-US": "Place in which category?",
                 "fr": "Dans quelle catégorie?",
+                "de": "In welcher Kategorie?",
             },
             "rename_category_parm_desc": {
                 "en-GB": "Which category?",
                 "en-US": "Which category?",
                 "fr": "Quelle catégorie?",
+                "de": "Welche Kategorie?",
             },
             "slowmode_parm_name": {
                 "en-GB": "slowmode",
                 "en-US": "slowmode",
                 "fr": "slowmode",
+                "de": "slowmode",
             },
             "slowmode_parm_desc": {
                 "en-GB": "What is the slowmode (1h, 30m, etc) (Max is 6 hours)",
                 "en-US": "What is the slowmode (1h, 30m, etc) (Max is 6 hours)",
                 "fr": "Quel est le mode lent (1h, 30m, etc) (Max est de 6 heures)",
+                "de": "Was ist der langsame Modus (1h, 30m usw.) (Maximal 6 Stunden)",
             },
             "nsfw_parm_name": {
                 "en-GB": "nsfw_enabled",
                 "en-US": "nsfw_enabled",
                 "fr": "nsfw_activé",
+                "de": "nsfw_aktiviert",
             },
             "nsfw_parm_desc": {
                 "en-GB": "Should it be an NSFW channel?",
                 "en-US": "Should it be an NSFW channel?",
                 "fr": "Doit-il s'agir d'un canal NSFW?",
+                "de": "Soll es ein NSFW-Kanal sein?",
             },
             "voicechannel_description": {
                 "en-GB": "Create a voice channel",
                 "en-US": "Create a voice channel",
                 "fr": "Créer un canal vocal",
+                "de": "Erstellen Sprachkanal",
             },
             "add_blacklist_ch_description": {
                 "en-GB": "Blacklists a channel for gaining XP",
                 "en-US": "Blacklists a channel for gaining XP",
                 "fr": "Met en liste noire un canal pour gagner de l'XP",
+                "de": "Schwarze Liste einen Kanal für den XP-Gewinn",
             },
             "clone_channel_desc": {
                 "en-GB": "Clone a channel",
                 "en-US": "Clone a channel",
                 "fr": "Cloner un canal",
+                "de": "Kanal klonen",
             },
-            "clone_channel_name": {"en-GB": "clone", "en-US": "clone", "fr": "cloner"},
+            "clone_channel_name": {
+                "en-GB": "clone",
+                "en-US": "clone",
+                "fr": "cloner",
+                "de": "klonen",
+            },
             "voicechannel_name": {
                 "en-GB": "voicechannel",
                 "en-US": "voicechannel",
-                "fr": "canal_vocal",
+                "fr": "canalvocal",
+                "de": "sprachkanal",
             },
             "category_name": {
                 "en-GB": "category",
                 "en-US": "category",
                 "fr": "catégorie",
+                "de": "kategorie",
             },
             "stagechannel_name": {
                 "en-GB": "stagechannel",
                 "en-US": "stagechannel",
-                "fr": "canal_scène",
+                "fr": "canalscène",
+                "de": "bühnenkanal",
             },
-            "forum_name": {"en-GB": "forum", "en-US": "forum", "fr": "forum"},
-            "role_name": {"en-GB": "role", "en-US": "role", "fr": "rôle"},
+            "forum_name": {
+                "en-GB": "forum",
+                "en-US": "forum",
+                "fr": "forum",
+                "de": "forum",
+            },
+            "role_name": {
+                "en-GB": "role",
+                "en-US": "role",
+                "fr": "rôle",
+                "de": "rolle",
+            },
             "public_thread_name": {
                 "en-GB": "public-thread",
                 "en-US": "public-thread",
                 "fr": "fil-public",
+                "de": "öffentlicher-thread",
             },
             "private_thread_name": {
                 "en-GB": "private-thread",
                 "en-US": "private-thread",
                 "fr": "fil-privé",
+                "de": "privater-thread",
             },
             "delete_channel_name": {
                 "en-GB": "channel",
                 "en-US": "channel",
                 "fr": "canal",
+                "de": "kanal",
             },
             "delete_role_name": {
                 "en-GB": "role",
                 "en-US": "role",
                 "fr": "rôle",
+                "de": "rolle",
             },
             "delete_emoji_name": {
                 "en-GB": "emoji",
                 "en-US": "emoji",
                 "fr": "emoji",
+                "de": "emoji",
             },
             "delete_sticker_name": {
                 "en-GB": "sticker",
                 "en-US": "sticker",
-                "fr": "autocollant",
+                "fr": "sticker",
+                "de": "sticker",
             },
             "edit_textchannel_name": {
                 "en-GB": "textchannel",
                 "en-US": "textchannel",
-                "fr": "canal-texte",
+                "fr": "canaltexte",
+                "de": "textkanal",
             },
             "edit_voicechannel_name": {
-                "en-GB": "voice-channel",
-                "en-US": "voice-channel",
-                "fr": "canal-vocal",
+                "en-GB": "voicechannel",
+                "en-US": "voicechannel",
+                "fr": "canalvocal",
+                "de": "sprachkanal",
             },
             "edit_role_name": {
                 "en-GB": "role",
                 "en-US": "role",
                 "fr": "rôle",
+                "de": "rolle",
             },
             "edit_server_name": {
                 "en-GB": "server",
                 "en-US": "server",
                 "fr": "serveur",
+                "de": "server",
             },
             "set_welcomer_name": {
                 "en-GB": "welcomer",
                 "en-US": "welcomer",
                 "fr": "accueil",
+                "de": "willkommensnachricht",
             },
             "set_modlog_name": {
                 "en-GB": "modlog",
                 "en-US": "modlog",
                 "fr": "journal-mod",
+                "de": "modlog",
             },
             "set_welcomingmsg_name": {
                 "en-GB": "welcomingmsg",
                 "en-US": "welcomingmsg",
                 "fr": "message-accueil",
+                "de": "welcomingmsg",
             },
             "set_leavingmsg_name": {
                 "en-GB": "leavingmsg",
                 "en-US": "leavingmsg",
                 "fr": "message-départ",
+                "de": "leavingmsg"
             },
             "set_rolereward_message_name": {
                 "en-GB": "rolereward-message",
                 "en-US": "rolereward-message",
                 "fr": "message-récompense-rôle",
+                "de": "rolereward-message"
             },
             "set_levelupdate_name": {
                 "en-GB": "levelupdate",
                 "en-US": "levelupdate",
                 "fr": "niveau-mise-à-jour",
+                "de": "levelupdate"
             },
             "set_confessionchannel_name": {
                 "en-GB": "confession-channel",
                 "en-US": "confession-channel",
                 "fr": "canal-confession",
+                "de": "geständnis-kanal"
             },
             "set_confessionchannel_desc": {
                 "en-GB": "Set the channel for confessions",
                 "en-US": "Set the channel for confessions",
                 "fr": "Définir le canal pour les confessions",
+                "de": "Den Kanal für Geständnisse festlegen",
             },
             "set_brightness_name": {
                 "en-GB": "profile-brightness",
                 "en-US": "profile-brightness",
                 "fr": "profile-luminosité",
+                "de": "profil-helligkeit"
             },
             "set_bio_name": {
                 "en-GB": "profile-bio",
                 "en-US": "profile-bio",
                 "fr": "profile-bio",
+                "de": "profil-bio",
             },
             "set_color_name": {
                 "en-GB": "profile-color",
                 "en-US": "profile-color",
                 "fr": "profile-couleur",
+                "de": "profil-farbe"
             },
             "add_role_name": {
                 "en-GB": "add-role",
                 "en-US": "add-role",
                 "fr": "ajouter-rôle",
+                "de": "rolle-hinzufügen"
             },
             "remove_role_name": {
                 "en-GB": "remove-role",
                 "en-US": "remove-role",
                 "fr": "supprimer-rôle",
+                "de": "rolle-entfernen"
             },
             "edit edit_textchannel_name": {
                 "en-GB": "edit textchannel",
                 "en-US": "edit textchannel",
                 "fr": "modifier canaltexte",
+                "de": "textkanal-bearbeiten"
             },
             "edit edit_voicechannel_name": {
                 "en-GB": "edit voicechannel",
                 "en-US": "edit voicechannel",
                 "fr": "modifier canalvocal",
+                "de": "stimmenkanal-bearbeiten"
             },
             "edit edit_role_name": {
                 "en-GB": "edit role",
                 "en-US": "edit role",
                 "fr": "modifier rôle",
+                "de": "rolle-bearbeiten"
             },
             "edit edit_server_name": {
                 "en-GB": "edit server",
                 "en-US": "edit server",
                 "fr": "modifier serveur",
+                "de": "server-bearbeiten"
             },
             "delete delete_channel_name": {
                 "en-GB": "delete channel",
                 "en-US": "delete channel",
                 "fr": "supprimer canal",
+                "de": "kanal-löschen"
             },
             "delete delete_role_name": {
                 "en-GB": "delete role",
                 "en-US": "delete role",
                 "fr": "supprimer rôle",
+                "de": "rolle-löschen"
             },
             "delete delete_emoji_name": {
                 "en-GB": "delete emoji",
                 "en-US": "delete emoji",
                 "fr": "supprimer emoji",
+                "de": "emoji-löschen"
             },
             "delete delete_sticker_name": {
                 "en-GB": "delete sticker",
                 "en-US": "delete sticker",
                 "fr": "supprimer sticker",
+                "de": "sticker-löschen"
             },
             "set": {
                 "en-GB": "set",
                 "en-US": "set",
                 "fr": "définir",
+                "de": "festlegen"
             },
             "set set_welcomer_name": {
                 "en-GB": "set welcomer",
                 "en-US": "set welcomer",
                 "fr": "définir accueil",
+                "de": "festlegen begrüßer"
             },
             "set set_modlog_name": {
                 "en-GB": "set modlog",
                 "en-US": "set modlog",
                 "fr": "définir modlog",
+                "de": "festlegen modlog"
             },
             "set set_welcomingmsg_name": {
                 "en-GB": "set welcomingmsg",
                 "en-US": "set welcomingmsg",
                 "fr": "définir welcomingmsg",
+                "de": "festlegen welcomingmsg"
             },
             "set set_leavingmsg_name": {
                 "en-GB": "set leavingmsg",
                 "en-US": "set leavingmsg",
                 "fr": "définir leavingmsg",
+                "de": "festlegen leavingmsg"
             },
             "set set_rolereward_message_name": {
                 "en-GB": "set rolereward message",
                 "en-US": "set rolereward message",
                 "fr": "définir rolereward message",
+                "de": "festlegen rolereward message"
             },
             "set set_levelupdate_name": {
                 "en-GB": "set levelupdate",
                 "en-US": "set levelupdate",
                 "fr": "définir levelupdate",
+                "de": "festlegen levelupdate"
             },
             "set set_confessionchannel_name": {
                 "en-GB": "set confession-channel",
                 "en-US": "set confession-channel",
                 "fr": "définir confession-channel",
+                "de": "festlegen confession-channel"
             },
             "set set_brightness_name": {
                 "en-GB": "set profile-brightness",
                 "en-US": "set profile-brightness",
                 "fr": "définir profile-luminosité",
+                "de": "festlegen profil-helligkeit"
             },
             "set_color_description": {
                 "en-GB": "Set your profile color",
                 "en-US": "Set your profile color",
                 "fr": "Définir votre profile couleur",
+                "de": "Festlegen Ihres Profilfarbtons"
             },
             "set set_bio_name": {
                 "en-GB": "set profile-bio",
                 "en-US": "set profile-bio",
                 "fr": "définir profile-bio",
+                "de": "festlegen profil-bio"
             },
             "set set_color_name": {
                 "en-GB": "set profile-color",
                 "en-US": "set profile-color",
                 "fr": "définir profile-couleur",
+                "de": "festlegen profil-farbe"
             },
             "rename": {
                 "en-GB": "rename",
                 "en-US": "rename",
                 "fr": "renommer",
+                "de": "umbenennen"
             },
             "rename rename_emoji_name": {
                 "en-GB": "rename emoji",
                 "en-US": "rename emoji",
                 "fr": "renommer emoji",
+                "de": "umbenennen emoji"
             },
             "rename rename_category_name": {
                 "en-GB": "rename category",
                 "en-US": "rename category",
                 "fr": "renommer catégorie",
+                "de": "umbenennen kategorie"
             },
             "rename rename_sticker_name": {
                 "en-GB": "rename sticker",
                 "en-US": "rename sticker",
                 "fr": "renommer sticker",
+                "de": "umbenennen sticker"
             },
             "command": {
                 "en-GB": "command",
                 "en-US": "command",
                 "fr": "commande",
+                "de": "befehl"
             },
             "command disable_command_name": {
                 "en-GB": "disable command",
                 "en-US": "disable command",
                 "fr": "désactiver commande",
+                "de": "befehl deaktivieren"
             },
             "command enable_command_name": {
                 "en-GB": "enable command",
                 "en-US": "enable command",
                 "fr": "activer commande",
+                "de": "befehl aktivieren"
             },
             "command list_disabled_commands_name": {
                 "en-GB": "list disabled commands",
                 "en-US": "list disabled commands",
                 "fr": "lister commandes désactivées",
+                "de": "liste deaktivierten befehle"
             },
             "level role_reward_group_name add_role_reward_name": {
                 "en-GB": "add role reward",
                 "en-US": "add role reward",
                 "fr": "ajouter role reward",
+                "de": "rollenbelohnung hinzufügen"
             },
             "level role_reward_group_name remove_role_reward_name": {
                 "en-GB": "remove role reward",
                 "en-US": "remove role reward",
                 "fr": "supprimer role reward",
+                "de": "rollenbelohnung entfernen"
             },
             "level role_reward_group_name list_role_rewards_name": {
                 "en-GB": "list role rewards",
                 "en-US": "list role rewards",
                 "fr": "lister role rewards",
+                "de": "liste rollenbelohnungen"
             },
             "level blacklist_channel_group_name add_blacklist_channel_name": {
                 "en-GB": "add blacklist channel",
                 "en-US": "add blacklist channel",
                 "fr": "ajouter blacklist canal",
+                "de": "schwarzen kanal hinzufügen"
             },
             "level blacklist_channel_group_name remove_blacklist_channel_name": {
                 "en-GB": "remove blacklist channel",
                 "en-US": "remove blacklist channel",
                 "fr": "supprimer blacklist canal",
+                "de": "schwarzen kanal entfernen",
             },
             "level blacklist_channel_group_name list_blacklist_channels_name": {
                 "en-GB": "list blacklist channels",
                 "en-US": "list blacklist channels",
                 "fr": "lister canaux liste noire",
+                "de": "liste schwarzer kanäle"
             },
             "embed generate_name": {
                 "en-GB": "embed generate",
                 "en-US": "embed generate",
                 "fr": "embed générer",
+                "de": "embed generieren",
             },
             "embed edit_name": {
                 "en-GB": "embed edit",
                 "en-US": "embed edit",
                 "fr": "embed modifier",
+                "de": "embed bearbeiten",
             },
             "weather_name": {
                 "en-GB": "weather",
                 "en-US": "weather",
                 "fr": "météo",
+                "de": "wetter",
             },
             "calculator_name": {
                 "en-GB": "calculator",
                 "en-US": "calculator",
                 "fr": "calculatrice",
+                "de": "rechner",
             },
             "invite_name": {
                 "en-GB": "invite",
                 "en-US": "invite",
                 "fr": "inviter",
+                "de": "einladen"
             },
             "botreport_name": {
                 "en-GB": "botreport",
                 "en-US": "botreport",
                 "fr": "rapportbot",
+                "de": "botbericht"
             },
             "reminder": {
                 "en-GB": "reminder",
                 "en-US": "reminder",
                 "fr": "rappel",
+                "de": "erinnerung"
             },
             "reminder reminder_add_name": {
                 "en-GB": "reminder add",
                 "en-US": "reminder add",
                 "fr": "rappel ajouter",
+                "de": "erinnerung hinzufügen"
             },
             "reminder reminder_list_name": {
                 "en-GB": "reminder list",
