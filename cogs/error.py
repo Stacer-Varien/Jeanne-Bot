@@ -6,6 +6,7 @@ from discord.ext.commands import Bot, Cog
 import pandas as pd
 import languages.en.error as en
 import languages.fr.error as fr
+import languages.de.error as de
 
 
 class ErrorsCog(Cog, name="ErrorsSlash"):
@@ -42,24 +43,38 @@ class ErrorsCog(Cog, name="ErrorsSlash"):
         if isinstance(error, Jeanne.MissingPermissions):
             if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
                 await en.Errors.handle_missing_permissions(self, ctx, error)
-            elif ctx.locale.value == "fr":
+                return
+            if ctx.locale.value == "fr":
                 await fr.Errors.handle_missing_permissions(self, ctx, error)
-        elif isinstance(error, Jeanne.BotMissingPermissions):
+                return
+            if ctx.locale.value == "de":
+                await de.Errors.handle_missing_permissions(self, ctx, error)
+                return
+            return
+        if isinstance(error, Jeanne.BotMissingPermissions):
             if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
                 await en.Errors.handle_bot_missing_permissions(self, ctx, error)
-            elif ctx.locale.value == "fr":
+                return
+            if ctx.locale.value == "fr":
                 await fr.Errors.handle_bot_missing_permissions(self, ctx, error)
-        elif isinstance(error, Jeanne.NoPrivateMessage):
+                return
+            if ctx.locale.value == "de":
+                await de.Errors.handle_bot_missing_permissions(self, ctx, error)
+                return
+            return
+        if isinstance(error, Jeanne.NoPrivateMessage):
             embed = Embed(description=str(error), color=Color.red())
             await ctx.response.send_message(embed=embed)
-        elif isinstance(error, Jeanne.CommandInvokeError) and isinstance(
+            return
+        if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, RuntimeError
         ):
             if ctx.command.qualified_name == "help command":
                 return
             embed = Embed(description=str(error), color=Color.red())
             await ctx.response.send_message(embed=embed)
-        elif isinstance(error, Jeanne.CommandOnCooldown):
+            return
+        if isinstance(error, Jeanne.CommandOnCooldown):
             pass
 
 
