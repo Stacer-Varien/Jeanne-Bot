@@ -19,7 +19,7 @@ import languages.fr.currency as fr
 import languages.de.currency as de
 from discord.app_commands import locale_str as T
 
-# de = dutch and translate to dutch
+
 
 class vote_button(ui.View):
     def __init__(self):

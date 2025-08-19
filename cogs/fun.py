@@ -9,9 +9,10 @@ from assets.images import get_animeme_pic
 from typing import Optional
 import languages.en.fun as en
 import languages.fr.fun as fr
+import languages.de.fun as de
 from discord.app_commands import locale_str as T
 
-
+# de = dutch and translate to dutch
 class fun(Cog, name="FunSlash"):
     def __init__(self, bot: Bot):
         self.bot = bot
@@ -42,6 +43,17 @@ class fun(Cog, name="FunSlash"):
                     }
                 ],
             },
+            "de": {
+                "name": "8ball",
+                "description": "Fragen Sie 8 Ball alles und Sie erhalten Ihre Antwort",
+                "parameters": [
+                    {
+                        "name": "question",
+                        "description": "Die Frage, die Sie 8 Ball stellen möchten",
+                        "required": True,
+                    }
+                ],
+            },
         },
     )
     @Jeanne.describe(question=T("question_parm_desc"))
@@ -51,9 +63,11 @@ class fun(Cog, name="FunSlash"):
     @Jeanne.check(is_suspended)
     async def _8ball(self, ctx: Interaction, question: str):
         if ctx.locale.value == "fr":
-            await fr.fun(self.bot)._8ball(ctx, question)        
-        else:
-            await en.fun(self.bot)._8ball(ctx, question)
+            await fr.fun(self.bot)._8ball(ctx, question) 
+            return
+        if ctx.locale.value == "de":
+            await de.fun(self.bot)._8ball(ctx, question)      
+        await en.fun(self.bot)._8ball(ctx, question)
 
     @Jeanne.command(
         name=T("reverse_name"),
@@ -81,6 +95,17 @@ class fun(Cog, name="FunSlash"):
                     }
                 ],
             },
+            "de": {
+                "name": "inverse",
+                "description": "Sagen Sie etwas und ich werde es in umgekehrtem Text sagen",
+                "parameters": [
+                    {
+                        "name": "text",
+                        "description": "Was möchten Sie umkehren?",
+                        "required": True,
+                    }
+                ],
+            },
         },
     )
     @Jeanne.describe(text=T("text_parm_desc"))
@@ -91,8 +116,11 @@ class fun(Cog, name="FunSlash"):
     async def reverse(self, ctx: Interaction, text: str):
         if ctx.locale.value == "fr":
             await fr.fun(self.bot).reverse(ctx, text)
-        else:
-            await en.fun(self.bot).reverse(ctx, text)
+            return
+        if ctx.locale.value == "de":
+            await de.fun(self.bot).reverse(ctx, text)
+            return
+        await en.fun(self.bot).reverse(ctx, text)
 
     @Jeanne.command(
         description=T("animeme_desc"),
@@ -102,6 +130,10 @@ class fun(Cog, name="FunSlash"):
                 "name": "animeme",
                 "description": "Obtenez un animeme aléatoire",
             },
+            "de": {
+                "name": "animeme",
+                "description": "Holen Sie sich ein zufälliges Animeme",
+            }
         },
     )
     @Jeanne.check(check_botbanned_app_command)
@@ -148,6 +180,22 @@ class fun(Cog, name="FunSlash"):
                     },
                 ],
             },
+            "de": {
+                "name": "kombinieren",
+                "description": "Kombinieren Sie zwei Wörter zu einem",
+                "parameters": [
+                    {
+                        "name": "erstes_wort",
+                        "description": "Das erste Wort zum Kombinieren",
+                        "required": True,
+                    },
+                    {
+                        "name": "zweites_wort",
+                        "description": "Das zweite Wort zum Kombinieren",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(
@@ -162,8 +210,11 @@ class fun(Cog, name="FunSlash"):
     async def combine(self, ctx: Interaction, first_word: str, second_word: str):
         if ctx.locale.value == "fr":
             await fr.fun(self.bot).combine(ctx, first_word, second_word)
-        else:
-            await en.fun(self.bot).combine(ctx, first_word, second_word)
+            return
+        if ctx.locale.value == "de":
+            await de.fun(self.bot).combine(ctx, first_word, second_word)
+            return
+        await en.fun(self.bot).combine(ctx, first_word, second_word)
 
     @Jeanne.command(
         name=T("choose_name"),
@@ -191,6 +242,17 @@ class fun(Cog, name="FunSlash"):
                     }
                 ],
             },
+            "de": {
+                "name": "wählen",
+                "description": "Geben Sie mir viele Optionen und ich wähle eine für Sie aus",
+                "parameters": [
+                    {
+                        "name": "auswahl",
+                        "description": "Fügen Sie hier Ihre Auswahl hinzu. Trennen Sie sie mit ','",
+                        "required": True,
+                    }
+                ],
+            },
         },
     )
     @Jeanne.describe(choices=T("choices_parm_desc"))
@@ -201,8 +263,11 @@ class fun(Cog, name="FunSlash"):
     async def choose(self, ctx: Interaction, choices: str):
         if ctx.locale.value == "fr":
             await fr.fun(self.bot).choose(ctx, choices)
-        else:
-            await en.fun(self.bot).choose(ctx, choices)
+            return
+        if ctx.locale.value == "de":
+            await de.fun(self.bot).choose(ctx, choices)
+            return
+        await en.fun(self.bot).choose(ctx, choices)
 
     @Jeanne.command(
         description=T("simprate_desc"),
@@ -229,6 +294,17 @@ class fun(Cog, name="FunSlash"):
                     }
                 ],
             },
+            "de": {
+                "name": "simprate",
+                "description": "Holen Sie sich eine zufällige Simp-Bewertung für Sie oder jemand anderen",
+                "parameters": [
+                    {
+                        "name": "mitglied",
+                        "description": "Welches Mitglied?",
+                        "required": False,
+                    }
+                ],
+            },
         },
     )
     @Jeanne.describe(member=T("member_parm_desc"))
@@ -239,8 +315,11 @@ class fun(Cog, name="FunSlash"):
     async def simprate(self, ctx: Interaction, member: Optional[Member] = None):
         if ctx.locale.value == "fr":
             await fr.fun(self.bot).simprate(ctx, member)
-        else:
-            await en.fun(self.bot).simprate(ctx, member)
+            return
+        if ctx.locale.value == "de":
+            await de.fun(self.bot).simprate(ctx, member)
+            return
+        await en.fun(self.bot).simprate(ctx, member)
 
     @Jeanne.command(
         description=T("gayrate_desc"),
@@ -267,6 +346,17 @@ class fun(Cog, name="FunSlash"):
                     }
                 ],
             },
+            "de": {
+                "name": "gayrate",
+                "description": "Holen Sie sich eine zufällige Gay-Bewertung für Sie oder jemand anderen",
+                "parameters": [
+                    {
+                        "name": "mitglied",
+                        "description": "Welches Mitglied?",
+                        "required": False,
+                    }
+                ],
+            },
         },
     )
     @Jeanne.describe(member=T("member_parm_desc"))
@@ -277,8 +367,11 @@ class fun(Cog, name="FunSlash"):
     async def gayrate(self, ctx: Interaction, member: Optional[Member] = None):
         if ctx.locale.value == "fr":
             await fr.fun(self.bot).gayrate(ctx, member)
-        else:
-            await en.fun(self.bot).gayrate(ctx, member)
+            return
+        if ctx.locale.value == "de":
+            await de.fun(self.bot).gayrate(ctx, member)
+            return
+        await en.fun(self.bot).gayrate(ctx, member)
 
 
 async def setup(bot: Bot):
