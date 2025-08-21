@@ -23,6 +23,7 @@ from functions import (
 from discord.app_commands import locale_str as T
 import languages.en.manage as en
 import languages.fr.manage as fr
+import languages.de.manage as de
 
 
 class Create_Group(GroupCog, name=T("create")):
@@ -100,14 +101,40 @@ class Create_Group(GroupCog, name=T("create")):
                     },
                 ],
             },
+            "de": {
+                "bot_perms": "Kanäle verwalten",
+                "member_perms": "Kanäle verwalten",
+                "name": "Textkanal erstellen",
+                "description": "Einen Textkanal erstellen",
+                "parameters": [
+                    {
+                        "name": "Name",
+                        "description": "Wie werden Sie ihn nennen?",
+                        "required": False,
+                    },
+                    {
+                        "name": "Thema",
+                        "description": "Was ist das Thema des Kanals?",
+                        "required": False,
+                    },
+                    {
+                        "name": "Kategorie",
+                        "description": "In welcher Kategorie?",
+                        "required": False,
+                    },
+                    {
+                        "name": "Slowmode",
+                        "description": "Was ist der Slowmode (1h, 30m, etc.) (Max 6 Stunden)",
+                        "required": False,
+                    },
+                    {
+                        "name": "NSFW aktiviert",
+                        "description": "Soll es ein NSFW-Kanal sein?",
+                        "required": False,
+                    },
+                ],
+            },
         },
-    )
-    @Jeanne.describe(
-        name=T("name_parm_desc"),
-        topic=T("topic_parm_desc"),
-        category=T("category_parm_desc"),
-        slowmode=T("slowmode_parm_desc"),
-        nsfw_enabled=T("nsfw_parm_desc"),
     )
     @Jeanne.rename(
         name=T("name_parm_name"),
@@ -136,6 +163,10 @@ class Create_Group(GroupCog, name=T("create")):
             )
         elif ctx.locale.value == "fr":
             await fr.Create_Group(self.bot).textchannel(
+                ctx, name, topic, category, slowmode, nsfw_enabled
+            )
+        elif ctx.locale.value == "de":
+            await de.Create_Group(self.bot).textchannel(
                 ctx, name, topic, category, slowmode, nsfw_enabled
             )
 
@@ -189,6 +220,39 @@ class Create_Group(GroupCog, name=T("create")):
                     },
                 ],
             },
+            "de": {
+                "bot_perms": "Kanäle verwalten",
+                "member_perms": "Kanäle verwalten",
+                "name": "Textkanal erstellen",
+                "description": "Einen Textkanal erstellen",
+                "parameters": [
+                    {
+                        "name": "Name",
+                        "description": "Wie werden Sie ihn nennen?",
+                        "required": False,
+                    },
+                    {
+                        "name": "Thema",
+                        "description": "Was ist das Thema des Kanals?",
+                        "required": False,
+                    },
+                    {
+                        "name": "Kategorie",
+                        "description": "In welcher Kategorie?",
+                        "required": False,
+                    },
+                    {
+                        "name": "Slowmode",
+                        "description": "Was ist der Slowmode (1h, 30m, etc.) (Max 6 Stunden)",
+                        "required": False,
+                    },
+                    {
+                        "name": "NSFW aktiviert",
+                        "description": "Soll es ein NSFW-Kanal sein?",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(
@@ -217,6 +281,8 @@ class Create_Group(GroupCog, name=T("create")):
             await en.Create_Group(self.bot).voicechannel(ctx, name, category, users)
         elif ctx.locale.value == "fr":
             await fr.Create_Group(self.bot).voicechannel(ctx, name, category, users)
+        elif ctx.locale.value == "de":
+            await de.Create_Group(self.bot).voicechannel(ctx, name, category, users)
 
     @Jeanne.command(
         name=T("category_name"),
@@ -248,6 +314,19 @@ class Create_Group(GroupCog, name=T("create")):
                     },
                 ],
             },
+            "de": {
+                "bot_perms": "Kanäle verwalten",
+                "member_perms": "Kanäle verwalten",
+                "name": "Kategorie erstellen",
+                "description": "Eine Kategorie erstellen",
+                "parameters": [
+                    {
+                        "name": "Name",
+                        "description": "Wie werden Sie ihn nennen?",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(name=T("name_parm_desc"))
@@ -262,6 +341,8 @@ class Create_Group(GroupCog, name=T("create")):
             await en.Create_Group(self.bot).category(ctx, name)
         elif ctx.locale.value == "fr":
             await fr.Create_Group(self.bot).category(ctx, name)
+        elif ctx.locale.value == "de":
+            await de.Create_Group(self.bot).category(ctx, name)
 
     @Jeanne.command(
         name=T("stagechannel_name"),
@@ -313,6 +394,29 @@ class Create_Group(GroupCog, name=T("create")):
                     },
                 ],
             },
+            "de": {
+                "bot_perms": "Kanäle verwalten",
+                "member_perms": "Kanäle verwalten",
+                "name": "Stimmkanal erstellen",
+                "description": "Einen Stimmkanal erstellen",
+                "parameters": [
+                    {
+                        "name": "Name",
+                        "description": "Wie werden Sie ihn nennen?",
+                        "required": True,
+                    },
+                    {
+                        "name": "Kategorie",
+                        "description": "In welcher Kategorie?",
+                        "required": False,
+                    },
+                    {
+                        "name": "Nutzer",
+                        "description": "Wie viele Nutzer können beitreten? (Max 10000)",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(
@@ -322,7 +426,7 @@ class Create_Group(GroupCog, name=T("create")):
     @Jeanne.rename(
         name=T("name_parm_name"),
         category=T("category_parm_name"),
-        users=T("users_parm_name")
+        users=T("users_parm_name"),
     )
     @Jeanne.checks.bot_has_permissions(manage_channels=True)
     @Jeanne.checks.has_permissions(manage_channels=True)
@@ -340,6 +444,8 @@ class Create_Group(GroupCog, name=T("create")):
             await en.Create_Group(self.bot).stagechannel(ctx, name, category, users)
         elif ctx.locale.value == "fr":
             await fr.Create_Group(self.bot).stagechannel(ctx, name, category, users)
+        elif ctx.locale.value == "de":
+            await de.Create_Group(self.bot).stagechannel(ctx, name, category, users)
 
     @Jeanne.command(
         name=T("forum_name"),
@@ -391,6 +497,24 @@ class Create_Group(GroupCog, name=T("create")):
                     },
                 ],
             },
+            "de": {
+                "bot_perms": "Kanäle verwalten",
+                "member_perms": "Kanäle verwalten",
+                "name": "Forum erstellen",
+                "description": "Ein Forum erstellen",
+                "parameters": [
+                    {
+                        "name": "Name",
+                        "description": "Wie werden Sie es nennen?",
+                        "required": True,
+                    },
+                    {
+                        "name": "Kategorie",
+                        "description": "In welcher Kategorie?",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(
@@ -419,6 +543,8 @@ class Create_Group(GroupCog, name=T("create")):
             await en.Create_Group(self.bot).forum(ctx, name, category, topic)
         elif ctx.locale.value == "fr":
             await fr.Create_Group(self.bot).forum(ctx, name, category, topic)
+        elif ctx.locale.value == "de":
+            await de.Create_Group(self.bot).forum(ctx, name, category, topic)
 
     @Jeanne.command(
         name=T("role_name"),
@@ -480,6 +606,34 @@ class Create_Group(GroupCog, name=T("create")):
                     },
                 ],
             },
+            "de": {
+                "bot_perms": "Rollen verwalten",
+                "member_perms": "Rollen verwalten",
+                "name": "Rolle erstellen",
+                "description": "Eine neue Rolle erstellen",
+                "parameters": [
+                    {
+                        "name": "Name",
+                        "description": "Wie werden Sie es nennen?",
+                        "required": True,
+                    },
+                    {
+                        "name": "Farbe",
+                        "description": "Welche Farbe wird es haben? (Hex-Code ohne #)",
+                        "required": False,
+                    },
+                    {
+                        "name": "Hervorgehoben",
+                        "description": "Soll es in der Mitgliederliste separat angezeigt werden?",
+                        "required": False,
+                    },
+                    {
+                        "name": "Erwähnbar",
+                        "description": "Soll es erwähnbar sein?",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(
@@ -511,6 +665,8 @@ class Create_Group(GroupCog, name=T("create")):
             await en.Create_Group(self.bot).role(ctx, name, color, hoisted, mentionable)
         elif ctx.locale.value == "fr":
             await fr.Create_Group(self.bot).role(ctx, name, color, hoisted, mentionable)
+        elif ctx.locale.value == "de":
+            await de.Create_Group(self.bot).role(ctx, name, color, hoisted, mentionable)
 
     thread_group = Jeanne.Group(name=T("thread"), description="...")
 
@@ -574,6 +730,34 @@ class Create_Group(GroupCog, name=T("create")):
                     },
                 ],
             },
+            "de": {
+                "bot_perms": "Öffentliche Threads erstellen\nThreads verwalten",
+                "member_perms": "Öffentliche Threads erstellen",
+                "name": "Öffentlichen Thread erstellen",
+                "description": "Einen öffentlichen Thread erstellen",
+                "parameters": [
+                    {
+                        "name": "Name",
+                        "description": "Wie werden Sie es nennen?",
+                        "required": True,
+                    },
+                    {
+                        "name": "Kanal",
+                        "description": "In welchem Kanal soll der Thread erstellt werden?",
+                        "required": True,
+                    },
+                    {
+                        "name": "Nachrichten-ID",
+                        "description": "ID der Nachricht, von der der Thread gestartet werden soll",
+                        "required": True,
+                    },
+                    {
+                        "name": "Slowmode",
+                        "description": "Was ist der Slowmode (optional)?",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(
@@ -611,6 +795,10 @@ class Create_Group(GroupCog, name=T("create")):
             await fr.Create_Group(self.bot).public(
                 ctx, name, channel, message_id, slowmode
             )
+        elif ctx.locale.value == "de":
+            await de.Create_Group(self.bot).public(
+                ctx, name, channel, message_id, slowmode
+            )
 
     @public.error
     async def public_thread_error(
@@ -627,6 +815,10 @@ class Create_Group(GroupCog, name=T("create")):
                 await fr.Create_Group(self.bot).public_thread_error(
                     ctx, error, "NotFound"
                 )
+            elif ctx.locale.value == "de":
+                await de.Create_Group(self.bot).public_thread_error(
+                    ctx, error, "NotFound"
+                )
             return
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, HTTPException
@@ -637,6 +829,10 @@ class Create_Group(GroupCog, name=T("create")):
                 )
             elif ctx.locale.value == "fr":
                 await fr.Create_Group(self.bot).public_thread_error(
+                    ctx, error, "Failed"
+                )
+            elif ctx.locale.value == "de":
+                await de.Create_Group(self.bot).public_thread_error(
                     ctx, error, "Failed"
                 )
 
@@ -690,6 +886,29 @@ class Create_Group(GroupCog, name=T("create")):
                     },
                 ],
             },
+            "de": {
+                "bot_perms": "Private Threads erstellen\nThreads verwalten",
+                "member_perms": "Private Threads erstellen",
+                "name": "Privaten Thread erstellen",
+                "description": "Einen privaten Thread erstellen",
+                "parameters": [
+                    {
+                        "name": "Name",
+                        "description": "Wie soll der Thread heißen?",
+                        "required": True,
+                    },
+                    {
+                        "name": "Kanal",
+                        "description": "In welchem Kanal soll der Thread erstellt werden?",
+                        "required": True,
+                    },
+                    {
+                        "name": "Slowmode",
+                        "description": "Was ist der Slowmode (optional)?",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(
@@ -718,6 +937,8 @@ class Create_Group(GroupCog, name=T("create")):
             await en.Create_Group(self.bot).private(ctx, name, channel, slowmode)
         elif ctx.locale.value == "fr":
             await fr.Create_Group(self.bot).private(ctx, name, channel, slowmode)
+        elif ctx.locale.value == "de":
+            await de.Create_Group(self.bot).private(ctx, name, channel, slowmode)
 
     @private.error
     async def private_thread_error(
@@ -730,6 +951,8 @@ class Create_Group(GroupCog, name=T("create")):
                 await en.Create_Group(self.bot).private_thread_error(ctx)
             elif ctx.locale.value == "fr":
                 await fr.Create_Group(self.bot).private_thread_error(ctx)
+            elif ctx.locale.value == "de":
+                await de.Create_Group(self.bot).private_thread_error(ctx)
 
     @Jeanne.command(
         description=T("emoji_description"),
@@ -770,6 +993,24 @@ class Create_Group(GroupCog, name=T("create")):
                     },
                 ],
             },
+            "de": {
+                "bot_perms": "Ausdrücke verwalten\nAusdrücke erstellen",
+                "member_perms": "Ausdrücke verwalten\nAusdrücke erstellen",
+                "name": "Emoji erstellen",
+                "description": "Ein benutzerdefiniertes Emoji erstellen",
+                "parameters": [
+                    {
+                        "name": "Name",
+                        "description": "Wie soll es heißen?",
+                        "required": True,
+                    },
+                    {
+                        "name": "Link",
+                        "description": "Der Link zum Emoji-Bild",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(
@@ -798,6 +1039,8 @@ class Create_Group(GroupCog, name=T("create")):
             await en.Create_Group(self.bot).emoji(ctx, name, emoji_link, emoji_image)
         elif ctx.locale.value == "fr":
             await fr.Create_Group(self.bot).emoji(ctx, name, emoji_link, emoji_image)
+        elif ctx.locale.value == "de":
+            await de.Create_Group(self.bot).emoji(ctx, name, emoji_link, emoji_image)
 
     @emoji.error
     async def emoji_error(self, ctx: Interaction, error: Jeanne.errors.AppCommandError):
@@ -806,6 +1049,8 @@ class Create_Group(GroupCog, name=T("create")):
                 await en.Create_Group(self.bot).emoji_error(ctx, error)
             elif ctx.locale.value == "fr":
                 await fr.Create_Group(self.bot).emoji_error(ctx, error)
+            elif ctx.locale.value == "de":
+                await de.Create_Group(self.bot).emoji_error(ctx, error)
 
     @Jeanne.command(
         description=T("sticker_description"),
@@ -831,7 +1076,11 @@ class Create_Group(GroupCog, name=T("create")):
                         "description": "The link to the sticker image",
                         "required": True,
                     },
-                    {"name": "Sticker", "description": "The image file for the sticker", "required": False},
+                    {
+                        "name": "Sticker",
+                        "description": "The image file for the sticker",
+                        "required": False,
+                    },
                 ],
             },
             "fr": {
@@ -858,6 +1107,34 @@ class Create_Group(GroupCog, name=T("create")):
                     {
                         "name": "Sticker Image",
                         "description": "Le fichier image pour l'autocollant",
+                        "required": False,
+                    },
+                ],
+            },
+            "de": {
+                "bot_perms": "Ausdrücke verwalten\nAusdrücke erstellen",
+                "member_perms": "Ausdrücke verwalten\nAusdrücke erstellen",
+                "name": "Sticker erstellen",
+                "description": "Einen benutzerdefinierten Sticker erstellen",
+                "parameters": [
+                    {
+                        "name": "Name",
+                        "description": "Wie soll es heißen?",
+                        "required": True,
+                    },
+                    {
+                        "name": "Emoji",
+                        "description": "Das Emoji, das für den Sticker verwendet werden soll",
+                        "required": True,
+                    },
+                    {
+                        "name": "Link",
+                        "description": "Der Link zum Sticker-Bild",
+                        "required": True,
+                    },
+                    {
+                        "name": "Sticker Image",
+                        "description": "Die Bilddatei für den Sticker",
                         "required": False,
                     },
                 ],
@@ -895,6 +1172,10 @@ class Create_Group(GroupCog, name=T("create")):
             await fr.Create_Group(self.bot).sticker(
                 ctx, name, emoji, sticker_link, sticker_image
             )
+        elif ctx.locale.value == "de":
+            await de.Create_Group(self.bot).sticker(
+                ctx, name, emoji, sticker_link, sticker_image
+            )
 
     @sticker.error
     async def sticker_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
@@ -902,6 +1183,8 @@ class Create_Group(GroupCog, name=T("create")):
             await en.Delete_Group(self.bot).sticker_error(ctx)
         elif ctx.locale.value == "fr":
             await fr.Delete_Group(self.bot).sticker_error(ctx)
+        elif ctx.locale.value == "de":
+            await de.Delete_Group(self.bot).sticker_error(ctx)
 
 
 class Delete_Group(GroupCog, name=T("delete")):
