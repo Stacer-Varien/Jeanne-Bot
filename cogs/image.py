@@ -31,6 +31,10 @@ class images(GroupCog, name="image"):
                 "name": "kitsune",
                 "description": "Obtenez une image de kitsune aléatoire",
             },
+            "de": {
+                "name": "kitsune",
+                "description": "Holen Sie sich ein zufälliges Kitsune-Bild",
+            },
         },
     )
     @Jeanne.check(check_botbanned_app_command)
@@ -51,6 +55,10 @@ class images(GroupCog, name="image"):
             "fr": {
                 "name": "wallpaper",
                 "description": "Obtenez un fond d'écran aléatoire pour votre PC ou téléphone",
+            },
+            "de": {
+                "name": "wallpaper",
+                "description": "Holen Sie sich ein zufälliges Wallpaper für Ihren PC oder Ihr Telefon",
             },
         },
     )
@@ -73,6 +81,10 @@ class images(GroupCog, name="image"):
                 "name": "jeanne",
                 "description": "Obtenez une image aléatoire de Jeanne d'Arc",
             },
+            "de": {
+                "name": "jeanne",
+                "description": "Holen Sie sich ein zufälliges Bild von Jeanne d'Arc",
+            },
         },
     )
     @Jeanne.check(check_botbanned_app_command)
@@ -91,6 +103,10 @@ class images(GroupCog, name="image"):
                 "name": "saber",
                 "description": "Obtenez une image aléatoire de Saber",
             },
+            "de": {
+                "name": "saber",
+                "description": "Holen Sie sich ein zufälliges Saber-Bild",
+            },
         },
     )
     @Jeanne.check(check_botbanned_app_command)
@@ -108,6 +124,10 @@ class images(GroupCog, name="image"):
             "fr": {
                 "name": "neko",
                 "description": "Obtenez une image aléatoire de Neko",
+            },
+            "de": {
+                "name": "neko",
+                "description": "Holen Sie sich ein zufälliges Neko-Bild",
             },
         },
     )
@@ -130,6 +150,10 @@ class images(GroupCog, name="image"):
                 "name": "morgan",
                 "description": "Obtenez une image aléatoire de Morgan Le Fay",
             },
+            "de": {
+                "name": "morgan",
+                "description": "Holen Sie sich ein zufälliges Bild von Morgan Le Fay",
+            },
         },
     )
     @Jeanne.check(check_botbanned_app_command)
@@ -147,6 +171,10 @@ class images(GroupCog, name="image"):
             "fr": {
                 "name": "medusa",
                 "description": "Obtenez une image aléatoire de Medusa",
+            },
+            "de": {
+                "name": "medusa",
+                "description": "Holen Sie sich ein zufälliges Bild von Medusa",
             },
         },
     )
@@ -169,6 +197,10 @@ class images(GroupCog, name="image"):
                 "name": "safebooru",
                 "description": "Obtenez une image aléatoire de Safebooru",
             },
+            "de": {
+                "name": "safebooru",
+                "description": "Holen Sie sich ein zufälliges Bild von Safebooru",
+            },
         },
     )
     @Jeanne.check(check_botbanned_app_command)
@@ -182,7 +214,13 @@ class images(GroupCog, name="image"):
             embed.set_footer(
                 text="Fetched from Safebooru • Credits must go to the artist"
             )
-        elif ctx.locale.value == "fr":
+            return
+        if ctx.locale.value=="de":
+            embed.set_footer(
+                text="Von Safebooru abgerufen • Die Credits müssen an den Künstler gehen"
+            )
+            return
+        if ctx.locale.value == "fr":
             embed.set_footer(
                 text="Récupéré depuis Safebooru • Les crédits doivent aller à l'artiste"
             )
