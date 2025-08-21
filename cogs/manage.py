@@ -22,7 +22,7 @@ from functions import (
 )
 from discord.app_commands import locale_str as T
 import languages.en.manage as en
-import languages.en.manage as fr
+import languages.fr.manage as fr
 
 
 class Create_Group(GroupCog, name=T("create")):

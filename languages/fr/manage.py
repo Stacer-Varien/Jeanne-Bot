@@ -284,7 +284,6 @@ class Create_Group():
             embed.add_field(name="Mode lent", value=added_slowmode, inline=True)
         await ctx.followup.send(embed=embed)
 
-    @private.error
     async def private_thread_error(
         self, ctx: Interaction):
             embed = Embed()
