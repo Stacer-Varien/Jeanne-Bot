@@ -13,12 +13,13 @@ from discord import (
 from typing import Optional
 import languages.en.info as en
 import languages.fr.info as fr
+import languages.de.info as de
 
 
 class InfoCog(Cog, name="InfoSlash"):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.bot_version = "v5.2.0"
+        self.bot_version = "v5.2.1"
         self.userinfo_context = Jeanne.ContextMenu(
             name="Userinfo", callback=self.userinfo_callback
         )
@@ -37,10 +38,12 @@ class InfoCog(Cog, name="InfoSlash"):
 
     async def get_userinfo(self, ctx: Interaction, member: Member):
         if ctx.locale.value == "fr":
-            await fr.Info(self.bot).get_userinfo(ctx, member)        
-        else:
-            await en.Info(self.bot).get_userinfo(ctx, member)
-
+            await fr.Info(self.bot).get_userinfo(ctx, member)
+            return       
+        if ctx.locale.value == "de":
+            await de.Info(self.bot).get_userinfo(ctx, member)
+            return
+        await en.Info(self.bot).get_userinfo(ctx, member)
 
     @Jeanne.command(
         description=T("stats_desc"),
@@ -53,6 +56,10 @@ class InfoCog(Cog, name="InfoSlash"):
                 "name": "stats",
                 "description": "Voir l'état du bot depuis le développement jusqu'à maintenant",
             },
+            "de": {
+                "name": "stats",
+                "description": "Sehen Sie den Status des Bots von der Entwicklung bis jetzt",
+            },
         },
     )
     @Jeanne.check(check_botbanned_app_command)
@@ -61,9 +68,11 @@ class InfoCog(Cog, name="InfoSlash"):
     async def stats(self, ctx: Interaction):
         if ctx.locale.value == "fr":
             await fr.Info(self.bot).stats(ctx, self.bot_version)
-        else:
-            await en.Info(self.bot).stats(ctx, self.bot_version)
-
+            return
+        if ctx.locale.value == "de":
+            await de.Info(self.bot).stats(ctx, self.bot_version)
+            return
+        await en.Info(self.bot).stats(ctx, self.bot_version)
 
     @Jeanne.command(
         description=T("userinfo_desc"),
@@ -84,6 +93,13 @@ class InfoCog(Cog, name="InfoSlash"):
                 "description": "Voir les informations d'un membre ou de vous-même",
                 "parameters": [
                     {"name": "member", "description": "Quel membre?", "required": False}
+                ],
+            },
+            "de": {
+                "name": "userinfo",
+                "description": "Sehen Sie die Informationen eines Mitglieds oder von sich selbst",
+                "parameters": [
+                    {"name": "member", "description": "Welches Mitglied?", "required": False}
                 ],
             },
         },
@@ -108,6 +124,10 @@ class InfoCog(Cog, name="InfoSlash"):
                 "name": "serverinfo",
                 "description": "Obtenez des informations sur ce serveur",
             },
+            "de": {
+                "name": "serverinfo",
+                "description": "Erhalten Sie Informationen über diesen Server",
+            },
         },
     )
     @Jeanne.check(check_botbanned_app_command)
@@ -115,10 +135,12 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.check(is_suspended)
     async def serverinfo(self, ctx: Interaction):
         if ctx.locale.value == "fr":
-            await fr.Info(self.bot).serverinfo(ctx)        
-        else:
-            await en.Info(self.bot).serverinfo(ctx)
-
+            await fr.Info(self.bot).serverinfo(ctx)
+            return
+        if ctx.locale.value == "de":
+            await de.Info(self.bot).serverinfo(ctx)
+            return
+        await en.Info(self.bot).serverinfo(ctx)
 
     @Jeanne.command(
         description=T("ping_desc"),
@@ -131,6 +153,10 @@ class InfoCog(Cog, name="InfoSlash"):
                 "name": "ping",
                 "description": "Vérifiez la rapidité de ma réponse à une commande",
             },
+            "de": {
+                "name": "ping",
+                "description": "Überprüfen Sie, wie schnell ich auf einen Befehl reagiere",
+            },
         },
     )
     @Jeanne.check(is_suspended)
@@ -139,10 +165,12 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.check(is_suspended)
     async def ping(self, ctx: Interaction):
         if ctx.locale.value == "fr":
-            await fr.Info(self.bot).ping(ctx)        
-        else:
-            await en.Info(self.bot).ping(ctx)
-
+            await fr.Info(self.bot).ping(ctx)
+            return
+        if ctx.locale.value == "de":
+            await de.Info(self.bot).ping(ctx)
+            return
+        await en.Info(self.bot).ping(ctx)
 
     @Jeanne.command(
         description=T("serverbanner_desc"),
@@ -152,6 +180,10 @@ class InfoCog(Cog, name="InfoSlash"):
                 "name": "serverbanner",
                 "description": "Obtenez la bannière du serveur",
             },
+            "de": {
+                "name": "serverbanner",
+                "description": "Holen Sie sich das Serverbanner",
+            },
         },
     )
     @Jeanne.check(check_botbanned_app_command)
@@ -159,10 +191,12 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.check(is_suspended)
     async def serverbanner(self, ctx: Interaction):
         if ctx.locale.value == "fr":
-            await fr.Info(self.bot).serverbanner(ctx)        
-        else:
-            await en.Info(self.bot).serverbanner(ctx)
-
+            await fr.Info(self.bot).serverbanner(ctx) 
+            return
+        if ctx.locale.value == "de":
+            await de.Info(self.bot).serverbanner(ctx)
+            return
+        await en.Info(self.bot).serverbanner(ctx)
 
     @Jeanne.command(
         description=T("avatar_desc"),
@@ -185,6 +219,13 @@ class InfoCog(Cog, name="InfoSlash"):
                     {"name": "member", "description": "Quel membre?", "required": False}
                 ],
             },
+            "de": {
+                "name": "avatar",
+                "description": "Sehen Sie Ihr Avatar oder das Avatar eines anderen Mitglieds",
+                "parameters": [
+                    {"name": "member", "description": "Welches Mitglied?", "required": False}
+                ],
+            },
         },
     )
     @Jeanne.describe(member=T("member_parm_desc"))
@@ -194,10 +235,12 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.check(is_suspended)
     async def avatar(self, ctx: Interaction, member: Optional[Member] = None) -> None:
         if ctx.locale.value == "fr":
-            await fr.Info(self.bot).avatar(ctx, member)        
-        else:
-            await en.Info(self.bot).avatar(ctx, member)
-
+            await fr.Info(self.bot).avatar(ctx, member)      
+            return
+        if ctx.locale.value == "de":
+            await de.Info(self.bot).avatar(ctx, member)
+            return
+        await en.Info(self.bot).avatar(ctx, member)
 
     @Jeanne.command(
         description=T("sticker_desc"),
@@ -224,6 +267,17 @@ class InfoCog(Cog, name="InfoSlash"):
                     }
                 ],
             },
+            "de": {
+                "name": "sticker",
+                "description": "Siehe einen Sticker",
+                "parameters": [
+                    {
+                        "name": "sticker",
+                        "description": "Fügen Sie die Nachrichten-ID mit dem Sticker oder den Namen des Stickers im Server ein",
+                        "required": True,
+                    }
+                ],
+            },
         },
     )
     @Jeanne.describe(
@@ -234,27 +288,34 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.check(is_suspended)
     async def sticker(self, ctx: Interaction, sticker: str):
         if ctx.locale.value == "fr":
-            await fr.Info(self.bot).sticker(ctx, sticker)        
-        else:
-            await en.Info(self.bot).sticker(ctx, sticker)
-
+            await fr.Info(self.bot).sticker(ctx, sticker)      
+            return
+        if ctx.locale.value == "de":
+            await de.Info(self.bot).sticker(ctx, sticker)
+            return
+        await en.Info(self.bot).sticker(ctx, sticker)
 
     @sticker.error
     async def sticker_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, IndexError
         ):
-            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-                await en.Info(self.bot).sticker_error(ctx, error, "NoSticker")
-            elif ctx.locale.value == "fr":
+            if ctx.locale.value == "fr":
                 await fr.Info(self.bot).sticker_error(ctx, error, "NoSticker")
+                return
+            if ctx.locale.value == "de":
+                await de.Info(self.bot).sticker_error(ctx, error, "NoSticker")
+            await en.Info(self.bot).sticker_error(ctx, error, "NoSticker")
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, AttributeError
         ):
-            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-                await en.Info(self.bot).sticker_error(ctx, error, "StickerNotFound")
-            elif ctx.locale.value == "fr":
+            if ctx.locale.value == "de":
+                await de.Info(self.bot).sticker_error(ctx, error, "StickerNotFound")
+                return
+            if ctx.locale.value == "fr":
                 await fr.Info(self.bot).sticker_error(ctx, error, "StickerNotFound")
+                return
+            await en.Info(self.bot).sticker_error(ctx, error, "StickerNotFound")
 
     @Jeanne.command(
         description=T("emoji_desc"),
@@ -281,6 +342,17 @@ class InfoCog(Cog, name="InfoSlash"):
                     }
                 ],
             },
+            "de": {
+                "name": "emoji",
+                "description": "Siehe ein Emoji",
+                "parameters": [
+                    {
+                        "name": "emoji",
+                        "description": "Fügen Sie den Namen oder die ID des Emojis ein",
+                        "required": True,
+                    }
+                ],
+            },
         },
     )
     @Jeanne.describe(emoji=T("emoji_parm_desc"))
@@ -288,20 +360,26 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def emoji(self, ctx: Interaction, emoji: str):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            await en.Info(self.bot).emoji(ctx, emoji)
-        elif ctx.locale.value == "fr":
+        if ctx.locale.value == "de":
+            await de.Info(self.bot).emoji(ctx, emoji)
+            return
+        if ctx.locale.value == "fr":
             await fr.Info(self.bot).emoji(ctx, emoji)
+            return
+        await en.Info(self.bot).emoji(ctx, emoji)
 
     @emoji.error
     async def emoji_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, AttributeError
         ):
-            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-                await en.Info(self.bot).emoji_error(ctx, error)
-            elif ctx.locale.value == "fr":
+            if ctx.locale.value == "de":
+                await de.Info(self.bot).emoji_error(ctx, error)
+                return
+            if ctx.locale.value == "fr":
                 await fr.Info(self.bot).emoji_error(ctx, error)
+                return
+            await en.Info(self.bot).emoji_error(ctx, error)
 
 
 async def setup(bot: Bot):
