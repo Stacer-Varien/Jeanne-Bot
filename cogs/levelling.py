@@ -15,6 +15,7 @@ from typing import Optional
 from topgg import DBLClient
 import languages.en.levelling as en
 import languages.fr.levelling as fr
+import languages.de.levelling as de
 from discord.app_commands import locale_str as T
 
 
@@ -34,6 +35,10 @@ class Rank_Group(GroupCog, name="rank"):
             await fr.Rank_Group(self.bot).send_leaderboard(
                 ctx, title, leaderboard, exp_index
             )
+        elif ctx.locale.value == "de":
+            await de.Rank_Group(self.bot).send_leaderboard(
+                ctx, title, leaderboard, exp_index
+            )
 
     @Jeanne.command(
         name="global",
@@ -46,6 +51,10 @@ class Rank_Group(GroupCog, name="rank"):
             "fr": {
                 "name": "global",
                 "description": "Vérifiez les utilisateurs avec le plus d'XP globalement",
+            },
+            "de": {
+                "name": "global",
+                "description": "Überprüfen Sie die Benutzer mit dem meisten XP global",
             },
         },
     )
@@ -67,6 +76,10 @@ class Rank_Group(GroupCog, name="rank"):
             "fr": {
                 "name": "serveur",
                 "description": "Vérifiez les utilisateurs avec le plus d'XP dans ce serveur",
+            },
+            "de": {
+                "name": "server",
+                "description": "Überprüfen Sie die Benutzer mit dem meisten XP auf diesem Server",
             },
         },
     )
@@ -99,6 +112,8 @@ class levelling(Cog):
             await en.levelling(self.bot).generate_profile_card(ctx, member)
         elif ctx.locale.value == "fr":
             await fr.levelling(self.bot).generate_profile_card(ctx, member)
+        elif ctx.locale.value == "de":
+            await de.levelling(self.bot).generate_profile_card(ctx, member)
 
     @Jeanne.checks.cooldown(1, 120, key=lambda i: (i.user.id))
     @Jeanne.check(check_botbanned_app_command)
@@ -114,6 +129,8 @@ class levelling(Cog):
                 await en.levelling(self.bot).profile_error(ctx, error)
             elif ctx.locale.value == "fr":
                 await fr.levelling(self.bot).profile_error(ctx, error)
+            elif ctx.locale.value == "de":
+                await de.levelling(self.bot).profile_error(ctx, error)
 
     @Jeanne.command(
         name=T("profile_name"),
@@ -137,6 +154,13 @@ class levelling(Cog):
                     {"name": "membre", "description": "Quel membre?", "required": False}
                 ],
             },
+            "de": {
+                "name": "profil",
+                "description": "Sehen Sie Ihr Profil oder das eines anderen Mitglieds",
+                "parameters": [
+                    {"name": "mitglied", "description": "Welches Mitglied?", "required": False}
+                ],
+            },
         },
     )
     @Jeanne.describe(member=T("member_parm_desc"))
@@ -150,6 +174,8 @@ class levelling(Cog):
             await en.levelling(self.bot).profile(ctx, member)
         elif ctx.locale.value == "fr":
             await fr.levelling(self.bot).profile(ctx, member)
+        elif ctx.locale.value == "de":
+            await de.levelling(self.bot).profile(ctx, member)
 
     @profile.error
     async def profile_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
@@ -158,6 +184,8 @@ class levelling(Cog):
                 await en.levelling(self.bot).profile_error(ctx, error)
             elif ctx.locale.value == "fr":
                 await fr.levelling(self.bot).profile_error(ctx, error)
+            elif ctx.locale.value == "de":
+                await de.levelling(self.bot).profile_error(ctx, error)
 
 
 async def setup(bot: Bot):
