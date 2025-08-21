@@ -11,6 +11,7 @@ from functions import (
 from typing import Optional
 import languages.en.hentai as en
 import languages.fr.hentai as fr
+import languages.de.hentai as de
 from discord.app_commands import locale_str as T
 
 
@@ -29,6 +30,7 @@ class nsfw(Cog):
                 "name": "hentai",
                 "description": "Obtenez un hentai aléatoire de Jeanne",
             },
+            "de":{"name": "hentai", "description": "Holen Sie sich ein zufälliges Hentai von Jeanne"},
         },
     )
     @Jeanne.checks.cooldown(1, 5, key=lambda i: (i.user.id))
@@ -41,8 +43,11 @@ class nsfw(Cog):
     ) -> None:
         if ctx.locale.value == "fr":
             await fr.nsfw(self.bot).hentai(ctx)
-        else:
-            await en.nsfw(self.bot).hentai(ctx)
+            return
+        if ctx.locale.value == "de":
+            await de.nsfw(self.bot).hentai(ctx)
+            return
+        await en.nsfw(self.bot).hentai(ctx)
 
 
 
@@ -79,6 +84,22 @@ class nsfw(Cog):
                     },
                 ],
             },
+            "de": {
+                "name": "yandere",
+                "description": "Holen Sie sich einen zufälligen Medieninhalt von Yandere",
+                "parameters": [
+                    {
+                        "name": "tag",
+                        "description": "Fügen Sie Ihre Tags hinzu",
+                        "required": False,
+                    },
+                    {
+                        "name": "plus",
+                        "description": "Brauchen Sie mehr Inhalte? (bis zu 4)",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.checks.cooldown(1, 5, key=lambda i: (i.user.id))
@@ -95,8 +116,11 @@ class nsfw(Cog):
     ) -> None:
         if ctx.locale.value == "fr":
             await fr.nsfw(self.bot).yandere(ctx, tag, plus)
-        else:
-            await en.nsfw(self.bot).yandere(ctx, tag, plus)
+            return
+        if ctx.locale.value == "de":
+            await de.nsfw(self.bot).yandere(ctx, tag, plus)
+            return
+        await en.nsfw(self.bot).yandere(ctx, tag, plus)
 
 
     @Jeanne.command(
@@ -132,6 +156,22 @@ class nsfw(Cog):
                     },
                 ],
             },
+            "de": {
+                "name": "konachan",
+                "description": "Holen Sie sich einen zufälligen Medieninhalt von Konachan",
+                "parameters": [
+                    {
+                        "name": "tag",
+                        "description": "Fügen Sie Ihre Tags hinzu",
+                        "required": False,
+                    },
+                    {
+                        "name": "plus",
+                        "description": "Brauchen Sie mehr Inhalte? (bis zu 4)",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.checks.cooldown(1, 5, key=lambda i: (i.user.id))
@@ -154,8 +194,11 @@ class nsfw(Cog):
     ) -> None:
         if ctx.locale.value == "fr":
             await fr.nsfw(self.bot).konachan(ctx, tag, plus)
-        else:
-            await en.nsfw(self.bot).konachan(ctx, tag, plus)
+            return
+        if ctx.locale.value == "de":
+            await de.nsfw(self.bot).konachan(ctx, tag, plus)
+            return
+        await en.nsfw(self.bot).konachan(ctx, tag, plus)
 
 
     @Jeanne.command(
@@ -191,6 +234,22 @@ class nsfw(Cog):
                     },
                 ],
             },
+            "de": {
+                "name": "danbooru",
+                "description": "Holen Sie sich einen zufälligen Medieninhalt von Danbooru",
+                "parameters": [
+                    {
+                        "name": "tag",
+                        "description": "Fügen Sie Ihre Tags hinzu",
+                        "required": False,
+                    },
+                    {
+                        "name": "plus",
+                        "description": "Brauchen Sie mehr Inhalte? (bis zu 4)",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.checks.cooldown(1, 5, key=lambda i: (i.user.id))
@@ -213,8 +272,11 @@ class nsfw(Cog):
     ) -> None:
         if ctx.locale.value == "fr":
             await fr.nsfw(self.bot).danbooru(ctx, tag, plus)
-        else:
-            await en.nsfw(self.bot).danbooru(ctx, tag, plus)
+            return
+        if ctx.locale.value == "de":
+            await de.nsfw(self.bot).danbooru(ctx, tag, plus)
+            return
+        await en.nsfw(self.bot).danbooru(ctx, tag, plus)
 
 
     @hentai.error
@@ -227,15 +289,20 @@ class nsfw(Cog):
         ):
             if ctx.locale.value == "fr":
                 await fr.nsfw(self.bot).Hentai_error(ctx, error, "NotFound")
-            else:
-                await en.nsfw(self.bot).Hentai_error(ctx, error, "NotFound")
+                return
+            if ctx.locale.value == "de":
+                await de.nsfw(self.bot).Hentai_error(ctx, error, "NotFound")
+                return
+            await en.nsfw(self.bot).Hentai_error(ctx, error, "NotFound")
 
         if isinstance(error, Jeanne.errors.CommandOnCooldown):
             if ctx.locale.value == "fr":
                 await fr.nsfw(self.bot).Hentai_error(ctx, error, "Cooldown")
-            else:
-                await en.nsfw(self.bot).Hentai_error(ctx, error, "Cooldown")
-
+                return
+            if ctx.locale.value == "de":
+                await de.nsfw(self.bot).Hentai_error(ctx, error, "Cooldown")
+                return
+            await en.nsfw(self.bot).Hentai_error(ctx, error, "Cooldown")
 
 
 async def setup(bot: Bot):
