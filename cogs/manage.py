@@ -1222,6 +1222,19 @@ class Delete_Group(GroupCog, name=T("delete")):
                     },
                 ],
             },
+            "de": {
+                "bot_perms": "Kanäle verwalten",
+                "member_perms": "Kanäle verwalten",
+                "name": "Emoji löschen",
+                "description": "Ein benutzerdefiniertes Emoji löschen",
+                "parameters": [
+                    {
+                        "name": "Emoji",
+                        "description": "Welches Emoji löschen?",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(channel=T("channel_parm_desc"))
@@ -1236,6 +1249,8 @@ class Delete_Group(GroupCog, name=T("delete")):
             await en.Delete_Group(self.bot).channel(ctx, channel)
         elif ctx.locale.value == "fr":
             await fr.Delete_Group(self.bot).channel(ctx, channel)
+        elif ctx.locale.value == "de":
+            await de.Delete_Group(self.bot).channel(ctx, channel)
 
     @Jeanne.command(
         name=T("delete_role_name"),
@@ -1267,6 +1282,19 @@ class Delete_Group(GroupCog, name=T("delete")):
                     },
                 ],
             },
+            "de": {
+                "bot_perms": "Rollen verwalten",
+                "member_perms": "Rollen verwalten",
+                "name": "Rolle löschen",
+                "description": "Eine Rolle löschen",
+                "parameters": [
+                    {
+                        "name": "Rolle",
+                        "description": "Welche Rolle löschen?",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(role=T("role_parm_desc"))
@@ -1281,6 +1309,8 @@ class Delete_Group(GroupCog, name=T("delete")):
             await en.Delete_Group(self.bot).role(ctx, role)
         elif ctx.locale.value == "fr":
             await fr.Delete_Group(self.bot).role(ctx, role)
+        elif ctx.locale.value == "de":
+            await de.Delete_Group(self.bot).role(ctx, role)
 
     @Jeanne.command(
         description=T("delete_emoji_description"),
@@ -1311,6 +1341,19 @@ class Delete_Group(GroupCog, name=T("delete")):
                     },
                 ],
             },
+            "de": {
+                "bot_perms": "Ausdrücke verwalten",
+                "member_perms": "Ausdrücke verwalten",
+                "name": "Emoji löschen",
+                "description": "Ein benutzerdefiniertes Emoji löschen",
+                "parameters": [
+                    {
+                        "name": "Emoji",
+                        "description": "Welches Emoji löschen?",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(emoji=T("emoji_parm_desc"))
@@ -1324,6 +1367,8 @@ class Delete_Group(GroupCog, name=T("delete")):
             await en.Delete_Group(self.bot).emoji(ctx, emoji)
         elif ctx.locale.value == "fr":
             await fr.Delete_Group(self.bot).emoji(ctx, emoji)
+        elif ctx.locale.value == "de":
+            await de.Delete_Group(self.bot).emoji(ctx, emoji)
 
     @emoji.error
     async def emoji_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
@@ -1331,6 +1376,8 @@ class Delete_Group(GroupCog, name=T("delete")):
             await en.Delete_Group(self.bot).emoji_error(ctx)
         elif ctx.locale.value == "fr":
             await fr.Delete_Group(self.bot).emoji_error(ctx)
+        elif ctx.locale.value == "de":
+            await de.Delete_Group(self.bot).emoji_error(ctx)
 
     @Jeanne.command(
         description=T("delete_sticker_description"),
@@ -1377,6 +1424,8 @@ class Delete_Group(GroupCog, name=T("delete")):
             await en.Delete_Group(self.bot).sticker(ctx, sticker, name)
         elif ctx.locale.value == "fr":
             await fr.Delete_Group(self.bot).sticker(ctx, sticker, name)
+        elif ctx.locale.value == "de":
+            await de.Delete_Group(self.bot).sticker(ctx, sticker, name)
 
 
 class Edit_Group(GroupCog, name="edit"):
@@ -1460,6 +1509,44 @@ class Edit_Group(GroupCog, name="edit"):
                     },
                 ],
             },
+            "de": {
+                "bot_perms": "Kanäle verwalten",
+                "member_perms": "Kanäle verwalten",
+                "name": "Textkanal bearbeiten",
+                "description": "Einen Textkanal bearbeiten",
+                "parameters": [
+                    {
+                        "name": "Kanal",
+                        "description": "Welchen Kanal bearbeiten?",
+                        "required": True,
+                    },
+                    {
+                        "name": "Name",
+                        "description": "Neuer Name für den Kanal",
+                        "required": False,
+                    },
+                    {
+                        "name": "Thema",
+                        "description": "Neues Thema für den Kanal",
+                        "required": False,
+                    },
+                    {
+                        "name": "Langsame Mode",
+                        "description": "Neuer langsamer Modus (optional)",
+                        "required": False,
+                    },
+                    {
+                        "name": "Kategorie",
+                        "description": "In welche Kategorie verschieben?",
+                        "required": False,
+                    },
+                    {
+                        "name": "NSFW",
+                        "description": "Als NSFW festlegen?",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(
@@ -1499,6 +1586,10 @@ class Edit_Group(GroupCog, name="edit"):
             )
         elif ctx.locale.value == "fr":
             await fr.Edit_Group(self.bot).textchannel(
+                ctx, channel, name, topic, slowmode, category, nsfw_enabled
+            )
+        elif ctx.locale.value == "de":
+            await de.Edit_Group(self.bot).textchannel(
                 ctx, channel, name, topic, slowmode, category, nsfw_enabled
             )
 
@@ -1562,6 +1653,44 @@ class Edit_Group(GroupCog, name="edit"):
                     },
                 ],
             },
+            "de": {
+                "bot_perms": "Kanäle verwalten",
+                "member_perms": "Kanäle verwalten",
+                "name": "Textkanal bearbeiten",
+                "description": "Einen Textkanal bearbeiten",
+                "parameters": [
+                    {
+                        "name": "Kanal",
+                        "description": "Welchen Kanal bearbeiten?",
+                        "required": True,
+                    },
+                    {
+                        "name": "Name",
+                        "description": "Neuer Name für den Kanal",
+                        "required": False,
+                    },
+                    {
+                        "name": "Thema",
+                        "description": "Neues Thema für den Kanal",
+                        "required": False,
+                    },
+                    {
+                        "name": "Langsame Mode",
+                        "description": "Neuer langsamer Modus (optional)",
+                        "required": False,
+                    },
+                    {
+                        "name": "Kategorie",
+                        "description": "In welche Kategorie verschieben?",
+                        "required": False,
+                    },
+                    {
+                        "name": "NSFW",
+                        "description": "Als NSFW festlegen?",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(
@@ -1595,6 +1724,10 @@ class Edit_Group(GroupCog, name="edit"):
             )
         elif ctx.locale.value == "fr":
             await fr.Edit_Group(self.bot).voicechannel(
+                ctx, channel, name, category, users
+            )
+        elif ctx.locale.value == "de":
+            await de.Edit_Group(self.bot).voicechannel(
                 ctx, channel, name, category, users
             )
 
@@ -1668,6 +1801,39 @@ class Edit_Group(GroupCog, name="edit"):
                     },
                 ],
             },
+            "de": {
+                "bot_perms": "Rollen verwalten",
+                "member_perms": "Rollen verwalten",
+                "name": "Rolle bearbeiten",
+                "description": "Eine Rolle bearbeiten",
+                "parameters": [
+                    {
+                        "name": "Rolle",
+                        "description": "Welche Rolle bearbeiten?",
+                        "required": True,
+                    },
+                    {
+                        "name": "Name",
+                        "description": "Neuer Name für die Rolle",
+                        "required": False,
+                    },
+                    {
+                        "name": "Farbe",
+                        "description": "Neue Farbe (hex)",
+                        "required": False,
+                    },
+                    {
+                        "name": "Hervorgehoben",
+                        "description": "Rolle separat anzeigen?",
+                        "required": False,
+                    },
+                    {
+                        "name": "Erwähnbar",
+                        "description": "Rolle erwähnbar machen?",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(
@@ -1704,6 +1870,10 @@ class Edit_Group(GroupCog, name="edit"):
             )
         elif ctx.locale.value == "fr":
             await fr.Edit_Group(self.bot).role(
+                ctx, role, name, color, hoisted, mentionable
+            )
+        elif ctx.locale.value == "de":
+            await de.Edit_Group(self.bot).role(
                 ctx, role, name, color, hoisted, mentionable
             )
 
@@ -1787,6 +1957,44 @@ class Edit_Group(GroupCog, name="edit"):
                     },
                 ],
             },
+            "de": {
+                "bot_perms": "Server verwalten",
+                "member_perms": "Server verwalten",
+                "name": "Server bearbeiten",
+                "description": "Servereinstellungen bearbeiten",
+                "parameters": [
+                    {
+                        "name": "Name",
+                        "description": "Neuer Servername",
+                        "required": False,
+                    },
+                    {
+                        "name": "Beschreibung",
+                        "description": "Neue Serverbeschreibung",
+                        "required": False,
+                    },
+                    {
+                        "name": "Avatar",
+                        "description": "Neuer Serveravatar",
+                        "required": False,
+                    },
+                    {
+                        "name": "Splash",
+                        "description": "Neues Splash-Bild",
+                        "required": False,
+                    },
+                    {
+                        "name": "Banner",
+                        "description": "Neues Bannerbild",
+                        "required": False,
+                    },
+                    {
+                        "name": "Verifizierungsstufe",
+                        "description": "Verifizierungsstufe festlegen",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(
@@ -1826,7 +2034,10 @@ class Edit_Group(GroupCog, name="edit"):
             await fr.Edit_Group(self.bot).server(
                 ctx, name, description, avatar, splash, banner, verification_level
             )
-
+        elif ctx.locale.value == "de":
+            await de.Edit_Group(self.bot).server(
+                ctx, name, description, avatar, splash, banner, verification_level
+            )
 
 class Set_Group(GroupCog, name="set"):
     def __init__(self, bot: Bot) -> None:
@@ -1877,6 +2088,23 @@ class Set_Group(GroupCog, name="set"):
                     },
                 ],
             },
+            "de": {
+                "member_perms": "Server verwalten",
+                "name": "Willkommensnachricht konfigurieren",
+                "description": "Konfigurieren Sie die Willkommensnachricht",
+                "parameters": [
+                    {
+                        "name": "Willkommenskanal",
+                        "description": "Kanal für Willkommensnachrichten",
+                        "required": False,
+                    },
+                    {
+                        "name": "Verlassen-Kanal",
+                        "description": "Kanal für Verlassen-Nachrichten",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(
@@ -1903,6 +2131,10 @@ class Set_Group(GroupCog, name="set"):
             )
         elif ctx.locale.value == "fr":
             await fr.Set_Group(self.bot).welcomer(
+                ctx, welcoming_channel, leaving_channel
+            )
+        elif ctx.locale.value == "de":
+            await de.Set_Group(self.bot).welcomer(
                 ctx, welcoming_channel, leaving_channel
             )
 
@@ -1934,6 +2166,18 @@ class Set_Group(GroupCog, name="set"):
                     },
                 ],
             },
+            "de": {
+                "member_perms": "Server verwalten",
+                "name": "Modlog konfigurieren",
+                "description": "Konfigurieren Sie den Modlog-Kanal",
+                "parameters": [
+                    {
+                        "name": "Kanal",
+                        "description": "Kanal für Modlog-Nachrichten",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(channel=T("channel_parm_desc"))
@@ -1947,6 +2191,8 @@ class Set_Group(GroupCog, name="set"):
             await en.Set_Group(self.bot).modlog(ctx, channel)
         elif ctx.locale.value == "fr":
             await fr.Set_Group(self.bot).modlog(ctx, channel)
+        elif ctx.locale.value == "de":
+            await de.Set_Group(self.bot).modlog(ctx, channel)
 
     @Jeanne.command(
         name=T("set_welcomingmsg_name"),
@@ -1976,6 +2222,18 @@ class Set_Group(GroupCog, name="set"):
                     },
                 ],
             },
+            "de": {
+                "member_perms": "Server verwalten",
+                "name": "Willkommensnachricht konfigurieren",
+                "description": "Konfigurieren Sie die Willkommensnachricht (JSON-Datei)",
+                "parameters": [
+                    {
+                        "name": "JSON-Datei",
+                        "description": "JSON-Datei für die Willkommensnachricht",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(jsonfile=T("jsonfile_parm_desc"))
@@ -1991,6 +2249,8 @@ class Set_Group(GroupCog, name="set"):
             await en.Set_Group(self.bot).welcomingmsg(ctx, jsonfile)
         elif ctx.locale.value == "fr":
             await fr.Set_Group(self.bot).welcomingmsg(ctx, jsonfile)
+        elif ctx.locale.value == "de":
+            await de.Set_Group(self.bot).welcomingmsg(ctx, jsonfile)
 
     @Jeanne.command(
         name=T("set_leavingmsg_name"),
@@ -2020,6 +2280,18 @@ class Set_Group(GroupCog, name="set"):
                     },
                 ],
             },
+            "de": {
+                "member_perms": "Server verwalten",
+                "name": "Verlassen-Nachricht konfigurieren",
+                "description": "Konfigurieren Sie die Verlassen-Nachricht (JSON-Datei)",
+                "parameters": [
+                    {
+                        "name": "JSON-Datei",
+                        "description": "JSON-Datei für die Verlassen-Nachricht",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(jsonfile=T("jsonfile_parm_desc"))
@@ -2035,6 +2307,8 @@ class Set_Group(GroupCog, name="set"):
             await en.Set_Group(self.bot).leavingmsg(ctx, jsonfile)
         elif ctx.locale.value == "fr":
             await fr.Set_Group(self.bot).leavingmsg(ctx, jsonfile)
+        elif ctx.locale.value == "de":
+            await de.Set_Group(self.bot).leavingmsg(ctx, jsonfile)
 
     @Jeanne.command(
         name=T("set_rolereward_message_name"),
@@ -2064,6 +2338,18 @@ class Set_Group(GroupCog, name="set"):
                     },
                 ],
             },
+            "de": {
+                "member_perms": "Server verwalten",
+                "name": "Rollenbelohnungsnachricht konfigurieren",
+                "description": "Konfigurieren Sie die Rollenbelohnungsnachricht",
+                "parameters": [
+                    {
+                        "name": "Nachricht",
+                        "description": "Aktivieren/deaktivieren Sie die Rollenbelohnungsnachricht",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(message=T("message_parm_desc"))
@@ -2079,6 +2365,8 @@ class Set_Group(GroupCog, name="set"):
             await en.Set_Group(self.bot).rolereward_message(ctx, message)
         elif ctx.locale.value == "fr":
             await fr.Set_Group(self.bot).rolereward_message(ctx, message)
+        elif ctx.locale.value == "de":
+            await de.Set_Group(self.bot).rolereward_message(ctx, message)
 
     @Jeanne.command(
         name=T("set_levelupdate_name"),
@@ -2118,6 +2406,23 @@ class Set_Group(GroupCog, name="set"):
                     },
                 ],
             },
+            "de": {
+                "member_perms": "Server verwalten",
+                "name": "Levelaktualisierung konfigurieren",
+                "description": "Den Kanal und die Nachricht für Levelaktualisierungen festlegen",
+                "parameters": [
+                    {
+                        "name": "Kanal",
+                        "description": "Kanal für Levelaktualisierungen",
+                        "required": True,
+                    },
+                    {
+                        "name": "Levelnachricht",
+                        "description": "Aktivieren/deaktivieren Sie die Levelnachricht",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(
@@ -2139,6 +2444,8 @@ class Set_Group(GroupCog, name="set"):
             await en.Set_Group(self.bot).levelupdate(ctx, channel, levelmsg)
         elif ctx.locale.value == "fr":
             await fr.Set_Group(self.bot).levelupdate(ctx, channel, levelmsg)
+        elif ctx.locale.value == "de":
+            await de.Set_Group(self.bot).levelupdate(ctx, channel, levelmsg)
 
     @Jeanne.command(
         name=T("set_confessionchannel_name"),
@@ -2168,6 +2475,18 @@ class Set_Group(GroupCog, name="set"):
                     },
                 ],
             },
+            "de": {
+                "member_perms": "Server verwalten",
+                "name": "Konfigurieren Sie den Geständniskanal",
+                "description": "Legen Sie den Geständniskanal fest",
+                "parameters": [
+                    {
+                        "name": "Kanal",
+                        "description": "Kanal für Geständnisse",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(channel=T("channel_parm_desc"))
@@ -2181,6 +2500,8 @@ class Set_Group(GroupCog, name="set"):
             await en.Set_Group(self.bot).confessionchannel(ctx, channel)
         elif ctx.locale.value == "fr":
             await fr.Set_Group(self.bot).confessionchannel(ctx, channel)
+        elif ctx.locale.value == "de":
+            await de.Set_Group(self.bot).confessionchannel(ctx, channel)
 
     @Jeanne.command(
         name=T("set_brightness_name"),
@@ -2208,6 +2529,17 @@ class Set_Group(GroupCog, name="set"):
                     },
                 ],
             },
+            "de": {
+                "name": "Profil-Helligkeit festlegen",
+                "description": "Legen Sie die Helligkeit Ihres Profils fest",
+                "parameters": [
+                    {
+                        "name": "Helligkeit",
+                        "description": "Helligkeitswert (50-150)",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(brightness=T("brightness_parm_desc"))
@@ -2222,6 +2554,8 @@ class Set_Group(GroupCog, name="set"):
             await en.Set_Group(self.bot).brightness(ctx, brightness)
         elif ctx.locale.value == "fr":
             await fr.Set_Group(self.bot).brightness(ctx, brightness)
+        elif ctx.locale.value == "de":
+            await de.Set_Group(self.bot).brightness(ctx, brightness)
 
     @Jeanne.command(
         name=T("set_bio_name"),
@@ -2245,6 +2579,17 @@ class Set_Group(GroupCog, name="set"):
                     },
                 ],
             },
+            "de": {
+                "name": "Profil-Bio festlegen",
+                "description": "Legen Sie Ihre Profil-Bio fest",
+                "parameters": [
+                    {
+                        "name": "Bio",
+                        "description": "Ihr Bio-Text",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(bio=T("bio_parm_desc"))
@@ -2257,6 +2602,8 @@ class Set_Group(GroupCog, name="set"):
             await en.Set_Group(self.bot).bio(ctx, bio)
         elif ctx.locale.value == "fr":
             await fr.Set_Group(self.bot).bio(ctx, bio)
+        elif ctx.locale.value == "de":
+            await de.Set_Group(self.bot).bio(ctx, bio)
 
     @Jeanne.command(
         name=T("set_color_name"),
@@ -2284,6 +2631,17 @@ class Set_Group(GroupCog, name="set"):
                     },
                 ],
             },
+            "de": {
+                "name": "Profil-Farbe festlegen",
+                "description": "Legen Sie Ihre Profil-Farbe fest",
+                "parameters": [
+                    {
+                        "name": "Farbe",
+                        "description": "Farbwert (hex oder Name)",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(color=T("color_parm_desc"))
@@ -2296,6 +2654,8 @@ class Set_Group(GroupCog, name="set"):
             await en.Set_Group(self.bot).color(ctx, color)
         elif ctx.locale.value == "fr":
             await fr.Set_Group(self.bot).color(ctx, color)
+        elif ctx.locale.value == "de":
+            await de.Set_Group(self.bot).color(ctx, color)
 
 
 class manage(Cog):
