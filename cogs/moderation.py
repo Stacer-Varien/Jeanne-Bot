@@ -20,6 +20,7 @@ from typing import Optional
 from discord.app_commands import locale_str as T
 import languages.en.moderation as en
 import languages.fr.moderation as fr
+import languages.de.moderation as de
 
 
 class moderation(Cog):
@@ -42,12 +43,18 @@ class moderation(Cog):
             await fr.moderation(self.bot).commit_ban(
                 ctx, member, reason, time, delete_message_history
             )
+        elif ctx.locale.value == "de":
+            await de.moderation(self.bot).commit_ban(
+                ctx, member, reason, time, delete_message_history
+            )
 
     async def check_banned(self, ctx: Interaction, member: User):
         if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
             await en.moderation(self.bot).check_banned(ctx, member)
         elif ctx.locale.value == "fr":
             await fr.moderation(self.bot).check_banned(ctx, member)
+        elif ctx.locale.value == "de":
+            await de.moderation(self.bot).check_banned(ctx, member)
 
     @Jeanne.command(
         name=T("ban_name"),
@@ -109,6 +116,34 @@ class moderation(Cog):
                     },
                 ],
             },
+            "de": {
+                "name": "ban",
+                "description": "Jemanden vom Server oder außerhalb des Servers bannen",
+                "bot_perms": "Mitglieder bannen",
+                "member_perms": "Mitglieder bannen",
+                "parameters": [
+                    {
+                        "name": "mitglied",
+                        "description": "Was ist die Mitglieds- oder Benutzer-ID?",
+                        "required": True,
+                    },
+                    {
+                        "name": "grund",
+                        "description": "Was haben sie getan? Sie können auch einen benutzerdefinierten Grund angeben",
+                        "required": False,
+                    },
+                    {
+                        "name": "nachricht_historie_löschen",
+                        "description": "Nachrichten der letzten 7 Tage löschen?",
+                        "required": False,
+                    },
+                    {
+                        "name": "zeit",
+                        "description": "Wie lange sollen sie vorübergehend gebannt werden? (1m, 1h30m, etc.)",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.check(is_suspended)
@@ -145,6 +180,10 @@ class moderation(Cog):
             await fr.moderation(self.bot).ban(
                 ctx, member, reason, delete_message_history, time
             )
+        elif ctx.locale.value == "de":
+            await de.moderation(self.bot).ban(
+                ctx, member, reason, delete_message_history, time
+            )
 
     @ban.error
     async def ban_user_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
@@ -155,6 +194,8 @@ class moderation(Cog):
                 await en.moderation(self.bot).ban_user_error(ctx)
             elif ctx.locale.value == "fr":
                 await fr.moderation(self.bot).ban_user_error(ctx)
+            elif ctx.locale.value == "de":
+                await de.moderation(self.bot).ban_user_error(ctx)
 
     @Jeanne.command(
         name=T("warn_name"),
@@ -196,6 +237,24 @@ class moderation(Cog):
                     },
                 ],
             },
+            "de": {
+                "name": "warnen",
+                "description": "Einen Benutzer warnen",
+                "bot_perms": "Mitglieder verwalten",
+                "member_perms": "Mitglieder verwalten",
+                "parameters": [
+                    {
+                        "name": "mitglied",
+                        "description": "Welches Mitglied?",
+                        "required": True,
+                    },
+                    {
+                        "name": "grund",
+                        "description": "Was haben sie getan? Sie können auch einen benutzerdefinierten Grund angeben",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.check(is_suspended)
@@ -220,6 +279,8 @@ class moderation(Cog):
             await en.moderation(self.bot).warn(ctx, member, reason)
         elif ctx.locale.value == "fr":
             await fr.moderation(self.bot).warn(ctx, member, reason)
+        elif ctx.locale.value == "de":
+            await de.moderation(self.bot).warn(ctx, member, reason)
 
     @Jeanne.command(
         name=T("list_warns_name"),
@@ -247,6 +308,17 @@ class moderation(Cog):
                     },
                 ],
             },
+            "de": {
+                "name": "liste-warnungen",
+                "description": "Warnungen auf dem Server oder bei einem Mitglied anzeigen",
+                "parameters": [
+                    {
+                        "name": "mitglied",
+                        "description": "Welches Mitglied?",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.check(is_suspended)
@@ -264,6 +336,8 @@ class moderation(Cog):
             await en.moderation(self.bot).listwarns(ctx, member)
         elif ctx.locale.value == "fr":
             await fr.moderation(self.bot).listwarns(ctx, member)
+        elif ctx.locale.value == "de":
+            await de.moderation(self.bot).listwarns(ctx, member)
 
     @listwarns.error
     async def listwarns_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
@@ -274,6 +348,8 @@ class moderation(Cog):
                 await en.moderation(self.bot).listwarns_error(ctx, error)
             elif ctx.locale.value == "fr":
                 await fr.moderation(self.bot).listwarns_error(ctx, error)
+            elif ctx.locale.value == "de":
+                await de.moderation(self.bot).listwarns_error(ctx, error)
 
     @Jeanne.command(
         name=T("clear_warn_name"),
@@ -315,6 +391,24 @@ class moderation(Cog):
                     },
                 ],
             },
+            "de": {
+                "name": "clear-warn",
+                "description": "Ein Warnung nach ID entfernen",
+                "bot_perms": "Mitglieder verwalten",
+                "member_perms": "Mitglieder verwalten",
+                "parameters": [
+                    {
+                        "name": "mitglied",
+                        "description": "Welches Mitglied?",
+                        "required": True,
+                    },
+                    {
+                        "name": "warn_id",
+                        "description": "Was ist die ID der Warnung, die Sie entfernen möchten?",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.check(is_suspended)
@@ -334,6 +428,8 @@ class moderation(Cog):
             await en.moderation(self.bot).clearwarn(ctx, member, warn_id)
         elif ctx.locale.value == "fr":
             await fr.moderation(self.bot).clearwarn(ctx, member, warn_id)
+        elif ctx.locale.value == "de":
+            await de.moderation(self.bot).clearwarn(ctx, member, warn_id)
 
     @Jeanne.command(
         name=T("kick_name"),
@@ -375,6 +471,24 @@ class moderation(Cog):
                     },
                 ],
             },
+            "de": {
+                "name": "kicken",
+                "description": "Einen Benutzer vom Server kicken",
+                "bot_perms": "Mitglieder kicken",
+                "member_perms": "Mitglieder kicken",
+                "parameters": [
+                    {
+                        "name": "mitglied",
+                        "description": "Welches Mitglied?",
+                        "required": True,
+                    },
+                    {
+                        "name": "grund",
+                        "description": "Was haben sie getan? Sie können auch einen benutzerdefinierten Grund angeben",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.check(is_suspended)
@@ -400,6 +514,8 @@ class moderation(Cog):
             await en.moderation(self.bot).kick(ctx, member, reason)
         elif ctx.locale.value == "fr":
             await fr.moderation(self.bot).kick(ctx, member, reason)
+        elif ctx.locale.value == "de":
+            await de.moderation(self.bot).kick(ctx, member, reason)
 
     @Jeanne.command(
         name=T("prune_name"),
@@ -441,6 +557,24 @@ class moderation(Cog):
                     },
                 ],
             },
+            "de": {
+                "name": "prune",
+                "description": "Nachrichten im Bulk löschen",
+                "bot_perms": "Nachrichten verwalten, Nachrichtenverlauf lesen",
+                "member_perms": "Nachrichten verwalten, Nachrichtenverlauf lesen",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "description": "Wie viele Nachrichten? (max ist 100)",
+                        "required": False,
+                    },
+                    {
+                        "name": "member",
+                        "description": "Welches Mitglied?",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.check(is_suspended)
@@ -466,6 +600,8 @@ class moderation(Cog):
             await en.moderation(self.bot).prune(ctx, limit, member)
         elif ctx.locale.value == "fr":
             await fr.moderation(self.bot).prune(ctx, limit, member)
+        elif ctx.locale.value == "de":
+            await de.moderation(self.bot).prune(ctx, limit, member)
 
     @Jeanne.command(
         name=T("change_nickname_name"),
@@ -507,6 +643,24 @@ class moderation(Cog):
                     },
                 ],
             },
+            "de": {
+                "name": "änder-pseudo",
+                "description": "Ändere den Pseudonym eines Mitglieds",
+                "bot_perms": "Pseudonyme verwalten",
+                "member_perms": "Pseudonyme verwalten",
+                "parameters": [
+                    {
+                        "name": "mitglied",
+                        "description": "Welches Mitglied?",
+                        "required": False,
+                    },
+                    {
+                        "name": "pseudo",
+                        "description": "Was ist sein neuer Pseudonym?",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.check(is_suspended)
@@ -530,6 +684,8 @@ class moderation(Cog):
     ):
         if ctx.locale.value == "fr":
             await fr.moderation(self.bot).changenickname(ctx, member, nickname)
+        elif ctx.locale.value == "de":
+            await de.moderation(self.bot).changenickname(ctx, member, nickname)
         else:
             await en.moderation(self.bot).changenickname(ctx, member, nickname)
 
@@ -573,6 +729,24 @@ class moderation(Cog):
                     },
                 ],
             },
+            "de": {
+                "name": "entbannen",
+                "description": "Einen Benutzer entbannen",
+                "bot_perms": "Mitglieder entbannen",
+                "member_perms": "Mitglieder entbannen",
+                "parameters": [
+                    {
+                        "name": "benutzer_id",
+                        "description": "Welchen Benutzer möchten Sie entbannen?",
+                        "required": True,
+                    },
+                    {
+                        "name": "grund",
+                        "description": "Was hat er getan? Sie können auch einen benutzerdefinierten Grund angeben",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.check(is_suspended)
@@ -597,6 +771,8 @@ class moderation(Cog):
             await en.moderation(self.bot).unban(ctx, user_id, reason)
         elif ctx.locale.value == "fr":
             await fr.moderation(self.bot).unban(ctx, user_id, reason)
+        elif ctx.locale.value == "de":
+            await de.moderation(self.bot).unban(ctx, user_id, reason)
 
     @unban.error
     async def unban_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
@@ -658,6 +834,29 @@ class moderation(Cog):
                     },
                 ],
             },
+            "de": {
+                "name": "zeitüberschreitung",
+                "description": "Ein Mitglied zeitlich begrenzen",
+                "bot_perms": "Mitglieder moderieren",
+                "member_perms": "Mitglieder moderieren",
+                "parameters": [
+                    {
+                        "name": "mitglied",
+                        "description": "Welches Mitglied?",
+                        "required": True,
+                    },
+                    {
+                        "name": "zeit",
+                        "description": "Wie lange sollten sie zeitlich begrenzt werden? (1m, 1h30m, etc)",
+                        "required": False,
+                    },
+                    {
+                        "name": "grund",
+                        "description": "Was hat er getan? Sie können auch einen benutzerdefinierten Grund angeben",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.check(is_suspended)
@@ -686,6 +885,8 @@ class moderation(Cog):
             await en.moderation(self.bot).timeout(ctx, member, time, reason)
         elif ctx.locale.value == "fr":
             await fr.moderation(self.bot).timeout(ctx, member, time, reason)
+        elif ctx.locale.value == "de":
+            await de.moderation(self.bot).timeout(ctx, member, time, reason)
 
     @timeout.error
     async def timeout_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
@@ -696,6 +897,8 @@ class moderation(Cog):
                 await en.moderation(self.bot).timeout_error(ctx, error)
             elif ctx.locale.value == "fr":
                 await fr.moderation(self.bot).timeout_error(ctx, error)
+            elif ctx.locale.value == "de":
+                await de.moderation(self.bot).timeout_error(ctx, error)
 
     @Jeanne.command(
         name=T("timeout_remove_name"),
@@ -737,6 +940,24 @@ class moderation(Cog):
                     },
                 ],
             },
+            "de": {
+                "name": "zeitüberschreitung-entfernen",
+                "description": "Ein Mitglied aus der Zeitüberschreitung entfernen",
+                "bot_perms": "Mitglieder moderieren",
+                "member_perms": "Mitglieder moderieren",
+                "parameters": [
+                    {
+                        "name": "mitglied",
+                        "description": "Welches Mitglied?",
+                        "required": True,
+                    },
+                    {
+                        "name": "grund",
+                        "description": "Was hat er getan? Sie können auch einen benutzerdefinierten Grund angeben",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.check(is_suspended)
@@ -762,6 +983,8 @@ class moderation(Cog):
             await en.moderation(self.bot).timeoutremove(ctx, member, reason)
         elif ctx.locale.value == "fr":
             await fr.moderation(self.bot).timeoutremove(ctx, member, reason)
+        elif ctx.locale.value == "de":
+            await de.moderation(self.bot).timeoutremove(ctx, member, reason)
 
     @Jeanne.command(
         name=T("massban_name"),
@@ -801,6 +1024,24 @@ class moderation(Cog):
                     },
                 ],
             },
+            "de": {
+                "name": "massban",
+                "description": "Banne mehrere Mitglieder auf einmal",
+                "bot_perms": "Mitglieder bannen",
+                "member_perms": "Administrator",
+                "parameters": [
+                    {
+                        "name": "user_ids",
+                        "description": "Wie viele Benutzer-IDs? Lassen Sie nach jeder ID ein Leerzeichen (min. 5 und max. 25)",
+                        "required": True,
+                    },
+                    {
+                        "name": "grund",
+                        "description": "Was haben sie getan? Sie können auch einen benutzerdefinierten Grund angeben",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.check(is_suspended)
@@ -822,6 +1063,8 @@ class moderation(Cog):
             await en.moderation(self.bot).massban(ctx, user_ids, reason)
         elif ctx.locale.value == "fr":
             await fr.moderation(self.bot).massban(ctx, user_ids, reason)
+        elif ctx.locale.value == "de":
+            await de.moderation(self.bot).massban(ctx, user_ids, reason)
 
     @massban.error
     async def massban_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
@@ -830,6 +1073,8 @@ class moderation(Cog):
                 await en.moderation(self.bot).massban_error(ctx, error)
             elif ctx.locale.value == "fr":
                 await fr.moderation(self.bot).massban_error(ctx, error)
+            elif ctx.locale.value == "de":
+                await de.moderation(self.bot).massban_error(ctx, error)
 
     @Jeanne.command(
         name=T("massunban_name"),
@@ -871,6 +1116,24 @@ class moderation(Cog):
                     },
                 ],
             },
+            "de": {
+                "name": "massunban",
+                "description": "Débannir plusieurs membres à la fois",
+                "bot_perms": "Bannir des membres",
+                "member_perms": "Administrateur",
+                "parameters": [
+                    {
+                        "name": "user_ids",
+                        "description": "Combien d'IDs utilisateur? Laissez un espace après chaque ID (min est 5 et max est 25)",
+                        "required": True,
+                    },
+                    {
+                        "name": "raison",
+                        "description": "Pourquoi les débannir? Vous pouvez aussi donner une raison personnalisée",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.check(is_suspended)
@@ -892,6 +1155,8 @@ class moderation(Cog):
             await en.moderation(self.bot).massunban(ctx, user_ids, reason)
         elif ctx.locale.value == "fr":
             await fr.moderation(self.bot).massunban(ctx, user_ids, reason)
+        elif ctx.locale.value == "de":
+            await de.moderation(self.bot).massunban(ctx, user_ids, reason)
 
     @massunban.error
     async def massunban_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
@@ -900,6 +1165,8 @@ class moderation(Cog):
                 await en.moderation(self.bot).massunban_error(ctx, error)
         elif ctx.locale.value == "fr":
             await fr.moderation(self.bot).massunban_error(ctx, error)
+        elif ctx.locale.value == "de":
+            await de.moderation(self.bot).massunban_error(ctx, error)
 
 
 async def setup(bot: Bot):
