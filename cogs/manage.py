@@ -1408,6 +1408,19 @@ class Delete_Group(GroupCog, name=T("delete")):
                     },
                 ],
             },
+            "de": {
+                "bot_perms": "Ausdrücke verwalten",
+                "member_perms": "Ausdrücke verwalten",
+                "name": "Sticker löschen",
+                "description": "Ein benutzerdefiniertes Sticker löschen",
+                "parameters": [
+                    {
+                        "name": "Sticker",
+                        "description": "Welches Sticker löschen?",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(sticker=T("sticker_parm_desc"))
@@ -2694,6 +2707,20 @@ class manage(Cog):
                     {"name": "Rôle", "description": "Rôle à ajouter", "required": True},
                 ],
             },
+            "de": {
+                "bot_perms": "Rollen verwalten",
+                "member_perms": "Rollen verwalten",
+                "name": "Rolle hinzufügen",
+                "description": "Fügen Sie einem Mitglied eine Rolle hinzu",
+                "parameters": [
+                    {
+                        "name": "Mitglied",
+                        "description": "Mitglied, dem die Rolle hinzugefügt werden soll",
+                        "required": True,
+                    },
+                    {"name": "Rolle", "description": "Rolle, die hinzugefügt werden soll", "required": True},
+                ],
+            },
         },
     )
     @Jeanne.describe(
@@ -2714,6 +2741,8 @@ class manage(Cog):
             await en.manage(self.bot).addrole(ctx, member, role)
         elif ctx.locale.value == "fr":
             await fr.manage(self.bot).addrole(ctx, member, role)
+        elif ctx.locale.value == "de":
+            await de.manage(self.bot).addrole(ctx, member, role)
 
     @Jeanne.command(
         name=T("remove_role_name"),
@@ -2747,6 +2776,20 @@ class manage(Cog):
                     {"name": "Rôle", "description": "Rôle à retirer", "required": True},
                 ],
             },
+            "de": {
+                "bot_perms": "Rollen verwalten",
+                "member_perms": "Rollen verwalten",
+                "name": "Rolle entfernen",
+                "description": "Entfernen Sie eine Rolle von einem Mitglied",
+                "parameters": [
+                    {
+                        "name": "Mitglied",
+                        "description": "Mitglied, von dem die Rolle entfernt werden soll",
+                        "required": True,
+                    },
+                    {"name": "Rolle", "description": "Rolle, die entfernt werden soll", "required": True},
+                ],
+            },
         },
     )
     @Jeanne.describe(
@@ -2767,6 +2810,8 @@ class manage(Cog):
             await en.manage(self.bot).removerole(ctx, member, role)
         elif ctx.locale.value == "fr":
             await fr.manage(self.bot).removerole(ctx, member, role)
+        elif ctx.locale.value == "de":
+            await de.manage(self.bot).removerole(ctx, member, role)
 
     @Jeanne.command(
         name=T("remove_name"),
@@ -2782,6 +2827,11 @@ class manage(Cog):
                 "name": "Supprimer",
                 "description": "Supprimer toutes les données du serveur",
             },
+            "de": {
+                "member_perms": "Server verwalten",
+                "name": "Entfernen",
+                "description": "Alle Serverdaten entfernen",
+            },
         },
     )
     @Jeanne.checks.bot_has_permissions(manage_guild=True)
@@ -2793,6 +2843,8 @@ class manage(Cog):
             await en.manage(self.bot).remove(ctx)
         elif ctx.locale.value == "fr":
             await fr.manage(self.bot).remove(ctx)
+        elif ctx.locale.value == "de":
+            await de.manage(self.bot).remove(ctx)
 
     @Jeanne.command(
         name=T("clone_name"),
@@ -2850,6 +2902,34 @@ class manage(Cog):
                     },
                 ],
             },
+            "de": {
+                "bot_perms": "Kanal verwalten",
+                "member_perms": "Kanal verwalten",
+                "name": "Klonen",
+                "description": "Einen Kanal klonen",
+                "parameters": [
+                    {
+                        "name": "Kanal",
+                        "description": "Zu klonender Kanal",
+                        "required": False,
+                    },
+                    {
+                        "name": "Name",
+                        "description": "Name für den neuen Kanal",
+                        "required": False,
+                    },
+                    {
+                        "name": "Kategorie",
+                        "description": "Kategorie für den neuen Kanal",
+                        "required": False,
+                    },
+                    {
+                        "name": "NSFW",
+                        "description": "Als NSFW festlegen?",
+                        "required": False,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(
@@ -2878,6 +2958,8 @@ class manage(Cog):
             await en.manage(self.bot).clone(ctx, channel, name, category, nsfw_enabled)
         elif ctx.locale.value == "fr":
             await fr.manage(self.bot).clone(ctx, channel, name, category, nsfw_enabled)
+        elif ctx.locale.value == "de":
+            await de.manage(self.bot).clone(ctx, channel, name, category, nsfw_enabled)
 
 
 class Rename_Group(GroupCog, name="rename"):
@@ -2924,6 +3006,24 @@ class Rename_Group(GroupCog, name="rename"):
                     },
                 ],
             },
+            "de": {
+                "bot_perms": "Ausdrücke verwalten",
+                "member_perms": "Ausdrücke verwalten",
+                "name": "Emoji umbenennen",
+                "description": "Ein benutzerdefiniertes Emoji umbenennen",
+                "parameters": [
+                    {
+                        "name": "Emoji",
+                        "description": "Zu umbenennendes Emoji",
+                        "required": True,
+                    },
+                    {
+                        "name": "Name",
+                        "description": "Neuer Name für das Emoji",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(
@@ -2943,6 +3043,8 @@ class Rename_Group(GroupCog, name="rename"):
             await en.Rename_Group(self.bot).emoji(ctx, emoji, name)
         elif ctx.locale.value == "fr":
             await fr.Rename_Group(self.bot).emoji(ctx, emoji, name)
+        elif ctx.locale.value == "de":
+            await de.Rename_Group(self.bot).emoji(ctx, emoji, name)
 
     @Jeanne.command(
         name=T("rename_category_name"),
@@ -2984,6 +3086,24 @@ class Rename_Group(GroupCog, name="rename"):
                     },
                 ],
             },
+            "de": {
+                "bot_perms": "Kanal verwalten",
+                "member_perms": "Kanal verwalten",
+                "name": "Kategorie umbenennen",
+                "description": "Eine Kategorie umbenennen",
+                "parameters": [
+                    {
+                        "name": "Kategorie",
+                        "description": "Zu umbenennende Kategorie",
+                        "required": True,
+                    },
+                    {
+                        "name": "Name",
+                        "description": "Neuer Name für die Kategorie",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(
@@ -3009,6 +3129,8 @@ class Rename_Group(GroupCog, name="rename"):
             await en.Rename_Group(self.bot).category(ctx, category, name)
         elif ctx.locale.value == "fr":
             await fr.Rename_Group(self.bot).category(ctx, category, name)
+        elif ctx.locale.value == "de":
+            await de.Rename_Group(self.bot).category(ctx, category, name)
 
     @Jeanne.command(
         description=T("rename_sticker_description"),
@@ -3049,6 +3171,24 @@ class Rename_Group(GroupCog, name="rename"):
                     },
                 ],
             },
+            "de": {
+                "bot_perms": "Ausdrücke verwalten",
+                "member_perms": "Ausdrücke verwalten",
+                "name": "Sticker umbenennen",
+                "description": "Ein benutzerdefiniertes Sticker umbenennen",
+                "parameters": [
+                    {
+                        "name": "Sticker",
+                        "description": "Sticker zu umbenennen",
+                        "required": True,
+                    },
+                    {
+                        "name": "Name",
+                        "description": "Neuer Name für das Sticker",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(
@@ -3070,6 +3210,8 @@ class Rename_Group(GroupCog, name="rename"):
             await en.Rename_Group(self.bot).sticker(ctx, sticker, name)
         elif ctx.locale.value == "fr":
             await fr.Rename_Group(self.bot).sticker(ctx, sticker, name)
+        elif ctx.locale.value == "de":
+            await de.Rename_Group(self.bot).sticker(ctx, sticker, name)
 
 
 class Command_Group(GroupCog, name="command"):
@@ -3105,6 +3247,18 @@ class Command_Group(GroupCog, name="command"):
                     },
                 ],
             },
+            "de": {
+                "member_perms": "Server verwalten",
+                "name": "Befehl deaktivieren",
+                "description": "Einen Befehl für diesen Server deaktivieren",
+                "parameters": [
+                    {
+                        "name": "Befehl",
+                        "description": "Zu deaktivierender Befehl",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.autocomplete(command=AutoCompleteChoices.command_choices)
@@ -3122,6 +3276,8 @@ class Command_Group(GroupCog, name="command"):
             await en.Command_Group(self.bot)._disable(ctx, command)
         elif ctx.locale.value == "fr":
             await fr.Command_Group(self.bot)._disable(ctx, command)
+        elif ctx.locale.value == "de":
+            await de.Command_Group(self.bot)._disable(ctx, command)
 
     @Jeanne.command(
         name=T("enable_command_name"),
@@ -3151,6 +3307,18 @@ class Command_Group(GroupCog, name="command"):
                     },
                 ],
             },
+            "de": {
+                "member_perms": "Server verwalten",
+                "name": "Befehl aktivieren",
+                "description": "Einen zuvor deaktivierten Befehl aktivieren",
+                "parameters": [
+                    {
+                        "name": "Befehl",
+                        "description": "Zu aktivierender Befehl",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.autocomplete(command=AutoCompleteChoices.disabled_commands)
@@ -3168,6 +3336,8 @@ class Command_Group(GroupCog, name="command"):
             await en.Command_Group(self.bot)._enable(ctx, command)
         elif ctx.locale.value == "fr":
             await fr.Command_Group(self.bot)._enable(ctx, command)
+        elif ctx.locale.value == "de":
+            await de.Command_Group(self.bot)._enable(ctx, command)
 
     @Jeanne.command(
         name=T("list_disabled_commands_name"),
@@ -3176,12 +3346,14 @@ class Command_Group(GroupCog, name="command"):
             "en": {
                 "name": "List Disabled Commands",
                 "description": "List all disabled commands for this server",
-                "parameters": [],
             },
             "fr": {
                 "name": "Lister les commandes désactivées",
                 "description": "Lister toutes les commandes désactivées pour ce serveur",
-                "parameters": [],
+            },
+            "de": {
+                "name": "Liste der deaktivierten Befehle",
+                "description": "Liste aller deaktivierten Befehle für diesen Server",
             },
         },
     )
@@ -3192,6 +3364,8 @@ class Command_Group(GroupCog, name="command"):
             await en.Command_Group(self.bot).listdisabled(ctx)
         elif ctx.locale.value == "fr":
             await fr.Command_Group(self.bot).listdisabled(ctx)
+        elif ctx.locale.value == "de":
+            await de.Command_Group(self.bot).listdisabled(ctx)
 
 
 class Level_Group(GroupCog, name="level"):
@@ -3235,6 +3409,23 @@ class Level_Group(GroupCog, name="level"):
                     },
                 ],
             },
+            "de": {
+                "member_perms": "Server verwalten",
+                "name": "Rollenbelohnung hinzufügen",
+                "description": "Eine Rollenbelohnung für ein Level hinzufügen",
+                "parameters": [
+                    {
+                        "name": "Rolle",
+                        "description": "Rolle zu belohnen",
+                        "required": True,
+                    },
+                    {
+                        "name": "Level",
+                        "description": "Level, das für die Belohnung erforderlich ist",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(
@@ -3254,6 +3445,8 @@ class Level_Group(GroupCog, name="level"):
             await en.Level_Group(self.bot)._add(ctx, role, level)
         elif ctx.locale.value == "fr":
             await fr.Level_Group(self.bot)._add(ctx, role, level)
+        elif ctx.locale.value == "de":
+            await de.Level_Group(self.bot)._add(ctx, role, level)
 
     @role.command(
         name=T("remove_role_reward_name"),
@@ -3283,6 +3476,18 @@ class Level_Group(GroupCog, name="level"):
                     },
                 ],
             },
+            "de": {
+                "member_perms": "Server verwalten",
+                "name": "Rollenbelohnung entfernen",
+                "description": "Eine Rollenbelohnung entfernen",
+                "parameters": [
+                    {
+                        "name": "Rolle",
+                        "description": "Rolle von den Belohnungen entfernen",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(role=T("remove_role_reward_role_desc"))
@@ -3296,6 +3501,8 @@ class Level_Group(GroupCog, name="level"):
             await en.Level_Group(self.bot)._remove(ctx, role)
         elif ctx.locale.value == "fr":
             await fr.Level_Group(self.bot)._remove(ctx, role)
+        elif ctx.locale.value == "de":
+            await de.Level_Group(self.bot)._remove(ctx, role)
 
     @role.command(
         name=T("list_role_rewards_name"),
@@ -3304,12 +3511,17 @@ class Level_Group(GroupCog, name="level"):
             "en": {
                 "name": "List Role Rewards",
                 "description": "List all role rewards",
-                "parameters": [],
+                
             },
             "fr": {
                 "name": "Lister les récompenses de rôle",
                 "description": "Lister toutes les récompenses de rôle",
-                "parameters": [],
+                
+            },
+            "de": {
+                "name": "Rollenbelohnungen auflisten",
+                "description": "Alle Rollenbelohnungen auflisten",
+                
             },
         },
     )
@@ -3321,6 +3533,8 @@ class Level_Group(GroupCog, name="level"):
             await en.Level_Group(self.bot).listrolerewards(ctx)
         elif ctx.locale.value == "fr":
             await fr.Level_Group(self.bot).listrolerewards(ctx)
+        elif ctx.locale.value == "de":
+            await de.Level_Group(self.bot).listrolerewards(ctx)
 
     channel_blacklist = Jeanne.Group(
         name=T("blacklist_channel_group_name"), description="..."
@@ -3354,6 +3568,18 @@ class Level_Group(GroupCog, name="level"):
                     },
                 ],
             },
+            "de": {
+                "member_perms": "Server verwalten",
+                "name": "Kanal zur Blacklist hinzufügen",
+                "description": "Einen Kanal zur Blacklist der Level hinzufügen",
+                "parameters": [
+                    {
+                        "name": "Kanal",
+                        "description": "Kanal, der auf die Blacklist gesetzt werden soll",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(channel=T("add_blacklist_ch_channel_desc"))
@@ -3367,6 +3593,8 @@ class Level_Group(GroupCog, name="level"):
             await en.Level_Group(self.bot).add(ctx, channel)
         elif ctx.locale.value == "fr":
             await fr.Level_Group(self.bot).add(ctx, channel)
+        elif ctx.locale.value == "de":
+            await de.Level_Group(self.bot).add(ctx, channel)
 
     @channel_blacklist.command(
         name=T("remove"),
@@ -3396,6 +3624,18 @@ class Level_Group(GroupCog, name="level"):
                     },
                 ],
             },
+            "de": {
+                "member_perms": "Server verwalten",
+                "name": "Kanal von der Blacklist entfernen",
+                "description": "Einen Kanal von der Blacklist der Level entfernen",
+                "parameters": [
+                    {
+                        "name": "Kanal",
+                        "description": "Kanal, der von der Blacklist entfernt werden soll",
+                        "required": True,
+                    },
+                ],
+            },
         },
     )
     @Jeanne.describe(channel=T("remove_blacklist_ch_channel_desc"))
@@ -3409,6 +3649,8 @@ class Level_Group(GroupCog, name="level"):
             await en.Level_Group(self.bot).remove(ctx, channel)
         elif ctx.locale.value == "fr":
             await fr.Level_Group(self.bot).remove(ctx, channel)
+        elif ctx.locale.value == "de":
+            await de.Level_Group(self.bot).remove(ctx, channel)
 
     @channel_blacklist.command(
         name=T("list_blacklist_channels_name"),
@@ -3417,12 +3659,16 @@ class Level_Group(GroupCog, name="level"):
             "en": {
                 "name": "List Blacklist Channels",
                 "description": "List all blacklisted channels",
-                "parameters": [],
+                
             },
             "fr": {
                 "name": "Lister les canels sur liste noire",
                 "description": "Lister tous les canels sur liste noire",
-                "parameters": [],
+            },
+            "de": {
+                "name": "Blacklist-Kanäle auflisten",
+                "description": "Alle Blacklist-Kanäle auflisten",
+
             },
         },
     )
@@ -3434,6 +3680,8 @@ class Level_Group(GroupCog, name="level"):
             await en.Level_Group(self.bot).listblacklistedchannels(ctx)
         elif ctx.locale.value == "fr":
             await fr.Level_Group(self.bot).listblacklistedchannels(ctx)
+        elif ctx.locale.value == "de":
+            await de.Level_Group(self.bot).listblacklistedchannels(ctx)
 
 
 async def setup(bot: Bot):
