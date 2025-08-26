@@ -138,7 +138,7 @@ class Background_Group():
                 text="Please note that if the custom background violates ToS or is NSFW, it will be removed with NO REFUNDS!"
             )
         )
-        view = Confirmation(ctx.user)
+        view = Confirmation(ctx, ctx.user)
         await ctx.edit_original_response(embed=preview, attachments=[file], view=view)
         await view.wait()
         if view.value:

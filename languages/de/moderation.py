@@ -104,7 +104,7 @@ class moderation():
 
         if member not in ctx.guild.members:
             if not await self.check_banned(ctx, member):
-                view = Confirmation(ctx.user)
+                view = Confirmation(ctx, ctx.user)
                 confirm = Embed(
                     description="Is {} degene die je wilt verbannen van je server?".format(
                         member
@@ -541,7 +541,7 @@ class moderation():
             embed = Embed(description="Geen gebruikers kunnen worden verbannen.", color=Color.red())
             await ctx.followup.send(embed=embed)
             return
-        view = Confirmation(ctx.user)
+        view = Confirmation(ctx, ctx.user)
         alert = Embed(
             title="Gevonden gebruikers:",
             description="\n".join(
@@ -641,7 +641,7 @@ class moderation():
             embed = Embed(description="Geen gebruikers kunnen worden unbanned.", color=Color.red())
             await ctx.followup.send(embed=embed)
             return
-        view = Confirmation(ctx.user)
+        view = Confirmation(ctx, ctx.user)
         alert = Embed(
             title="LET OP",
             description="De ontwikkelaar is **NIET** op welke manier dan ook verantwoordelijk als je een fout maakt, zelfs niet bij misbruik.\n\nWil je doorgaan?",

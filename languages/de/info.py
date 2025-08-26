@@ -74,7 +74,7 @@ class Info:
         userinfo.set_thumbnail(url=member.display_avatar)
         if user.banner:
             userinfo.set_image(url=user.banner)
-        view = RolesButton(member, userinfo, has_roles)
+        view = RolesButton(ctx, member, userinfo, has_roles)
         await ctx.followup.send(embeds=[userinfo], view=view)
         await view.wait()
         if view.value is None:

@@ -735,8 +735,8 @@ class Set_Group:
                     ("%icon%", str(ctx.guild.icon)),
                 ]
             )
-            json_request = str(get(jsonscript.url).content)
-            json_content = self.replace_all(json_request, parameters)
+
+            json_content = self.replace_all(jsonscript, parameters)
             json = loads(json_content)
             try:
                 content = json["content"]
@@ -747,7 +747,7 @@ class Set_Group:
                 description="Voici un aperçu du message de bienvenue.\nÊtes-vous satisfait ?"
             )
             embed = Embed.from_dict(json["embeds"][0])
-            view = Confirmation(ctx.user)
+            view = Confirmation(ctx, ctx.user)
             await ctx.followup.send(
                 content=content,
                 embeds=[embed, confirm],
@@ -759,7 +759,7 @@ class Set_Group:
             )
             await view.wait()
             if view.value:
-                await Manage(ctx.guild).set_welcomer_msg(str(json_request))
+                await Manage(ctx.guild).set_welcomer_msg(str(jsonscript))
                 embed = Embed(description="Message de bienvenue défini")
                 await ctx.edit_original_response(
                     content=None, embeds=[embed], view=None
@@ -798,8 +798,7 @@ class Set_Group:
                     ("%icon%", str(ctx.guild.icon)),
                 ]
             )
-            json_request = str(get(jsonscript.url).content)
-            json_content = self.replace_all(json_request, parameters)
+            json_content = self.replace_all(jsonscript, parameters)
             json = loads(json_content)
             try:
                 content = json["content"]
@@ -810,7 +809,7 @@ class Set_Group:
                 description="Voici un aperçu du message de départ.\nÊtes-vous satisfait ?"
             )
             embed = Embed.from_dict(json["embeds"][0])
-            view = Confirmation(ctx.user)
+            view = Confirmation(ctx, ctx.user)
             await ctx.followup.send(
                 content=content,
                 embeds=[embed, confirm],
@@ -822,7 +821,7 @@ class Set_Group:
             )
             await view.wait()
             if view.value:
-                await Manage(ctx.guild).set_leaving_msg(str(json_request))
+                await Manage(ctx.guild).set_leaving_msg(str(jsonscript))
                 embed = Embed(description="Message de départ défini")
                 await ctx.edit_original_response(
                     content=None, embeds=[embed], view=None

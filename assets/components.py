@@ -40,17 +40,17 @@ class Confirmation(ui.View):
         self.value = None
 
         if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            self.confirm = "Confirm"
-            self.cancel = "Cancel"
+            label_confirm = "Confirm"
+            label_cancel = "Cancel"
         elif ctx.locale.value == "fr":
-            self.confirm = "Confirmer"
-            self.cancel = "Annuler"
+            label_confirm = "Confirmer"
+            label_cancel = "Annuler"
         elif ctx.locale.value == "de":
-            self.confirm = "Bestätigen"
-            self.cancel = "Abbrechen"
+            label_confirm = "Bestätigen"
+            label_cancel = "Abbrechen"
 
-        confirm_button = ui.Button(label=self.confirm, style=ButtonStyle.green)
-        cancel_button = ui.Button(label=self.cancel, style=ButtonStyle.red)
+        confirm_button = ui.Button(label=label_confirm, style=ButtonStyle.green)
+        cancel_button = ui.Button(label=label_cancel, style=ButtonStyle.red)
 
         async def confirm_callback(ctx: Interaction):
             await self.confirm(ctx, confirm_button)

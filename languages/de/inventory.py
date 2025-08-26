@@ -137,7 +137,7 @@ class Background_Group:
                 text="Let op: als de aangepaste achtergrond in strijd is met de ToS of NSFW is, wordt deze verwijderd ZONDER TERUGBETALING!"
             )
         )
-        view = Confirmation(ctx.user)
+        view = Confirmation(ctx, ctx.user)
         await ctx.edit_original_response(embed=preview, attachments=[file], view=view)
         await view.wait()
         if view.value:

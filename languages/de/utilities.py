@@ -428,7 +428,7 @@ class Utilities:
         await ctx.followup.send(embed=invite, view=InviteButton())
 
     async def botreport(self, ctx: Interaction, report_type: str):
-        await ctx.response.send_modal(ReportModal(report_type))
+        await ctx.response.send_modal(ReportModal(ctx, report_type))
 
     async def confession(
         self,
