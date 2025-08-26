@@ -2002,18 +2002,6 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Insérer un script JSON",
                 "de": "JSON-Skript einfügen",
             },
-            "generate_jsonfile_parm_name": {
-                "en-GB": "jsonfile",
-                "en-US": "jsonfile",
-                "fr": "fichierjson",
-                "de": "jsondatei",
-            },
-            "generate_jsonfile_parm_desc": {
-                "en-GB": "JSON file",
-                "en-US": "JSON file",
-                "fr": "Fichier JSON",
-                "de": "JSON-Datei",
-            },
             "edit": {
                 "en-GB": "edit",
                 "en-US": "edit",
@@ -2050,18 +2038,13 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "ID du message de l'embed",
                 "de": "Nachrichten-ID des Embeds",
             },
-            "jsonfile_parm_name": {
-                "en-GB": "jsonfile",
-                "en-US": "jsonfile",
+            "jsonscript_parm_name": {
+                "en-GB": "jsonscript",
+                "en-US": "jsonscript",
                 "fr": "fichierjson",
                 "de": "jsondatei",
             },
-            "jsonfile_parm_desc": {
-                "en-GB": "Insert JSON file",
-                "en-US": "Insert JSON file",
-                "fr": "Insérer un fichier JSON",
-                "de": "JSON-Datei einfügen",
-            },
+
             "jsonscript_parm_desc": {
                 "en-GB": "Insert JSON script",
                 "en-US": "Insert JSON script",

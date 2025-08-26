@@ -2214,11 +2214,11 @@ class Set_Group(GroupCog, name="set"):
             "en": {
                 "member_perms": "Manage Server",
                 "name": "Set Welcoming Message",
-                "description": "Set the welcoming message (JSON file)",
+                "description": "Set the welcoming message (JSON script)",
                 "parameters": [
                     {
-                        "name": "JSON File",
-                        "description": "JSON file for welcome message",
+                        "name": "JSON script",
+                        "description": "JSON script for welcome message",
                         "required": False,
                     },
                 ],
@@ -2226,11 +2226,11 @@ class Set_Group(GroupCog, name="set"):
             "fr": {
                 "member_perms": "Gérer le serveur",
                 "name": "Configurer message d'accueil",
-                "description": "Définir le message d'accueil (fichier JSON)",
+                "description": "Définir le message d'accueil (script JSON)",
                 "parameters": [
                     {
-                        "name": "Fichier JSON",
-                        "description": "Fichier JSON pour le message d'accueil",
+                        "name": "Script JSON",
+                        "description": "Script JSON pour le message d'accueil",
                         "required": False,
                     },
                 ],
@@ -2238,32 +2238,32 @@ class Set_Group(GroupCog, name="set"):
             "de": {
                 "member_perms": "Server verwalten",
                 "name": "Willkommensnachricht konfigurieren",
-                "description": "Konfigurieren Sie die Willkommensnachricht (JSON-Datei)",
+                "description": "Konfigurieren Sie die Willkommensnachricht (JSON-Skript)",
                 "parameters": [
                     {
-                        "name": "JSON-Datei",
-                        "description": "JSON-Datei für die Willkommensnachricht",
+                        "name": "JSON-Skript",
+                        "description": "JSON-Skript für die Willkommensnachricht",
                         "required": False,
                     },
                 ],
             },
         },
     )
-    @Jeanne.describe(jsonfile=T("jsonfile_parm_desc"))
-    @Jeanne.rename(jsonfile=T("jsonfile_parm_name"))
+    @Jeanne.describe(jsonscript=T("jsonscript_parm_desc"))
+    @Jeanne.rename(jsonscript=T("jsonscript_parm_name"))
     @Jeanne.checks.bot_has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def welcomingmsg(
-        self, ctx: Interaction, jsonfile: Optional[Attachment] = None
+        self, ctx: Interaction, jsonscript: Optional[str] = None
     ) -> None:
         if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            await en.Set_Group(self.bot).welcomingmsg(ctx, jsonfile)
+            await en.Set_Group(self.bot).welcomingmsg(ctx, jsonscript)
         elif ctx.locale.value == "fr":
-            await fr.Set_Group(self.bot).welcomingmsg(ctx, jsonfile)
+            await fr.Set_Group(self.bot).welcomingmsg(ctx, jsonscript)
         elif ctx.locale.value == "de":
-            await de.Set_Group(self.bot).welcomingmsg(ctx, jsonfile)
+            await de.Set_Group(self.bot).welcomingmsg(ctx, jsonscript)
 
     @Jeanne.command(
         name=T("set_leavingmsg_name"),
@@ -2272,11 +2272,11 @@ class Set_Group(GroupCog, name="set"):
             "en": {
                 "member_perms": "Manage Server",
                 "name": "Set Leaving Message",
-                "description": "Set the leaving message (JSON file)",
+                "description": "Set the leaving message (JSON script)",
                 "parameters": [
                     {
-                        "name": "JSON File",
-                        "description": "JSON file for leave message",
+                        "name": "JSON Script",
+                        "description": "JSON script for leave message",
                         "required": False,
                     },
                 ],
@@ -2284,11 +2284,11 @@ class Set_Group(GroupCog, name="set"):
             "fr": {
                 "member_perms": "Gérer le serveur",
                 "name": "Configurer message de départ",
-                "description": "Définir le message de départ (fichier JSON)",
+                "description": "Définir le message de départ (script JSON)",
                 "parameters": [
                     {
-                        "name": "Fichier JSON",
-                        "description": "Fichier JSON pour le message de départ",
+                        "name": "Script JSON",
+                        "description": "Script JSON pour le message de départ",
                         "required": False,
                     },
                 ],
@@ -2296,32 +2296,32 @@ class Set_Group(GroupCog, name="set"):
             "de": {
                 "member_perms": "Server verwalten",
                 "name": "Verlassen-Nachricht konfigurieren",
-                "description": "Konfigurieren Sie die Verlassen-Nachricht (JSON-Datei)",
+                "description": "Konfigurieren Sie die Verlassen-Nachricht (JSON-Skript)",
                 "parameters": [
                     {
-                        "name": "JSON-Datei",
-                        "description": "JSON-Datei für die Verlassen-Nachricht",
+                        "name": "JSON-Skript",
+                        "description": "JSON-Skript für die Verlassen-Nachricht",
                         "required": False,
                     },
                 ],
             },
         },
     )
-    @Jeanne.describe(jsonfile=T("jsonfile_parm_desc"))
-    @Jeanne.rename(jsonfile=T("jsonfile_parm_name"))
+    @Jeanne.describe(jsonscript=T("jsonscript_parm_desc"))
+    @Jeanne.rename(jsonscript=T("jsonscript_parm_name"))
     @Jeanne.checks.bot_has_permissions(manage_guild=True)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def leavingmsg(
-        self, ctx: Interaction, jsonfile: Optional[Attachment] = None
+        self, ctx: Interaction, jsonscript: Optional[str] = None
     ) -> None:
         if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            await en.Set_Group(self.bot).leavingmsg(ctx, jsonfile)
+            await en.Set_Group(self.bot).leavingmsg(ctx, jsonscript)
         elif ctx.locale.value == "fr":
-            await fr.Set_Group(self.bot).leavingmsg(ctx, jsonfile)
+            await fr.Set_Group(self.bot).leavingmsg(ctx, jsonscript)
         elif ctx.locale.value == "de":
-            await de.Set_Group(self.bot).leavingmsg(ctx, jsonfile)
+            await de.Set_Group(self.bot).leavingmsg(ctx, jsonscript)
 
     @Jeanne.command(
         name=T("set_rolereward_message_name"),

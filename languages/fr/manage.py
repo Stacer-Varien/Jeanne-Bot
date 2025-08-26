@@ -713,12 +713,12 @@ class Set_Group:
         await ctx.followup.send(embed=embed)
 
     async def welcomingmsg(
-        self, ctx: Interaction, jsonfile: Optional[Attachment] = None
+        self, ctx: Interaction, jsonscript: Optional[str] = None
     ) -> None:
-        if jsonfile is None:
+        if jsonscript is None:
             await ctx.response.send_modal(Welcomingmsg(ctx))
             return
-        if jsonfile is not None:
+        if jsonscript is not None:
             await ctx.response.defer()
             humans = str(
                 len([member for member in ctx.guild.members if not member.bot])
@@ -735,7 +735,7 @@ class Set_Group:
                     ("%icon%", str(ctx.guild.icon)),
                 ]
             )
-            json_request = str(get(jsonfile.url).content)
+            json_request = str(get(jsonscript.url).content)
             json_content = self.replace_all(json_request, parameters)
             json = loads(json_content)
             try:
@@ -776,12 +776,12 @@ class Set_Group:
                 )
 
     async def leavingmsg(
-        self, ctx: Interaction, jsonfile: Optional[Attachment] = None
+        self, ctx: Interaction, jsonscript: Optional[str] = None
     ) -> None:
-        if jsonfile is None:
+        if jsonscript is None:
             await ctx.response.send_modal(Leavingmsg(ctx))
             return
-        if jsonfile is not None:
+        if jsonscript is not None:
             await ctx.response.defer()
             humans = str(
                 len([member for member in ctx.guild.members if not member.bot])
@@ -798,7 +798,7 @@ class Set_Group:
                     ("%icon%", str(ctx.guild.icon)),
                 ]
             )
-            json_request = str(get(jsonfile.url).content)
+            json_request = str(get(jsonscript.url).content)
             json_content = self.replace_all(json_request, parameters)
             json = loads(json_content)
             try:
