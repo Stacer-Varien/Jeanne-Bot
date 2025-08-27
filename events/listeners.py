@@ -84,9 +84,8 @@ class listenersCog(Cog):
                                     ),
                                 ]
                             )
-                            
-                            if update == "0" or update is None:
-                                # Separate English and French messages
+
+                            if update is None:
                                 if message.guild.preferred_locale.value in ["en-GB", "en-US"]:
                                     msg = "{} has leveled up to `{}`".format(
                                         message.author,
@@ -94,8 +93,15 @@ class listenersCog(Cog):
                                             message.author, message.guild
                                         ).get_member_level,
                                     )
-                                else:
+                                elif message.guild.preferred_locale.value == "fr":
                                     msg = "{} a atteint le niveau `{}`".format(
+                                        message.author,
+                                        Levelling(
+                                            message.author, message.guild
+                                        ).get_member_level,
+                                    )
+                                elif message.guild.preferred_locale.value == "de":
+                                    msg = "{} hat das Level `{}` erreicht".format(
                                         message.author,
                                         Levelling(
                                             message.author, message.guild
@@ -116,15 +122,19 @@ class listenersCog(Cog):
                                 await channel.send(content=msg, embed=embed)
                             if role_reward:
                                 await message.author.add_roles(role_reward)
-                                if levelup == "0" or levelup is None:
-                                    # Separate English and French messages
+                                if levelup is None:
                                     if message.guild.preferred_locale.value in ["en-GB", "en-US"]:
                                         msg = "CONGRATS {}! You were role awarded {}".format(
                                             message.author,
                                             role_reward.name,
                                         )
-                                    else:
+                                    elif message.guild.preferred_locale.value == "fr":
                                         msg = "FÉLICITATIONS {}! Tu as reçu le rôle {}".format(
+                                            message.author,
+                                            role_reward.name,
+                                        )
+                                    elif message.guild.preferred_locale.value == "de":
+                                        msg = "HERZLICHEN GLÜCKWUNSCH {}! Du hast die Rolle {} erhalten".format(
                                             message.author,
                                             role_reward.name,
                                         )
