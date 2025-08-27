@@ -19,7 +19,7 @@ class DBL(Cog, name="DBL"):
         self.topgg_webhook.run(5000)
         self.update_stats.start()
 
-    @tasks.loop(minutes=30, reconnect=True)
+    @tasks.loop(minutes=60, reconnect=True)
     async def update_stats(self):
         servers = len(self.bot.guilds)
         dbheaders = {
