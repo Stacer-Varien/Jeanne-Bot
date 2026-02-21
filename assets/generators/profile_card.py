@@ -45,35 +45,89 @@ class Profile:
 
     @staticmethod
     def calculate_level_xp(level: int) -> int:
-        """Calculates the cumulative XP required to reach the END of the given level."""
         return (level * 50) + ((level - 1) * 25) + 50
 
     @staticmethod
+    def _fit_text(
+        draw: ImageDraw.ImageDraw,
+        value: str,
+        font_path: str,
+        start_size: int,
+        max_width: int,
+    ) -> ImageFont.FreeTypeFont:
+        size = start_size
+        font = ImageFont.truetype(font_path, size)
+        while draw.textlength(value, font=font) > max_width and size > 20:
+            size -= 2
+            font = ImageFont.truetype(font_path, size)
+        return font
+
+    @staticmethod
     def draw_progress_bar(
-        draw: ImageDraw,
+        draw: ImageDraw.ImageDraw,
         x: int,
         y: int,
         width: int,
         height: int,
         percent: float,
         color: tuple,
-        bg_color: tuple = (50, 50, 50),
+        bg_color: tuple = (36, 40, 50, 230),
     ):
-        """Draws a modern progress bar with a background track."""
-        # Draw background track
-        draw.rounded_rectangle(
-            (x, y, x + width, y + height), radius=height // 2, fill=bg_color
-        )
-
-        # Calculate fill width (clamped between 0 and 100%)
         safe_percent = max(0.0, min(100.0, percent))
         fill_width = int(width * (safe_percent / 100))
 
-        # Draw fill
+        draw.rounded_rectangle(
+            (x, y, x + width, y + height),
+            radius=height // 2,
+            fill=bg_color,
+        )
         if fill_width > 0:
             draw.rounded_rectangle(
-                (x, y, x + fill_width, y + height), radius=height // 2, fill=color
+                (x, y, x + fill_width, y + height),
+                radius=height // 2,
+                fill=color,
             )
+
+    @staticmethod
+    def _draw_glass_panel(
+        draw: ImageDraw.ImageDraw,
+        x1: int,
+        y1: int,
+        x2: int,
+        y2: int,
+        outline: tuple[int, int, int],
+        alpha: int = 155,
+    ):
+        draw.rounded_rectangle(
+            (x1, y1, x2, y2),
+            radius=20,
+            fill=(20, 24, 33, alpha),
+            outline=outline,
+            width=2,
+        )
+
+    @staticmethod
+    def _draw_stat_card(
+        draw: ImageDraw.ImageDraw,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        label: str,
+        value: str,
+        theme_color: tuple[int, int, int],
+        font_label: ImageFont.FreeTypeFont,
+        font_value: ImageFont.FreeTypeFont,
+    ):
+        draw.rounded_rectangle(
+            (x, y, x + width, y + height),
+            radius=16,
+            fill=(23, 27, 37, 220),
+            outline=theme_color,
+            width=1,
+        )
+        draw.text((x + 14, y + 12), label, fill=theme_color, font=font_label)
+        draw.text((x + 14, y + 52), value, fill=(240, 240, 247), font=font_value)
 
     async def fetch_image(self, url: str) -> BytesIO | Literal[False]:
         headers = {"User-Agent": "Mozilla/5.0"}
@@ -91,15 +145,12 @@ class Profile:
         voted: bool = False,
         country: str = None,
     ) -> BytesIO | Literal[False]:
-        # Initialize Data
         inventory_instance = Inventory(user)
         currency_instance = Currency(user)
 
-        # Safety check for DM contexts
         guild = user.guild if isinstance(user, Member) else None
         levelling_instance = Levelling(user, guild)
 
-        # --- 1. Background Setup ---
         if bg_image:
             bg_data = await self.fetch_image(bg_image)
             card_bg = (
@@ -117,13 +168,19 @@ class Profile:
         if card_bg.size != (900, 500):
             card_bg = card_bg.resize((900, 500), resample=Image.Resampling.LANCZOS)
 
-        # --- 2. Canvas Setup ---
-        canvas_color = (32, 32, 32)
-        final_canvas = Image.new("RGBA", (900, 900), canvas_color)
+        final_canvas = Image.new("RGBA", (900, 900), (12, 16, 24, 255))
         final_canvas.paste(card_bg, (0, 0))
+
+        # Strong top-to-bottom gradient for readability and depth
+        overlay = Image.new("RGBA", (900, 500), (0, 0, 0, 0))
+        overlay_draw = ImageDraw.Draw(overlay)
+        for i in range(500):
+            alpha = int(22 + (i / 500) * 110)
+            overlay_draw.line((0, i, 900, i), fill=(8, 12, 18, alpha), width=1)
+        final_canvas = Image.alpha_composite(final_canvas, overlay)
+
         draw = ImageDraw.Draw(final_canvas)
 
-        # Theme Color
         font_color_hex = inventory_instance.get_color
         theme_color = (
             tuple(ImageColor.getcolor(font_color_hex, "RGB"))
@@ -131,59 +188,45 @@ class Profile:
             else (204, 204, 255)
         )
 
-        # --- 3. Profile Picture ---
+        # Main info panel
+        self._draw_glass_panel(draw, 25, 355, 875, 875, theme_color, alpha=152)
+        draw.rectangle((40, 560, 860, 562), fill=theme_color)
+
         avatar_url = user.display_avatar.url
         avatar_data = await self.fetch_image(avatar_url)
         if not avatar_data:
             avatar_data = await self.fetch_image(user.default_avatar.url)
+        if not avatar_data:
+            return False
 
         profile_img = Image.open(avatar_data).convert("RGBA")
-        profile_img = profile_img.resize((180, 180), resample=Image.Resampling.LANCZOS)
+        profile_img = profile_img.resize((190, 190), resample=Image.Resampling.LANCZOS)
 
-        mask = Image.new("L", (180, 180), 0)
-        ImageDraw.Draw(mask).ellipse((0, 0, 180, 180), fill=255)
+        mask = Image.new("L", (190, 190), 0)
+        ImageDraw.Draw(mask).ellipse((0, 0, 190, 190), fill=255)
 
-        pfp_x, pfp_y = 50, 410
+        pfp_x, pfp_y = 55, 380
         draw.ellipse(
-            (pfp_x - 5, pfp_y - 5, pfp_x + 185, pfp_y + 185), fill=canvas_color
+            (pfp_x - 7, pfp_y - 7, pfp_x + 197, pfp_y + 197), fill=(8, 10, 16, 230)
         )
         draw.ellipse(
-            (pfp_x - 2, pfp_y - 2, pfp_x + 182, pfp_y + 182),
+            (pfp_x - 3, pfp_y - 3, pfp_x + 193, pfp_y + 193),
             outline=theme_color,
-            width=3,
+            width=4,
         )
         final_canvas.paste(profile_img, (pfp_x, pfp_y), mask)
 
-        # Username with dynamic font size adjustment
-        name_font_size = 55
-        name_font = ImageFont.truetype(self.font1, name_font_size)
-        username_width = draw.textlength(str(user), font=name_font)
-        max_width = 500  # Maximum width before shrinking
+        username = str(user)
+        name_font = self._fit_text(draw, username, self.font1, 56, 470)
+        draw.text((270, 398), username, fill=theme_color, font=name_font)
 
-        while username_width > max_width:
-            name_font_size -= 2
-            name_font = ImageFont.truetype(self.font1, name_font_size)
-            username_width = draw.textlength(str(user), font=name_font)
-
-        draw.text(
-            (250, 425), str(user), fill=(0, 0, 0, 180), font=name_font, stroke_width=1
-        )
-        draw.text((250, 425), str(user), fill=theme_color, font=name_font)
-
-        # Badges
         badges_list = await self.get_badges(user, voted, country)
-        for badge, x_pos in badges_list:
-            self.enhance_and_paste(badge, (x_pos, 430), final_canvas)
+        badge_start_x = 270
+        for index, (badge, _) in enumerate(badges_list[:8]):
+            self.enhance_and_paste(
+                badge, (badge_start_x + index * 58, 468), final_canvas
+            )
 
-        # --- 4. Stats & Progress Bars ---
-        # Adjusted Y coordinates to prevent overlap
-        stats_y = 610
-        g_bar_y = 700
-        s_bar_y = 770
-        bio_y = 840
-        col_margin = 50
-
-        # Localization
         lang = ctx.locale.value if ctx.locale else "en-US"
         if lang in ["fr"]:
             labels = {
@@ -204,11 +247,11 @@ class Profile:
                 "bio": "No bio available",
             }
 
-        font_header = ImageFont.truetype(self.font1, 32)
-        font_val = ImageFont.truetype(self.font1, 40)
-        font_small = ImageFont.truetype(self.font1, 24)
+        font_header = ImageFont.truetype(self.font1, 26)
+        font_val = ImageFont.truetype(self.font1, 34)
+        font_small = ImageFont.truetype(self.font1, 22)
+        bio_font = ImageFont.truetype(self.font1, 22)
 
-        # Row 1: Ranks & Balance
         g_rank = (
             f"#{levelling_instance.get_user_global_rank}"
             if levelling_instance.get_user_global_rank
@@ -220,20 +263,24 @@ class Profile:
             else "N/A"
         )
 
-        self._draw_stat_box(
+        self._draw_stat_card(
             draw,
-            col_margin,
-            stats_y,
+            50,
+            590,
+            255,
+            120,
             labels["g_rank"],
             g_rank,
             theme_color,
             font_header,
             font_val,
         )
-        self._draw_stat_box(
+        self._draw_stat_card(
             draw,
-            col_margin + 270,
-            stats_y,
+            322,
+            590,
+            255,
+            120,
             labels["s_rank"],
             s_rank,
             theme_color,
@@ -241,105 +288,87 @@ class Profile:
             font_val,
         )
 
-        # Balance
-        qp_icon = Image.open(self.badges["qp"]).resize((40, 40))
-        final_canvas.paste(qp_icon, (820, stats_y + 10), qp_icon)
-        draw.text(
-            (810, stats_y),
+        qp_text = self.format_number(currency_instance.get_balance)
+        self._draw_stat_card(
+            draw,
+            594,
+            590,
+            256,
+            120,
             labels["bal"],
-            fill=theme_color,
-            font=font_header,
-            anchor="ra",
+            qp_text,
+            theme_color,
+            font_header,
+            font_val,
         )
-        draw.text(
-            (810, stats_y + 35),
-            self.format_number(currency_instance.get_balance),
-            fill=(255, 255, 255),
-            font=font_val,
-            anchor="ra",
-        )
+        qp_icon = Image.open(self.badges["qp"]).resize((36, 36))
+        final_canvas.paste(qp_icon, (804, 603), qp_icon)
 
-        # Row 2: Global Level Bar
+        # Global level bar
         g_level = levelling_instance.get_user_level
         g_xp_cur = levelling_instance.get_user_xp
-
-        # Calculate thresholds
         g_prev_xp = self.calculate_level_xp(g_level - 1) if g_level > 0 else 0
         g_next_xp = self.calculate_level_xp(g_level)
-
-        # Progress Calculation
         g_needed = g_next_xp - g_prev_xp
         g_progress = g_xp_cur - g_prev_xp
         g_percent = (g_progress / g_needed * 100) if g_needed > 0 else 0
 
         draw.text(
-            (col_margin, g_bar_y),
+            (50, 735),
             f"{labels['g_lvl']} {g_level}",
             fill=theme_color,
             font=font_header,
         )
         draw.text(
-            (860, g_bar_y),
+            (850, 735),
             f"{self.format_number(g_xp_cur)} / {self.format_number(g_next_xp)} XP",
-            fill=(200, 200, 200),
+            fill=(220, 222, 232),
             font=font_small,
             anchor="ra",
         )
-        self.draw_progress_bar(
-            draw, col_margin, g_bar_y + 40, 810, 20, g_percent, theme_color
-        )
+        self.draw_progress_bar(draw, 50, 772, 800, 22, g_percent, theme_color)
 
-        # Row 3: Server Level Bar
+        # Server level bar
         s_level = levelling_instance.get_member_level
         s_xp_cur = levelling_instance.get_member_xp
-
         s_prev_xp = self.calculate_level_xp(s_level - 1) if s_level > 0 else 0
         s_next_xp = self.calculate_level_xp(s_level)
-
         s_needed = s_next_xp - s_prev_xp
         s_progress = s_xp_cur - s_prev_xp
         s_percent = (s_progress / s_needed * 100) if s_needed > 0 else 0
 
         draw.text(
-            (col_margin, s_bar_y),
+            (50, 807),
             f"{labels['s_lvl']} {s_level}",
             fill=theme_color,
             font=font_header,
         )
         draw.text(
-            (860, s_bar_y),
+            (850, 807),
             f"{self.format_number(s_xp_cur)} / {self.format_number(s_next_xp)} XP",
-            fill=(200, 200, 200),
+            fill=(220, 222, 232),
             font=font_small,
             anchor="ra",
         )
-        self.draw_progress_bar(
-            draw, col_margin, s_bar_y + 40, 810, 20, s_percent, theme_color
-        )
+        self.draw_progress_bar(draw, 50, 844, 800, 22, s_percent, theme_color)
 
-        # Row 4: Bio
         bio_text = inventory_instance.get_bio or labels["bio"]
+        if len(bio_text) > 70:
+            bio_text = bio_text[:67] + "..."
+
         draw.rounded_rectangle(
-            (40, bio_y, 860, bio_y + 50),
-            radius=10,
-            fill=(45, 45, 45),
+            (270, 510, 850, 548),
+            radius=12,
+            fill=(17, 20, 28, 230),
             outline=theme_color,
             width=1,
         )
-
-        bio_font = ImageFont.truetype(self.font1, 22)
-        if len(bio_text) > 75:
-            bio_text = bio_text[:72] + "..."
-        draw.text((55, bio_y + 12), bio_text, fill=(230, 230, 230), font=bio_font)
+        draw.text((285, 518), bio_text, fill=(235, 236, 245), font=bio_font)
 
         final_bytes = BytesIO()
         final_canvas.save(final_bytes, "png")
         final_bytes.seek(0)
         return final_bytes
-
-    def _draw_stat_box(self, draw, x, y, label, value, color, font_label, font_value):
-        draw.text((x, y), label, fill=color, font=font_label)
-        draw.text((x, y + 35), value, fill=(255, 255, 255), font=font_value)
 
     async def get_badges(
         self, user: User, voted: bool, country: str
