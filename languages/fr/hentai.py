@@ -25,7 +25,7 @@ class nsfw(Cog):
         ctx: Interaction,
     ) -> None:
         await ctx.response.defer()
-        hentai, source = await Hentai().hentai()
+        hentai, source = Hentai().hentai()
         if hentai.endswith(("mp4", "webm")):
             view = ReportContent(ctx, shorten_url(hentai))
             await ctx.followup.send(hentai, view=view)

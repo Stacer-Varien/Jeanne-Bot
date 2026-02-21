@@ -260,7 +260,7 @@ class nsfw(Cog):
         plus: Optional[bool] = None,
     ) -> None:
         await ctx.response.defer()
-        image = await Hentai(plus).konachan(tag)
+        image = Hentai().get_images_konachan(tag)
         if plus:
             images = [image[randint(1, len(image)) - 1] for _ in range(4)]
             try:
@@ -330,7 +330,7 @@ class nsfw(Cog):
         plus: Optional[bool] = None,
     ) -> None:
         await ctx.response.defer()
-        image = await Hentai().danbooru(tag)
+        image = Hentai().get_images_danbooru(tag)
         if plus:
             images = [
                 img
