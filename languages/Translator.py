@@ -617,6 +617,12 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "sticker",
                 "de": "aufkleber",
             },
+            "sticker_parm_name": {
+                "en-GB": "sticker",
+                "en-US": "sticker",
+                "fr": "sticker",
+                "de": "aufkleber",
+            },
             "sticker_parm_desc": {
                 "en-GB": "Insert message ID with the sticker or name of the sticker in the server",
                 "en-US": "Insert message ID with the sticker or name of the sticker in the server",
@@ -967,6 +973,12 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "role",
                 "fr": "rôle",
                 "de": "rolle",
+            },
+            "image_parm_name": {
+                "en-GB": "image",
+                "en-US": "image",
+                "fr": "image",
+                "de": "bild",
             },
             "image_parm_desc": {
                 "en-GB": "Add an image",
@@ -1324,7 +1336,18 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "cloner",
                 "de": "klonen",
             },
-            "remove_name": {"en-GB": "remove", "en-US": "remove", "fr": "supprimer"},
+            "remove_name": {
+                "en-GB": "remove",
+                "en-US": "remove",
+                "fr": "supprimer",
+                "de": "entfernen",
+            },
+            "remove": {
+                "en-GB": "remove",
+                "en-US": "remove",
+                "fr": "supprimer",
+                "de": "entfernen",
+            },
             "remove_role_description": {
                 "en-GB": "Remove a role from a member",
                 "en-US": "Remove a role from a member",
@@ -1444,6 +1467,12 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "role",
                 "fr": "rôle",
                 "de": "rolle",
+            },
+            "remove_role_reward_name": {
+                "en-GB": "remove",
+                "en-US": "remove",
+                "fr": "supprimer",
+                "de": "entfernen",
             },
             "remove_role_reward_description": {
                 "en-GB": "Remove a role reward for a level",
@@ -1624,6 +1653,12 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "What is the message ID?",
                 "fr": "Quel est l'ID du message?",
                 "de": "Was ist die Nachrichten-ID?",
+            },
+            "thread": {
+                "en-GB": "thread",
+                "en-US": "thread",
+                "fr": "fil",
+                "de": "thread",
             },
             "public_thread_description": {
                 "en-GB": "Make a public thread",

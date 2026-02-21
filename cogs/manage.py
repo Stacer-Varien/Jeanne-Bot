@@ -71,8 +71,8 @@ class Create_Group(GroupCog, name=T("create")):
             "fr": {
                 "bot_perms": "Gérer les canels",
                 "member_perms": "Gérer les canels",
-                "name": "Créer un canel textuel",
-                "description": "Créer un canel textuel",
+                "name": "Créer un canal vocal",
+                "description": "Créer un canal vocal",
                 "parameters": [
                     {
                         "name": "Nom",
@@ -104,17 +104,12 @@ class Create_Group(GroupCog, name=T("create")):
             "de": {
                 "bot_perms": "Kanäle verwalten",
                 "member_perms": "Kanäle verwalten",
-                "name": "Textkanal erstellen",
-                "description": "Einen Textkanal erstellen",
+                "name": "Sprachkanal erstellen",
+                "description": "Einen Sprachkanal erstellen",
                 "parameters": [
                     {
                         "name": "Name",
                         "description": "Wie werden Sie ihn nennen?",
-                        "required": False,
-                    },
-                    {
-                        "name": "Thema",
-                        "description": "Was ist das Thema des Kanals?",
                         "required": False,
                     },
                     {
@@ -123,13 +118,8 @@ class Create_Group(GroupCog, name=T("create")):
                         "required": False,
                     },
                     {
-                        "name": "Slowmode",
-                        "description": "Was ist der Slowmode (1h, 30m, etc.) (Max 6 Stunden)",
-                        "required": False,
-                    },
-                    {
-                        "name": "NSFW aktiviert",
-                        "description": "Soll es ein NSFW-Kanal sein?",
+                        "name": "Benutzer",
+                        "description": "Wie viele Benutzer können beitreten? (Max 99)",
                         "required": False,
                     },
                 ],
