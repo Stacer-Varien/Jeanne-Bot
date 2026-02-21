@@ -1392,7 +1392,7 @@ class Hentai:
                 "SELECT source, tags, file_url FROM hentaiCache WHERE lower(tags) LIKE lower(?)",
                 (pattern,),
             )
-            
+
         elif tags == "" or tags is None:
             cur.execute("SELECT source, tags, file_url FROM hentaiCache")
 
@@ -1414,9 +1414,12 @@ class Hentai:
 
         if data.rowcount == 0:
             date = datetime.now().strftime("%Y%m%d")
-            if int(date) == int(db.execute(
-                "SELECT date FROM hentaiCache WHERE source=? AND file_url = ?", (source, file_url)
-            ).fetchone()[0]):
+            if int(date) == int(
+                db.execute(
+                    "SELECT date FROM hentaiCache WHERE source=? AND file_url = ?",
+                    (source, file_url),
+                ).fetchone()[0]
+            ):
                 pass
             db.commit()
 
@@ -1436,13 +1439,33 @@ class Hentai:
         cur.execute("DELETE FROM hentaiCache WHERE file_url = ?", (link,))
         db.commit()
 
+    def _is_allowed_post(
+        self, tags_field: str, file_url: str, blacklisted_links: set[str]
+    ) -> bool:
+        if not tags_field or self._filter_blacklisted(tags_field.lower()):
+            return False
+        if not file_url or file_url in blacklisted_links:
+            return False
+        return True
+
     def get_images_rule34(self, tags: Optional[str] = None):
 
+        blacklisted_links = set(self.get_blacklisted_links() or [])
         try:
-            cache = [i for i in self.load_cache(tags) if i["source"] == "rule34"]
+            cache = [
+                i
+                for i in self.load_cache(tags)
+                if i["source"] == "rule34"
+                and self._is_allowed_post(
+                    str(i.get("tags", "")),
+                    str(i.get("file_url", "")),
+                    blacklisted_links,
+                )
+            ]
         except Exception:
             cache = []
 
+        post_list = cache
         if len(cache) < 100:
             tag_part = self.format_tags(tags)
 
@@ -1455,42 +1478,39 @@ class Hentai:
 
             posts = data
             filtered = []
-            bl = self.get_blacklisted_links()
             for p in posts:
-                if len(cache) < 100:
-                    tags_field = str(p.get("tags", ""))
+                tags_field = str(p.get("tags", ""))
+                file_url = str(p.get("file_url", ""))
 
-                if not tags_field:
-                    continue
-                if any(tag in self.blacklisted_tags for tag in tags_field):
+                if not self._is_allowed_post(tags_field, file_url, blacklisted_links):
                     continue
 
-                if len(cache) < 100:
-                    file_url = str(p.get("file_url"))
-                    if any(url in bl for url in file_url):
-                        continue
-                    self.save_cache("rule34", tags_field, file_url)
-
-                if not file_url:
-                    continue
+                self.save_cache("rule34", tags_field, file_url)
                 filtered.append(
                     {"source": "Rule34", "tags": tags_field, "file_url": file_url}
                 )
             if filtered:
                 post_list = filtered
 
-        else:
-            post_list = cache
-
         return post_list
 
-
     def get_images_gelbooru(self, tags: Optional[str] = None):
+        blacklisted_links = set(self.get_blacklisted_links() or [])
         try:
-            cache = [i for i in self.load_cache(tags) if i["source"] == "gelbooru"]
+            cache = [
+                i
+                for i in self.load_cache(tags)
+                if i["source"] == "gelbooru"
+                and self._is_allowed_post(
+                    str(i.get("tags", "")),
+                    str(i.get("file_url", "")),
+                    blacklisted_links,
+                )
+            ]
         except Exception:
             cache = []
 
+        post_list = cache
         if len(cache) < 100:
             tag_part = self.format_tags(tags)
 
@@ -1503,41 +1523,39 @@ class Hentai:
 
             posts = data.get("post", [])
             filtered = []
-            bl = self.get_blacklisted_links()
             for p in posts:
-                if len(cache) < 100:
-                    tags_field = str(p.get("tags", ""))
+                tags_field = str(p.get("tags", ""))
+                file_url = str(p.get("file_url", ""))
 
-                if not tags_field:
-                    continue
-                if any(tag in self.blacklisted_tags for tag in tags_field):
+                if not self._is_allowed_post(tags_field, file_url, blacklisted_links):
                     continue
 
-                if len(cache) < 100:
-                    file_url = str(p.get("file_url"))
-                    if any(url in bl for url in file_url):
-                        continue
-                    self.save_cache("gelbooru", tags_field, file_url)
-
-                if not file_url:
-                    continue
+                self.save_cache("gelbooru", tags_field, file_url)
                 filtered.append(
                     {"source": "Gelbooru", "tags": tags_field, "file_url": file_url}
                 )
             if filtered:
                 post_list = filtered
 
-        else:
-            post_list = cache
-
         return post_list
 
     def get_images_konachan(self, tags: Optional[str] = None):
+        blacklisted_links = set(self.get_blacklisted_links() or [])
         try:
-            cache = [i for i in self.load_cache(tags) if i["source"] == "konachan"]
+            cache = [
+                i
+                for i in self.load_cache(tags)
+                if i["source"] == "konachan"
+                and self._is_allowed_post(
+                    str(i.get("tags", "")),
+                    str(i.get("file_url", "")),
+                    blacklisted_links,
+                )
+            ]
         except Exception:
             cache = []
 
+        post_list = cache
         if len(cache) < 100:
             tag_part = self.format_tags(tags)
 
@@ -1551,37 +1569,38 @@ class Hentai:
             posts = data
             filtered = []
             for p in posts:
-                if len(cache) < 100:
-                    tags_field = str(p.get("tags", ""))
-                else:
-                    tags_field = str(p[1] if len(p) > 1 else "")
-                if not tags_field:
-                    continue
-                if self._filter_blacklisted(tags_field.lower()):
+                tags_field = str(p.get("tags", ""))
+                file_url = str(p.get("file_url", ""))
+
+                if not self._is_allowed_post(tags_field, file_url, blacklisted_links):
                     continue
 
-                if len(cache) < 100:
-                    file_url = str(p.get("file_url"))
-                    self.save_cache("konachan", tags_field, file_url)
-                if not file_url:
-                    continue
+                self.save_cache("konachan", tags_field, file_url)
                 filtered.append(
                     {"source": "Konachan", "tags": tags_field, "file_url": file_url}
                 )
             if filtered:
                 post_list = filtered
 
-        else:
-            post_list = cache
-
         return post_list
 
     def get_images_yandere(self, tags: Optional[str] = None):
+        blacklisted_links = set(self.get_blacklisted_links() or [])
         try:
-            cache = [i for i in self.load_cache(tags) if i["source"] == "yandere"]
+            cache = [
+                i
+                for i in self.load_cache(tags)
+                if i["source"] == "yandere"
+                and self._is_allowed_post(
+                    str(i.get("tags", "")),
+                    str(i.get("sample_url", "")),
+                    blacklisted_links,
+                )
+            ]
         except Exception:
             cache = []
 
+        post_list = cache
         if len(cache) < 100:
             tag_part = self.format_tags(tags)
 
@@ -1595,38 +1614,38 @@ class Hentai:
             posts = data["posts"]
             filtered = []
             for p in posts:
-                if len(cache) < 100:
-                    tags_field = str(p.get("tags", ""))
-                else:
-                    tags_field = str(p[1] if len(p) > 1 else "")
-                if not tags_field:
-                    continue
-                if self._filter_blacklisted(tags_field.lower()):
+                tags_field = str(p.get("tags", ""))
+                file_url = str(p.get("sample_url", ""))
+
+                if not self._is_allowed_post(tags_field, file_url, blacklisted_links):
                     continue
 
-                if len(cache) < 100:
-                    file_url = str(p.get("sample_url"))
-                    self.save_cache("yandere", tags_field, file_url)
-
-                if not file_url:
-                    continue
+                self.save_cache("yandere", tags_field, file_url)
                 filtered.append(
                     {"source": "Yandere", "tags": tags_field, "file_url": file_url}
                 )
             if filtered:
                 post_list = filtered
 
-        else:
-            post_list = cache
-
         return post_list
 
     def get_images_danbooru(self, tags: Optional[str] = None):
+        blacklisted_links = set(self.get_blacklisted_links() or [])
         try:
-            cache = [i for i in self.load_cache(tags) if i["source"] == "danbooru"]
+            cache = [
+                i
+                for i in self.load_cache(tags)
+                if i["source"] == "danbooru"
+                and self._is_allowed_post(
+                    str(i.get("tags", "")),
+                    str(i.get("file_url", "")),
+                    blacklisted_links,
+                )
+            ]
         except Exception:
             cache = []
 
+        post_list = cache
         if len(cache) < 100:
             tag_part = self.format_tags(tags)
 
@@ -1640,29 +1659,18 @@ class Hentai:
             posts = data
             filtered = []
             for p in posts:
-                if len(cache) < 100:
-                    tags_field = str(p.get("tag_string", ""))
-                else:
-                    tags_field = str(p[1] if len(p) > 1 else "")
-                if not tags_field:
-                    continue
-                if self._filter_blacklisted(tags_field.lower()):
+                tags_field = str(p.get("tag_string", ""))
+                file_url = str(p.get("file_url", ""))
+
+                if not self._is_allowed_post(tags_field, file_url, blacklisted_links):
                     continue
 
-                if len(cache) < 100:
-                    file_url = str(p.get("file_url"))
-                    self.save_cache("danbooru", tags_field, file_url)
-                if not file_url:
-                    continue
-
+                self.save_cache("danbooru", tags_field, file_url)
                 filtered.append(
                     {"source": "Danbooru", "tags": tags_field, "file_url": file_url}
                 )
             if filtered:
                 post_list = filtered
-
-        else:
-            post_list = cache
 
         return post_list
 
@@ -1672,7 +1680,13 @@ class Hentai:
         yandere_image = choice(self.get_images_yandere())["file_url"]
         konachan_image = choice(self.get_images_konachan())["file_url"]
         danbooru_image = choice(self.get_images_danbooru())["file_url"]
-        h = [rule34_image, gelbooru_image, yandere_image, konachan_image, danbooru_image]
+        h = [
+            rule34_image,
+            gelbooru_image,
+            yandere_image,
+            konachan_image,
+            danbooru_image,
+        ]
         hentai: str = choice(h)
         if hentai == rule34_image:
             return hentai, "Rule34"
