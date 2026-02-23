@@ -87,7 +87,7 @@ class Profile:
         self,
         ctx: Interaction,
         user: User | Member,
-        # bg_image: str = None,
+        bg_image: str = None,
         voted: bool = False,
         country: str = None,
     ) -> BytesIO | Literal[False]:
@@ -100,15 +100,15 @@ class Profile:
         levelling_instance = Levelling(user, guild)
 
         # --- 1. Background Setup ---
-        #if bg_image:
-         #   bg_data = await self.fetch_image(bg_image)
-          #  card_bg = (
-           #     Image.open(bg_data).convert("RGBA")
-            #    if bg_data
-             #   else Image.open(self.default_bg).convert("RGBA")
-          #  )
-       # else:
-        card_bg = Image.open(self.default_bg).convert("RGBA")
+        if bg_image:
+            bg_data = await self.fetch_image(bg_image)
+            card_bg = (
+                Image.open(bg_data).convert("RGBA")
+                if bg_data
+                else Image.open(self.default_bg).convert("RGBA")
+            )
+        else:
+            card_bg = Image.open(self.default_bg).convert("RGBA")
 
         card_bg = ImageEnhance.Brightness(card_bg).enhance(
             float(inventory_instance.get_brightness) / 100
