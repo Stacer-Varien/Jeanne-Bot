@@ -422,6 +422,58 @@ class fun(Cog, name="FunSlash"):
             return
         await en.fun(self.bot).roast(ctx, member)
 
+    @Jeanne.command(
+        name=T("mock_name"),
+        description=T("mock_desc"),
+        extras={
+            "en": {
+                "name": "mock",
+                "description": "Turn your text into silly mocking text",
+                "parameters": [
+                    {
+                        "name": "text",
+                        "description": "The text you want to mock",
+                        "required": True,
+                    }
+                ],
+            },
+            "fr": {
+                "name": "moquer",
+                "description": "Transforme ton texte en texte moqueur",
+                "parameters": [
+                    {
+                        "name": "texte",
+                        "description": "Le texte à transformer",
+                        "required": True,
+                    }
+                ],
+            },
+            "de": {
+                "name": "spotten",
+                "description": "Verwandle deinen Text in lustigen Spotttext",
+                "parameters": [
+                    {
+                        "name": "text",
+                        "description": "Der Text, den du verspotten möchtest",
+                        "required": True,
+                    }
+                ],
+            },
+        },
+    )
+    @Jeanne.describe(text=T("text_parm_desc"))
+    @Jeanne.rename(text=T("text_parm_name"))
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
+    async def mock(self, ctx: Interaction, text: str):
+        if ctx.locale.value == "fr":
+            await fr.fun(self.bot).mock(ctx, text)
+            return
+        if ctx.locale.value == "de":
+            await de.fun(self.bot).mock(ctx, text)
+            return
+        await en.fun(self.bot).mock(ctx, text)
 
 
 async def setup(bot: Bot):

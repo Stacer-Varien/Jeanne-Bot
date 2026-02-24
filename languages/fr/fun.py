@@ -121,7 +121,6 @@ class fun():
             embed.set_image(url="https://i.imgur.com/tYAbWCl.jpg")
         await ctx.followup.send(embed=embed)
 
-
     async def roast(self, ctx: Interaction, member: Optional[Member] = None):
         await ctx.response.defer()
         member = member if member else ctx.user
@@ -191,4 +190,16 @@ class fun():
         else:
             roast = f"Tu es le genre de personne qui {choice(ROASTS)}"
         embed.description = roast
+        await ctx.followup.send(embed=embed)
+
+    async def mock(self, ctx: Interaction, text: str):
+        await ctx.response.defer()
+        mocked = "".join(
+            letter.upper() if randint(0, 1) else letter.lower() for letter in text
+        )
+        embed = Embed(
+            title="🗣️ Générateur moqueur",
+            description=mocked,
+            color=Color.random(),
+        )
         await ctx.followup.send(embed=embed)

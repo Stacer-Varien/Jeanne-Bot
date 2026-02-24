@@ -191,3 +191,15 @@ class fun():
             roast = f"You are the type of person who {choice(ROASTS)}"
         embed.description = roast
         await ctx.followup.send(embed=embed)
+
+    async def mock(self, ctx: Interaction, text: str):
+        await ctx.response.defer()
+        mocked = "".join(
+            letter.upper() if randint(0, 1) else letter.lower() for letter in text
+        )
+        embed = Embed(
+            title="🗣️ Mock Generator",
+            description=mocked,
+            color=Color.random(),
+        )
+        await ctx.followup.send(embed=embed)
