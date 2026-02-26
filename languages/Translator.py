@@ -2783,7 +2783,29 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Combien de temps devraient-ils être temporairement bannis? (1m, 1h30m, etc)",
                 "de": "Wie lange sollten sie vorübergehend gesperrt werden? (1m, 1h30m, etc)",
             },
+            "mock_name": {
+                "en-GB": "mock",
+                "en-US": "mock",
+                "fr": "moquer",
+                "de": "spotten",
+            },
+            "mock_desc": {
+                "en-GB": "Turn your text into silly mocking text",
+                "en-US": "Turn your text into silly mocking text",
+                "fr": "Transformez votre texte en texte moqueur amusant",
+                "de": "Verwandelt deinen Text in einen lächerlichen Spotttext",
+            },
+            "mock_text_parm_desc": {
+                "en-GB": "The text you want to mock",
+                "en-US": "The text you want to mock",
+                "fr": "Le texte que vous voulez moquer",
+                "de": "Der Text, den du verspotten möchtest",
+            },
         }
         return translations.get(string.message, {}).get(
-            (locale.value if locale.value in ["en-GB", "en-US", "fr", "de"] else "en-US")
+            (
+                locale.value
+                if locale.value in ["en-GB", "en-US", "fr", "de"]
+                else "en-US"
+            )
         )

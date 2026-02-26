@@ -12,7 +12,7 @@ import languages.fr.fun as fr
 import languages.de.fun as de
 from discord.app_commands import locale_str as T
 
-# de = dutch and translate to dutch
+
 class fun(Cog, name="FunSlash"):
     def __init__(self, bot: Bot):
         self.bot = bot
@@ -461,7 +461,7 @@ class fun(Cog, name="FunSlash"):
             },
         },
     )
-    @Jeanne.describe(text=T("text_parm_desc"))
+    @Jeanne.describe(text=T("mock_text_parm_desc"))
     @Jeanne.rename(text=T("text_parm_name"))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
