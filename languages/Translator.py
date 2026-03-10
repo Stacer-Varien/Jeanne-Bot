@@ -2801,6 +2801,19 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Le texte que vous voulez moquer",
                 "de": "Der Text, den du verspotten möchtest",
             },
+            "spin_name": {
+                "en-GB": "spin",
+                "en-US": "spin",
+                "fr": "tourner",
+                "de": "drehen",
+            },
+            "spin_desc": {
+                "en-GB": "Spin the *very fair* casino wheel",
+                "en-US": "Spin the *very fair* casino wheel",
+                "fr": "Faites tourner la roue de la casino *très équitable*",
+                "de": "Drehen Sie das *sehr faire* Kasino-Rad",
+            },
+
         }
         return translations.get(string.message, {}).get(
             (

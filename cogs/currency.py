@@ -1,5 +1,3 @@
-import asyncio
-from random import randint, random
 from typing import Optional
 from discord import (
     ButtonStyle,
@@ -8,9 +6,7 @@ from discord import (
     Interaction,
     ui,
 )
-import discord
 from discord.ext.commands import Cog, Bot, GroupCog
-from assets.spinwheel import Wheel
 from functions import (
     check_botbanned_app_command,
     check_disabled_app_command,
@@ -713,82 +709,47 @@ class currency(Cog, name="CurrencySlash"):
                 return
             await en.currency(self.bot).slots_error(ctx, error)
 
-    @Jeanne.command(name="spin", description="Spin the *very fair* casino wheel.")
-    async def spin(self, interaction: Interaction, bet: int):
-        if bet <= 0:
-            await interaction.response.send_message("❌ Bet must be greater than 0.", ephemeral=True)
+    @Jeanne.command(name=T("spin_name"), description=T("spin_desc"), extras={
+        "en": {"name": "spin", "description": "Play the spin the wheel game", "parameters": [
+            {
+                "name": "bet",
+                "description": "How much are you betting?",
+                "required": True,
+            }
+        ]},
+        "fr": {"name": "tourner", "description": "Faites tourner la roue de la casino *très équitable*", "parameters": [
+            {
+                "name": "pari",
+                "description": "Combien pariez-vous?",
+                "required": True,
+            }
+        ]},
+        "de": {"name": "drehen", "description": "Drehen Sie das *sehr faire* Kasino-Rad", "parameters": [
+            {
+                "name": "wette",
+                "description": "Wie viel setzen Sie?",
+                "required": True,
+            }
+        ]},
+
+    })
+    @Jeanne.describe(bet=T("bet_parm_desc"))
+    @Jeanne.rename(bet=T("bet_parm_name"))
+    @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(check_disabled_app_command)
+    @Jeanne.check(is_suspended)
+    async def spin(self, ctx: Interaction, bet: int):
+        if ctx.locale.value == "fr":
+            await fr.currency(self.bot).spin(ctx, bet)
             return
-
-        wheel=Wheel(self.bot)
-        # ----- FORCE DISTRIBUTION -----
-        negatives = [round(random.uniform(-2.0, -0.5), 1) for _ in range(5)]
-        small_positives = [round(random.uniform(0.1, 0.5), 1) for _ in range(2)]
-        big_positive = [round(random.uniform(1.5, 2.0), 1)]
-
-        multipliers = negatives + small_positives + big_positive
-        random.shuffle(multipliers)
-
-        # Categorize indexes
-        negative_indexes = [i for i, m in enumerate(multipliers) if m < 0]
-        small_positive_indexes = [i for i, m in enumerate(multipliers) if 0 < m <= 0.5]
-        big_positive_index = [i for i, m in enumerate(multipliers) if m > 1][0]
-
-        # ----- RIGGED WIN CHANCE -----
-        roll = random()
-
-        if roll <= 0.80:
-            winner_index = random.choice(negative_indexes)
-        elif roll <= 0.98:
-            winner_index = random.choice(small_positive_indexes)
+        elif ctx.locale.value == "de":
+            await de.currency(self.bot).spin(ctx, bet)
+            return
         else:
-            winner_index = big_positive_index
+            await en.currency(self.bot).spin(ctx, bet)
 
-        winner_multiplier = multipliers[winner_index]
 
-        await interaction.response.send_message("🎡 Spinning the wheel...")
-        message = await interaction.original_response()
-
-        total_spins = randint(20, 28)
-        current_index = 0
-
-        for i in range(total_spins):
-            wheel_visual = wheel.build_wheel(multipliers, current_index)
-
-            embed = discord.Embed(
-                title="🎡 Spinning...",
-                description=wheel_visual,
-                color=discord.Color.gold()
-            )
-
-            await message.edit(embed=embed)
-            current_index = (current_index + 1) % 8
-            await asyncio.sleep(0.07 + (i / total_spins) * 0.3)
-
-        # Final landing
-        wheel_visual = wheel.build_wheel(multipliers, winner_index)
-
-        winnings = round(bet * winner_multiplier, 2)
-
-        if winnings > 0:
-            result_text = f"🎉 You won {winnings}!"
-            color = discord.Color.green()
-        elif winnings < 0:
-            result_text = f"💀 You lost {abs(winnings)}..."
-            color = discord.Color.red()
-        else:
-            result_text = "😐 You broke even!"
-            color = discord.Color.blurple()
-
-        final_embed = discord.Embed(
-            title="🎯 Wheel Result",
-            description=wheel_visual,
-            color=color
-        )
-        final_embed.add_field(name="💰 Bet", value=str(bet))
-        final_embed.add_field(name="📈 Multiplier", value=f"{winner_multiplier}x")
-        final_embed.add_field(name="🏆 Result", value=result_text)
-
-        await message.edit(embed=final_embed)
 
 async def setup(bot: Bot):
     await bot.add_cog(Guess_Group(bot))

@@ -1,5 +1,6 @@
 import asyncio
 from random import choice, randint, shuffle
+import random
 from discord import (
     ButtonStyle,
     Color,
@@ -13,6 +14,7 @@ from datetime import datetime, timedelta
 from discord.ext.commands import Bot
 from assets.blackjack_game import BlackjackView
 from assets.components import Dice_Buttons, Guess_Buttons, Heads_or_Tails
+from assets.spinwheel import Wheel
 from functions import (
     BetaTest,
     Currency,
@@ -529,10 +531,10 @@ class currency:
         )
 
     async def slots(self, ctx: Interaction, bet: int):
-            await ctx.response.defer()
-            embed = Embed(color=Color.random())
+        await ctx.response.defer()
+        embed = Embed(color=Color.random())
 
-            emojis = (
+        emojis = (
                 ["🍒"] * 60 
                 + ["🍋"] * 25
                 + ["🍉"] * 10 
@@ -541,65 +543,65 @@ class currency:
                 + ["💎"] * 0 
             )
 
-            def spin_symbol():
-                if randint(1, 2000) == 1: 
-                    return "💎"
-                return choice(emojis)
+        def spin_symbol():
+            if randint(1, 2000) == 1: 
+                return "💎"
+            return choice(emojis)
 
-            def spin_grid():
-                return [spin_symbol() for _ in range(9)]
+        def spin_grid():
+            return [spin_symbol() for _ in range(9)]
 
-            def format_grid(grid):
-                return (
+        def format_grid(grid):
+            return (
                     f"{grid[0]} {grid[1]} {grid[2]}\n"
                     f"{grid[3]} {grid[4]} {grid[5]}  ⬅️\n"
                     f"{grid[6]} {grid[7]} {grid[8]}"
                 )
 
+        grid = spin_grid()
+        # "Lancement..." means "Spinning..."
+        embed.description = f"🎰 **MACHINE À SOUS**\n{format_grid(grid)}\n\nLancement..."
+        await ctx.edit_original_response(embed=embed)
+
+        for _ in range(8):
+            await asyncio.sleep(0.45)
             grid = spin_grid()
-            # "Lancement..." means "Spinning..."
+            embed.color = Color.random()
             embed.description = f"🎰 **MACHINE À SOUS**\n{format_grid(grid)}\n\nLancement..."
             await ctx.edit_original_response(embed=embed)
 
-            for _ in range(8):
-                await asyncio.sleep(0.45)
-                grid = spin_grid()
-                embed.color = Color.random()
-                embed.description = f"🎰 **MACHINE À SOUS**\n{format_grid(grid)}\n\nLancement..."
-                await ctx.edit_original_response(embed=embed)
+        await asyncio.sleep(0.6)
+        final_grid = spin_grid()
+        middle = final_grid[3:6]  
 
-            await asyncio.sleep(0.6)
-            final_grid = spin_grid()
-            middle = final_grid[3:6]  
+        payout = bet
+        # Translation for loss
+        result_text = f"💀 Vous avez perdu **{bet}** <:quantumpiece:1161010445205905418>."
+        await Currency(ctx.user).remove_qp(bet)
 
+        if middle == ["💎", "💎", "💎"]:
+            payout = bet * 10
+            result_text = f"💎💎💎 **JACKPOT LÉGENDAIRE !**\nVous avez gagné **{payout}** <:quantumpiece:1161010445205905418> !"
+        elif middle == ["⭐", "⭐", "⭐"]:
+            payout = bet * 5
+            result_text = f"⭐ **Triple Étoile !**\nVous avez gagné **{payout}** <:quantumpiece:1161010445205905418> !"
+        elif middle == ["🔔", "🔔", "🔔"]:
+            payout = bet * 3
+            result_text = f"🔔 **Triple Cloche !**\nVous avez gagné **{payout}** <:quantumpiece:1161010445205905418> !"
+        elif middle.count("🍉") == 3:
+            payout = bet * 2
+            result_text = f"🍉 **Triple Pastèque !**\nVous avez gagné **{payout}** <:quantumpiece:1161010445205905418> !"
+        elif middle.count("🍒") == 3:
             payout = bet
-            # Translation for loss
-            result_text = f"💀 Vous avez perdu **{bet}** <:quantumpiece:1161010445205905418>."
-            await Currency(ctx.user).remove_qp(bet)
+            result_text = "🍒 **Tout juste.**\nVotre mise vous a été remboursée."
 
-            if middle == ["💎", "💎", "💎"]:
-                payout = bet * 10
-                result_text = f"💎💎💎 **JACKPOT LÉGENDAIRE !**\nVous avez gagné **{payout}** <:quantumpiece:1161010445205905418> !"
-            elif middle == ["⭐", "⭐", "⭐"]:
-                payout = bet * 5
-                result_text = f"⭐ **Triple Étoile !**\nVous avez gagné **{payout}** <:quantumpiece:1161010445205905418> !"
-            elif middle == ["🔔", "🔔", "🔔"]:
-                payout = bet * 3
-                result_text = f"🔔 **Triple Cloche !**\nVous avez gagné **{payout}** <:quantumpiece:1161010445205905418> !"
-            elif middle.count("🍉") == 3:
-                payout = bet * 2
-                result_text = f"🍉 **Triple Pastèque !**\nVous avez gagné **{payout}** <:quantumpiece:1161010445205905418> !"
-            elif middle.count("🍒") == 3:
-                payout = bet
-                result_text = "🍒 **Tout juste.**\nVotre mise vous a été remboursée."
-            
-            await Currency(ctx.user).add_qp(payout)
+        await Currency(ctx.user).add_qp(payout)
 
-            embed.description = (
+        embed.description = (
                 f"🎰 **RÉSULTAT**\n" f"{format_grid(final_grid)}\n\n" f"{result_text}"
             )
 
-            await ctx.edit_original_response(embed=embed)
+        await ctx.edit_original_response(embed=embed)
 
     async def slots_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         cooldown = Embed(
@@ -608,3 +610,70 @@ class currency:
         )
         await ctx.response.send_message(embed=cooldown)
 
+    async def spin(self, ctx: Interaction, bet: int):
+        wheel = Wheel(self.bot)
+        negatives = [round(random.uniform(-2.0, -0.5), 1) for _ in range(5)]
+        small_positives = [round(random.uniform(0.1, 0.5), 1) for _ in range(2)]
+        big_positive = [round(random.uniform(1.5, 2.0), 1)]
+
+        multipliers = negatives + small_positives + big_positive
+        random.shuffle(multipliers)
+
+        negative_indexes = [i for i, m in enumerate(multipliers) if m < 0]
+        small_positive_indexes = [i for i, m in enumerate(multipliers) if 0 < m <= 0.5]
+        big_positive_index = [i for i, m in enumerate(multipliers) if m > 1][0]
+
+        roll = random.random()
+
+        if roll <= 0.80:
+            winner_index = random.choice(negative_indexes)
+        elif roll <= 0.98:
+            winner_index = random.choice(small_positive_indexes)
+        else:
+            winner_index = big_positive_index
+
+        winner_multiplier = multipliers[winner_index]
+
+        await ctx.response.send_message("🎡 Faire tourner la roue...")
+        message = await ctx.original_response()
+
+        total_spins = randint(20, 28)
+        current_index = 0
+
+        for i in range(total_spins):
+            wheel_visual = wheel.build_wheel(multipliers, current_index)
+
+            embed = Embed(
+                title="🎡 Filage...", description=wheel_visual, color=Color.gold()
+            )
+
+            await message.edit(embed=embed)
+            current_index = (current_index + 1) % 8
+            await asyncio.sleep(0.07 + (i / total_spins) * 0.3)
+
+        wheel_visual = wheel.build_wheel(multipliers, winner_index)
+
+        winnings = round(bet * winner_multiplier, 2)
+
+        if winnings > 0:
+            await Currency(ctx.user).add_qp(winnings)
+            result_text = f"🎉 Vous avez gagné {winnings} <:quantumpiece:1161010445205905418>!"
+            color = Color.green()
+        elif winnings < 0:
+            await Currency(ctx.user).remove_qp(abs(winnings))
+            result_text = (
+                f"💀 Vous avez perdu {abs(winnings)} <:quantumpiece:1161010445205905418>..."
+            )
+            color = Color.red()
+        else:
+            result_text = "😐 Vous êtes à zéro !"
+            color = Color.blurple()
+
+        final_embed = Embed(
+            title="🎯 Résultat de la roue", description=wheel_visual, color=color
+        )
+        final_embed.add_field(name="💰 Mise", value=str(bet))
+        final_embed.add_field(name="📈 Multiplicateur", value=f"{winner_multiplier}x")
+        final_embed.add_field(name="🏆 Résultat", value=result_text)
+
+        await message.edit(embed=final_embed)

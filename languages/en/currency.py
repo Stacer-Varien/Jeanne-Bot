@@ -1,5 +1,6 @@
 import asyncio
 from random import choice, randint, shuffle
+import random
 from discord import (
     ButtonStyle,
     Color,
@@ -13,6 +14,7 @@ from datetime import datetime, timedelta
 from discord.ext.commands import Bot
 from assets.blackjack_game import BlackjackView
 from assets.components import Dice_Buttons, Guess_Buttons, Heads_or_Tails
+from assets.spinwheel import Wheel
 from functions import (
     BetaTest,
     Currency,
@@ -618,4 +620,81 @@ class currency:
             description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`",
             color=Color.red(),
         )
+        await ctx.response.send_message(embed=cooldown)
+    
+    async def spin(self, ctx: Interaction, bet: int):
+        wheel=Wheel(self.bot)
+        negatives = [round(random.uniform(-2.0, -0.5), 1) for _ in range(5)]
+        small_positives = [round(random.uniform(0.1, 0.5), 1) for _ in range(2)]
+        big_positive = [round(random.uniform(1.5, 2.0), 1)]
+
+        multipliers = negatives + small_positives + big_positive
+        random.shuffle(multipliers)
+
+        negative_indexes = [i for i, m in enumerate(multipliers) if m < 0]
+        small_positive_indexes = [i for i, m in enumerate(multipliers) if 0 < m <= 0.5]
+        big_positive_index = [i for i, m in enumerate(multipliers) if m > 1][0]
+
+        roll = random.random()
+
+        if roll <= 0.80:
+            winner_index = random.choice(negative_indexes)
+        elif roll <= 0.98:
+            winner_index = random.choice(small_positive_indexes)
+        else:
+            winner_index = big_positive_index
+
+        winner_multiplier = multipliers[winner_index]
+
+        await ctx.response.send_message("🎡 Spinning the wheel...")
+        message = await ctx.original_response()
+
+        total_spins = randint(20, 28)
+        current_index = 0
+
+        for i in range(total_spins):
+            wheel_visual = wheel.build_wheel(multipliers, current_index)
+
+            embed = Embed(
+                title="🎡 Spinning...",
+                description=wheel_visual,
+                color=Color.gold()
+            )
+
+            await message.edit(embed=embed)
+            current_index = (current_index + 1) % 8
+            await asyncio.sleep(0.07 + (i / total_spins) * 0.3)
+
+        wheel_visual = wheel.build_wheel(multipliers, winner_index)
+
+        winnings = round(bet * winner_multiplier, 2)
+
+        if winnings > 0:
+            await Currency(ctx.user).add_qp(winnings)
+            result_text = f"🎉 You won {winnings} <:quantumpiece:1161010445205905418>!"
+            color = Color.green()
+        elif winnings < 0:
+            await Currency(ctx.user).remove_qp(abs(winnings))
+            result_text = f"💀 You lost {abs(winnings)} <:quantumpiece:1161010445205905418>..."
+            color = Color.red()
+        else:
+            result_text = "😐 You broke even!"
+            color = Color.blurple()
+
+        final_embed = Embed(
+            title="🎯 Wheel Result",
+            description=wheel_visual,
+            color=color
+        )
+        final_embed.add_field(name="💰 Bet", value=str(bet))
+        final_embed.add_field(name="📈 Multiplier", value=f"{winner_multiplier}x")
+        final_embed.add_field(name="🏆 Result", value=result_text)
+
+        await message.edit(embed=final_embed)
+    
+    async def spin_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+        cooldown = Embed(
+                description=f"WOAH! Calm down!\nTry again after `{round(error.retry_after, 2)} seconds`",
+                color=Color.red(),
+            )
         await ctx.response.send_message(embed=cooldown)
