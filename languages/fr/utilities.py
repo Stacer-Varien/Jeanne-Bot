@@ -477,8 +477,17 @@ class Utilities:
     async def reportconfession(
         self, ctx: Interaction, confession_id: int, reason: Optional[str] = None
     ):
-        confession = Confess(ctx.guild).get_confession(confession_id)
+        confession = await Confess(ctx.guild).get_confession(confession_id)
         modlog = Moderation(ctx.guild).get_modlog_channel
+        if modlog is None:
+            await ctx.response.send_message(
+                embed=Embed(
+                    description="Le canal de journal de moderation n'est pas configure. Veuillez contacter les administrateurs du serveur.",
+                    color=Color.red(),
+                ),
+                ephemeral=True,
+            )
+            return
         if confession is None:
             await ctx.response.send_message(
                 embed=Embed(

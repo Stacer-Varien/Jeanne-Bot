@@ -48,9 +48,8 @@ class listenersCog(Cog):
                             if lvl is None:
                                 return
                             channel, update, levelup = lvl
-                            role_reward = message.guild.get_role(
-                                level_instance.get_role_reward
-                            )
+                            role_reward = level_instance.get_role_reward
+                            new_level = level_instance.get_member_level
                             parameters = OrderedDict(
                                 [
                                     ("%member%", str(message.author)),
@@ -60,11 +59,7 @@ class listenersCog(Cog):
                                     ("%name%", str(message.author.name)),
                                     (
                                         "%newlevel%",
-                                        str(
-                                            Levelling(
-                                                message.author, message.guild
-                                            ).get_member_level
-                                        ),
+                                        str(new_level),
                                     ),
                                     (
                                         "%role%",
@@ -85,58 +80,22 @@ class listenersCog(Cog):
                                 ]
                             )
 
-                            if update is None:
-                                if message.guild.preferred_locale.value in ["en-GB", "en-US"]:
-                                    msg = "{} has leveled up to `{}`".format(
-                                        message.author,
-                                        Levelling(
-                                            message.author, message.guild
-                                        ).get_member_level,
-                                    )
-                                elif message.guild.preferred_locale.value == "fr":
-                                    msg = "{} a atteint le niveau `{}`".format(
-                                        message.author,
-                                        Levelling(
-                                            message.author, message.guild
-                                        ).get_member_level,
-                                    )
-                                elif message.guild.preferred_locale.value == "de":
-                                    msg = "{} hat das Level `{}` erreicht".format(
-                                        message.author,
-                                        Levelling(
-                                            message.author, message.guild
-                                        ).get_member_level,
-                                    )
-
-                                await channel.send(
-                                    msg,
-                                    allowed_mentions=AllowedMentions(
-                                        roles=False, everyone=False, users=True
-                                    ),
-                                )
-                            else:
-                                json = loads(self.replace_all(update, parameters))
-                                msg = json["content"]
-                                embed = Embed.from_dict(json["embeds"][0])
-
-                                await channel.send(content=msg, embed=embed)
-                            if role_reward:
-                                await message.author.add_roles(role_reward)
-                                if levelup is None:
+                            if channel is not None:
+                                if update is None:
                                     if message.guild.preferred_locale.value in ["en-GB", "en-US"]:
-                                        msg = "CONGRATS {}! You were role awarded {}".format(
+                                        msg = "{} has leveled up to `{}`".format(
                                             message.author,
-                                            role_reward.name,
+                                            new_level,
                                         )
                                     elif message.guild.preferred_locale.value == "fr":
-                                        msg = "FÉLICITATIONS {}! Tu as reçu le rôle {}".format(
+                                        msg = "{} a atteint le niveau `{}`".format(
                                             message.author,
-                                            role_reward.name,
+                                            new_level,
                                         )
                                     elif message.guild.preferred_locale.value == "de":
-                                        msg = "HERZLICHEN GLÜCKWUNSCH {}! Du hast die Rolle {} erhalten".format(
+                                        msg = "{} hat das Level `{}` erreicht".format(
                                             message.author,
-                                            role_reward.name,
+                                            new_level,
                                         )
 
                                     await channel.send(
@@ -146,14 +105,45 @@ class listenersCog(Cog):
                                         ),
                                     )
                                 else:
-                                    json = loads(self.replace_all(levelup, parameters))
+                                    json = loads(self.replace_all(update, parameters))
                                     msg = json["content"]
                                     embed = Embed.from_dict(json["embeds"][0])
 
                                     await channel.send(content=msg, embed=embed)
+                            if role_reward:
+                                await message.author.add_roles(role_reward)
+                                if channel is not None:
+                                    if levelup is None:
+                                        if message.guild.preferred_locale.value in ["en-GB", "en-US"]:
+                                            msg = "CONGRATS {}! You were role awarded {}".format(
+                                                message.author,
+                                                role_reward.name,
+                                            )
+                                        elif message.guild.preferred_locale.value == "fr":
+                                            msg = "FÉLICITATIONS {}! Tu as reçu le rôle {}".format(
+                                                message.author,
+                                                role_reward.name,
+                                            )
+                                        elif message.guild.preferred_locale.value == "de":
+                                            msg = "HERZLICHEN GLÜCKWUNSCH {}! Du hast die Rolle {} erhalten".format(
+                                                message.author,
+                                                role_reward.name,
+                                            )
+
+                                        await channel.send(
+                                            msg,
+                                            allowed_mentions=AllowedMentions(
+                                                roles=False, everyone=False, users=True
+                                            ),
+                                        )
+                                    else:
+                                        json = loads(self.replace_all(levelup, parameters))
+                                        msg = json["content"]
+                                        embed = Embed.from_dict(json["embeds"][0])
+
+                                        await channel.send(content=msg, embed=embed)
                             return
-                    except AttributeError:
-                        
+                    except Exception:
                         return
         except Exception:
             return

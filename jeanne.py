@@ -4,6 +4,10 @@ from discord import Intents, AllowedMentions
 from os import listdir
 from languages.Translator import MyTranslator
 from config import TOKEN
+from functions import ensure_database_schema
+
+
+ensure_database_schema()
 
 
 

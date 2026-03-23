@@ -142,7 +142,17 @@ class Background_Group():
         await ctx.edit_original_response(embed=preview, attachments=[file], view=view)
         await view.wait()
         if view.value:
-            url=await Inventory(ctx.user).upload_to_catbox(link)
+            url = await Inventory(ctx.user).upload_to_catbox(link)
+            if not url:
+                failed = Embed(
+                    description="Le televersement de l'image a echoue. Veuillez reessayer plus tard.",
+                    color=Color.red(),
+                )
+                await ctx.edit_original_response(
+                    embed=failed, view=None, attachments=[]
+                )
+                return
+
             await Inventory(ctx.user).add_user_custom_wallpaper(name, url)
             embed1 = Embed(
                 description="Fond d'écran acheté et sélectionné",

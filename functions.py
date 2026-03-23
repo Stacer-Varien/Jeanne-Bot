@@ -23,6 +23,219 @@ from typing import Literal, Optional, List
 from discord.app_commands import locale_str as T
 
 
+TABLE_BOOTSTRAP_STATEMENTS = (
+    """
+    CREATE TABLE IF NOT EXISTS bankData (
+        user_id INTEGER PRIMARY KEY,
+        amount INTEGER DEFAULT 0,
+        claimed_date INTEGER DEFAULT 0
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS botbannedData (
+        user_id INTEGER PRIMARY KEY,
+        reason TEXT
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS confessData (
+        user_id INTEGER,
+        server_id INTEGER,
+        id INTEGER,
+        confession TEXT,
+        PRIMARY KEY (server_id, id)
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS devWarnData (
+        user INTEGER,
+        reason TEXT,
+        warn_id INTEGER,
+        revoke_date INTEGER
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS disabledCommandsData (
+        server INTEGER,
+        command TEXT,
+        PRIMARY KEY (server, command)
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS globalxpData (
+        user_id INTEGER PRIMARY KEY,
+        lvl INTEGER DEFAULT 0,
+        exp INTEGER DEFAULT 0,
+        cumulative_exp INTEGER DEFAULT 0,
+        next_time INTEGER DEFAULT 0
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS hentaiBlacklist (
+        links TEXT PRIMARY KEY
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS hentaiCache (
+        date TEXT,
+        source TEXT,
+        tags TEXT,
+        file_url TEXT,
+        UNIQUE (source, file_url)
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS levelRewardData (
+        server INTEGER,
+        role INTEGER,
+        level INTEGER,
+        PRIMARY KEY (server, role)
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS partnerData (
+        user_id INTEGER PRIMARY KEY
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS reminderData (
+        userid INTEGER,
+        id INTEGER,
+        time INTEGER,
+        reason TEXT,
+        PRIMARY KEY (userid, id)
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS serverData (
+        server INTEGER PRIMARY KEY,
+        leaving_channel INTEGER,
+        welcoming_channel INTEGER,
+        levelup_channel INTEGER,
+        levelup_message TEXT,
+        modlog INTEGER,
+        welcoming_message TEXT,
+        leaving_message TEXT,
+        rankup_message TEXT,
+        confess_channel INTEGER
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS serverxpData (
+        user_id INTEGER,
+        guild_id INTEGER,
+        lvl INTEGER DEFAULT 0,
+        exp INTEGER DEFAULT 0,
+        cumulative_exp INTEGER DEFAULT 0,
+        next_time INTEGER DEFAULT 0,
+        PRIMARY KEY (user_id, guild_id)
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS softbannedMembers (
+        user_id INTEGER,
+        guild_id INTEGER,
+        ends INTEGER,
+        PRIMARY KEY (user_id, guild_id)
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS suspensionData (
+        user INTEGER PRIMARY KEY,
+        modules TEXT,
+        timeout INTEGER
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS userBio (
+        user_id INTEGER PRIMARY KEY,
+        bio TEXT,
+        color TEXT
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS userWallpaperInventory (
+        user_id INTEGER,
+        wallpaper TEXT,
+        link TEXT,
+        brightness INTEGER,
+        selected INTEGER,
+        country TEXT,
+        PRIMARY KEY (user_id, wallpaper)
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS wallpapers (
+        id INTEGER PRIMARY KEY,
+        name TEXT UNIQUE,
+        link TEXT,
+        price INTEGER
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS warnData (
+        user_id INTEGER,
+        guild_id INTEGER,
+        moderator_id INTEGER,
+        reason TEXT,
+        warn_id INTEGER,
+        date INTEGER,
+        PRIMARY KEY (guild_id, user_id, warn_id)
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS welcomerMsgData (
+        server INTEGER PRIMARY KEY,
+        welcoming TEXT,
+        leaving TEXT
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS xpChannelData (
+        server INTEGER,
+        channel INTEGER,
+        PRIMARY KEY (server, channel)
+    )
+    """,
+)
+
+COLUMN_BOOTSTRAP_STATEMENTS = {
+    "globalxpData": {
+        "cumulative_exp": "INTEGER DEFAULT 0",
+    },
+    "serverxpData": {
+        "cumulative_exp": "INTEGER DEFAULT 0",
+    },
+    "serverData": {
+        "rankup_message": "TEXT",
+        "confess_channel": "INTEGER",
+    },
+    "userBio": {
+        "color": "TEXT",
+    },
+    "userWallpaperInventory": {
+        "country": "TEXT",
+    },
+}
+
+
+def ensure_database_schema() -> None:
+    for statement in TABLE_BOOTSTRAP_STATEMENTS:
+        db.execute(statement)
+
+    for table_name, columns in COLUMN_BOOTSTRAP_STATEMENTS.items():
+        existing_columns = {
+            row[1] for row in db.execute(f"PRAGMA table_info({table_name})").fetchall()
+        }
+        for column_name, definition in columns.items():
+            if column_name not in existing_columns:
+                db.execute(
+                    f"ALTER TABLE {table_name} ADD COLUMN {column_name} {definition}"
+                )
+
+    db.commit()
+
+
 class DevPunishment:
     def __init__(self, user: Optional[User] = None) -> None:
         self.user = user
@@ -290,7 +503,7 @@ class Inventory:
         self.user = user
 
     @staticmethod
-    async def upload_to_catbox(image_url: str) -> str:
+    async def upload_to_catbox(image_url: str) -> str | None:
         headers = {
             "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"
         }
@@ -298,11 +511,14 @@ class Inventory:
             url = "https://catbox.moe/user/api.php"
             userhash = CATBOX_HASH
             data = {"reqtype": "urlupload", "userhash": userhash, "url": image_url}
-            response = await session.post(url, data=data)
-        if response.status == 200:
-            return response.content
-        else:
-            return None
+            async with session.post(url, data=data) as response:
+                if response.status != 200:
+                    return None
+                uploaded_url = (await response.text()).strip()
+
+        if uploaded_url.startswith("http"):
+            return uploaded_url
+        return None
 
     async def add_country(self, country: str):
         db.execute(
@@ -379,7 +595,11 @@ class Inventory:
         db.commit()
         await Currency(self.user).remove_qp(1000)
 
-    async def add_user_custom_wallpaper(self, name: str, url: str):
+    async def add_user_custom_wallpaper(
+        self, name: str, url: str
+    ) -> Literal[False] | None:
+        if not url:
+            return False
         await self.deselect_wallpaper()
         db.execute(
             "INSERT OR IGNORE INTO userWallpaperInventory (user_id, wallpaper, link, brightness, selected) VALUES (?,?,?,?,?)",
@@ -436,9 +656,9 @@ class Inventory:
         ).fetchone()
         return 100 if (data is None) else int(data[0])
 
-    async def set_brightness(self, brightness: int) -> Literal[False] | None:
+    async def set_brightness(self, brightness: int) -> bool:
         try:
-            db.execute(
+            data = db.execute(
                 "UPDATE userWallpaperInventory SET brightness = ? WHERE user_id = ? AND selected = ?",
                 (
                     brightness,
@@ -447,6 +667,7 @@ class Inventory:
                 ),
             )
             db.commit()
+            return data.rowcount > 0
         except Exception:
             return False
 
@@ -1042,14 +1263,23 @@ class Manage:
         db.commit()
 
     async def add_confession_channel(self, channel: TextChannel):
-        db.execute(
-            "UPDATE serverData SET confess_channel = ? WHERE server = ?",
+        cursor = db.execute(
+            "INSERT OR IGNORE INTO serverData (server, confess_channel) VALUES (?,?)",
             (
-                channel.id,
                 self.server.id,
+                channel.id,
             ),
         )
         db.commit()
+        if cursor.rowcount == 0:
+            db.execute(
+                "UPDATE serverData SET confess_channel = ? WHERE server = ?",
+                (
+                    channel.id,
+                    self.server.id,
+                ),
+            )
+            db.commit()
 
 
 class Confess:
@@ -1106,7 +1336,7 @@ class Command:
             db.commit()
             return data is not None and command == data[0]
         except Exception:
-            pass
+            return False
 
     async def disable(self, command: str):
         db.execute(
@@ -1217,9 +1447,11 @@ class Moderation:
 
     async def softban_member(self, member: Member, ends: int = None):
         if ends is None:
-            ends = 99999999999  # infinite value for now
+            ending = 99999999999  # infinite value for now
+        elif isinstance(ends, (int, float)):
+            ending = round((datetime.now() + timedelta(seconds=float(ends))).timestamp())
         else:
-            seconds = parse_timespan(ends)
+            seconds = parse_timespan(str(ends))
             ending = round((datetime.now() + timedelta(seconds=seconds)).timestamp())
         db.execute(
             "INSERT OR IGNORE INTO softbannedMembers (user_id, guild_id, ends) VALUES (?,?,?)",
@@ -1777,16 +2009,20 @@ class AutoCompleteChoices:
         current: str,
     ) -> List[Jeanne.Choice[str]]:
         commands = Command(ctx.guild).list_all_disabled
+        if not commands:
+            return []
         return [
             Jeanne.Choice(name=command, value=command)
             for command in commands
-            if current.lower() in command
+            if current.lower() in command.lower()
         ][:25]
 
     async def list_all_user_inventory(
         self, ctx: Interaction, current: str
     ) -> List[Jeanne.Choice[str]]:
         inventory = Inventory(ctx.user).get_user_inventory
+        if not inventory:
+            return []
         return [
             Jeanne.Choice(name=image[1], value=image[1])
             for image in inventory

@@ -1,12 +1,15 @@
-import os
+import asyncio
 import json
 import random
-from discord import Embed, Guild, Interaction
+from pathlib import Path
+from discord import Embed, Interaction
 import markdown
 from openai import OpenAI
 from config import OPENAI_API
 
 client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=OPENAI_API)
+HISTORY_DIR = Path("assets/AI/history")
+DOCUMENTATION_PATH = Path("assets/AI/documentation.md")
 
 def read_md_file_as_markdown(filepath):
     try:
@@ -20,14 +23,17 @@ def read_md_file_as_markdown(filepath):
         return f"An error occurred: {e}"
 
 
-def create_history(server: Guild):
-    history_dir = "assets/AI/history"
-    os.makedirs(history_dir, exist_ok=True)
+def build_history_file(ctx: Interaction) -> Path:
+    if ctx.guild is not None:
+        scope = f"guild_{ctx.guild.id}_user_{ctx.user.id}"
+    else:
+        scope = f"dm_user_{ctx.user.id}"
+    return HISTORY_DIR / f"{scope}_history.txt"
 
-    history_file = os.path.join(history_dir, f"{server.id}_history.txt")
-    if not os.path.exists(history_file):
-        with open(history_file, "w", encoding="utf-8") as f:  # noqa: F841
-            pass
+
+def create_history(history_file: Path) -> None:
+    HISTORY_DIR.mkdir(parents=True, exist_ok=True)
+    history_file.touch(exist_ok=True)
 
 
 async def open_ai(ctx:Interaction, input_text: str):
@@ -63,37 +69,37 @@ Here's what you should know:
 - Your version is currently at 5.3 Beta and latest update was on January 2026
 
 Your documentation is (the file is in markdown but readable for you and it is made by the developer so where it says "I" or "Me" in the FAQ and Updates section, that is your developer speaking, the rest where it says "Jeanne" or "Bot" refers to you):
-{read_md_file_as_markdown('assets/AI/documentation.md')}
+    {read_md_file_as_markdown(str(DOCUMENTATION_PATH))}
     """
-    create_history(ctx.guild)
-    history_file = f"assets/AI/history/{ctx.guild.id}_history.txt"
+    history_file = build_history_file(ctx)
+    create_history(history_file)
     history = []
 
-    if os.path.exists(history_file):
-        with open(history_file, "r", encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                if line:
-                    try:
-                        entry = json.loads(line)
-                        if isinstance(entry, dict) and "role" in entry:
-                            role = "assistant" if entry.get("role") == "model" else entry.get("role")
+    with history_file.open("r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                try:
+                    entry = json.loads(line)
+                    if isinstance(entry, dict) and "role" in entry:
+                        role = "assistant" if entry.get("role") == "model" else entry.get("role")
 
-                            content = ""
-                            if "parts" in entry and isinstance(entry["parts"], list):
-                                content = entry["parts"][0].get("text", "") if entry["parts"] else ""
-                            else:
-                                content = entry.get("content", "")
+                        content = ""
+                        if "parts" in entry and isinstance(entry["parts"], list):
+                            content = entry["parts"][0].get("text", "") if entry["parts"] else ""
+                        else:
+                            content = entry.get("content", "")
 
-                            if content:
-                                history.append({"role": role, "content": content})
-                    except (json.JSONDecodeError, IndexError, KeyError):
-                        continue
+                        if content:
+                            history.append({"role": role, "content": content})
+                except (json.JSONDecodeError, IndexError, KeyError):
+                    continue
 
     
     limited_history = history[-20:] if len(history) > 20 else history
 
-    response = client.chat.completions.create(
+    response = await asyncio.to_thread(
+        client.chat.completions.create,
         model="mistralai/devstral-2512:free",
         messages=[{"role": "system", "content": system_instruction}]
         + limited_history
@@ -103,16 +109,20 @@ Your documentation is (the file is in markdown but readable for you and it is ma
         top_p=0.95,
     )
 
-    outpout_text = response.choices[0].message.content
+    output_text = response.choices[0].message.content or "I couldn't generate a response."
 
     user_entry = {"role": "user", "content": input_text}
-    model_entry = {"role": "assistant", "content": outpout_text}
+    model_entry = {"role": "assistant", "content": output_text}
 
-    with open(history_file, "a", encoding="utf-8", newline="\n") as f:
-        f.write(json.dumps(user_entry) + "\n")
-        f.write(json.dumps(model_entry) + "\n")
+    with history_file.open("a", encoding="utf-8", newline="\n") as f:
+        f.write(json.dumps(user_entry, ensure_ascii=False) + "\n")
+        f.write(json.dumps(model_entry, ensure_ascii=False) + "\n")
 
     embed = Embed()
-    embed.color=random.randint(0, 0xFFFFFF)
-    embed.description = outpout_text
+    embed.color = random.randint(0, 0xFFFFFF)
+    embed.description = (
+        output_text[:4093] + "..."
+        if len(output_text) > 4096
+        else output_text
+    )
     await ctx.followup.send(embed=embed)

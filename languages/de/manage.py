@@ -870,12 +870,11 @@ class Set_Group:
     ):
         await ctx.response.defer()
         embed = Embed()
-        if not Inventory(ctx.user).set_brightness(brightness):
+        if not await Inventory(ctx.user).set_brightness(brightness):
             embed.description = "Je hebt geen achtergrond"
             embed.color = Color.red()
             await ctx.followup.send(embed=embed)
             return
-        await Inventory(ctx.user).set_brightness(brightness)
         embed.description = "Helderheid is gewijzigd naar {}%".format(brightness)
         embed.color = Color.random()
         await ctx.followup.send(embed=embed)

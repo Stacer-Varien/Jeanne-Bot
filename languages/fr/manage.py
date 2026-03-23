@@ -879,12 +879,11 @@ class Set_Group:
     ):
         await ctx.response.defer()
         embed = Embed()
-        if not Inventory(ctx.user).set_brightness(brightness):
+        if not await Inventory(ctx.user).set_brightness(brightness):
             embed.description = "Vous n'avez pas de fond d'écran"
             embed.color = Color.red()
             await ctx.followup.send(embed=embed)
             return
-        await Inventory(ctx.user).set_brightness(brightness)
         embed.description = "La luminosité a été changée à {}%".format(brightness)
         embed.color = Color.random()
         await ctx.followup.send(embed=embed)
