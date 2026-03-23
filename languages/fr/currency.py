@@ -609,6 +609,13 @@ class currency:
             color=Color.red(),
         )
         await ctx.response.send_message(embed=cooldown)
+    
+    async def spinwheel_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+            cooldown = Embed(
+                description=f"WOAH! Calmez-vous!\nEssayez à nouveau après `{round(error.retry_after, 2)} secondes`",
+                color=Color.red(),
+            )
+            await ctx.response.send_message(embed=cooldown)
 
     async def spin(self, ctx: Interaction, bet: int):
         wheel = Wheel(self.bot)
