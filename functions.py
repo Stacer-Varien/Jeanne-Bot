@@ -487,6 +487,42 @@ class Currency:
             )
             db.commit()
 
+    async def claim_daily(self) -> int | None:
+        now = round(datetime.now().timestamp())
+        next_claim = round((datetime.now() + timedelta(days=1)).timestamp())
+        qp = 200 if (datetime.today().weekday() > 4) else 100
+
+        cur = db.execute(
+            """
+            UPDATE bankData
+            SET claimed_date = ?, amount = amount + ?
+            WHERE user_id = ? AND claimed_date < ?
+            """,
+            (
+                next_claim,
+                qp,
+                self.user.id,
+                now,
+            ),
+        )
+        db.commit()
+        if cur.rowcount == 1:
+            return next_claim
+
+        cur = db.execute(
+            "INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)",
+            (
+                self.user.id,
+                qp,
+                next_claim,
+            ),
+        )
+        db.commit()
+        if cur.rowcount == 1:
+            return next_claim
+
+        return None
+
     @property
     def check_daily(self) -> int | Literal[True]:
         data = db.execute(

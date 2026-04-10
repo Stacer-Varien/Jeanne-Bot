@@ -460,9 +460,8 @@ class currency:
     async def daily(self, ctx: Interaction):
         await ctx.response.defer()
         bank = Currency(ctx.user)
-        tomorrow = round((datetime.now() + timedelta(days=1)).timestamp())
-        if bank.check_daily:
-            await bank.give_daily()
+        next_claim = await bank.claim_daily()
+        if next_claim is not None:
             daily = Embed(
                 title="Quotidien",
                 description=f"**{ctx.user}**, vous avez réclamé votre récompense quotidienne.",
@@ -496,11 +495,12 @@ class currency:
                 name="Solde",
                 value=f"{bank.get_balance} <:quantumpiece:1161010445205905418>",
             )
-            daily.add_field(name="Prochain quotidien :", value=f"<t:{tomorrow}:f>")
+            daily.add_field(name="Prochain quotidien :", value=f"<t:{next_claim}:f>")
             await ctx.followup.send(embed=daily)
         else:
+            next_daily = bank.check_daily
             cooldown = Embed(
-                description=f"Vous avez déjà réclamé votre quotidien.\nVotre prochaine réclamation est <t:{bank.check_daily}:R>",
+                description=f"Vous avez déjà réclamé votre quotidien.\nVotre prochaine réclamation est <t:{next_daily}:R>",
                 color=Color.red(),
             )
             await ctx.followup.send(embed=cooldown)
