@@ -24,7 +24,7 @@ class CommandLog(Cog, name="CommandLogSlash"):
         }
         df_new = pd.DataFrame(new_data)
         df_existing = pd.read_excel(existing_file)
-        df_combined = df_existing._append(df_new, ignore_index=True)
+        df_combined = pd.concat([df_existing, df_new], ignore_index=True)
         df_combined.to_excel(existing_file, index=False)
 
 
