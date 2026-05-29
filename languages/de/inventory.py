@@ -22,14 +22,14 @@ class Shop_Group:
         await ctx.response.defer()
         balance = Currency(ctx.user).get_balance
         if balance is None or balance < 500:
-            nomoney = Embed(description="Je hebt niet genoeg QP.")
+            nomoney = Embed(description="Du hast nicht genug QP.")
             await ctx.followup.send(embed=nomoney)
             return
         view = Country_Badge_Buttons(self.bot, ctx.user)
         embed = Embed(
-            description="Hier zijn de beschikbare landbadges:", color=Color.random()
+            description="Hier sind die verfügbaren Länderabzeichen:", color=Color.random()
         )
-        embed.set_footer(text="Klik op een van de knoppen om de badge te kopen")
+        embed.set_footer(text="Klicke auf einen der Buttons, um das Abzeichen zu kaufen")
         await ctx.followup.send(embed=embed, view=view)
         await view.wait()
 
@@ -37,7 +37,7 @@ class Shop_Group:
             country = view.value
             await Inventory(ctx.user).add_country(country)
             embed1 = Embed(
-                description="Landbadge gekocht en toegevoegd aan profiel",
+                description="Landabzeichen gekauft und dem Profil hinzugefügt",
                 color=Color.random(),
             )
             await ctx.edit_original_response(embed=embed1, view=None)
@@ -64,7 +64,7 @@ class Shop_Group:
             page_embed = Embed(title=name, color=embed.color)
 
             page_embed.add_field(
-                name="Prijs", value="1000 <:quantumpiece:1161010445205905418>"
+                name="Preis", value="1000 <:quantumpiece:1161010445205905418>"
             )
             page_embed.set_image(url=str(wallpaper[2]))
             menu.add_page(embed=page_embed)
@@ -94,7 +94,7 @@ class Shop_Group:
 
     async def backgrounds_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         cooldown = Embed(
-            description=f"Je hebt al geprobeerd een achtergrond te bekijken!\nProbeer het opnieuw na `{round(error.retry_after, 2)} seconden`",
+            description=f"Du hast bereits versucht, ein Hintergrundbild anzusehen!\nVersuche es erneut in `{round(error.retry_after, 2)} Sekunden`",
             color=Color.random(),
         )
         await ctx.response.send_message(embed=cooldown)
@@ -108,12 +108,12 @@ class Background_Group:
         await ctx.response.defer()
         balance = Currency(ctx.user).get_balance
         if balance is None or balance < 1500:
-            nomoney = Embed(description="Je hebt niet genoeg QP.")
+            nomoney = Embed(description="Du hast nicht genug QP.")
             await ctx.followup.send(embed=nomoney)
             return
         await ctx.followup.send(
             embed=Embed(
-                description="Voorbeeld wordt aangemaakt... Dit kan even duren <a:loading:1161038734620373062>"
+                description="Vorschau wird erstellt... Das kann eine Weile dauern <a:loading:1161038734620373062>"
             )
         )
         image = await Profile(self.bot).generate_profile(
@@ -121,20 +121,20 @@ class Background_Group:
         )
         if not image:
             size_error = Embed(
-                description="De afbeelding is kleiner dan 900x500.\nVergroot de afbeelding en probeer het opnieuw"
+                description="Das Bild ist kleiner als 900x500.\nVergrößere das Bild und versuche es erneut"
             )
             await ctx.edit_original_response(embed=size_error)
             return
         file = File(fp=image, filename="preview_profile_card.png")
         preview = (
             Embed(
-                description="Dit is het voorbeeld van de profielkaart.",
+                description="Dies ist die Vorschau der Profilkarte.",
                 color=Color.blue(),
             )
             .add_field(name="Kosten", value="1500 <:quantumpiece:1161010445205905418>")
-            .set_footer(text="Is dit de achtergrond die je wilde?")
+            .set_footer(text="Ist dies der Hintergrund, den du wolltest?")
             .set_footer(
-                text="Let op: als de aangepaste achtergrond in strijd is met de ToS of NSFW is, wordt deze verwijderd ZONDER TERUGBETALING!"
+                text="Achtung: Wenn der benutzerdefinierte Hintergrund gegen die ToS verstößt oder NSFW ist, wird er OHNE RÜCKERSTATTUNG entfernt!"
             )
         )
         view = Confirmation(ctx, ctx.user)
@@ -154,13 +154,13 @@ class Background_Group:
 
             await Inventory(ctx.user).add_user_custom_wallpaper(name, url)
             embed1 = Embed(
-                description="Achtergrond gekocht en geselecteerd",
+                description="Hintergrund gekauft und ausgewählt",
                 color=Color.random(),
             )
             await ctx.edit_original_response(embed=embed1, view=None, attachments=[])
         else:
             await ctx.edit_original_response(
-                embed=Embed(description="Geannuleerd"), view=None, attachments=[]
+                embed=Embed(description="Abgebrochen"), view=None, attachments=[]
             )
 
     async def buycustom_error(
@@ -168,19 +168,19 @@ class Background_Group:
     ):
         if type == "cooldown":
             cooldown = Embed(
-                description=f"Je hebt al geprobeerd een achtergrond te bekijken!\nProbeer het opnieuw na `{round(error.retry_after, 2)} seconden`",
+                description=f"Du hast bereits versucht, ein Hintergrundbild anzusehen!\nVersuche es erneut in `{round(error.retry_after, 2)} Sekunden`",
                 color=Color.random(),
             )
             await ctx.response.send_message(embed=cooldown)
             return
         if type == "invalid":
-            embed = Embed(description="Ongeldige afbeeldings-URL", color=Color.red())
+            embed = Embed(description="Ungültige Bild-URL", color=Color.red())
             await ctx.edit_original_response(content=None, embed=embed)
 
     async def list(self, ctx: Interaction):
         await ctx.response.defer()
         if Inventory(ctx.user).get_user_inventory is None:
-            embed = Embed(description="Je inventaris is leeg", color=Color.red())
+            embed = Embed(description="Dein Inventar ist leer", color=Color.red())
             await ctx.followup.send(embed=embed)
             return
         a = Inventory(ctx.user).get_user_inventory
@@ -208,7 +208,7 @@ class Background_Group:
         menu.add_button(ViewButton.back())
         menu.add_button(
             ViewButton(
-                label="Gebruiken",
+                label="Verwenden",
                 style=ButtonStyle.green,
                 custom_id=ViewButton.ID_CALLER,
                 followup=call_followup,

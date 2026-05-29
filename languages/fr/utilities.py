@@ -510,13 +510,3 @@ class Utilities:
             ephemeral=True,
         )
 
-    async def chat_error(
-        self,
-        ctx: Interaction,
-        error: Jeanne.AppCommandError,
-    ):
-            cooldown = Embed(
-                description=f"WOAH ! Calmez-vous ! Laissez-moi un peu de répit !\nRéessayez après `{round(error.retry_after, 2)} secondes`",
-                color=Color.red(),
-            )
-            await ctx.followup.send(embed=cooldown)

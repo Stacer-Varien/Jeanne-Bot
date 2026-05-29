@@ -37,7 +37,7 @@ This repository is the actual bot codebase, not just a command demo. It includes
 - ✉️ embed generation and editing
 - 🐞 bot report flow
 - 🕶️ anonymous confession flow
-- 🤖 AI chat command
+- ❓ command help lookup via `/help ask`
 
 ### Fun and Media 🎉
 
@@ -58,7 +58,7 @@ Jeanne ships with localized command content for:
 
 ```text
 .
-|-- assets/              # UI views, generators, AI helpers, image helpers
+|-- assets/              # UI views, generators, and image helpers
 |-- cogs/                # Main slash-command and event feature groups
 |-- events/              # Background tasks and listeners
 |-- languages/           # Localized command implementations
@@ -77,7 +77,6 @@ Jeanne ships with localized command content for:
 - 🗃️ SQLite
 - 🌐 aiohttp
 - 🎨 Pillow
-- 🧠 OpenAI client library
 - 🧭 ReactionMenu
 - 📄 pandas / openpyxl
 
@@ -124,7 +123,6 @@ kitsune_album=
 badges_album=
 catbox_hash=
 status=
-OPENAI_API_KEY=
 GELBOORU_API_KEY=
 GELBOORU_USER_ID=
 RULE34_API_KEY=
@@ -133,7 +131,7 @@ RULE34_USER_ID=
 
 Notes 📝:
 
-- 🔐 `OPENAI_API_KEY`, `GELBOORU_API_KEY`, `GELBOORU_USER_ID`, `RULE34_API_KEY`, and `RULE34_USER_ID` are read as required environment variables in `config.py`.
+- 🔐 `GELBOORU_API_KEY`, `GELBOORU_USER_ID`, `RULE34_API_KEY`, and `RULE34_USER_ID` are read as required environment variables in `config.py`.
 - 🧩 Some variables power optional features, but if the current code reads them during startup, they still need to exist.
 - 🔞 The mature-content command set is present in the codebase. Host responsibly and keep usage aligned with Discord rules and your local laws.
 

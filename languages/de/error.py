@@ -9,14 +9,14 @@ class Errors():
 
     async def handle_missing_permissions(self, ctx: Interaction, error: Jeanne.MissingPermissions):
         embed = Embed(
-            description=f"Je mist {''.join(error.missing_permissions)} voor dit commando",
+            description=f"Dir fehlen {''.join(error.missing_permissions)} für diesen Befehl",
             color=Color.red(),
         )
         await ctx.response.send_message(embed=embed)
 
     async def handle_bot_missing_permissions(self, ctx: Interaction, error: Jeanne.BotMissingPermissions):
         embed = Embed(
-            description=f"Ik mis {''.join(error.missing_permissions)} voor dit commando",
+            description=f"Ich habe {''.join(error.missing_permissions)} für diesen Befehl vermisst",
             color=Color.red(),
         )
         await ctx.response.send_message(embed=embed)

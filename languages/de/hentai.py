@@ -83,7 +83,7 @@ class nsfw(Cog):
             embeds = [
                 Embed(color=color, url="https://rule34.xxx")
                 .set_image(url=img["file_url"])
-                .set_footer(text="Gehaald van Rule34 • Credits gaan naar de artiest")
+                .set_footer(text="Abgerufen von Rule34 • Credits gehen an den Künstler")
                 for img in images
             ]
             await ctx.followup.send(embeds=embeds, view=view)
@@ -97,7 +97,7 @@ class nsfw(Cog):
             embed = (
                 Embed(color=Color.purple())
                 .set_image(url=image)
-                .set_footer(text="Gehaald van Rule34 • Credits gaan naar de artiest")
+                .set_footer(text="Abgerufen von Rule34 • Credits gehen an den Künstler")
             )
             await ctx.followup.send(embed=embed, view=view)
             await view.wait()
@@ -115,7 +115,7 @@ class nsfw(Cog):
                 Embed(color=Color.purple())
                 .set_image(url=image)
                 .set_footer(
-                    text="Gehaald van Rule34 • Credits gaan naar de artiest\nAls je illegale inhoud ziet, gebruik dan /botreport en voeg de link toe bij het rapporteren"
+                    text="Abgerufen von Rule34 • Credits gehen an den Künstler\nWenn du illegale Inhalte siehst, verwende /botreport und füge den Link bei der Meldung hinzu"
                 )
             )
             await ctx.followup.send(embed=embed)
@@ -152,7 +152,7 @@ class nsfw(Cog):
             embeds = [
                 Embed(color=color, url="https://gelbooru.com")
                 .set_image(url=img["file_url"])
-                .set_footer(text="Gehaald van Gelbooru • Credits gaan naar de artiest")
+                .set_footer(text="Abgerufen von Gelbooru • Credits gehen an den Künstler")
                 for img in images
             ]
             await ctx.followup.send(embeds=embeds, view=view)
@@ -166,7 +166,7 @@ class nsfw(Cog):
             embed = (
                 Embed(color=Color.purple())
                 .set_image(url=image)
-                .set_footer(text="Gehaald van Gelbooru • Credits gaan naar de artiest")
+                .set_footer(text="Abgerufen von Gelbooru • Credits gehen an den Künstler")
             )
             await ctx.followup.send(embed=embed, view=view)
             await view.wait()
@@ -185,7 +185,7 @@ class nsfw(Cog):
                 Embed(color=Color.purple())
                 .set_image(url=image)
                 .set_footer(
-                    text="Gehaald van Gelbooru • Credits gaan naar de artiest\nAls je illegale inhoud ziet, gebruik dan /botreport en voeg de link toe bij het rapporteren"
+                    text="Abgerufen von Gelbooru • Credits gehen an den Künstler\nWenn du illegale Inhalte siehst, verwende /botreport und füge den Link bei der Meldung hinzu"
                 )
             )
             await ctx.followup.send(embed=embed)
@@ -199,7 +199,7 @@ class nsfw(Cog):
         await ctx.response.defer()
         if tag == "02":
             await ctx.followup.send(
-                "Tag is op de zwarte lijst gezet omdat deze extreme inhoud retourneert"
+                "Der Tag wurde auf die schwarze Liste gesetzt, weil er extreme Inhalte zurückgibt"
             )
             return
         image = Hentai().get_images_yandere(tag)
@@ -212,10 +212,10 @@ class nsfw(Cog):
             embeds = [
                 Embed(color=color, url="https://yande.re")
                 .set_image(url=(str(url)))
-                .set_footer(text="Gehaald van Yande.re • Credits gaan naar de artiest")
+                .set_footer(text="Abgerufen von Yande.re • Credits gehen an den Künstler")
                 for url in images
             ]
-            footer_text = "Gehaald van Yande.re • Credits gaan naar de artiest"
+            footer_text = "Abgerufen von Yande.re • Credits gehen an den Künstler"
             try:
                 await ctx.followup.send(embeds=embeds, view=view)
                 await view.wait()
@@ -226,7 +226,7 @@ class nsfw(Cog):
                         return
                 return
             except Exception:
-                footer_text += "\nAls je illegale inhoud ziet, gebruik dan /botreport en voeg de link toe bij het rapporteren"
+                footer_text += "\nWenn du illegale Inhalte siehst, verwende /botreport und füge den Link bei der Meldung hinzu"
                 for embed in embeds:
                     embed.set_footer(text=footer_text)
                 await ctx.followup.send(embeds=embeds)
@@ -236,7 +236,7 @@ class nsfw(Cog):
         shortened_url = shorten_url(img)
         embed = Embed(color=color, url="https://yande.re")
         embed.set_image(url=img)
-        footer_text = "Gehaald van Yande.re • Credits gaan naar de artiest"
+        footer_text = "Abgerufen von Yande.re • Credits gehen an den Künstler"
         try:
             view = ReportContent(ctx, shortened_url)
             embed.set_footer(text=footer_text)
@@ -249,7 +249,7 @@ class nsfw(Cog):
                     return
             return
         except Exception:
-            footer_text += "\nAls je illegale inhoud ziet, gebruik dan /botreport en voeg de link toe bij het rapporteren"
+            footer_text += "\nWenn du illegale Inhalte siehst, verwende /botreport und füge den Link bei der Meldung hinzu"
             embed.set_footer(text=footer_text)
             await ctx.followup.send(embed=embed)
 
@@ -273,11 +273,11 @@ class nsfw(Cog):
                     Embed(color=color, url="https://konachan.com")
                     .set_image(url=str(url))
                     .set_footer(
-                        text="Gehaald van Konachan • Credits gaan naar de artiest"
+                        text="Abgerufen von Konachan • Credits gehen an den Künstler"
                     )
                     for url in images
                 ]
-                footer_text = "Gehaald van Konachan • Credits gaan naar de artiest"
+                footer_text = "Abgerufen von Konachan • Credits gehen an den Künstler"
                 await ctx.followup.send(embeds=embeds, view=view)
                 await view.wait()
                 if view.value is None:
@@ -292,11 +292,11 @@ class nsfw(Cog):
                     Embed(color=color, url="https://konachan.com")
                     .set_image(url=str(url["image_url"]))
                     .set_footer(
-                        text="Gehaald van Konachan • Credits gaan naar de artiest"
+                        text="Abgerufen von Konachan • Credits gehen an den Künstler"
                     )
                     for url in images
                 ]
-                footer_text += "\nAls je illegale inhoud ziet, gebruik dan /botreport en voeg de link toe bij het rapporteren"
+                footer_text += "\nWenn du illegale Inhalte siehst, verwende /botreport und füge den Link bei der Meldung hinzu"
                 for embed in embeds:
                     embed.set_footer(text=footer_text)
                 await ctx.followup.send(embeds=embeds)
@@ -306,7 +306,7 @@ class nsfw(Cog):
         url=shorten_url(img)
         embed = Embed(color=color, url="https://konachan.com")
         embed.set_image(url=img)
-        footer_text = "Gehaald van Konachan • Credits gaan naar de artiest"
+        footer_text = "Abgerufen von Konachan • Credits gehen an den Künstler"
         try:
             view = ReportContent(ctx, url)
             embed.set_footer(text=footer_text)
@@ -319,7 +319,7 @@ class nsfw(Cog):
                     return
             return
         except Exception:
-            footer_text += "\nAls je illegale inhoud ziet, gebruik dan /botreport en voeg de link toe bij het rapporteren"
+            footer_text += "\nWenn du illegale Inhalte siehst, verwende /botreport und füge den Link bei der Meldung hinzu"
             embed.set_footer(text=footer_text)
             await ctx.followup.send(embed=embed)
 
@@ -356,7 +356,7 @@ class nsfw(Cog):
             embeds = [
                 Embed(color=color, url="https://danbooru.donmai.us/")
                 .set_image(url=img["file_url"])
-                .set_footer(text="Gehaald van Danbooru • Credits gaan naar de artiest")
+                .set_footer(text="Abgerufen von Danbooru • Credits gehen an den Künstler")
                 for img in images
             ]
             await ctx.followup.send(embeds=embeds, view=view)
@@ -372,7 +372,7 @@ class nsfw(Cog):
             embed = (
                 Embed(color=Color.purple())
                 .set_image(url=image)
-                .set_footer(text="Gehaald van Danbooru • Credits gaan naar de artiest")
+                .set_footer(text="Abgerufen von Danbooru • Credits gehen an den Künstler")
             )
             await ctx.followup.send(embed=embed, view=view)
             await view.wait()
@@ -390,7 +390,7 @@ class nsfw(Cog):
                 Embed(color=Color.purple())
                 .set_image(url=image)
                 .set_footer(
-                    text="Gehaald van Danbooru • Credits gaan naar de artiest\nAls je illegale inhoud ziet, gebruik dan /botreport en voeg de link toe bij het rapporteren"
+                    text="Abgerufen von Danbooru • Credits gehen an den Künstler\nWenn du illegale Inhalte siehst, verwende /botreport und füge den Link bei der Meldung hinzu"
                 )
             )
             await ctx.followup.send(embed=embed)
@@ -400,13 +400,13 @@ class nsfw(Cog):
     ):
         if type == "NotFound":
             no_tag = Embed(
-                description="De hentai kon niet worden gevonden", color=Color.red()
+                description="Der Hentai konnte nicht gefunden werden", color=Color.red()
             )
             await ctx.followup.send(embed=no_tag)
             return
         if type == "cooldown":
             cooldown = Embed(
-                description=f"WOAH! Rustig aan! Geef me even een pauze!\nProbeer het opnieuw over `{round(error.retry_after, 2)} seconden`",
+                description=f"WOAH! Ruhig Blut! Gib mir bitte eine kleine Pause!\nVersuche es erneut in `{round(error.retry_after, 2)} Sekunden`",
                 color=Color.red(),
             )
             await ctx.response.send_message(embed=cooldown)

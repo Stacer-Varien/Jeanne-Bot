@@ -30,7 +30,6 @@ GELBOORU_API=environ["GELBOORU_API_KEY"]
 GELBOORU_USER=environ["GELBOORU_USER_ID"]
 RULE34_API=environ["RULE34_API_KEY"]
 RULE34_USER=environ["RULE34_USER_ID"]
-OPENAI_API=environ["OPENAI_API_KEY"]
 
 db = connect("database.db", autocommit=True)
 

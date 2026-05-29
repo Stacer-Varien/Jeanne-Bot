@@ -2723,30 +2723,6 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Danser avec un membre ou vous-même",
                 "de": "Tanze mit einem Mitglied oder dir selbst",
             },
-            "chat_name": {
-                "en-GB": "chat",
-                "en-US": "chat",
-                "fr": "discuter",
-                "de": "chatten",
-            },
-            "chat_desc": {
-                "en-GB": "Chat with the me (with Mistral AI)",
-                "en-US": "Chat with the me (with Mistral AI)",
-                "fr": "Discutez avec moi (avec Mistral AI)",
-                "de": "Chatte mit mir (mit Mistral AI)",
-            },
-            "prompt_parm_name": {
-                "en-GB": "prompt",
-                "en-US": "prompt",
-                "fr": "invite",
-                "de": "eingabe",
-            },
-            "prompt_parm_desc": {
-                "en-GB": "What do you want to say to me?",
-                "en-US": "What do you want to say to me?",
-                "fr": "Que voulez-vous me dire?",
-                "de": "Was möchtest du mir sagen?",
-            },
             "roast_name": {
                 "en-GB": "roast",
                 "en-US": "roast",

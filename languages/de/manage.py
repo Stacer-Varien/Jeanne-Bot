@@ -61,15 +61,15 @@ class Create_Group:
         channel = await ctx.guild.create_text_channel(name=name)
         embed = Embed()
         embed.color = Color.random()
-        embed.description = "{} is aangemaakt".format(channel.jump_url)
+        embed.description = "{} wurde erstellt".format(channel.jump_url)
         if category:
             await channel.edit(category=category)
             embed.add_field(
-                name="Toegevoegd aan categorie", value=category.name, inline=True
+                name="Zur Kategorie hinzugefügt", value=category.name, inline=True
             )
         if topic:
             await channel.edit(topic=topic)
-            embed.add_field(name="Onderwerp", value=topic, inline=True)
+            embed.add_field(name="Thema", value=topic, inline=True)
         if slowmode:
             try:
                 delay = int(parse_timespan(slowmode))
@@ -96,23 +96,23 @@ class Create_Group:
         name = "new-channel" if name is None else name
         channel = await ctx.guild.create_voice_channel(name=name)
         embed = Embed()
-        embed.description = "{} is aangemaakt".format(channel.jump_url)
+        embed.description = "{} wurde erstellt".format(channel.jump_url)
         embed.color = Color.random()
         if category:
             await channel.edit(category=category)
             embed.add_field(
-                name="Toegevoegd aan categorie", value=category.name, inline=True
+                name="Zur Kategorie hinzugefügt", value=category.name, inline=True
             )
         if users:
             await channel.edit(user_limit=users)
-            embed.add_field(name="Gebruikerslimiet", value=users, inline=True)
+            embed.add_field(name="Benutzerlimit", value=users, inline=True)
         await ctx.followup.send(embed=embed)
 
     async def category(self, ctx: Interaction, name: Jeanne.Range[str, 1, 100]):
         await ctx.response.defer()
         cat = await ctx.guild.create_category(name=name)
         embed = Embed()
-        embed.description = "{} is aangemaakt".format(cat.mention)
+        embed.description = "{} wurde erstellt".format(cat.mention)
         embed.color = Color.random()
         await ctx.followup.send(embed=embed)
 
@@ -126,21 +126,21 @@ class Create_Group:
         await ctx.response.defer()
         embed = Embed()
         channel: StageChannel = await ctx.guild.create_stage_channel(name=name)
-        embed.description = "{} is aangemaakt".format(channel.jump_url)
+        embed.description = "{} wurde erstellt".format(channel.jump_url)
         if category:
             await channel.edit(category=category)
             embed.add_field(
-                name="Verplaatst naar categorie", value=category.mention, inline=True
+                name="In Kategorie verschoben", value=category.mention, inline=True
             )
         if users:
             await channel.edit(user_limit=users)
-            embed.add_field(name="Gebruikers", value=users, inline=True)
+            embed.add_field(name="Benutzers", value=users, inline=True)
         embed.color = Color.random()
         await ctx.followup.send(embed=embed)
 
     async def stagechannel_error(self, ctx: Interaction):
         embed = Embed()
-        embed.description = "Kon geen nieuw stagekanaal maken. Zorg ervoor dat de server community is ingeschakeld"
+        embed.description = "Konnte keinen neuen Stage-Kanal erstellen. Stelle sicher, dass die Server-Community aktiviert ist."
         embed.color = Color.red()
         await ctx.followup.send(embed=embed)
 
@@ -157,18 +157,18 @@ class Create_Group:
         await ctx.response.defer()
         embed = Embed()
         forum = await ctx.guild.create_forum(name=name, topic=topic)
-        embed.description = "{} is aangemaakt".format(forum.jump_url)
+        embed.description = "{} wurde erstellt".format(forum.jump_url)
         embed.color = Color.random()
         if category:
             await forum.edit(category=category)
             embed.add_field(
-                name="Toegevoegd aan categorie", value=category.name, inline=True
+                name="Zur Kategorie hinzugefügt", value=category.name, inline=True
             )
         await ctx.followup.send(embed=embed)
 
     async def forum_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         embed = Embed()
-        embed.description = "Kon geen nieuw forum maken. Zorg ervoor dat de server community is ingeschakeld"
+        embed.description = "Konnte kein neues Forum erstellen. Stelle sicher, dass die Server-Community aktiviert ist."
         embed.color = Color.red()
         await ctx.followup.send(embed=embed)
 
@@ -183,28 +183,28 @@ class Create_Group:
         await ctx.response.defer()
         role = await ctx.guild.create_role(name=name)
         embed = Embed()
-        embed.description = "Rol `{}` is aangemaakt".format(name)
+        embed.description = "Rolle `{}` wurde erstellt".format(name)
         if color is not None:
             try:
                 await role.edit(color=int(color, 16))
                 embed.add_field(name="Kleur", value=color, inline=True)
                 embed.color = role.color
             except Exception:
-                embed.add_field(name="Kleur", value="Ongeldige kleurcode", inline=True)
+                embed.add_field(name="Kleur", value="Ungültiger Farbcode", inline=True)
         else:
             embed.color = Color.random()
         if hoisted:
             if hoisted:
                 await role.edit(hoist=True)
-                embed.add_field(name="Gehoisted", value="Ja", inline=True)
+                embed.add_field(name="Hervorgehoben", value="Ja", inline=True)
             elif not hoisted:
-                embed.add_field(name="Gehoisted", value="Nee", inline=True)
+                embed.add_field(name="Hervorgehoben", value="Nein", inline=True)
         if mentionable:
             if mentionable:
                 await role.edit(mentionable=True)
-                embed.add_field(name="Mentionable", value="Ja", inline=True)
+                embed.add_field(name="Erwähnbar", value="Ja", inline=True)
             elif not mentionable:
-                embed.add_field(name="Mentionable", value="Nee", inline=True)
+                embed.add_field(name="Erwähnbar", value="Nein", inline=True)
         await ctx.followup.send(embed=embed)
 
     async def public(
@@ -217,12 +217,12 @@ class Create_Group:
     ):
         await ctx.response.defer()
         embed = Embed()
-        embed.add_field(name="Kanaal", value=channel.jump_url, inline=True)
+        embed.add_field(name="Kanal", value=channel.jump_url, inline=True)
         message = await channel.fetch_message(int(message_id))
         thread = await channel.create_thread(name=name, message=message)
-        embed.add_field(name="Gevonden in bericht", value=message.jump_url, inline=True)
+        embed.add_field(name="Gefunden in Nachricht", value=message.jump_url, inline=True)
         await thread.add_user(ctx.user)
-        embed.description = "{} is aangemaakt".format(thread.jump_url)
+        embed.description = "{} wurde erstellt".format(thread.jump_url)
         embed.color = Color.random()
         if slowmode:
             try:
@@ -244,13 +244,13 @@ class Create_Group:
     ):
         if type == "NotFound":
             embed = Embed()
-            embed.description = "Bericht kon niet worden gevonden. Zorg ervoor dat je het juiste bericht-ID hebt toegevoegd"
+            embed.description = "Nachricht konnte nicht gefunden werden. Stelle sicher, dass du die richtige Nachrichten-ID hinzugefügt hast"
             embed.color = Color.red()
             await ctx.followup.send(embed=embed)
             return
         if type == "Failed":
             embed = Embed()
-            embed.description = "Kan geen openbaar draad maken. Probeer het opnieuw"
+            embed.description = "Kann keinen öffentlichen Thread erstellen. Versuche es erneut"
             embed.color = Color.red()
             await ctx.followup.send(embed=embed)
 
@@ -263,10 +263,10 @@ class Create_Group:
     ):
         await ctx.response.defer()
         embed = Embed()
-        embed.add_field(name="Kanaal", value=channel.jump_url, inline=True)
+        embed.add_field(name="Kanal", value=channel.jump_url, inline=True)
         thread = await channel.create_thread(name=name)
         await thread.add_user(ctx.user)
-        embed.description = "{} is aangemaakt".format(thread.jump_url)
+        embed.description = "{} wurde erstellt".format(thread.jump_url)
         embed.color = Color.random()
         if slowmode:
             try:
@@ -282,7 +282,7 @@ class Create_Group:
 
     async def private_thread_error(self, ctx: Interaction):
         embed = Embed()
-        embed.description = "Kan geen privé draad maken. Probeer het opnieuw"
+        embed.description = "Kann keinen privaten Thread erstellen. Versuche es erneut"
         embed.color = Color.red()
         await ctx.followup.send(embed=embed)
 
@@ -296,10 +296,10 @@ class Create_Group:
         await ctx.response.defer()
         embed = Embed()
         if emoji_link is None and emoji_image is None:
-            embed.description = "Voeg een emoji-URL of emoji-afbeelding toe"
+            embed.description = "Füge eine Emoji-URL oder Emoji-Grafik hinzu"
             embed.color = Color.red()
         elif emoji_link and emoji_image:
-            embed.description = "Gebruik een emoji-URL of emoji-afbeelding"
+            embed.description = "Verwende eine Emoji-URL oder Emoji-Grafik"
             embed.color = Color.red()
         else:
             emojibytes = get(emoji_link if emoji_link else emoji_image.url).content
@@ -317,9 +317,9 @@ class Create_Group:
         if HTTPException:
             embed = Embed(color=Color.red())
             if a_emojis == limit or emojis == limit:
-                embed.description = "Je hebt het maximale aantal emoji's bereikt"
+                embed.description = "Du hast die maximale Anzahl an Emojis erreicht"
             else:
-                embed.description = "Er is een probleem opgetreden bij het maken van de emoji. Controleer of de emoji een PNG, JPEG of GIF is"
+                embed.description = "Es gab ein Problem bei der Erstellung des Emojis. Stelle sicher, dass das Emoji eine PNG-, JPEG- oder GIF-Datei ist"
             await ctx.followup.send(embed=embed)
 
     async def sticker(
@@ -332,10 +332,10 @@ class Create_Group:
     ):
         embed = Embed()
         if sticker_link is None and sticker_image is None:
-            embed.description = "Voeg een sticker-URL of sticker-afbeelding toe"
+            embed.description = "Füge eine Sticker-URL oder Sticker-Datei hinzu"
             embed.color = Color.red()
         elif sticker_link and sticker_image:
-            embed.description = "Gebruik een sticker-URL of sticker-afbeelding"
+            embed.description = "Verwende eine Sticker-URL oder Sticker-Datei"
             embed.color = Color.red()
         else:
             url = sticker_link if sticker_link else sticker_image.url
@@ -344,14 +344,14 @@ class Create_Group:
             sticker = await ctx.guild.create_sticker(
                 name=name.lower(), description="None", emoji=emoji, file=stickerfile
             )
-            embed.description = "{} is aangemaakt".format(sticker.name)
+            embed.description = "{} wurde erstellt".format(sticker.name)
             embed.color = Color.random()
             embed.set_image(url=url)
         await ctx.followup.send(embed=embed)
 
     async def sticker_error(self, ctx: Interaction):
         embed = Embed(color=Color.red())
-        embed.description = "Er is een probleem opgetreden bij het maken van de sticker. Controleer of de sticker voldoet aan:\n\n1. 512kb of minder\n2. Het bestand is in PNG of APNG formaat\n3. De juiste emoji is toegevoegd\n\nAls alles klopt maar het nog steeds mislukt, heb je het maximum aantal sticker-slots bereikt"
+        embed.description = "Beim Erstellen des Stickers ist ein Problem aufgetreten. Stelle sicher, dass der Sticker:\n\n1. 512kb oder weniger groß ist\n2. Die Datei im PNG- oder APNG-Format vorliegt\n3. Das richtige Emoji hinzugefügt wurde\n\nWenn alles korrekt ist, es aber trotzdem fehlschlägt, hast du möglicherweise die maximale Anzahl an Sticker-Slots erreicht"
         await ctx.followup.send(embed=embed)
 
 
@@ -388,7 +388,7 @@ class Delete_Group:
 
     async def emoji_error(self, ctx: Interaction):
         embed = Embed(
-            description="Deze emoji bestaat niet op de server",
+            description="Dieser Emoji existiert nicht auf dem Server",
             color=Color.red(),
         )
         await ctx.followup.send(embed=embed)
@@ -404,7 +404,7 @@ class Delete_Group:
 
     async def sticker_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         embed = Embed(
-            description="Deze sticker bestaat niet op de server",
+            description="Dieser Sticker existiert nicht auf dem Server",
             color=Color.red(),
         )
         await ctx.followup.send(embed=embed)
@@ -427,19 +427,19 @@ class Edit_Group:
         await ctx.response.defer()
         channel = ctx.channel if channel is None else channel
         embed = Embed()
-        embed.description = "Kanaal `{}` is bewerkt".format(channel.name)
+        embed.description = "Kanal `{}` wurde bearbeitet".format(channel.name)
         embed.color = Color.green()
         if name:
             await channel.edit(name=name)
-            embed.add_field(name="Naam", value=name, inline=True)
+            embed.add_field(name="Name", value=name, inline=True)
         if category:
             await channel.edit(category=category)
             embed.add_field(
-                name="Verplaatst naar categorie", value=category, inline=True
+                name="In Kategorie verschoben", value=category, inline=True
             )
         if topic:
             await channel.edit(topic=topic)
-            embed.add_field(name="Onderwerp", value=topic, inline=True)
+            embed.add_field(name="Thema", value=topic, inline=True)
         if slowmode:
             try:
                 delay = int(parse_timespan(slowmode))
@@ -453,10 +453,10 @@ class Edit_Group:
         if nsfw_enabled:
             if nsfw_enabled:
                 await channel.edit(nsfw=True)
-                embed.add_field(name="NSFW ingeschakeld", value="Ja", inline=True)
+                embed.add_field(name="NSFW aktiviert", value="Ja", inline=True)
             elif not nsfw_enabled:
                 await channel.edit(nsfw=False)
-                embed.add_field(name="NSFW ingeschakeld", value="Nee", inline=True)
+                embed.add_field(name="NSFW aktiviert", value="Nein", inline=True)
         await ctx.followup.send(embed=embed)
 
     async def voicechannel(
@@ -470,21 +470,21 @@ class Edit_Group:
         await ctx.response.defer()
         channel = ctx.channel if channel is None else channel
         embed = Embed()
-        embed.description = "Kanaal `{}` is bewerkt".format(channel.name)
+        embed.description = "Kanal `{}` wurde bearbeitet".format(channel.name)
         embed.color = Color.green()
         if name:
             await channel.edit(name=name)
-            embed.add_field(name="Naam", value=name, inline=True)
+            embed.add_field(name="Name", value=name, inline=True)
         if category:
             await channel.edit(category=category)
             embed.add_field(
-                name="Verplaatst naar categorie", value=category, inline=True
+                name="In Kategorie verschoben", value=category, inline=True
             )
         if users:
             if users > 99:
                 users = 99
             await channel.edit(user_limit=users)
-            embed.add_field(name="Gebruikers", value=users, inline=True)
+            embed.add_field(name="Benutzers", value=users, inline=True)
 
         await ctx.followup.send(embed=embed)
 
@@ -499,33 +499,33 @@ class Edit_Group:
     ) -> None:
         await ctx.response.defer()
         embed = Embed()
-        embed.description = "Rol `{}` is bewerkt".format(role.name)
+        embed.description = "Rolle `{}` wurde bearbeitet".format(role.name)
         if name:
             await role.edit(name=name)
-            embed.add_field(name="Naam", value=name, inline=True)
+            embed.add_field(name="Name", value=name, inline=True)
         if color is not None:
             try:
                 await role.edit(color=int(color, 16))
                 embed.add_field(name="Kleur", value=color, inline=True)
                 embed.color = role.color
             except Exception:
-                embed.add_field(name="Kleur", value="Ongeldige kleurcode", inline=True)
+                embed.add_field(name="Kleur", value="Ungültiger Farbcode", inline=True)
         else:
             embed.color = Color.random()
         if hoisted:
             if hoisted:
                 await role.edit(hoist=True)
-                embed.add_field(name="Gehoisted", value="Ja", inline=True)
+                embed.add_field(name="Hervorgehoben", value="Ja", inline=True)
             elif not hoisted:
                 await role.edit(hoist=False)
-                embed.add_field(name="Gehoisted", value="Nee", inline=True)
+                embed.add_field(name="Hervorgehoben", value="Nee", inline=True)
         if mentionable:
             if mentionable:
                 await role.edit(mentionable=True)
-                embed.add_field(name="Mentionable", value="Ja", inline=True)
+                embed.add_field(name="Erwähnbar", value="Ja", inline=True)
             elif not mentionable:
                 await role.edit(mentionable=False)
-                embed.add_field(name="Mentionable", value="Nee", inline=True)
+                embed.add_field(name="Erwähnbar", value="Nee", inline=True)
         await ctx.followup.send(embed=embed)
 
     async def server(
@@ -544,7 +544,7 @@ class Edit_Group:
         embed.color = Color.green()
         if name:
             await ctx.guild.edit(name=name)
-            embed.add_field(name="Naam", value=name, inline=True)
+            embed.add_field(name="Name", value=name, inline=True)
         if description:
             if "PUBLIC" in ctx.guild.features:
                 await ctx.guild.edit(description=description)
@@ -552,7 +552,7 @@ class Edit_Group:
             else:
                 embed.add_field(
                     name="Beschrijving",
-                    value="Je server is niet openbaar om een beschrijving te bewerken",
+                    value="Dein Server ist nicht öffentlich, um eine Beschreibung zu bearbeiten",
                     inline=True,
                 )
         if avatar:
@@ -563,15 +563,15 @@ class Edit_Group:
                 await ctx.guild.edit(icon=avatarbytes)
             except Exception:
                 embed.add_field(
-                    name="Icoon niet toegevoegd",
-                    value="Er is een probleem opgetreden bij het toevoegen van het avatar",
+                    name="Symbol nicht hinzugefügt",
+                    value="Beim Hinzufügen des Avatars ist ein Fehler aufgetreten",
                     inline=True,
                 )
         if splash:
             if ctx.guild.premium_tier == 0:
                 embed.add_field(
-                    name="Splash niet toegevoegd",
-                    value="Deze server is niet geboost naar Tier 1",
+                    name="Splash nicht hinzugefügt",
+                    value="Dieser Server ist nicht auf Tier 1 geboostet",
                     inline=True,
                 )
             else:
@@ -580,7 +580,7 @@ class Edit_Group:
                     splash_bytes = get(splash_url).content
                     await ctx.guild.edit(splash=splash_bytes)
                     embed.add_field(
-                        name="Nieuwe splash van de server",
+                        name="Neue Server-Splash",
                         value=ctx.guild.splash.url,
                         inline=True,
                     )
@@ -589,8 +589,8 @@ class Edit_Group:
         if banner:
             if ctx.guild.premium_tier <= 1:
                 embed.add_field(
-                    name="Banner niet toegevoegd",
-                    value="Deze server is niet geboost naar Tier 2",
+                    name="Banner nicht hinzugefügt",
+                    value="Dieser Server ist nicht auf Tier 2 geboostet",
                     inline=True,
                 )
             else:
@@ -598,7 +598,7 @@ class Edit_Group:
                     bannerbytes = get(banner.url).content
                     await ctx.guild.edit(banner=bannerbytes)
                     embed.add_field(
-                        name="Nieuwe banner van de server",
+                        name="Neues Server-Banner",
                         value=ctx.guild.banner.url,
                         inline=True,
                     )
@@ -609,7 +609,7 @@ class Edit_Group:
                 await ctx.guild.edit(verification_level=VerificationLevel.none)
                 embed.add_field(
                     name="Verificatieniveau",
-                    value="**{}**\nGeen verificatie vereist".format(
+                    value="**{}**\nKeine Verifizierung erforderlich".format(
                         verification_level.name.title()
                     ),
                     inline=True,
@@ -618,7 +618,7 @@ class Edit_Group:
                 await ctx.guild.edit(verification_level=VerificationLevel.low)
                 embed.add_field(
                     name="Verificatieniveau",
-                    value="**{}**\nLeden moeten een geverifieerd e-mailadres hebben".format(
+                    value="**{}**\nMitglieder müssen eine verifizierte E-Mail-Adresse haben".format(
                         verification_level.name.title()
                     ),
                     inline=True,
@@ -627,7 +627,7 @@ class Edit_Group:
                 await ctx.guild.edit(verification_level=VerificationLevel.medium)
                 embed.add_field(
                     name="Verificatieniveau",
-                    value="**{}**\nLeden moeten een geverifieerd e-mailadres hebben en langer dan 5 minuten geregistreerd zijn op Discord".format(
+                    value="**{}**\nMitglieder müssen eine verifizierte E-Mail-Adresse haben und länger als 5 Minuten bei Discord registriert sein".format(
                         verification_level.name.title()
                     ),
                     inline=True,
@@ -636,7 +636,7 @@ class Edit_Group:
                 await ctx.guild.edit(verification_level=VerificationLevel.high)
                 embed.add_field(
                     name="Verificatieniveau",
-                    value="**{}**\nLeden moeten een geverifieerd e-mailadres hebben, langer dan 5 minuten geregistreerd zijn op Discord en langer dan 10 minuten in de server zijn".format(
+                    value="**{}**\nMitglieder müssen eine verifizierte E-Mail-Adresse haben, länger als 5 Minuten bei Discord registriert sein und länger als 10 Minuten auf dem Server sein".format(
                         verification_level.name.title()
                     ),
                     inline=True,
@@ -645,7 +645,7 @@ class Edit_Group:
                 await ctx.guild.edit(verification_level=VerificationLevel.highest)
                 embed.add_field(
                     name="Verificatieniveau",
-                    value="**{}**\nLeden moeten een geverifieerd telefoonnummer hebben".format(
+                    value="**{}**\nMitglieder müssen eine verifizierte Telefonnummer haben".format(
                         verification_level.name.title()
                     ),
                     inline=True,
@@ -672,7 +672,7 @@ class Set_Group:
         await ctx.response.defer()
         if (welcoming_channel is None) and (leaving_channel is None):
             error = Embed(
-                description="Beide opties zijn leeg. Stel ten minste een welkom- of vertrek-kanaal in",
+                description="Beide Optionen sind leer. Lege mindestens einen Begrüßungs- oder Abgangskanal fest",
                 color=Color.red(),
             )
             await ctx.followup.send(embed=error)
@@ -681,14 +681,14 @@ class Set_Group:
         if welcoming_channel:
             await Manage(ctx.guild).set_welcomer(welcoming_channel)
             setup.add_field(
-                name="Kanaal dat gebruikers verwelkomt",
+                name="Kanal, der Benutzer willkommen heißt",
                 value=welcoming_channel.mention,
                 inline=True,
             )
         if leaving_channel:
             await Manage(ctx.guild).set_leaver(leaving_channel)
             setup.add_field(
-                name="Kanaal dat laat zien wie vertrekt",
+                name="Kanal, der zeigt, wer geht",
                 value=leaving_channel.mention,
                 inline=True,
             )
@@ -697,8 +697,8 @@ class Set_Group:
     async def modlog(self, ctx: Interaction, channel: TextChannel):
         await ctx.response.defer()
         await Manage(ctx.guild).set_modloger(channel)
-        embed = Embed(description="Modlog-kanaal ingesteld", color=Color.red())
-        embed.add_field(name="Geselecteerd kanaal", value=channel.mention, inline=True)
+        embed = Embed(description="Modlog-Kanal eingestellt", color=Color.red())
+        embed.add_field(name="Ausgewählter Kanal", value=channel.mention, inline=True)
         await ctx.followup.send(embed=embed)
 
     async def welcomingmsg(
@@ -733,7 +733,7 @@ class Set_Group:
             except Exception:
                 content = json_content
             confirm = Embed(
-                description="Dit is de voorbeeldweergave van het welkomstbericht.\nBen je tevreden?"
+                description="Dies ist die Vorschau der Willkommensnachricht.\nBist du zufrieden?"
             )
             embed = Embed.from_dict(json["embeds"][0])
             view = Confirmation(ctx, ctx.user)
@@ -754,7 +754,7 @@ class Set_Group:
                     content=None, embeds=[embed], view=None
                 )
             elif not view.value:
-                embed = Embed(description="Actie geannuleerd")
+                embed = Embed(description="Aktion abgebrochen")
                 await ctx.edit_original_response(
                     content=None, embeds=[embed], view=None
                 )
@@ -795,7 +795,7 @@ class Set_Group:
             except Exception:
                 content = json_content
             confirm = Embed(
-                description="Dit is de voorbeeldweergave van het vertrekbericht.\nBen je tevreden?"
+                description="Dies ist die Vorschau der Abgangsnachricht.\nBist du zufrieden?"
             )
             embed = Embed.from_dict(json["embeds"][0])
             view = Confirmation(ctx, ctx.user)
@@ -816,7 +816,7 @@ class Set_Group:
                     content=None, embeds=[embed], view=None
                 )
             elif not view.value:
-                embed = Embed(description="Actie geannuleerd")
+                embed = Embed(description="Aktion abgebrochen")
                 await ctx.edit_original_response(
                     content=None, embeds=[embed], view=None
                 )
@@ -860,7 +860,7 @@ class Set_Group:
         await ctx.response.defer()
         await Manage(ctx.guild).add_confession_channel(channel)
         embed = Embed(
-            description=f"{channel.mention} ontvangt anonieme bekentenissen van leden",
+            description=f"{channel.mention} erhält anonyme Beichten von Mitgliedern",
             color=Color.random(),
         )
         await ctx.followup.send(embed=embed)
@@ -871,7 +871,7 @@ class Set_Group:
         await ctx.response.defer()
         embed = Embed()
         if not await Inventory(ctx.user).set_brightness(brightness):
-            embed.description = "Je hebt geen achtergrond"
+            embed.description = "Du hast keinen Hintergrund"
             embed.color = Color.red()
             await ctx.followup.send(embed=embed)
             return
@@ -883,7 +883,7 @@ class Set_Group:
         await ctx.response.defer()
         if len(bio) > 60 <= 120:
             bio = bio[:60] + "\n" + bio[60:120]
-        embed = Embed(title="Nieuwe bio is ingesteld op:", color=Color.random())
+        embed = Embed(title="Neue Bio wurde festgelegt auf:", color=Color.random())
         await Inventory(ctx.user).set_bio(bio)
         embed.description = bio
         await ctx.followup.send(embed=embed)
@@ -894,12 +894,12 @@ class Set_Group:
         try:
             c = ImageColor.getcolor(color, "RGB")
             await Inventory(ctx.user).set_color(color)
-            embed.description = "Profielkaart lettertype en balkkleur gewijzigd naar {} zoals weergegeven in de embedkleur".format(
+            embed.description = "Profilkartenschriftart und Balkenfarbe geändert zu {} wie in der Embedfarbe angezeigt".format(
                 color
             )
             embed.color = int("{:02X}{:02X}{:02X}".format(*c), 16)
         except Exception:
-            embed.description = "Ongeldige kleur"
+            embed.description = "Ungültige Farbe"
             embed.color = Color.red()
         await ctx.followup.send(embed=embed)
 
@@ -934,14 +934,14 @@ class manage:
     async def remove(self, ctx: Interaction) -> None:
         await ctx.response.defer()
         embed = Embed(
-            description="Klik op een van de knoppen om te verwijderen",
+            description="Klicke auf einen der Buttons, um zu löschen",
             color=Color.random(),
         )
         view = RemoveManage(ctx, ctx.user)
         await ctx.followup.send(embed=embed, view=view)
         await view.wait()
         if view.value is None:
-            embed.description = "Alle knoppen verwijderd vanwege time-out"
+            embed.description = "Alle Buttons wegen Ablauf entfernt"
             await ctx.edit_original_response(embed=embed, view=None)
 
     async def clone(
@@ -963,18 +963,18 @@ class manage:
         if category:
             if channel is CategoryChannel:
                 cloned.add_field(
-                    name="Verplaatst naar categorie",
-                    value="Kan geen categorie naar categorie verplaatsen",
+                    name="In Kategorie verschoben",
+                    value="Kann Kategorie nicht verschieben",
                     inline=True,
                 )
             else:
                 await cloned_channel.edit(category=category)
                 cloned.add_field(
-                    name="Verplaatst naar categorie", value=category.name, inline=True
+                    name="In Kategorie verschoben", value=category.name, inline=True
                 )
         if nsfw_enabled:
             await cloned_channel.edit(nsfw=nsfw_enabled)
-            cloned.add_field(name="NSFW ingeschakeld", value=nsfw_enabled, inline=True)
+            cloned.add_field(name="NSFW aktiviert", value=nsfw_enabled, inline=True)
         cloned.color = Color.random()
         await ctx.followup.send(embed=cloned)
 
@@ -999,7 +999,7 @@ class Rename_Group:
 
     async def emoji_error(self, ctx: Interaction):
         embed = Embed(
-            description="Deze emoji bestaat niet op de server",
+            description="Dieser Emoji existiert nicht auf dem Server",
             color=Color.red(),
         )
         await ctx.followup.send(embed=embed)
@@ -1030,7 +1030,7 @@ class Rename_Group:
 
     async def sticker_error(self, ctx: Interaction):
         embed = Embed(
-            description="Deze sticker bestaat niet op de server",
+            description="Dieser Sticker existiert nicht auf dem Server",
             color=Color.red(),
         )
         await ctx.followup.send(embed=embed)
@@ -1050,17 +1050,17 @@ class Command_Group:
         embed = Embed()
         if command.startswith(("help", "command")):
             embed.color = Color.red()
-            embed.description = "WOAH! Schakel dat commando niet uit!"
+            embed.description = "WOAH! Schalte diesen Befehl nicht aus!"
         elif command not in [
             cmd.qualified_name
             for cmd in self.bot.tree.walk_commands()
             if not isinstance(cmd, Jeanne.Group)
         ]:
             embed.color = Color.red()
-            embed.description = "Zo'n commando heb ik niet..."
+            embed.description = "So einen Befehl habe ich nicht..."
         elif cmd.check_disabled(command):
             embed.color = Color.red()
-            embed.description = "Dit commando is momenteel uitgeschakeld"
+            embed.description = "Dieser Befehl ist derzeit deaktiviert"
         else:
             embed.title = "Commando uitgeschakeld"
             embed.description = f"`{command}` is uitgeschakeld"
@@ -1082,13 +1082,13 @@ class Command_Group:
             if not isinstance(cmd, Jeanne.Group)
         ]:
             embed.color = Color.red()
-            embed.description = "Zo'n commando heb ik niet..."
+            embed.description = "So einen Befehl habe ich nicht..."
         elif cmd.check_disabled(command) is None:
             embed.color = Color.red()
-            embed.description = "Dit commando is momenteel ingeschakeld"
+            embed.description = "Dieser Befehl ist derzeit aktiviert"
         else:
-            embed.title = "Commando ingeschakeld"
-            embed.description = f"`{command}` is ingeschakeld"
+            embed.title = "Befehl aktiviert"
+            embed.description = f"`{command}` ist aktiviert"
             embed.color = Color.random()
             await cmd.enable(command)
         await ctx.followup.send(embed=embed)
@@ -1098,10 +1098,10 @@ class Command_Group:
         cmd = Command(ctx.guild)
         embed = Embed()
         if cmd.list_all_disabled is None:
-            embed.description = "Er zijn momenteel geen uitgeschakelde commando's"
+            embed.description = "Derzeit gibt es keine deaktivierten Befehle"
             embed.color = Color.red()
         else:
-            embed.title = "Lijst van uitgeschakelde commando's:"
+            embed.title = "Liste der deaktivierten Befehle:"
             embed.description = "\n".join(cmd.list_all_disabled)
             embed.color = Color.random()
         await ctx.followup.send(embed=embed)
@@ -1116,13 +1116,13 @@ class Level_Group:
         botmember = await ctx.guild.fetch_member(self.bot.user.id)
         if role.position >= botmember.top_role.position:
             embed = Embed(color=Color.red())
-            embed.description = "Deze rol staat boven mij"
+            embed.description = "Diese Rolle steht über mir"
             await ctx.followup.send(embed=embed)
             return
         await Manage(server=ctx.guild).add_role_reward(role, level)
         embed = Embed(color=Color.random())
         embed.description = (
-            "{} wordt gegeven aan een lid als ze level {} bereiken".format(
+            "{} wird einem Mitglied gegeben, wenn es Level {} erreicht".format(
                 role.mention, level
             )
         )
@@ -1132,7 +1132,7 @@ class Level_Group:
         await ctx.response.defer()
         await Manage(server=ctx.guild).remove_role_reward(role)
         embed = Embed(color=Color.random())
-        embed.description = "{} is verwijderd als level rolbeloning".format(
+        embed.description = "{} wurde als Level-Rollenbelohnung entfernt".format(
             role.mention
         )
         await ctx.followup.send(embed=embed)
@@ -1156,29 +1156,29 @@ class Level_Group:
             await Manage(server=ctx.guild).add_xpblacklist(channel)
             embed = Embed(color=Color.random())
             embed.add_field(
-                name="Kanaal XP geblacklist",
-                value=f"{channel.jump_url} is toegevoegd aan de XP-blacklist",
+                name="Kanal-XP auf Blacklist",
+                value=f"{channel.jump_url} wurde zur XP-Blacklist hinzugefügt",
                 inline=False,
             )
             await ctx.followup.send(embed=embed)
             return
         embed = Embed(color=Color.red())
-        embed.description = f"{channel.jump_url} staat al op de XP-blacklist"
+        embed.description = f"{channel.jump_url} steht bereits auf der XP-Blacklist"
         await ctx.followup.send(embed=embed)
 
     async def remove(self, ctx: Interaction, channel: TextChannel) -> None:
         await ctx.response.defer()
         if not Levelling(server=ctx.guild).check_xpblacklist_channel(channel):
             embed = Embed(color=Color.red())
-            embed.description = f"{channel.jump_url} staat niet op de XP-blacklist"
+            embed.description = f"{channel.jump_url} steht nicht auf der XP-Blacklist"
             embed.color = Color.red()
             await ctx.followup.send(embed=embed)
             return
         await Manage(server=ctx.guild).remove_blacklist(channel)
         embed = Embed(color=Color.random())
         embed.add_field(
-            name="Kanaal XP verwijderd uit blacklist",
-            value=f"{channel.jump_url} is verwijderd uit de XP-blacklist",
+            name="Kanal-XP aus der Blacklist entfernt",
+            value=f"{channel.jump_url} wurde von der XP-Blacklist entfernt",
             inline=False,
         )
         await ctx.followup.send(embed=embed)
@@ -1188,11 +1188,11 @@ class Level_Group:
         embed = Embed()
         channels = Levelling(server=ctx.guild).get_blacklisted_channels
         if channels is None:
-            embed.description = "Er zijn geen XP-geblackliste kanalen"
+            embed.description = "Es gibt keine XP-geblacklisteten Kanäle"
             embed.color = Color.red()
         else:
             embed.color = Color.random()
-            embed.title = "Lijst van XP-geblackliste kanalen"
+            embed.title = "Liste der XP-geblacklisteten Kanäle"
             blchannels = []
             for channel in channels:
                 blchannel = await ctx.guild.fetch_channel(channel)

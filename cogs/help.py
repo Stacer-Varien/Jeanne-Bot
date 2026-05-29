@@ -1,4 +1,6 @@
 from discord import (
+    Color,
+    Embed,
     Interaction,
     app_commands as Jeanne,
 )
@@ -8,11 +10,200 @@ import languages.en.help as en
 import languages.fr.help as fr
 import languages.de.help as de
 from discord.app_commands import locale_str as T
+from difflib import SequenceMatcher
+import re
+import unicodedata
 
 
 class HelpGroup(GroupCog, name=T("help_group_name")):
     def __init__(self, bot: Bot):
         self.bot = bot
+
+    @staticmethod
+    def _normalize_text(value: str) -> str:
+        normalized = unicodedata.normalize("NFKD", value).encode(
+            "ascii", "ignore"
+        ).decode("ascii")
+        normalized = normalized.lower().replace("/", " ").replace("-", " ")
+        normalized = re.sub(r"[^a-z0-9_ ]+", " ", normalized)
+        return re.sub(r"\s+", " ", normalized).strip()
+
+    @classmethod
+    def _tokenize(cls, value: str) -> list[str]:
+        stop_words = {
+            "a",
+            "an",
+            "and",
+            "ask",
+            "can",
+            "command",
+            "de",
+            "des",
+            "do",
+            "for",
+            "help",
+            "how",
+            "i",
+            "ich",
+            "is",
+            "je",
+            "la",
+            "le",
+            "les",
+            "me",
+            "my",
+            "on",
+            "pour",
+            "que",
+            "the",
+            "to",
+            "use",
+            "what",
+            "wie",
+            "with",
+        }
+        return [
+            token
+            for token in cls._normalize_text(value).split()
+            if len(token) > 2 and token not in stop_words
+        ]
+
+    def _build_search_blob(self, command) -> str:
+        fields = [command.qualified_name]
+        extras = command.extras if isinstance(command.extras, dict) else {}
+
+        for locale in ("en", "fr", "de"):
+            locale_data = extras.get(locale, {})
+            fields.append(str(locale_data.get("name", "")))
+            fields.append(str(locale_data.get("description", "")))
+            for parameter in locale_data.get("parameters", []):
+                fields.append(str(parameter.get("name", "")))
+                fields.append(str(parameter.get("description", "")))
+
+        return self._normalize_text(" ".join(fields))
+
+    def _score_commands(self, question: str):
+        query = self._normalize_text(question)
+        tokens = self._tokenize(question)
+        scored = []
+
+        for command in self.bot.tree.walk_commands():
+            if isinstance(command, Jeanne.Group):
+                continue
+
+            qualified_name = command.qualified_name
+            normalized_name = self._normalize_text(qualified_name)
+            searchable = self._build_search_blob(command)
+            score = 0
+
+            if query:
+                if query == normalized_name:
+                    score += 140
+                elif query in normalized_name:
+                    score += 90
+                elif normalized_name in query:
+                    score += 55
+
+                if query in searchable:
+                    score += 45
+
+            for token in tokens:
+                if token in normalized_name.split():
+                    score += 22
+                elif token in searchable:
+                    score += 9
+
+            if query:
+                score += int(
+                    SequenceMatcher(None, query, normalized_name).ratio() * 30
+                )
+            scored.append((score, qualified_name, command))
+
+        return sorted(scored, key=lambda item: item[0], reverse=True)
+
+    def _find_best_command(self, question: str) -> tuple[str | None, list[str]]:
+        scored = self._score_commands(question)
+        suggestions = [name for _, name, _ in scored[:3]]
+
+        if not scored or scored[0][0] < 35:
+            return None, suggestions
+
+        return scored[0][1], suggestions
+
+    def _format_ask_choice(self, ctx: Interaction, qualified_name: str, command) -> str:
+        if ctx.locale.value == "fr":
+            locale = "fr"
+        elif ctx.locale.value == "de":
+            locale = "de"
+        else:
+            locale = "en"
+        extras = command.extras if isinstance(command.extras, dict) else {}
+        locale_data = extras.get(locale) or extras.get("en", {})
+        description = str(locale_data.get("description", "")).strip()
+        label = f"/{qualified_name}"
+
+        if description:
+            label = f"{label} - {description}"
+
+        return label[:100]
+
+    async def ask_autocomplete(
+        self, ctx: Interaction, current: str
+    ) -> list[Jeanne.Choice[str]]:
+        choices = []
+        seen = set()
+
+        for score, qualified_name, command in self._score_commands(current):
+            if qualified_name in seen:
+                continue
+            if current and score < 5:
+                break
+
+            seen.add(qualified_name)
+            choices.append(
+                Jeanne.Choice(
+                    name=self._format_ask_choice(ctx, qualified_name, command),
+                    value=qualified_name[:100],
+                )
+            )
+
+            if len(choices) == 25:
+                break
+
+        return choices
+
+    async def _send_ask_error(self, ctx: Interaction, suggestions: list[str]):
+        if ctx.locale.value == "fr":
+            description = (
+                "Je n'ai pas trouvé de commande correspondante.\n"
+                "Essayez avec un nom de commande ou un mot-clé (ex: `ban`, `météo`, `rappel ajouter`)."
+            )
+            suggestions_name = "Commandes proches"
+            footer = "Voir la documentation: https://jeannebot.vercel.app/help"
+        elif ctx.locale.value == "de":
+            description = (
+                "Ich konnte keinen passenden Befehl finden.\n"
+                "Versuche es mit einem Befehlsnamen oder Stichwort (z. B. `ban`, `wetter`, `reminder add`)."
+            )
+            suggestions_name = "Ahnliche Befehle"
+            footer = "Dokumentation: https://jeannebot.vercel.app/help"
+        else:
+            description = (
+                "I could not find a matching command.\n"
+                "Try a command name or keyword (e.g. `ban`, `weather`, `reminder add`)."
+            )
+            suggestions_name = "Closest commands"
+            footer = "Documentation: https://jeannebot.vercel.app/help"
+
+        embed = Embed(description=description, color=Color.red())
+        if suggestions:
+            embed.add_field(
+                name=suggestions_name,
+                value="\n".join(f"`/{name}`" for name in suggestions),
+                inline=False,
+            )
+        embed.set_footer(text=footer)
+        await ctx.response.send_message(embed=embed)
 
     @Jeanne.command(
         name=T("command_name"),
@@ -66,6 +257,64 @@ class HelpGroup(GroupCog, name=T("help_group_name")):
             await de.HelpGroup(self.bot).command(ctx, command)
             return
         await en.HelpGroup(self.bot).command(ctx, command)
+
+    @Jeanne.command(
+        name="ask",
+        description="Ask what command to use (non-AI command help)",
+        extras={
+            "en": {
+                "name": "ask",
+                "description": "Ask what command to use. Jeanne matches your question to the best command.",
+                "parameters": [
+                    {
+                        "name": "question",
+                        "description": "What do you want help with?",
+                        "required": True,
+                    }
+                ],
+            },
+            "fr": {
+                "name": "ask",
+                "description": "Demandez quelle commande utiliser. Jeanne associe votre question a la meilleure commande.",
+                "parameters": [
+                    {
+                        "name": "question",
+                        "description": "Avec quoi avez-vous besoin d'aide?",
+                        "required": True,
+                    }
+                ],
+            },
+            "de": {
+                "name": "ask",
+                "description": "Frage, welchen Befehl du nutzen sollst. Jeanne ordnet deine Frage dem passendsten Befehl zu.",
+                "parameters": [
+                    {
+                        "name": "question",
+                        "description": "Wobei brauchst du Hilfe?",
+                        "required": True,
+                    }
+                ],
+            },
+        },
+    )
+    @Jeanne.autocomplete(question=ask_autocomplete)
+    @Jeanne.rename(question="question")
+    @Jeanne.describe(question="What do you need help with?")
+    @Jeanne.check(check_botbanned_app_command)
+    @Jeanne.check(is_suspended)
+    async def ask(self, ctx: Interaction, question: Jeanne.Range[str, 3, 2000]):
+        best_match, suggestions = self._find_best_command(question)
+        if best_match is None:
+            await self._send_ask_error(ctx, suggestions)
+            return
+
+        if ctx.locale.value == "fr":
+            await fr.HelpGroup(self.bot).command(ctx, best_match)
+            return
+        if ctx.locale.value == "de":
+            await de.HelpGroup(self.bot).command(ctx, best_match)
+            return
+        await en.HelpGroup(self.bot).command(ctx, best_match)
 
     @command.error
     async def command_error(self, ctx: Interaction, error: Jeanne.AppCommandError):

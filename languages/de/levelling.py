@@ -28,7 +28,7 @@ class Rank_Group:
         embed = Embed(color=Color.random())
         embed.set_author(name=title)
         if not leaderboard:
-            embed.description = f"Geen {title.lower()} gevonden"
+            embed.description = f"Kein {title.lower()} gefunden"
             await ctx.followup.send(embed=embed)
             return
         for rank, entry in enumerate(leaderboard, start=1):
@@ -66,7 +66,7 @@ class levelling(Cog):
             await ctx.followup.send(file=file)
         except Exception as e:
             embed = Embed(
-                description=f"Kan profielkaart niet genereren: {e}", color=Color.red()
+                description=f"Das Profilbild konnte nicht generiert werden: {e}", color=Color.red()
             )
             await ctx.followup.send(embed=embed)
 
@@ -76,7 +76,7 @@ class levelling(Cog):
 
     async def profile_generate_error(self, ctx: Interaction, error: Exception) -> None:
         embed = Embed(
-            description=f"Je hebt het profielcommando al gebruikt!\nProbeer het opnieuw na `{round(error.retry_after, 2)} seconden`",
+            description=f"Du hast den Profilbefehl bereits verwendet!\nVersuche es erneut in `{round(error.retry_after, 2)} Sekunden`",
             color=Color.red(),
         )
         await ctx.response.send_message(embed=embed)
@@ -87,7 +87,7 @@ class levelling(Cog):
 
     async def profile_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         embed = Embed(
-            description=f"Je hebt het profielcommando al gebruikt!\nProbeer het opnieuw na `{round(error.retry_after, 2)} seconden`",
+            description=f"Du hast den Profilbefehl bereits verwendet!\nVersuche es erneut in `{round(error.retry_after, 2)} Sekunden`",
             color=Color.red(),
         )
         await ctx.response.send_message(embed=embed)

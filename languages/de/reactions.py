@@ -35,7 +35,7 @@ class Reactions:
     ) -> None:
         reaction_api = get(api_url)
         reaction_embed = Embed(color=Color.random())
-        reaction_embed.set_footer(text="Opgehaald van Tenor")
+        reaction_embed.set_footer(text="Abgerufen von Tenor")
         random_gif = random.choice(json.loads(reaction_api.content)["results"])
         reaction_url = random_gif["media_formats"]["gif"]["url"]
         reaction_embed.set_image(url=reaction_url)
@@ -44,64 +44,64 @@ class Reactions:
             "baka": (
                 f"*{ctx.user}*, je bent een baka!"
                 if member is None
-                else f"*{member.mention}*, *{ctx.user} noemt je een baka!*"
+                else f"*{member.mention}*, *{ctx.user} nennt dich einen baka!*"
             ),
-            "smug": f"*{ctx.user}* is aan het grijnzen",
+            "smug": f"*{ctx.user}* grinst",
             "hug": (
-                f"*Knuffelt {ctx.user}*"
+                f"*Umarmt {ctx.user}*"
                 if member is None
-                else f"*{ctx.user} knuffelde {member.mention}*"
+                else f"*{ctx.user} umarmte {member.mention}*"
             ),
             "poke": (
-                f"*Poke {ctx.user}*"
+                f"*{ctx.user} stupst an*"
                 if member is None
-                else f"*{ctx.user} prikt {member.mention}*"
+                else f"*{ctx.user} sticht {member.mention}*"
             ),
             "cuddle": (
-                f"*Knuffelt {ctx.user}*"
+                f"*Umarmt {ctx.user}*"
                 if member is None
-                else f"*{ctx.user} knuffelt met {member.mention}*"
+                else f"*{ctx.user} umarmt {member.mention}*"
             ),
             "dance": (
-                f"*{ctx.user} is aan het dansen*"
+                f"*{ctx.user} tanzt*"
                 if member is None
-                else f"*{ctx.user} danst met {member.mention}*"
+                else f"*{ctx.user} tanzt mit {member.mention}*"
             ),
             "pat": (
-                f"*Aait {ctx.user}*"
+                f"*Streichelt {ctx.user}*"
                 if member is None
-                else f"*{ctx.user} aait {member.mention}*"
+                else f"*{ctx.user} streichelt {member.mention}*"
             ),
-            "blush": f"*{ctx.user} bloost*",
+            "blush": f"*{ctx.user} errötet*",
             "bite": (
-                f"*Bijt {ctx.user}*"
+                f"*Beißt {ctx.user}*"
                 if member is None
-                else f"*{ctx.user} beet {member.mention}*"
+                else f"*{ctx.user} biss {member.mention}*"
             ),
             "feed": (
-                f"*Voert {ctx.user}*"
+                f"*Füttert {ctx.user}*"
                 if member is None
-                else f"*{ctx.user} voert {member.mention}. Eet smakelijk*"
+                else f"*{ctx.user} füttert {member.mention}. Guten Appetit*"
             ),
-            "cry": f"*{ctx.user} huilt*",
+            "cry": f"*{ctx.user} weint*",
             "slap": (
-                f"*Slaat {ctx.user}*"
+                f"*Schlägt {ctx.user}*"
                 if member is None
-                else f"*{ctx.user} sloeg {member.mention}*"
+                else f"*{ctx.user} schlug {member.mention}*"
             ),
             "kiss": (
-                f"*Kust {ctx.user}*"
+                f"*Küsst {ctx.user}*"
                 if member is None
-                else f"*{ctx.user} kuste {member.mention}*"
+                else f"*{ctx.user} küsste {member.mention}*"
             ),
             "tickle": (
-                f"*Kietelt {ctx.user}*"
+                f"*Kitzelt {ctx.user}*"
                 if member is None
-                else f"*{ctx.user} kietelde {member.mention}*"
+                else f"*{ctx.user} kitzelte {member.mention}*"
             ),
         }
 
-        msg = messages.get(action, f"*{ctx.user} voert een actie uit*")
+        msg = messages.get(action, f"*{ctx.user} führt eine Aktion aus*")
         await ctx.response.send_message(msg, embed=reaction_embed)
 
     async def hug(self, ctx: Interaction, member: Optional[Member] = None) -> None:

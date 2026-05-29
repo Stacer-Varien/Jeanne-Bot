@@ -14,51 +14,50 @@ class fun:
     async def _8ball(self, ctx: Interaction, question: str):
         await ctx.response.defer()
         answers = [
-            "Het is zeker.",
-            "Het is beslist zo.",
-            "Zonder twijfel.",
-            "Ja – zeker weten.",
-            "Je kunt erop vertrouwen.",
-            "Zoals ik het zie, ja.",
-            "Waarschijnlijk.",
-            "Vooruitzichten zijn goed.",
+            "Es ist sicher.",
+            "Es ist definitiv so.",
+            "Ohne Zweifel.",
+            "Ja – auf jeden Fall.",
+            "Darauf kannst du vertrauen.",
+            "So wie ich es sehe, ja.",
+            "Wahrscheinlich.",
+            "Die Aussichten sind gut.",
             "Ja.",
-            "Tekenen wijzen op ja.",
-            "Antwoord is vaag, probeer opnieuw.",
-            "Vraag het later nog eens.",
-            "Beter dat ik het je nu niet vertel.",
-            "Kan nu niet voorspellen.",
-            "Concentreer je en vraag opnieuw.",
-            "Reken er niet op.",
-            "Mijn antwoord is nee.",
-            "Mijn bronnen zeggen nee.",
-            "Vooruitzichten niet zo goed.",
-            "Zeer twijfelachtig.",
-            "Waarom vraag je het mij? Gewoon doen!",
-            "Waarom vraag je het mij? Doe het gewoon niet!",
-            "Ja... nee",
-            "Ja... wat dan ook",
-            "Ja... ik weet het niet",
-            "Ja? Nee? Ik weet het niet!",
-            "Absoluut niet, en ik ben beledigd dat je het vraagt.",
-            "Zeker, als de sterren goed staan en varkens kunnen vliegen.",
-            "Alleen op dinsdagen.",
-            "Het antwoord ligt... in je koelkast.",
-            "Vraag het aan je kat.",
-            "Probeer het opnieuw na koffie.",
-            "404 antwoord niet gevonden.",
-            "Je bent nog niet klaar voor die waarheid.",
-            "Wil je het echt weten?",
-            "Hmm... mijn magische circuits haperen.",
-            "Ik ben maar een bal, geen therapeut.",
-            "Laat me nadenken... nee.",
-            "Ja. Maar ook nee.",
-            "Als ik het je vertel, moet ik verdwijnen in een wolk rook.",
+            "Die Zeichen stehen auf Ja.",
+            "Antwort ist vage, versuche es erneut.",
+            "Frag später noch einmal.",
+            "Besser, ich sage es dir jetzt nicht.",
+            "Kann jetzt nicht vorhersagen.",
+            "Konzentriere dich und frage erneut.",
+            "Rechne nicht damit.",
+            "Meine Antwort ist nein.",
+            "Meine Quellen sagen nein.",
+            "Die Aussichten sind nicht so gut.",
+            "Sehr zweifelhaft.",
+            "Warum fragst du mich? Mach es einfach!",
+            "Warum fragst du mich? Tu es einfach nicht!",
+            "Ja... nein",
+            "Ja... was auch immer",
+            "Ja... ich weiß es nicht",
+            "Ja? Nein? Ich weiß es nicht!",
+            "Absolut nicht, und ich bin beleidigt, dass du es fragst.",
+            "Natürlich, wenn die Sterne richtig stehen und Schweine fliegen können.",
+            "Nur dienstags.",
+            "Die Antwort liegt... in deinem Kühlschrank.",
+            "Frag deine Katze.",
+            "404 Antwort nicht gefunden.",
+            "Du bist noch nicht bereit für diese Wahrheit.",
+            "Willst du es wirklich wissen?",
+            "Hmm... meine magischen Schaltkreise stottern.",
+            "Ich bin nur eine Kugel, kein Therapeut.",
+            "Lass mich nachdenken... nein.",
+            "Ja. Aber auch nein.",
+            "Wenn ich es dir erzähle, muss ich in einer Rauchwolke verschwinden.",
         ]
 
         embed = Embed(color=Color.random())
-        embed.add_field(name="Vraag:", value=question, inline=False)
-        embed.add_field(name="Antwoord:", value=choice(answers), inline=False)
+        embed.add_field(name="Frage:", value=question, inline=False)
+        embed.add_field(name="Antwort:", value=choice(answers), inline=False)
         await ctx.followup.send(embed=embed)
 
     async def reverse(self, ctx: Interaction, text: str):
@@ -82,7 +81,7 @@ class fun:
             first_word[len(first_word) // 2 :] + second_word[: len(second_word) // 2]
         )
         embed = Embed(
-            description=f"**1e gecombineerde woord**: {combine1}\n**2e gecombineerde woord**: {combine2}",
+            description=f"**1. kombiniertes Wort**: {combine1}\n**2. kombiniertes Wort**: {combine2}",
             color=Color.random(),
         ).set_author(name=f"{first_word} + {second_word}")
         await ctx.followup.send(embed=embed)
@@ -90,7 +89,7 @@ class fun:
     async def choose(self, ctx: Interaction, choices: str):
         await ctx.response.defer()
         embed = Embed(
-            description=f"Ik kies **{choice(choices.split(','))}**",
+            description=f"Ich wähle **{choice(choices.split(','))}**",
             color=Color.random(),
         )
         await ctx.followup.send(embed=embed)
@@ -100,7 +99,7 @@ class fun:
         perc = randint(0, 100)
         member = member or ctx.user
         embed = Embed(
-            description=f"De simp-percentage van {member} is {perc}%",
+            description=f"Der Simp-Prozentsatz von {member} ist {perc}%",
             color=Color.random(),
         )
         if perc >= 75:
@@ -114,7 +113,7 @@ class fun:
         perc = randint(0, 100)
         member = member or ctx.user
         embed = Embed(
-            description=f"De gay-percentage van {member} is {perc}%",
+            description=f"Der Gay-Prozentsatz von {member} ist {perc}%",
             color=Color.random(),
         )
         if perc >= 75:

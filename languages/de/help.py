@@ -16,15 +16,15 @@ class help_button(ui.View):
         orleans_url = "https://discord.gg/jh7jkuk2pp"
         tos_and_policy_url = "https://jeannebot.vercel.app/tos"
         self.add_item(
-            ui.Button(style=ButtonStyle.link, label="Jeanne Website", url=wiki_url)
+            ui.Button(style=ButtonStyle.link, label="Jeanne-Website", url=wiki_url)
         )
         self.add_item(
-            ui.Button(style=ButtonStyle.link, label="Support Server", url=orleans_url)
+            ui.Button(style=ButtonStyle.link, label="Support-Server", url=orleans_url)
         )
         self.add_item(
             ui.Button(
                 style=ButtonStyle.link,
-                label="ToS en Privacybeleid",
+                label="ToS und Datenschutz",
                 url=tos_and_policy_url,
             )
         )
@@ -69,33 +69,33 @@ class HelpGroup:
                 f"`{parm}` - {i['description']}"
                 for i, parm in zip(command["parameters"], parms)
             ]
-            embed.add_field(name="Parameters", value="\n".join(descs), inline=False)
+            embed.add_field(name="Parameter", value="\n".join(descs), inline=False)
         except Exception:
             parms = []
         if bot_perms:
-            embed.add_field(name="Jeanne Machtigingen", value=bot_perms, inline=True)
+            embed.add_field(name="Jeanne-Berechtigungen", value=bot_perms, inline=True)
         if member_perms:
             embed.add_field(
-                name="Gebruiker Machtigingen", value=member_perms, inline=True
+                name="Benutzerberechtigungen", value=member_perms, inline=True
             )
         if nsfw:
-            embed.add_field(name="Vereist NSFW-kanaal", value=nsfw, inline=True)
+            embed.add_field(name="NSFW-Kanal erforderlich", value=nsfw, inline=True)
 
         cmd_usage = "/" + name + " " + " ".join(parms)
-        embed.add_field(name="Commando Gebruik", value=f"`{cmd_usage}`", inline=False)
+        embed.add_field(name="Befehlsverwendung", value=f"`{cmd_usage}`", inline=False)
         embed.set_footer(
-            text="Legenda:\n[] - Verplicht\n<> - Optioneel\n\nHet is het beste om naar de websites te gaan voor gedetailleerde uitleg en gebruik"
+            text="Legende:\n[] - Pflicht\n<> - Optional\n\nAm besten besuchst du die Websites für detaillierte Erklärungen und Nutzung"
         )
         await ctx.followup.send(embed=embed)
 
     async def command_error(self, ctx: Interaction):
-        embed = Embed(description="Ik heb dit commando niet", color=Color.red())
+        embed = Embed(description="Ich habe diesen Befehl nicht", color=Color.red())
         await ctx.followup.send(embed=embed)
 
     async def support(self, ctx: Interaction):
         view = help_button()
         help = Embed(
-            description="Klik op een van de knoppen om de documentatie te openen of hulp te krijgen in de support server",
+            description="Klicke auf einen der Buttons, um die Dokumentation zu öffnen oder Hilfe im Support-Server zu erhalten",
             color=Color.random(),
         )
         await ctx.response.send_message(embed=help, view=view)

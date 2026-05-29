@@ -52,7 +52,7 @@ class EmbedGroup:
         if not jsonscript:
             await ctx.followup.send(
                 embed=Embed(
-                    description="Geef een JSON-script of bestand op. Gebruik [Discohook](https://discohook.app/)"
+                    description="Gib ein JSON-Skript oder eine Datei an. Verwende [Discohook](https://discohook.app/)"
                 )
             )
             return
@@ -105,7 +105,7 @@ class ReminderCog:
         if user_reminders and len(user_reminders) >= 10:
             await ctx.followup.send(
                 embed=Embed(
-                    description="Te veel herinneringen! Annuleer er een of wacht tot er een verloopt.",
+                    description="Zu viele Erinnerungen! Lösche eine oder warte, bis eine abläuft.",
                     color=Color.red(),
                 ),
                 ephemeral=True,
@@ -119,7 +119,7 @@ class ReminderCog:
         except InvalidTimespan:
             await ctx.followup.send(
                 embed=Embed(
-                    description="Ongeldige tijd! Gebruik een duur van meer dan 1 minuut.",
+                    description="Ungültige Zeit! Verwende eine Dauer von mehr als 1 Minute.",
                     color=Color.red(),
                 ),
                 ephemeral=True,
@@ -129,12 +129,12 @@ class ReminderCog:
         date = datetime.now() + timedelta(seconds=reminder_time)
         await Reminder(ctx.user).add(reason, round(date.timestamp()))
         embed = Embed(
-            title="Herinnering toegevoegd",
-            description=f"Op <t:{round(date.timestamp())}:F> zal ik je eraan herinneren.",
+            title="Erinnerung hinzugefügt",
+            description=f"Ich werde dich um <t:{round(date.timestamp())}:F> daran erinnern.",
             color=Color.random(),
         )
-        embed.add_field(name="Reden", value=reason, inline=False)
-        embed.set_footer(text="Zorg dat je DM's open staan om meldingen te ontvangen.")
+        embed.add_field(name="Grund", value=reason, inline=False)
+        embed.set_footer(text="Stelle sicher, dass deine DMs geöffnet sind, um Benachrichtigungen zu erhalten.")
         await ctx.followup.send(embed=embed, ephemeral=True)
 
     async def add_error(self, ctx: Interaction, error: Jeanne.errors.AppCommandError):
@@ -142,7 +142,7 @@ class ReminderCog:
             error.original, InvalidTimespan
         ):
             embed = Embed(
-                title="Ongeldige tijd",
+                title="Ungültige Zeit",
                 description="Ondersteunde tijdseenheden: ms, s, m, h, d, w, j.",
                 color=Color.red(),
             )
@@ -153,7 +153,7 @@ class ReminderCog:
         embed = Embed()
         reminders = Reminder(ctx.user).get_all_user_reminders
         if reminders is None:
-            embed.description = "Geen herinneringen"
+            embed.description = "Keine Erinnerungen"
         else:
             for i in reminders:
                 ids = i[1]
@@ -174,7 +174,7 @@ class ReminderCog:
         embed = Embed()
         if not await reminder.remove(reminder_id):
             embed.color = Color.red()
-            embed.description = "Je hebt geen herinnering met dat ID"
+            embed.description = "Du hast keine Erinnerung mit dieser ID"
             await ctx.followup.send(embed=embed, ephemeral=True)
             return
         embed.color = Color.random()
@@ -275,7 +275,7 @@ class Utilities:
             value=f"{forecast['daily_chance_of_rain']}%",
             inline=True,
         )
-        day1.set_footer(text="Opgehaald van weatherapi.com")
+        day1.set_footer(text="Abgerufen von weatherapi.com")
         if three_day:
             menu = ViewMenu(
                 ctx,
@@ -330,7 +330,7 @@ class Utilities:
                 value=f"{forecastday2['day']['daily_chance_of_rain']}%",
                 inline=False,
             )
-            day2.set_footer(text="Opgehaald van weatherapi.com")
+            day2.set_footer(text="Abgerufen von weatherapi.com")
 
             day3.description = f"{emoji_map['newspaper']} Conditie: {forecastday3['day']['condition']['text']}"
             day3.add_field(
@@ -353,7 +353,7 @@ class Utilities:
                 value=f"{forecastday3['day']['daily_chance_of_rain']}%",
                 inline=False,
             )
-            day3.set_footer(text="Opgehaald van weatherapi.com")
+            day3.set_footer(text="Abgerufen von weatherapi.com")
 
             menu.add_page(day1)
             menu.add_page(day2)
@@ -376,14 +376,14 @@ class Utilities:
             reset_hour_time = datetime.now() + timedelta(seconds=error.retry_after)
             reset_hour = round(reset_hour_time.timestamp())
             cooldown = Embed(
-                description=f"WOAH! Je hebt het weer al gecontroleerd.\nProbeer het opnieuw na <t:{reset_hour}:R>",
+                description=f"WOAH! Du hast das Wetter bereits überprüft.\nVersuche es erneut in <t:{reset_hour}:R>",
                 color=0xFF0000,
             )
             await ctx.response.send_message(embed=cooldown)
             return
         if error_type == "failed":
             no_city = Embed(
-                description="Kon geen weerinformatie ophalen voor deze stad\nLet op: Postcodes worden alleen ondersteund voor Canada, de VS en het VK voor dit commando.",
+                description="Konnte keine Wetterinformationen für diese Stadt abrufen\nHinweis: Postleitzahlen werden für diesen Befehl nur für Kanada, die USA und das Vereinigte Königreich unterstützt.",
                 color=Color.red(),
             )
             await ctx.followup.send(embed=no_city)
@@ -414,7 +414,7 @@ class Utilities:
             return
         if error_type == "failed":
             failed = Embed(
-                description=f"{error}\nRaadpleeg [Python Operators](https://www.geeksforgeeks.org/python-operators/?ref=lbp) als je niet weet hoe je het commando moet gebruiken"
+                description=f"{error}\nSiehe [Python Operators](https://www.geeksforgeeks.org/python-operators/?ref=lbp), wenn du nicht weißt, wie du den Befehl verwenden sollst"
             )
             await ctx.followup.send(embed=failed)
 
@@ -422,7 +422,7 @@ class Utilities:
         await ctx.response.defer()
         invite = Embed(
             title="Nodig mij uit!",
-            description="Klik op een van deze knoppen om mij uit te nodigen voor jouw server of om de server van mijn maker te joinen",
+            description="Klicke auf einen dieser Buttons, um mich auf deinen Server einzuladen oder dem Server meines Erstellers beizutreten",
             color=Color.random(),
         )
         await ctx.followup.send(embed=invite, view=InviteButton())
@@ -440,7 +440,7 @@ class Utilities:
         if not channel:
             await ctx.response.send_message(
                 embed=Embed(
-                    description="Bekenteniskanaal is niet ingesteld. Neem contact op met de serverbeheerder.",
+                    description="Beichtkanal ist nicht eingerichtet. Bitte kontaktiere den Serveradministrator.",
                     color=Color.red(),
                 ),
                 ephemeral=True,
@@ -451,19 +451,19 @@ class Utilities:
         embed = Embed(color=Color.random())
 
         if anonymous:
-            embed.title = "Anonieme Bekentenis"
+            embed.title = "Anonyme Beichte"
         else:
-            embed.title = f"Bekentenis van {ctx.user.name}"
+            embed.title = f"Beichte von {ctx.user.name}"
 
         embed.description = confession
         embed.set_footer(
-            text=f"Bekentenis ID: {confession_id}\nAls deze bekentenis ongepast is, meld dit dan bij de moderators met het Bekentenis ID via `/reportconfession`. Als de bekentenis zeer ernstig is, meld het dan bij de ontwikkelaar met `/botreport` en voeg het Bekentenis ID toe."
+            text=f"Beicht-ID: {confession_id}\nWenn diese Beichte unangemessen ist, melde sie bitte den Moderatoren mit der Beicht-ID über `/reportconfession`. Wenn die Beichte sehr schwerwiegend ist, melde sie bitte dem Entwickler mit `/botreport` und füge die Beicht-ID hinzu."
         )
         await Confess(ctx.guild).add_confession(ctx.user, confession_id, confession)
         await channel.send(embed=embed)
         await ctx.response.send_message(
             embed=Embed(
-                description=f"Je bekentenis is verzonden naar {channel.mention} met ID: {confession_id}",
+                description=f"Dein Geständnis wurde an {channel.mention} mit der ID {confession_id} gesendet",
                 color=Color.green(),
             ),
             ephemeral=True,
@@ -477,7 +477,7 @@ class Utilities:
         if modlog is None:
             await ctx.response.send_message(
                 embed=Embed(
-                    description="Moderatie logkanaal is niet ingesteld. Neem contact op met de serverbeheerders.",
+                    description="Moderations-Logkanal ist nicht eingerichtet. Bitte kontaktiere die Serveradministratoren.",
                     color=Color.red(),
                 ),
                 ephemeral=True,
@@ -486,29 +486,23 @@ class Utilities:
         if confession is None:
             await ctx.response.send_message(
                 embed=Embed(
-                    description="Geen bekentenis gevonden met dat ID.", color=Color.red()
+                    description="Keine Beichte mit dieser ID gefunden.", color=Color.red()
                 ),
                 ephemeral=True,
             )
             return
         embed = Embed()
-        embed.title = "Bekentenis rapporteren"
-        embed.add_field(name="Bekentenis ID", value=confession_id, inline=False)
-        embed.add_field(name="Reden", value=reason, inline=False)
+        embed.title = "Beichte melden"
+        embed.add_field(name="Beicht-ID", value=confession_id, inline=False)
+        embed.add_field(name="Grund", value=reason, inline=False)
 
         await modlog.send(embed=embed)
         await ctx.response.send_message(
             embed=Embed(
-                description=f"Bekentenis met ID: {confession_id} is gerapporteerd aan de moderators.",
+                description=f"Beichte mit ID: {confession_id} wurde den Moderatoren gemeldet.",
                 color=Color.green(),
             ),
             ephemeral=True,
         )
     
-    async def chat_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-        cooldown = Embed(
-            description=f"WOAH! Beruhige dich! Gönn mir eine Pause!\nVersuche es erneut nach `{round(error.retry_after, 2)} Sekunden`",
-            color=Color.red(),
-        )
-        await ctx.followup.send(embed=cooldown)
 

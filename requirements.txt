@@ -24,10 +24,8 @@ idna
 import_expression
 jishaku
 jiter
-Markdown
 multidict
 numpy
-openai
 openpyxl
 pandas
 pillow
