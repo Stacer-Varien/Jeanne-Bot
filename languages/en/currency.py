@@ -578,7 +578,7 @@ class currency:
         await ctx.edit_original_response(embed=embed)
 
         for _ in range(8):
-            await asyncio.sleep(0.45)
+            await asyncio.sleep(0.95)
             grid = spin_grid()
             embed.color = Color.random()
             embed.description = f"🎰 **SLOTS**\n{format_grid(grid)}\n\nSpinning..."

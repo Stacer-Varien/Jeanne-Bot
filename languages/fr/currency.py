@@ -559,12 +559,12 @@ class currency:
                 )
 
         grid = spin_grid()
-        # "Lancement..." means "Spinning..."
+
         embed.description = f"🎰 **MACHINE À SOUS**\n{format_grid(grid)}\n\nLancement..."
         await ctx.edit_original_response(embed=embed)
 
         for _ in range(8):
-            await asyncio.sleep(0.45)
+            await asyncio.sleep(0.95)
             grid = spin_grid()
             embed.color = Color.random()
             embed.description = f"🎰 **MACHINE À SOUS**\n{format_grid(grid)}\n\nLancement..."
