@@ -1,6 +1,6 @@
 from datetime import datetime
 import traceback
-from discord import Color, Embed, Interaction
+from discord import Color, Embed, Interaction, InteractionResponseType
 from discord import app_commands as Jeanne
 from discord.ext.commands import Bot, Cog
 import pandas as pd
@@ -21,6 +21,20 @@ class ErrorsCog(Cog, name="ErrorsSlash"):
     def cog_unload(self):
         tree = self.bot.tree
         tree.on_error = self._old_tree_error
+
+    @staticmethod
+    def _error_response_already_sent(ctx: Interaction) -> bool:
+        return ctx.response.type in (
+            InteractionResponseType.channel_message,
+            InteractionResponseType.message_update,
+        )
+
+    @staticmethod
+    async def _send_error(ctx: Interaction, embed: Embed) -> None:
+        if ctx.response.is_done():
+            await ctx.followup.send(embed=embed)
+        else:
+            await ctx.response.send_message(embed=embed)
 
     @Cog.listener()
     async def on_app_command_error(
@@ -46,6 +60,10 @@ class ErrorsCog(Cog, name="ErrorsSlash"):
         except Exception as logging_error:
             print(f"Unable to write command error log: {logging_error}")
 
+        # Command-specific handlers run before this global handler.
+        if self._error_response_already_sent(ctx):
+            return
+
         if isinstance(error, Jeanne.MissingPermissions):
             if ctx.locale.value not in ("fr", "de"):
                 await en.Errors.handle_missing_permissions(self, ctx, error)
@@ -70,7 +88,7 @@ class ErrorsCog(Cog, name="ErrorsSlash"):
             return
         if isinstance(error, Jeanne.NoPrivateMessage):
             embed = Embed(description=str(error), color=Color.red())
-            await ctx.response.send_message(embed=embed)
+            await self._send_error(ctx, embed)
             return
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, RuntimeError
@@ -78,7 +96,7 @@ class ErrorsCog(Cog, name="ErrorsSlash"):
             if ctx.command.qualified_name == "help command":
                 return
             embed = Embed(description=str(error), color=Color.red())
-            await ctx.response.send_message(embed=embed)
+            await self._send_error(ctx, embed)
             return
         if isinstance(error, Jeanne.CommandOnCooldown):
             retry_after = round(error.retry_after, 2)
@@ -93,10 +111,7 @@ class ErrorsCog(Cog, name="ErrorsSlash"):
                 ),
                 color=Color.red(),
             )
-            if ctx.response.is_done():
-                await ctx.followup.send(embed=embed, ephemeral=True)
-            else:
-                await ctx.response.send_message(embed=embed, ephemeral=True)
+            await self._send_error(ctx, embed)
 
 
 async def setup(bot: Bot):
