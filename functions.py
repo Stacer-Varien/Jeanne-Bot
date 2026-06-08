@@ -98,6 +98,12 @@ TABLE_BOOTSTRAP_STATEMENTS = (
     )
     """,
     """
+    CREATE TABLE IF NOT EXISTS profileFeatures (
+        user_id INTEGER PRIMARY KEY,
+        animated_unlocked INTEGER DEFAULT 0
+    )
+    """,
+    """
     CREATE TABLE IF NOT EXISTS reminderData (
         userid INTEGER,
         id INTEGER,
@@ -161,6 +167,7 @@ TABLE_BOOTSTRAP_STATEMENTS = (
         brightness INTEGER,
         selected INTEGER,
         country TEXT,
+        animated INTEGER DEFAULT 0,
         PRIMARY KEY (user_id, wallpaper)
     )
     """,
@@ -215,6 +222,7 @@ COLUMN_BOOTSTRAP_STATEMENTS = {
     },
     "userWallpaperInventory": {
         "country": "TEXT",
+        "animated": "INTEGER DEFAULT 0",
     },
 }
 
@@ -261,6 +269,7 @@ class DevPunishment:
         db.execute(
             "DELETE FROM userWallpaperInventory WHERE user_id = ?", (self.user.id,)
         )
+        db.execute("DELETE FROM profileFeatures WHERE user_id = ?", (self.user.id,))
         db.execute("DELETE FROM bankData WHERE user_id = ?", (self.user.id,))
         db.commit()
         botbanned = Embed(
@@ -632,23 +641,69 @@ class Inventory:
         await Currency(self.user).remove_qp(1000)
 
     async def add_user_custom_wallpaper(
-        self, name: str, url: str
-    ) -> Literal[False] | None:
+        self, name: str, url: str, price: int = 1500, animated: bool = False
+    ) -> bool:
         if not url:
             return False
-        await self.deselect_wallpaper()
-        db.execute(
-            "INSERT OR IGNORE INTO userWallpaperInventory (user_id, wallpaper, link, brightness, selected) VALUES (?,?,?,?,?)",
+        if animated and not self.animated_profile_unlocked:
+            return False
+        if Currency(self.user).get_balance < price:
+            return False
+
+        cur = db.execute(
+            "INSERT OR IGNORE INTO userWallpaperInventory "
+            "(user_id, wallpaper, link, brightness, selected, animated) "
+            "VALUES (?,?,?,?,?,?)",
             (
                 self.user.id,
                 name,
                 url,
                 100,
-                1,
+                0,
+                int(animated),
+            ),
+        )
+        if cur.rowcount == 0:
+            return False
+
+        await self.deselect_wallpaper()
+        db.execute(
+            "UPDATE userWallpaperInventory SET selected = 1 "
+            "WHERE user_id = ? AND wallpaper = ?",
+            (
+                self.user.id,
+                name,
             ),
         )
         db.commit()
-        await Currency(self.user).remove_qp(1500)
+        await Currency(self.user).remove_qp(price)
+        return True
+
+    @property
+    def animated_profile_unlocked(self) -> bool:
+        data = db.execute(
+            "SELECT animated_unlocked FROM profileFeatures WHERE user_id = ?",
+            (self.user.id,),
+        ).fetchone()
+        return data is not None and bool(data[0])
+
+    async def unlock_animated_profile(self, price: int = 10000) -> bool:
+        if self.animated_profile_unlocked:
+            return True
+        cur = db.execute(
+            "UPDATE bankData SET amount = amount - ? "
+            "WHERE user_id = ? AND amount >= ?",
+            (price, self.user.id, price),
+        )
+        if cur.rowcount == 0:
+            return False
+        db.execute(
+            "INSERT OR REPLACE INTO profileFeatures (user_id, animated_unlocked) "
+            "VALUES (?, 1)",
+            (self.user.id,),
+        )
+        db.commit()
+        return True
 
     @property
     def selected_wallpaper(self) -> str | None:
@@ -661,6 +716,15 @@ class Inventory:
         ).fetchone()
         db.commit()
         return None if (wallpaper is None) else str(wallpaper[0])
+
+    @property
+    def selected_wallpaper_is_animated(self) -> bool:
+        wallpaper = db.execute(
+            "SELECT animated FROM userWallpaperInventory "
+            "WHERE user_id = ? AND selected = ?",
+            (self.user.id, 1),
+        ).fetchone()
+        return wallpaper is not None and bool(wallpaper[0])
 
     async def use_wallpaper(self, name: str):
         await self.deselect_wallpaper()

@@ -23,7 +23,8 @@ from json import loads
 from humanfriendly import parse_timespan, InvalidTimespan
 
 bot_invite_url = (
-    "https://canary.discord.com/oauth2/authorize?client_id=831993597166747679"
+    "https://discord.com/oauth2/authorize?client_id=831993597166747679"
+    "&permissions=10292218424374&scope=bot%20applications.commands"
 )
 topgg_invite = "https://top.gg/bot/831993597166747679"
 discordbots_url = "https://discord.bots.gg/bots/831993597166747679"

@@ -67,11 +67,13 @@ class Confirmation(ui.View):
     async def confirm(self, ctx: Interaction, button: ui.Button):
         self.value = True
         button.disabled = True
+        await ctx.response.defer()
         self.stop()
 
     async def cancel(self, ctx: Interaction, button: ui.Button):
         self.value = False
         button.disabled = True
+        await ctx.response.defer()
         self.stop()
 
     async def interaction_check(self, ctx: Interaction):
@@ -1716,7 +1718,8 @@ async def buy_function_context(bot: Bot, ctx: Context, name: str, message: Messa
         image = await Profile(bot).generate_profile(
             ctx, ctx.author, image_url, True, True, "southafrica"
         )
-        file = File(fp=image, filename="preview_profile_card.png")
+        extension = Profile.output_extension(image)
+        file = File(fp=image, filename=f"preview_profile_card.{extension}")
         preview = (
             Embed(
                 description="This is the preview of the profile card.",
@@ -1748,7 +1751,8 @@ async def buy_function_context(bot: Bot, ctx: Context, name: str, message: Messa
         image = await Profile(bot).generate_profile(
             ctx, ctx.author, image_url, True, True, "southafrica"
         )
-        file = File(fp=image, filename="preview_profile_card.png")
+        extension = Profile.output_extension(image)
+        file = File(fp=image, filename=f"preview_profile_card.{extension}")
         preview = (
             Embed(
                 description="Ceci est l'aperçu de la carte de profil.",
@@ -1780,7 +1784,8 @@ async def buy_function_context(bot: Bot, ctx: Context, name: str, message: Messa
         image = await Profile(bot).generate_profile(
             ctx, ctx.author, image_url, True, True, "southafrica"
         )
-        file = File(fp=image, filename="preview_profile_card.png")
+        extension = Profile.output_extension(image)
+        file = File(fp=image, filename=f"preview_profile_card.{extension}")
         preview = (
             Embed(
                 description="Dies ist die Vorschau der Profilkarte.",
@@ -1825,7 +1830,8 @@ async def buy_function_app(bot: Bot, ctx: Interaction, name: str):
         image = await Profile(bot).generate_profile(
             ctx, ctx.user, image_url, True, True, "southafrica"
         )
-        file = File(fp=image, filename="preview_profile_card.png")
+        extension = Profile.output_extension(image)
+        file = File(fp=image, filename=f"preview_profile_card.{extension}")
         preview = (
             Embed(
                 description="This is the preview of the profile card.",
@@ -1862,7 +1868,8 @@ async def buy_function_app(bot: Bot, ctx: Interaction, name: str):
         image = await Profile(bot).generate_profile(
             ctx, ctx.user, image_url, True, True, "southafrica"
         )
-        file = File(fp=image, filename="preview_profile_card.png")
+        extension = Profile.output_extension(image)
+        file = File(fp=image, filename=f"preview_profile_card.{extension}")
         preview = (
             Embed(
                 description="Ceci est l'aperçu de la carte de profil.",

@@ -12,6 +12,10 @@ ensure_database_schema()
 
 
 class Jeanne(AutoShardedBot):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.chunked_guild_ids: set[int] = set()
+
     async def setup_hook(self):
         for directory in ("events", "cogs"):
             for filename in sorted(listdir(directory)):
@@ -25,21 +29,11 @@ class Jeanne(AutoShardedBot):
         await self.tree.sync()
 
 
-intents = Intents()
-intents.messages = True
-intents.message_content = True
+intents = Intents.none()
 intents.guilds = True
+intents.guild_messages = True
 intents.members = True
-intents.reactions = True
-intents.expressions = True
-intents.typing = True
-intents.presences = False
-intents.voice_states = False
-intents.auto_moderation = False
-intents.invites = False
-intents.integrations = False
-intents.webhooks = False
-intents.guild_scheduled_events = False
+intents.message_content = True
 
 
 bot = Jeanne(
@@ -61,9 +55,12 @@ async def on_ready():
     print("Listening to {} shards".format(bot.shard_count))
 
     for guild in bot.guilds:
+        if guild.id in bot.chunked_guild_ids:
+            continue
         try:
             print(f"Chunking guild: {guild.name} ({guild.id})...")
             await asyncio.wait_for(guild.chunk(), timeout=60.0)
+            bot.chunked_guild_ids.add(guild.id)
             print(f"Successfully chunked {guild.name}.")
         except asyncio.TimeoutError:
             print(f"Chunking timed out for {guild.name}.")

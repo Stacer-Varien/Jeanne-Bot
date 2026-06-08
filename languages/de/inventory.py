@@ -106,9 +106,30 @@ class Background_Group:
 
     async def buycustom(self, ctx: Interaction, name: str, link: str):
         await ctx.response.defer()
+        profile = Profile(self.bot)
+        media = await profile.inspect_image(link, ctx.filesize_limit)
+        if not media:
+            await ctx.followup.send(
+                embed=Embed(
+                    description="Das Bild ist ungültig oder überschreitet das Upload-Limit dieses Servers.",
+                    color=Color.red(),
+                )
+            )
+            return
+        animated = media.animated
+        price = 5000 if animated else 1500
+        inventory = Inventory(ctx.user)
+        if animated and not inventory.animated_profile_unlocked:
+            await ctx.followup.send(
+                embed=Embed(
+                    description="Schalte animierte Profile mit `/shop animated-profile` frei, bevor du einen GIF-Hintergrund kaufst.",
+                    color=Color.red(),
+                )
+            )
+            return
         balance = Currency(ctx.user).get_balance
-        if balance is None or balance < 1500:
-            nomoney = Embed(description="Du hast nicht genug QP.")
+        if balance is None or balance < price:
+            nomoney = Embed(description=f"Du benötigst {price:,} QP.")
             await ctx.followup.send(embed=nomoney)
             return
         await ctx.followup.send(
@@ -116,23 +137,33 @@ class Background_Group:
                 description="Vorschau wird erstellt... Das kann eine Weile dauern <a:loading:1161038734620373062>"
             )
         )
-        image = await Profile(self.bot).generate_profile(
+        image = await profile.generate_profile(
             ctx, ctx.user, link, True, True, "southafrica"
         )
         if not image:
             size_error = Embed(
-                description="Das Bild ist kleiner als 900x500.\nVergrößere das Bild und versuche es erneut"
+                description="Aus diesem Bild konnte keine Vorschau erstellt werden."
             )
             await ctx.edit_original_response(embed=size_error)
             return
-        file = File(fp=image, filename="preview_profile_card.png")
+        extension = Profile.output_extension(image)
+        if animated and extension != "gif":
+            await ctx.edit_original_response(
+                embed=Embed(
+                    description="Die animierte Profilkarte überschreitet das Upload-Limit dieses Servers.",
+                    color=Color.red(),
+                )
+            )
+            return
+        file = File(fp=image, filename=f"preview_profile_card.{extension}")
         preview = (
             Embed(
                 description="Dies ist die Vorschau der Profilkarte.",
                 color=Color.blue(),
             )
-            .add_field(name="Kosten", value="1500 <:quantumpiece:1161010445205905418>")
-            .set_footer(text="Ist dies der Hintergrund, den du wolltest?")
+            .add_field(
+                name="Kosten", value=f"{price:,} <:quantumpiece:1161010445205905418>"
+            )
             .set_footer(
                 text="Achtung: Wenn der benutzerdefinierte Hintergrund gegen die ToS verstößt oder NSFW ist, wird er OHNE RÜCKERSTATTUNG entfernt!"
             )
@@ -152,7 +183,19 @@ class Background_Group:
                 )
                 return
 
-            await Inventory(ctx.user).add_user_custom_wallpaper(name, url)
+            added = await inventory.add_user_custom_wallpaper(
+                name, url, price=price, animated=animated
+            )
+            if not added:
+                await ctx.edit_original_response(
+                    embed=Embed(
+                        description="Der Kauf konnte nicht abgeschlossen werden.",
+                        color=Color.red(),
+                    ),
+                    view=None,
+                    attachments=[],
+                )
+                return
             embed1 = Embed(
                 description="Hintergrund gekauft und ausgewählt",
                 color=Color.random(),

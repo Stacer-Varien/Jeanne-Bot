@@ -193,9 +193,12 @@ class WelcomerCog(Cog):
 
     @Cog.listener()
     async def on_guild_join(self, server: Guild):
+        if server.id in self.bot.chunked_guild_ids:
+            return
         try:
             print(f"Chunking guild: {server.name} ({server.id})...")
             await asyncio.wait_for(server.chunk(), timeout=60.0)
+            self.bot.chunked_guild_ids.add(server.id)
             print(f"Successfully chunked {server.name}.")
         except asyncio.TimeoutError:
             print(f"Chunking timed out for {server.name}.")

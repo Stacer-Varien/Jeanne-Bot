@@ -107,9 +107,30 @@ class Background_Group():
 
     async def buycustom(self, ctx: Interaction, name: str, link: str):
         await ctx.response.defer()
+        profile = Profile(self.bot)
+        media = await profile.inspect_image(link, ctx.filesize_limit)
+        if not media:
+            await ctx.followup.send(
+                embed=Embed(
+                    description="L'image est invalide ou dépasse la limite d'envoi de ce serveur.",
+                    color=Color.red(),
+                )
+            )
+            return
+        animated = media.animated
+        price = 5000 if animated else 1500
+        inventory = Inventory(ctx.user)
+        if animated and not inventory.animated_profile_unlocked:
+            await ctx.followup.send(
+                embed=Embed(
+                    description="Débloquez les profils animés avec `/shop animated-profile` avant d'acheter un fond GIF.",
+                    color=Color.red(),
+                )
+            )
+            return
         balance = Currency(ctx.user).get_balance
-        if balance is None or balance < 1500:
-            nomoney = Embed(description="Vous n'avez pas assez de QP.")
+        if balance is None or balance < price:
+            nomoney = Embed(description=f"Vous avez besoin de {price:,} QP.")
             await ctx.followup.send(embed=nomoney)
             return
         await ctx.followup.send(
@@ -117,23 +138,33 @@ class Background_Group():
                 description="Création de la prévisualisation... Cela prendra un peu de temps <a:loading:1161038734620373062>"
             )
         )
-        image = await Profile(self.bot).generate_profile(ctx,
-            ctx.user, link, True, True, "southafrica"
+        image = await profile.generate_profile(
+            ctx, ctx.user, link, True, True, "southafrica"
         )
         if not image:
             size_error = Embed(
-                description="L'image est inférieure à la taille 900x500.\nVeuillez agrandir l'image et réessayer"
+                description="Impossible de générer un aperçu avec cette image."
             )
             await ctx.edit_original_response(embed=size_error)
             return
-        file = File(fp=image, filename="preview_profile_card.png")
+        extension = Profile.output_extension(image)
+        if animated and extension != "gif":
+            await ctx.edit_original_response(
+                embed=Embed(
+                    description="La carte animée dépasse la limite d'envoi de ce serveur.",
+                    color=Color.red(),
+                )
+            )
+            return
+        file = File(fp=image, filename=f"preview_profile_card.{extension}")
         preview = (
             Embed(
                 description="Voici la prévisualisation de la carte de profil.",
                 color=Color.blue(),
             )
-            .add_field(name="Coût", value="1500 <:quantumpiece:1161010445205905418>")
-            .set_footer(text="Est-ce le fond d'écran que vous vouliez ?")
+            .add_field(
+                name="Coût", value=f"{price:,} <:quantumpiece:1161010445205905418>"
+            )
             .set_footer(
                 text="Veuillez noter que si le fond d'écran personnalisé enfreint les CGU ou est NSFW, il sera supprimé SANS REMBOURSEMENT !"
             )
@@ -153,7 +184,19 @@ class Background_Group():
                 )
                 return
 
-            await Inventory(ctx.user).add_user_custom_wallpaper(name, url)
+            added = await inventory.add_user_custom_wallpaper(
+                name, url, price=price, animated=animated
+            )
+            if not added:
+                await ctx.edit_original_response(
+                    embed=Embed(
+                        description="L'achat n'a pas pu être finalisé.",
+                        color=Color.red(),
+                    ),
+                    view=None,
+                    attachments=[],
+                )
+                return
             embed1 = Embed(
                 description="Fond d'écran acheté et sélectionné",
                 color=Color.random(),

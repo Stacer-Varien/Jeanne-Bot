@@ -164,6 +164,12 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "aide commande",
                 "de": "hilfe befehl",
             },
+            "help_group_name ask_name": {
+                "en-GB": "help ask",
+                "en-US": "help ask",
+                "fr": "aide demander",
+                "de": "hilfe fragen",
+            },
             "help_group_name support_name": {
                 "en-GB": "help support",
                 "en-US": "help support",
@@ -422,6 +428,30 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "Get help on a certain command",
                 "fr": "Obtenez de l'aide sur une certaine commande",
                 "de": "Holen Sie sich Hilfe zu einem bestimmten Befehl",
+            },
+            "ask_desc": {
+                "en-GB": "Ask what command to use",
+                "en-US": "Ask what command to use",
+                "fr": "Demandez quelle commande utiliser",
+                "de": "Frage, welchen Befehl du nutzen sollst",
+            },
+            "ask_name": {
+                "en-GB": "ask",
+                "en-US": "ask",
+                "fr": "demander",
+                "de": "fragen",
+            },
+            "question_parm_name": {
+                "en-GB": "question",
+                "en-US": "question",
+                "fr": "question",
+                "de": "frage",
+            },
+            "ask_question_parm_desc": {
+                "en-GB": "What do you need help with?",
+                "en-US": "What do you need help with?",
+                "fr": "Avec quoi avez-vous besoin d'aide?",
+                "de": "Wobei brauchst du Hilfe?",
             },
             "command_parm_name": {
                 "en-GB": "command",

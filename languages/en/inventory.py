@@ -107,9 +107,31 @@ class Background_Group():
 
     async def buycustom(self, ctx: Interaction, name: str, link: str):
         await ctx.response.defer()
+        profile = Profile(self.bot)
+        media = await profile.inspect_image(link, ctx.filesize_limit)
+        if not media:
+            await ctx.followup.send(
+                embed=Embed(
+                    description="The image is invalid or exceeds this server's upload limit.",
+                    color=Color.red(),
+                )
+            )
+            return
+
+        animated = media.animated
+        price = 5000 if animated else 1500
+        inventory = Inventory(ctx.user)
+        if animated and not inventory.animated_profile_unlocked:
+            await ctx.followup.send(
+                embed=Embed(
+                    description="Unlock animated profile cards with `/shop animated-profile` before buying a GIF background.",
+                    color=Color.red(),
+                )
+            )
+            return
         balance = Currency(ctx.user).get_balance
-        if balance is None or balance < 1500:
-            nomoney = Embed(description="You do not have enough QP.")
+        if balance is None or balance < price:
+            nomoney = Embed(description=f"You need {price:,} QP for this background.")
             await ctx.followup.send(embed=nomoney)
             return
         await ctx.followup.send(
@@ -117,25 +139,37 @@ class Background_Group():
                 description="Creating preview... This will take some time <a:loading:1161038734620373062>"
             )
         )
-        image = await Profile(self.bot).generate_profile(ctx, 
-            ctx.user, link, True, True, "southafrica"
+        image = await profile.generate_profile(
+            ctx, ctx.user, link, True, True, "southafrica"
         )
         if not image:
-            size_error = Embed(
-                description="The image is below the 900x500 size.\nPlease enlarge the image and try again"
+            await ctx.edit_original_response(
+                embed=Embed(
+                    description="Failed to generate a preview from that image.",
+                    color=Color.red(),
+                )
             )
-            await ctx.edit_original_response(embed=size_error)
             return
-        file = File(fp=image, filename="preview_profile_card.png")
+        extension = Profile.output_extension(image)
+        if animated and extension != "gif":
+            await ctx.edit_original_response(
+                embed=Embed(
+                    description="The animated profile card could not fit within this server's upload limit.",
+                    color=Color.red(),
+                )
+            )
+            return
+        file = File(fp=image, filename=f"preview_profile_card.{extension}")
         preview = (
             Embed(
                 description="This is the preview of the profile card.",
                 color=Color.blue(),
             )
-            .add_field(name="Cost", value="1500 <:quantumpiece:1161010445205905418>")
-            .set_footer(text="Is this the background you wanted?")
+            .add_field(
+                name="Cost", value=f"{price:,} <:quantumpiece:1161010445205905418>"
+            )
             .set_footer(
-                text="Please note that if the custom background violates ToS or is NSFW, it will be removed with NO REFUNDS!"
+                text="Confirm this background. ToS or NSFW violations are removed with no refunds."
             )
         )
         view = Confirmation(ctx, ctx.user)
@@ -153,7 +187,18 @@ class Background_Group():
                 )
                 return
 
-            await Inventory(ctx.user).add_user_custom_wallpaper(name, url)
+            added = await inventory.add_user_custom_wallpaper(
+                name, url, price=price, animated=animated
+            )
+            if not added:
+                failed = Embed(
+                    description="The purchase could not complete. Check your balance and background name.",
+                    color=Color.red(),
+                )
+                await ctx.edit_original_response(
+                    embed=failed, view=None, attachments=[]
+                )
+                return
             embed1 = Embed(
                 description="Background wallpaper bought and selected",
                 color=Color.random(),

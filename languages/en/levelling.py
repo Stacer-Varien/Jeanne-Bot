@@ -62,7 +62,8 @@ class levelling(Cog):
                 voted=False,
                 country=inventory.selected_country,
             )
-            file = File(fp=image, filename=f"{member.name}_profile_card.png")
+            extension = Profile.output_extension(image)
+            file = File(fp=image, filename=f"{member.name}_profile_card.{extension}")
             await ctx.followup.send(file=file)
         except Exception as e:
             embed = Embed(description=f"Failed to generate profile card: {e}", color=Color.red())

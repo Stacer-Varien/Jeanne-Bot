@@ -170,10 +170,7 @@ class HelpGroup(GroupCog, name=T("help_group_name")):
                 )
             )
 
-            if len(choices) == 25:
-                break
-
-        return choices
+        return choices[:25]
 
     async def _send_ask_error(self, ctx: Interaction, suggestions: list[str]):
         if ctx.locale.value == "fr":
@@ -262,8 +259,8 @@ class HelpGroup(GroupCog, name=T("help_group_name")):
         await en.HelpGroup(self.bot).command(ctx, command)
 
     @Jeanne.command(
-        name="ask",
-        description="Ask what command to use (non-AI command help)",
+        name=T("ask_name"),
+        description=T("ask_desc"),
         extras={
             "en": {
                 "name": "ask",
@@ -301,8 +298,8 @@ class HelpGroup(GroupCog, name=T("help_group_name")):
         },
     )
     @Jeanne.autocomplete(question=ask_autocomplete)
-    @Jeanne.rename(question="question")
-    @Jeanne.describe(question="What do you need help with?")
+    @Jeanne.rename(question=T("question_parm_name"))
+    @Jeanne.describe(question=T("ask_question_parm_desc"))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(is_suspended)
     async def ask(self, ctx: Interaction, question: Jeanne.Range[str, 3, 2000]):

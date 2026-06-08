@@ -26,7 +26,7 @@ start_time = time()
 class stat_buttons(ui.View):
     def __init__(self):
         super().__init__()
-        invite = "https://discord.com/api/oauth2/authorize?client_id=831993597166747679&permissions=1429553343542&scope=bot%20applications.commands"
+        invite = "https://discord.com/oauth2/authorize?client_id=831993597166747679&permissions=10292218424374&scope=bot%20applications.commands"
         votetopgg = "https://top.gg/bot/831993597166747679"
         orleans_url = "https://discord.gg/jh7jkuk2pp"
         website = "https://jeannebot.gitbook.io/jeannebot/"
