@@ -29,7 +29,7 @@ class stat_buttons(ui.View):
         invite = "https://discord.com/oauth2/authorize?client_id=831993597166747679&permissions=10292218424374&scope=bot%20applications.commands"
         votetopgg = "https://top.gg/bot/831993597166747679"
         orleans_url = "https://discord.gg/jh7jkuk2pp"
-        website = "https://jeannebot.gitbook.io/jeannebot/"
+        website = "https://jeannebot.vercel.app/"
         self.add_item(ui.Button(style=ButtonStyle.link, label="Bot einladen", url=invite))
         self.add_item(
             ui.Button(style=ButtonStyle.link, label="Stimme für mich ab", url=votetopgg)
