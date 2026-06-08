@@ -82,7 +82,7 @@ class listenersCog(Cog):
 
                             if channel is not None:
                                 if update is None:
-                                    if message.guild.preferred_locale.value in ["en-GB", "en-US"]:
+                                    if message.guild.preferred_locale.value not in ("fr", "de"):
                                         msg = "{} has leveled up to `{}`".format(
                                             message.author,
                                             new_level,
@@ -114,7 +114,7 @@ class listenersCog(Cog):
                                 await message.author.add_roles(role_reward)
                                 if channel is not None:
                                     if levelup is None:
-                                        if message.guild.preferred_locale.value in ["en-GB", "en-US"]:
+                                        if message.guild.preferred_locale.value not in ("fr", "de"):
                                             msg = "CONGRATS {}! You were role awarded {}".format(
                                                 message.author,
                                                 role_reward.name,

@@ -12,8 +12,6 @@ TOPGG_AUTH = getenv("topgg_auth")
 DB_AUTH = getenv("db_auth")
 WEBHOOK = getenv("report_webhook")
 BB_WEBHOOK = getenv("botban_webhook")
-TENOR = getenv("tenor")
-CLIENTKEY = getenv("client_key")
 JEANNE = str(getenv("jeanne_album"))
 SABER = str(getenv("saber_album"))
 WALLPAPER = str(getenv("wallpaper_album"))
@@ -32,18 +30,3 @@ RULE34_API=environ["RULE34_API_KEY"]
 RULE34_USER=environ["RULE34_USER_ID"]
 
 db = connect("database.db", autocommit=True)
-
-hug = f"https://tenor.googleapis.com/v2/search?q=hug%20anime&key={TENOR}&client_key={CLIENTKEY}&limit=50"
-slap = f"https://tenor.googleapis.com/v2/search?q=slap%20anime&key={TENOR}&client_key={CLIENTKEY}&limit=50"
-smug = f"https://tenor.googleapis.com/v2/search?q=smug%20anime&key={TENOR}&client_key={CLIENTKEY}&limit=50"
-poke = f"https://tenor.googleapis.com/v2/search?q=poke%20anime&key={TENOR}&client_key={CLIENTKEY}&limit=50"
-pat = f"https://tenor.googleapis.com/v2/search?q=headpat%20anime&key={TENOR}&client_key={CLIENTKEY}&limit=50"
-kiss = f"https://tenor.googleapis.com/v2/search?q=kiss%20anime&key={TENOR}&client_key={CLIENTKEY}&limit=50"
-tickle = f"https://tenor.googleapis.com/v2/search?q=tickle%20anime&key={TENOR}&client_key={CLIENTKEY}&limit=50"
-baka = f"https://tenor.googleapis.com/v2/search?q=baka%20anime&key={TENOR}&client_key={CLIENTKEY}&limit=50"
-feed = f"https://tenor.googleapis.com/v2/search?q=feed%20anime&key={TENOR}&client_key={CLIENTKEY}&limit=50"
-cry = f"https://tenor.googleapis.com/v2/search?q=cry%20anime&key={TENOR}&client_key={CLIENTKEY}&limit=50"
-bite = f"https://tenor.googleapis.com/v2/search?q=bite%20anime&key={TENOR}&client_key={CLIENTKEY}&limit=50"
-blush = f"https://tenor.googleapis.com/v2/search?q=blush%20anime&key={TENOR}&client_key={CLIENTKEY}&limit=50"
-cuddle = f"https://tenor.googleapis.com/v2/search?q=cuddle%20anime&key={TENOR}&client_key={CLIENTKEY}&limit=50"
-dance = f"https://tenor.googleapis.com/v2/search?q=dance%20anime&key={TENOR}&client_key={CLIENTKEY}&limit=50"

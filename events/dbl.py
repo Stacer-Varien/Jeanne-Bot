@@ -7,20 +7,35 @@ from discord.ext.commands import Cog, Bot
 from datetime import datetime
 
 
+JEANNE_BOT_ID = 831993597166747679
+
+
 class DBL(Cog, name="DBL"):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.topggpy = DBLClient(
-            bot=self.bot, token=TOPGG, autopost=True, post_shard_count=True
-        )
+        self.topggpy = DBLClient(bot=self.bot, token=TOPGG, autopost=False)
         self.topgg_webhook = WebhookManager(self.bot).dbl_webhook(
             route="/dblwebhook", auth_key=TOPGG_AUTH
         )
-        self.topgg_webhook.run(5000)
+        self.topgg_webhook_started = self._is_production_bot()
+        if self.topgg_webhook_started:
+            self.topgg_webhook.run(5000)
         self.update_stats.start()
+
+    def _is_production_bot(self) -> bool:
+        return self.bot.user is not None and self.bot.user.id == JEANNE_BOT_ID
+
+    async def cog_unload(self):
+        self.update_stats.cancel()
+        await self.topggpy.close()
+        if self.topgg_webhook_started:
+            await self.topgg_webhook.close()
 
     @tasks.loop(minutes=60, reconnect=True)
     async def update_stats(self):
+        if not self._is_production_bot():
+            return
+
         servers = len(self.bot.guilds)
         dbheaders = {
             "Content-Type": "application/json",
@@ -47,7 +62,7 @@ class DBL(Cog, name="DBL"):
 
     @Cog.listener()
     async def on_dbl_vote(self, data: dict):
-        if data["type"] != "upvote":
+        if not self._is_production_bot() or data["type"] != "upvote":
             return
 
         voter_id = int(data["user"])

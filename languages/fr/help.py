@@ -77,7 +77,7 @@ class HelpGroup:
             ]
             descs = [
                 f"`{parm}` - {i["description"]}"
-                for i, parm in zip(command["parameters"], parms)
+                for i, parm in zip(command["parameters"], parms, strict=False)
             ]
             embed.add_field(name="Paramètres", value="\n".join(descs), inline=False)
         except Exception:

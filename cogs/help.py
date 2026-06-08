@@ -85,6 +85,9 @@ class HelpGroup(GroupCog, name=T("help_group_name")):
     def _score_commands(self, question: str):
         query = self._normalize_text(question)
         tokens = self._tokenize(question)
+        if not query:
+            return []
+
         scored = []
 
         for command in self.bot.tree.walk_commands():

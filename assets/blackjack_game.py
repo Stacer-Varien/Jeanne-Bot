@@ -84,7 +84,7 @@ class BlackjackView(ui.View):
         self.add_item(stand_button)
 
     def create_embed(self, ctx: Interaction):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             embed = Embed(title="Blackjack", color=Color.green())
             embed.add_field(
                 name="Your Hand",
@@ -135,7 +135,7 @@ class BlackjackView(ui.View):
         ctx: Interaction,
         button: ui.Button,
     ):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             self.value = "Hit"
         elif ctx.locale.value == "fr":
             self.value = "Tirer"
@@ -149,7 +149,7 @@ class BlackjackView(ui.View):
         if self.player_value > 21:
             self.embed.color = Color.red()
             # Locale-based bust message
-            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            if ctx.locale.value not in ("fr", "de"):
                 self.embed.title = "You busted! You lose."
                 if self.bet:
                     self.embed.description = f"Unfortunately, I have to take away {self.bet} <:quantumpiece:1161010445205905418>"
@@ -175,7 +175,7 @@ class BlackjackView(ui.View):
         ctx: Interaction,
         button: ui.Button,
     ):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             self.value = "Stand"
         elif ctx.locale.value == "fr":
             self.value = "Rester"
@@ -190,7 +190,7 @@ class BlackjackView(ui.View):
             self.dealer_value = calculate_hand(self.dealer_hand)
 
         # Locale-based result embed
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             result_embed = Embed(title="Blackjack Result", color=Color.red())
             result_embed.add_field(
                 name="Your Hand",

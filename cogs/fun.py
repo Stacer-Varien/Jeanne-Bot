@@ -66,7 +66,8 @@ class fun(Cog, name="FunSlash"):
             await fr.fun(self.bot)._8ball(ctx, question) 
             return
         if ctx.locale.value == "de":
-            await de.fun(self.bot)._8ball(ctx, question)      
+            await de.fun(self.bot)._8ball(ctx, question)
+            return
         await en.fun(self.bot)._8ball(ctx, question)
 
     @Jeanne.command(

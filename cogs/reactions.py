@@ -61,7 +61,7 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def hug(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             await en.Reactions(self.bot).hug(ctx, member)
         elif ctx.locale.value == "fr":
             await fr.Reactions(self.bot).hug(ctx, member)
@@ -113,7 +113,7 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def slap(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             await en.Reactions(self.bot).slap(ctx, member)
         elif ctx.locale.value == "fr":
             await fr.Reactions(self.bot).slap(ctx, member)
@@ -143,7 +143,7 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def smug(self, ctx: Interaction):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             await en.Reactions(self.bot).smug(ctx)
         elif ctx.locale.value == "fr":
             await fr.Reactions(self.bot).smug(ctx)
@@ -195,7 +195,7 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def poke(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             await en.Reactions(self.bot).poke(ctx, member)
         elif ctx.locale.value == "fr":
             await fr.Reactions(self.bot).poke(ctx, member)
@@ -247,7 +247,7 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def pat(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             await en.Reactions(self.bot).pat(ctx, member)
         elif ctx.locale.value == "fr":
             await fr.Reactions(self.bot).pat(ctx, member)
@@ -299,7 +299,7 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def kiss(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             await en.Reactions(self.bot).kiss(ctx, member)
         elif ctx.locale.value == "fr":
             await fr.Reactions(self.bot).kiss(ctx, member)
@@ -351,7 +351,7 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def tickle(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             await en.Reactions(self.bot).tickle(ctx, member)
         elif ctx.locale.value == "fr":
             await fr.Reactions(self.bot).tickle(ctx, member)
@@ -402,7 +402,7 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def baka(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             await en.Reactions(self.bot).baka(ctx, member)
         elif ctx.locale.value == "fr":
             await fr.Reactions(self.bot).baka(ctx, member)
@@ -454,7 +454,7 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def feed(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             await en.Reactions(self.bot).feed(ctx, member)
         elif ctx.locale.value == "fr":
             await fr.Reactions(self.bot).feed(ctx, member)
@@ -483,7 +483,7 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def cry(self, ctx: Interaction):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             await en.Reactions(self.bot).cry(ctx)
         elif ctx.locale.value == "fr":
             await fr.Reactions(self.bot).cry(ctx)
@@ -535,7 +535,7 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def bite(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             await en.Reactions(self.bot).bite(ctx, member)
         elif ctx.locale.value == "fr":
             await fr.Reactions(self.bot).bite(ctx, member)
@@ -564,7 +564,7 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def blush(self, ctx: Interaction):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             await en.Reactions(self.bot).blush(ctx)
         elif ctx.locale.value == "fr":
             await fr.Reactions(self.bot).blush(ctx)
@@ -616,7 +616,7 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def cuddle(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             await en.Reactions(self.bot).cuddle(ctx, member)
         elif ctx.locale.value == "fr":
             await fr.Reactions(self.bot).cuddle(ctx, member)
@@ -668,7 +668,7 @@ class SlashReactions(Cog, name="ReactionsSlash"):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def dance(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             await en.Reactions(self.bot).dance(ctx, member)
         elif ctx.locale.value == "fr":
             await fr.Reactions(self.bot).dance(ctx, member)

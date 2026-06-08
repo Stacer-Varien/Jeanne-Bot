@@ -1,24 +1,6 @@
-import json
-import random
+from assets.reaction_gifs import get_reaction_gif
 from discord import Color, Embed, Interaction, Member
 from discord.ext.commands import Bot
-from requests import get
-from config import (
-    hug,
-    slap,
-    smug,
-    poke,
-    cry,
-    pat,
-    kiss,
-    tickle,
-    baka,
-    feed,
-    bite,
-    blush,
-    cuddle,
-    dance,
-)
 from typing import Optional
 
 
@@ -31,14 +13,10 @@ class Reactions():
         ctx: Interaction,
         action: str,
         member: Optional[Member] = None,
-        api_url: str = None,
     ) -> None:
-        reaction_api = get(api_url)
         reaction_embed = Embed(color=Color.random())
-        reaction_embed.set_footer(text="Tiré de Ténor")
-        random_gif = random.choice(json.loads(reaction_api.content)["results"])
-        reaction_url = random_gif["media_formats"]["gif"]["url"]
-        reaction_embed.set_image(url=reaction_url)
+        reaction_embed.set_footer(text="Archivé depuis Tenor")
+        reaction_embed.set_image(url=get_reaction_gif(action))
 
         messages = {
             "baka": (
@@ -105,43 +83,43 @@ class Reactions():
         await ctx.response.send_message(msg, embed=reaction_embed)
 
     async def hug(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        await self._send_reaction(ctx, "hug", member, hug)
+        await self._send_reaction(ctx, "hug", member)
 
     async def slap(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        await self._send_reaction(ctx, "slap", member, slap)
+        await self._send_reaction(ctx, "slap", member)
 
     async def smug(self, ctx: Interaction):
-        await self._send_reaction(ctx, "smug", api_url=smug)
+        await self._send_reaction(ctx, "smug")
 
     async def poke(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        await self._send_reaction(ctx, "poke", member, poke)
+        await self._send_reaction(ctx, "poke", member)
 
     async def pat(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        await self._send_reaction(ctx, "pat", member, pat)
+        await self._send_reaction(ctx, "pat", member)
 
     async def kiss(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        await self._send_reaction(ctx, "kiss", member, kiss)
+        await self._send_reaction(ctx, "kiss", member)
 
     async def tickle(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        await self._send_reaction(ctx, "tickle", member, tickle)
+        await self._send_reaction(ctx, "tickle", member)
 
     async def baka(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        await self._send_reaction(ctx, "baka", member, baka)
+        await self._send_reaction(ctx, "baka", member)
 
     async def feed(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        await self._send_reaction(ctx, "feed", member, feed)
+        await self._send_reaction(ctx, "feed", member)
 
     async def cry(self, ctx: Interaction):
-        await self._send_reaction(ctx, "cry", api_url=cry)
+        await self._send_reaction(ctx, "cry")
 
     async def bite(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        await self._send_reaction(ctx, "bite", member, bite)
+        await self._send_reaction(ctx, "bite", member)
 
     async def blush(self, ctx: Interaction):
-        await self._send_reaction(ctx, "blush", api_url=blush)
+        await self._send_reaction(ctx, "blush")
 
     async def cuddle(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        await self._send_reaction(ctx, "cuddle", member, cuddle)
+        await self._send_reaction(ctx, "cuddle", member)
 
     async def dance(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        await self._send_reaction(ctx, "dance", member, dance)
+        await self._send_reaction(ctx, "dance", member)

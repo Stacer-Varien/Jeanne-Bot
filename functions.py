@@ -17,7 +17,7 @@ from discord import (
 )
 
 from discord.ext.commands import Bot, Context
-from requests import get
+from requests import RequestException, get
 from config import db, BB_WEBHOOK, CATBOX_HASH, GELBOORU_API, GELBOORU_USER, RULE34_API, RULE34_USER
 from typing import Literal, Optional, List
 from discord.app_commands import locale_str as T
@@ -1473,7 +1473,10 @@ class Moderation:
         return 0 if wp_query is None else len(wp_query)
 
     async def revoke_warn(self, member: Member, warn_id: int):
-        db.execute("DELETE FROM warnData WHERE warn_id = ?", (warn_id,))
+        db.execute(
+            "DELETE FROM warnData WHERE guild_id = ? AND user_id = ? AND warn_id = ?",
+            (self.server.id, member.id, warn_id),
+        )
         db.commit()
 
     def get_softban_data(self):
@@ -1574,7 +1577,7 @@ def get_richest(member: Member) -> int:
 
 class NsfwApis(Enum):
     GelbooruApi = f"https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&api_key={GELBOORU_API}&user_id={GELBOORU_USER}&limit=100&tags=rating:explicit+"
-    KonachanApi = "https://konachan.com/post.json?s=post&q=index&limit=100&tags=score:>10+rating:explicit+"
+    KonachanApi = "https://konachan.com/post.json?limit=100&tags=rating:explicit+"
     YandereApi = "https://yande.re/post.json?api_version=2&limit=100&tags=score:>10+rating:explicit+"
     DanbooruApi = "https://danbooru.donmai.us/posts.json?limit=100&tags=rating:explicit+"
     Rule34Api = f"https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&api_key={RULE34_API}&user_id={RULE34_USER}&limit=100&tags=rating:explicit+"
@@ -1582,6 +1585,9 @@ class NsfwApis(Enum):
 
 class Hentai:
     def __init__(self):
+        self.api_headers = {
+            "User-Agent": "Jeanne-Bot/5.4 (+https://github.com/Stacer-Varien/Jeanne-Bot)"
+        }
         self.blacklisted_tags = {
             "loli",
             "shota",
@@ -1627,6 +1633,14 @@ class Hentai:
             "child_model", #for very very obvious reasons
             "commission", #copyright reasons
         }
+
+    def _fetch_json(self, url: str):
+        try:
+            response = get(url, headers=self.api_headers, timeout=15)
+            response.raise_for_status()
+            return response.json()
+        except (RequestException, ValueError):
+            return None
 
     def format_tags(self, tags: Optional[str] = None) -> str:
         if tags:
@@ -1741,10 +1755,8 @@ class Hentai:
             if tag_part:
                 url = f"{url}+{tag_part}"
 
-            resp = get(url, timeout=10)
-            data = resp.json()
-
-            posts = data
+            data = self._fetch_json(url)
+            posts = data if isinstance(data, list) else []
             filtered = []
             for p in posts:
                 tags_field = str(p.get("tags", ""))
@@ -1786,10 +1798,8 @@ class Hentai:
             if tag_part:
                 url = f"{url}+{tag_part}"
 
-            resp = get(url, timeout=10)
-            data = resp.json()
-
-            posts = data.get("post", [])
+            data = self._fetch_json(url)
+            posts = data.get("post", []) if isinstance(data, dict) else []
             filtered = []
             for p in posts:
                 tags_field = str(p.get("tags", ""))
@@ -1831,10 +1841,8 @@ class Hentai:
             if tag_part:
                 url = f"{url}+{tag_part}"
 
-            resp = get(url, timeout=10)
-            data = resp.json()
-
-            posts = data
+            data = self._fetch_json(url)
+            posts = data if isinstance(data, list) else []
             filtered = []
             for p in posts:
                 tags_field = str(p.get("tags", ""))
@@ -1861,7 +1869,7 @@ class Hentai:
                 if i["source"] == "yandere"
                 and self._is_allowed_post(
                     str(i.get("tags", "")),
-                    str(i.get("sample_url", "")),
+                    str(i.get("file_url", "")),
                     blacklisted_links,
                 )
             ]
@@ -1876,10 +1884,8 @@ class Hentai:
             if tag_part:
                 url = f"{url}+{tag_part}"
 
-            resp = get(url, timeout=10)
-            data = resp.json()
-
-            posts = data["posts"]
+            data = self._fetch_json(url)
+            posts = data.get("posts", []) if isinstance(data, dict) else []
             filtered = []
             for p in posts:
                 tags_field = str(p.get("tags", ""))
@@ -1921,10 +1927,8 @@ class Hentai:
             if tag_part:
                 url = f"{url}+{tag_part}"
 
-            resp = get(url, timeout=10)
-            data = resp.json()
-
-            posts = data
+            data = self._fetch_json(url)
+            posts = data if isinstance(data, list) else []
             filtered = []
             for p in posts:
                 tags_field = str(p.get("tag_string", ""))
@@ -1943,29 +1947,27 @@ class Hentai:
         return post_list
 
     def hentai(self):
-        rule34_image = choice(self.get_images_rule34())["file_url"]
-        gelbooru_image = choice(self.get_images_gelbooru())["file_url"]
-        yandere_image = choice(self.get_images_yandere())["file_url"]
-        konachan_image = choice(self.get_images_konachan())["file_url"]
-        danbooru_image = choice(self.get_images_danbooru())["file_url"]
-        h = [
-            rule34_image,
-            gelbooru_image,
-            yandere_image,
-            konachan_image,
-            danbooru_image,
-        ]
-        hentai: str = choice(h)
-        if hentai == rule34_image:
-            return hentai, "Rule34"
-        if hentai == gelbooru_image:
-            return hentai, "Gelbooru"
-        if hentai == yandere_image:
-            return hentai, "Yande.re"
-        if hentai == konachan_image:
-            return hentai, "Konachan"
-        if hentai == danbooru_image:
-            return hentai, "Danbooru"
+        available_posts = []
+        sources = (
+            ("Rule34", self.get_images_rule34),
+            ("Gelbooru", self.get_images_gelbooru),
+            ("Yande.re", self.get_images_yandere),
+            ("Konachan", self.get_images_konachan),
+            ("Danbooru", self.get_images_danbooru),
+        )
+
+        for source, fetch_posts in sources:
+            try:
+                posts = fetch_posts() or []
+            except Exception:
+                continue
+            if posts:
+                available_posts.append((choice(posts)["file_url"], source))
+
+        if not available_posts:
+            raise IndexError("No image sources returned a usable post")
+
+        return choice(available_posts)
 
 
 class Reminder:
@@ -2078,19 +2080,25 @@ class AutoCompleteChoices:
     async def default_ban_options(
         self, ctx: Interaction, current: str
     ) -> List[Jeanne.Choice[str]]:
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            default_options = [
-                "Suspicious or spam account",
-                "Compromised or hacked account",
-                "Breaking server rules",
-                "Botting account",
-            ]
-        elif ctx.locale.value == "fr":
+        default_options = [
+            "Suspicious or spam account",
+            "Compromised or hacked account",
+            "Breaking server rules",
+            "Botting account",
+        ]
+        if ctx.locale.value == "fr":
             default_options = [
                 "Compte suspect ou spam",
                 "Compte compromis ou piraté",
                 "Violation des règles du serveur",
                 "Compte de botting",
+            ]
+        elif ctx.locale.value == "de":
+            default_options = [
+                "Verdächtiges oder Spam-Konto",
+                "Kompromittiertes oder gehacktes Konto",
+                "Verstoß gegen Serverregeln",
+                "Bot-Konto",
             ]
         return [
             Jeanne.Choice(name=option, value=option)
@@ -2153,16 +2161,15 @@ class AutoCompleteChoices:
     async def report_types(
         self, ctx: Interaction, current: str
     ) -> List[Jeanne.Choice[str]]:
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            report_types = [
-                "Fault",
-                "Bug",
-                "ToS Violator",
-                "Exploit",
-                "Translation Error",
-                "Other",
-            ]
-        elif ctx.locale.value == "fr":
+        report_types = [
+            "Fault",
+            "Bug",
+            "ToS Violator",
+            "Exploit",
+            "Translation Error",
+            "Other",
+        ]
+        if ctx.locale.value == "fr":
             report_types = [
                 "Défaillance",
                 "Bogue",
@@ -2170,6 +2177,15 @@ class AutoCompleteChoices:
                 "Exploitation",
                 "Erreur de traduction",
                 "Autre",
+            ]
+        elif ctx.locale.value == "de":
+            report_types = [
+                "Fehler",
+                "Bug",
+                "AGB-Verstoß",
+                "Exploit",
+                "Übersetzungsfehler",
+                "Sonstiges",
             ]
         return [
             Jeanne.Choice(name=option, value=option)

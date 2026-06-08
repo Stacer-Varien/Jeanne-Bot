@@ -19,7 +19,7 @@ import languages.de.info as de
 class InfoCog(Cog, name="InfoSlash"):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.bot_version = "v5.3 Beta"
+        self.bot_version = "v5.4 Beta"
         self.userinfo_context = Jeanne.ContextMenu(
             name="Userinfo", callback=self.userinfo_callback
         )
@@ -159,7 +159,6 @@ class InfoCog(Cog, name="InfoSlash"):
             },
         },
     )
-    @Jeanne.check(is_suspended)
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
@@ -305,6 +304,7 @@ class InfoCog(Cog, name="InfoSlash"):
                 return
             if ctx.locale.value == "de":
                 await de.Info(self.bot).sticker_error(ctx, error, "NoSticker")
+                return
             await en.Info(self.bot).sticker_error(ctx, error, "NoSticker")
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, AttributeError

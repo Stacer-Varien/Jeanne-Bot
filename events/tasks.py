@@ -38,7 +38,7 @@ class tasksCog(Cog):
             if modlog is None:
                 continue
 
-            if guild.preferred_locale.value in ["en-GB", "en-US"]:
+            if guild.preferred_locale.value not in ("fr", "de"):
                 unmute = Embed(title="Member unbanned", color=0xFF0000)
                 unmute.add_field(name="Member", value=member, inline=True)
                 unmute.add_field(name="ID", value=member.id, inline=True)

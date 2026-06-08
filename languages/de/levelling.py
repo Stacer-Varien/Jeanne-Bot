@@ -7,14 +7,12 @@ from discord import (
     Member,
     app_commands as Jeanne,
 )
-from config import TOPGG
 from functions import (
     Inventory,
     Levelling,
 )
 from typing import Optional
 from assets.generators.profile_card import Profile
-from topgg import DBLClient
 
 
 class Rank_Group:
@@ -49,7 +47,6 @@ class Rank_Group:
 class levelling(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.topggpy = DBLClient(bot=self.bot, token=TOPGG)
 
     async def generate_profile_card(self, ctx: Interaction, member: Member):
         try:

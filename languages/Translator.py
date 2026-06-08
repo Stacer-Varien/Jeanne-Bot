@@ -20,7 +20,12 @@ class MyTranslator(Jeanne.Translator):
 
         translations = {
             # global
-            "name_parm_name": {"en-GB": "name", "en-US": "name", "fr": "nom"},
+            "name_parm_name": {
+                "en-GB": "name",
+                "en-US": "name",
+                "fr": "nom",
+                "de": "name",
+            },
             "name_parm_desc": {
                 "en-GB": "What will you name it?",
                 "en-US": "What will you name it?",
@@ -243,21 +248,36 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Jouez au blackjack et gagnez avec des paris",
                 "de": "Spielen Sie ein Spiel Blackjack und gewinnen Sie mit Wetten",
             },
-            "daily_name": {"en-GB": "daily", "en-US": "daily", "fr": "quotidien"},
+            "daily_name": {
+                "en-GB": "daily",
+                "en-US": "daily",
+                "fr": "quotidien",
+                "de": "taeglich",
+            },
             "daily_desc": {
                 "en-GB": "Claim your daily QP reward",
                 "en-US": "Claim your daily QP reward",
                 "fr": "Réclamez votre récompense quotidienne de QP",
                 "de": "Fordern Sie Ihre tägliche QP-Belohnung an",
             },
-            "balance_name": {"en-GB": "balance", "en-US": "balance", "fr": "solde"},
+            "balance_name": {
+                "en-GB": "balance",
+                "en-US": "balance",
+                "fr": "solde",
+                "de": "guthaben",
+            },
             "balance_desc": {
                 "en-GB": "Check your or another user's balance",
                 "en-US": "Check your or another user's balance",
                 "fr": "Vérifiez votre solde ou celui d'un autre utilisateur",
                 "de": "Überprüfen Sie Ihr Guthaben oder das eines anderen Benutzers",
             },
-            "vote_name": {"en-GB": "vote", "en-US": "vote", "fr": "voter"},
+            "vote_name": {
+                "en-GB": "vote",
+                "en-US": "vote",
+                "fr": "voter",
+                "de": "abstimmen",
+            },
             "vote_desc": {
                 "en-GB": "Vote for Jeanne on Top.gg",
                 "en-US": "Vote for Jeanne on Top.gg",
@@ -817,7 +837,12 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Créer canal texte",
                 "de": "Textkanal erstellen",
             },
-            "topic_parm_name": {"en-GB": "topic", "en-US": "topic", "fr": "sujet"},
+            "topic_parm_name": {
+                "en-GB": "topic",
+                "en-US": "topic",
+                "fr": "sujet",
+                "de": "thema",
+            },
             "topic_parm_desc": {
                 "en-GB": "What is the channel topic?",
                 "en-US": "What is the channel topic?",
@@ -1276,11 +1301,11 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "embed générer",
                 "de": "embed generieren",
             },
-            "embed edit_name": {
-                "en-GB": "embed edit",
-                "en-US": "embed edit",
-                "fr": "embed modifier",
-                "de": "embed bearbeiten",
+            "edit_name": {
+                "en-GB": "edit",
+                "en-US": "edit",
+                "fr": "modifier",
+                "de": "bearbeiten",
             },
             "weather_name": {
                 "en-GB": "weather",
@@ -1942,6 +1967,12 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "Fournissez une liste d'ID utilisateur séparés par des espaces",
                 "de": "Geben Sie eine Liste von Benutzer-IDs an, die durch Leerzeichen getrennt sind",
             },
+            "user_ids_param_name": {
+                "en-GB": "user_ids",
+                "en-US": "user_ids",
+                "fr": "ids_utilisateur",
+                "de": "benutzer_ids",
+            },
             "massban_reason_desc": {
                 "en-GB": "Reason for the ban",
                 "en-US": "Reason for the ban",
@@ -2259,6 +2290,24 @@ class MyTranslator(Jeanne.Translator):
                 "en-US": "reason",
                 "fr": "raison",
                 "de": "grund",
+            },
+            "kick_reason_parm_desc": {
+                "en-GB": "What did they do? You can also provide a custom reason",
+                "en-US": "What did they do? You can also provide a custom reason",
+                "fr": "Qu'a-t-il fait? Vous pouvez aussi donner une raison personnalisée",
+                "de": "Was haben sie getan? Sie können auch einen eigenen Grund angeben",
+            },
+            "warn_id_param_name": {
+                "en-GB": "warn_id",
+                "en-US": "warn_id",
+                "fr": "id_avertissement",
+                "de": "warn_id",
+            },
+            "warn_id_param_desc": {
+                "en-GB": "Which warning ID do you want to remove?",
+                "en-US": "Which warning ID do you want to remove?",
+                "fr": "Quel ID d'avertissement souhaitez-vous supprimer?",
+                "de": "Welche Warnungs-ID möchten Sie entfernen?",
             },
             "reminder_add_reason_parm_name": {
                 "en-GB": "reason",
@@ -2692,7 +2741,6 @@ class MyTranslator(Jeanne.Translator):
                 "fr": "rougir",
                 "de": "erröten",
             },
-            "_member_parm_desc"
             "blush_desc": {
                 "en-GB": "Make yourself blush",
                 "en-US": "Make yourself blush",

@@ -59,7 +59,7 @@ class Shop_Group(GroupCog, name="shop"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def backgrounds(self, ctx: Interaction):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             await en.Shop_Group(self.bot).backgrounds(ctx)
         elif ctx.locale.value == "fr":
             await fr.Shop_Group(self.bot).backgrounds(ctx)
@@ -68,7 +68,7 @@ class Shop_Group(GroupCog, name="shop"):
 
     @backgrounds.error
     async def backgrounds_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             await en.Shop_Group(self.bot).backgrounds_error(ctx, error)
         elif ctx.locale.value == "fr":
             await fr.Shop_Group(self.bot).backgrounds_error(ctx, error)
@@ -137,12 +137,12 @@ class Background_Group(GroupCog, name="background"):
     )
     @Jeanne.checks.cooldown(1, 60, key=lambda i: (i.user.id))
     @Jeanne.describe(name=T("name_parm_desc"), link=T("link_parm_desc"))
-    @Jeanne.rename(name="name_parm_name", link="link_parm_name")
+    @Jeanne.rename(name=T("name_parm_name"), link=T("link_parm_name"))
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def buycustom(self, ctx: Interaction, name: str, link: str):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             await en.Background_Group(self.bot).buycustom(ctx, name, link)
         elif ctx.locale.value == "fr":
             await fr.Background_Group(self.bot).buycustom(ctx, name, link)
@@ -151,7 +151,7 @@ class Background_Group(GroupCog, name="background"):
 
     @buycustom.error
     async def buycustom_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             await en.Background_Group(self.bot).buycustom_error(
                 ctx,
                 error,
@@ -201,7 +201,7 @@ class Background_Group(GroupCog, name="background"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def _list(self, ctx: Interaction):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             await en.Background_Group(self.bot).list(ctx)
         elif ctx.locale.value == "fr":
             await fr.Background_Group(self.bot).list(ctx)

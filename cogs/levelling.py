@@ -4,7 +4,6 @@ from discord import (
     Member,
     app_commands as Jeanne,
 )
-from config import TOPGG
 from functions import (
     Levelling,
     check_botbanned_app_command,
@@ -12,7 +11,6 @@ from functions import (
     is_suspended,
 )
 from typing import Optional
-from topgg import DBLClient
 import languages.en.levelling as en
 import languages.fr.levelling as fr
 import languages.de.levelling as de
@@ -27,7 +25,7 @@ class Rank_Group(GroupCog, name="rank"):
     async def send_leaderboard(
         self, ctx: Interaction, title: str, leaderboard: list, exp_index: int
     ):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             await en.Rank_Group(self.bot).send_leaderboard(
                 ctx, title, leaderboard, exp_index
             )
@@ -95,7 +93,6 @@ class Rank_Group(GroupCog, name="rank"):
 class levelling(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.topggpy = DBLClient(bot=self.bot, token=TOPGG)
         self.profile_context = Jeanne.ContextMenu(
             name="Profile", callback=self.profile_generate
         )
@@ -108,7 +105,7 @@ class levelling(Cog):
         )
 
     async def generate_profile_card(self, ctx: Interaction, member: Member):
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             await en.levelling(self.bot).generate_profile_card(ctx, member)
         elif ctx.locale.value == "fr":
             await fr.levelling(self.bot).generate_profile_card(ctx, member)
@@ -125,7 +122,7 @@ class levelling(Cog):
 
     async def profile_generate_error(self, ctx: Interaction, error: Exception) -> None:
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            if ctx.locale.value not in ("fr", "de"):
                 await en.levelling(self.bot).profile_error(ctx, error)
             elif ctx.locale.value == "fr":
                 await fr.levelling(self.bot).profile_error(ctx, error)
@@ -170,7 +167,7 @@ class levelling(Cog):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def profile(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             await en.levelling(self.bot).profile(ctx, member)
         elif ctx.locale.value == "fr":
             await fr.levelling(self.bot).profile(ctx, member)
@@ -180,7 +177,7 @@ class levelling(Cog):
     @profile.error
     async def profile_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+            if ctx.locale.value not in ("fr", "de"):
                 await en.levelling(self.bot).profile_error(ctx, error)
             elif ctx.locale.value == "fr":
                 await fr.levelling(self.bot).profile_error(ctx, error)

@@ -13,14 +13,12 @@ ensure_database_schema()
 
 class Jeanne(AutoShardedBot):
     async def setup_hook(self):
-        dirs = ["./events", "./cogs"]
-        for i in dirs:
-            for filename in listdir(i):
-                if filename.endswith(".py"):
-                    await self.load_extension(f"{i[2:]}.{filename[:-3]}")
-                    print(f"{i}.{filename} loaded")
-                else:
-                    print(f"Unable to load {i}.{filename[:-3]}")
+        for directory in ("events", "cogs"):
+            for filename in sorted(listdir(directory)):
+                if not filename.endswith(".py"):
+                    continue
+                await self.load_extension(f"{directory}.{filename[:-3]}")
+                print(f"./{directory}.{filename} loaded")
         self.translator = MyTranslator()
         await self.tree.set_translator(self.translator)
         await self.load_extension("jishaku")

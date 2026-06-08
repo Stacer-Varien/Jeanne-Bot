@@ -8,12 +8,11 @@ from discord import (
 )
 from discord.ext.commands import Cog, Bot, GroupCog
 from functions import (
+    Currency,
     check_botbanned_app_command,
     check_disabled_app_command,
     is_suspended,
 )
-from config import TOPGG
-from topgg import DBLClient
 import languages.en.currency as en
 import languages.fr.currency as fr
 import languages.de.currency as de
@@ -36,7 +35,6 @@ class vote_button(ui.View):
 class Guess_Group(GroupCog, group_name=T("guess_group_name")):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
-        self.topggpy = DBLClient(bot=self.bot, token=TOPGG)
         super().__init__()
 
     @Jeanne.command(
@@ -154,7 +152,6 @@ class Guess_Group(GroupCog, group_name=T("guess_group_name")):
 class Dice_Group(GroupCog, group_name=T("dice_group_name")):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
-        self.topggpy = DBLClient(bot=self.bot, token=TOPGG)
         super().__init__()
 
     @Jeanne.command(
@@ -273,7 +270,6 @@ class Flip_Group(GroupCog, group_name=T("flip_group_name")):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()
-        self.topggpy = DBLClient(bot=self.bot, token=TOPGG)
 
     @Jeanne.command(
         name=T("free_name"),
@@ -411,7 +407,7 @@ class Blackjack_Group(GroupCog, group_name=T("blackjack_group_name")):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def free(self, ctx: Interaction):
-        if ctx.locale.value == "en-US" or ctx.locale.value == "en-GB":
+        if ctx.locale.value not in ("fr", "de"):
             await en.Blackjack_Group(self.bot).free(ctx)
             return
         if ctx.locale.value == "fr":
@@ -614,7 +610,7 @@ class currency(Cog, name="CurrencySlash"):
         self, ctx: Interaction, error: Jeanne.errors.AppCommandError
     ):
         if isinstance(error, Jeanne.errors.CommandOnCooldown):
-            if ctx.locale.value == "en-US" or ctx.locale.value == "en-GB":
+            if ctx.locale.value not in ("fr", "de"):
                 await en.currency(self.bot).balance_error(ctx, error)
                 return
             if ctx.locale.value == "fr":
@@ -740,6 +736,32 @@ class currency(Cog, name="CurrencySlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def spin(self, ctx: Interaction, bet: int):
+        if bet <= 0:
+            messages = {
+                "fr": "Votre pari doit être supérieur à 0.",
+                "de": "Dein Einsatz muss größer als 0 sein.",
+            }
+            await ctx.response.send_message(
+                messages.get(ctx.locale.value, "Your bet must be greater than 0."),
+                ephemeral=True,
+            )
+            return
+
+        required_balance = bet * 2
+        if Currency(ctx.user).get_balance < required_balance:
+            messages = {
+                "fr": f"Vous avez besoin d'au moins {required_balance} QP pour couvrir la perte maximale.",
+                "de": f"Du brauchst mindestens {required_balance} QP, um den maximalen Verlust abzudecken.",
+            }
+            await ctx.response.send_message(
+                messages.get(
+                    ctx.locale.value,
+                    f"You need at least {required_balance} QP to cover the maximum loss.",
+                ),
+                ephemeral=True,
+            )
+            return
+
         if ctx.locale.value == "fr":
             await fr.currency(self.bot).spin(ctx, bet)
             return
@@ -748,6 +770,18 @@ class currency(Cog, name="CurrencySlash"):
             return
         else:
             await en.currency(self.bot).spin(ctx, bet)
+
+    @spin.error
+    async def spin_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
+        if not isinstance(error, Jeanne.CommandOnCooldown):
+            return
+        if ctx.locale.value == "fr":
+            await fr.currency(self.bot).spin_error(ctx, error)
+            return
+        if ctx.locale.value == "de":
+            await de.currency(self.bot).spin_error(ctx, error)
+            return
+        await en.currency(self.bot).spin_error(ctx, error)
 
 
 

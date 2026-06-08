@@ -19,8 +19,6 @@ from functions import (
     BetaTest,
     Currency,
 )
-from config import TOPGG
-from topgg import DBLClient
 
 
 class vote_button(ui.View):
@@ -39,7 +37,6 @@ class vote_button(ui.View):
 class Guess_Group:
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
-        self.topggpy = DBLClient(bot=self.bot, token=TOPGG)
 
     async def free(self, ctx: Interaction):
         view = Guess_Buttons(ctx.user)
@@ -146,7 +143,6 @@ class Guess_Group:
 class Dice_Group:
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
-        self.topggpy = DBLClient(bot=self.bot, token=TOPGG)
 
     async def free(self, ctx: Interaction):
         await ctx.response.defer()
@@ -245,7 +241,6 @@ class Flip_Group:
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
         super().__init__()
-        self.topggpy = DBLClient(bot=self.bot, token=TOPGG)
 
     async def free(self, ctx: Interaction):
         await ctx.response.defer()
@@ -623,7 +618,7 @@ class currency:
         await ctx.response.send_message(embed=cooldown)
     
     async def spin(self, ctx: Interaction, bet: int):
-        wheel=Wheel(self.bot)
+        wheel = Wheel()
         negatives = [round(random.uniform(-2.0, -0.5), 1) for _ in range(5)]
         small_positives = [round(random.uniform(0.1, 0.5), 1) for _ in range(2)]
         big_positive = [round(random.uniform(1.5, 2.0), 1)]

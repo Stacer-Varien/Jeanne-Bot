@@ -39,7 +39,7 @@ class Confirmation(ui.View):
         self.author = author
         self.value = None
 
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             label_confirm = "Confirm"
             label_cancel = "Cancel"
         elif ctx.locale.value == "fr":
@@ -84,7 +84,7 @@ class Heads_or_Tails(ui.View):
         super().__init__(timeout=30)
         self.value = None
 
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             self.heads = "Heads"
             self.tails = "Tails"
         elif ctx.locale.value == "fr":
@@ -115,7 +115,7 @@ class Welcomingmsg(ui.Modal, title="Welcoming Message"):
     def __init__(self, ctx: Interaction) -> None:
         super().__init__()
 
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             self.jsonscript = ui.TextInput(
                 label="JSON",
                 style=TextStyle.paragraph,
@@ -164,7 +164,7 @@ class Welcomingmsg(ui.Modal, title="Welcoming Message"):
             embed = Embed.from_dict(json["embeds"][0])
         except Exception:
             content = replace_all(self.jsonscript.value, parameters)
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             confirm = Embed(
                 description="This is the preview of the welcoming message.\nAre you happy with it?"
             )
@@ -275,7 +275,7 @@ class Leavingmsg(ui.Modal, title="Leaving Message"):
     def __init__(self, ctx: Interaction) -> None:
         super().__init__()
 
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             self.jsonscript = ui.TextInput(
                 label="JSON",
                 style=TextStyle.paragraph,
@@ -324,7 +324,7 @@ class Leavingmsg(ui.Modal, title="Leaving Message"):
             embed = Embed.from_dict(json["embeds"][0])
         except Exception:
             content = replace_all(self.jsonscript.value, parameters)
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             confirm = Embed(
                 description="This is the preview of the leaving message.\nAre you happy with it?"
             )
@@ -436,7 +436,7 @@ class Levelmsg(ui.Modal, title="Level Update Message"):
         super().__init__()
         self.channel = channel
 
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             self.jsonscript = ui.TextInput(
                 label="JSON",
                 style=TextStyle.paragraph,
@@ -483,7 +483,7 @@ class Levelmsg(ui.Modal, title="Level Update Message"):
             embed = Embed.from_dict(json["embeds"][0])
         except Exception:
             content = replace_all(self.jsonscript.value, parameters)
-        if ctx.locale.value == "en-US" or ctx.locale.value == "en-GB":
+        if ctx.locale.value not in ("fr", "de"):
             confirm = Embed(
                 description="This is the preview of the level update message whenever someone levels up in the server and will be sent to {}.\nAre you happy with it?".format(
                     self.channel.mention
@@ -604,7 +604,7 @@ class RankUpmsg(ui.Modal, title="Role Reward Message"):
     def __init__(self, ctx: Interaction) -> None:
         super().__init__()
 
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             self.jsonscript = ui.TextInput(
                 label="JSON",
                 style=TextStyle.paragraph,
@@ -652,7 +652,7 @@ class RankUpmsg(ui.Modal, title="Role Reward Message"):
             embed = Embed.from_dict(json["embeds"][0])
         except Exception:
             content = replace_all(self.jsonscript.value, parameters)
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             confirm = Embed(
                 description="This is the preview of the role reward message whenever someone recieves a role reward after levelling up in the server and will be sent to the current level update channel\nAre you happy with it?"
             )
@@ -766,9 +766,7 @@ class RankUpmsg(ui.Modal, title="Role Reward Message"):
 
 
 class ModuleMenu(ui.Select):
-    def __init__(
-        self, ctx: Interaction, user: User, reason: str, duration: int
-    ) -> None:
+    def __init__(self, user: User, reason: str, duration: int) -> None:
         self.modules = [
             "cogs.utilities",
             "cogs.fun",
@@ -814,7 +812,7 @@ class ModuleSelect(ui.View):
 
 class BotReportMenu(ui.Select):
     def __init__(self, ctx: Interaction) -> None:
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             options = [
                 SelectOption(label="ToS Violator", value="violator"),
                 SelectOption(label="Exploit", value="exploit"),
@@ -853,8 +851,11 @@ class BotReportMenu(ui.Select):
         )
 
     async def callback(self, ctx: Interaction):
-
-        await ctx.response.send_modal(ReportModal(self.options[0].label))
+        selected_value = self.values[0]
+        selected_label = next(
+            option.label for option in self.options if option.value == selected_value
+        )
+        await ctx.response.send_modal(ReportModal(ctx, selected_value, selected_label))
         try:
             await ctx.message.delete()
         except Exception:
@@ -869,12 +870,25 @@ class BotReportSelect(ui.View):
 
 
 class ReportModal(ui.Modal, title="Bot Report"):
-    def __init__(self, ctx: Interaction, type_of_report: str):
-        self.type = type_of_report
+    def __init__(
+        self, ctx: Interaction, type_of_report: str, report_title: str | None = None
+    ):
+        translation_error_labels = {
+            "translation_error",
+            "translation error",
+            "erreur de traduction",
+            "übersetzungsfehler",
+        }
+        self.type = (
+            "translation_error"
+            if type_of_report.casefold() in translation_error_labels
+            else type_of_report
+        )
+        self.report_title = report_title or type_of_report
         super().__init__()
 
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
-            if self.type == "Translation Error":
+        if ctx.locale.value not in ("fr", "de"):
+            if self.type == "translation_error":
                 self.lang = ui.TextInput(
                     label="Language",
                     required=True,
@@ -917,7 +931,7 @@ class ReportModal(ui.Modal, title="Bot Report"):
                     style=TextStyle.paragraph,
                 )
         elif ctx.locale.value == "fr":
-            if self.type == "Translation Error":
+            if self.type == "translation_error":
                 self.lang = ui.TextInput(
                     label="Langue",
                     required=True,
@@ -960,28 +974,55 @@ class ReportModal(ui.Modal, title="Bot Report"):
                     style=TextStyle.paragraph,
                 )
         elif ctx.locale.value == "de":
-            self.report = ui.TextInput(
-                label="Problem",
-                placeholder="Beschreiben Sie das Problem hier",
-                required=True,
-                min_length=10,
-                max_length=2000,
-                style=TextStyle.paragraph,
-            )
-            self.steps = ui.TextInput(
-                label="Schritte zur Reproduktion des Problems",
-                placeholder="Geben Sie die Schritte hier ein",
-                required=False,
-                min_length=10,
-                max_length=1024,
-                style=TextStyle.paragraph,
-            )
-        self.add_item(self.report)
-        self.add_item(self.steps)
+            if self.type == "translation_error":
+                self.lang = ui.TextInput(
+                    label="Sprache",
+                    required=True,
+                    min_length=2,
+                    max_length=2000,
+                    placeholder="Sprache eingeben",
+                )
+                self.incorrect = ui.TextInput(
+                    label="Falsche Übersetzung",
+                    required=True,
+                    min_length=2,
+                    max_length=2000,
+                    placeholder="Falsche Übersetzung eingeben",
+                )
+                self.correct = ui.TextInput(
+                    label="Korrekte Übersetzung",
+                    required=True,
+                    min_length=2,
+                    max_length=2000,
+                    placeholder="Korrekte Übersetzung eingeben",
+                )
+                self.add_item(self.lang)
+                self.add_item(self.incorrect)
+                self.add_item(self.correct)
+            else:
+                self.report = ui.TextInput(
+                    label="Problem",
+                    placeholder="Beschreiben Sie das Problem hier",
+                    required=True,
+                    min_length=10,
+                    max_length=2000,
+                    style=TextStyle.paragraph,
+                )
+                self.steps = ui.TextInput(
+                    label="Schritte zur Reproduktion des Problems",
+                    placeholder="Geben Sie die Schritte hier ein",
+                    required=False,
+                    min_length=10,
+                    max_length=1024,
+                    style=TextStyle.paragraph,
+                )
+        if self.type != "translation_error":
+            self.add_item(self.report)
+            self.add_item(self.steps)
 
     async def on_submit(self, ctx: Interaction) -> None:
-        if self.type == "Translation Error":
-            report = Embed(title=self.type, color=Color.brand_red())
+        if self.type == "translation_error":
+            report = Embed(title=self.report_title, color=Color.brand_red())
             report.add_field(name="Language", value=self.lang.value, inline=False)
             report.add_field(
                 name="Incorrect Translation", value=self.incorrect.value, inline=False
@@ -990,13 +1031,13 @@ class ReportModal(ui.Modal, title="Bot Report"):
                 name="Correct Translation", value=self.correct.value, inline=False
             )
         else:
-            report = Embed(title=self.type, color=Color.brand_red())
+            report = Embed(title=self.report_title, color=Color.brand_red())
             report.description = self.report.value
-            if self.steps.value is not None or self.steps.value == "":
+            if self.steps.value:
                 report.add_field(name="Steps", value=self.steps.value, inline=False)
         report.set_footer(text="Reporter {}| `{}`".format(ctx.user, ctx.user.id))
         SyncWebhook.from_url(WEBHOOK).send(embed=report)
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             embed = Embed(
                 description="Thank you for submitting your bot report. The developer will look into it but will not tell you the results.\n\nPlease know that your user ID has been logged if you are trolling around."
             )
@@ -1023,7 +1064,7 @@ class ForumGuildlines(ui.Modal, title=str):
         self.category = category
         super().__init__(title=self.title)
 
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             self.guidelines = ui.TextInput(
                 label="Guidelines",
                 placeholder="Type here. Markdown supported",
@@ -1048,7 +1089,7 @@ class ForumGuildlines(ui.Modal, title=str):
         forum = await ctx.guild.create_forum(
             name=self.name, topic=self.guidelines.value
         )
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             embed.description = "{} has been created".format(forum.jump_url)
             embed.color = Color.random()
             if self.category:
@@ -1086,7 +1127,7 @@ class ReportContentM(ui.Modal, title="Illicit Content Report"):
         self.link = link
         super().__init__()
 
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             self.illegalcontent = ui.TextInput(
                 label="Reason",
                 style=TextStyle.short,
@@ -1122,7 +1163,7 @@ class ReportContentM(ui.Modal, title="Illicit Content Report"):
         report.add_field(name="Reason", value=self.illegalcontent.value, inline=False)
         report.set_footer(text=f"Reporter: {ctx.user} | ID: `{ctx.user.id}`")
         SyncWebhook.from_url(WEBHOOK).send(embed=report)
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             embed = Embed(
                 description="Thank you for submitting the report. Your user ID has been logged for accountability."
             )
@@ -1150,7 +1191,7 @@ class ReportContentPlus(ui.View):
         super().__init__(timeout=60)
         self.links = [link1, link2, link3, link4]
         self.value = None
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             labels = [
                 "Report 1st Content",
                 "Report 2nd Content",
@@ -1171,7 +1212,7 @@ class ReportContentPlus(ui.View):
                 "Inhalt 3 melden",
                 "Inhalt 4 melden",
             ]
-        for idx, (label, link) in enumerate(zip(labels, self.links)):
+        for idx, (label, link) in enumerate(zip(labels, self.links, strict=False)):
             if link:
                 row = 1 if idx < 2 else 2
                 button = ui.Button(label=label, style=ButtonStyle.grey, row=row)
@@ -1197,7 +1238,7 @@ class ReportContent(ui.View):
         self.link = link
         self.value = None
 
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             label = "Report Content"
         elif ctx.locale.value == "fr":
             label = "Signaler le contenu"
@@ -1223,7 +1264,7 @@ class RemoveManage(ui.View):
         self.value = None
         self.author = author
 
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             labels = [
                 "Welcoming Channel",
                 "Greeting Message",
@@ -1313,7 +1354,7 @@ class RemoveManage(ui.View):
         self.value = "welcomer"
         Embed()
         check = Welcomer(ctx.guild).get_welcomer
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             if check is None:
                 button.label = "No welcoming channel found"
                 button.style = ButtonStyle.danger
@@ -1347,7 +1388,7 @@ class RemoveManage(ui.View):
     async def welcomemsg(self, ctx: Interaction, button: ui.Button):
         self.value = "welcomemsg"
         check = Welcomer(ctx.guild).get_welcoming_msg
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             if check is None:
                 button.style = ButtonStyle.danger
                 button.label = "No welcoming message set"
@@ -1381,7 +1422,7 @@ class RemoveManage(ui.View):
     async def leaving(self, ctx: Interaction, button: ui.Button):
         self.value = "leaver"
         check = Welcomer(ctx.guild).get_leaver
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             if check is None:
                 button.style = ButtonStyle.danger
                 button.label = "No leaving channel found"
@@ -1415,7 +1456,7 @@ class RemoveManage(ui.View):
     async def leavingmsg(self, ctx: Interaction, button: ui.Button):
         self.value = "leavingmsg"
         check = Welcomer(ctx.guild).get_leaving_msg
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             if check is None:
                 button.style = ButtonStyle.danger
                 button.label = "No leaving message set"
@@ -1449,7 +1490,7 @@ class RemoveManage(ui.View):
     async def level(self, ctx: Interaction, button: ui.Button):
         self.value = "levelup"
         check = Levelling(server=ctx.guild).get_levelup_channel
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             if check is None:
                 button.style = ButtonStyle.danger
                 button.label = "No level update channel found"
@@ -1483,7 +1524,7 @@ class RemoveManage(ui.View):
     async def levelupdate(self, ctx: Interaction, button: ui.Button):
         self.value = "levelnotif"
         check = Levelling(server=ctx.guild).get_levelup_msg
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             if check is None:
                 button.style = ButtonStyle.danger
                 button.label = "No level update message set"
@@ -1517,7 +1558,7 @@ class RemoveManage(ui.View):
     async def rolereward(self, ctx: Interaction, button: ui.Button):
         self.value = "rolereward"
         check = Levelling(server=ctx.guild).get_rank_up_update
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             if check is None:
                 button.style = ButtonStyle.danger
                 button.label = "No role reward message set"
@@ -1551,7 +1592,7 @@ class RemoveManage(ui.View):
     async def modlog(self, ctx: Interaction, button: ui.Button):
         self.value = "modlog"
         check = Moderation(ctx.guild).get_modlog_channel
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             if check is None:
                 button.style = ButtonStyle.danger
                 button.label = "No modlog found"
@@ -1594,7 +1635,7 @@ class RolesButton(ui.View):
         self.Roles = Roles
         self.Uinfo = Uinfo
 
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             label = "Roles"
         elif ctx.locale.value == "fr":
             label = "Rôles"
@@ -1665,7 +1706,7 @@ class Dice_Buttons(ui.View):
 
 async def buy_function_context(bot: Bot, ctx: Context, name: str, message: Message):
     image_url = Inventory().get_wallpaper(name)[2]
-    if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+    if ctx.locale.value not in ("fr", "de"):
         m = await message.edit(
             embed=Embed(
                 description="Creating preview... This will take some time <a:loading:1161038734620373062>"
@@ -1684,7 +1725,7 @@ async def buy_function_context(bot: Bot, ctx: Context, name: str, message: Messa
             .add_field(name="Cost", value="1000 <:quantumpiece:1161010445205905418>")
             .set_footer(text="Is this the background you wanted?")
         )
-        view = Confirmation(ctx.author)
+        view = Confirmation(ctx, ctx.author)
         m = await m.edit(attachments=[file], embed=preview, view=view)
         await view.wait()
 
@@ -1716,7 +1757,7 @@ async def buy_function_context(bot: Bot, ctx: Context, name: str, message: Messa
             .add_field(name="Coût", value="1000 <:quantumpiece:1161010445205905418>")
             .set_footer(text="Est-ce le fond que vous vouliez?")
         )
-        view = Confirmation(ctx.author)
+        view = Confirmation(ctx, ctx.author)
         m = await m.edit(attachments=[file], embed=preview, view=view)
         await view.wait()
 
@@ -1748,7 +1789,7 @@ async def buy_function_context(bot: Bot, ctx: Context, name: str, message: Messa
             .add_field(name="Kosten", value="1000 <:quantumpiece:1161010445205905418>")
             .set_footer(text="Ist das der Hintergrund, den Sie wollten?")
         )
-        view = Confirmation(ctx.author)
+        view = Confirmation(ctx, ctx.author)
         m = await m.edit(attachments=[file], embed=preview, view=view)
         await view.wait()
 
@@ -1765,7 +1806,7 @@ async def buy_function_context(bot: Bot, ctx: Context, name: str, message: Messa
 
 async def use_function_context(ctx: Context, name: str, message: Message):
     await Inventory(ctx.author).use_wallpaper(name)
-    if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+    if ctx.locale.value not in ("fr", "de"):
         description = f"{name} has been selected"
     elif ctx.locale.value == "fr":
         description = f"{name} a été sélectionné"
@@ -1777,7 +1818,7 @@ async def use_function_context(ctx: Context, name: str, message: Message):
 
 async def buy_function_app(bot: Bot, ctx: Interaction, name: str):
     image_url = Inventory().get_wallpaper(name)[2]
-    if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+    if ctx.locale.value not in ("fr", "de"):
         await ctx.edit_original_response(
             "Creating preview... This will take some time <a:loading:1161038734620373062>"
         )
@@ -1859,7 +1900,7 @@ async def buy_function_app(bot: Bot, ctx: Interaction, name: str):
 
 async def use_function_app(ctx: Interaction, name: str):
     await Inventory(ctx.user).use_wallpaper(name)
-    if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+    if ctx.locale.value not in ("fr", "de"):
         embed = Embed(description=f"{name} has been selected", color=Color.random())
         await ctx.edit_original_response(embed=embed, view=None)
     elif ctx.locale.value == "fr":
@@ -1880,7 +1921,7 @@ class TopicButton(ui.View):
         self.category = category
         super().__init__(timeout=180)
 
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             label = "Add Guidelines"
         elif ctx.locale.value == "fr":
             label = "Ajouter des directives"
@@ -1910,7 +1951,7 @@ class WelcomerSetButtons(ui.View):
         self.message = message
         super().__init__(timeout=180)
 
-        if ctx.locale.value == "en-GB" or ctx.locale.value == "en-US":
+        if ctx.locale.value not in ("fr", "de"):
             set_welcome_msg_label = "Set Welcoming Message"
             set_leaving_msg_label = "Set Leaving Message"
         elif ctx.locale.value == "fr":
@@ -1965,7 +2006,9 @@ class Country_Badge_Buttons(ui.View):
         badges = [i for i in files if i.endswith((".png"))]
         server = self.bot.get_guild(913051824095916142)
         for i in badges:
-            emoji = utils.find(lambda m: m.name == i[:-4], server.emojis)
+            emoji = utils.get(server.emojis, name=i[:-4])
+            if emoji is None:
+                continue
             button = ui.Button(label=emoji.name, style=ButtonStyle.green, emoji=emoji)
             button.callback = partial(self.button_callback, cbadge=emoji.name)
             self.add_item(button)
