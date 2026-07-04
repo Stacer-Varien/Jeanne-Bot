@@ -7,6 +7,7 @@ import pandas as pd
 import languages.en.error as en
 import languages.fr.error as fr
 import languages.de.error as de
+from functions import get_command_locale
 
 
 class ErrorsCog(Cog, name="ErrorsSlash"):
@@ -65,24 +66,24 @@ class ErrorsCog(Cog, name="ErrorsSlash"):
             return
 
         if isinstance(error, Jeanne.MissingPermissions):
-            if ctx.locale.value not in ("fr", "de"):
+            if get_command_locale(ctx) not in ("fr", "de"):
                 await en.Errors.handle_missing_permissions(self, ctx, error)
                 return
-            if ctx.locale.value == "fr":
+            if get_command_locale(ctx) == "fr":
                 await fr.Errors.handle_missing_permissions(self, ctx, error)
                 return
-            if ctx.locale.value == "de":
+            if get_command_locale(ctx) == "de":
                 await de.Errors.handle_missing_permissions(self, ctx, error)
                 return
             return
         if isinstance(error, Jeanne.BotMissingPermissions):
-            if ctx.locale.value not in ("fr", "de"):
+            if get_command_locale(ctx) not in ("fr", "de"):
                 await en.Errors.handle_bot_missing_permissions(self, ctx, error)
                 return
-            if ctx.locale.value == "fr":
+            if get_command_locale(ctx) == "fr":
                 await fr.Errors.handle_bot_missing_permissions(self, ctx, error)
                 return
-            if ctx.locale.value == "de":
+            if get_command_locale(ctx) == "de":
                 await de.Errors.handle_bot_missing_permissions(self, ctx, error)
                 return
             return
@@ -106,7 +107,7 @@ class ErrorsCog(Cog, name="ErrorsSlash"):
             }
             embed = Embed(
                 description=messages.get(
-                    ctx.locale.value,
+                    get_command_locale(ctx),
                     f"This command is on cooldown. Try again in `{retry_after}` seconds.",
                 ),
                 color=Color.red(),
