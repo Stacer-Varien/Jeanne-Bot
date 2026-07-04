@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from enum import Enum
 from random import choice, randint
+import json
 import aiohttp
 from humanfriendly import parse_timespan
 from discord import (
@@ -123,7 +125,11 @@ TABLE_BOOTSTRAP_STATEMENTS = (
         welcoming_message TEXT,
         leaving_message TEXT,
         rankup_message TEXT,
-        confess_channel INTEGER
+        confess_channel INTEGER,
+        language_override TEXT DEFAULT 'auto',
+        currency_name TEXT DEFAULT 'QP',
+        currency_emoji TEXT DEFAULT '<:quantumpiece:1161010445205905418>',
+        disabled_modules TEXT DEFAULT ''
     )
     """,
     """
@@ -143,6 +149,21 @@ TABLE_BOOTSTRAP_STATEMENTS = (
         guild_id INTEGER,
         ends INTEGER,
         PRIMARY KEY (user_id, guild_id)
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS modCaseData (
+        guild_id INTEGER,
+        case_id INTEGER,
+        action TEXT,
+        target_id INTEGER,
+        moderator_id INTEGER,
+        reason TEXT,
+        date INTEGER,
+        duration TEXT,
+        status TEXT,
+        related_warn_id INTEGER,
+        PRIMARY KEY (guild_id, case_id)
     )
     """,
     """
@@ -216,6 +237,10 @@ COLUMN_BOOTSTRAP_STATEMENTS = {
     "serverData": {
         "rankup_message": "TEXT",
         "confess_channel": "INTEGER",
+        "language_override": "TEXT DEFAULT 'auto'",
+        "currency_name": "TEXT DEFAULT 'QP'",
+        "currency_emoji": "TEXT DEFAULT '<:quantumpiece:1161010445205905418>'",
+        "disabled_modules": "TEXT DEFAULT ''",
     },
     "userBio": {
         "color": "TEXT",
@@ -241,7 +266,325 @@ def ensure_database_schema() -> None:
                     f"ALTER TABLE {table_name} ADD COLUMN {column_name} {definition}"
                 )
 
+    db.execute(
+        "UPDATE bankData SET amount = CAST(ROUND(COALESCE(amount, 0)) AS INTEGER)"
+    )
     db.commit()
+
+
+SUPPORTED_SERVER_LOCALES = {"en", "fr", "de"}
+DEFAULT_CURRENCY_NAME = "QP"
+DEFAULT_CURRENCY_EMOJI = "<:quantumpiece:1161010445205905418>"
+
+
+class ServerSettings:
+    MODULES = {
+        "currency": "Currency",
+        "fun": "Fun",
+        "hentai": "NSFW",
+        "image": "Images",
+        "info": "Info",
+        "inventory": "Inventory",
+        "levelling": "Levelling",
+        "manage": "Management",
+        "moderation": "Moderation",
+        "reactions": "Reactions",
+        "utilities": "Utilities",
+    }
+    MODULE_COMMAND_ROOTS = {
+        "currency": {
+            "balance",
+            "blackjack",
+            "daily",
+            "dice",
+            "flip",
+            "guess",
+            "slots",
+            "spin",
+            "vote",
+        },
+        "fun": {
+            "8ball",
+            "animeme",
+            "avatar",
+            "combine",
+            "hack",
+            "rate",
+            "reverse",
+            "ship",
+            "wanted",
+        },
+        "hentai": {
+            "danbooru",
+            "gelbooru",
+            "hentai",
+            "konachan",
+            "rule34",
+            "yandere",
+        },
+        "image": {"image"},
+        "info": {"about", "botinfo", "serverinfo", "userinfo"},
+        "inventory": {"background", "bio", "profile", "shop"},
+        "levelling": {"rank", "xp"},
+        "manage": {
+            "clone",
+            "command",
+            "create",
+            "delete",
+            "edit",
+            "level",
+            "manage",
+            "rename",
+            "set",
+        },
+        "moderation": {
+            "ban",
+            "change-nickname",
+            "clear-warn",
+            "kick",
+            "list-warns",
+            "massban",
+            "massunban",
+            "prune",
+            "timeout",
+            "timeout-remove",
+            "unban",
+            "warn",
+        },
+        "reactions": {
+            "bite",
+            "blush",
+            "cry",
+            "cuddle",
+            "dance",
+            "hug",
+            "kill",
+            "kiss",
+            "lick",
+            "pat",
+            "poke",
+            "slap",
+            "smug",
+        },
+        "utilities": {
+            "calculate",
+            "confession",
+            "define",
+            "embed",
+            "reminder",
+            "say",
+            "search",
+            "weather",
+        },
+    }
+
+    def __init__(self, server: Guild | int) -> None:
+        self.server_id = server.id if hasattr(server, "id") else int(server)
+
+    def _ensure_row(self) -> None:
+        db.execute(
+            """
+            INSERT OR IGNORE INTO serverData
+                (server, language_override, currency_name, currency_emoji, disabled_modules)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (
+                self.server_id,
+                "auto",
+                DEFAULT_CURRENCY_NAME,
+                DEFAULT_CURRENCY_EMOJI,
+                "",
+            ),
+        )
+        db.commit()
+
+    @property
+    def row(self) -> dict:
+        self._ensure_row()
+        data = db.execute(
+            """
+            SELECT
+                leaving_channel,
+                welcoming_channel,
+                levelup_channel,
+                levelup_message,
+                modlog,
+                welcoming_message,
+                leaving_message,
+                rankup_message,
+                confess_channel,
+                language_override,
+                currency_name,
+                currency_emoji,
+                disabled_modules
+            FROM serverData
+            WHERE server = ?
+            """,
+            (self.server_id,),
+        ).fetchone()
+        keys = (
+            "leaving_channel",
+            "welcoming_channel",
+            "levelup_channel",
+            "levelup_message",
+            "modlog",
+            "welcoming_message",
+            "leaving_message",
+            "rankup_message",
+            "confess_channel",
+            "language_override",
+            "currency_name",
+            "currency_emoji",
+            "disabled_modules",
+        )
+        return dict(zip(keys, data, strict=False))
+
+    @property
+    def language_override(self) -> str:
+        value = self.row.get("language_override") or "auto"
+        return value if value in (*SUPPORTED_SERVER_LOCALES, "auto") else "auto"
+
+    async def set_language_override(self, language: str) -> None:
+        if language not in (*SUPPORTED_SERVER_LOCALES, "auto"):
+            raise ValueError("Unsupported language override")
+        self._ensure_row()
+        db.execute(
+            "UPDATE serverData SET language_override = ? WHERE server = ?",
+            (language, self.server_id),
+        )
+        db.commit()
+
+    @property
+    def currency_name(self) -> str:
+        return str(self.row.get("currency_name") or DEFAULT_CURRENCY_NAME)
+
+    @property
+    def currency_emoji(self) -> str:
+        return str(self.row.get("currency_emoji") or DEFAULT_CURRENCY_EMOJI)
+
+    async def set_currency_display(
+        self, name: str | None = None, emoji: str | None = None
+    ) -> None:
+        name = (name or DEFAULT_CURRENCY_NAME).strip()[:32] or DEFAULT_CURRENCY_NAME
+        emoji = (emoji or "").strip()[:80]
+        self._ensure_row()
+        db.execute(
+            "UPDATE serverData SET currency_name = ?, currency_emoji = ? WHERE server = ?",
+            (name, emoji, self.server_id),
+        )
+        db.commit()
+
+    def format_currency(self, amount: int | float | Decimal) -> str:
+        amount = Currency.normalize_qp(amount)
+        name = self.currency_name
+        emoji = self.currency_emoji
+        if emoji and name and name != DEFAULT_CURRENCY_NAME:
+            return f"{amount} {emoji} {name}"
+        if emoji:
+            return f"{amount} {emoji}"
+        return f"{amount} {name}"
+
+    @staticmethod
+    def format_currency_for(server: Guild | int | None, amount: int | float | Decimal) -> str:
+        if server is None:
+            amount = Currency.normalize_qp(amount)
+            return f"{amount} {DEFAULT_CURRENCY_EMOJI}"
+        return ServerSettings(server).format_currency(amount)
+
+    @property
+    def disabled_modules(self) -> list[str]:
+        raw_value = self.row.get("disabled_modules") or ""
+        try:
+            modules = json.loads(raw_value)
+        except (TypeError, json.JSONDecodeError):
+            modules = [item for item in str(raw_value).split(",") if item]
+        return [module for module in modules if module in self.MODULES]
+
+    async def set_module_enabled(self, module: str, enabled: bool) -> None:
+        if module not in self.MODULES:
+            raise ValueError("Unsupported module")
+        modules = set(self.disabled_modules)
+        if enabled:
+            modules.discard(module)
+        else:
+            modules.add(module)
+        self._ensure_row()
+        db.execute(
+            "UPDATE serverData SET disabled_modules = ? WHERE server = ?",
+            (json.dumps(sorted(modules)), self.server_id),
+        )
+        db.commit()
+
+    def is_module_disabled(self, module: str) -> bool:
+        return module in self.disabled_modules
+
+    @classmethod
+    def command_module(cls, command) -> str | None:
+        if command is None:
+            return None
+        callback = getattr(command, "callback", None)
+        module_name = getattr(callback, "__module__", "")
+        if module_name.startswith("cogs."):
+            module_name = module_name.split(".")[-1]
+            if module_name in cls.MODULES:
+                return module_name
+
+        qualified_name = getattr(command, "qualified_name", "")
+        root = qualified_name.split()[0] if qualified_name else ""
+        for module, roots in cls.MODULE_COMMAND_ROOTS.items():
+            if root in roots:
+                return module
+        return None
+
+    def setup_status(self, server: Guild | None = None) -> dict:
+        data = self.row
+
+        def channel_state(key: str) -> dict:
+            channel_id = data.get(key)
+            channel = server.get_channel(channel_id) if server and channel_id else None
+            return {
+                "configured": channel_id is not None,
+                "channel_id": channel_id,
+                "channel": channel,
+                "missing": channel_id is not None and channel is None,
+            }
+
+        return {
+            "welcome": channel_state("welcoming_channel"),
+            "leave": channel_state("leaving_channel"),
+            "modlog": channel_state("modlog"),
+            "level": channel_state("levelup_channel"),
+            "confession": channel_state("confess_channel"),
+            "language_override": self.language_override,
+            "currency_name": self.currency_name,
+            "currency_emoji": self.currency_emoji,
+            "disabled_modules": self.disabled_modules,
+        }
+
+
+def _coerce_locale(value: object) -> str:
+    locale = getattr(value, "value", value)
+    locale = str(locale or "en")
+    if locale == "fr":
+        return "fr"
+    if locale == "de":
+        return "de"
+    return "en"
+
+
+def get_guild_locale(server: Guild | None) -> str:
+    if server is None:
+        return "en"
+    override = ServerSettings(server).language_override
+    if override in SUPPORTED_SERVER_LOCALES:
+        return override
+    return _coerce_locale(getattr(server, "preferred_locale", "en"))
+
+
+def get_command_locale(ctx: Interaction) -> str:
+    if getattr(ctx, "guild", None) is not None:
+        return get_guild_locale(ctx.guild)
+    return _coerce_locale(getattr(ctx, "locale", "en"))
 
 
 class DevPunishment:
@@ -434,44 +777,118 @@ class Currency:
     def __init__(self, user: User):
         self.user = user
 
+    @staticmethod
+    def _qp_decimal(amount: int | float | str | Decimal) -> Decimal:
+        try:
+            value = Decimal(str(amount))
+        except (InvalidOperation, TypeError, ValueError) as exc:
+            raise ValueError("QP amount must be a valid number") from exc
+        if not value.is_finite():
+            raise ValueError("QP amount must be a valid number")
+        return value
+
+    @staticmethod
+    def normalize_qp(amount: int | float | str | Decimal) -> int:
+        value = Currency._qp_decimal(amount)
+        return int(value.quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+
+    @staticmethod
+    def is_negative_qp(amount: int | float | str | Decimal) -> bool:
+        return Currency._qp_decimal(amount) < 0
+
+    def _ensure_bank_row(self) -> None:
+        previous_day = round((datetime.now() - timedelta(days=1)).timestamp())
+        db.execute(
+            "INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)",
+            (
+                self.user.id,
+                0,
+                previous_day,
+            ),
+        )
+        db.execute(
+            "UPDATE bankData SET amount = CAST(ROUND(COALESCE(amount, 0)) AS INTEGER) WHERE user_id = ?",
+            (self.user.id,),
+        )
+        db.commit()
+
     @property
     def get_balance(self) -> int:
         data = db.execute(
             "SELECT amount FROM bankData WHERE user_id = ?", (self.user.id,)
         ).fetchone()
         db.commit()
-        return 0 if data is None else data[0]
-
-    async def add_qp(self, amount: int):
-        previous_day = round((datetime.now() - timedelta(days=1)).timestamp())
-        cur = db.execute(
-            "INSERT OR IGNORE INTO bankData (user_id, amount, claimed_date) VALUES (?,?,?)",
-            (
-                self.user.id,
-                amount,
-                previous_day,
-            ),
-        )
-        db.commit()
-        if cur.rowcount == 0:
+        if data is None:
+            return 0
+        balance = self.normalize_qp(data[0])
+        if data[0] != balance:
             db.execute(
-                "UPDATE bankData SET amount = amount + ? WHERE user_id = ?",
+                "UPDATE bankData SET amount = ? WHERE user_id = ?",
                 (
-                    amount,
+                    balance,
                     self.user.id,
                 ),
             )
             db.commit()
+        return balance
 
-    async def remove_qp(self, amount: int):
+    async def add_qp(self, amount: int | float | str | Decimal) -> int:
+        if self.is_negative_qp(amount):
+            raise ValueError("QP amount cannot be negative")
+        amount = self.normalize_qp(amount)
+        self._ensure_bank_row()
+        if amount == 0:
+            return 0
         db.execute(
-            "UPDATE bankData SET amount = amount - ? WHERE user_id = ?",
+            "UPDATE bankData SET amount = amount + ? WHERE user_id = ?",
             (
                 amount,
                 self.user.id,
             ),
         )
         db.commit()
+        return amount
+
+    async def remove_qp(self, amount: int | float | str | Decimal) -> int:
+        if self.is_negative_qp(amount):
+            raise ValueError("QP amount cannot be negative")
+        amount = self.normalize_qp(amount)
+        self._ensure_bank_row()
+        if amount == 0:
+            return 0
+        removed = min(self.get_balance, amount)
+        db.execute(
+            """
+            UPDATE bankData
+            SET amount = CASE
+                WHEN amount - ? < 0 THEN 0
+                ELSE amount - ?
+            END
+            WHERE user_id = ?
+            """,
+            (
+                amount,
+                amount,
+                self.user.id,
+            ),
+        )
+        db.commit()
+        return removed
+
+    async def set_qp(self, amount: int | float | str | Decimal) -> int:
+        if self.is_negative_qp(amount):
+            raise ValueError("QP amount cannot be negative")
+        amount = self.normalize_qp(amount)
+        self._ensure_bank_row()
+        db.execute(
+            "UPDATE bankData SET amount = ? WHERE user_id = ?",
+            (
+                amount,
+                self.user.id,
+            ),
+        )
+        db.commit()
+        return amount
 
     async def give_daily(self):
         next_claim = round((datetime.now() + timedelta(days=1)).timestamp())
@@ -690,13 +1107,11 @@ class Inventory:
     async def unlock_animated_profile(self, price: int = 10000) -> bool:
         if self.animated_profile_unlocked:
             return True
-        cur = db.execute(
-            "UPDATE bankData SET amount = amount - ? "
-            "WHERE user_id = ? AND amount >= ?",
-            (price, self.user.id, price),
-        )
-        if cur.rowcount == 0:
+        price = Currency.normalize_qp(price)
+        bank = Currency(self.user)
+        if price < 0 or bank.get_balance < price:
             return False
+        await bank.remove_qp(price)
         db.execute(
             "INSERT OR REPLACE INTO profileFeatures (user_id, animated_unlocked) "
             "VALUES (?, 1)",
@@ -1472,6 +1887,85 @@ class Moderation:
     def __init__(self, server: Optional[Guild] = None) -> None:
         self.server = server
 
+    def _next_case_id(self) -> int:
+        data = db.execute(
+            "SELECT COALESCE(MAX(case_id), 0) + 1 FROM modCaseData WHERE guild_id = ?",
+            (self.server.id,),
+        ).fetchone()
+        db.commit()
+        return int(data[0])
+
+    async def create_case(
+        self,
+        action: str,
+        target: Member | User | int | None,
+        moderator: Member | User | int | None,
+        reason: str | None = None,
+        duration: str | None = None,
+        status: str = "active",
+        related_warn_id: int | None = None,
+    ) -> int:
+        target_id = target.id if hasattr(target, "id") else target
+        moderator_id = moderator.id if hasattr(moderator, "id") else moderator
+        case_id = self._next_case_id()
+        date = round(datetime.now().timestamp())
+        db.execute(
+            """
+            INSERT INTO modCaseData
+                (guild_id, case_id, action, target_id, moderator_id, reason, date, duration, status, related_warn_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                self.server.id,
+                case_id,
+                str(action),
+                int(target_id) if target_id is not None else None,
+                int(moderator_id) if moderator_id is not None else None,
+                reason or "Unspecified",
+                date,
+                duration,
+                status,
+                related_warn_id,
+            ),
+        )
+        db.commit()
+        return case_id
+
+    def fetch_case(self, case_id: int) -> tuple | None:
+        data = db.execute(
+            "SELECT * FROM modCaseData WHERE guild_id = ? AND case_id = ?",
+            (self.server.id, case_id),
+        ).fetchone()
+        db.commit()
+        return data
+
+    def fetch_cases_user(self, target: Member | User | int, limit: int = 10) -> list:
+        target_id = target.id if hasattr(target, "id") else target
+        data = db.execute(
+            """
+            SELECT * FROM modCaseData
+            WHERE guild_id = ? AND target_id = ?
+            ORDER BY case_id DESC
+            LIMIT ?
+            """,
+            (self.server.id, int(target_id), limit),
+        ).fetchall()
+        db.commit()
+        return data
+
+    def fetch_recent_cases(self, limit: int = 10) -> list:
+        data = db.execute(
+            """
+            SELECT * FROM modCaseData
+            WHERE guild_id = ?
+            ORDER BY case_id DESC
+            LIMIT ?
+            """,
+            (self.server.id, limit),
+        ).fetchall()
+        db.commit()
+        return data
+
     async def warn_user(
         self, member: Member, moderator: int, reason: str, warn_id: int, date: int
     ):
@@ -2150,14 +2644,15 @@ class AutoCompleteChoices:
             "Breaking server rules",
             "Botting account",
         ]
-        if ctx.locale.value == "fr":
+        locale = get_command_locale(ctx)
+        if locale == "fr":
             default_options = [
                 "Compte suspect ou spam",
                 "Compte compromis ou piraté",
                 "Violation des règles du serveur",
                 "Compte de botting",
             ]
-        elif ctx.locale.value == "de":
+        elif locale == "de":
             default_options = [
                 "Verdächtiges oder Spam-Konto",
                 "Kompromittiertes oder gehacktes Konto",
@@ -2233,7 +2728,8 @@ class AutoCompleteChoices:
             "Translation Error",
             "Other",
         ]
-        if ctx.locale.value == "fr":
+        locale = get_command_locale(ctx)
+        if locale == "fr":
             report_types = [
                 "Défaillance",
                 "Bogue",
@@ -2242,7 +2738,7 @@ class AutoCompleteChoices:
                 "Erreur de traduction",
                 "Autre",
             ]
-        elif ctx.locale.value == "de":
+        elif locale == "de":
             report_types = [
                 "Fehler",
                 "Bug",
@@ -2332,6 +2828,18 @@ async def check_disabled_app_command(ctx: Interaction):
     if Command(ctx.guild).check_disabled(ctx.command.qualified_name):
         await ctx.response.send_message(
             "This command is disabled by the server's managers", ephemeral=True
+        )
+        return
+    module = ServerSettings.command_module(ctx.command)
+    if module and ServerSettings(ctx.guild).is_module_disabled(module):
+        locale = get_command_locale(ctx)
+        messages = {
+            "fr": "Ce module est désactivé par les gestionnaires du serveur.",
+            "de": "Dieses Modul wurde von der Serververwaltung deaktiviert.",
+        }
+        await ctx.response.send_message(
+            messages.get(locale, "This module is disabled by the server's managers."),
+            ephemeral=True,
         )
         return
     return True
