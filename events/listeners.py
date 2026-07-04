@@ -3,7 +3,7 @@ from datetime import datetime
 from json import loads
 from discord import AllowedMentions, DMChannel, Embed, Message
 from discord.ext.commands import Bot, Cog
-from functions import BetaTest, DevPunishment, Levelling
+from functions import BetaTest, DevPunishment, Levelling, get_guild_locale
 # from topgg import DBLClient
 # from config import TOPGG
 
@@ -81,18 +81,19 @@ class listenersCog(Cog):
                             )
 
                             if channel is not None:
+                                locale = get_guild_locale(message.guild)
                                 if update is None:
-                                    if message.guild.preferred_locale.value not in ("fr", "de"):
+                                    if locale == "en":
                                         msg = "{} has leveled up to `{}`".format(
                                             message.author,
                                             new_level,
                                         )
-                                    elif message.guild.preferred_locale.value == "fr":
+                                    elif locale == "fr":
                                         msg = "{} a atteint le niveau `{}`".format(
                                             message.author,
                                             new_level,
                                         )
-                                    elif message.guild.preferred_locale.value == "de":
+                                    elif locale == "de":
                                         msg = "{} hat das Level `{}` erreicht".format(
                                             message.author,
                                             new_level,
@@ -114,17 +115,17 @@ class listenersCog(Cog):
                                 await message.author.add_roles(role_reward)
                                 if channel is not None:
                                     if levelup is None:
-                                        if message.guild.preferred_locale.value not in ("fr", "de"):
+                                        if locale == "en":
                                             msg = "CONGRATS {}! You were role awarded {}".format(
                                                 message.author,
                                                 role_reward.name,
                                             )
-                                        elif message.guild.preferred_locale.value == "fr":
+                                        elif locale == "fr":
                                             msg = "FÉLICITATIONS {}! Tu as reçu le rôle {}".format(
                                                 message.author,
                                                 role_reward.name,
                                             )
-                                        elif message.guild.preferred_locale.value == "de":
+                                        elif locale == "de":
                                             msg = "HERZLICHEN GLÜCKWUNSCH {}! Du hast die Rolle {} erhalten".format(
                                                 message.author,
                                                 role_reward.name,

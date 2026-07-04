@@ -1,7 +1,7 @@
 import asyncio
 from discord import Color, Embed, Guild, Member, AllowedMentions, RawMemberRemoveEvent
 from discord.ext.commands import Cog, Bot
-from functions import Welcomer
+from functions import Welcomer, get_guild_locale
 from collections import OrderedDict
 from json import loads, JSONDecodeError
 
@@ -28,10 +28,8 @@ class WelcomerCog(Cog):
             if member.guild.id == server.id:
                 welcomemsg = welcomer_instance.get_welcoming_msg
                 if welcomemsg is None:
-                    if (
-                        server.preferred_locale.value == "en-GB"
-                        or server.preferred_locale.value == "en-US"
-                    ):
+                    locale = get_guild_locale(server)
+                    if locale == "en":
                         welcome = Embed(
                             description=f"Hi {member} and welcome to {member.guild.name}!",
                             color=Color.random(),
@@ -44,7 +42,7 @@ class WelcomerCog(Cog):
                         )
                         await welcomer.send(embed=welcome)
                         
-                    elif server.preferred_locale.value == "fr":
+                    elif locale == "fr":
                         welcome = Embed(
                             description=f"Salut {member} et bienvenue sur {member.guild.name} !",
                             color=Color.random(),
@@ -57,7 +55,7 @@ class WelcomerCog(Cog):
                         )
                         await welcomer.send(embed=welcome)
                         
-                    elif server.preferred_locale.value == "de":
+                    elif locale == "de":
                         welcome = Embed(
                             description=f"Hallo {member} und willkommen auf {member.guild.name}!",
                             color=Color.random(),
@@ -128,10 +126,8 @@ class WelcomerCog(Cog):
         if payload.guild_id == server_data.id:
             leavingmsg = welcomer_instance.get_leaving_msg
             if leavingmsg is None:
-                if (
-                    server.preferred_locale.value == "en-GB"
-                    or server.preferred_locale.value == "en-US"
-                ):
+                locale = get_guild_locale(server)
+                if locale == "en":
                     leave = Embed(
                         description=f"{member} left the server",
                         color=Color.random(),
@@ -140,7 +136,7 @@ class WelcomerCog(Cog):
                     )
                     await leaver.send(embed=leave)
                     return
-                if server.preferred_locale.value == "fr":
+                if locale == "fr":
                     leave = Embed(
                         description=f"{member} a quitté le serveur",
                         color=Color.random(),
@@ -149,7 +145,7 @@ class WelcomerCog(Cog):
                     )
                     await leaver.send(embed=leave)
                     return
-                if server.preferred_locale.value=="de":
+                if locale == "de":
                     leave = Embed(
                         description=f"{member} hat den Server verlassen",
                         color=Color.random(),

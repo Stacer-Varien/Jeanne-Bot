@@ -1,5 +1,5 @@
 from discord import Color, Embed, NotFound
-from functions import DevPunishment, Moderation, Reminder
+from functions import DevPunishment, Moderation, Reminder, get_guild_locale
 from discord.ext import tasks
 from discord.ext.commands import Cog, Bot
 from datetime import datetime
@@ -38,13 +38,14 @@ class tasksCog(Cog):
             if modlog is None:
                 continue
 
-            if guild.preferred_locale.value not in ("fr", "de"):
+            locale = get_guild_locale(guild)
+            if locale == "en":
                 unmute = Embed(title="Member unbanned", color=0xFF0000)
                 unmute.add_field(name="Member", value=member, inline=True)
                 unmute.add_field(name="ID", value=member.id, inline=True)
                 unmute.add_field(name="Reason", value="Softban expired", inline=True)
                 unmute.set_thumbnail(url=member.display_avatar)
-            elif guild.preferred_locale.value == "fr":
+            elif locale == "fr":
                 unmute = Embed(title="Membre débanni", color=0xFF0000)
                 unmute.add_field(name="Membre", value=member, inline=True)
                 unmute.add_field(name="ID", value=member.id, inline=True)
