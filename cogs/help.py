@@ -5,7 +5,12 @@ from discord import (
     app_commands as Jeanne,
 )
 from discord.ext.commands import GroupCog, Bot
-from functions import AutoCompleteChoices, check_botbanned_app_command, is_suspended
+from functions import (
+    AutoCompleteChoices,
+    check_botbanned_app_command,
+    get_command_locale,
+    is_suspended,
+)
 import languages.en.help as en
 import languages.fr.help as fr
 import languages.de.help as de
@@ -114,7 +119,7 @@ class HelpGroup(GroupCog, name=T("help_group_name")):
                 if token in normalized_name.split():
                     score += 22
                 elif token in searchable:
-                    score += 9
+                    score += 28
 
             if query:
                 score += int(
@@ -134,12 +139,7 @@ class HelpGroup(GroupCog, name=T("help_group_name")):
         return scored[0][1], suggestions
 
     def _format_ask_choice(self, ctx: Interaction, qualified_name: str, command) -> str:
-        if ctx.locale.value == "fr":
-            locale = "fr"
-        elif ctx.locale.value == "de":
-            locale = "de"
-        else:
-            locale = "en"
+        locale = get_command_locale(ctx)
         extras = command.extras if isinstance(command.extras, dict) else {}
         locale_data = extras.get(locale) or extras.get("en", {})
         description = str(locale_data.get("description", "")).strip()
@@ -173,20 +173,23 @@ class HelpGroup(GroupCog, name=T("help_group_name")):
         return choices[:25]
 
     async def _send_ask_error(self, ctx: Interaction, suggestions: list[str]):
-        if ctx.locale.value == "fr":
+        locale = get_command_locale(ctx)
+        if locale == "fr":
             description = (
                 "Je n'ai pas trouvé de commande correspondante.\n"
                 "Essayez avec un nom de commande ou un mot-clé (ex: `ban`, `météo`, `rappel ajouter`)."
             )
             suggestions_name = "Commandes proches"
             footer = "Voir la documentation: https://jeannebot.vercel.app/help"
-        elif ctx.locale.value == "de":
+            view = fr.help_button()
+        elif locale == "de":
             description = (
                 "Ich konnte keinen passenden Befehl finden.\n"
                 "Versuche es mit einem Befehlsnamen oder Stichwort (z. B. `ban`, `wetter`, `reminder add`)."
             )
             suggestions_name = "Ahnliche Befehle"
             footer = "Dokumentation: https://jeannebot.vercel.app/help"
+            view = de.help_button()
         else:
             description = (
                 "I could not find a matching command.\n"
@@ -194,6 +197,7 @@ class HelpGroup(GroupCog, name=T("help_group_name")):
             )
             suggestions_name = "Closest commands"
             footer = "Documentation: https://jeannebot.vercel.app/help"
+            view = en.help_button()
 
         embed = Embed(description=description, color=Color.red())
         if suggestions:
@@ -203,7 +207,7 @@ class HelpGroup(GroupCog, name=T("help_group_name")):
                 inline=False,
             )
         embed.set_footer(text=footer)
-        await ctx.response.send_message(embed=embed)
+        await ctx.response.send_message(embed=embed, view=view)
 
     @Jeanne.command(
         name=T("command_name"),
@@ -250,10 +254,11 @@ class HelpGroup(GroupCog, name=T("help_group_name")):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(is_suspended)
     async def command(self, ctx: Interaction, command: Jeanne.Range[str, 3]):
-        if ctx.locale.value == "fr":
+        locale = get_command_locale(ctx)
+        if locale == "fr":
             await fr.HelpGroup(self.bot).command(ctx, command)  
             return
-        if ctx.locale.value == "de":
+        if locale == "de":
             await de.HelpGroup(self.bot).command(ctx, command)
             return
         await en.HelpGroup(self.bot).command(ctx, command)
@@ -308,23 +313,26 @@ class HelpGroup(GroupCog, name=T("help_group_name")):
             await self._send_ask_error(ctx, suggestions)
             return
 
-        if ctx.locale.value == "fr":
-            await fr.HelpGroup(self.bot).command(ctx, best_match)
+        related = [name for name in suggestions if name != best_match][:2]
+        locale = get_command_locale(ctx)
+        if locale == "fr":
+            await fr.HelpGroup(self.bot).command(ctx, best_match, related)
             return
-        if ctx.locale.value == "de":
-            await de.HelpGroup(self.bot).command(ctx, best_match)
+        if locale == "de":
+            await de.HelpGroup(self.bot).command(ctx, best_match, related)
             return
-        await en.HelpGroup(self.bot).command(ctx, best_match)
+        await en.HelpGroup(self.bot).command(ctx, best_match, related)
 
     @command.error
     async def command_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, IndexError
         ):
-            if ctx.locale.value == "fr":
+            locale = get_command_locale(ctx)
+            if locale == "fr":
                 await fr.HelpGroup(self.bot).command_error(ctx)
                 return
-            if ctx.locale.value == "de":
+            if locale == "de":
                 await de.HelpGroup(self.bot).command_error(ctx)
                 return
             await en.HelpGroup(self.bot).command_error(ctx)
@@ -350,10 +358,11 @@ class HelpGroup(GroupCog, name=T("help_group_name")):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(is_suspended)
     async def support(self, ctx: Interaction):
-        if ctx.locale.value == "fr":
+        locale = get_command_locale(ctx)
+        if locale == "fr":
             await fr.HelpGroup(self.bot).support(ctx)
             return
-        if ctx.locale.value == "de":
+        if locale == "de":
             await de.HelpGroup(self.bot).support(ctx)
             return
         await en.HelpGroup(self.bot).support(ctx)

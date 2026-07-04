@@ -34,16 +34,22 @@ class HelpGroup:
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    async def command(self, ctx: Interaction, command: Jeanne.Range[str, 3]):
+    async def command(
+        self,
+        ctx: Interaction,
+        command: Jeanne.Range[str, 3],
+        related_commands: list[str] | None = None,
+    ):
         await ctx.response.defer()
-        cmd = next(
+        cmd_obj = next(
             (
-                cmd.extras
+                cmd
                 for cmd in self.bot.tree.walk_commands()
                 if not isinstance(cmd, Jeanne.Group) and cmd.qualified_name == command
             ),
         )
-        command = cmd["en"]
+        cmd = cmd_obj.extras
+        command = cmd["de"]
         try:
             bot_perms = command["bot_perms"]
         except Exception:
@@ -83,10 +89,25 @@ class HelpGroup:
 
         cmd_usage = "/" + name + " " + " ".join(parms)
         embed.add_field(name="Befehlsverwendung", value=f"`{cmd_usage}`", inline=False)
+        examples = command.get("examples") or [cmd_usage]
+        embed.add_field(
+            name="Beispiele",
+            value="\n".join(f"`{example}`" for example in examples),
+            inline=False,
+        )
+        cooldown = command.get("cooldown") or cmd.get("cooldown")
+        if cooldown:
+            embed.add_field(name="Cooldown", value=str(cooldown), inline=True)
+        if related_commands:
+            embed.add_field(
+                name="Ähnliche Befehle",
+                value="\n".join(f"`/{related}`" for related in related_commands),
+                inline=False,
+            )
         embed.set_footer(
             text="Legende:\n[] - Pflicht\n<> - Optional\n\nAm besten besuchst du die Websites für detaillierte Erklärungen und Nutzung"
         )
-        await ctx.followup.send(embed=embed)
+        await ctx.followup.send(embed=embed, view=help_button())
 
     async def command_error(self, ctx: Interaction):
         embed = Embed(description="Ich habe diesen Befehl nicht", color=Color.red())

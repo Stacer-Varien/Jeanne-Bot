@@ -38,15 +38,21 @@ class HelpGroup:
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    async def command(self, ctx: Interaction, command: Jeanne.Range[str, 3]):
+    async def command(
+        self,
+        ctx: Interaction,
+        command: Jeanne.Range[str, 3],
+        related_commands: list[str] | None = None,
+    ):
         await ctx.response.defer()
-        cmd = next(
+        cmd_obj = next(
             (
-                cmd.extras
+                cmd
                 for cmd in self.bot.tree.walk_commands()
                 if not isinstance(cmd, Jeanne.Group) and cmd.qualified_name == command
             ),
         )
+        cmd = cmd_obj.extras
         command = cmd["fr"]
         try:
             bot_perms = command["bot_perms"]
@@ -96,11 +102,26 @@ class HelpGroup:
         embed.add_field(
             name="Utilisation de la Commande", value=f"`{cmd_usage}`", inline=False
         )
+        examples = command.get("examples") or [cmd_usage]
+        embed.add_field(
+            name="Exemples",
+            value="\n".join(f"`{example}`" for example in examples),
+            inline=False,
+        )
+        cooldown = command.get("cooldown") or cmd.get("cooldown")
+        if cooldown:
+            embed.add_field(name="Cooldown", value=str(cooldown), inline=True)
+        if related_commands:
+            embed.add_field(
+                name="Commandes liées",
+                value="\n".join(f"`/{related}`" for related in related_commands),
+                inline=False,
+            )
         embed.set_footer(
             text="Légende:\n[] - Requis\n<> - Optionnel\n\nIl est préférable de visiter les sites web pour des explications et utilisations détaillées"
         )
 
-        await ctx.followup.send(embed=embed)
+        await ctx.followup.send(embed=embed, view=help_button())
 
     async def command_error(self, ctx: Interaction):
         embed = Embed(description=("Je n'ai pas cette commande"), color=Color.red())
