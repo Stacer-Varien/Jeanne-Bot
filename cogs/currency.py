@@ -9,8 +9,10 @@ from discord import (
 from discord.ext.commands import Cog, Bot, GroupCog
 from functions import (
     Currency,
+    ServerSettings,
     check_botbanned_app_command,
     check_disabled_app_command,
+    get_command_locale,
     is_suspended,
 )
 import languages.en.currency as en
@@ -43,15 +45,15 @@ class Guess_Group(GroupCog, group_name=T("guess_group_name")):
         extras={  # for autocomplete help reasons
             "en": {
                 "name": "guess free",
-                "description": "Guess my number and you can win 20 QP",
+                "description": "Guess my number and you can win 20 currency",
             },
             "fr": {
                 "name": "deviner libre",
-                "description": "Devinez mon nombre et vous pouvez gagner 20 QP",
+                "description": "Devinez mon nombre et vous pouvez gagner 20 unités de monnaie",
             },
             "de": {
                 "name": "rate frei",
-                "description": "Errate meine Zahl und du kannst 20 QP gewinnen",
+                "description": "Errate meine Zahl und du kannst 20 Währungseinheiten gewinnen",
             },
         },
     )
@@ -60,10 +62,10 @@ class Guess_Group(GroupCog, group_name=T("guess_group_name")):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def free(self, ctx: Interaction):
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.Guess_Group(self.bot).free(ctx)
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.Guess_Group(self.bot).free(ctx)
             return
         await en.Guess_Group(self.bot).free(ctx)
@@ -118,10 +120,10 @@ class Guess_Group(GroupCog, group_name=T("guess_group_name")):
         ctx: Interaction,
         bet: Jeanne.Range[int, 5],
     ):
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.Guess_Group(self.bot).bet(ctx, bet)
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.Guess_Group(self.bot).bet(ctx, bet)
             return
         await en.Guess_Group(self.bot).bet(ctx, bet)
@@ -129,10 +131,10 @@ class Guess_Group(GroupCog, group_name=T("guess_group_name")):
     @free.error
     async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if ctx.locale.value == "fr":
+            if get_command_locale(ctx) == "fr":
                 await fr.Guess_Group(self.bot).free_error(ctx, error)
                 return
-            if ctx.locale.value == "de":
+            if get_command_locale(ctx) == "de":
                 await de.Guess_Group(self.bot).free_error(ctx, error)
                 return
             await en.Guess_Group(self.bot).free_error(ctx, error)
@@ -140,10 +142,10 @@ class Guess_Group(GroupCog, group_name=T("guess_group_name")):
     @bet.error
     async def bet_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if ctx.locale.value == "fr":
+            if get_command_locale(ctx) == "fr":
                 await fr.Guess_Group(self.bot).bet_error(ctx, error)
                 return
-            if ctx.locale.value == "de":
+            if get_command_locale(ctx) == "de":
                 await de.Guess_Group(self.bot).bet_error(ctx, error)
                 return
             await en.Guess_Group(self.bot).bet_error(ctx, error)
@@ -160,15 +162,15 @@ class Dice_Group(GroupCog, group_name=T("dice_group_name")):
         extras={  # for autocomplete help reasons
             "en": {
                 "name": "dice free",
-                "description": "Roll a dice and earn 20 QP for free",
+                "description": "Roll a dice and earn 20 currency for free",
             },
             "fr": {
                 "name": "dé libre",
-                "description": "Lancez un dé et gagnez 20 QP gratuitement",
+                "description": "Lancez un dé et gagnez 20 unités de monnaie gratuitement",
             },
             "de": {
                 "name": "würfeln frei",
-                "description": "Würfeln Sie und verdienen Sie 20 QP kostenlos",
+                "description": "Würfeln Sie und verdienen Sie 20 Währungseinheiten kostenlos",
             },
         },
     )
@@ -177,10 +179,10 @@ class Dice_Group(GroupCog, group_name=T("dice_group_name")):
     @Jeanne.check(is_suspended)
     @Jeanne.checks.cooldown(1, 3600, key=lambda i: (i.user.id))
     async def free(self, ctx: Interaction):
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.Dice_Group(self.bot).free(ctx)
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.Dice_Group(self.bot).free(ctx)
             return
         await en.Dice_Group(self.bot).free(ctx)
@@ -235,10 +237,10 @@ class Dice_Group(GroupCog, group_name=T("dice_group_name")):
         ctx: Interaction,
         bet: Jeanne.Range[int, 5],
     ):
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.Dice_Group(self.bot).bet(ctx, bet)
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.Dice_Group(self.bot).bet(ctx, bet)
             return
         await en.Dice_Group(self.bot).bet(ctx, bet)
@@ -246,10 +248,10 @@ class Dice_Group(GroupCog, group_name=T("dice_group_name")):
     @free.error
     async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if ctx.locale.value == "fr":
+            if get_command_locale(ctx) == "fr":
                 await fr.Dice_Group(self.bot).free_error(ctx, error)
                 return
-            if ctx.locale.value == "de":
+            if get_command_locale(ctx) == "de":
                 await de.Dice_Group(self.bot).free_error(ctx, error)
                 return
             await en.Dice_Group(self.bot).free_error(ctx, error)
@@ -257,10 +259,10 @@ class Dice_Group(GroupCog, group_name=T("dice_group_name")):
     @bet.error
     async def bet_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if ctx.locale.value == "fr":
+            if get_command_locale(ctx) == "fr":
                 await fr.Dice_Group(self.bot).bet_error(ctx, error)
                 return
-            if ctx.locale.value == "de":
+            if get_command_locale(ctx) == "de":
                 await de.Dice_Group(self.bot).bet_error(ctx, error)
                 return
             await en.Dice_Group(self.bot).bet_error(ctx, error)
@@ -277,15 +279,15 @@ class Flip_Group(GroupCog, group_name=T("flip_group_name")):
         extras={  # for autocomplete help reasons
             "en": {
                 "name": "flip free",
-                "description": "Flip a coin and earn 20 QP for free",
+                "description": "Flip a coin and earn 20 currency for free",
             },
             "fr": {
                 "name": "lancer libre",
-                "description": "Lancez une pièce et gagnez 20 QP gratuitement",
+                "description": "Lancez une pièce et gagnez 20 unités de monnaie gratuitement",
             },
             "de": {
                 "name": "flip frei",
-                "description": "Flippe eine Münze und verdiene 20 QP kostenlos",
+                "description": "Flippe eine Münze und verdiene 20 Währungseinheiten kostenlos",
             },
         },
     )
@@ -294,10 +296,10 @@ class Flip_Group(GroupCog, group_name=T("flip_group_name")):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def free(self, ctx: Interaction):
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.Flip_Group(self.bot).free(ctx)
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.Flip_Group(self.bot).free(ctx)
             return
         await en.Flip_Group(self.bot).free(ctx)
@@ -348,10 +350,10 @@ class Flip_Group(GroupCog, group_name=T("flip_group_name")):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def bet(self, ctx: Interaction, bet: Jeanne.Range[int, 5]):
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.Flip_Group(self.bot).bet(ctx, bet)
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.Flip_Group(self.bot).bet(ctx, bet)
             return
         await en.Flip_Group(self.bot).bet(ctx, bet)
@@ -359,10 +361,10 @@ class Flip_Group(GroupCog, group_name=T("flip_group_name")):
     @free.error
     async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if ctx.locale.value == "fr":
+            if get_command_locale(ctx) == "fr":
                 await fr.Flip_Group(self.bot).free_error(ctx, error)
                 return
-            if ctx.locale.value == "de":
+            if get_command_locale(ctx) == "de":
                 await de.Flip_Group(self.bot).free_error(ctx, error)
                 return
             await en.Flip_Group(self.bot).free_error(ctx, error)
@@ -370,10 +372,10 @@ class Flip_Group(GroupCog, group_name=T("flip_group_name")):
     @bet.error
     async def bet_error(self, ctx: Interaction, error: Jeanne.errors.AppCommandError):
         if isinstance(error, Jeanne.errors.CommandOnCooldown):
-            if ctx.locale.value == "fr":
+            if get_command_locale(ctx) == "fr":
                 await fr.Flip_Group(self.bot).bet_error(ctx, error)
                 return
-            if ctx.locale.value == "de":
+            if get_command_locale(ctx) == "de":
                 await de.Flip_Group(self.bot).bet_error(ctx, error)
                 return
             await en.Flip_Group(self.bot).bet_error(ctx, error)
@@ -390,15 +392,15 @@ class Blackjack_Group(GroupCog, group_name=T("blackjack_group_name")):
         extras={
             "en": {
                 "name": "blackjack free",
-                "description": "Play blackjack for free and earn 20 QP",
+                "description": "Play blackjack for free and earn 20 currency",
             },
             "fr": {
                 "name": "blackjack libre",
-                "description": "Jouez au blackjack gratuitement et gagnez 20 QP",
+                "description": "Jouez au blackjack gratuitement et gagnez 20 unités de monnaie",
             },
             "de": {
                 "name": "blackjack frei",
-                "description": "Spielen Sie Blackjack kostenlos und verdienen Sie 20 QP",
+                "description": "Spielen Sie Blackjack kostenlos und verdienen Sie 20 Währungseinheiten",
             },
         },
     )
@@ -407,13 +409,13 @@ class Blackjack_Group(GroupCog, group_name=T("blackjack_group_name")):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def free(self, ctx: Interaction):
-        if ctx.locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.Blackjack_Group(self.bot).free(ctx)
             return
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.Blackjack_Group(self.bot).free(ctx)
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.Blackjack_Group(self.bot).free(ctx)
             return
 
@@ -463,10 +465,10 @@ class Blackjack_Group(GroupCog, group_name=T("blackjack_group_name")):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def bet(self, ctx: Interaction, bet: Jeanne.Range[int, 5]):
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.Blackjack_Group(self.bot).bet(ctx, bet)
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.Blackjack_Group(self.bot).bet(ctx, bet)
             return
         await en.Blackjack_Group(self.bot).bet(ctx, bet)
@@ -474,10 +476,10 @@ class Blackjack_Group(GroupCog, group_name=T("blackjack_group_name")):
     @free.error
     async def free_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if ctx.locale.value == "fr":
+            if get_command_locale(ctx) == "fr":
                 await fr.Blackjack_Group(self.bot).free_error(ctx, error)
                 return
-            if ctx.locale.value == "de":
+            if get_command_locale(ctx) == "de":
                 await de.Blackjack_Group(self.bot).free_error(ctx, error)
                 return
             await en.Blackjack_Group(self.bot).free_error(ctx, error)
@@ -485,10 +487,10 @@ class Blackjack_Group(GroupCog, group_name=T("blackjack_group_name")):
     @bet.error
     async def bet_error(self, ctx: Interaction, error: Jeanne.errors.AppCommandError):
         if isinstance(error, Jeanne.errors.CommandOnCooldown):
-            if ctx.locale.value == "fr":
+            if get_command_locale(ctx) == "fr":
                 await fr.Blackjack_Group(self.bot).bet_error(ctx, error)
                 return
-            if ctx.locale.value == "de":
+            if get_command_locale(ctx) == "de":
                 await de.Blackjack_Group(self.bot).bet_error(ctx, error)
                 return
             await en.Blackjack_Group(self.bot).bet_error(ctx, error)
@@ -519,19 +521,19 @@ class currency(Cog, name="CurrencySlash"):
 
     async def balance_callback_error(self, ctx: Interaction, error: Exception):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if ctx.locale.value == "fr":
+            if get_command_locale(ctx) == "fr":
                 await fr.currency(self.bot).balance_error(ctx, error)
                 return
-            if ctx.locale.value == "de":
+            if get_command_locale(ctx) == "de":
                 await de.currency(self.bot).balance_error(ctx, error)
                 return
             await en.currency(self.bot).balance_error(ctx, error)
 
     async def get_balance(self, ctx: Interaction, member: Member):
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.currency(self.bot).get_balance(ctx, member)
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.currency(self.bot).get_balance(ctx, member)
             return
         await en.currency(self.bot).get_balance(ctx, member)
@@ -540,14 +542,14 @@ class currency(Cog, name="CurrencySlash"):
         name=T("daily_name"),
         description=T("daily_desc"),
         extras={
-            "en": {"name": "daily", "description": "Claim your daily QP reward"},
+            "en": {"name": "daily", "description": "Claim your daily currency reward"},
             "fr": {
                 "name": "quotidien",
-                "description": "Réclamez votre récompense quotidienne de QP",
+                "description": "Réclamez votre récompense quotidienne de monnaie",
             },
             "de": {
                 "name": "täglich",
-                "description": "Fordern Sie Ihre tägliche QP-Belohnung an",
+                "description": "Fordern Sie Ihre tägliche Währungsbelohnung an",
             },
         },
     )
@@ -555,10 +557,10 @@ class currency(Cog, name="CurrencySlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def daily(self, ctx: Interaction):
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.currency(self.bot).daily(ctx)
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.currency(self.bot).daily(ctx)
             return
 
@@ -610,13 +612,13 @@ class currency(Cog, name="CurrencySlash"):
         self, ctx: Interaction, error: Jeanne.errors.AppCommandError
     ):
         if isinstance(error, Jeanne.errors.CommandOnCooldown):
-            if ctx.locale.value not in ("fr", "de"):
+            if get_command_locale(ctx) not in ("fr", "de"):
                 await en.currency(self.bot).balance_error(ctx, error)
                 return
-            if ctx.locale.value == "fr":
+            if get_command_locale(ctx) == "fr":
                 await fr.currency(self.bot).balance_error(ctx, error)
                 return
-            if ctx.locale.value == "de":
+            if get_command_locale(ctx) == "de":
                 await de.currency(self.bot).balance_error(ctx, error)
 
     @Jeanne.command(
@@ -633,10 +635,10 @@ class currency(Cog, name="CurrencySlash"):
     )
     @Jeanne.check(is_suspended)
     async def vote(self, ctx: Interaction):
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.currency(self.bot).vote(ctx)
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.currency(self.bot).vote(ctx)
             return
         await en.currency(self.bot).vote(ctx)
@@ -686,10 +688,10 @@ class currency(Cog, name="CurrencySlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def slots(self, ctx: Interaction, bet: Jeanne.Range[int, 5]):
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.currency(self.bot).slots(ctx, bet)
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.currency(self.bot).slots(ctx, bet)
             return
         await en.currency(self.bot).slots(ctx, bet)
@@ -697,10 +699,10 @@ class currency(Cog, name="CurrencySlash"):
     @slots.error
     async def slots_error(self, ctx: Interaction, error: Jeanne.errors.AppCommandError):
         if isinstance(error, Jeanne.errors.CommandOnCooldown):
-            if ctx.locale.value == "fr":
+            if get_command_locale(ctx) == "fr":
                 await fr.currency(self.bot).slots_error(ctx, error)
                 return
-            if ctx.locale.value == "de":
+            if get_command_locale(ctx) == "de":
                 await de.currency(self.bot).slots_error(ctx, error)
                 return
             await en.currency(self.bot).slots_error(ctx, error)
@@ -736,36 +738,40 @@ class currency(Cog, name="CurrencySlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def spin(self, ctx: Interaction, bet: int):
+        locale = get_command_locale(ctx)
         if bet <= 0:
             messages = {
                 "fr": "Votre pari doit être supérieur à 0.",
                 "de": "Dein Einsatz muss größer als 0 sein.",
             }
             await ctx.response.send_message(
-                messages.get(ctx.locale.value, "Your bet must be greater than 0."),
+                messages.get(locale, "Your bet must be greater than 0."),
                 ephemeral=True,
             )
             return
 
         required_balance = bet * 2
         if Currency(ctx.user).get_balance < required_balance:
+            required_balance_text = ServerSettings.format_currency_for(
+                ctx.guild, required_balance
+            )
             messages = {
-                "fr": f"Vous avez besoin d'au moins {required_balance} QP pour couvrir la perte maximale.",
-                "de": f"Du brauchst mindestens {required_balance} QP, um den maximalen Verlust abzudecken.",
+                "fr": f"Vous avez besoin d'au moins {required_balance_text} pour couvrir la perte maximale.",
+                "de": f"Du brauchst mindestens {required_balance_text}, um den maximalen Verlust abzudecken.",
             }
             await ctx.response.send_message(
                 messages.get(
-                    ctx.locale.value,
-                    f"You need at least {required_balance} QP to cover the maximum loss.",
+                    locale,
+                    f"You need at least {required_balance_text} to cover the maximum loss.",
                 ),
                 ephemeral=True,
             )
             return
 
-        if ctx.locale.value == "fr":
+        if locale == "fr":
             await fr.currency(self.bot).spin(ctx, bet)
             return
-        elif ctx.locale.value == "de":
+        elif locale == "de":
             await de.currency(self.bot).spin(ctx, bet)
             return
         else:
@@ -775,10 +781,10 @@ class currency(Cog, name="CurrencySlash"):
     async def spin_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if not isinstance(error, Jeanne.CommandOnCooldown):
             return
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.currency(self.bot).spin_error(ctx, error)
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.currency(self.bot).spin_error(ctx, error)
             return
         await en.currency(self.bot).spin_error(ctx, error)

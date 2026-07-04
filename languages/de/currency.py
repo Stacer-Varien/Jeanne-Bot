@@ -18,7 +18,12 @@ from assets.spinwheel import Wheel
 from functions import (
     BetaTest,
     Currency,
+    ServerSettings,
 )
+
+
+def qp(ctx: Interaction, amount: int) -> str:
+    return ServerSettings.format_currency_for(ctx.guild, amount)
 
 
 class vote_button(ui.View):
@@ -53,15 +58,15 @@ class Guess_Group():
         if view.value == answer:
             await Currency(ctx.user).add_qp(20)
             correct = Embed(
-                description="JA! DU HAST RICHTIG GERATEN!\nDu hast 20 <:quantumpiece:1161010445205905418> erhalten!",
+                description=f"JA! DU HAST RICHTIG GERATEN!\nDu hast {qp(ctx, 20)} erhalten!",
                 color=Color.random(),
             )
             
             if await BetaTest(self.bot).check(ctx.user):
-                    await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
+                    await Currency(ctx.user).add_qp(Currency.normalize_qp(20 * 1.25))
                     correct.add_field(
                         name="Beta-Benutzer-Bonus",
-                        value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>",
+                        value=qp(ctx, Currency.normalize_qp(20 * 1.25)),
                     )
             correct.set_image(url="https://files.catbox.moe/phqnb1.gif")
             await ctx.edit_original_response(embed=correct, view=None)
@@ -80,13 +85,13 @@ class Guess_Group():
         balance = Currency(ctx.user).get_balance
         if bet > balance:
             betlower = Embed(
-                description=f"Dein Guthaben ist zu niedrig!\nSetze weniger als {balance} <:quantumpiece:1161010445205905418> in"
+                description=f"Dein Guthaben ist zu niedrig!\nSetze weniger als {qp(ctx, balance)} ein"
             )
             await ctx.followup.send(embed=betlower)
             return
         if balance == 0:
             zerobal = Embed(
-                description="Leider hast du 0 <:quantumpiece:1161010445205905418>."
+                description=f"Leider hast du {qp(ctx, 0)}."
             )
             await ctx.followup.send(embed=zerobal)
             return
@@ -103,23 +108,23 @@ class Guess_Group():
         if view.value == answer:
             await Currency(ctx.user).add_qp(bet)
             correct = Embed(
-                description=f"JA! DU HAST RICHTIG GERATEN!\nDu hast {bet} <:quantumpiece:1161010445205905418> erhalten!",
+                description=f"JA! DU HAST RICHTIG GERATEN!\nDu hast {qp(ctx, bet)} erhalten!",
                 color=Color.random(),
             )
             
             
             if await BetaTest(self.bot).check(ctx.user):
-                    await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
+                    await Currency(ctx.user).add_qp(Currency.normalize_qp(bet * 1.25))
                     correct.add_field(
                         name="Beta-Benutzer-Bonus",
-                        value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
+                        value=qp(ctx, Currency.normalize_qp(bet * 1.25)),
                     )
             correct.set_image(url="https://files.catbox.moe/phqnb1.gif")
             await ctx.followup.send(embed=correct, view=view)
             return
         await Currency(ctx.user).remove_qp(bet)
         wrong = Embed(
-            description=f"Falsche Antwort. Es war {answer}\nLeider muss ich {bet} <:quantumpiece:1161010445205905418> von dir nehmen...",
+            description=f"Falsche Antwort. Es war {answer}\nLeider muss ich {qp(ctx, bet)} von dir nehmen...",
             color=Color.red(),
         )
         wrong.set_image(url="https://files.catbox.moe/mbk0nm.jpg")
@@ -164,7 +169,7 @@ class Dice_Group():
             await Currency(ctx.user).add_qp(20)
             embed = Embed(color=Color.random())
             embed.add_field(
-                name="YAY! Du hast es richtig!\n20 <:quantumpiece:1161010445205905418> wurden hinzugefügt",
+                name=f"YAY! Du hast es richtig!\n{qp(ctx, 20)} wurden hinzugefügt",
                 value=f"Der Würfel zeigte: **{rolled}**\nDu hast gewettet auf: **{view.value}**!",
                 inline=False,
             )
@@ -183,13 +188,13 @@ class Dice_Group():
         balance = Currency(ctx.user).get_balance
         if bet > balance:
             betlower = Embed(
-                description=f"Dein Guthaben ist zu niedrig!\nSetze weniger als {balance} <:quantumpiece:1161010445205905418> in"
+                description=f"Dein Guthaben ist zu niedrig!\nSetze weniger als {qp(ctx, balance)} ein"
             )
             await ctx.followup.send(embed=betlower)
             return
         if balance == 0:
             zerobal = Embed(
-                description="Leider hast du 0 <:quantumpiece:1161010445205905418>."
+                description=f"Leider hast du {qp(ctx, 0)}."
             )
             await ctx.followup.send(embed=zerobal)
             return
@@ -209,7 +214,7 @@ class Dice_Group():
             await Currency(ctx.user).add_qp(bet)
             embed = Embed(color=Color.random())
             embed.add_field(
-                name=f"YAY! Du hast es richtig!\n{bet} <:quantumpiece:1161010445205905418> wurden hinzugefügt",
+                name=f"YAY! Du hast es richtig!\n{qp(ctx, bet)} wurden hinzugefügt",
                 value=f"Der Würfel zeigte: **{rolled}**\nDu hast gewettet auf: **{view.value}**!",
                 inline=False,
             )
@@ -217,10 +222,10 @@ class Dice_Group():
             
 
             if await BetaTest(self.bot).check(ctx.user):
-                    await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
+                    await Currency(ctx.user).add_qp(Currency.normalize_qp(bet * 1.25))
                     embed.add_field(
                         name="Beta-Benutzer-Bonus",
-                        value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
+                        value=qp(ctx, Currency.normalize_qp(bet * 1.25)),
                     )
             await ctx.edit_original_response(embed=embed, view=None)
             return
@@ -263,17 +268,15 @@ class Flip_Group():
         if view.value == jeannes_pick:
             await Currency(ctx.user).add_qp(20)
             embed = Embed(
-                description="YAY! Du hast es richtig!\n20 <:quantumpiece:1161010445205905418> wurden hinzugefügt",
+                description=f"YAY! Du hast es richtig!\n{qp(ctx, 20)} wurden hinzugefügt",
                 color=Color.random(),
             )
             
-            await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
-
             if await BetaTest(self.bot).check(ctx.user):
-                    await Currency(ctx.user).add_qp(round((20 * 1.25), 2))
+                    await Currency(ctx.user).add_qp(Currency.normalize_qp(20 * 1.25))
                     embed.add_field(
                         name="Beta-Benutzer-Bonus",
-                        value=f"{round((20 * 1.25),2)} <:quantumpiece:1161010445205905418>",
+                        value=qp(ctx, Currency.normalize_qp(20 * 1.25)),
                     )
             await ctx.edit_original_response(embed=embed, view=None)
             return
@@ -299,13 +302,13 @@ class Flip_Group():
         balance = Currency(ctx.user).get_balance
         if balance < bet:
             betlower = Embed(
-                description=f"Dein Guthaben ist zu niedrig!\nSetze weniger als {balance} <:quantumpiece:1161010445205905418> in"
+                description=f"Dein Guthaben ist zu niedrig!\nSetze weniger als {qp(ctx, balance)} ein"
             )
             await ctx.followup.send(embed=betlower)
             return
         if balance == 0:
             zerobal = Embed(
-                description="Leider hast du 0 <:quantumpiece:1161010445205905418>."
+                description=f"Leider hast du {qp(ctx, 0)}."
             )
             await ctx.followup.send(embed=zerobal)
             return
@@ -316,18 +319,16 @@ class Flip_Group():
         if view.value == jeannes_pick:
             await Currency(ctx.user).add_qp(bet)
             embed = Embed(
-                description="YAY! Du hast es richtig!\n{} <:quantumpiece:1161010445205905418> wurden hinzugefügt".format(
-                    bet
-                )
+                description=f"YAY! Du hast es richtig!\n{qp(ctx, bet)} wurden hinzugefügt"
             )
             
             
 
             if await BetaTest(self.bot).check(ctx.user):
-                    await Currency(ctx.user).add_qp(round((bet * 1.25), 2))
+                    await Currency(ctx.user).add_qp(Currency.normalize_qp(bet * 1.25))
                     embed.add_field(
                         name="Beta-Benutzer-Bonus",
-                        value=f"{round((bet * 1.25),2)} <:quantumpiece:1161010445205905418>",
+                        value=qp(ctx, Currency.normalize_qp(bet * 1.25)),
                     )
             await ctx.edit_original_response(embed=embed, view=None)
             return
@@ -335,9 +336,7 @@ class Flip_Group():
             await Currency(ctx.user).remove_qp(int(bet))
             embed = Embed(color=Color.red())
             embed = Embed(
-                description="Oh nein, es war {}\nEs tut mir leid, aber ich muss {} <:quantumpiece:1161010445205905418> von dir nehmen".format(
-                    jeannes_pick, bet
-                ),
+                description=f"Oh nein, es war {jeannes_pick}\nEs tut mir leid, aber ich muss {qp(ctx, bet)} von dir nehmen",
                 color=Color.red(),
             )
             await ctx.edit_original_response(embed=embed, view=None)
@@ -404,13 +403,13 @@ class Blackjack_Group():
         balance = Currency(ctx.user).get_balance
         if balance < bet:
             betlower = Embed(
-                description=f"Dein Guthaben ist zu niedrig!\nSetze weniger als {balance} <:quantumpiece:1161010445205905418> in"
+                description=f"Dein Guthaben ist zu niedrig!\nSetze weniger als {qp(ctx, balance)} ein"
             )
             await ctx.followup.send(embed=betlower)
             return
         if balance == 0:
             zerobal = Embed(
-                description="Leider hast du 0 <:quantumpiece:1161010445205905418>."
+                description=f"Leider hast du {qp(ctx, 0)}."
             )
             await ctx.followup.send(embed=zerobal)
             return
@@ -462,6 +461,10 @@ class currency():
     def __init__(self, bot: Bot):
         self.bot = bot
 
+    @staticmethod
+    def qp(ctx: Interaction, amount: int) -> str:
+        return qp(ctx, amount)
+
     async def balance_callback_error(self, ctx: Interaction, error: Exception):
         cooldown = Embed(
                 description=f"WOAH! Ruhig Blut! Warum kontrollierst du so oft?\nVersuche es erneut in `{round(error.retry_after, 2)} Sekunden`",
@@ -473,11 +476,11 @@ class currency():
         await ctx.response.defer()
         bal = Currency(member).get_balance
         balance = Embed(
-            description=f"{'Du' if (member == ctx.user) else member} hat {bal} <:quantumpiece:1161010445205905418>",
+            description=f"{'Du' if (member == ctx.user) else member} hat {self.qp(ctx, bal)}",
             color=Color.blue(),
         )
         balance.add_field(
-            name="Wenn du mehr möchtest <:quantumpiece:1161010445205905418>:",
+            name=f"Wenn du mehr {ServerSettings(ctx.guild).currency_name} möchtest:",
             value="[Stem op mij in TopGG](https://top.gg/bot/831993597166747679/vote)",
             inline=True,
         )
@@ -497,15 +500,15 @@ class currency():
             is_weekend = datetime.today().weekday() >= 5
             rewards_text = "Beloningen (weekend):" if is_weekend else "Beloningen:"
             rewards_value = (
-                "Du hast 200 <:quantumpiece:1161010445205905418> erhalten"
+                f"Du hast {self.qp(ctx, 200)} erhalten"
                 if is_weekend
-                else "Du hast 100 <:quantumpiece:1161010445205905418> erhalten"
+                else f"Du hast {self.qp(ctx, 100)} erhalten"
             )
             bonus_text = "Beta Bonus (weekend)" if is_weekend else "Beta Bonus"
             bonus_value = (
-                "50 <:quantumpiece:1161010445205905418>"
+                self.qp(ctx, 50)
                 if is_weekend
-                else "25 <:quantumpiece:1161010445205905418>"
+                else self.qp(ctx, 25)
             )
             daily.add_field(
                 name=rewards_text,
@@ -519,7 +522,7 @@ class currency():
                 )
             daily.add_field(
                 name="Saldo",
-                value=f"{bank.get_balance} <:quantumpiece:1161010445205905418>",
+                value=self.qp(ctx, bank.get_balance),
             )
             daily.add_field(name="Nächster Daily:", value=f"<t:{next_claim}:f>")
             await ctx.followup.send(embed=daily)
@@ -546,10 +549,10 @@ class currency():
             description="Du kannst für mich stimmen, indem du auf einen der untenstehenden Buttons klickst, um folgende Vorteile zu erhalten:",
         )
         topgg_perks = """
-- 100 QP
 - 5XP keer hun wereldwijde niveau
 - - Beloningen zijn dubbel in het weekend
 """
+        topgg_perks = f"- {self.qp(ctx, 100)}\n{topgg_perks}"
         embed.add_field(name="Stimmvorteile", value=topgg_perks, inline=True)
         await ctx.response.send_message(
             embed=embed,
@@ -559,6 +562,15 @@ class currency():
     async def slots(self, ctx: Interaction, bet: int):
         await ctx.response.defer()
         embed = Embed(color=Color.random())
+        balance = Currency(ctx.user).get_balance
+        if balance < bet:
+            await ctx.followup.send(
+                embed=Embed(
+                    description=f"Dein Guthaben ist zu niedrig!\nSetze weniger als {self.qp(ctx, balance)} ein",
+                    color=Color.red(),
+                )
+            )
+            return
 
         emojis = (
                 ["🍒"] * 60 
@@ -600,28 +612,29 @@ class currency():
         final_grid = spin_grid()
         middle = final_grid[3:6]  
 
-        payout = bet
+        payout = 0
 
-        result_text = f"💀 Du hast **{bet}** <:quantumpiece:1161010445205905418> verloren."
+        result_text = f"💀 Du hast **{self.qp(ctx, bet)}** verloren."
         await Currency(ctx.user).remove_qp(bet)
 
         if middle == ["💎", "💎", "💎"]:
             payout = bet * 10
-            result_text = f"💎💎💎 **LEGENDÄRER JACKPOT!**\nDu hast **{payout}** <:quantumpiece:1161010445205905418> gewonnen!"
+            result_text = f"💎💎💎 **LEGENDÄRER JACKPOT!**\nDu hast **{self.qp(ctx, payout)}** gewonnen!"
         elif middle == ["⭐", "⭐", "⭐"]:
             payout = bet * 5
-            result_text = f"⭐ **Dreifache Sterne!**\nDu hast **{payout}** <:quantumpiece:1161010445205905418> gewonnen!"
+            result_text = f"⭐ **Dreifache Sterne!**\nDu hast **{self.qp(ctx, payout)}** gewonnen!"
         elif middle == ["🔔", "🔔", "🔔"]:
             payout = bet * 3
-            result_text = f"🔔 **Dreifache Glocken!**\nDu hast **{payout}** <:quantumpiece:1161010445205905418> gewonnen!"
+            result_text = f"🔔 **Dreifache Glocken!**\nDu hast **{self.qp(ctx, payout)}** gewonnen!"
         elif middle.count("🍉") == 3:
             payout = bet * 2
-            result_text = f"🍉 **Dreifache Melonen!**\nDu hast **{payout}** <:quantumpiece:1161010445205905418> gewonnen!"
+            result_text = f"🍉 **Dreifache Melonen!**\nDu hast **{self.qp(ctx, payout)}** gewonnen!"
         elif middle.count("🍒") == 3:
             payout = bet
             result_text = "🍒 **Knapp gewonnen.**\nEinsatz zurückerstattet."
 
-        await Currency(ctx.user).add_qp(payout)
+        if payout > 0:
+            await Currency(ctx.user).add_qp(payout)
 
         embed.description = (
                 f"🎰 **ERGEBNIS**\n" f"{format_grid(final_grid)}\n\n" f"{result_text}"
@@ -679,16 +692,16 @@ class currency():
 
         wheel_visual = wheel.build_wheel(multipliers, winner_index)
 
-        winnings = round(bet * winner_multiplier, 2)
+        winnings = Currency.normalize_qp(bet * winner_multiplier)
 
         if winnings > 0:
-            await Currency(ctx.user).add_qp(winnings)
-            result_text = f"🎉 Du hast gewonnen {winnings} <:quantumpiece:1161010445205905418>!"
+            won = await Currency(ctx.user).add_qp(winnings)
+            result_text = f"🎉 Du hast {self.qp(ctx, won)} gewonnen!"
             color = Color.green()
         elif winnings < 0:
-            await Currency(ctx.user).remove_qp(abs(winnings))
+            lost = await Currency(ctx.user).remove_qp(abs(winnings))
             result_text = (
-                f"💀 Du hast verloren {abs(winnings)} <:quantumpiece:1161010445205905418>..."
+                f"💀 Du hast {self.qp(ctx, lost)} verloren..."
             )
             color = Color.red()
         else:
@@ -698,7 +711,7 @@ class currency():
         final_embed = Embed(
             title="🎯 Radergebnis", description=wheel_visual, color=color
         )
-        final_embed.add_field(name="💰 Wette", value=str(bet))
+        final_embed.add_field(name="💰 Wette", value=self.qp(ctx, bet))
         final_embed.add_field(name="📈 Multiplikator", value=f"{winner_multiplier}x")
         final_embed.add_field(name="🏆 Ergebnis", value=result_text)
 
