@@ -1,8 +1,10 @@
 from functions import (
     Currency,
     Inventory,
+    ServerSettings,
     check_botbanned_app_command,
     check_disabled_app_command,
+    get_command_locale,
     is_suspended,
 )
 from assets.components import Confirmation
@@ -13,6 +15,10 @@ from typing import Optional
 import languages.en.inventory as en
 import languages.fr.inventory as fr
 import languages.de.inventory as de
+
+
+def qp(ctx: Interaction, amount: int) -> str:
+    return ServerSettings.format_currency_for(ctx.guild, amount)
 
 
 class Shop_Group(GroupCog, name="shop"):
@@ -33,10 +39,10 @@ class Shop_Group(GroupCog, name="shop"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def country(self, ctx: Interaction):
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.Shop_Group(self.bot).country(ctx)
             return
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.Shop_Group(self.bot).country(ctx)
             return    
         await en.Shop_Group(self.bot).country(ctx)
@@ -63,37 +69,37 @@ class Shop_Group(GroupCog, name="shop"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def backgrounds(self, ctx: Interaction):
-        if ctx.locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.Shop_Group(self.bot).backgrounds(ctx)
-        elif ctx.locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.Shop_Group(self.bot).backgrounds(ctx)
-        elif ctx.locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.Shop_Group(self.bot).backgrounds(ctx)
 
     @backgrounds.error
     async def backgrounds_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-        if ctx.locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.Shop_Group(self.bot).backgrounds_error(ctx, error)
-        elif ctx.locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.Shop_Group(self.bot).backgrounds_error(ctx, error)
-        elif ctx.locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.Shop_Group(self.bot).backgrounds_error(ctx, error)
 
     @Jeanne.command(
         name="animated-profile",
-        description="Permanently unlock animated profile cards for 10,000 QP",
+        description="Permanently unlock animated profile cards for 10,000 currency",
         extras={
             "en": {
                 "name": "animated-profile",
-                "description": "Permanently unlock animated profile cards for 10,000 QP",
+                "description": "Permanently unlock animated profile cards for 10,000 currency",
             },
             "fr": {
                 "name": "profil-animé",
-                "description": "Débloquez définitivement les cartes de profil animées pour 10 000 QP",
+                "description": "Débloquez définitivement les cartes de profil animées avec la monnaie du serveur",
             },
             "de": {
                 "name": "animiertes-profil",
-                "description": "Schalte animierte Profilkarten dauerhaft für 10.000 QP frei",
+                "description": "Schalte animierte Profilkarten dauerhaft mit Serverwährung frei",
             },
         },
     )
@@ -102,7 +108,7 @@ class Shop_Group(GroupCog, name="shop"):
     @Jeanne.check(is_suspended)
     async def animated_profile(self, ctx: Interaction):
         inventory = Inventory(ctx.user)
-        locale = ctx.locale.value
+        locale = get_command_locale(ctx)
         if inventory.animated_profile_unlocked:
             messages = {
                 "fr": "Vous avez déjà débloqué les cartes de profil animées.",
@@ -114,27 +120,27 @@ class Shop_Group(GroupCog, name="shop"):
             return
         if Currency(ctx.user).get_balance < 10000:
             messages = {
-                "fr": "Vous avez besoin de 10 000 QP pour débloquer les cartes de profil animées.",
-                "de": "Du benötigst 10.000 QP, um animierte Profilkarten freizuschalten.",
+                "fr": f"Vous avez besoin de {qp(ctx, 10000)} pour débloquer les cartes de profil animées.",
+                "de": f"Du benötigst {qp(ctx, 10000)}, um animierte Profilkarten freizuschalten.",
             }
             await ctx.response.send_message(
                 messages.get(
                     locale,
-                    "You need 10,000 QP to unlock animated profile cards.",
+                    f"You need {qp(ctx, 10000)} to unlock animated profile cards.",
                 )
             )
             return
 
         descriptions = {
-            "fr": "Débloquer définitivement les cartes de profil animées pour **10 000 QP** ?",
-            "de": "Animierte Profilkarten dauerhaft für **10.000 QP** freischalten?",
+            "fr": f"Débloquer définitivement les cartes de profil animées pour **{qp(ctx, 10000)}** ?",
+            "de": f"Animierte Profilkarten dauerhaft für **{qp(ctx, 10000)}** freischalten?",
         }
         view = Confirmation(ctx, ctx.user)
         await ctx.response.send_message(
             embed=Embed(
                 description=descriptions.get(
                     locale,
-                    "Permanently unlock animated profile cards for **10,000 QP**?",
+                    f"Permanently unlock animated profile cards for **{qp(ctx, 10000)}**?",
                 ),
                 color=Color.random(),
             ),
@@ -246,16 +252,16 @@ class Background_Group(GroupCog, name="background"):
         if not source_url:
             await ctx.response.send_message("Add an image link or upload an image/GIF.")
             return
-        if ctx.locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.Background_Group(self.bot).buycustom(ctx, name, source_url)
-        elif ctx.locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.Background_Group(self.bot).buycustom(ctx, name, source_url)
-        elif ctx.locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.Background_Group(self.bot).buycustom(ctx, name, source_url)
 
     @buycustom.error
     async def buycustom_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
-        if ctx.locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.Background_Group(self.bot).buycustom_error(
                 ctx,
                 error,
@@ -265,7 +271,7 @@ class Background_Group(GroupCog, name="background"):
                     else "invalid"
                 ),
             )
-        elif ctx.locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.Background_Group(self.bot).buycustom_error(
                 ctx,
                 error,
@@ -275,7 +281,7 @@ class Background_Group(GroupCog, name="background"):
                     else "invalid"
                 ),
             )
-        elif ctx.locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.Background_Group(self.bot).buycustom_error(
                 ctx,
                 error,
@@ -305,11 +311,11 @@ class Background_Group(GroupCog, name="background"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def _list(self, ctx: Interaction):
-        if ctx.locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.Background_Group(self.bot).list(ctx)
-        elif ctx.locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.Background_Group(self.bot).list(ctx)
-        elif ctx.locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.Background_Group(self.bot).list(ctx)
 
 

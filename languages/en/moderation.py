@@ -56,6 +56,10 @@ class moderation():
             except Exception:
                 time = "Invalid time added. User is banned permanently!"
             ban.add_field(name="Duration", value=time, inline=True)
+        case_id = await Moderation(ctx.guild).create_case(
+            "ban", member, ctx.user, reason, duration=time
+        )
+        ban.add_field(name="Case ID", value=f"`#{case_id}`", inline=True)
         ban.set_thumbnail(url=member.display_avatar)
         modlog = Moderation(ctx.guild).get_modlog_channel
         if modlog is None:
@@ -173,12 +177,16 @@ class moderation():
         await Moderation(ctx.guild).warn_user(
             member, ctx.user.id, reason, warn_id, date
         )
+        case_id = await Moderation(ctx.guild).create_case(
+            "warn", member, ctx.user, reason, related_warn_id=warn_id
+        )
         warn = Embed(title="Member warned", color=0xFF0000)
         warn.add_field(name="Member", value=member, inline=True)
         warn.add_field(name="ID", value=member.id, inline=True)
         warn.add_field(name="Moderator", value=ctx.user, inline=True)
         warn.add_field(name="Reason", value=reason, inline=False)
         warn.add_field(name="Warn ID", value=warn_id, inline=True)
+        warn.add_field(name="Case ID", value=f"`#{case_id}`", inline=True)
         warn.add_field(name="Date", value="<t:{}:F>".format(date), inline=True)
         warn.set_thumbnail(url=member.display_avatar)
         modlog = Moderation(ctx.guild).get_modlog_channel
@@ -274,10 +282,14 @@ class moderation():
             await ctx.followup.send("Invalid warn ID")
             return
         await mod.revoke_warn(member, warn_id)
+        case_id = await mod.create_case(
+            "clearwarn", member, ctx.user, f"Revoked warn ID {warn_id}", related_warn_id=warn_id
+        )
         revoked_warn = Embed(
             title="Warn removed",
             description=f"{ctx.user} has revoked warn ID ({warn_id})",
         )
+        revoked_warn.add_field(name="Case ID", value=f"`#{case_id}`", inline=True)
         modlog = Moderation(ctx.guild).get_modlog_channel
         if modlog is None:
             await ctx.followup.send(embed=revoked_warn)
@@ -327,11 +339,15 @@ class moderation():
         except Exception:
             pass
         await ctx.guild.kick(member, reason="{} | {}".format(reason, ctx.user))
+        case_id = await Moderation(ctx.guild).create_case(
+            "kick", member, ctx.user, reason
+        )
         kick = Embed(title="Member Kicked", color=0xFF0000)
         kick.add_field(name="Member", value=member, inline=True)
         kick.add_field(name="ID", value=member.id, inline=True)
         kick.add_field(name="Moderator", value=ctx.user, inline=True)
         kick.add_field(name="Reason", value=reason, inline=True)
+        kick.add_field(name="Case ID", value=f"`#{case_id}`", inline=True)
         kick.set_thumbnail(url=member.display_avatar)
         modlog = Moderation(ctx.guild).get_modlog_channel
         if modlog is None:
@@ -403,11 +419,15 @@ class moderation():
         reason = reason if reason else "Unspecified"
         user = await self.bot.fetch_user(int(user_id))
         await ctx.guild.unban(user, reason="{} | {}".format(reason, ctx.user))
+        case_id = await Moderation(ctx.guild).create_case(
+            "unban", user, ctx.user, reason, status="completed"
+        )
         unban = Embed(title="User Unbanned", color=0xFF0000)
         unban.add_field(name="Name", value=user, inline=True)
         unban.add_field(name="ID", value=user.id, inline=True)
         unban.add_field(name="Moderator", value=ctx.user, inline=True)
         unban.add_field(name="Reason", value=reason, inline=False)
+        unban.add_field(name="Case ID", value=f"`#{case_id}`", inline=True)
         unban.set_thumbnail(url=user.display_avatar)
         modlog = Moderation(ctx.guild).get_modlog_channel
         if modlog is None:
@@ -451,12 +471,17 @@ class moderation():
             timed_out_until=(datetime.now().astimezone() + timedelta(seconds=timed)),
             reason="{} | {}".format(reason, ctx.user),
         )
+        duration = format_timespan(timed)
+        case_id = await Moderation(ctx.guild).create_case(
+            "timeout", member, ctx.user, reason, duration=duration
+        )
         mute = Embed(title="Member Timeout", color=0xFF0000)
         mute.add_field(name="Member", value=member, inline=True)
         mute.add_field(name="ID", value=member.id, inline=True)
         mute.add_field(name="Moderator", value=ctx.user, inline=True)
-        mute.add_field(name="Duration", value=format_timespan(timed), inline=True)
+        mute.add_field(name="Duration", value=duration, inline=True)
         mute.add_field(name="Reason", value=reason, inline=False)
+        mute.add_field(name="Case ID", value=f"`#{case_id}`", inline=True)
         mute.set_thumbnail(url=member.display_avatar)
         modlog = Moderation(ctx.guild).get_modlog_channel
         if modlog is None:
@@ -499,11 +524,15 @@ class moderation():
         await member.edit(
             timed_out_until=None, reason="{} | {}".format(reason, ctx.user)
         )
+        case_id = await Moderation(ctx.guild).create_case(
+            "untimeout", member, ctx.user, reason, status="completed"
+        )
         unmute = Embed(title="User Untimeout", color=0xFF0000)
         unmute.add_field(name="User", value=member, inline=True)
         unmute.add_field(name="ID", value=member.id, inline=True)
         unmute.add_field(name="Moderator", value=ctx.user, inline=True)
         unmute.add_field(name="Reason", value=reason, inline=False)
+        unmute.add_field(name="Case ID", value=f"`#{case_id}`", inline=True)
         unmute.set_thumbnail(url=member.display_avatar)
         modlog = Moderation(ctx.guild).get_modlog_channel
         if modlog is None:
@@ -570,17 +599,28 @@ class moderation():
             await ctx.edit_original_response(embed=em, view=None)
             ban_results = await ctx.guild.bulk_ban(to_ban, reason=reason)
 
-            if len(ban_results) > 0:
+            if ban_results.banned:
                 embed = Embed(
                     title="List of banned users",
                     color=Color.red(),
                 )
                 banned_users = []
+                case_ids = []
                 for i in ban_results.banned:
                     u = await self.bot.fetch_user(i.id)
                     banned_users.append(f"{u.global_name} | `{i.id}`")
+                    case_id = await Moderation(ctx.guild).create_case(
+                        "massban", i, ctx.user, reason
+                    )
+                    case_ids.append(f"`#{case_id}`")
                 embed.description = "\n".join(banned_users)
                 embed.add_field(name="Reason", value=reason, inline=False)
+                if case_ids:
+                    embed.add_field(
+                        name="Case IDs",
+                        value=", ".join(case_ids),
+                        inline=False,
+                    )
                 if ban_results.failed:
                     failed_banned_users = []
                     for i in ban_results.failed:
@@ -658,12 +698,17 @@ class moderation():
             unban_count = 0
             failed_ids = []
             unbanned = []
+            case_ids = []
             for user_id in to_ban_ids:
                 try:
                     user = await self.bot.fetch_user(int(user_id))
                     await ctx.guild.unban(user, reason=reason)
                     unbanned.append(f"{user} | `{user.id}`")
                     unban_count += 1
+                    case_id = await Moderation(ctx.guild).create_case(
+                        "massunban", user, ctx.user, reason, status="completed"
+                    )
+                    case_ids.append(f"`#{case_id}`")
                     await asyncio.sleep(0.5)
                 except Exception:
                     failed_ids.append(user_id)
@@ -675,6 +720,12 @@ class moderation():
                 )
                 embed.description = "\n".join(unbanned)
                 embed.add_field(name="Reason", value=reason, inline=False)
+                if case_ids:
+                    embed.add_field(
+                        name="Case IDs",
+                        value=", ".join(case_ids),
+                        inline=False,
+                    )
                 if failed_ids:
                     embed.add_field(
                         name="Failed to unban",

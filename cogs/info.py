@@ -1,6 +1,7 @@
 from functions import (
     check_botbanned_app_command,
     check_disabled_app_command,
+    get_command_locale,
     is_suspended,
 )
 from discord.app_commands import locale_str as T
@@ -37,10 +38,10 @@ class InfoCog(Cog, name="InfoSlash"):
         await self.get_userinfo(ctx, member)
 
     async def get_userinfo(self, ctx: Interaction, member: Member):
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.Info(self.bot).get_userinfo(ctx, member)
             return       
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.Info(self.bot).get_userinfo(ctx, member)
             return
         await en.Info(self.bot).get_userinfo(ctx, member)
@@ -66,10 +67,10 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def stats(self, ctx: Interaction):
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.Info(self.bot).stats(ctx, self.bot_version)
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.Info(self.bot).stats(ctx, self.bot_version)
             return
         await en.Info(self.bot).stats(ctx, self.bot_version)
@@ -134,10 +135,10 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def serverinfo(self, ctx: Interaction):
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.Info(self.bot).serverinfo(ctx)
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.Info(self.bot).serverinfo(ctx)
             return
         await en.Info(self.bot).serverinfo(ctx)
@@ -163,10 +164,10 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def ping(self, ctx: Interaction):
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.Info(self.bot).ping(ctx)
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.Info(self.bot).ping(ctx)
             return
         await en.Info(self.bot).ping(ctx)
@@ -189,10 +190,10 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def serverbanner(self, ctx: Interaction):
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.Info(self.bot).serverbanner(ctx) 
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.Info(self.bot).serverbanner(ctx)
             return
         await en.Info(self.bot).serverbanner(ctx)
@@ -233,10 +234,10 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def avatar(self, ctx: Interaction, member: Optional[Member] = None) -> None:
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.Info(self.bot).avatar(ctx, member)      
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.Info(self.bot).avatar(ctx, member)
             return
         await en.Info(self.bot).avatar(ctx, member)
@@ -286,10 +287,10 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def sticker(self, ctx: Interaction, sticker: str):
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.Info(self.bot).sticker(ctx, sticker)      
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.Info(self.bot).sticker(ctx, sticker)
             return
         await en.Info(self.bot).sticker(ctx, sticker)
@@ -299,20 +300,20 @@ class InfoCog(Cog, name="InfoSlash"):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, IndexError
         ):
-            if ctx.locale.value == "fr":
+            if get_command_locale(ctx) == "fr":
                 await fr.Info(self.bot).sticker_error(ctx, error, "NoSticker")
                 return
-            if ctx.locale.value == "de":
+            if get_command_locale(ctx) == "de":
                 await de.Info(self.bot).sticker_error(ctx, error, "NoSticker")
                 return
             await en.Info(self.bot).sticker_error(ctx, error, "NoSticker")
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, AttributeError
         ):
-            if ctx.locale.value == "de":
+            if get_command_locale(ctx) == "de":
                 await de.Info(self.bot).sticker_error(ctx, error, "StickerNotFound")
                 return
-            if ctx.locale.value == "fr":
+            if get_command_locale(ctx) == "fr":
                 await fr.Info(self.bot).sticker_error(ctx, error, "StickerNotFound")
                 return
             await en.Info(self.bot).sticker_error(ctx, error, "StickerNotFound")
@@ -360,10 +361,10 @@ class InfoCog(Cog, name="InfoSlash"):
     @Jeanne.check(check_disabled_app_command)
     @Jeanne.check(is_suspended)
     async def emoji(self, ctx: Interaction, emoji: str):
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.Info(self.bot).emoji(ctx, emoji)
             return
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.Info(self.bot).emoji(ctx, emoji)
             return
         await en.Info(self.bot).emoji(ctx, emoji)
@@ -373,10 +374,10 @@ class InfoCog(Cog, name="InfoSlash"):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, AttributeError
         ):
-            if ctx.locale.value == "de":
+            if get_command_locale(ctx) == "de":
                 await de.Info(self.bot).emoji_error(ctx, error)
                 return
-            if ctx.locale.value == "fr":
+            if get_command_locale(ctx) == "fr":
                 await fr.Info(self.bot).emoji_error(ctx, error)
                 return
             await en.Info(self.bot).emoji_error(ctx, error)

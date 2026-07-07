@@ -6,12 +6,17 @@ from assets.components import (
 )
 from functions import (
     Currency,
-    Inventory,  
+    Inventory,
+    ServerSettings,
 )
 from discord import ButtonStyle, Color, Embed, File, Interaction, app_commands as Jeanne
 from discord.ext.commands import Bot
 from assets.generators.profile_card import Profile
 from reactionmenu import ViewButton, ViewMenu
+
+
+def qp(ctx: Interaction, amount: int) -> str:
+    return ServerSettings.format_currency_for(ctx.guild, amount)
 
 
 class Shop_Group():
@@ -22,7 +27,7 @@ class Shop_Group():
         await ctx.response.defer()
         balance = Currency(ctx.user).get_balance
         if balance is None or balance < 500:
-            nomoney = Embed(description="Vous n'avez pas assez de QP.")
+            nomoney = Embed(description="Vous n'avez pas assez de monnaie.")
             await ctx.followup.send(embed=nomoney)
             return
         view = Country_Badge_Buttons(self.bot, ctx.user)
@@ -64,7 +69,7 @@ class Shop_Group():
             page_embed = Embed(title=name, color=embed.color)
 
             page_embed.add_field(
-                name="Prix", value="1000 <:quantumpiece:1161010445205905418>"
+                name="Prix", value=qp(ctx, 1000)
             )
             page_embed.set_image(url=str(wallpaper[2]))
             menu.add_page(embed=page_embed)
@@ -130,7 +135,7 @@ class Background_Group():
             return
         balance = Currency(ctx.user).get_balance
         if balance is None or balance < price:
-            nomoney = Embed(description=f"Vous avez besoin de {price:,} QP.")
+            nomoney = Embed(description=f"Vous avez besoin de {qp(ctx, price)}.")
             await ctx.followup.send(embed=nomoney)
             return
         await ctx.followup.send(
@@ -163,7 +168,7 @@ class Background_Group():
                 color=Color.blue(),
             )
             .add_field(
-                name="Coût", value=f"{price:,} <:quantumpiece:1161010445205905418>"
+                name="Coût", value=qp(ctx, price)
             )
             .set_footer(
                 text="Veuillez noter que si le fond d'écran personnalisé enfreint les CGU ou est NSFW, il sera supprimé SANS REMBOURSEMENT !"

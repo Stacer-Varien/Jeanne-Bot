@@ -24,7 +24,7 @@ from sys import executable, argv
 
 from humanfriendly import parse_timespan
 from assets.components import ModuleSelect
-from functions import BetaTest, DevPunishment, Hentai, Partner
+from functions import BetaTest, Currency, DevPunishment, Hentai, Partner, ServerSettings
 from typing import Literal, Optional
 
 
@@ -35,6 +35,29 @@ class OwnerCog(Cog, name="Owner"):
     @staticmethod
     def restart_bot():
         execv(executable, [executable] + argv)
+
+    @staticmethod
+    async def _parse_qp_amount(
+        ctx: Context, amount: str, *, allow_zero: bool = False
+    ) -> int | None:
+        try:
+            if Currency.is_negative_qp(amount):
+                requirement = "0 or higher" if allow_zero else "greater than 0"
+                await ctx.send(f"QP amount must be {requirement}.")
+                return None
+            normalized = Currency.normalize_qp(amount)
+        except ValueError:
+            await ctx.send("QP amount must be a valid number.")
+            return None
+        if normalized == 0 and not allow_zero:
+            requirement = "0 or higher" if allow_zero else "greater than 0"
+            await ctx.send(f"QP amount must be {requirement}.")
+            return None
+        return normalized
+
+    @staticmethod
+    def _currency(ctx: Context, amount: int) -> str:
+        return ServerSettings.format_currency_for(ctx.guild, amount)
 
     @group(
         invoke_without_command=True, description="Main partner command (Developer Only)"
@@ -96,6 +119,76 @@ class OwnerCog(Cog, name="Owner"):
         if DevPunishment(ctx.author).check_botbanned_user:
             return
         await BetaTest(self.bot).remove(ctx, user)
+
+    @group(
+        name="qp",
+        aliases=["currency", "bank"],
+        invoke_without_command=True,
+        description="Manage currency balances (Developer Only)",
+    )
+    @is_owner()
+    async def qp(self, ctx: Context):
+        if DevPunishment(ctx.author).check_botbanned_user:
+            return
+        embed = Embed(
+            title="Currency owner commands",
+            description=(
+                "`qp check USER`\n"
+                "`qp add USER AMOUNT`\n"
+                "`qp remove USER AMOUNT`\n"
+                "`qp set USER AMOUNT`"
+            ),
+        )
+        await ctx.send(embed=embed)
+
+    @qp.command(name="check", aliases=["balance"], description="Check a user's currency")
+    @is_owner()
+    async def qp_check(self, ctx: Context, user: User):
+        if DevPunishment(ctx.author).check_botbanned_user:
+            return
+        await ctx.send(f"{user} has {self._currency(ctx, Currency(user).get_balance)}.")
+
+    @qp.command(name="add", aliases=["give"], description="Add currency to a user")
+    @is_owner()
+    async def qp_add(self, ctx: Context, user: User, amount: str):
+        if DevPunishment(ctx.author).check_botbanned_user:
+            return
+        qp = await self._parse_qp_amount(ctx, amount)
+        if qp is None:
+            return
+        bank = Currency(user)
+        added = await bank.add_qp(qp)
+        await ctx.send(
+            f"Added {self._currency(ctx, added)} to {user}. "
+            f"New balance: {self._currency(ctx, bank.get_balance)}."
+        )
+
+    @qp.command(name="remove", aliases=["take"], description="Remove currency from a user")
+    @is_owner()
+    async def qp_remove(self, ctx: Context, user: User, amount: str):
+        if DevPunishment(ctx.author).check_botbanned_user:
+            return
+        qp = await self._parse_qp_amount(ctx, amount)
+        if qp is None:
+            return
+        bank = Currency(user)
+        removed = await bank.remove_qp(qp)
+        await ctx.send(
+            f"Removed {self._currency(ctx, removed)} from {user}. "
+            f"New balance: {self._currency(ctx, bank.get_balance)}."
+        )
+
+    @qp.command(name="set", description="Set a user's currency")
+    @is_owner()
+    async def qp_set(self, ctx: Context, user: User, amount: str):
+        if DevPunishment(ctx.author).check_botbanned_user:
+            return
+        qp = await self._parse_qp_amount(ctx, amount, allow_zero=True)
+        if qp is None:
+            return
+        bank = Currency(user)
+        balance = await bank.set_qp(qp)
+        await ctx.send(f"Set {user}'s currency to {self._currency(ctx, balance)}.")
 
     @group(
         aliases=["act", "presence"],

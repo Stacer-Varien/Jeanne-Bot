@@ -6,6 +6,7 @@ from discord.ext.commands import Cog, Bot
 from functions import (
     check_botbanned_app_command,
     check_disabled_app_command,
+    get_command_locale,
     is_suspended,
 )
 from typing import Optional
@@ -41,10 +42,10 @@ class nsfw(Cog):
         self,
         ctx: Interaction,
     ) -> None:
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.nsfw(self.bot).hentai(ctx)
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.nsfw(self.bot).hentai(ctx)
             return
         await en.nsfw(self.bot).hentai(ctx)
@@ -113,10 +114,10 @@ class nsfw(Cog):
         tag: Optional[str] = None,
         plus: Optional[bool] = None,
     ) -> None:
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.nsfw(self.bot).rule34(ctx, tag, plus)
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.nsfw(self.bot).rule34(ctx, tag, plus)
             return
         await en.nsfw(self.bot).rule34(ctx, tag, plus)
@@ -184,10 +185,10 @@ class nsfw(Cog):
         tag: Optional[str] = None,
         plus: Optional[bool] = None,
     ) -> None:
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.nsfw(self.bot).gelbooru(ctx, tag, plus)
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.nsfw(self.bot).gelbooru(ctx, tag, plus)
             return
         await en.nsfw(self.bot).gelbooru(ctx, tag, plus)
@@ -255,10 +256,10 @@ class nsfw(Cog):
         tag: Optional[str] = None,
         plus: Optional[bool] = None,
     ) -> None:
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.nsfw(self.bot).yandere(ctx, tag, plus)
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.nsfw(self.bot).yandere(ctx, tag, plus)
             return
         await en.nsfw(self.bot).yandere(ctx, tag, plus)
@@ -333,10 +334,10 @@ class nsfw(Cog):
         tag: Optional[str] = None,
         plus: Optional[bool] = None,
     ) -> None:
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.nsfw(self.bot).konachan(ctx, tag, plus)
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.nsfw(self.bot).konachan(ctx, tag, plus)
             return
         await en.nsfw(self.bot).konachan(ctx, tag, plus)
@@ -411,10 +412,10 @@ class nsfw(Cog):
         tag: Optional[str] = None,
         plus: Optional[bool] = None,
     ) -> None:
-        if ctx.locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.nsfw(self.bot).danbooru(ctx, tag, plus)
             return
-        if ctx.locale.value == "de":
+        if get_command_locale(ctx) == "de":
             await de.nsfw(self.bot).danbooru(ctx, tag, plus)
             return
         await en.nsfw(self.bot).danbooru(ctx, tag, plus)
@@ -428,19 +429,19 @@ class nsfw(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (IndexError, KeyError, TypeError)
         ):
-            if ctx.locale.value == "fr":
+            if get_command_locale(ctx) == "fr":
                 await fr.nsfw(self.bot).Hentai_error(ctx, error, "NotFound")
                 return
-            if ctx.locale.value == "de":
+            if get_command_locale(ctx) == "de":
                 await de.nsfw(self.bot).Hentai_error(ctx, error, "NotFound")
                 return
             await en.nsfw(self.bot).Hentai_error(ctx, error, "NotFound")
 
         if isinstance(error, Jeanne.errors.CommandOnCooldown):
-            if ctx.locale.value == "fr":
+            if get_command_locale(ctx) == "fr":
                 await fr.nsfw(self.bot).Hentai_error(ctx, error, "Cooldown")
                 return
-            if ctx.locale.value == "de":
+            if get_command_locale(ctx) == "de":
                 await de.nsfw(self.bot).Hentai_error(ctx, error, "Cooldown")
                 return
             await en.nsfw(self.bot).Hentai_error(ctx, error, "Cooldown")

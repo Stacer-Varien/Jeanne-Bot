@@ -11,6 +11,7 @@ from assets.dictionary import dictionary
 from functions import (
     check_botbanned_app_command,
     check_disabled_app_command,
+    get_command_locale,
     is_suspended,
     AutoCompleteChoices,
 )
@@ -98,11 +99,11 @@ class EmbedGroup(GroupCog, name="embed"):
         jsonscript=T("generate_jsonscript_parm_name"),
     )
     async def generate(self, ctx: Interaction, channel: TextChannel, jsonscript: str):
-        if ctx.locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.EmbedGroup(self.bot).generate(ctx, channel, jsonscript)
-        elif ctx.locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.EmbedGroup(self.bot).generate(ctx, channel, jsonscript)
-        elif ctx.locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.EmbedGroup(self.bot).generate(ctx, channel, jsonscript)
 
     @Jeanne.command(
@@ -195,11 +196,11 @@ class EmbedGroup(GroupCog, name="embed"):
         self, ctx: Interaction, channel: TextChannel, messageid: str, jsonscript: str
     ):
         await ctx.response.defer()
-        if ctx.locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.EmbedGroup(self.bot).edit(ctx, channel, messageid, jsonscript)
-        elif ctx.locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.EmbedGroup(self.bot).edit(ctx, channel, messageid, jsonscript)
-        elif ctx.locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.EmbedGroup(self.bot).edit(ctx, channel, messageid, jsonscript)
 
     @edit.error
@@ -207,11 +208,11 @@ class EmbedGroup(GroupCog, name="embed"):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (Forbidden, NotFound, HTTPException)
         ):
-            if ctx.locale.value not in ("fr", "de"):
+            if get_command_locale(ctx) not in ("fr", "de"):
                 await en.EmbedGroup(self.bot).edit_error(ctx, error)
-            elif ctx.locale.value == "fr":
+            elif get_command_locale(ctx) == "fr":
                 await fr.EmbedGroup(self.bot).edit_error(ctx, error)
-            elif ctx.locale.value == "de":
+            elif get_command_locale(ctx) == "de":
                 await de.EmbedGroup(self.bot).edit_error(ctx, error)
 
 
@@ -286,11 +287,11 @@ class ReminderCog(GroupCog, name=T("reminder")):
         time=T("time_parm_name"),
     )
     async def add(self, ctx: Interaction, reason: str, time: str):
-        if ctx.locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.ReminderCog(self.bot).add(ctx, reason, time)
-        elif ctx.locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.ReminderCog(self.bot).add(ctx, reason, time)
-        elif ctx.locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.ReminderCog(self.bot).add(ctx, reason, time)
 
     @add.error
@@ -298,11 +299,11 @@ class ReminderCog(GroupCog, name=T("reminder")):
         if isinstance(error, Jeanne.errors.CommandInvokeError) and isinstance(
             error.original, InvalidTimespan
         ):
-            if ctx.locale.value not in ("fr", "de"):
+            if get_command_locale(ctx) not in ("fr", "de"):
                 await en.ReminderCog(self.bot).add_error(ctx, error)
-            elif ctx.locale.value == "fr":
+            elif get_command_locale(ctx) == "fr":
                 await fr.ReminderCog(self.bot).add_error(ctx, error)
-            elif ctx.locale.value == "de":
+            elif get_command_locale(ctx) == "de":
                 await de.ReminderCog(self.bot).add_error(ctx, error)
 
     @Jeanne.command(
@@ -327,11 +328,11 @@ class ReminderCog(GroupCog, name=T("reminder")):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def _list(self, ctx: Interaction):
-        if ctx.locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.ReminderCog(self.bot)._list(ctx)
-        elif ctx.locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.ReminderCog(self.bot)._list(ctx)
-        elif ctx.locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.ReminderCog(self.bot)._list(ctx)
 
     @Jeanne.command(
@@ -379,11 +380,11 @@ class ReminderCog(GroupCog, name=T("reminder")):
     @Jeanne.describe(reminder_id=T("reminder_cancel_rmd_id_parm_desc"))
     @Jeanne.rename(reminder_id=T("reminder_cancel_rmd_id_parm_name"))
     async def cancel(self, ctx: Interaction, reminder_id: int):
-        if ctx.locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.ReminderCog(self.bot).cancel(ctx, reminder_id)
-        elif ctx.locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.ReminderCog(self.bot).cancel(ctx, reminder_id)
-        elif ctx.locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.ReminderCog(self.bot).cancel(ctx, reminder_id)
 
 
@@ -482,30 +483,30 @@ class SlashUtilities(Cog):
         units: Optional[Literal["Metric", "Imperial"]] = None,
         three_day: Optional[bool] = False,
     ):
-        if ctx.locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.Utilities(self.bot).weather(ctx, city, units, three_day)
-        elif ctx.locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.Utilities(self.bot).weather(ctx, city, units, three_day)
-        elif ctx.locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.Utilities(self.bot).weather(ctx, city, units, three_day)
 
     @weather.error
     async def weather_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if ctx.locale.value not in ("fr", "de"):
+            if get_command_locale(ctx) not in ("fr", "de"):
                 await en.Utilities(self.bot).weather_error(ctx, error, "cooldown")
-            elif ctx.locale.value == "fr":
+            elif get_command_locale(ctx) == "fr":
                 await fr.Utilities(self.bot).weather_error(ctx, error, "cooldown")
-            elif ctx.locale.value == "de":
+            elif get_command_locale(ctx) == "de":
                 await de.Utilities(self.bot).weather_error(ctx, error, "cooldown")
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (KeyError, TypeError)
         ):
-            if ctx.locale.value not in ("fr", "de"):
+            if get_command_locale(ctx) not in ("fr", "de"):
                 await en.Utilities(self.bot).weather_error(ctx, error, "failed")
-            elif ctx.locale.value == "fr":
+            elif get_command_locale(ctx) == "fr":
                 await fr.Utilities(self.bot).weather_error(ctx, error, "failed")
-            elif ctx.locale.value == "de":
+            elif get_command_locale(ctx) == "de":
                 await de.Utilities(self.bot).weather_error(ctx, error, "failed")
 
     @Jeanne.command(
@@ -553,11 +554,11 @@ class SlashUtilities(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def calculator(self, ctx: Interaction, calculate: str):
-        if ctx.locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.Utilities(self.bot).calculator(ctx, calculate)
-        elif ctx.locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.Utilities(self.bot).calculator(ctx, calculate)
-        elif ctx.locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.Utilities(self.bot).calculator(ctx, calculate)
 
     @calculator.error
@@ -565,20 +566,20 @@ class SlashUtilities(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, OverflowError
         ):
-            if ctx.locale.value not in ("fr", "de"):
+            if get_command_locale(ctx) not in ("fr", "de"):
                 await en.Utilities(self.bot).calculator_error(ctx, error, "overflow")
-            elif ctx.locale.value == "fr":
+            elif get_command_locale(ctx) == "fr":
                 await fr.Utilities(self.bot).calculator_error(ctx, error, "overflow")
-            elif ctx.locale.value == "de":
+            elif get_command_locale(ctx) == "de":
                 await de.Utilities(self.bot).calculator_error(ctx, error, "overflow")
         elif isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, Exception
         ):
-            if ctx.locale.value not in ("fr", "de"):
+            if get_command_locale(ctx) not in ("fr", "de"):
                 await en.Utilities(self.bot).calculator_error(ctx, error, "failed")
-            elif ctx.locale.value == "fr":
+            elif get_command_locale(ctx) == "fr":
                 await fr.Utilities(self.bot).calculator_error(ctx, error, "failed")
-            elif ctx.locale.value == "de":
+            elif get_command_locale(ctx) == "de":
                 await de.Utilities(self.bot).calculator_error(ctx, error, "failed")
 
     @Jeanne.command(
@@ -603,11 +604,11 @@ class SlashUtilities(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def invite(self, ctx: Interaction):
-        if ctx.locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.Utilities(self.bot).invite(ctx)
-        elif ctx.locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.Utilities(self.bot).invite(ctx)
-        elif ctx.locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.Utilities(self.bot).invite(ctx)
 
     @Jeanne.command(
@@ -636,11 +637,11 @@ class SlashUtilities(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def botreport(self, ctx: Interaction, report_type: str):
-        if ctx.locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.Utilities(self.bot).botreport(ctx, report_type)
-        elif ctx.locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.Utilities(self.bot).botreport(ctx, report_type)
-        elif ctx.locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.Utilities(self.bot).botreport(ctx, report_type)
 
     @Jeanne.command(
@@ -727,11 +728,11 @@ class SlashUtilities(Cog):
         confession: Jeanne.Range[str, 1, 4096],
         anonymous: Optional[bool] = False,
     ):
-        if ctx.locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.Utilities(self.bot).confession(ctx, confession, anonymous)
-        elif ctx.locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.Utilities(self.bot).confession(ctx, confession, anonymous)
-        elif ctx.locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.Utilities(self.bot).confession(ctx, confession, anonymous)
 
     @Jeanne.command(
@@ -802,11 +803,11 @@ class SlashUtilities(Cog):
     async def reportconfession(
         self, ctx: Interaction, confession_id: int, reason: Jeanne.Range[str, 1, 512]
     ):
-        if ctx.locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.Utilities(self.bot).reportconfession(ctx, confession_id, reason)
-        elif ctx.locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.Utilities(self.bot).reportconfession(ctx, confession_id, reason)
-        elif ctx.locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.Utilities(self.bot).reportconfession(ctx, confession_id, reason)
 
 async def setup(bot: Bot):

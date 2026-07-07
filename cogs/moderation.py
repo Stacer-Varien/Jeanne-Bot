@@ -14,6 +14,7 @@ from functions import (
     AutoCompleteChoices,
     check_botbanned_app_command,
     check_disabled_app_command,
+    get_command_locale,
     is_suspended,
 )
 from typing import Optional
@@ -35,25 +36,25 @@ class moderation(Cog):
         time: Optional[str] = None,
         delete_message_history: Optional[bool] = None,
     ):
-        if ctx.guild.preferred_locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.moderation(self.bot).commit_ban(
                 ctx, member, reason, time, delete_message_history
             )
-        elif ctx.guild.preferred_locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.moderation(self.bot).commit_ban(
                 ctx, member, reason, time, delete_message_history
             )
-        elif ctx.guild.preferred_locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.moderation(self.bot).commit_ban(
                 ctx, member, reason, time, delete_message_history
             )
 
     async def check_banned(self, ctx: Interaction, member: User):
-        if ctx.guild.preferred_locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.moderation(self.bot).check_banned(ctx, member)
-        elif ctx.guild.preferred_locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.moderation(self.bot).check_banned(ctx, member)
-        elif ctx.guild.preferred_locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.moderation(self.bot).check_banned(ctx, member)
 
     @Jeanne.command(
@@ -172,15 +173,15 @@ class moderation(Cog):
         delete_message_history: Optional[bool] = None,
         time: Optional[str] = None,
     ) -> None:
-        if ctx.guild.preferred_locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.moderation(self.bot).ban(
                 ctx, member, reason, delete_message_history, time
             )
-        elif ctx.guild.preferred_locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.moderation(self.bot).ban(
                 ctx, member, reason, delete_message_history, time
             )
-        elif ctx.guild.preferred_locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.moderation(self.bot).ban(
                 ctx, member, reason, delete_message_history, time
             )
@@ -190,11 +191,11 @@ class moderation(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (HTTPException, ValueError)
         ):
-            if ctx.guild.preferred_locale.value not in ("fr", "de"):
+            if get_command_locale(ctx) not in ("fr", "de"):
                 await en.moderation(self.bot).ban_user_error(ctx)
-            elif ctx.guild.preferred_locale.value == "fr":
+            elif get_command_locale(ctx) == "fr":
                 await fr.moderation(self.bot).ban_user_error(ctx)
-            elif ctx.guild.preferred_locale.value == "de":
+            elif get_command_locale(ctx) == "de":
                 await de.moderation(self.bot).ban_user_error(ctx)
 
     @Jeanne.command(
@@ -275,11 +276,11 @@ class moderation(Cog):
         member: Member,
         reason: Optional[Jeanne.Range[str, None, 512]] = None,
     ) -> None:
-        if ctx.guild.preferred_locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.moderation(self.bot).warn(ctx, member, reason)
-        elif ctx.guild.preferred_locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.moderation(self.bot).warn(ctx, member, reason)
-        elif ctx.guild.preferred_locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.moderation(self.bot).warn(ctx, member, reason)
 
     @Jeanne.command(
@@ -332,11 +333,11 @@ class moderation(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def listwarns(self, ctx: Interaction, member: Optional[str]):
-        if ctx.locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.moderation(self.bot).listwarns(ctx, member)
-        elif ctx.locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.moderation(self.bot).listwarns(ctx, member)
-        elif ctx.locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.moderation(self.bot).listwarns(ctx, member)
 
     @listwarns.error
@@ -344,11 +345,11 @@ class moderation(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, (ValueError, AttributeError)
         ):
-            if ctx.guild.preferred_locale.value not in ("fr", "de"):
+            if get_command_locale(ctx) not in ("fr", "de"):
                 await en.moderation(self.bot).listwarns_error(ctx, error)
-            elif ctx.guild.preferred_locale.value == "fr":
+            elif get_command_locale(ctx) == "fr":
                 await fr.moderation(self.bot).listwarns_error(ctx, error)
-            elif ctx.guild.preferred_locale.value == "de":
+            elif get_command_locale(ctx) == "de":
                 await de.moderation(self.bot).listwarns_error(ctx, error)
 
     @Jeanne.command(
@@ -424,11 +425,11 @@ class moderation(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def clearwarn(self, ctx: Interaction, member: Member, warn_id: int):
-        if ctx.guild.preferred_locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.moderation(self.bot).clearwarn(ctx, member, warn_id)
-        elif ctx.guild.preferred_locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.moderation(self.bot).clearwarn(ctx, member, warn_id)
-        elif ctx.guild.preferred_locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.moderation(self.bot).clearwarn(ctx, member, warn_id)
 
     @Jeanne.command(
@@ -510,11 +511,11 @@ class moderation(Cog):
         member: Member,
         reason: Optional[Jeanne.Range[str, None, 470]] = None,
     ) -> None:
-        if ctx.guild.preferred_locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.moderation(self.bot).kick(ctx, member, reason)
-        elif ctx.guild.preferred_locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.moderation(self.bot).kick(ctx, member, reason)
-        elif ctx.guild.preferred_locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.moderation(self.bot).kick(ctx, member, reason)
 
     @Jeanne.command(
@@ -596,11 +597,11 @@ class moderation(Cog):
         limit: Optional[Jeanne.Range[int, None, 100]] = None,
         member: Optional[Member] = None,
     ) -> None:
-        if ctx.guild.preferred_locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.moderation(self.bot).prune(ctx, limit, member)
-        elif ctx.guild.preferred_locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.moderation(self.bot).prune(ctx, limit, member)
-        elif ctx.guild.preferred_locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.moderation(self.bot).prune(ctx, limit, member)
 
     @Jeanne.command(
@@ -682,9 +683,9 @@ class moderation(Cog):
         member: Member,
         nickname: Optional[Jeanne.Range[str, 1, 32]] = None,
     ):
-        if ctx.guild.preferred_locale.value == "fr":
+        if get_command_locale(ctx) == "fr":
             await fr.moderation(self.bot).changenickname(ctx, member, nickname)
-        elif ctx.guild.preferred_locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.moderation(self.bot).changenickname(ctx, member, nickname)
         else:
             await en.moderation(self.bot).changenickname(ctx, member, nickname)
@@ -766,11 +767,11 @@ class moderation(Cog):
         user_id: str,
         reason: Optional[Jeanne.Range[str, None, 470]] = None,
     ) -> None:
-        if ctx.guild.preferred_locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.moderation(self.bot).unban(ctx, user_id, reason)
-        elif ctx.guild.preferred_locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.moderation(self.bot).unban(ctx, user_id, reason)
-        elif ctx.guild.preferred_locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.moderation(self.bot).unban(ctx, user_id, reason)
 
     @unban.error
@@ -880,11 +881,11 @@ class moderation(Cog):
         time: Optional[str] = None,
         reason: Optional[Jeanne.Range[str, None, 470]] = None,
     ) -> None:
-        if ctx.guild.preferred_locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.moderation(self.bot).timeout(ctx, member, time, reason)
-        elif ctx.guild.preferred_locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.moderation(self.bot).timeout(ctx, member, time, reason)
-        elif ctx.guild.preferred_locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.moderation(self.bot).timeout(ctx, member, time, reason)
 
     @timeout.error
@@ -892,11 +893,11 @@ class moderation(Cog):
         if isinstance(error, Jeanne.CommandInvokeError) and isinstance(
             error.original, InvalidTimespan
         ):
-            if ctx.guild.preferred_locale.value not in ("fr", "de"):
+            if get_command_locale(ctx) not in ("fr", "de"):
                 await en.moderation(self.bot).timeout_error(ctx, error)
-            elif ctx.guild.preferred_locale.value == "fr":
+            elif get_command_locale(ctx) == "fr":
                 await fr.moderation(self.bot).timeout_error(ctx, error)
-            elif ctx.guild.preferred_locale.value == "de":
+            elif get_command_locale(ctx) == "de":
                 await de.moderation(self.bot).timeout_error(ctx, error)
 
     @Jeanne.command(
@@ -978,11 +979,11 @@ class moderation(Cog):
         member: Member,
         reason: Optional[Jeanne.Range[str, None, 470]] = None,
     ) -> None:
-        if ctx.guild.preferred_locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.moderation(self.bot).timeoutremove(ctx, member, reason)
-        elif ctx.guild.preferred_locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.moderation(self.bot).timeoutremove(ctx, member, reason)
-        elif ctx.guild.preferred_locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.moderation(self.bot).timeoutremove(ctx, member, reason)
 
     @Jeanne.command(
@@ -1058,21 +1059,21 @@ class moderation(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def massban(self, ctx: Interaction, user_ids: str, reason: str):
-        if ctx.guild.preferred_locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.moderation(self.bot).massban(ctx, user_ids, reason)
-        elif ctx.guild.preferred_locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.moderation(self.bot).massban(ctx, user_ids, reason)
-        elif ctx.guild.preferred_locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.moderation(self.bot).massban(ctx, user_ids, reason)
 
     @massban.error
     async def massban_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if ctx.guild.preferred_locale.value not in ("fr", "de"):
+            if get_command_locale(ctx) not in ("fr", "de"):
                 await en.moderation(self.bot).massban_error(ctx, error)
-            elif ctx.guild.preferred_locale.value == "fr":
+            elif get_command_locale(ctx) == "fr":
                 await fr.moderation(self.bot).massban_error(ctx, error)
-            elif ctx.guild.preferred_locale.value == "de":
+            elif get_command_locale(ctx) == "de":
                 await de.moderation(self.bot).massban_error(ctx, error)
 
     @Jeanne.command(
@@ -1149,21 +1150,21 @@ class moderation(Cog):
     @Jeanne.check(check_botbanned_app_command)
     @Jeanne.check(check_disabled_app_command)
     async def massunban(self, ctx: Interaction, user_ids: str, reason: str):
-        if ctx.guild.preferred_locale.value not in ("fr", "de"):
+        if get_command_locale(ctx) not in ("fr", "de"):
             await en.moderation(self.bot).massunban(ctx, user_ids, reason)
-        elif ctx.guild.preferred_locale.value == "fr":
+        elif get_command_locale(ctx) == "fr":
             await fr.moderation(self.bot).massunban(ctx, user_ids, reason)
-        elif ctx.guild.preferred_locale.value == "de":
+        elif get_command_locale(ctx) == "de":
             await de.moderation(self.bot).massunban(ctx, user_ids, reason)
 
     @massunban.error
     async def massunban_error(self, ctx: Interaction, error: Jeanne.AppCommandError):
         if isinstance(error, Jeanne.CommandOnCooldown):
-            if ctx.guild.preferred_locale.value not in ("fr", "de"):
+            if get_command_locale(ctx) not in ("fr", "de"):
                 await en.moderation(self.bot).massunban_error(ctx, error)
-            elif ctx.guild.preferred_locale.value == "fr":
+            elif get_command_locale(ctx) == "fr":
                 await fr.moderation(self.bot).massunban_error(ctx, error)
-            elif ctx.guild.preferred_locale.value == "de":
+            elif get_command_locale(ctx) == "de":
                 await de.moderation(self.bot).massunban_error(ctx, error)
 
 
